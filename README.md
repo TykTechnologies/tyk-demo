@@ -46,3 +46,15 @@ Bootstrap the instance:
 Open your browser to http://www.tyk-test.com:3000.  You will be presented with the Bootstrap UI to create your first organisation and admin user.
 
 Note, if you run into DNS issues with `www.tyk-test.com` while trying to bootstrap through the GUI, you will need to set the `host_config.hostname` value in `tyk_analytics.conf` to the public IP of your Docker daemon or simply use `localhost`
+
+
+
+# Licencing
+
+The docker compose file uses a Docker environment variable to set the dashboard licence. To implement this, create a file called `.env` in the root of the repo, then set the content of the file to be:
+
+```
+DASHBOARD_LICENCE=<YOUR_LICENCE>
+```
+
+Replacing `<YOUR_LICENCE>` with your Dashboard licence.

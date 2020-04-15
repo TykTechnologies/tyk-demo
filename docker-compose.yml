@@ -9,6 +9,8 @@ services:
     - tyk
     volumes:
     - ./confs/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
+    environment:
+    - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
     depends_on:
     - tyk-redis
     - tyk-mongo
