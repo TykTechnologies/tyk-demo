@@ -52,6 +52,10 @@ services:
     - mongo-data:/data/db
     networks:
     - tyk
+  httpbin:
+    image: kennethreitz/httpbin
+    networks:
+    - tyk
 
 volumes:
   redis-data:
