@@ -3,60 +3,74 @@ services:
   tyk-dashboard:
     image: tykio/tyk-dashboard:latest
     ports:
-    - "3000:3000"
-    - "5000:5000"
+      - "3000:3000"
+      - "5000:5000"
     networks:
-    - tyk
+      - tyk
     volumes:
-    - ./confs/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
+      - ./confs/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
     environment:
-    - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
+      - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
     depends_on:
-    - tyk-redis
-    - tyk-mongo
+      - tyk-redis
+      - tyk-mongo
   tyk-gateway:
     image: tykio/tyk-gateway:latest
     ports:
-    - "8080:8080"
+      - "8080:8080"
     networks:
-    - tyk
+      - tyk
     volumes:
-    - ./confs/tyk.conf:/opt/tyk-gateway/tyk.conf
-    - ./middleware:/opt/tyk-gateway/middleware
+      - ./confs/tyk.conf:/opt/tyk-gateway/tyk.conf
+      - ./middleware:/opt/tyk-gateway/middleware
     depends_on:
-    - tyk-redis
+      - tyk-redis
   tyk-pump:
     image: tykio/tyk-pump-docker-pub:latest
     networks:
-    - tyk
+      - tyk
     volumes:
-    - ./confs/pump.conf:/opt/tyk-pump/pump.conf
+      - ./confs/pump.conf:/opt/tyk-pump/pump.conf
     depends_on:
-    - tyk-redis
-    - tyk-mongo
-    - tyk-gateway
+      - tyk-redis
+      - tyk-mongo
+      - tyk-gateway
   tyk-redis:
     image: redis
     ports:
-    - "6379:6379"
+      - "6379:6379"
     volumes:
-    - redis-data:/data
+      - redis-data:/data
     networks:
-    - tyk
+      - tyk
   tyk-mongo:
     image: mongo:3.2
     command: ["mongod", "--smallfiles"]
     ports:
-    - "27017:27017"
+      - "27017:27017"
     volumes:
-    - mongo-data:/data/db
+      - mongo-data:/data/db
     networks:
-    - tyk
+      - tyk
   httpbin:
     image: kennethreitz/httpbin
     networks:
-    - tyk
-
+      - tyk
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.6.2
+    # volumes:
+      # - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    networks:
+      - tyk
+    ports:
+      - "5601:5601"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+    environment:
+      - discovery.type=single-node
+    networks:
+      - tyk
+    
 volumes:
   redis-data:
   mongo-data:
