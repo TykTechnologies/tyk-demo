@@ -58,8 +58,6 @@ services:
       - tyk
   kibana:
     image: docker.elastic.co/kibana/kibana:7.6.2
-    # volumes:
-      # - ./kibana.yml:/usr/share/kibana/config/kibana.yml
     networks:
       - tyk
     ports:
