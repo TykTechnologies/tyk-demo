@@ -58,3 +58,27 @@ DASHBOARD_LICENCE=<YOUR_LICENCE>
 ```
 
 Replacing `<YOUR_LICENCE>` with your Dashboard licence.
+
+# Syncing Data
+
+Use [Tyk Sync](https://tyk.io/docs/advanced-configuration/manage-multiple-environments/tyk-sync/) to synchronise data. Install it locally and target your containerised environment.
+
+Data for Tyk Sync should be stored in the `tyk-sync-data` directory. This directory should be the target for your `tyk-sync` commands, so either run the command from that directory or use the `-t` flag to specify the location.
+
+When you make changes to the environment which you want everyone else to benefit from, dump the data and commit it to the repo.
+
+## Extracting data
+
+```
+tyk-sync dump -d http://localhost:3000 -s <YOUR_API_KEY>
+```
+
+## Syncing data
+
+When syncing data with your local Dashboard, override the org id so that the data ends up available in your particular org. This is because other user's org ids will not be the same as yours.
+
+**Important Note**: This command will fully sync your API definitions and policies, which means that it will **delete** data in the Dashboard which is not in the source data directory.
+
+```
+tyk-sync sync -d http://localhost:3000 -s <YOUR_API_KEY> -o <YOUR_ORG_ID> -p <YOUR_TYK_SYNC_DATA_PATH>
+```
