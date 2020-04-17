@@ -1,0 +1,31 @@
+{
+	"info": {
+		"_postman_id": "d727d88f-14c8-4382-97ca-b66c41a44895",
+		"name": "Tyk Demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Correlation Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/basic-open-api/get",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"basic-open-api",
+						"get"
+					]
+				},
+				"description": "Header `X-Req-Id` is injected by the Gateway. The value is a GUID created by the Gateway when processing the request."
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
