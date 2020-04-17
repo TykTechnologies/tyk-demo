@@ -68,10 +68,13 @@ services:
       - discovery.type=single-node
     networks:
       - tyk
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
     
 volumes:
   redis-data:
   mongo-data:
+  elasticsearch-data:
 
 networks:
   tyk:
