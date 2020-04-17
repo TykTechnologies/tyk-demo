@@ -82,3 +82,24 @@ When syncing data with your local Dashboard, override the org id so that the dat
 ```
 tyk-sync sync -d http://localhost:3000 -s <YOUR_API_KEY> -o <YOUR_ORG_ID> -p <YOUR_TYK_SYNC_DATA_PATH>
 ```
+
+# Elasticsearch & Kibana
+
+The pump is already configured to push data to the Elasticsearch container, so Kibana can visualise this data.
+
+To get started:
+
+1. Create some analytics data by sending requests to an API via the Gateway
+1. Log into Kibana via http://localhost:5601/
+1. Set up an index pattern for the `tyk_analytics` index:
+  - Go to Management -> Index Patterns -> Create Index Pattern
+  - Define index pattern: search for `tyk_analytics`, click Next Step
+  - Configure settings: select `@timestamp`, click Create Index Pattern
+1. Set up a visualisation:
+  - Go to Visualize -> Create a visualization
+  - Select Line
+  - Select `tyk_analytics` as source
+  - Select `X-Axis` as bucket type
+  - Select `Date Histogram` as aggregation, click Apply icon
+1. Try sending more API requests via Gateway to see data appear
+1. Bear in mind that by default, graph shows last 15 min data - this can be changed
