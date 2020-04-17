@@ -74,7 +74,9 @@
         },
         "use_extended_paths": true,
         "extended_paths": {},
-        "global_headers": {},
+        "global_headers": {
+          "x-req-id": "$tyk_context.request_id"
+        },
         "global_headers_remove": [],
         "global_size_limit": 0,
         "override_target": ""
@@ -194,7 +196,7 @@
   "certificates": [],
   "do_not_track": false,
   "tags": [],
-  "enable_context_vars": false,
+  "enable_context_vars": true,
   "config_data": {},
   "tag_headers": [],
   "global_rate_limit": {
