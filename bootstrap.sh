@@ -63,24 +63,20 @@ echo "Synchronising APIs and Policies"
 tyk-sync sync -d $dashboard_base_url -s $dashboard_user_api_credentials -o $organisation_id -p tyk-sync-data
 echo "  Done"
 
-echo "Making test API call"
-curl $gateway_base_url:8080/bootstrap-api/get \
-  --silent \
-  > /dev/null
-echo "  Done"
-
 echo "Waiting for Kibana to be available (please be patient)"
 kibana_status=""
-while [[ $kibana_status != "200" ]]
+while [ "$kibana_status" != "200" ]
 do
   kibana_status=$(curl -I $kibana_base_url/app/kibana 2>/dev/null | head -n 1 | cut -d$' ' -f2)
-  if [[ $kibana_status != "200" ]]
+  
+  if [ "$kibana_status" != "200" ]
   then
-    echo "  Kibana not ready yet, waiting 5 seconds to try again"
+    echo "  Kibana not ready yet - retrying in 5 seconds..."
     sleep 5
+  else
+    echo "  Done"
   fi
 done
-echo "  Done"
 
 echo "Setting up Kibana objects"
 curl $kibana_base_url/api/saved_objects/index-pattern/1208b8f0-815b-11ea-b0b2-c9a8a88fbfb2?overwrite=true \
@@ -96,6 +92,15 @@ curl $kibana_base_url/api/saved_objects/visualization/407e91c0-8168-11ea-9323-29
   --data @bootstrap-data/kibana/visualizations/requests-in-last-30-minutes.json \
   > /dev/null
 echo "  Done"
+
+echo "Making test call to Bootstrap API"
+bootstrap_api_status=$(curl -I $gateway_base_url/bootstrap-api/get 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+if [ "$bootstrap_api_status" != "200" ]
+then
+  echo "  Failed"
+else
+  echo "  Done"
+fi
 
 echo "--------------------------------------"
 echo "Bootstrap complete"

@@ -36,6 +36,7 @@ services:
       - tyk-redis
       - tyk-mongo
       - tyk-gateway
+      - elasticsearch
   tyk-redis:
     image: redis
     volumes:
