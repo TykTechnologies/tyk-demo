@@ -8,7 +8,7 @@ Note that all commands provided here should be run from the root directory of th
 
 ## Step 1: Add your Dashboard licence
 
-The `docker-compose.yml` file uses a Docker environment variable to set the dashboard licence. To set this, create a file called `.env` in the root directory of the repo, then set the content of the file, replacing `<YOUR_LICENCE>` with your Dashboard licence:
+The `docker-compose.yml` file uses a Docker environment variable to set the dashboard licence. To set this, create a file called `.env` in the root directory of the repo, then set the content of the file as follows, replacing `<YOUR_LICENCE>` with your Dashboard licence:
 
 ```
 DASHBOARD_LICENCE=<YOUR_LICENCE>
@@ -22,11 +22,11 @@ Run Docker compose:
 docker-compose up -d
 ```
 
-Please note that this command may take a while to complete, as Docker needs to download and provision all of the containers.
+Please note that this command may take a while to complete, as Docker needs to download images and provision the containers.
 
 ## Step 3: Install Tyk Sync
 
-We will use [Tyk Sync](https://tyk.io/docs/advanced-configuration/manage-multiple-environments/tyk-sync/) to synchronise API and Policy data:
+We will use [Tyk Sync](https://tyk.io/docs/advanced-configuration/manage-multiple-environments/tyk-sync/) to synchronise API and Policy data. Install it as follows:
 
 ```
 go install -u github.com/TykTechnologies/tyk-sync
