@@ -37,8 +37,6 @@ services:
       - tyk-gateway
   tyk-redis:
     image: redis
-    ports:
-      - "6379:6379"
     volumes:
       - redis-data:/data
     networks:
@@ -46,8 +44,6 @@ services:
   tyk-mongo:
     image: mongo:3.2
     command: ["mongod", "--smallfiles"]
-    ports:
-      - "27017:27017"
     volumes:
       - mongo-data:/data/db
     networks:
@@ -72,7 +68,18 @@ services:
       - tyk
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
-    
+  tyk-identity-broker:
+    image: tykio/tyk-identity-broker:latest
+    networks:
+      - tyk
+    ports:
+      - 3010:3010
+    environment:
+      - SESSION_SECRET=12345
+    volumes:
+      - "./confs/tib.conf:/opt/tyk-identity-broker/tib.conf"
+      - "./confs/profiles.json:/opt/tyk-identity-broker/profiles.json"
+        
 volumes:
   redis-data:
   mongo-data:
