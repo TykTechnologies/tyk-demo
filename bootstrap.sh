@@ -17,9 +17,9 @@ organisation_id=$(curl $dashboard_base_url/admin/organisations \
 echo "  Organisation Id: $organisation_id"
 
 echo "Creating Dashboard user"
-dashboard_user_first_name=$(jq -r '.first_name' bootstrap-data/tyk-dashboard/user.json)
-dashboard_user_last_name=$(jq -r '.last_name' bootstrap-data/tyk-dashboard/user.json)
-dashboard_user_email=$(jq -r '.email_address' bootstrap-data/tyk-dashboard/user.json)
+dashboard_user_first_name=$(jq -r '.first_name' bootstrap-data/tyk-dashboard/dashboard-user.json)
+dashboard_user_last_name=$(jq -r '.last_name' bootstrap-data/tyk-dashboard/dashboard-user.json)
+dashboard_user_email=$(jq -r '.email_address' bootstrap-data/tyk-dashboard/dashboard-user.json)
 dashboard_user=$(curl $dashboard_base_url/admin/users \
   --silent \
   --header "admin-auth: $dashboard_admin_api_credentials" \
@@ -121,8 +121,8 @@ cat <<EOF
                                          #####                        
                              ################                         
                                ##########/                            
-      
-                                                 
+
+
 Dashboard
   URL      : $dashboard_base_url
   Username : $dashboard_user_email
