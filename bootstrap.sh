@@ -105,7 +105,8 @@ fi
 echo "Bootstrap complete"
 
 cat <<EOF
-                                                                   
+
+
             #####################                  ####               
             #####################                  ####               
                     #####                          ####               
@@ -120,19 +121,20 @@ cat <<EOF
                                          #####                        
                              ################                         
                                ##########/                            
+      
                                                  
-Dashboard                               
-  URL:      $dashboard_base_url           
-  Username: $dashboard_user_email
-  Password: $dashboard_user_password
-  
-Portal
-  URL:      $dashboard_base_url/portal
+Dashboard
+  URL      : $dashboard_base_url
+  Username : $dashboard_user_email
+  Password : $dashboard_user_password
 
-Gateway                                 
-  URL:      $gateway_base_url             
+Portal
+  URL : $dashboard_base_url/portal
+
+Gateway
+  URL : $gateway_base_url
 
 Kibana
-  URL:      $kibana_base_url
+  URL : $kibana_base_url
 
 EOF
