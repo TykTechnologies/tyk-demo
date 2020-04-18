@@ -14,6 +14,7 @@ services:
     depends_on:
       - tyk-redis
       - tyk-mongo
+      - tyk-identity-broker
   tyk-gateway:
     image: tykio/tyk-gateway:latest
     ports:
