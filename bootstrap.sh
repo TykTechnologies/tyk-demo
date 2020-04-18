@@ -1,11 +1,15 @@
 #!/bin/bash
 
+DASHBOARD_BASE_URL="http://localhost:3000"
+GATEWAY_BASE_URL="http://localhost:8080"
+KIBANA_BASE_URL="http://localhost:5601"
+
 echo "Getting Dashboard Admin API credentials"
 DASHBOARD_ADMIN_API_CREDENTIALS=$(cat ./confs/tyk_analytics.conf | jq -r .admin_secret)
 echo "  Dashboard Admin API Credentials: $DASHBOARD_ADMIN_API_CREDENTIALS"
 
 echo "Creating Organisation"
-ORGANISATION_ID=$(curl localhost:3000/admin/organisations \
+ORGANISATION_ID=$(curl $DASHBOARD_BASE_URL/admin/organisations \
   --silent \
   --header "admin-auth: $DASHBOARD_ADMIN_API_CREDENTIALS" \
   --data @bootstrap-data/tyk-dashboard/organisation.json \
@@ -16,7 +20,7 @@ echo "Creating Dashboard user"
 DASHBOARD_USER_FIRST_NAME=$(jq -r '.first_name' bootstrap-data/tyk-dashboard/user.json)
 DASHBOARD_USER_LAST_NAME=$(jq -r '.last_name' bootstrap-data/tyk-dashboard/user.json)
 DASHBOARD_USER_EMAIL=$(jq -r '.email_address' bootstrap-data/tyk-dashboard/user.json)
-DASHBOARD_USER=$(curl localhost:3000/admin/users \
+DASHBOARD_USER=$(curl $DASHBOARD_BASE_URL/admin/users \
   --silent \
   --header "admin-auth: $DASHBOARD_ADMIN_API_CREDENTIALS" \
   --data-raw '{
@@ -34,7 +38,7 @@ DASHBOARD_USER=$(curl localhost:3000/admin/users \
 DASHBOARD_USER_ID=$(echo $DASHBOARD_USER | jq -r '.id')
 DASHBOARD_USER_API_CREDENTIALS=$(echo $DASHBOARD_USER | jq -r '.api_key')
 DASHBOARD_USER_PASSWORD=$(openssl rand -base64 12)
-curl localhost:3000/api/users/$DASHBOARD_USER_ID/actions/reset \
+curl $DASHBOARD_BASE_URL/api/users/$DASHBOARD_USER_ID/actions/reset \
   --silent \
   --header "authorization: $DASHBOARD_USER_API_CREDENTIALS" \
   --data-raw '{
@@ -48,7 +52,7 @@ echo "  Dashboard API Credentials: $DASHBOARD_USER_API_CREDENTIALS"
 echo "  ID: $DASHBOARD_USER_ID"
 
 echo "Creating Portal home page"
-curl localhost:3000/api/portal/pages \
+curl $DASHBOARD_BASE_URL/api/portal/pages \
   --silent \
   --header "Authorization: $DASHBOARD_USER_API_CREDENTIALS" \
   --data '{"is_homepage": true, "template_name":"", "title":"Developer Portal Home", "slug":"/", "fields": {"JumboCTATitle": "Tyk Developer Portal", "SubHeading": "Sub Header", "JumboCTALink": "#cta", "JumboCTALinkTitle": "Your awesome APIs, hosted with Tyk!", "PanelOneContent": "Panel 1 content.", "PanelOneLink": "#panel1", "PanelOneLinkTitle": "Panel 1 Button", "PanelOneTitle": "Panel 1 Title", "PanelThereeContent": "", "PanelThreeContent": "Panel 3 content.", "PanelThreeLink": "#panel3", "PanelThreeLinkTitle": "Panel 3 Button", "PanelThreeTitle": "Panel 3 Title", "PanelTwoContent": "Panel 2 content.", "PanelTwoLink": "#panel2", "PanelTwoLinkTitle": "Panel 2 Button", "PanelTwoTitle": "Panel 2 Title"}}' \
@@ -56,31 +60,45 @@ curl localhost:3000/api/portal/pages \
 echo "  Done"
 
 echo "Synchronising APIs and Policies"
-tyk-sync sync -d http://localhost:3000 -s $DASHBOARD_USER_API_CREDENTIALS -o $ORGANISATION_ID -p tyk-sync-data
+tyk-sync sync -d $DASHBOARD_BASE_URL -s $DASHBOARD_USER_API_CREDENTIALS -o $ORGANISATION_ID -p tyk-sync-data
 echo "  Done"
 
 echo "Making test API call"
-curl localhost:8080/bootstrap-api/get \
+curl $GATEWAY_BASE_URL:8080/bootstrap-api/get \
   --silent \
   > /dev/null
 echo "  Done"
 
+echo "Waiting for Kibana to be available (please be patient)"
+kibana_status=""
+while [[ $kibana_status != "200" ]]
+do
+  kibana_status=$(curl -I $KIBANA_BASE_URL/app/kibana 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+  if [[ $kibana_status != "200" ]]
+  then
+    echo "  Kibana not ready yet, waiting 5 seconds to try again"
+    sleep 5
+  fi
+done
+echo "  Done"
+
 echo "Setting up Kibana objects"
-curl --location --request POST 'http://localhost:5601/api/saved_objects/index-pattern/1208b8f0-815b-11ea-b0b2-c9a8a88fbfb2' \
---header 'Content-Type: application/json' \
---header 'kbn-xsrf: true' \
---header 'Content-Type: text/plain' \
---data-raw '{
-    "attributes": {
-        "title": "tyk_analytics*",
-        "timeFieldName": "@timestamp",
-        "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"_id\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":false},{\"name\":\"_index\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":false},{\"name\":\"_score\",\"type\":\"number\",\"count\":0,\"scripted\":false,\"searchable\":false,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"_source\",\"type\":\"_source\",\"count\":0,\"scripted\":false,\"searchable\":false,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"_type\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":false},{\"name\":\"alias\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"alias.keyword\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"api_id\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"api_id.keyword\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"api_key\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"api_key.keyword\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"api_name\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"api_name.keyword\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"api_version\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"api_version.keyword\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"content_length\",\"type\":\"number\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"http_method\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"http_method.keyword\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"ip_address\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"ip_address.keyword\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"oauth_id\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"oauth_id.keyword\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"org_id\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"org_id.keyword\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"request_time_ms\",\"type\":\"number\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"request_uri\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"request_uri.keyword\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"request_uri_full\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"request_uri_full.keyword\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"response_code\",\"type\":\"number\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true},{\"name\":\"tags\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":false,\"readFromDocValues\":false},{\"name\":\"tags.keyword\",\"type\":\"string\",\"count\":0,\"scripted\":false,\"searchable\":true,\"aggregatable\":true,\"readFromDocValues\":true}]"
-    }
-}'
+curl $KIBANA_BASE_URL/api/saved_objects/index-pattern/1208b8f0-815b-11ea-b0b2-c9a8a88fbfb2?overwrite=true \
+  --silent \
+  --header 'Content-Type: application/json' \
+  --header 'kbn-xsrf: true' \
+  --data @bootstrap-data/kibana/index-patterns/tyk-analytics.json \
+  > /dev/null
+curl $KIBANA_BASE_URL:5601/api/saved_objects/visualization/407e91c0-8168-11ea-9323-293461ad91e5?overwrite=true \
+  --silent \
+  --header 'Content-Type: application/json' \
+  --header 'kbn-xsrf: true' \
+  --data @bootstrap-data/kibana/visualizations/requests-in-last-30-minutes.json \
+  > /dev/null
 
 echo "--------------------------------------"
 echo "Bootstrap complete"
 echo "Dashboard login information"
-echo "  Dashboard URL: http://localhost:3000"
+echo "  Dashboard URL: $DASHBOARD_BASE_URL"
 echo "  Username: $DASHBOARD_USER_EMAIL"
 echo "  Password: $DASHBOARD_USER_PASSWORD"
