@@ -4,9 +4,11 @@ dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
 kibana_base_url="http://localhost:5601"
 
-echo "Getting Dashboard Admin API credentials"
+echo "Getting Dashboard Configuration"
 dashboard_admin_api_credentials=$(cat ./confs/tyk_analytics.conf | jq -r .admin_secret)
+portal_root_path=$(cat ./confs/tyk_analytics.conf | jq -r .host_config.portal_root_path)
 echo "  Dashboard Admin API Credentials: $dashboard_admin_api_credentials"
+echo "  Portal Root Path: $portal_root_path"
 
 echo "Creating Organisation"
 organisation_id=$(curl $dashboard_base_url/admin/organisations \
@@ -51,12 +53,35 @@ echo "  Password: $dashboard_user_password"
 echo "  Dashboard API Credentials: $dashboard_user_api_credentials"
 echo "  ID: $dashboard_user_id"
 
+echo "Creating Portal default settings"
+curl $dashboard_base_url/api/portal/catalogue \
+  --silent \
+  --header "Authorization: $dashboard_user_api_credentials" \
+  --data '{"org_id": "'$organisation_id'"}' 
+curl $dashboard_base_url/api/portal/configuration \
+  --silent \
+  --header "Authorization: $dashboard_user_api_credentials" \
+  --data "{}"
+echo "  Done"
+
 echo "Creating Portal home page"
 curl $dashboard_base_url/api/portal/pages \
   --silent \
   --header "Authorization: $dashboard_user_api_credentials" \
   --data '{"is_homepage": true, "template_name":"", "title":"Developer Portal Home", "slug":"/", "fields": {"JumboCTATitle": "Tyk Developer Portal", "SubHeading": "Sub Header", "JumboCTALink": "#cta", "JumboCTALinkTitle": "Your awesome APIs, hosted with Tyk!", "PanelOneContent": "Panel 1 content.", "PanelOneLink": "#panel1", "PanelOneLinkTitle": "Panel 1 Button", "PanelOneTitle": "Panel 1 Title", "PanelThereeContent": "", "PanelThreeContent": "Panel 3 content.", "PanelThreeLink": "#panel3", "PanelThreeLinkTitle": "Panel 3 Button", "PanelThreeTitle": "Panel 3 Title", "PanelTwoContent": "Panel 2 content.", "PanelTwoLink": "#panel2", "PanelTwoLinkTitle": "Panel 2 Button", "PanelTwoTitle": "Panel 2 Title"}}' \
   > /dev/null
+echo "  Done"
+
+echo "Creating Portal user"
+portal_user_email=$(jq -r '.email' bootstrap-data/tyk-dashboard/portal-user.json)
+portal_user_password=$(openssl rand -base64 12)
+curl $dashboard_base_url/api/portal/developers \
+  --header "Authorization: $dashboard_user_api_credentials" \
+  --data '{
+      "email": "'$portal_user_email'",
+      "password": "'$portal_user_password'",
+      "org_id": "'$organisation_id'"   
+    }'
 echo "  Done"
 
 echo "Synchronising APIs and Policies"
@@ -106,7 +131,6 @@ echo "Bootstrap complete"
 
 cat <<EOF
 
-
             #####################                  ####               
             #####################                  ####               
                     #####                          ####               
@@ -122,14 +146,15 @@ cat <<EOF
                              ################                         
                                ##########/                            
 
-
 Dashboard
   URL      : $dashboard_base_url
   Username : $dashboard_user_email
   Password : $dashboard_user_password
 
 Portal
-  URL : $dashboard_base_url/portal
+  URL      : $dashboard_base_url$portal_root_path
+  Username : $portal_user_email
+  Password : $portal_user_password
 
 Gateway
   URL : $gateway_base_url
