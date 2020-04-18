@@ -83,7 +83,8 @@ curl $dashboard_base_url/api/portal/developers \
       "email": "'$portal_user_email'",
       "password": "'$portal_user_password'",
       "org_id": "'$organisation_id'"   
-    }'
+    }' \
+  > /dev/null
 echo "  Done"
 
 echo "Synchronising APIs and Policies"
