@@ -17,6 +17,7 @@ DASHBOARD_USER_FIRST_NAME=$(jq -r '.first_name' bootstrap-data/tyk-dashboard/use
 DASHBOARD_USER_LAST_NAME=$(jq -r '.last_name' bootstrap-data/tyk-dashboard/user.json)
 DASHBOARD_USER_EMAIL=$(jq -r '.email_address' bootstrap-data/tyk-dashboard/user.json)
 DASHBOARD_USER=$(curl localhost:3000/admin/users \
+  --silent \
   --header "admin-auth: $DASHBOARD_ADMIN_API_CREDENTIALS" \
   --data-raw '{
       "first_name": "'$DASHBOARD_USER_FIRST_NAME'",
