@@ -102,9 +102,37 @@ else
   echo "  Done"
 fi
 
-echo "--------------------------------------"
 echo "Bootstrap complete"
-echo "Dashboard login information"
-echo "  Dashboard URL: $dashboard_base_url"
-echo "  Username: $dashboard_user_email"
-echo "  Password: $dashboard_user_password"
+
+cat <<EOF
+                                                                   
+            #####################                  ####               
+            #####################                  ####               
+                    #####                          ####               
+  /////////         #####    ((.            (((    ####          (((  
+  ///////////,      #####    ####         #####    ####       /####   
+  ////////////      #####    ####         #####    ####      #####    
+  ////////////      #####    ####         #####    ##############     
+    //////////      #####    ####         #####    ##############     
+                    #####    ####         #####    ####      ,####    
+                    #####    ##################    ####        ####   
+                    #####      ########## #####    ####         ####  
+                                         #####                        
+                             ################                         
+                               ##########/                            
+                                                 
+Dashboard                               
+  URL:      $dashboard_base_url           
+  Username: $dashboard_user_email
+  Password: $dashboard_user_password
+  
+Portal
+  URL:      $dashboard_base_url/portal
+
+Gateway                                 
+  URL:      $gateway_base_url             
+
+Kibana
+  URL:      $kibana_base_url
+
+EOF
