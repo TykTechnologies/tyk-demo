@@ -52,6 +52,8 @@ Now you can run the file, passing the admin user's `Tyk Dashboard API Access Cre
 ./bootstrap.sh
 ```
 
+## Step 5: Log into the Dashboard
+
 Check the last few lines of output from the `bootstrap.sh` command, these will contain your Dashboard login credentials.
 
 When you log into the Dashboard, you will find the imported APIs and Policies are now available.
