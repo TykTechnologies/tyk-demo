@@ -22,7 +22,7 @@
 						"get"
 					]
 				},
-				"description": "Header `X-Req-Id` is injected by the Gateway. The value is a GUID created by the Gateway when processing the request."
+				"description": "Header `X-Req-Id` is injected by the Gateway, and can be seen in the response body. \n\nThe header value is a GUID representing the random id assigned to the request by the Gateway. It is configured using the Tyk context variable `$tyk_context.request_id`."
 			},
 			"response": []
 		}
