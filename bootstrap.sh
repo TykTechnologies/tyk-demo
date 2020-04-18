@@ -78,6 +78,7 @@ echo "Creating Portal user"
 portal_user_email=$(jq -r '.email' bootstrap-data/tyk-dashboard/portal-user.json)
 portal_user_password=$(openssl rand -base64 12)
 curl $dashboard_base_url/api/portal/developers \
+  --silent \
   --header "Authorization: $dashboard_user_api_credentials" \
   --data '{
       "email": "'$portal_user_email'",
