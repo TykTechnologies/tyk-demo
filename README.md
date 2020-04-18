@@ -26,7 +26,11 @@ Please note that this command may take a while to complete, as Docker needs to d
 
 ## Step 3: Install Tyk Sync
 
-We will use [Tyk Sync](https://tyk.io/docs/advanced-configuration/manage-multiple-environments/tyk-sync/) to synchronise API and Policy data. Follow [these instructions](https://tyk.io/docs/advanced-configuration/manage-multiple-environments/tyk-sync/#installation) to install it locally.
+We will use [Tyk Sync](https://tyk.io/docs/advanced-configuration/manage-multiple-environments/tyk-sync/) to synchronise API and Policy data:
+
+```
+go install -u github.com/TykTechnologies/tyk-sync
+```
 
 ## Step 4: Bootstrap the system
 
