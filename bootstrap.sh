@@ -118,7 +118,7 @@ curl $kibana_base_url/api/saved_objects/visualization/407e91c0-8168-11ea-9323-29
   --silent \
   --header 'Content-Type: application/json' \
   --header 'kbn-xsrf: true' \
-  --data @bootstrap-data/kibana/visualizations/requests-in-last-30-minutes.json \
+  --data @bootstrap-data/kibana/visualizations/request-count-by-time.json \
   > /dev/null
 echo "  Done"
 
