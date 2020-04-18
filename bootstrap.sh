@@ -59,6 +59,12 @@ echo "Synchronising APIs and Policies"
 tyk-sync sync -d http://localhost:3000 -s $DASHBOARD_USER_API_CREDENTIALS -o $ORGANISATION_ID -p tyk-sync-data
 echo "  Done"
 
+echo "Making test API call"
+curl localhost:8080/bootstrap-api/get \
+  --silent \
+  > /dev/null
+echo "  Done"
+
 echo "--------------------------------------"
 echo "Bootstrap complete"
 echo "Dashboard login information"
