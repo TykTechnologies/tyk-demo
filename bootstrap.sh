@@ -57,11 +57,13 @@ echo "Creating Portal default settings"
 curl $dashboard_base_url/api/portal/catalogue \
   --silent \
   --header "Authorization: $dashboard_user_api_credentials" \
-  --data '{"org_id": "'$organisation_id'"}' 
+  --data '{"org_id": "'$organisation_id'"}' \
+  > /dev/null
 curl $dashboard_base_url/api/portal/configuration \
   --silent \
   --header "Authorization: $dashboard_user_api_credentials" \
-  --data "{}"
+  --data "{}" \
+  > /dev/null
 echo "  Done"
 
 echo "Creating Portal home page"
