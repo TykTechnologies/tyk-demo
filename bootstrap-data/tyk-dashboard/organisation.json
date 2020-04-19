@@ -1,7 +1,7 @@
 {
     "owner_name": "Tyk Demo",
-    "owner_slug": "tyk-demo",
-    "cname_enabled": true,
+    "owner_slug": "",
+    "cname_enabled": false,
     "cname": "",
     "apis": [],
     "sso_enabled": true
