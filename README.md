@@ -82,22 +82,24 @@ There are two scenarios for working with this data:
 
 ## Scenario 1: Committing changes
 
-If you have changed APIs and Policies in your Dashboard, and want to commit these so other people can use them, use the `tyk-sync dump` command:
+If you have changed APIs and Policies in your Dashboard, and want to commit these so other people can use them, use the `dump.sh` script, which is pre-configured to call the `tyk-sync dump` command using you local `.organisation-id` value:
 
 ```
-tyk-sync dump -d http://localhost:3000 -s <DASHBOARD_API_ACCESS_CREDENTIALS> -t tyk-sync-data
+./dump.sh
 ```
 
 This will update the files in the `tyk-sync-data` directory. You can then commit these files into the repo.
 
 ## Scenario 2: Synchronising updates
 
-If you want to get the changes other people have made, use the `tyk-sync sync` command. 
+If you want to get the changes other people have made, use the `sync.sh` script, which calls the `tyk-sync sync` command using you local `.organisation-id` and `.dashboard-user-api-credentials` files.
+
+To get the latest updates, you should pull from the remote repo first.
 
 **Warning:** This command is a hard sync which will **delete** any APIs and Policies from your Dashboard that do not exist in the source data.
 
 ```
-tyk-sync sync -d http://localhost:3000 -s <DASHBOARD_API_ACCESS_CREDENTIALS> -o <ORGANISATION_ID> -p tyk-sync-data
+./sync.sh
 ```
 
 # Using Elasticsearch & Kibana
