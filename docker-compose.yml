@@ -26,7 +26,7 @@ services:
       - ./volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
     depends_on:
       - tyk-redis
-  tyk-gateway-secure:
+  tyk-gateway-tls:
     image: tykio/tyk-gateway:latest
     ports:
       - "8081:8080"
