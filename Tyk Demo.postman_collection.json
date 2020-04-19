@@ -6,67 +6,175 @@
 	},
 	"item": [
 		{
-			"name": "Correlation Id",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/basic-open-api/get",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"basic-open-api",
-						"get"
-					]
-				},
-				"description": "Header `X-Req-Id` is injected by the Gateway, and can be seen in the response body. \n\nThe header value is a GUID representing the random id assigned to each request by the Gateway. It is configured using the Tyk context variable `$tyk_context.request_id`.\n\nThe value is accessible to various parts of the Tyk middleware chain, so can be used as a reference when processing requests."
-			},
-			"response": []
+			"name": "Endpoint Designer Plugins",
+			"item": [
+				{
+					"name": "Mock Response",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-version",
+								"value": "Default",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"plugin-demo-api",
+								"anything",
+								"mock"
+							]
+						},
+						"description": "This request uses the `Mock Response` Endpoint Designer plugin to return a response directly from the Gateway when the API endpoint is called.\n\nThe mock response sets the response:\n- HTTP status code: `200 OK`\n- Body: See the mock JSON object in the response body\n- Headers: See the `Mock` header in the repsonse headers\n\nWhen the Mock Response is executed, the request does not reach the API Server.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only, see part 2 of this plugin to see what happens when version `2` is requested instead. Control of the version is"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "JavaScript Middleware",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Deleted",
-						"value": "deleted value",
-						"type": "text"
-					},
-					{
-						"key": "Accepted",
-						"value": "789",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "http://localhost:8080/javascript-middleware-api/post?deleted=deleted-value&accepted=456",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"javascript-middleware-api",
-						"post"
-					],
-					"query": [
-						{
-							"key": "deleted",
-							"value": "deleted-value"
+			"name": "Context Variables",
+			"item": [
+				{
+					"name": "Correlation Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/basic-open-api/get",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"basic-open-api",
+								"get"
+							]
 						},
-						{
-							"key": "accepted",
-							"value": "456"
-						}
-					]
+						"description": "Header `X-Req-Id` is injected by the Gateway, and can be seen in the response body. \n\nThe header value is a GUID representing the random id assigned to each request by the Gateway. It is configured using the Tyk context variable `$tyk_context.request_id`.\n\nThe value is accessible to various parts of the Tyk middleware chain, so can be used as a reference when processing requests."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Middleware",
+			"item": [
+				{
+					"name": "JavaScript Middleware",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Deleted",
+								"value": "deleted value",
+								"type": "text"
+							},
+							{
+								"key": "Accepted",
+								"value": "789",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/javascript-middleware-api/post?deleted=deleted-value&accepted=456",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"javascript-middleware-api",
+								"post"
+							],
+							"query": [
+								{
+									"key": "deleted",
+									"value": "deleted-value"
+								},
+								{
+									"key": "accepted",
+									"value": "456"
+								}
+							]
+						},
+						"description": "Calls the `JavaScript Middleware API`, which executes two JavaScript middleware functions at the `pre` and `post` hooks.\n\nThe `pre` function does the following:\n- Writes to the API Gateway application log\n- Adds `User-Agent` header\n- Deletes `Deleted` header\n- Adds `added` URL parameter\n- Deletes `deleted` URL parameter\n- Changes the request body - see `data` property of response object\n- Changes the requested URL - see `url` property of response object\n\nThe `post` function does the following:\n- Writes to the API Gateway application log\n- Adds `config-data` header using value taken from API definition `config data`"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Versioning",
+			"item": [
+				{
+					"name": "Versioning (part 1)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-version",
+								"value": "Default",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"plugin-demo-api",
+								"anything",
+								"mock"
+							]
+						},
+						"description": "This request uses the `Mock Response` Endpoint Designer plugin to demonstrate versioning. It shows how the API Gateway can change behaviour based on the requested version of an API. Using API versioning allows you to redefine how the API Gateway will handle endpoint requests.\n\nThe API used here has two versions:\n- `Default`: the default version, used in this request, which returns a mock response directly from the Gateway\n- `2`: the second version, used in part 2, which returns a response from the API server\n\nBoth versions make a request to the same API and API endpoint. The versioning is controlled by the `x-api-version` header in the request, which the Gateway will check to decide how the handle the request."
+					},
+					"response": []
 				},
-				"description": "Calls the `JavaScript Middleware API`, which executes two JavaScript middleware functions at the `pre` and `post` hooks.\n\nThe `pre` function does the following:\n- Writes to the API Gateway application log\n- Adds `User-Agent` header\n- Deletes `Deleted` header\n- Adds `added` URL parameter\n- Deletes `deleted` URL parameter\n- Changes the request body - see `data` property of response object\n- Changes the requested URL - see `url` property of response object\n\nThe `post` function does the following:\n- Writes to the API Gateway application log\n- Adds `config-data` header using value taken from API definition `config data`"
-			},
-			"response": []
+				{
+					"name": "Versioning (part 2)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-version",
+								"type": "text",
+								"value": "2"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"plugin-demo-api",
+								"anything",
+								"mock"
+							]
+						},
+						"description": "Part 2 of the versioning example. This request shows that when version `2` of the API is requested, the API Gateway proxies the request to the API server.\n\nThis request uses the same URL as part 1, but uses `2` as the value for the `x-api-version` request header."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"protocolProfileBehavior": {}
