@@ -4,6 +4,11 @@ dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
 kibana_base_url="http://localhost:5601"
 
+echo "Making tyk-sync scripts executable"
+chmod +x dump.sh
+chmod +x sync.sh
+echo "  Done"
+
 echo "Getting Dashboard Configuration"
 dashboard_admin_api_credentials=$(cat ./confs/tyk_analytics.conf | jq -r .admin_secret)
 portal_root_path=$(cat ./confs/tyk_analytics.conf | jq -r .host_config.portal_root_path)
@@ -16,6 +21,7 @@ organisation_id=$(curl $dashboard_base_url/admin/organisations \
   --header "admin-auth: $dashboard_admin_api_credentials" \
   --data @bootstrap-data/tyk-dashboard/organisation.json \
   | jq -r '.Meta')
+echo $organisation_id > .organisation-id
 echo "  Organisation Id: $organisation_id"
 
 echo "Creating Dashboard user"
@@ -39,6 +45,7 @@ dashboard_user=$(curl $dashboard_base_url/admin/users \
     | jq -r '. | {api_key:.Message, id:.Meta.id}')
 dashboard_user_id=$(echo $dashboard_user | jq -r '.id')
 dashboard_user_api_credentials=$(echo $dashboard_user | jq -r '.api_key')
+echo $dashboard_user_api_credentials > .dashboard-user-api-credentials
 dashboard_user_password=$(openssl rand -base64 12)
 curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset \
   --silent \
