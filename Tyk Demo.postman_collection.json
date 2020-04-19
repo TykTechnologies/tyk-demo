@@ -25,6 +25,48 @@
 				"description": "Header `X-Req-Id` is injected by the Gateway, and can be seen in the response body. \n\nThe header value is a GUID representing the random id assigned to each request by the Gateway. It is configured using the Tyk context variable `$tyk_context.request_id`.\n\nThe value is accessible to various parts of the Tyk middleware chain, so can be used as a reference when processing requests."
 			},
 			"response": []
+		},
+		{
+			"name": "JavaScript Middleware",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Deleted",
+						"value": "deleted value",
+						"type": "text"
+					},
+					{
+						"key": "Accepted",
+						"value": "789",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/javascript-middleware-api/post?deleted=deleted-value&accepted=456",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"javascript-middleware-api",
+						"post"
+					],
+					"query": [
+						{
+							"key": "deleted",
+							"value": "deleted-value"
+						},
+						{
+							"key": "accepted",
+							"value": "456"
+						}
+					]
+				},
+				"description": "Calls the `JavaScript Middleware API`, which executes two JavaScript middleware functions at the `pre` and `post` hooks.\n\nThe `pre` function does the following:\n- Writes to the API Gateway application log\n- Adds `User-Agent` header\n- Deletes `Deleted` header\n- Adds `added` URL parameter\n- Deletes `deleted` URL parameter\n- Changes the request body - see `data` property of response object\n- Changes the requested URL - see `url` property of response object\n\nThe `post` function does the following:\n- Writes to the API Gateway application log\n- Adds `config-data` header using value taken from API definition `config data`"
+			},
+			"response": []
 		}
 	],
 	"protocolProfileBehavior": {}
