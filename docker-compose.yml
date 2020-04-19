@@ -8,7 +8,7 @@ services:
     networks:
       - tyk
     volumes:
-      - ./confs/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
+      - ./volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
     depends_on:
@@ -22,8 +22,22 @@ services:
     networks:
       - tyk
     volumes:
-      - ./confs/tyk.conf:/opt/tyk-gateway/tyk.conf
-      - ./middleware:/opt/tyk-gateway/middleware
+      - ./volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
+      - ./volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+    depends_on:
+      - tyk-redis
+  tyk-gateway-secure:
+    image: tykio/tyk-gateway:latest
+    ports:
+      - "8081:8080"
+    networks:
+      - tyk
+    volumes:
+      - ./volumes/tyk-gateway/tyk-secure.conf:/opt/tyk-gateway/tyk.conf
+      - ./volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+      - ./volumes/tyk-gateway/certificates:/opt/tyk-gateway/certificates
+    environment:
+      - TYK_GW
     depends_on:
       - tyk-redis
   tyk-pump:
@@ -31,7 +45,7 @@ services:
     networks:
       - tyk
     volumes:
-      - ./confs/pump.conf:/opt/tyk-pump/pump.conf
+      - ./volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
     depends_on:
       - tyk-redis
       - tyk-mongo
@@ -79,8 +93,8 @@ services:
     environment:
       - SESSION_SECRET=12345
     volumes:
-      - "./confs/tib.conf:/opt/tyk-identity-broker/tib.conf"
-      - "./confs/profiles.json:/opt/tyk-identity-broker/profiles.json"
+      - "./volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf"
+      - "./volumes/tyk-identity-broker/profiles.json:/opt/tyk-identity-broker/profiles.json"
         
 volumes:
   redis-data:

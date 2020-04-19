@@ -203,6 +203,34 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "TLS",
+			"item": [
+				{
+					"name": "TLS request to Gateway",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8081/plugin-demo-api/anything/mock",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"plugin-demo-api",
+								"anything",
+								"mock"
+							]
+						},
+						"description": "This request uses the HTTPS scheme to connect to the API Gateway. The Gateway is configured to listen for requests on `localhost` and use a locally stored self-signed certificate.\n\nThis is configured in the `http_server_options` section of the Gateway's configuration file.\n\n**Note:** self-signed cetificates will fail verification by an API client, which will prevent the request for working. To resolve this, configure your client to allow self-signed certificates."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"protocolProfileBehavior": {}
