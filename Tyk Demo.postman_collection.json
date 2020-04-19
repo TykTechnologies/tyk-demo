@@ -231,6 +231,34 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Scaling",
+			"item": [
+				{
+					"name": "Send request to additional Gateway",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8081/plugin-demo-api/anything/mock",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"plugin-demo-api",
+								"anything",
+								"mock"
+							]
+						},
+						"description": "**Note:** This request requires that the `add-gateway.sh` script is run first.\n\nThis request is sent to the container mapped on port `8088`. This container is not part of the base docker compose setup, so will not normally be available. Instead, it has to be manually created using the `add-gateway.sh` script for the purposes of demonstration. This container uses the same setup as the other containers, it connects to the same database and loads the same API definitions and policies - you can see this be making this request, it does to the same `plugin-demo-api` used elsewhere."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"protocolProfileBehavior": {}
