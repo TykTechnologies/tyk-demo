@@ -172,6 +172,34 @@
 						"description": "Part 2 of the versioning example. This request shows that when version `2` of the API is requested, the API Gateway proxies the request to the API server.\n\nThis request uses the same URL as part 1, but uses `2` as the value for the `x-api-version` request header."
 					},
 					"response": []
+				},
+				{
+					"name": "Versioning (part 3)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-version",
+								"type": "text",
+								"value": "expired"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"plugin-demo-api",
+								"anything",
+								"mock"
+							]
+						},
+						"description": "This request shows that version can be expired. In this case a version called `expired` was created with an expiry date in the past. This means that requests for this version are rejected by the Gateway, with a message provided in the response body which says the version has expired."
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
