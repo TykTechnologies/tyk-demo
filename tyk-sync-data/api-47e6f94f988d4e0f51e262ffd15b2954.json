@@ -1,8 +1,8 @@
 {
-  "id": "5e9bcac8fa38d00001e1217a",
-  "name": "Basic Open API",
-  "slug": "basic-open-api",
-  "api_id": "727dad853a8a45f64ab981154d1ffdad",
+  "id": "5e9bcac8fa38d00001e1217c",
+  "name": "JavaScript Middleware API",
+  "slug": "javascript-middleware-api",
+  "api_id": "47e6f94f988d4e0f51e262ffd15b2954",
   "org_id": "5e9bcac7fa38d00001e12175",
   "use_keyless": true,
   "use_oauth2": false,
@@ -21,7 +21,7 @@
     "param_name": "",
     "use_cookie": false,
     "cookie_name": "",
-    "auth_header_name": "",
+    "auth_header_name": "Authorization",
     "use_certificate": false
   },
   "use_basic_auth": false,
@@ -74,9 +74,7 @@
         },
         "use_extended_paths": true,
         "extended_paths": {},
-        "global_headers": {
-          "x-req-id": "$tyk_context.request_id"
-        },
+        "global_headers": {},
         "global_headers_remove": [],
         "global_size_limit": 0,
         "override_target": ""
@@ -104,7 +102,7 @@
   },
   "proxy": {
     "preserve_host_header": false,
-    "listen_path": "/basic-open-api/",
+    "listen_path": "/javascript-middleware-api/",
     "target_url": "http://httpbin/",
     "disable_strip_slash": false,
     "strip_listen_path": true,
@@ -133,8 +131,20 @@
   "disable_rate_limit": false,
   "disable_quota": false,
   "custom_middleware": {
-    "pre": [],
-    "post": [],
+    "pre": [
+      {
+        "name": "exampleJavaScriptMiddlewarePreHook",
+        "path": "middleware/example-javascript-middleware.js",
+        "require_session": false
+      }
+    ],
+    "post": [
+      {
+        "name": "exampleJavaScriptMiddlewarePostHook",
+        "path": "middleware/example-javascript-middleware.js",
+        "require_session": false
+      }
+    ],
     "post_key_auth": [],
     "auth_check": {
       "name": "",
@@ -196,8 +206,10 @@
   "certificates": [],
   "do_not_track": false,
   "tags": [],
-  "enable_context_vars": true,
-  "config_data": {},
+  "enable_context_vars": false,
+  "config_data": {
+    "config_key": "config-value"
+  },
   "tag_headers": [],
   "global_rate_limit": {
     "rate": 0,
