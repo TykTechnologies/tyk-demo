@@ -10,8 +10,8 @@ chmod +x sync.sh
 echo "  Done"
 
 echo "Getting Dashboard Configuration"
-dashboard_admin_api_credentials=$(cat ./confs/tyk_analytics.conf | jq -r .admin_secret)
-portal_root_path=$(cat ./confs/tyk_analytics.conf | jq -r .host_config.portal_root_path)
+dashboard_admin_api_credentials=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
+portal_root_path=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_config.portal_root_path)
 echo "  Dashboard Admin API Credentials: $dashboard_admin_api_credentials"
 echo "  Portal Root Path: $portal_root_path"
 
