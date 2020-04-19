@@ -4,9 +4,10 @@ dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
 kibana_base_url="http://localhost:5601"
 
-echo "Making tyk-sync scripts executable"
+echo "Making scripts executable"
 chmod +x dump.sh
 chmod +x sync.sh
+chmod +x add-gateway.sh
 echo "  Done"
 
 echo "Getting Dashboard Configuration"
