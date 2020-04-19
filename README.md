@@ -24,21 +24,25 @@ docker-compose up -d
 
 Please note that this command may take a while to complete, as Docker needs to download images and provision the containers.
 
-## Step 3: Install Tyk Sync
+## Step 3: Install dependencies
 
-We will use [Tyk Sync](https://tyk.io/docs/advanced-configuration/manage-multiple-environments/tyk-sync/) to synchronise API and Policy data. Install it as follows:
+### Tyk Sync
+
+[Tyk Sync](https://tyk.io/docs/advanced-configuration/manage-multiple-environments/tyk-sync/) is used to synchronise API and Policy data. Install it as follows:
 
 ```
 go install -u github.com/TykTechnologies/tyk-sync
 ```
 
-## Step 4: Bootstrap the system
+### JQ
 
-First, if you don't have `jq` installed, install it:
+The bootstrap script uses JQ for extracting data from JSON object. Can be installed as follows:
 
 ```
 brew install jq
 ```
+
+## Step 4: Bootstrap the system
 
 Now we will run the bootstrap script, which will complete the remaining items needed to get started. But before the `bootstrap.sh` file can be run, it must be made executable:
 
