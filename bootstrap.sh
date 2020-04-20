@@ -3,6 +3,7 @@
 dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
 kibana_base_url="http://localhost:5601"
+identity_broker_base_url="http://localhost:3010"
 
 echo "Making scripts executable"
 chmod +x dump.sh
@@ -65,6 +66,12 @@ curl $dashboard_base_url/api/usergroups \
   --header "Authorization: $dashboard_user_api_credentials" \
   --data @bootstrap-data/tyk-dashboard/usergroup-admin.json \
   > /dev/null
+user_group_data=$(curl $dashboard_base_url/api/usergroups \
+  --silent \
+  --header "Authorization: $dashboard_user_api_credentials")
+user_group_readonly_id=$(echo $user_group_data | jq -r .groups[0].id)
+user_group_default_id=$(echo $user_group_data | jq -r .groups[1].id)
+user_group_admin_id=$(echo $user_group_data | jq -r .groups[2].id)
 echo "  Done"
 
 echo "Creating Portal default settings"
@@ -84,7 +91,7 @@ echo "Creating Portal home page"
 curl $dashboard_base_url/api/portal/pages \
   --silent \
   --header "Authorization: $dashboard_user_api_credentials" \
-  --data '{"is_homepage": true, "template_name":"", "title":"Developer Portal Home", "slug":"/", "fields": {"JumboCTATitle": "Tyk Developer Portal", "SubHeading": "Sub Header", "JumboCTALink": "#cta", "JumboCTALinkTitle": "Your awesome APIs, hosted with Tyk!", "PanelOneContent": "Panel 1 content.", "PanelOneLink": "#panel1", "PanelOneLinkTitle": "Panel 1 Button", "PanelOneTitle": "Panel 1 Title", "PanelThereeContent": "", "PanelThreeContent": "Panel 3 content.", "PanelThreeLink": "#panel3", "PanelThreeLinkTitle": "Panel 3 Button", "PanelThreeTitle": "Panel 3 Title", "PanelTwoContent": "Panel 2 content.", "PanelTwoLink": "#panel2", "PanelTwoLinkTitle": "Panel 2 Button", "PanelTwoTitle": "Panel 2 Title"}}' \
+  --data @bootstrap-data/tyk-dashboard/portal-home-page.json \
   > /dev/null
 echo "  Done"
 
@@ -104,6 +111,20 @@ echo "  Done"
 
 echo "Synchronising APIs and Policies"
 tyk-sync sync -d $dashboard_base_url -s $dashboard_user_api_credentials -o $organisation_id -p tyk-sync-data
+echo "  Done"
+
+echo "Creating Identity Broker Profiles"
+identity_broker_api_credentials=$(cat ./volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
+identity_broker_profile_tyk_dashboard_data=$(cat ./bootstrap-data/tyk-identity-broker/profile-tyk-dashboard.json | \
+  sed 's/DASHBOARD_USER_API_CREDENTIALS/'"$dashboard_user_api_credentials"'/' | \
+  sed 's/DASHBOARD_USER_GROUP_DEFAULT/'"$user_group_default_id"'/' | \
+  sed 's/DASHBOARD_USER_GROUP_READONLY/'"$user_group_readonly_id"'/' | \
+  sed 's/DASHBOARD_USER_GROUP_ADMIN/'"$user_group_admin_id"'/')
+curl $identity_broker_base_url/api/profiles/tyk-dashboard \
+  --silent \
+  --header "Authorization: $identity_broker_api_credentials" \
+  --data "$(echo $identity_broker_profile_tyk_dashboard_data)" \
+  > /dev/null
 echo "  Done"
 
 echo "Waiting for Kibana to be available (please be patient)"

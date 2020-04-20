@@ -23,7 +23,7 @@ services:
     networks:
       - tyk
     volumes:
-      - ./volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
+      - ./volumes/tyk-dashboard/tyk_analytics_sso.conf:/opt/tyk-dashboard/tyk_analytics.conf
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
     depends_on:
@@ -109,7 +109,6 @@ services:
       - SESSION_SECRET=12345
     volumes:
       - "./volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf"
-      - "./volumes/tyk-identity-broker/profiles.json:/opt/tyk-identity-broker/profiles.json"
   keycloak:
     image: jboss/keycloak:7.0.0
     environment:
