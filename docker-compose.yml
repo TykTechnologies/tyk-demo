@@ -15,6 +15,21 @@ services:
       - tyk-redis
       - tyk-mongo
       - tyk-identity-broker
+  tyk-dashboard-sso:
+    image: tykio/tyk-dashboard:latest
+    ports:
+      - "3000:3000"
+      - "5000:5000"
+    networks:
+      - tyk
+    volumes:
+      - ./volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
+    environment:
+      - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
+    depends_on:
+      - tyk-redis
+      - tyk-mongo
+      - tyk-identity-broker
   tyk-gateway:
     image: tykio/tyk-gateway:latest
     ports:
