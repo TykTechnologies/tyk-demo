@@ -18,8 +18,8 @@ services:
   tyk-dashboard-sso:
     image: tykio/tyk-dashboard:latest
     ports:
-      - "3000:3000"
-      - "5000:5000"
+      - "3001:3000"
+      - "5001:5000"
     networks:
       - tyk
     volumes:
@@ -110,7 +110,20 @@ services:
     volumes:
       - "./volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf"
       - "./volumes/tyk-identity-broker/profiles.json:/opt/tyk-identity-broker/profiles.json"
-        
+  keycloak:
+    image: jboss/keycloak:7.0.0
+    environment:
+      DB_VENDOR: H2
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: pw
+      KEYCLOAK_IMPORT: /opt/jboss/keycloak-realm.json
+    volumes:
+      - ./volumes/keycloak/keycloak-realm.json:/opt/jboss/keycloak-realm.json
+    ports:
+      - 8090:8080
+    networks:
+      - tyk    
+  
 volumes:
   redis-data:
   mongo-data:
