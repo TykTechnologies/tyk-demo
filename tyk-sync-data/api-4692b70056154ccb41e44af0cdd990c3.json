@@ -1,9 +1,9 @@
 {
-  "id": "5e9c16af4558aa0001b22150",
+  "id": "5e9d409253ce6a0001c93984",
   "name": "Plugin Demo API",
   "slug": "plugin-demo-api",
   "api_id": "4692b70056154ccb41e44af0cdd990c3",
-  "org_id": "5e9c16ad4558aa0001b22148",
+  "org_id": "5e9d408d53ce6a0001c9397f",
   "use_keyless": true,
   "use_oauth2": false,
   "use_openid": false,
@@ -102,6 +102,17 @@
                   }
                 }
               }
+            }
+          ],
+          "transform_headers": [
+            {
+              "delete_headers": [],
+              "add_headers": {
+                "new-header": "new-header-value"
+              },
+              "path": "/anything/modify-headers",
+              "method": "GET",
+              "act_on": false
             }
           ]
         },
