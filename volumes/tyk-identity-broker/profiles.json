@@ -1,179 +1,31 @@
-[{
-    "ActionType": "GenerateOAuthTokenForClient",
-    "ID": "1",
-    "IdentityHandlerConfig": {
-        "DashboardCredential": "71fdcb84337c45e873784e2057ba7cc7",
-        "DisableOneTokenPerAPI": false,
-        "OAuth": {
-            "APIListenPath": "test",
-            "BaseAPIID": "2dc134e2adb142f8656f6478c76871b6",
-            "ClientId": "8b1e6d65baf9403cba7e487f2657851e",
-            "RedirectURI": "http://tyktib.free.beeceptor.com",
-            "ResponseType": "token",
-            "Secret": "OTljMTdhY2ItNjJmMi00NjhjLTlkNjgtMDgwMjZhMmJlMWEw",
-            "NoRedirect": false
+[
+    {
+        "ActionType": "GenerateOrLoginUserProfile",
+        "ID": "tyk-dashboard",
+        "OrgID": "5e9d9544a1dcd60001d0ed20",
+        "IdentityHandlerConfig": {
+            "DashboardCredential": "71defbda4e1546656ecc5a225255256e"
+        },
+        "ProviderConfig": {
+            "CallbackBaseURL": "http://localhost:3010",
+            "FailureRedirect": "http://localhost:3000/?fail=true",
+            "UseProviders": [
+                {
+                    "Key": "0oar1yz2qwjFQCiis0h7",
+                    "Secret": "vnVBbrjkRamElJd4_1bhNgpgX2BGPKBDiMTKA7z7",
+                    "DiscoverURL": "https://dev-979792.oktapreview.com/oauth2/default/.well-known/openid-configuration",
+                    "Name": "openid-connect"
+                }
+            ]
+        },
+        "ProviderName": "SocialProvider",
+        "ReturnURL": "http://localhost:3000/tap",
+        "Type": "redirect",
+        "DefaultUserGroupID": "5e9d9f1eeb1e6f0001df13ad",
+        "CustomUserGroupField": "scope",
+        "UserGroupMapping": {
+            "read-only": "5e9d9e16eb1e6f0001df13ac",
+            "admin": "5e9d9f3deb1e6f0001df13ae"
         }
-    },
-    "MatchedPolicyID": "5bfba779d88d77000115da8f",
-    "OrgID": "5bfb9de8d88d7700011203fd",
-    "ProviderConfig": {
-        "CallbackBaseURL": "http://0a882bc9.ngrok.io",
-        "FailureRedirect": "http://127.0.0.1:3000/portal/login/?fail=true",
-        "UseProviders": [{
-            "Key": "85e8ed3223b00739f99a",
-            "Name": "github",
-            "Secret": "d535e5740c72879d668d0170c285d3073748f672"
-        }]
-    },
-    "ProviderName": "SocialProvider",
-    "ReturnURL": "",
-    "Type": "redirect"
-},
-{
-    "ActionType": "GenerateOrLoginUserProfile",
-    "ID": "2",
-    "OrgID": "5b8e119821702e000196c3db",
-    "IdentityHandlerConfig": {
-        "DashboardCredential": "216d22aaa8c0428274afe7347b8c0ee0"
-    },
-    "ProviderConfig": {
-        "CallbackBaseURL": "http://127.0.0.1:3010",
-        "FailureRedirect": "http://127.0.0.1:3000/?fail=true",
-        "UseProviders": [{
-            "Key": "0oag7jz13pgBl6Qpx0h7",
-            "Secret": "HplU1xto1SVO3XlGSX_xIjoeg3fFxkfOrez2WEtp",
-            "DiscoverURL": "https://dev-979792-admin.oktapreview.com/oauth2/default/.well-known/openid-configuration",
-            "Name": "openid-connect"
-        }]
-    },
-    "ProviderName": "SocialProvider",
-    "ReturnURL": "http://127.0.0.1:3000/tap",
-    "Type": "redirect"
-},
-{
-    "ActionType": "GenerateOrLoginDeveloperProfile",
-	"ID": "3",
-	"OrgID": "5b8e119821702e000196c3db",
-	"IdentityHandlerConfig": {
-		"DashboardCredential": "216d22aaa8c0428274afe7347b8c0ee0"
-	},
-	"ProviderConfig": {
-        "CallbackBaseURL": "http://127.0.0.1:3010",
-        "FailureRedirect": "http://127.0.0.1:3000/?fail=true",
-        "UseProviders": [{
-            "Key": "0oagadw6e7t2Orp5T0h7",
-            "Secret": "LfB5KtrUkQdckkcHemxBp6DZ4t7mgIF5mERoR1n8",
-            "DiscoverURL": "https://dev-979792-admin.oktapreview.com/oauth2/default/.well-known/openid-configuration",
-            "Name": "openid-connect"
-        }]
-    },
-	"ProviderName": "SocialProvider",
-	"ReturnURL": "http://tyk-portal.local:3000/portal/sso/",
-    "Type": "redirect"
-},
-{
-    "ActionType": "GenerateOAuthTokenForClient",
-    "ID": "4",
-    "IdentityHandlerConfig": {
-        "DashboardCredential": "71fdcb84337c45e873784e2057ba7cc7",
-        "DisableOneTokenPerAPI": false,
-        "OAuth": {
-            "APIListenPath": "github-oauth",
-            "BaseAPIID": "cd2ed5ed751642ce7cd0ba47e03848b3",
-            "ClientId": "8b1e6d65baf9403cba7e487f2657851e",
-            "RedirectURI": "http://tyktib.free.beeceptor.com",
-            "ResponseType": "token",
-            "Secret": "OTljMTdhY2ItNjJmMi00NjhjLTlkNjgtMDgwMjZhMmJlMWEw",
-            "NoRedirect": false
-        }
-    },
-    "MatchedPolicyID": "5bfba779d88d77000115da8f",
-    "OrgID": "5bfb9de8d88d7700011203fd",
-    "ProviderConfig": {
-        "CallbackBaseURL": "http://0a882bc9.ngrok.io",
-        "FailureRedirect": "http://127.0.0.1:8000/?fail=true",
-        "UseProviders": [{
-            "Key": "85e8ed3223b00739f99a",
-            "Name": "github",
-            "Secret": "d535e5740c72879d668d0170c285d3073748f672"
-        }]
-    },
-    "ProviderName": "SocialProvider",
-    "ReturnURL": "",
-    "Type": "redirect"
-},
-{
-    "ActionType": "GenerateOAuthTokenForClient",
-    "ID": "github-oauth",
-    "IdentityHandlerConfig": {
-        "DashboardCredential": "71fdcb84337c45e873784e2057ba7cc7",
-        "DisableOneTokenPerAPI": false,
-        "OAuth": {
-            "APIListenPath": "github-oauth",
-            "BaseAPIID": "cd2ed5ed751642ce7cd0ba47e03848b3",
-            "ClientId": "8b1e6d65baf9403cba7e487f2657851e",
-            "RedirectURI": "http://tyktib.free.beeceptor.com",
-            "ResponseType": "token",
-            "Secret": "OTljMTdhY2ItNjJmMi00NjhjLTlkNjgtMDgwMjZhMmJlMWEw",
-            "NoRedirect": false
-        }
-    },
-    "MatchedPolicyID": "5bfba779d88d77000115da8f",
-    "OrgID": "5bfb9de8d88d7700011203fd",
-    "ProviderConfig": {
-        "CallbackBaseURL": "http://fd97c0f1.ngrok.io",
-        "FailureRedirect": "http://127.0.0.1",
-        "UseProviders": [{
-            "Key": "85e8ed3223b00739f99a",
-            "Name": "github",
-            "Secret": "d535e5740c72879d668d0170c285d3073748f672"
-        }]
-    },
-    "ProviderName": "SocialProvider",
-    "ReturnURL": "",
-    "Type": "redirect"
-},
-{
-    "ActionType": "GenerateTemporaryAuthToken",
-    "ID": "ldap",
-    "IdentityHandlerConfig": {
-		"DashboardCredential": "756fb086d5fe461364944921d00f36ae",
-		"TokenAuth": {
-			"BaseAPIID": "9d53858fdaa94f5e6bdf222cfb5085f3"
-		}
-	},
-    "MatchedPolicyID": "5c6659e073beb1000115473c",
-    "OrgID": "5c652b6b73beb10001154739",
-    "ProviderConfig": {
-		"FailureRedirect": "http://tyk-dashboard.local:3000",
-		"LDAPAttributes": [],
-		"LDAPPort": "389",
-		"LDAPServer": "openldap",
-		"LDAPUserDN": "cn=*USERNAME*,dc=my-company,dc=com"
-	},
-	"ProviderName": "ADProvider",
-    "ReturnURL": "",
-    "Type": "redirect"
-},
-{
-    "ActionType": "GenerateOrLoginUserProfile",
-    "ID": "okta-oidc",
-    "OrgID": "5c652b6b73beb10001154739",
-    "IdentityHandlerConfig": {
-        "DashboardCredential": "756fb086d5fe461364944921d00f36ae"
-    },
-    "ProviderConfig": {
-        "CallbackBaseURL": "http://localhost:3010",
-        "FailureRedirect": "http://tyk-dashboard.local:3000/?fail=true",
-        "UseProviders": [{
-            "Key": "0oajmob1ylTDqJ2je0h7",
-            "Secret": "p_aCvyQVAjDKUvHM01Rem4yfUTBg-B0WY8Axg5ip",
-            "DiscoverURL": "https://dev-979792.oktapreview.com/oauth2/default/.well-known/openid-configuration",
-            "Name": "openid-connect"
-        }]
-    },
-    "ProviderName": "SocialProvider",
-    "ReturnURL": "http://tyk-dashboard.local:3000/tap",
-    "Type": "redirect"
-}
+    }
 ]
