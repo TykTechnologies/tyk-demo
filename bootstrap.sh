@@ -16,8 +16,8 @@ portal_root_path=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_
 echo "  Dashboard Admin API Credentials: $dashboard_admin_api_credentials"
 echo "  Portal Root Path: $portal_root_path"
 
-echo "Creating Organisation"
-organisation_id=$(curl $dashboard_base_url/admin/organisations \
+echo "Importing Organisation"
+organisation_id=$(curl $dashboard_base_url/admin/organisations/import \
   --silent \
   --header "admin-auth: $dashboard_admin_api_credentials" \
   --data @bootstrap-data/tyk-dashboard/organisation.json \
@@ -26,28 +26,15 @@ echo $organisation_id > .organisation-id
 echo "  Organisation Id: $organisation_id"
 
 echo "Creating Dashboard user"
-dashboard_user_first_name=$(jq -r '.first_name' bootstrap-data/tyk-dashboard/dashboard-user.json)
-dashboard_user_last_name=$(jq -r '.last_name' bootstrap-data/tyk-dashboard/dashboard-user.json)
 dashboard_user_email=$(jq -r '.email_address' bootstrap-data/tyk-dashboard/dashboard-user.json)
-dashboard_user=$(curl $dashboard_base_url/admin/users \
+dashboard_user_api_response=$(curl $dashboard_base_url/admin/users \
   --silent \
   --header "admin-auth: $dashboard_admin_api_credentials" \
-  --data-raw '{
-      "first_name": "'$dashboard_user_first_name'",
-      "last_name": "'$dashboard_user_last_name'",
-      "email_address": "'$dashboard_user_email'",
-      "org_id": "'$organisation_id'",
-      "active": true,
-      "user_permissions": {
-          "IsAdmin": "admin",
-          "ResetPassword": "admin"
-      }
-    }' \
-    | jq -r '. | {api_key:.Message, id:.Meta.id}')
-dashboard_user_id=$(echo $dashboard_user | jq -r '.id')
-dashboard_user_api_credentials=$(echo $dashboard_user | jq -r '.api_key')
-echo $dashboard_user_api_credentials > .dashboard-user-api-credentials
-dashboard_user_password=$(openssl rand -base64 12)
+  --data @bootstrap-data/tyk-dashboard/dashboard-user.json \
+  | jq -r '. | {api_key:.Message, id:.Meta.id}')
+dashboard_user_id=$(echo $dashboard_user_api_response | jq -r '.id')
+dashboard_user_api_credentials=$(echo $dashboard_user_api_response | jq -r '.api_key')
+dashboard_user_password=$(jq -r '.password' bootstrap-data/tyk-dashboard/dashboard-user.json)
 curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset \
   --silent \
   --header "authorization: $dashboard_user_api_credentials" \
@@ -56,10 +43,29 @@ curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset \
       "user_permissions": { "IsAdmin": "admin" }
     }' \
   > /dev/null
+echo $dashboard_user_api_credentials > .dashboard-user-api-credentials
 echo "  Username: $dashboard_user_email"
 echo "  Password: $dashboard_user_password"
 echo "  Dashboard API Credentials: $dashboard_user_api_credentials"
 echo "  ID: $dashboard_user_id"
+
+echo "Creating Dashboard User Groups"
+curl $dashboard_base_url/api/usergroups \
+  --silent \
+  --header "Authorization: $dashboard_user_api_credentials" \
+  --data @bootstrap-data/tyk-dashboard/usergroup-readonly.json \
+  > /dev/null
+curl $dashboard_base_url/api/usergroups \
+  --silent \
+  --header "Authorization: $dashboard_user_api_credentials" \
+  --data @bootstrap-data/tyk-dashboard/usergroup-default.json \
+  > /dev/null
+curl $dashboard_base_url/api/usergroups \
+  --silent \
+  --header "Authorization: $dashboard_user_api_credentials" \
+  --data @bootstrap-data/tyk-dashboard/usergroup-admin.json \
+  > /dev/null
+echo "  Done"
 
 echo "Creating Portal default settings"
 curl $dashboard_base_url/api/portal/catalogue \
