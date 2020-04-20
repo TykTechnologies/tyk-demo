@@ -1,9 +1,9 @@
 {
-  "id": "5e9c16af4558aa0001b22150",
+  "id": "5e9d7a22c1eb760001d1befc",
   "name": "Plugin Demo API",
   "slug": "plugin-demo-api",
   "api_id": "4692b70056154ccb41e44af0cdd990c3",
-  "org_id": "5e9c16ad4558aa0001b22148",
+  "org_id": "5e9d7a21c1eb760001d1bef4",
   "use_keyless": true,
   "use_oauth2": false,
   "use_openid": false,
@@ -103,6 +103,9 @@
                 }
               }
             }
+          ],
+          "cache": [
+            "/uuid"
           ]
         },
         "global_headers": {},
@@ -195,10 +198,12 @@
   },
   "custom_middleware_bundle": "",
   "cache_options": {
-    "cache_timeout": 60,
+    "cache_timeout": 5,
     "enable_cache": true,
     "cache_all_safe_requests": false,
-    "cache_response_codes": [],
+    "cache_response_codes": [
+      200
+    ],
     "enable_upstream_cache_control": false,
     "cache_control_ttl_header": ""
   },
