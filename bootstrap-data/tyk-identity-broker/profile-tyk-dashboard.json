@@ -21,7 +21,7 @@
     "ReturnURL": "http://localhost:3001/tap",
     "Type": "redirect",
     "DefaultUserGroupID": "DASHBOARD_USER_GROUP_DEFAULT",
-    "CustomUserGroupField": "scope",
+    "CustomUserGroupField": "division",
     "UserGroupMapping": {
         "read-only": "DASHBOARD_USER_GROUP_READONLY",
         "admin": "DASHBOARD_USER_GROUP_ADMIN"
