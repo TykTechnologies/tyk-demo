@@ -107,3 +107,14 @@ To get the latest updates, you should pull from the remote repo first.
 The Tyk Pump is already configured to push data to the Elasticsearch container, so Kibana can visualise this data.
 
 The bootstrap process creates an Index Pattern and Visualization which can be used to view API analytics data.
+
+# SSO Dashboard
+
+The `dashboard-sso` container is set up to provide a Dashboard using SSO. It works in conjunction with the Identity Broker and Okta to enable this.
+
+If you go to http://localhost:3001 it will redirect you to the Okta login page, where you can use these credentials to log in:
+
+Username: `dashboard.admin@example.org`
+Password: `Abcd1234`
+
+This will redirect back to the Dashboard, using a temporary session created via the Identity Broker and Dashboard SSO API.
