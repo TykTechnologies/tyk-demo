@@ -68,7 +68,7 @@ The following applications are available once the system is bootstrapped:
 
 - [Tyk Dashboard](http://localhost:3000)
 - [Tyk Portal](http://localhost:3000/portal)
-- [Tyk Gateway](http://localhost:8080)
+- [Tyk Gateway](http://localhost:8080/bootstrap-api/get)
 - [Kibana](http://localhost:5601)
 
 # Synchronisations of API and Policies
