@@ -62,17 +62,17 @@ Check the last few lines of output from the `bootstrap.sh` command, these will c
 
 When you log into the Dashboard, you will find the imported APIs and Policies are now available.
 
-## Step 6: Log into the Dashboard
+## Step 6: Terminate Docker containers
 
 To bring down the containers and delete asscociate volumes (To end-up with clean slate)
 
 ```
-docker-compose down 
+docker-compose down -v
 ```
 
 To bring down just the containers
 ```
-docker-compose down -v
+docker-compose down
 ```
 
 # Applications available
