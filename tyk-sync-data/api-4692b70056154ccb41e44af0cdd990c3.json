@@ -1,9 +1,9 @@
 {
-  "id": "5e9d7a22c1eb760001d1befc",
+  "id": "5e9d409253ce6a0001c93984",
   "name": "Plugin Demo API",
   "slug": "plugin-demo-api",
   "api_id": "4692b70056154ccb41e44af0cdd990c3",
-  "org_id": "5e9d7a21c1eb760001d1bef4",
+  "org_id": "5e9d408d53ce6a0001c9397f",
   "use_keyless": true,
   "use_oauth2": false,
   "use_openid": false,
@@ -89,6 +89,9 @@
         },
         "use_extended_paths": true,
         "extended_paths": {
+          "cache": [
+            "/uuid"
+          ],
           "ignored": [
             {
               "path": "anything/mock",
@@ -104,8 +107,16 @@
               }
             }
           ],
-          "cache": [
-            "/uuid"
+          "transform_headers": [
+            {
+              "delete_headers": [],
+              "add_headers": {
+                "new-header": "new-header-value"
+              },
+              "path": "/anything/modify-headers",
+              "method": "GET",
+              "act_on": false
+            }
           ]
         },
         "global_headers": {},

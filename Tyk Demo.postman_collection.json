@@ -37,18 +37,12 @@
 					"response": []
 				},
 				{
-					"name": "Cache",
+					"name": "Modify Headers",
 					"request": {
 						"method": "GET",
-						"header": [
-							{
-								"key": "x-api-version",
-								"type": "text",
-								"value": "Default"
-							}
-						],
+						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/plugin-demo-api/uuid",
+							"raw": "http://localhost:8080/plugin-demo-api/anything/modify-headers",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -56,13 +50,41 @@
 							"port": "8080",
 							"path": [
 								"plugin-demo-api",
-								"uuid"
+								"anything",
+								"modify-headers"
 							]
 						},
-						"description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
+						"description": "To be updated"
 					},
 					"response": []
-				}
+				},
+        {
+          "name": "Cache",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-version",
+                "type": "text",
+                "value": "Default"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/plugin-demo-api/uuid",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "plugin-demo-api",
+                "uuid"
+              ]
+            },
+            "description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
+          },
+          "response": []
+        }
 			],
 			"protocolProfileBehavior": {}
 		},
