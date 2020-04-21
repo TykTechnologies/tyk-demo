@@ -3,6 +3,7 @@
 dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
 kibana_base_url="http://localhost:5601"
+identity_broker_base_url="http://localhost:3010"
 
 echo "Making scripts executable"
 chmod +x dump.sh
@@ -16,8 +17,8 @@ portal_root_path=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_
 echo "  Dashboard Admin API Credentials: $dashboard_admin_api_credentials"
 echo "  Portal Root Path: $portal_root_path"
 
-echo "Creating Organisation"
-organisation_id=$(curl $dashboard_base_url/admin/organisations \
+echo "Importing Organisation"
+organisation_id=$(curl $dashboard_base_url/admin/organisations/import \
   --silent \
   --header "admin-auth: $dashboard_admin_api_credentials" \
   --data @bootstrap-data/tyk-dashboard/organisation.json \
@@ -26,28 +27,15 @@ echo $organisation_id > .organisation-id
 echo "  Organisation Id: $organisation_id"
 
 echo "Creating Dashboard user"
-dashboard_user_first_name=$(jq -r '.first_name' bootstrap-data/tyk-dashboard/dashboard-user.json)
-dashboard_user_last_name=$(jq -r '.last_name' bootstrap-data/tyk-dashboard/dashboard-user.json)
 dashboard_user_email=$(jq -r '.email_address' bootstrap-data/tyk-dashboard/dashboard-user.json)
-dashboard_user=$(curl $dashboard_base_url/admin/users \
+dashboard_user_api_response=$(curl $dashboard_base_url/admin/users \
   --silent \
   --header "admin-auth: $dashboard_admin_api_credentials" \
-  --data-raw '{
-      "first_name": "'$dashboard_user_first_name'",
-      "last_name": "'$dashboard_user_last_name'",
-      "email_address": "'$dashboard_user_email'",
-      "org_id": "'$organisation_id'",
-      "active": true,
-      "user_permissions": {
-          "IsAdmin": "admin",
-          "ResetPassword": "admin"
-      }
-    }' \
-    | jq -r '. | {api_key:.Message, id:.Meta.id}')
-dashboard_user_id=$(echo $dashboard_user | jq -r '.id')
-dashboard_user_api_credentials=$(echo $dashboard_user | jq -r '.api_key')
-echo $dashboard_user_api_credentials > .dashboard-user-api-credentials
-dashboard_user_password=$(openssl rand -base64 12)
+  --data @bootstrap-data/tyk-dashboard/dashboard-user.json \
+  | jq -r '. | {api_key:.Message, id:.Meta.id}')
+dashboard_user_id=$(echo $dashboard_user_api_response | jq -r '.id')
+dashboard_user_api_credentials=$(echo $dashboard_user_api_response | jq -r '.api_key')
+dashboard_user_password=$(jq -r '.password' bootstrap-data/tyk-dashboard/dashboard-user.json)
 curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset \
   --silent \
   --header "authorization: $dashboard_user_api_credentials" \
@@ -56,10 +44,35 @@ curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset \
       "user_permissions": { "IsAdmin": "admin" }
     }' \
   > /dev/null
+echo $dashboard_user_api_credentials > .dashboard-user-api-credentials
 echo "  Username: $dashboard_user_email"
 echo "  Password: $dashboard_user_password"
 echo "  Dashboard API Credentials: $dashboard_user_api_credentials"
 echo "  ID: $dashboard_user_id"
+
+echo "Creating Dashboard User Groups"
+curl $dashboard_base_url/api/usergroups \
+  --silent \
+  --header "Authorization: $dashboard_user_api_credentials" \
+  --data @bootstrap-data/tyk-dashboard/usergroup-readonly.json \
+  > /dev/null
+curl $dashboard_base_url/api/usergroups \
+  --silent \
+  --header "Authorization: $dashboard_user_api_credentials" \
+  --data @bootstrap-data/tyk-dashboard/usergroup-default.json \
+  > /dev/null
+curl $dashboard_base_url/api/usergroups \
+  --silent \
+  --header "Authorization: $dashboard_user_api_credentials" \
+  --data @bootstrap-data/tyk-dashboard/usergroup-admin.json \
+  > /dev/null
+user_group_data=$(curl $dashboard_base_url/api/usergroups \
+  --silent \
+  --header "Authorization: $dashboard_user_api_credentials")
+user_group_readonly_id=$(echo $user_group_data | jq -r .groups[0].id)
+user_group_default_id=$(echo $user_group_data | jq -r .groups[1].id)
+user_group_admin_id=$(echo $user_group_data | jq -r .groups[2].id)
+echo "  Done"
 
 echo "Creating Portal default settings"
 curl $dashboard_base_url/api/portal/catalogue \
@@ -78,7 +91,7 @@ echo "Creating Portal home page"
 curl $dashboard_base_url/api/portal/pages \
   --silent \
   --header "Authorization: $dashboard_user_api_credentials" \
-  --data '{"is_homepage": true, "template_name":"", "title":"Developer Portal Home", "slug":"/", "fields": {"JumboCTATitle": "Tyk Developer Portal", "SubHeading": "Sub Header", "JumboCTALink": "#cta", "JumboCTALinkTitle": "Your awesome APIs, hosted with Tyk!", "PanelOneContent": "Panel 1 content.", "PanelOneLink": "#panel1", "PanelOneLinkTitle": "Panel 1 Button", "PanelOneTitle": "Panel 1 Title", "PanelThereeContent": "", "PanelThreeContent": "Panel 3 content.", "PanelThreeLink": "#panel3", "PanelThreeLinkTitle": "Panel 3 Button", "PanelThreeTitle": "Panel 3 Title", "PanelTwoContent": "Panel 2 content.", "PanelTwoLink": "#panel2", "PanelTwoLinkTitle": "Panel 2 Button", "PanelTwoTitle": "Panel 2 Title"}}' \
+  --data @bootstrap-data/tyk-dashboard/portal-home-page.json \
   > /dev/null
 echo "  Done"
 
@@ -98,6 +111,20 @@ echo "  Done"
 
 echo "Synchronising APIs and Policies"
 tyk-sync sync -d $dashboard_base_url -s $dashboard_user_api_credentials -o $organisation_id -p tyk-sync-data
+echo "  Done"
+
+echo "Creating Identity Broker Profiles"
+identity_broker_api_credentials=$(cat ./volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
+identity_broker_profile_tyk_dashboard_data=$(cat ./bootstrap-data/tyk-identity-broker/profile-tyk-dashboard.json | \
+  sed 's/DASHBOARD_USER_API_CREDENTIALS/'"$dashboard_user_api_credentials"'/' | \
+  sed 's/DASHBOARD_USER_GROUP_DEFAULT/'"$user_group_default_id"'/' | \
+  sed 's/DASHBOARD_USER_GROUP_READONLY/'"$user_group_readonly_id"'/' | \
+  sed 's/DASHBOARD_USER_GROUP_ADMIN/'"$user_group_admin_id"'/')
+curl $identity_broker_base_url/api/profiles/tyk-dashboard \
+  --silent \
+  --header "Authorization: $identity_broker_api_credentials" \
+  --data "$(echo $identity_broker_profile_tyk_dashboard_data)" \
+  > /dev/null
 echo "  Done"
 
 echo "Waiting for Kibana to be available (please be patient)"

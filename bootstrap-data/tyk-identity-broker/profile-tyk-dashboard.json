@@ -1,0 +1,29 @@
+{
+    "ActionType": "GenerateOrLoginUserProfile",
+    "ID": "tyk-dashboard",
+    "OrgID": "5e9d9544a1dcd60001d0ed20",
+    "IdentityHandlerConfig": {
+        "DashboardCredential": "DASHBOARD_USER_API_CREDENTIALS"
+    },
+    "ProviderConfig": {
+        "CallbackBaseURL": "http://localhost:3010",
+        "FailureRedirect": "http://localhost:3001/?fail=true",
+        "UseProviders": [
+            {
+                "Key": "0oar1yz2qwjFQCiis0h7",
+                "Secret": "vnVBbrjkRamElJd4_1bhNgpgX2BGPKBDiMTKA7z7",
+                "DiscoverURL": "https://dev-979792.oktapreview.com/oauth2/default/.well-known/openid-configuration",
+                "Name": "openid-connect"
+            }
+        ]
+    },
+    "ProviderName": "SocialProvider",
+    "ReturnURL": "http://localhost:3001/tap",
+    "Type": "redirect",
+    "DefaultUserGroupID": "DASHBOARD_USER_GROUP_DEFAULT",
+    "CustomUserGroupField": "scope",
+    "UserGroupMapping": {
+        "read-only": "DASHBOARD_USER_GROUP_READONLY",
+        "admin": "DASHBOARD_USER_GROUP_ADMIN"
+    }
+}
