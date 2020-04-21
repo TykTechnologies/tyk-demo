@@ -70,7 +70,7 @@ The following applications are available once the system is bootstrapped:
 - [Tyk Dashboard using SSO](http://localhost:3001)
 - [Tyk Portal](http://localhost:3000/portal)
 - [Tyk Gateway](http://localhost:8080/bootstrap-api/get)
-- [Tyk Gateway using TLS](https://localhost:8081/bootstrap-api/get)
+- [Tyk Gateway using TLS](https://localhost:8081/bootstrap-api/get) (using self-signed certificate, so expect a warning)
 - [Kibana](http://localhost:5601)
 
 # Synchronisations of API and Policies
