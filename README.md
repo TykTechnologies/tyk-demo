@@ -108,6 +108,8 @@ The Tyk Pump is already configured to push data to the Elasticsearch container, 
 
 The bootstrap process creates an Index Pattern and Visualization which can be used to view API analytics data.
 
+Go to http://localhost:5601/app/kibana to access Kibana and view the visualisation.
+
 # SSO Dashboard
 
 The `dashboard-sso` container is set up to provide a Dashboard using SSO. It works in conjunction with the Identity Broker and Okta to enable this.
