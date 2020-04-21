@@ -89,6 +89,9 @@
         },
         "use_extended_paths": true,
         "extended_paths": {
+          "cache": [
+            "/uuid"
+          ],
           "ignored": [
             {
               "path": "anything/mock",
@@ -206,10 +209,12 @@
   },
   "custom_middleware_bundle": "",
   "cache_options": {
-    "cache_timeout": 60,
+    "cache_timeout": 5,
     "enable_cache": true,
     "cache_all_safe_requests": false,
-    "cache_response_codes": [],
+    "cache_response_codes": [
+      200
+    ],
     "enable_upstream_cache_control": false,
     "cache_control_ttl_header": ""
   },

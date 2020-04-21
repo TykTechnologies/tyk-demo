@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d727d88f-14c8-4382-97ca-b66c41a44895",
+		"_postman_id": "33b7c60f-1a42-4eec-af5f-3539ca0786eb",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -57,7 +57,34 @@
 						"description": "To be updated"
 					},
 					"response": []
-				}
+				},
+        {
+          "name": "Cache",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-version",
+                "type": "text",
+                "value": "Default"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/plugin-demo-api/uuid",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "plugin-demo-api",
+                "uuid"
+              ]
+            },
+            "description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
+          },
+          "response": []
+        }
 			],
 			"protocolProfileBehavior": {}
 		},
