@@ -1,8 +1,10 @@
 {
+    "id": "5e9d9544a1dcd60001d0ed20",
     "owner_name": "Tyk Demo",
     "owner_slug": "",
     "cname_enabled": false,
     "cname": "",
     "apis": [],
-    "sso_enabled": true
+    "sso_enabled": true,
+    "hybrid_enabled": true
 }

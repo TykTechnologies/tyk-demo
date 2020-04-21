@@ -15,6 +15,21 @@ services:
       - tyk-redis
       - tyk-mongo
       - tyk-identity-broker
+  tyk-dashboard-sso:
+    image: tykio/tyk-dashboard:latest
+    ports:
+      - "3001:3000"
+      - "5001:5000"
+    networks:
+      - tyk
+    volumes:
+      - ./volumes/tyk-dashboard/tyk_analytics_sso.conf:/opt/tyk-dashboard/tyk_analytics.conf
+    environment:
+      - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
+    depends_on:
+      - tyk-redis
+      - tyk-mongo
+      - tyk-identity-broker
   tyk-gateway:
     image: tykio/tyk-gateway:latest
     ports:
@@ -94,8 +109,20 @@ services:
       - SESSION_SECRET=12345
     volumes:
       - "./volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf"
-      - "./volumes/tyk-identity-broker/profiles.json:/opt/tyk-identity-broker/profiles.json"
-        
+  keycloak:
+    image: jboss/keycloak:7.0.0
+    environment:
+      DB_VENDOR: H2
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: pw
+      KEYCLOAK_IMPORT: /opt/jboss/keycloak-realm.json
+    volumes:
+      - ./volumes/keycloak/keycloak-realm.json:/opt/jboss/keycloak-realm.json
+    ports:
+      - 8090:8080
+    networks:
+      - tyk    
+  
 volumes:
   redis-data:
   mongo-data:

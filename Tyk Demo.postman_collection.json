@@ -35,6 +35,28 @@
 						"description": "This request uses the `Mock Response` Endpoint Designer plugin to return a response directly from the Gateway when the API endpoint is called.\n\nThe mock response sets the response:\n- HTTP status code: `200 OK`\n- Body: See the mock JSON object in the response body\n- Headers: See the `Mock` header in the repsonse headers\n\nWhen the Mock Response is executed, the request does not reach the API Server.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only, see part 2 of this plugin to see what happens when version `2` is requested instead. Control of the version is"
 					},
 					"response": []
+				},
+				{
+					"name": "Modify Headers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/plugin-demo-api/anything/modify-headers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"plugin-demo-api",
+								"anything",
+								"modify-headers"
+							]
+						},
+						"description": "To be updated"
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}

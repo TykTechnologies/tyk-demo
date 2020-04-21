@@ -1,0 +1,23 @@
+{
+  "name": "Default",
+  "description": "",
+  "org_id": "5e9d9544a1dcd60001d0ed20",
+  "active": true,
+  "user_permissions": {
+    "analytics": "read",
+    "apis": "deny",
+    "certs": "deny",
+    "hooks": "deny",
+    "idm": "deny",
+    "keys": "deny",
+    "log": "deny",
+    "oauth": "deny",
+    "policies": "deny",
+    "portal": "deny",
+    "system": "deny",
+    "user_groups": "deny",
+    "users": "deny",
+    "websockets": "deny"
+  },
+  "password_max_days": 0
+}
