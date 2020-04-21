@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "342c2d18-c0b9-4dd0-b3a6-8f4d7c80174d",
+		"_postman_id": "33b7c60f-1a42-4eec-af5f-3539ca0786eb",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -59,7 +59,7 @@
 								"uuid"
 							]
 						},
-						"description": "This request uses the `Mock Response` Endpoint Designer plugin to return a response directly from the Gateway when the API endpoint is called.\n\nThe mock response sets the response:\n- HTTP status code: `200 OK`\n- Body: See the mock JSON object in the response body\n- Headers: See the `Mock` header in the repsonse headers\n\nWhen the Mock Response is executed, the request does not reach the API Server.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only, see part 2 of this plugin to see what happens when version `2` is requested instead. Control of the version is"
+						"description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
 					},
 					"response": []
 				}
