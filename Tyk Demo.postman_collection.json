@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "33b7c60f-1a42-4eec-af5f-3539ca0786eb",
+		"_postman_id": "57945f11-5a90-4102-9eae-23c47b162e92",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -58,33 +58,33 @@
 					},
 					"response": []
 				},
-        {
-          "name": "Cache",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "x-api-version",
-                "type": "text",
-                "value": "Default"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:8080/plugin-demo-api/uuid",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "plugin-demo-api",
-                "uuid"
-              ]
-            },
-            "description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
-          },
-          "response": []
-        }
+				{
+					"name": "Cache",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-version",
+								"type": "text",
+								"value": "Default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/plugin-demo-api/uuid",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"plugin-demo-api",
+								"uuid"
+							]
+						},
+						"description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
+					},
+					"response": []
+				}
 			],
 			"protocolProfileBehavior": {}
 		},
@@ -302,7 +302,7 @@
 								"mock"
 							]
 						},
-						"description": "**Note:** This request requires that the `add-gateway.sh` script is run first.\n\nThis request is sent to the container mapped on port `8088`. This container is not part of the base docker compose setup, so will not normally be available. Instead, it has to be manually created using the `add-gateway.sh` script for the purposes of demonstration. This container uses the same setup as the other containers, it connects to the same database and loads the same API definitions and policies - you can see this be making this request, it does to the same `plugin-demo-api` used elsewhere."
+						"description": "This request is sent to the container mapped on port `8081`. It is the TLS-enabled Gateway which is otherwise configured the same as the HTTP-only Gateway.\n\nYou can use the `add-gateway.sh` script to add more Gateways. Note that in order to access them using this request, you will need to use `http` and change the port number."
 					},
 					"response": []
 				}
