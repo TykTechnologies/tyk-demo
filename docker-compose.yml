@@ -130,6 +130,7 @@ services:
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
       - TYK_DB_MONGOURL=mongodb://e2-tyk-mongo:27017/tyk_analytics
+      - TYK_DB_REDISHOST=e2-tyk-redis
       - TYK_DB_TYKAPICONFIG_HOST=http://e2-tyk-gateway
       - TYK_DB_HOSTCONFIG_OVERRIDEHOSTNAME=localhost:8085
     depends_on:
