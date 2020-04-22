@@ -160,7 +160,7 @@ curl $kibana_base_url/api/saved_objects/visualization/407e91c0-8168-11ea-9323-29
   > /dev/null
 echo "  Done"
 
-echo "Setting up Jenkins"
+echo "Getting Jenkins admin password"
 jenkins_admin_password=$(cat ./jenkins_home/secrets/initialAdminPassword)
 echo "  Done"
 
