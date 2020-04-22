@@ -2,7 +2,7 @@
 
 docker run \
   -d \
-  -p 8088:8080 \
+  -P \
   -v $(pwd)/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf \
   -v $(pwd)/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware \
   --network tyk-pro-docker-demo-extended_tyk \

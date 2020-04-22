@@ -159,3 +159,7 @@ If you go to SSO-enabled Dashboard http://localhost:3001 it will redirect you to
 This will redirect back to the Dashboard, using a temporary session created via the Identity Broker and Dashboard SSO API.
 
 Functionality is based on the `division` attribute of the Okta user profile and ID token. The value of which is matched against the `UserGroupMapping` property of the `tyk-dashboard` Identity Broker profile.
+
+# Scaling the solution
+
+Run the `add-gateway.sh` script to create a new Gateway instance. It will behave like the existing `tyk-gateway` container as it will use the same configuration. The new Gateway will be mapped on a random port, to avoid collisions.
