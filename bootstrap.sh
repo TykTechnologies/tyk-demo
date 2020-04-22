@@ -1,7 +1,9 @@
 #!/bin/bash
 
 dashboard_base_url="http://localhost:3000"
+dashboard_sso_base_url="http://localhost:3001"
 gateway_base_url="http://localhost:8080"
+gateway_tls_base_url="https://localhost:8081"
 kibana_base_url="http://localhost:5601"
 identity_broker_base_url="http://localhost:3010"
 
@@ -187,6 +189,7 @@ cat <<EOF
 
 Dashboard
   URL      : $dashboard_base_url
+             $dashboard_sso_base_url (SSO)
   Username : $dashboard_user_email
   Password : $dashboard_user_password
 
@@ -197,6 +200,7 @@ Portal
 
 Gateway
   URL : $gateway_base_url
+        $gateway_tls_base_url
 
 Kibana
   URL : $kibana_base_url
