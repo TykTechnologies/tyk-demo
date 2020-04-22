@@ -12,9 +12,8 @@ pipeline {
             }
             steps {
                 echo "Deploying from ${env.BRANCH_NAME}"
-                sh "wget https://github.com/davegarvey/tyk-jenkins-cicd-sync/releases/download/1/tyk-sync-1.0.0"
-                sh "chmod +x tyk-sync-1.0.0"
-                sh "./tyk-sync-1.0.0 sync -d http://e2-tyk-dashboard:3002 -s ${env.TYK_DASH_SECRET} -p ./tyk-sync-data"
+                sh "chmod +x $(pwd)/volumes/jenkins/tyk-sync"
+                sh "./volumes/jenkins/tyk-sync sync -d http://e2-tyk-dashboard:3000 -s ${env.TYK_DASH_SECRET} -p $(pwd)/tyk-sync-data"
             }
         }
     }
