@@ -308,6 +308,61 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Importing Data",
+			"item": [
+				{
+					"name": "Import custom key (part 1)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-tyk-authorization",
+								"value": "28d220fd77974a4facfb07dc1e49c2aa",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"last_check\": 0,\n    \"allowance\": 1000,\n    \"rate\": 1000,\n    \"per\": 60,\n    \"throttle_interval\": -1,\n    \"throttle_retry_limit\": -1,\n    \"expires\": 0,\n    \"quota_max\": -1,\n    \"quota_renews\": 1587521934,\n    \"quota_remaining\": -1,\n    \"quota_renewal_rate\": -1,\n    \"access_rights\": {\n        \"accbdd1b89e84ec97f4f16d4e3197d5c\": {\n            \"api_name\": \"Basic Protected API\",\n            \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\n            \"versions\": [\n                \"Default\"\n            ],\n            \"allowed_urls\": [],\n            \"limit\": null,\n            \"allowance_scope\": \"\"\n        }\n    },\n    \"org_id\": \"5e9d9544a1dcd60001d0ed20\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/tyk/keys/my-custom-key",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tyk",
+								"keys",
+								"my-custom-key"
+							]
+						},
+						"description": "This request uses the Gateway API to import a custom key. The Gateway API is used as the Gateway is responsible for managing keys.\n\nThe URL defines the id that the key will be assigned, in this instance `my-custom-key`, which is very different to the random values assigned by the Gateway when creating keys normally.\n\nOnce imported, the key can be used to access the `Basic Protected API` (see part 2), as defined in the `access_rights` section of the key definition JSON (see request Body)."
+					},
+					"response": []
+				},
+				{
+					"name": "Import custom key (part 2)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						},
+						"description": "This request uses the custom key imported in Part 1 (which must be run prior to this) to access a protected API.\n\nThe custom key is provided in the `Authorization` header."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"protocolProfileBehavior": {}
