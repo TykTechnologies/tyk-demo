@@ -109,7 +109,15 @@ services:
       - SESSION_SECRET=12345
     volumes:
       - "./volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf"
-  
+  jenkins:
+    image: jenkins/jenkins:lts
+    ports:
+      - "8082:8080"
+    networks:
+      - tyk
+    volumes:
+      - ./jenkins_home:/var/jenkins_home  
+
 volumes:
   redis-data:
   mongo-data:

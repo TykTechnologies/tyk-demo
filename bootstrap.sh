@@ -6,6 +6,7 @@ gateway_base_url="http://localhost:8080"
 gateway_tls_base_url="https://localhost:8081"
 kibana_base_url="http://localhost:5601"
 identity_broker_base_url="http://localhost:3010"
+jenkins_base_url="http://localhost:8082"
 
 echo "Making scripts executable"
 chmod +x dump.sh
@@ -159,6 +160,10 @@ curl $kibana_base_url/api/saved_objects/visualization/407e91c0-8168-11ea-9323-29
   > /dev/null
 echo "  Done"
 
+echo "Setting up Jenkins"
+jenkins_admin_password=$(cat ./jenkins_home/secrets/initialAdminPassword)
+echo "  Done"
+
 echo "Making test call to Bootstrap API"
 bootstrap_api_status=$(curl -I $gateway_base_url/bootstrap-api/get 2>/dev/null | head -n 1 | cut -d$' ' -f2)
 if [ "$bootstrap_api_status" != "200" ]
@@ -204,5 +209,9 @@ Gateway
 
 Kibana
   URL : $kibana_base_url
+
+Jenkins
+  URL      : $jenkins_base_url
+  Password : $jenkins_admin_password
 
 EOF

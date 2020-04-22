@@ -20,6 +20,8 @@ Run Docker compose:
 
 ```
 docker-compose up -d
+
+-d: daemon-mode
 ```
 
 Please note that this command may take a while to complete, as Docker needs to download images and provision the containers.
