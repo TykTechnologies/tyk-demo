@@ -191,6 +191,10 @@ echo "Getting Jenkins admin password"
 jenkins_admin_password=$(docker-compose exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword)
 echo "  Done"
 
+echo "Making Jenkins CLI available"
+docker-compose exec jenkins curl -L -o /var/jenkins_home/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar > /dev/null
+echo "  Done"
+
 echo "Making test call to Bootstrap API"
 bootstrap_api_status=$(curl -I $gateway_base_url/bootstrap-api/get 2>/dev/null | head -n 1 | cut -d$' ' -f2)
 if [ "$bootstrap_api_status" != "200" ]
