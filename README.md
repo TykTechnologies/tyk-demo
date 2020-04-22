@@ -165,3 +165,9 @@ Functionality is based on the `division` attribute of the Okta user profile and 
 # Scaling the solution
 
 Run the `add-gateway.sh` script to create a new Gateway instance. It will behave like the existing `tyk-gateway` container as it will use the same configuration. The new Gateway will be mapped on a random port, to avoid collisions.
+
+# Jenkins
+
+General setup is manual for the moment.
+
+The Jenkins CLI is set up as part of the `bootstrap.sh` process. This may be useful for importing job data etc.
