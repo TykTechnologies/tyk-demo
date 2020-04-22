@@ -6,7 +6,9 @@ gateway_base_url="http://localhost:8080"
 gateway_tls_base_url="https://localhost:8081"
 kibana_base_url="http://localhost:5601"
 identity_broker_base_url="http://localhost:3010"
-jenkins_base_url="http://localhost:8082"
+jenkins_base_url="http://localhost:8070"
+e2_dashboard_base_url="http://localhost:3002"
+e2_gateway_base_url="http://localhost:8085"
 
 echo "Making scripts executable"
 chmod +x dump.sh
@@ -28,6 +30,13 @@ organisation_id=$(curl $dashboard_base_url/admin/organisations/import \
   | jq -r '.Meta')
 echo $organisation_id > .organisation-id
 echo "  Organisation Id: $organisation_id"
+echo "  Importing same organisation into environment 2"
+curl $e2_dashboard_base_url/admin/organisations/import \
+  --silent \
+  --header "admin-auth: $dashboard_admin_api_credentials" \
+  --data @bootstrap-data/tyk-dashboard/organisation.json \
+  > /dev/null
+echo "  Done"
 
 echo "Creating Dashboard user"
 dashboard_user_email=$(jq -r '.email_address' bootstrap-data/tyk-dashboard/dashboard-user.json)
@@ -52,6 +61,24 @@ echo "  Username: $dashboard_user_email"
 echo "  Password: $dashboard_user_password"
 echo "  Dashboard API Credentials: $dashboard_user_api_credentials"
 echo "  ID: $dashboard_user_id"
+
+echo "Creating Dashboard user for environment 2"
+e2_dashboard_user_api_response=$(curl $e2_dashboard_base_url/admin/users \
+  --silent \
+  --header "admin-auth: $dashboard_admin_api_credentials" \
+  --data @bootstrap-data/tyk-dashboard/dashboard-user.json \
+  | jq -r '. | {api_key:.Message, id:.Meta.id}')
+e2_dashboard_user_id=$(echo $e2_dashboard_user_api_response | jq -r '.id')
+e2_dashboard_user_api_credentials=$(echo $e2_dashboard_user_api_response | jq -r '.api_key')
+curl $e2_dashboard_base_url/api/users/$e2_dashboard_user_id/actions/reset \
+  --silent \
+  --header "authorization: $e2_dashboard_user_api_credentials" \
+  --data-raw '{
+      "new_password":"'$dashboard_user_password'",
+      "user_permissions": { "IsAdmin": "admin" }
+    }' \
+  > /dev/null
+echo "  Dashboard API Credentials: $e2_dashboard_user_api_credentials"
 
 echo "Creating Dashboard User Groups"
 curl $dashboard_base_url/api/usergroups \
@@ -161,7 +188,7 @@ curl $kibana_base_url/api/saved_objects/visualization/407e91c0-8168-11ea-9323-29
 echo "  Done"
 
 echo "Getting Jenkins admin password"
-jenkins_admin_password=$(cat ./jenkins_home/secrets/initialAdminPassword)
+jenkins_admin_password=$(docker-compose exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword)
 echo "  Done"
 
 echo "Making test call to Bootstrap API"
@@ -192,26 +219,28 @@ cat <<EOF
                              ################                         
                                ##########/                            
 
-Dashboard
-  URL      : $dashboard_base_url
+ Dashboard
+       URL : $dashboard_base_url
              $dashboard_sso_base_url (SSO)
+             $e2_dashboard_base_url (Environment 2)
   Username : $dashboard_user_email
   Password : $dashboard_user_password
 
-Portal
-  URL      : $dashboard_base_url$portal_root_path
+    Portal
+       URL : $dashboard_base_url$portal_root_path
   Username : $portal_user_email
   Password : $portal_user_password
 
-Gateway
-  URL : $gateway_base_url
-        $gateway_tls_base_url
+   Gateway
+       URL : $gateway_base_url
+             $gateway_tls_base_url
+             $e2_gateway_base_url (Environment 2)
 
-Kibana
-  URL : $kibana_base_url
+    Kibana
+       URL : $kibana_base_url
 
-Jenkins
-  URL      : $jenkins_base_url
+   Jenkins
+       URL : $jenkins_base_url
   Password : $jenkins_admin_password
 
 EOF
