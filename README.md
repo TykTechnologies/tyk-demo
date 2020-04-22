@@ -146,7 +146,7 @@ Go to http://localhost:5601/app/kibana to access Kibana and view the visualisati
 
 The `dashboard-sso` container is set up to provide a Dashboard using SSO. It works in conjunction with the Identity Broker and Okta to enable this.
 
-If you go to SSO-enabled Dashboard http://localhost:3001 it will redirect you to the Okta login page, where you can use these credentials to log in:
+If you go to SSO-enabled Dashboard http://localhost:3001 (in a private browser session to avoid sending any pre-existing auth cookies) it will redirect you to the Okta login page, where you can use these credentials to log in:
 
   - Admin user:
     - Username: `dashboard.admin@example.org`
