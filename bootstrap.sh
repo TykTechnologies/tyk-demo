@@ -30,7 +30,8 @@ organisation_id=$(curl $dashboard_base_url/admin/organisations/import \
   | jq -r '.Meta')
 echo $organisation_id > .organisation-id
 echo "  Organisation Id: $organisation_id"
-echo "  Importing same organisation into environment 2"
+
+echo "Importing Organisation for environment 2"
 curl $e2_dashboard_base_url/admin/organisations/import \
   --silent \
   --header "admin-auth: $dashboard_admin_api_credentials" \
