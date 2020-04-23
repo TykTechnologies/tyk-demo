@@ -170,7 +170,7 @@ Run the `add-gateway.sh` script to create a new Gateway instance. It will behave
 
 Jenkins is used to provide an automated way of pushing API Definitions and Policies to different Tyk environments. It uses the `tyk-sync` CLI tool and a Github repository to achieve this.
 
-The `docker-compose.yml` has some services prefixed with `e2`. These represent a separate Tyk environment, with an independent Gateway, Dashboard, Pump and databases. We can use Jenkins to automate the deployment of API Definitions and Policies from the 'normal' environment to the 'separate' environment.
+The `docker-compose.yml` has some services prefixed with `e2`. These represent a separate Tyk environment, with an independent Gateway, Dashboard, Pump and databases. We can use Jenkins to automate the deployment of API Definitions and Policies from the default environment to the e2 environment.
 
 ## Setup
 
@@ -179,13 +179,19 @@ Setting up Jenkins is a manual process:
 1. Browse to [Jenkins web UI](http://localhost:8070)
 2. Use the Jenkins admin credentials provided by the `bootstrap.sh` script to log in
 3. Install recommended plugins
-4. Create a new job:
+4. Add credentials: (these are needed by `tyk-sync` to push data into the e2 Dashboard)
+  - Kind: Secret text
+  - Scope: Global (this is just a PoC...)
+  - Secret: The e2 Dashboard API credentials, shown in `Creating Dashboard user for environment 2` section of the `bootstrap.sh` output
+  - ID: `tyk-dash-secret`
+  - Description: `Tyk Dashboard Secret`
+5. Create a new job:
   - Name: `APIs and Policies`
   - Type: Multibranch Pipeline
   - Branch Source: Github
   - Branch Source Credentials: Your Github credentials (to avoid using anonymous GitHub API usage, which is very restrictive)
   - Branch Source -> Repository HTTPS URL: Github URL for this repository
-  - Build Configuration -> Script Path: `volumes/jenkins/JenkinsFile` (this is case sensitive)
+  - Build Configuration -> Script Path: `volumes/jenkins/JenkinsFile`
 
 Ideally, this will be automated in the future.
 
@@ -193,11 +199,18 @@ Ideally, this will be automated in the future.
 
 This CI/CD functionality can be demonstrated as follows:
 
-1. Log into the ['separate' Dashboard](http://localhost:3002) (use credentials shown in `bootstrap.sh` output, and use a private session to avoid invalidating your session cookie for the 'normal' Dashboard)
+1. Log into the [e2 Dashboard](http://localhost:3002) (using credentials shown in `bootstrap.sh` output, and a private browser session to avoid invalidating your session cookie for the default Dashboard)
 2. You will see that there are no API Definitions or Policies
-3. Set the `APIs and Polcies` job to build in Jenkins
-4. Check the 'separate' Dashboard, you will now see that it has the same API Definitions and Policies as the 'normal' Dashboard. 
+3. Build the `APIs and Polcies` job in Jenkins
+4. Check the e2 Dashboard again, you will now see that it has the same API Definitions and Policies as the default Dashboard.
+5. Check that the e2 Gateway can proxy requests for these APIs by making a request to the [Basic Open API](http://localhost:8085/basic-open-api)
 
 ## Jenkins CLI
 
-The Jenkins CLI is set up as part of the `bootstrap.sh` process. This may be useful for importing job data etc.
+The Jenkins CLI is set up as part of the `bootstrap.sh` process. This may be useful for importing job data etc. See [the Jenkins wiki](https://wiki.jenkins.io/display/JENKINS/Jenkins+CLI) and [Jenkins commands](http://localhost:8070/cli/) for reference.
+
+Commands can be sent to the CLI via docker. Here's an example which gets the 'APIs and Policies' Job we created, but replace `f284436d222a4d73841ae92ebc5928e8` with your Jenkins admin password:
+
+```
+docker-compose exec jenkins java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ -auth admin:f284436d222a4d73841ae92ebc5928e8 -webSocket get-job 'APIs and Policies'
+```
