@@ -1,0 +1,8 @@
+{
+  "org_id": "",
+  "api_model": {},
+  "template_path": "",
+  "name": "Webhook Receiver Post",
+  "method": "POST",
+  "target_path": "http://localhost:8080/webhook-receiver/post"
+}
