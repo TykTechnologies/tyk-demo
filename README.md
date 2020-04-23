@@ -20,36 +20,13 @@ Run Docker compose:
 
 ```
 docker-compose up -d
-
--d: daemon-mode
 ```
+
+Using `-d` creates the containers in detached mode, running them in the background.
 
 Please note that this command may take a while to complete, as Docker needs to download images and provision the containers.
 
 ## Step 3: Install dependencies
-
-### Tyk Sync
-
-[Tyk Sync](https://tyk.io/docs/advanced-configuration/manage-multiple-environments/tyk-sync/) is used to synchronise API and Policy data. Install it as follows:
-Please ensure `go` has been installed before trying below commands.
-
-Please try other commands if the first one doesn't work. or
-
-```
-go install -u github.com/TykTechnologies/tyk-sync
-```
-  or              
-
-```
-go install -i github.com/TykTechnologies/tyk-sync
-```
-  or              
-
-```
-go get github.com/TykTechnologies/tyk-sync
-```
-
-After installation,please ensure `tyk-sync` is added to your system `PATH`
 
 ### JQ
 
@@ -81,13 +58,14 @@ When you log into the Dashboard, you will find the imported APIs and Policies ar
 
 ## Step 6: Terminating Docker containers
 
-To bring down the containers and delete asscociated volumes (To end-up with clean slate)
+To bring down the containers and delete asscociated volumes (To end-up with clean slate):
 
 ```
 docker-compose down -v
 ```
 
-To bring down just the containers
+To bring down just the containers:
+
 ```
 docker-compose down
 ```
