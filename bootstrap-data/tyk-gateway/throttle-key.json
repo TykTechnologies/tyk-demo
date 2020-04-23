@@ -1,0 +1,54 @@
+{
+  "last_check": 0,
+  "allowance": 2,
+  "rate": 2,
+  "per": 5,
+  "throttle_interval": 5,
+  "throttle_retry_limit": 2,
+  "date_created": "2020-04-23T04:41:37.0404484Z",
+  "expires": 0,
+  "quota_max": -1,
+  "quota_renews": 1587616896,
+  "quota_remaining": -1,
+  "quota_renewal_rate": -1,
+  "access_rights": {
+    "accbdd1b89e84ec97f4f16d4e3197d5c": {
+      "api_name": "Basic Protected API",
+      "api_id": "accbdd1b89e84ec97f4f16d4e3197d5c",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "limit": null,
+      "allowance_scope": ""
+    }
+  },
+  "org_id": "5e9d9544a1dcd60001d0ed20",
+  "oauth_client_id": "",
+  "oauth_keys": null,
+  "certificate": "",
+  "basic_auth_data": {
+    "user": "",
+    "password": "",
+    "hash_type": ""
+  },
+  "jwt_data": {
+    "secret": ""
+  },
+  "hmac_enabled": false,
+  "hmac_string": "",
+  "is_inactive": false,
+  "apply_policy_id": "",
+  "apply_policies": [],
+  "data_expires": 0,
+  "monitor": {
+    "trigger_limits": null
+  },
+  "enable_detail_recording": false,
+  "meta_data": {},
+  "tags": [],
+  "alias": "",
+  "last_updated": "1587616897",
+  "id_extractor_deadline": 0,
+  "session_lifetime": 0
+}
