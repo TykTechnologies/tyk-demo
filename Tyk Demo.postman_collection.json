@@ -6,360 +6,441 @@
 	},
 	"item": [
 		{
-			"name": "Endpoint Designer Plugins",
+			"name": "API Definition",
 			"item": [
 				{
-					"name": "Mock Response",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "x-api-version",
-								"value": "Default",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"plugin-demo-api",
-								"anything",
-								"mock"
-							]
-						},
-						"description": "This request uses the `Mock Response` Endpoint Designer plugin to return a response directly from the Gateway when the API endpoint is called.\n\nThe mock response sets the response:\n- HTTP status code: `200 OK`\n- Body: See the mock JSON object in the response body\n- Headers: See the `Mock` header in the repsonse headers\n\nWhen the Mock Response is executed, the request does not reach the API Server.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only, see part 2 of this plugin to see what happens when version `2` is requested instead. Control of the version is"
-					},
-					"response": []
-				},
-				{
-					"name": "Modify Headers",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/plugin-demo-api/anything/modify-headers",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"plugin-demo-api",
-								"anything",
-								"modify-headers"
-							]
-						},
-						"description": "To be updated"
-					},
-					"response": []
-				},
-				{
-					"name": "Cache",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "x-api-version",
-								"type": "text",
-								"value": "Default"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/plugin-demo-api/uuid",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"plugin-demo-api",
-								"uuid"
-							]
-						},
-						"description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
-					},
-					"response": []
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "Context Variables",
-			"item": [
-				{
-					"name": "Correlation Id",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/basic-open-api/get",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"basic-open-api",
-								"get"
-							]
-						},
-						"description": "Header `X-Req-Id` is injected by the Gateway, and can be seen in the response body. \n\nThe header value is a GUID representing the random id assigned to each request by the Gateway. It is configured using the Tyk context variable `$tyk_context.request_id`.\n\nThe value is accessible to various parts of the Tyk middleware chain, so can be used as a reference when processing requests."
-					},
-					"response": []
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "Middleware",
-			"item": [
-				{
-					"name": "JavaScript Middleware",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Deleted",
-								"value": "deleted value",
-								"type": "text"
-							},
-							{
-								"key": "Accepted",
-								"value": "789",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/javascript-middleware-api/post?deleted=deleted-value&accepted=456",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"javascript-middleware-api",
-								"post"
-							],
-							"query": [
-								{
-									"key": "deleted",
-									"value": "deleted-value"
+					"name": "Middleware",
+					"item": [
+						{
+							"name": "Middleware - JavaScript",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Deleted",
+										"value": "deleted value",
+										"type": "text"
+									},
+									{
+										"key": "Accepted",
+										"value": "789",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/javascript-middleware-api/post?deleted=deleted-value&accepted=456",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"javascript-middleware-api",
+										"post"
+									],
+									"query": [
+										{
+											"key": "deleted",
+											"value": "deleted-value"
+										},
+										{
+											"key": "accepted",
+											"value": "456"
+										}
+									]
 								},
-								{
-									"key": "accepted",
-									"value": "456"
-								}
-							]
-						},
-						"description": "Calls the `JavaScript Middleware API`, which executes two JavaScript middleware functions at the `pre` and `post` hooks.\n\nThe `pre` function does the following:\n- Writes to the API Gateway application log\n- Adds `User-Agent` header\n- Deletes `Deleted` header\n- Adds `added` URL parameter\n- Deletes `deleted` URL parameter\n- Changes the request body - see `data` property of response object\n- Changes the requested URL - see `url` property of response object\n\nThe `post` function does the following:\n- Writes to the API Gateway application log\n- Adds `config-data` header using value taken from API definition `config data`"
-					},
-					"response": []
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "Versioning",
-			"item": [
-				{
-					"name": "Versioning (part 1)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "x-api-version",
-								"value": "Default",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"plugin-demo-api",
-								"anything",
-								"mock"
-							]
-						},
-						"description": "This request uses the `Mock Response` Endpoint Designer plugin to demonstrate versioning. It shows how the API Gateway can change behaviour based on the requested version of an API. Using API versioning allows you to redefine how the API Gateway will handle endpoint requests.\n\nThe API used here has two versions:\n- `Default`: the default version, used in this request, which returns a mock response directly from the Gateway\n- `2`: the second version, used in part 2, which returns a response from the API server\n\nBoth versions make a request to the same API and API endpoint. The versioning is controlled by the `x-api-version` header in the request, which the Gateway will check to decide how the handle the request."
-					},
-					"response": []
+								"description": "Calls the `JavaScript Middleware API`, which executes two JavaScript middleware functions at the `pre` and `post` hooks.\n\nThe `pre` function does the following:\n- Writes to the API Gateway application log\n- Adds `User-Agent` header\n- Deletes `Deleted` header\n- Adds `added` URL parameter\n- Deletes `deleted` URL parameter\n- Changes the request body - see `data` property of response object\n- Changes the requested URL - see `url` property of response object\n\nThe `post` function does the following:\n- Writes to the API Gateway application log\n- Adds `config-data` header using value taken from API definition `config data`"
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Versioning (part 2)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "x-api-version",
-								"type": "text",
-								"value": "2"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"plugin-demo-api",
-								"anything",
-								"mock"
-							]
+					"name": "Endpoint Designer",
+					"item": [
+						{
+							"name": "Plugin - Mock Response",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-version",
+										"value": "Default",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"mock"
+									]
+								},
+								"description": "This request uses the `Mock Response` Endpoint Designer plugin to return a response directly from the Gateway when the API endpoint is called.\n\nThe mock response sets the response:\n- HTTP status code: `200 OK`\n- Body: See the mock JSON object in the response body\n- Headers: See the `Mock` header in the repsonse headers\n\nWhen the Mock Response is executed, the request does not reach the API Server.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only, see part 2 of this plugin to see what happens when version `2` is requested instead. Control of the version is"
+							},
+							"response": []
 						},
-						"description": "Part 2 of the versioning example. This request shows that when version `2` of the API is requested, the API Gateway proxies the request to the API server.\n\nThis request uses the same URL as part 1, but uses `2` as the value for the `x-api-version` request header."
-					},
-					"response": []
+						{
+							"name": "Plugin - Modify Headers",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/modify-headers",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"modify-headers"
+									]
+								},
+								"description": "To be updated"
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Cache",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-version",
+										"type": "text",
+										"value": "Default"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/uuid",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"uuid"
+									]
+								},
+								"description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "acfc7e7f-570f-4d77-bc52-cecab69a4962",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "f4715ee1-dd68-47ce-828a-b5c9f86ead48",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Versioning (part 3)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "x-api-version",
-								"type": "text",
-								"value": "expired"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"plugin-demo-api",
-								"anything",
-								"mock"
-							]
+					"name": "Versioning",
+					"item": [
+						{
+							"name": "Versioning (part 1) - Mock response",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-version",
+										"value": "Default",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"mock"
+									]
+								},
+								"description": "This request uses the `Mock Response` Endpoint Designer plugin to demonstrate versioning. It shows how the API Gateway can change behaviour based on the requested version of an API. Using API versioning allows you to redefine how the API Gateway will handle endpoint requests.\n\nThe API used here has two versions:\n- `Default`: the default version, used in this request, which returns a mock response directly from the Gateway\n- `2`: the second version, used in part 2, which returns a response from the API server\n\nBoth versions make a request to the same API and API endpoint. The versioning is controlled by the `x-api-version` header in the request, which the Gateway will check to decide how the handle the request."
+							},
+							"response": []
 						},
-						"description": "This request shows that version can be expired. In this case a version called `expired` was created with an expiry date in the past. This means that requests for this version are rejected by the Gateway, with a message provided in the response body which says the version has expired."
-					},
-					"response": []
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "TLS",
-			"item": [
-				{
-					"name": "TLS request to Gateway",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://localhost:8081/plugin-demo-api/anything/mock",
-							"protocol": "https",
-							"host": [
-								"localhost"
-							],
-							"port": "8081",
-							"path": [
-								"plugin-demo-api",
-								"anything",
-								"mock"
-							]
+						{
+							"name": "Versioning (part 2) - Normal response",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-version",
+										"type": "text",
+										"value": "2"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"mock"
+									]
+								},
+								"description": "Part 2 of the versioning example. This request shows that when version `2` of the API is requested, the API Gateway proxies the request to the API server.\n\nThis request uses the same URL as part 1, but uses `2` as the value for the `x-api-version` request header."
+							},
+							"response": []
 						},
-						"description": "This request uses the HTTPS scheme to connect to the API Gateway. The Gateway is configured to listen for requests on `localhost` and use a locally stored self-signed certificate.\n\nThis is configured in the `http_server_options` section of the Gateway's configuration file.\n\n**Note:** self-signed cetificates will fail verification by an API client, which will prevent the request for working. To resolve this, configure your client to allow self-signed certificates."
-					},
-					"response": []
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "Scaling",
-			"item": [
-				{
-					"name": "Send request to additional Gateway",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://localhost:8081/plugin-demo-api/anything/mock",
-							"protocol": "https",
-							"host": [
-								"localhost"
-							],
-							"port": "8081",
-							"path": [
-								"plugin-demo-api",
-								"anything",
-								"mock"
-							]
-						},
-						"description": "This request is sent to the container mapped on port `8081`. It is the TLS-enabled Gateway which is otherwise configured the same as the HTTP-only Gateway.\n\nYou can use the `add-gateway.sh` script to add more Gateways. Note that in order to access them using this request, you will need to use `http` and change the port number."
-					},
-					"response": []
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "Importing Data",
-			"item": [
-				{
-					"name": "Import custom key (part 1)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "x-tyk-authorization",
-								"value": "28d220fd77974a4facfb07dc1e49c2aa",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"last_check\": 0,\n    \"allowance\": 1000,\n    \"rate\": 1000,\n    \"per\": 60,\n    \"throttle_interval\": -1,\n    \"throttle_retry_limit\": -1,\n    \"expires\": 0,\n    \"quota_max\": -1,\n    \"quota_renews\": 1587521934,\n    \"quota_remaining\": -1,\n    \"quota_renewal_rate\": -1,\n    \"access_rights\": {\n        \"accbdd1b89e84ec97f4f16d4e3197d5c\": {\n            \"api_name\": \"Basic Protected API\",\n            \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\n            \"versions\": [\n                \"Default\"\n            ],\n            \"allowed_urls\": [],\n            \"limit\": null,\n            \"allowance_scope\": \"\"\n        }\n    },\n    \"org_id\": \"5e9d9544a1dcd60001d0ed20\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/tyk/keys/my-custom-key",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"tyk",
-								"keys",
-								"my-custom-key"
-							]
-						},
-						"description": "This request uses the Gateway API to import a custom key. The Gateway API is used as the Gateway is responsible for managing keys.\n\nThe URL defines the id that the key will be assigned, in this instance `my-custom-key`, which is very different to the random values assigned by the Gateway when creating keys normally.\n\nOnce imported, the key can be used to access the `Basic Protected API` (see part 2), as defined in the `access_rights` section of the key definition JSON (see request Body)."
-					},
-					"response": []
+						{
+							"name": "Versioning (part 3) - Expired version",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-version",
+										"type": "text",
+										"value": "expired"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"mock"
+									]
+								},
+								"description": "This request shows that version can be expired. In this case a version called `expired` was created with an expiry date in the past. This means that requests for this version are rejected by the Gateway, with a message provided in the response body which says the version has expired."
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Import custom key (part 2)",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": ""
+					"name": "Context Variables",
+					"item": [
+						{
+							"name": "Context Variables - Correlation Id",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/basic-open-api/get",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"basic-open-api",
+										"get"
+									]
+								},
+								"description": "Header `X-Req-Id` is injected by the Gateway, and can be seen in the response body. \n\nThe header value is a GUID representing the random id assigned to each request by the Gateway. It is configured using the Tyk context variable `$tyk_context.request_id`.\n\nThe value is accessible to various parts of the Tyk middleware chain, so can be used as a reference when processing requests."
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Webhooks",
+					"item": [
+						{
+							"name": "Webhooks - Authentication Failure",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "sdfsdf",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/basic-protected-api/get",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"basic-protected-api",
+										"get"
+									]
+								},
+								"description": "This example makes an unauthenticated request to the `Basic Protected API`. The API requires authentication so the request fails, as expected, with a `403 Forbidden` response.\n\nThe `Basic Protected API` is configured to use a webhook in the event of authentication failure. This webhook calls another API, passing information about the failed request. You can see this webhook call in the Dashboard analytics, it's made to the `Webhook Receiver` API, and will appear straight after this failed API request to `Basic Protected API`. In the analytics record, check the body of the request to see origin of the request and key which was used.\n\nWebhooks can be set up to handle lots of different types of events, such as rate limit exceeded, quota exceeded etc. They can also be configured with a cooldown time so that the events don't overload the API receiving the webhooks."
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "System Management",
+			"item": [
+				{
+					"name": "Importing Data",
+					"item": [
+						{
+							"name": "Import custom key (part 1)",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-tyk-authorization",
+										"value": "28d220fd77974a4facfb07dc1e49c2aa",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"last_check\": 0,\n    \"allowance\": 1000,\n    \"rate\": 1000,\n    \"per\": 60,\n    \"throttle_interval\": -1,\n    \"throttle_retry_limit\": -1,\n    \"expires\": 0,\n    \"quota_max\": -1,\n    \"quota_renews\": 1587521934,\n    \"quota_remaining\": -1,\n    \"quota_renewal_rate\": -1,\n    \"access_rights\": {\n        \"accbdd1b89e84ec97f4f16d4e3197d5c\": {\n            \"api_name\": \"Basic Protected API\",\n            \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\n            \"versions\": [\n                \"Default\"\n            ],\n            \"allowed_urls\": [],\n            \"limit\": null,\n            \"allowance_scope\": \"\"\n        }\n    },\n    \"org_id\": \"5e9d9544a1dcd60001d0ed20\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/tyk/keys/my-custom-key",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"tyk",
+										"keys",
+										"my-custom-key"
+									]
+								},
+								"description": "This request uses the Gateway API to import a custom key. The Gateway API is used as the Gateway is responsible for managing keys.\n\nThe URL defines the id that the key will be assigned, in this instance `my-custom-key`, which is very different to the random values assigned by the Gateway when creating keys normally.\n\nOnce imported, the key can be used to access the `Basic Protected API` (see part 2), as defined in the `access_rights` section of the key definition JSON (see request Body)."
+							},
+							"response": []
 						},
-						"description": "This request uses the custom key imported in Part 1 (which must be run prior to this) to access a protected API.\n\nThe custom key is provided in the `Authorization` header."
-					},
-					"response": []
+						{
+							"name": "Import custom key (part 2)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": ""
+								},
+								"description": "This request uses the custom key imported in Part 1 (which must be run prior to this) to access a protected API.\n\nThe custom key is provided in the `Authorization` header."
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Scaling",
+					"item": [
+						{
+							"name": "Send request to additional Gateway",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8081/plugin-demo-api/anything/mock",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"mock"
+									]
+								},
+								"description": "This request is sent to the container mapped on port `8081`. It is the TLS-enabled Gateway which is otherwise configured the same as the HTTP-only Gateway.\n\nYou can use the `add-gateway.sh` script to add more Gateways. Note that in order to access them using this request, you will need to use `http` and change the port number."
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Gateway Configuration",
+			"item": [
+				{
+					"name": "TLS",
+					"item": [
+						{
+							"name": "TLS request to Gateway",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8081/plugin-demo-api/anything/mock",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"mock"
+									]
+								},
+								"description": "This request uses the HTTPS scheme to connect to the API Gateway. The Gateway is configured to listen for requests on `localhost` and use a locally stored self-signed certificate.\n\nThis is configured in the `http_server_options` section of the Gateway's configuration file.\n\n**Note:** self-signed cetificates will fail verification by an API client, which will prevent the request for working. To resolve this, configure your client to allow self-signed certificates."
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
