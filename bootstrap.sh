@@ -98,7 +98,8 @@ echo "  Done"
 echo "Creating Webhooks"
 curl $dashboard_base_url/api/hooks -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @bootstrap-data/tyk-dashboard/webhook-webhook-receiver-api-post.json  
+  -d @bootstrap-data/tyk-dashboard/webhook-webhook-receiver-api-post.json \
+  > /dev/null
 echo "  Done"
 
 echo "Creating Portal default settings"
