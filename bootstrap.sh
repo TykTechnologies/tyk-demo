@@ -23,35 +23,31 @@ echo "  Dashboard Admin API Credentials: $dashboard_admin_api_credentials"
 echo "  Portal Root Path: $portal_root_path"
 
 echo "Importing Organisation"
-organisation_id=$(curl $dashboard_base_url/admin/organisations/import \
-  --silent \
-  --header "admin-auth: $dashboard_admin_api_credentials" \
-  --data @bootstrap-data/tyk-dashboard/organisation.json \
+organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d @bootstrap-data/tyk-dashboard/organisation.json \
   | jq -r '.Meta')
 echo $organisation_id > .organisation-id
 echo "  Organisation Id: $organisation_id"
 
 echo "Importing Organisation for environment 2"
-curl $e2_dashboard_base_url/admin/organisations/import \
-  --silent \
-  --header "admin-auth: $dashboard_admin_api_credentials" \
-  --data @bootstrap-data/tyk-dashboard/organisation.json \
+curl $e2_dashboard_base_url/admin/organisations/import -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d @bootstrap-data/tyk-dashboard/organisation.json \
   > /dev/null
 echo "  Done"
 
 echo "Creating Dashboard user"
 dashboard_user_email=$(jq -r '.email_address' bootstrap-data/tyk-dashboard/dashboard-user.json)
-dashboard_user_api_response=$(curl $dashboard_base_url/admin/users \
-  --silent \
-  --header "admin-auth: $dashboard_admin_api_credentials" \
-  --data @bootstrap-data/tyk-dashboard/dashboard-user.json \
+dashboard_user_api_response=$(curl $dashboard_base_url/admin/users -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d @bootstrap-data/tyk-dashboard/dashboard-user.json \
   | jq -r '. | {api_key:.Message, id:.Meta.id}')
 dashboard_user_id=$(echo $dashboard_user_api_response | jq -r '.id')
 dashboard_user_api_credentials=$(echo $dashboard_user_api_response | jq -r '.api_key')
 dashboard_user_password=$(jq -r '.password' bootstrap-data/tyk-dashboard/dashboard-user.json)
-curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset \
-  --silent \
-  --header "authorization: $dashboard_user_api_credentials" \
+curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset -s \
+  -H "authorization: $dashboard_user_api_credentials" \
   --data-raw '{
       "new_password":"'$dashboard_user_password'",
       "user_permissions": { "IsAdmin": "admin" }
@@ -64,16 +60,14 @@ echo "  Dashboard API Credentials: $dashboard_user_api_credentials"
 echo "  ID: $dashboard_user_id"
 
 echo "Creating Dashboard user for environment 2"
-e2_dashboard_user_api_response=$(curl $e2_dashboard_base_url/admin/users \
-  --silent \
-  --header "admin-auth: $dashboard_admin_api_credentials" \
-  --data @bootstrap-data/tyk-dashboard/dashboard-user.json \
+e2_dashboard_user_api_response=$(curl $e2_dashboard_base_url/admin/users -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d @bootstrap-data/tyk-dashboard/dashboard-user.json \
   | jq -r '. | {api_key:.Message, id:.Meta.id}')
 e2_dashboard_user_id=$(echo $e2_dashboard_user_api_response | jq -r '.id')
 e2_dashboard_user_api_credentials=$(echo $e2_dashboard_user_api_response | jq -r '.api_key')
-curl $e2_dashboard_base_url/api/users/$e2_dashboard_user_id/actions/reset \
-  --silent \
-  --header "authorization: $e2_dashboard_user_api_credentials" \
+curl $e2_dashboard_base_url/api/users/$e2_dashboard_user_id/actions/reset -s \
+  -H "authorization: $e2_dashboard_user_api_credentials" \
   --data-raw '{
       "new_password":"'$dashboard_user_password'",
       "user_permissions": { "IsAdmin": "admin" }
@@ -82,57 +76,49 @@ curl $e2_dashboard_base_url/api/users/$e2_dashboard_user_id/actions/reset \
 echo "  Dashboard API Credentials: $e2_dashboard_user_api_credentials"
 
 echo "Creating Dashboard User Groups"
-curl $dashboard_base_url/api/usergroups \
-  --silent \
-  --header "Authorization: $dashboard_user_api_credentials" \
-  --data @bootstrap-data/tyk-dashboard/usergroup-readonly.json \
+curl $dashboard_base_url/api/usergroups -s \
+  -H "Authorization: $dashboard_user_api_credentials" \
+  -d @bootstrap-data/tyk-dashboard/usergroup-readonly.json \
   > /dev/null
-curl $dashboard_base_url/api/usergroups \
-  --silent \
-  --header "Authorization: $dashboard_user_api_credentials" \
-  --data @bootstrap-data/tyk-dashboard/usergroup-default.json \
+curl $dashboard_base_url/api/usergroups -s \
+  -H "Authorization: $dashboard_user_api_credentials" \
+  -d @bootstrap-data/tyk-dashboard/usergroup-default.json \
   > /dev/null
-curl $dashboard_base_url/api/usergroups \
-  --silent \
-  --header "Authorization: $dashboard_user_api_credentials" \
-  --data @bootstrap-data/tyk-dashboard/usergroup-admin.json \
+curl $dashboard_base_url/api/usergroups -s \
+  -H "Authorization: $dashboard_user_api_credentials" \
+  -d @bootstrap-data/tyk-dashboard/usergroup-admin.json \
   > /dev/null
-user_group_data=$(curl $dashboard_base_url/api/usergroups \
-  --silent \
-  --header "Authorization: $dashboard_user_api_credentials")
+user_group_data=$(curl $dashboard_base_url/api/usergroups -s \
+  -H "Authorization: $dashboard_user_api_credentials")
 user_group_readonly_id=$(echo $user_group_data | jq -r .groups[0].id)
 user_group_default_id=$(echo $user_group_data | jq -r .groups[1].id)
 user_group_admin_id=$(echo $user_group_data | jq -r .groups[2].id)
 echo "  Done"
 
 echo "Creating Portal default settings"
-curl $dashboard_base_url/api/portal/catalogue \
-  --silent \
-  --header "Authorization: $dashboard_user_api_credentials" \
-  --data '{"org_id": "'$organisation_id'"}' \
+curl $dashboard_base_url/api/portal/catalogue -s \
+  -H "Authorization: $dashboard_user_api_credentials" \
+  -d '{"org_id": "'$organisation_id'"}' \
   > /dev/null
-curl $dashboard_base_url/api/portal/configuration \
-  --silent \
-  --header "Authorization: $dashboard_user_api_credentials" \
-  --data "{}" \
+curl $dashboard_base_url/api/portal/configuration -s \
+  -H "Authorization: $dashboard_user_api_credentials" \
+  -d "{}" \
   > /dev/null
 echo "  Done"
 
 echo "Creating Portal home page"
-curl $dashboard_base_url/api/portal/pages \
-  --silent \
-  --header "Authorization: $dashboard_user_api_credentials" \
-  --data @bootstrap-data/tyk-dashboard/portal-home-page.json \
+curl $dashboard_base_url/api/portal/pages -s \
+  -H "Authorization: $dashboard_user_api_credentials" \
+  -d @bootstrap-data/tyk-dashboard/portal-home-page.json \
   > /dev/null
 echo "  Done"
 
 echo "Creating Portal user"
 portal_user_email=$(jq -r '.email' bootstrap-data/tyk-dashboard/portal-user.json)
 portal_user_password=$(openssl rand -base64 12)
-curl $dashboard_base_url/api/portal/developers \
-  --silent \
-  --header "Authorization: $dashboard_user_api_credentials" \
-  --data '{
+curl $dashboard_base_url/api/portal/developers -s \
+  -H "Authorization: $dashboard_user_api_credentials" \
+  -d '{
       "email": "'$portal_user_email'",
       "password": "'$portal_user_password'",
       "org_id": "'$organisation_id'"
@@ -141,7 +127,12 @@ curl $dashboard_base_url/api/portal/developers \
 echo "  Done"
 
 echo "Synchronising APIs and Policies"
-tyk-sync sync -d $dashboard_base_url -s $dashboard_user_api_credentials -o $organisation_id -p data/tyk-sync
+docker run --rm \
+  --network tyk-pro-docker-demo-extended_tyk \
+  -v $(pwd)/data/tyk-sync:/opt/tyk-sync/data \
+  tykio/tyk-sync:v1.1.0 \
+  sync -d http://tyk-dashboard:3000 -s $dashboard_user_api_credentials -o $organisation_id -p data \
+  > /dev/null
 echo "  Done"
 
 echo "Creating Identity Broker Profiles"
@@ -151,10 +142,9 @@ identity_broker_profile_tyk_dashboard_data=$(cat ./bootstrap-data/tyk-identity-b
   sed 's/DASHBOARD_USER_GROUP_DEFAULT/'"$user_group_default_id"'/' | \
   sed 's/DASHBOARD_USER_GROUP_READONLY/'"$user_group_readonly_id"'/' | \
   sed 's/DASHBOARD_USER_GROUP_ADMIN/'"$user_group_admin_id"'/')
-curl $identity_broker_base_url/api/profiles/tyk-dashboard \
-  --silent \
-  --header "Authorization: $identity_broker_api_credentials" \
-  --data "$(echo $identity_broker_profile_tyk_dashboard_data)" \
+curl $identity_broker_base_url/api/profiles/tyk-dashboard -s \
+  -H "Authorization: $identity_broker_api_credentials" \
+  -d "$(echo $identity_broker_profile_tyk_dashboard_data)" \
   > /dev/null
 echo "  Done"
 
@@ -174,17 +164,15 @@ do
 done
 
 echo "Setting up Kibana objects"
-curl $kibana_base_url/api/saved_objects/index-pattern/1208b8f0-815b-11ea-b0b2-c9a8a88fbfb2?overwrite=true \
-  --silent \
-  --header 'Content-Type: application/json' \
-  --header 'kbn-xsrf: true' \
-  --data @bootstrap-data/kibana/index-patterns/tyk-analytics.json \
+curl $kibana_base_url/api/saved_objects/index-pattern/1208b8f0-815b-11ea-b0b2-c9a8a88fbfb2?overwrite=true -s \
+  -H 'Content-Type: application/json' \
+  -H 'kbn-xsrf: true' \
+  -d @bootstrap-data/kibana/index-patterns/tyk-analytics.json \
   > /dev/null
-curl $kibana_base_url/api/saved_objects/visualization/407e91c0-8168-11ea-9323-293461ad91e5?overwrite=true \
-  --silent \
-  --header 'Content-Type: application/json' \
-  --header 'kbn-xsrf: true' \
-  --data @bootstrap-data/kibana/visualizations/request-count-by-time.json \
+curl $kibana_base_url/api/saved_objects/visualization/407e91c0-8168-11ea-9323-293461ad91e5?overwrite=true -s \
+  -H 'Content-Type: application/json' \
+  -H 'kbn-xsrf: true' \
+  -d @bootstrap-data/kibana/visualizations/request-count-by-time.json \
   > /dev/null
 echo "  Done"
 
@@ -193,15 +181,30 @@ jenkins_admin_password=$(docker-compose exec jenkins cat /var/jenkins_home/secre
 echo "  Done"
 
 echo "Making Jenkins CLI available"
-docker-compose exec jenkins curl -L -o /var/jenkins_home/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar > /dev/null
+docker-compose exec \
+  jenkins \
+  curl -L -o /var/jenkins_home/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar \
+  > /dev/null
 echo "  Done"
 
 echo "Importing custom keys"
 gateway_admin_api_credentials=$(cat ./volumes/tyk-gateway/tyk.conf | jq -r .secret)
-curl $gateway_base_url/tyk/keys/auth_key -H "x-tyk-authorization: $gateway_admin_api_credentials" -H "Content-Type: application/json"  -d @./bootstrap-data/tyk-gateway/auth-key.json > /dev/null
-curl $gateway_base_url/tyk/keys/ratelimit_key -H "x-tyk-authorization: $gateway_admin_api_credentials" -H "Content-Type: application/json"  -d @./bootstrap-data/tyk-gateway/rate-limit-key.json > /dev/null
-curl $gateway_base_url/tyk/keys/throttle_key -H "x-tyk-authorization: $gateway_admin_api_credentials" -H "Content-Type: application/json"  -d @./bootstrap-data/tyk-gateway/throttle-key.json > /dev/null
-curl $gateway_base_url/tyk/keys/quota_key -H "x-tyk-authorization: $gateway_admin_api_credentials" -H "Content-Type: application/json"  -d @./bootstrap-data/tyk-gateway/quota-key.json > /dev/null
+curl $gateway_base_url/tyk/keys/auth_key -s \
+  -H "x-tyk-authorization: $gateway_admin_api_credentials" \
+  -d @./bootstrap-data/tyk-gateway/auth-key.json \
+  > /dev/null
+curl $gateway_base_url/tyk/keys/ratelimit_key -s \
+  -H "x-tyk-authorization: $gateway_admin_api_credentials" \
+  -d @./bootstrap-data/tyk-gateway/rate-limit-key.json \
+  > /dev/null
+curl $gateway_base_url/tyk/keys/throttle_key -s \
+  -H "x-tyk-authorization: $gateway_admin_api_credentials" \
+  -d @./bootstrap-data/tyk-gateway/throttle-key.json \
+  > /dev/null
+curl $gateway_base_url/tyk/keys/quota_key -s \
+  -H "x-tyk-authorization: $gateway_admin_api_credentials" \
+  -d @./bootstrap-data/tyk-gateway/quota-key.json \
+  > /dev/null
 echo "  Done"
 
 echo "Making test call to Bootstrap API"

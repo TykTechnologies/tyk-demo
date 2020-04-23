@@ -174,7 +174,6 @@ services:
       - e2-tyk-redis
       - e2-tyk-mongo
       - e2-tyk-gateway
-      
 
 volumes:
   redis-data:
