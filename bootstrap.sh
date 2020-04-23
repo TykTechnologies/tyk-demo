@@ -95,6 +95,12 @@ user_group_default_id=$(echo $user_group_data | jq -r .groups[1].id)
 user_group_admin_id=$(echo $user_group_data | jq -r .groups[2].id)
 echo "  Done"
 
+echo "Creating Webhooks"
+curl $dashboard_base_url/api/hooks -s \
+  -H "Authorization: $dashboard_user_api_credentials" \
+  -d @bootstrap-data/tyk-dashboard/webhook-webhook-receiver-api-post.json  
+echo "  Done"
+
 echo "Creating Portal default settings"
 curl $dashboard_base_url/api/portal/catalogue -s \
   -H "Authorization: $dashboard_user_api_credentials" \
