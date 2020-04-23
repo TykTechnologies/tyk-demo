@@ -1,8 +1,8 @@
 {
-  "id": "5ea0eb3f9b94a700016e68f9",
-  "name": "Plugin Demo API",
-  "slug": "plugin-demo-api",
-  "api_id": "4692b70056154ccb41e44af0cdd990c3",
+  "id": "5ea0ef699b94a700016e68fb",
+  "name": "Webhook Receiver",
+  "slug": "webhook-receiver",
+  "api_id": "c33b310e41f944ee590aa41012bdcc9d",
   "org_id": "5e9d9544a1dcd60001d0ed20",
   "use_keyless": true,
   "use_oauth2": false,
@@ -61,72 +61,12 @@
     "strip_path": false
   },
   "version_data": {
-    "not_versioned": false,
-    "default_version": "Default",
+    "not_versioned": true,
+    "default_version": "",
     "versions": {
-      "2": {
-        "name": "2",
-        "expires": "",
-        "paths": {
-          "ignored": [],
-          "white_list": [],
-          "black_list": []
-        },
-        "use_extended_paths": true,
-        "extended_paths": {},
-        "global_headers": {},
-        "global_headers_remove": [],
-        "global_size_limit": 0,
-        "override_target": ""
-      },
       "Default": {
         "name": "Default",
         "expires": "",
-        "paths": {
-          "ignored": [],
-          "white_list": [],
-          "black_list": []
-        },
-        "use_extended_paths": true,
-        "extended_paths": {
-          "ignored": [
-            {
-              "path": "anything/mock",
-              "method_actions": {
-                "GET": {
-                  "action": "reply",
-                  "code": 200,
-                  "data": "{\n    \"mock\": \"response\"\n}",
-                  "headers": {
-                    "mock": "response"
-                  }
-                }
-              }
-            }
-          ],
-          "cache": [
-            "/uuid"
-          ],
-          "transform_headers": [
-            {
-              "delete_headers": [],
-              "add_headers": {
-                "new-header": "new-header-value"
-              },
-              "path": "/anything/modify-headers",
-              "method": "GET",
-              "act_on": false
-            }
-          ]
-        },
-        "global_headers": {},
-        "global_headers_remove": [],
-        "global_size_limit": 0,
-        "override_target": ""
-      },
-      "expired": {
-        "name": "expired",
-        "expires": "2020-04-15 09:22",
         "paths": {
           "ignored": [],
           "white_list": [],
@@ -162,7 +102,7 @@
   },
   "proxy": {
     "preserve_host_header": false,
-    "listen_path": "/plugin-demo-api/",
+    "listen_path": "/webhook-receiver/",
     "target_url": "http://httpbin/",
     "disable_strip_slash": false,
     "strip_listen_path": true,
@@ -209,12 +149,10 @@
   },
   "custom_middleware_bundle": "",
   "cache_options": {
-    "cache_timeout": 5,
+    "cache_timeout": 60,
     "enable_cache": true,
     "cache_all_safe_requests": false,
-    "cache_response_codes": [
-      200
-    ],
+    "cache_response_codes": [],
     "enable_upstream_cache_control": false,
     "cache_control_ttl_header": ""
   },
