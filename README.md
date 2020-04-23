@@ -197,7 +197,7 @@ Ideally, this will be automated in the future.
 
 ## Usage
 
-After the setup process is compelte, the CI/CD functionality can be demonstrated as follows:
+After the setup process is complete, the CI/CD functionality can be demonstrated as follows:
 
 1. Log into the [e2 Dashboard](http://localhost:3002) (using credentials shown in `bootstrap.sh` output, and a private browser session to avoid invalidating your session cookie for the default Dashboard)
 2. You will see that there are no API Definitions or Policies
