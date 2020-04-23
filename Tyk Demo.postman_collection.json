@@ -292,7 +292,7 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "sdfsdf",
+										"value": "auth-failure-key",
 										"type": "text"
 									}
 								],
@@ -315,6 +315,148 @@
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Authentication",
+					"item": [
+						{
+							"name": "Token authorization - failure",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/basic-security-api/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"basic-security-api",
+										""
+									]
+								},
+								"description": "This API will showcase the Token authorization feature of Tyk.\n\nToken (Key) will not be sent in the HTTP header field `Authorization` resulting in HTTP status code `401 Unauthorized` by gateway."
+							},
+							"response": []
+						},
+						{
+							"name": "Token authorization - success",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "auth_key",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/basic-security-api/get",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"basic-security-api",
+										"get"
+									]
+								},
+								"description": "This API will showcase the Token authorization feature of Tyk.\n\nToken (Key) will be sent in the HTTP header field `Authorization`."
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Rate Limit",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "ratelimit_key",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/basic-protected-api/get",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"basic-protected-api",
+								"get"
+							]
+						},
+						"description": "This API will showcase the Rate limiting feature of Tyk.\n\nRate limit is set as 2 per 5 seconds. More than 2 request per 5 will result in `429  Too many requests` error from gateway."
+					},
+					"response": []
+				},
+				{
+					"name": "Throttling",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "throttle_key"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/basic-protected-api/get",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"basic-protected-api",
+								"get"
+							]
+						},
+						"description": "This API will showcase the Throttling feature of Tyk.\n\nRate limit is set as 2 per 5 seconds. Gateway Throttling is configured for 10 times with 1 sec interval. \n\nWe can obeserve a delay in response due to throttling after the rate limit has reached."
+					},
+					"response": []
+				},
+				{
+					"name": "Quota Limit",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "quota_key"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/basic-protected-api/get",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"basic-protected-api",
+								"get"
+							]
+						},
+						"description": "This API will showcase the Quota limiting feature of Tyk.\n\nQuota limit is set as 2 per hour. More than 2 request per hour will result in `403 Forbidden` error from gateway."
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -366,9 +508,24 @@
 							"name": "Import custom key (part 2)",
 							"request": {
 								"method": "GET",
-								"header": [],
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "my-custom-key",
+										"type": "text"
+									}
+								],
 								"url": {
-									"raw": ""
+									"raw": "http://localhost:8080/basic-protected-api/get",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"basic-protected-api",
+										"get"
+									]
 								},
 								"description": "This request uses the custom key imported in Part 1 (which must be run prior to this) to access a protected API.\n\nThe custom key is provided in the `Authorization` header."
 							},
@@ -399,7 +556,7 @@
 										"mock"
 									]
 								},
-								"description": "This request is sent to the container mapped on port `8081`. It is the TLS-enabled Gateway which is otherwise configured the same as the HTTP-only Gateway.\n\nYou can use the `add-gateway.sh` script to add more Gateways. Note that in order to access them using this request, you will need to use `http` and change the port number."
+								"description": "This request is sent to the container mapped on port `8081`. It is the TLS-enabled Gateway which is otherwise configured the same as the HTTP-only Gateway.\n\nYou can use the `add-gateway.sh` script to add more Gateways. Note that in order to access them using this request, you will need to use `http` and change the port number - the Gateway created by the script has a random port assigned to it."
 							},
 							"response": []
 						}
@@ -422,16 +579,15 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:8081/plugin-demo-api/anything/mock",
+									"raw": "https://localhost:8081/basic-open-api/get",
 									"protocol": "https",
 									"host": [
 										"localhost"
 									],
 									"port": "8081",
 									"path": [
-										"plugin-demo-api",
-										"anything",
-										"mock"
+										"basic-open-api",
+										"get"
 									]
 								},
 								"description": "This request uses the HTTPS scheme to connect to the API Gateway. The Gateway is configured to listen for requests on `localhost` and use a locally stored self-signed certificate.\n\nThis is configured in the `http_server_options` section of the Gateway's configuration file.\n\n**Note:** self-signed cetificates will fail verification by an API client, which will prevent the request for working. To resolve this, configure your client to allow self-signed certificates."

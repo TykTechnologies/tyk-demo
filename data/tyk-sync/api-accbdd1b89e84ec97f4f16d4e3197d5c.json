@@ -1,10 +1,10 @@
 {
-  "id": "5ea0eb3f9b94a700016e68fa",
-  "name": "JavaScript Middleware API",
-  "slug": "javascript-middleware-api",
-  "api_id": "47e6f94f988d4e0f51e262ffd15b2954",
+  "id": "5ea11112f4f8460001a9389c",
+  "name": "Basic Protected API",
+  "slug": "basic-protected-api",
+  "api_id": "accbdd1b89e84ec97f4f16d4e3197d5c",
   "org_id": "5e9d9544a1dcd60001d0ed20",
-  "use_keyless": true,
+  "use_keyless": false,
   "use_oauth2": false,
   "use_openid": false,
   "openid_options": {
@@ -34,7 +34,7 @@
   "upstream_certificates": {},
   "pinned_public_keys": {},
   "enable_jwt": false,
-  "use_standard_auth": false,
+  "use_standard_auth": true,
   "enable_coprocess_auth": false,
   "jwt_signing_method": "",
   "jwt_source": "",
@@ -102,7 +102,7 @@
   },
   "proxy": {
     "preserve_host_header": false,
-    "listen_path": "/javascript-middleware-api/",
+    "listen_path": "/basic-protected-api/",
     "target_url": "http://httpbin/",
     "disable_strip_slash": false,
     "strip_listen_path": true,
@@ -131,20 +131,8 @@
   "disable_rate_limit": false,
   "disable_quota": false,
   "custom_middleware": {
-    "pre": [
-      {
-        "name": "exampleJavaScriptMiddlewarePreHook",
-        "path": "middleware/example-javascript-middleware.js",
-        "require_session": false
-      }
-    ],
-    "post": [
-      {
-        "name": "exampleJavaScriptMiddlewarePostHook",
-        "path": "middleware/example-javascript-middleware.js",
-        "require_session": false
-      }
-    ],
+    "pre": [],
+    "post": [],
     "post_key_auth": [],
     "auth_check": {
       "name": "",
@@ -207,9 +195,7 @@
   "do_not_track": false,
   "tags": [],
   "enable_context_vars": false,
-  "config_data": {
-    "config_key": "config-value"
-  },
+  "config_data": {},
   "tag_headers": [],
   "global_rate_limit": {
     "rate": 0,

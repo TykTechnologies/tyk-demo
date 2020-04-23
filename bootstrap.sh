@@ -135,13 +135,13 @@ curl $dashboard_base_url/api/portal/developers \
   --data '{
       "email": "'$portal_user_email'",
       "password": "'$portal_user_password'",
-      "org_id": "'$organisation_id'"   
+      "org_id": "'$organisation_id'"
     }' \
   > /dev/null
 echo "  Done"
 
 echo "Synchronising APIs and Policies"
-tyk-sync sync -d $dashboard_base_url -s $dashboard_user_api_credentials -o $organisation_id -p tyk-sync-data
+tyk-sync sync -d $dashboard_base_url -s $dashboard_user_api_credentials -o $organisation_id -p data/tyk-sync
 echo "  Done"
 
 echo "Creating Identity Broker Profiles"
@@ -194,6 +194,14 @@ echo "  Done"
 
 echo "Making Jenkins CLI available"
 docker-compose exec jenkins curl -L -o /var/jenkins_home/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar > /dev/null
+echo "  Done"
+
+echo "Importing custom keys"
+gateway_admin_api_credentials=$(cat ./volumes/tyk-gateway/tyk.conf | jq -r .secret)
+curl $gateway_base_url/tyk/keys/auth_key -H "x-tyk-authorization: $gateway_admin_api_credentials" -H "Content-Type: application/json"  -d @./bootstrap-data/tyk-gateway/auth-key.json > /dev/null
+curl $gateway_base_url/tyk/keys/ratelimit_key -H "x-tyk-authorization: $gateway_admin_api_credentials" -H "Content-Type: application/json"  -d @./bootstrap-data/tyk-gateway/rate-limit-key.json > /dev/null
+curl $gateway_base_url/tyk/keys/throttle_key -H "x-tyk-authorization: $gateway_admin_api_credentials" -H "Content-Type: application/json"  -d @./bootstrap-data/tyk-gateway/throttle-key.json > /dev/null
+curl $gateway_base_url/tyk/keys/quota_key -H "x-tyk-authorization: $gateway_admin_api_credentials" -H "Content-Type: application/json"  -d @./bootstrap-data/tyk-gateway/quota-key.json > /dev/null
 echo "  Done"
 
 echo "Making test call to Bootstrap API"

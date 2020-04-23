@@ -1,8 +1,8 @@
 {
-  "id": "5ea0eb3f9b94a700016e68f8",
-  "name": "Basic Open API",
-  "slug": "basic-open-api",
-  "api_id": "727dad853a8a45f64ab981154d1ffdad",
+  "id": "5ea11112f4f8460001a9389d",
+  "name": "Bootstrap API",
+  "slug": "bootstrap-api",
+  "api_id": "0a7d71a2e7f743dd7b5d46cda1fad154",
   "org_id": "5e9d9544a1dcd60001d0ed20",
   "use_keyless": true,
   "use_oauth2": false,
@@ -21,7 +21,7 @@
     "param_name": "",
     "use_cookie": false,
     "cookie_name": "",
-    "auth_header_name": "",
+    "auth_header_name": "Authorization",
     "use_certificate": false
   },
   "use_basic_auth": false,
@@ -74,9 +74,7 @@
         },
         "use_extended_paths": true,
         "extended_paths": {},
-        "global_headers": {
-          "x-req-id": "$tyk_context.request_id"
-        },
+        "global_headers": {},
         "global_headers_remove": [],
         "global_size_limit": 0,
         "override_target": ""
@@ -104,7 +102,7 @@
   },
   "proxy": {
     "preserve_host_header": false,
-    "listen_path": "/basic-open-api/",
+    "listen_path": "/bootstrap-api/",
     "target_url": "http://httpbin/",
     "disable_strip_slash": false,
     "strip_listen_path": true,
@@ -196,7 +194,7 @@
   "certificates": [],
   "do_not_track": false,
   "tags": [],
-  "enable_context_vars": true,
+  "enable_context_vars": false,
   "config_data": {},
   "tag_headers": [],
   "global_rate_limit": {

@@ -13,7 +13,7 @@ pipeline {
             steps {
                 echo "Deploying from ${env.BRANCH_NAME}"
                 sh "chmod +x ./data/jenkins/tyk-sync"
-                sh "./data/jenkins/tyk-sync sync -d http://e2-tyk-dashboard:3000 -s ${env.TYK_DASH_SECRET} -p ./tyk-sync-data"
+                sh "./data/jenkins/tyk-sync sync -d http://e2-tyk-dashboard:3000 -s ${env.TYK_DASH_SECRET} -p ./data/tyk-sync"
             }
         }
     }

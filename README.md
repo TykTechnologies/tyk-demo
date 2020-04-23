@@ -98,14 +98,16 @@ The following applications are available once the system is bootstrapped:
 
 - [Tyk Dashboard](http://localhost:3000)
 - [Tyk Dashboard using SSO](http://localhost:3001)
+- [Tyk Dashboard environment 2](http://localhost:3002)
 - [Tyk Portal](http://localhost:3000/portal)
-- [Tyk Gateway](http://localhost:8080/bootstrap-api/get)
-- [Tyk Gateway using TLS](https://localhost:8081/bootstrap-api/get) (using self-signed certificate, so expect a warning)
+- [Tyk Gateway](http://localhost:8080/basic-open-api/get)
+- [Tyk Gateway using TLS](https://localhost:8081/basic-open-api/get) (using self-signed certificate, so expect a warning)
+- [Tyk Gateway environment 2](http://localhost:8085/basic-open-api/get)
 - [Kibana](http://localhost:5601)
 
 # Synchronisations of API and Policies
 
-The files in `tyk-sync-data` are API and Policy definitions which are used to store the common APIs and Policies which this demo uses.
+The files in `data/tyk-sync` are API and Policy definitions which are used to store the common APIs and Policies which this demo uses.
 
 There are two scenarios for working with this data:
 
@@ -120,7 +122,7 @@ If you have changed APIs and Policies in your Dashboard, and want to commit thes
 ./dump.sh
 ```
 
-This will update the files in the `tyk-sync-data` directory. You can then commit these files into the repo.
+This will update the files in the `data/tyk-sync` directory. You can then commit these files into the repo.
 
 ## Scenario 2: Synchronising updates
 

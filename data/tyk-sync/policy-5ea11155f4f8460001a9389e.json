@@ -1,0 +1,32 @@
+{
+  "_id": "5ea11155f4f8460001a9389e",
+  "id": "5ea11155f4f8460001a9389e",
+  "org_id": "5e9d9544a1dcd60001d0ed20",
+  "rate": 2,
+  "per": 5,
+  "quota_max": -1,
+  "quota_renewal_rate": 3600,
+  "access_rights": {
+    "accbdd1b89e84ec97f4f16d4e3197d5c": {
+      "api_name": "Basic Protected API",
+      "api_id": "accbdd1b89e84ec97f4f16d4e3197d5c",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": []
+    }
+  },
+  "hmac_enabled": false,
+  "active": true,
+  "name": "Rate Limit Policy",
+  "is_inactive": false,
+  "date_created": "2020-04-23T03:53:57.116Z",
+  "tags": [],
+  "key_expires_in": 0,
+  "partitions": {
+    "quota": false,
+    "rate_limit": false,
+    "acl": false
+  },
+  "last_updated": "1587614037"
+}

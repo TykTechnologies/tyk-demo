@@ -1,8 +1,8 @@
 {
-  "id": "5ea0ef699b94a700016e68fb",
-  "name": "Webhook Receiver",
-  "slug": "webhook-receiver",
-  "api_id": "c33b310e41f944ee590aa41012bdcc9d",
+  "id": "5ea11112f4f8460001a9389b",
+  "name": "Basic Open API",
+  "slug": "basic-open-api",
+  "api_id": "727dad853a8a45f64ab981154d1ffdad",
   "org_id": "5e9d9544a1dcd60001d0ed20",
   "use_keyless": true,
   "use_oauth2": false,
@@ -21,7 +21,7 @@
     "param_name": "",
     "use_cookie": false,
     "cookie_name": "",
-    "auth_header_name": "Authorization",
+    "auth_header_name": "",
     "use_certificate": false
   },
   "use_basic_auth": false,
@@ -74,7 +74,9 @@
         },
         "use_extended_paths": true,
         "extended_paths": {},
-        "global_headers": {},
+        "global_headers": {
+          "x-req-id": "$tyk_context.request_id"
+        },
         "global_headers_remove": [],
         "global_size_limit": 0,
         "override_target": ""
@@ -102,7 +104,7 @@
   },
   "proxy": {
     "preserve_host_header": false,
-    "listen_path": "/webhook-receiver/",
+    "listen_path": "/basic-open-api/",
     "target_url": "http://httpbin/",
     "disable_strip_slash": false,
     "strip_listen_path": true,
@@ -194,7 +196,7 @@
   "certificates": [],
   "do_not_track": false,
   "tags": [],
-  "enable_context_vars": false,
+  "enable_context_vars": true,
   "config_data": {},
   "tag_headers": [],
   "global_rate_limit": {
