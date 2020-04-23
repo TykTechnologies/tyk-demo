@@ -191,7 +191,7 @@ Setting up Jenkins is a manual process:
   - Branch Source: Github
   - Branch Source Credentials: Your Github credentials (to avoid using anonymous GitHub API usage, which is very restrictive)
   - Branch Source -> Repository HTTPS URL: Github URL for this repository
-  - Build Configuration -> Script Path: `volumes/jenkins/JenkinsFile`
+  - Build Configuration -> Script Path: `data/jenkins/Jenkinsfile`
 
 Ideally, this will be automated in the future.
 
