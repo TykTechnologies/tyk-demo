@@ -168,6 +168,36 @@ Run the `add-gateway.sh` script to create a new Gateway instance. It will behave
 
 # Jenkins
 
-General setup is manual for the moment.
+Jenkins is used to provide an automated way of pushing API Definitions and Policies to different Tyk environments. It uses the `tyk-sync` CLI tool and a Github repository to achieve this.
+
+The `docker-compose.yml` has some services prefixed with `e2`. These represent a separate Tyk environment, with an independent Gateway, Dashboard, Pump and databases. We can use Jenkins to automate the deployment of API Definitions and Policies from the 'normal' environment to the 'separate' environment.
+
+## Setup
+
+Setting up Jenkins is a manual process:
+
+1. Browse to [Jenkins web UI](http://localhost:8070)
+2. Use the Jenkins admin credentials provided by the `bootstrap.sh` script to log in
+3. Install recommended plugins
+4. Create a new job:
+  - Name: `APIs and Policies`
+  - Type: Multibranch Pipeline
+  - Branch Source: Github
+  - Branch Source Credentials: Your Github credentials (to avoid using anonymous GitHub API usage, which is very restrictive)
+  - Branch Source -> Repository HTTPS URL: Github URL for this repository
+  - Build Configuration -> Script Path: `volumes/jenkins/JenkinsFile` (this is case sensitive)
+
+Ideally, this will be automated in the future.
+
+## Usage
+
+This CI/CD functionality can be demonstrated as follows:
+
+1. Log into the ['separate' Dashboard](http://localhost:3002) (use credentials shown in `bootstrap.sh` output, and use a private session to avoid invalidating your session cookie for the 'normal' Dashboard)
+2. You will see that there are no API Definitions or Policies
+3. Set the `APIs and Polcies` job to build in Jenkins
+4. Check the 'separate' Dashboard, you will now see that it has the same API Definitions and Policies as the 'normal' Dashboard. 
+
+## Jenkins CLI
 
 The Jenkins CLI is set up as part of the `bootstrap.sh` process. This may be useful for importing job data etc.
