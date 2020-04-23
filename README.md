@@ -178,7 +178,7 @@ Setting up Jenkins is a manual process:
 
 1. Browse to [Jenkins web UI](http://localhost:8070)
 2. Use the Jenkins admin credentials provided by the `bootstrap.sh` script to log in
-3. Install recommended plugins
+3. Install suggested plugins
 4. Add credentials: (these are needed by `tyk-sync` to push data into the e2 Dashboard)
   - Kind: Secret text
   - Scope: Global (this is just a PoC...)
