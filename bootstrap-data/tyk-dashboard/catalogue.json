@@ -1,0 +1,27 @@
+{
+  "id": "5ea1c006b1135c0001744c73",
+  "org_id": "5e9d9544a1dcd60001d0ed20",
+  "apis": [
+    {
+      "api_id": "",
+      "hasDocumentation": false,
+      "config": {
+        "email": "",
+        "key_request_fields": [],
+        "require_key_approval": false,
+        "oauth_usage_limit": -1,
+        "redirect_on_key_request": false,
+        "override": false
+      },
+      "policy_id": "5ea2de4a62daf30001a2f0b8",
+      "name": "Swagger Petstore",
+      "version": "v2",
+      "short_description": "",
+      "long_description": "",
+      "fields": {},
+      "documentation": "",
+      "show": true
+    }
+  ],
+  "email": ""
+}
