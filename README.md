@@ -56,15 +56,23 @@ Check the last few lines of output from the `bootstrap.sh` command, these will c
 
 When you log into the Dashboard, you will find the imported APIs and Policies are now available.
 
-## Step 6: Terminating Docker containers
+## Step 6: Import API requests into Postman
 
-To bring down the containers and delete asscociated volumes (To end-up with clean slate):
+There is a Postman collection built to compliment the API definitions, such that you can start using Tyk features and functionality straight away.
+
+Import the `Tyk Demo.postman_collection.json` into your Postman to start making requests.
+
+# Resetting
+
+The purpose of the `bootstrap.sh` script is to enable the environment to be easily set up from scratch. If you want to reset your environment then you need to remove the volumes associated with the container as well as the containers themselves.
+
+To bring down the containers and delete asscociated volumes:
 
 ```
 docker-compose down -v
 ```
 
-To bring down just the containers:
+Or, if you want to retain the existing data then just remove the containers:
 
 ```
 docker-compose down
@@ -121,6 +129,8 @@ The bootstrap process creates an Index Pattern and Visualization which can be us
 Go to http://localhost:5601/app/kibana to access Kibana and view the visualisation.
 
 # SSO Dashboard
+
+**Note:** This example is not very configurable right now, since it relies on a specific Okta setup which is only configurable by the owner of the Okta account (i.e. not you!). Would be good to change this at some point to use a self-contained method which can be managed by anyone. Please feel free to implement such a change an make a pull request. Anyway, here's the SSO we have...
 
 The `dashboard-sso` container is set up to provide a Dashboard using SSO. It works in conjunction with the Identity Broker and Okta to enable this.
 
