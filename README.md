@@ -94,7 +94,7 @@ There are two scenarios for working with this data:
 
 ## Scenario 1: Committing changes
 
-If you have changed APIs and Policies in your Dashboard, and want to commit these so other people can use them, use the `dump.sh` script, which is pre-configured to call the `tyk-sync dump` command using you local `.organisation-id` value:
+If you have changed APIs and Policies in your Dashboard, and want to commit these so other people can use them, use the `dump.sh` script, which is pre-configured to call the `tyk-sync dump` command using your local Dashboard user API credentials:
 
 ```
 ./dump.sh
@@ -104,9 +104,7 @@ This will update the files in the `data/tyk-sync` directory. You can then commit
 
 ## Scenario 2: Synchronising updates
 
-If you want to get the changes other people have made, use the `sync.sh` script, which calls the `tyk-sync sync` command using you local `.organisation-id` and `.dashboard-user-api-credentials` files.
-
-To get the latest updates, you should pull from the remote repo first.
+If you want to get the changes other people have made, first pull from the repo, then use the `sync.sh` script, which calls the `tyk-sync sync` command using your local `.organisation-id` and `.dashboard-user-api-credentials` files.
 
 **Warning:** This command is a hard sync which will **delete** any APIs and Policies from your Dashboard that do not exist in the source data.
 
