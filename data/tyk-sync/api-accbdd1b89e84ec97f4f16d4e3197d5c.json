@@ -1,5 +1,5 @@
 {
-  "id": "5ea1b61a3e9ce3000180e5d9",
+  "id": "5ea1c00bb1135c0001744c7c",
   "name": "Basic Protected API",
   "slug": "basic-protected-api",
   "api_id": "accbdd1b89e84ec97f4f16d4e3197d5c",
@@ -169,24 +169,7 @@
     "meta": {}
   },
   "event_handlers": {
-    "events": {
-      "AuthFailure": [
-        {
-          "handler_name": "eh_web_hook_handler",
-          "handler_meta": {
-            "api_model": {},
-            "event_timeout": 60,
-            "header_map": {},
-            "id": "5ea1b61657a4e9d9f3aefff5",
-            "method": "POST",
-            "name": "Webhook Receiver Post",
-            "org_id": "5e9d9544a1dcd60001d0ed20",
-            "target_path": "http://localhost:8080/webhook-receiver/post",
-            "template_path": ""
-          }
-        }
-      ]
-    }
+    "events": {}
   },
   "enable_batch_request_support": false,
   "enable_ip_whitelisting": false,
