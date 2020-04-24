@@ -142,6 +142,20 @@ docker run --rm \
   > /dev/null
 echo "  Done"
 
+echo "Creating Catalogue"
+# curl $dashboard_base_url/api/portal/catalogue -X 'PUT' \
+#   -H "Authorization: $dashboard_user_api_credentials" \
+#   -d @bootstrap-data/tyk-dashboard/catalogue.json
+
+# curl $dashboard_base_url//api/portal/documentation \
+#   -H "Authorization: $dashboard_user_api_credentials" \
+#   --data-raw '{
+#       "api_id":"",
+#       "doc_type":"swagger",
+#       "documentation":"'$(cat bootstrap-data/tyk-dashboard/documentation-swagger-petstore.json | base64)'"
+#     }'
+echo "  Done"
+
 echo "Creating Identity Broker Profiles"
 identity_broker_api_credentials=$(cat ./volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
 identity_broker_profile_tyk_dashboard_data=$(cat ./bootstrap-data/tyk-identity-broker/profile-tyk-dashboard.json | \
