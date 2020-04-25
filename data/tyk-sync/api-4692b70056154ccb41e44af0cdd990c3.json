@@ -205,10 +205,73 @@
               ],
               "MatchRegexp": null
             }
+          ],
+          "virtual": [
+            {
+              "response_function_name": "myUniqueFunctionName",
+              "function_source_type": "blob",
+              "function_source_uri": "ZnVuY3Rpb24gbXlVbmlxdWVGdW5jdGlvbk5hbWUocmVxdWVzdCwgc2Vzc2lvbiwgY29uZmlnKSB7CiAgdmFyIHJlc3BvbnNlT2JqZWN0ID0geyAKICAgIEJvZHk6ICJWaXJ0dWFsIGVuZHBvaW50IHJlc3BvbnNlIGJvZHkiLCAKICAgIENvZGU6IDIwMCAKICB9CiAgcmV0dXJuIFR5a0pzUmVzcG9uc2UocmVzcG9uc2VPYmplY3QsIHNlc3Npb24ubWV0YV9kYXRhKQp9",
+              "path": "/anything/virtual-endpoint",
+              "method": "GET",
+              "use_session": false,
+              "proxy_on_error": false
+            }
+          ],
+          "size_limits": [
+            {
+              "path": "/anything/request-size-limit",
+              "method": "POST",
+              "size_limit": 9
+            }
+          ],
+          "method_transforms": [
+            {
+              "path": "/anything/method-transform",
+              "method": "PUT",
+              "to_method": "POST"
+            }
+          ],
+          "track_endpoints": [
+            {
+              "path": "/anything/track-endpoint",
+              "method": "GET"
+            }
+          ],
+          "validate_json": [
+            {
+              "path": "anything/validate-json",
+              "method": "POST",
+              "schema": {
+                "properties": {
+                  "age": {
+                    "description": "Age in years",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "firstName",
+                  "lastName"
+                ],
+                "title": "Person",
+                "type": "object"
+              },
+              "error_response_code": 422
+            }
           ]
         },
-        "global_headers": {},
-        "global_headers_remove": [],
+        "global_headers": {
+          "global-add": "global-value"
+        },
+        "global_headers_remove": [
+          "global-delete"
+        ],
         "global_size_limit": 0,
         "override_target": ""
       },
@@ -222,6 +285,35 @@
         },
         "use_extended_paths": true,
         "extended_paths": {},
+        "global_headers": {},
+        "global_headers_remove": [],
+        "global_size_limit": 0,
+        "override_target": ""
+      },
+      "whitelist": {
+        "name": "whitelist",
+        "expires": "",
+        "paths": {
+          "ignored": [],
+          "white_list": [],
+          "black_list": []
+        },
+        "use_extended_paths": true,
+        "extended_paths": {
+          "white_list": [
+            {
+              "path": "/anything/whitelist$",
+              "method_actions": {
+                "GET": {
+                  "action": "no_action",
+                  "code": 200,
+                  "data": "",
+                  "headers": {}
+                }
+              }
+            }
+          ]
+        },
         "global_headers": {},
         "global_headers_remove": [],
         "global_size_limit": 0,
