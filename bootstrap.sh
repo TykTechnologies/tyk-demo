@@ -104,6 +104,10 @@ curl $dashboard_base_url/api/hooks -s \
   > /dev/null
 echo "  Done"
 
+echo "Synchronising APIs and Policies"
+source sync.sh > /dev/null
+echo "  Done"
+
 echo "Creating Portal default settings"
 curl $dashboard_base_url/api/portal/catalogue -s \
   -H "Authorization: $dashboard_user_api_credentials" \
@@ -133,10 +137,6 @@ curl $dashboard_base_url/api/portal/developers -s \
       "org_id": "'$organisation_id'"
     }' \
   > /dev/null
-echo "  Done"
-
-echo "Synchronising APIs and Policies"
-source sync.sh > /dev/null
 echo "  Done"
 
 echo "Creating Catalogue"
