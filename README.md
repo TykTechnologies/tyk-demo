@@ -18,7 +18,13 @@ DASHBOARD_LICENCE=<YOUR_LICENCE>
 
 There are multiple compose files for this deployment. This is to give flexibility it terms of what is deployed.
 
-The `docker-compose.yml` is the base compose file, containing Tyk. The other compose files are prefixed `dc.` and can be included in the deployment. For example, to include Kibana:
+The `docker-compose.yml` is the base compose file, containing Tyk. To bring up the base Tyk installation, run the Docker Compose command:
+
+```
+docker-compose up -d
+```
+
+To include other services, there are additional compose files which are prefixed `dc.` and can be included in the deployment. For example, to include Kibana:
 
 ```
 docker-compose -f docker-compose.yml -f dc.kibana.yml up -d
