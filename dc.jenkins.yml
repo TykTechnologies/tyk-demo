@@ -1,0 +1,16 @@
+version: '3.3'
+services:
+  jenkins:
+    image: jenkins/jenkins:lts-slim
+    ports:
+      - "8070:8080"
+    networks:
+      - tyk
+    volumes:
+      - jenkins-data:/var/jenkins_home
+
+volumes:
+  jenkins-data:
+
+networks:
+  tyk:
