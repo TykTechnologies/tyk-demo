@@ -1,7 +1,7 @@
 {
     "ActionType": "GenerateOrLoginUserProfile",
     "ID": "tyk-dashboard",
-    "OrgID": "5e9d9544a1dcd60001d0ed20",
+    "OrgID": "ORGANISATION_ID",
     "IdentityHandlerConfig": {
         "DashboardCredential": "DASHBOARD_USER_API_CREDENTIALS"
     },
