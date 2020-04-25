@@ -570,6 +570,34 @@
 								"description": "This request is rejected as the requested path `/anything/whitelist-123` has not been defined with the Whitelist plugin. The API Gateway responds with a `403 Forbidden` response."
 							},
 							"response": []
+						},
+						{
+							"name": "Plugin - Whitelist (part 2) Copy",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-version",
+										"type": "text",
+										"value": "whitelist"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/whitelist-123",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"whitelist-123"
+									]
+								},
+								"description": "This request is rejected as the requested path `/anything/whitelist-123` has not been defined with the Whitelist plugin. The API Gateway responds with a `403 Forbidden` response."
+							},
+							"response": []
 						}
 					],
 					"event": [
@@ -1034,6 +1062,18 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Basic Test Request",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				},
+				"description": "This is a basic test request to check that the Gateway is working ok.\n\nA `200 OK` status code and JSON response should be received in the response."
+			},
+			"response": []
 		}
 	],
 	"protocolProfileBehavior": {}

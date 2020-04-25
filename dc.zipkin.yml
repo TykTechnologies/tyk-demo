@@ -1,0 +1,13 @@
+version: '3.3'
+services:
+  zipkin:
+    image: openzipkin/zipkin-slim:latest
+    ports:
+      - 9411:9411
+    networks:
+      - tyk
+    environment:
+      - STORAGE_TYPE=mem
+
+networks:
+  tyk:

@@ -4,11 +4,7 @@ dashboard_base_url="http://localhost:3000"
 dashboard_sso_base_url="http://localhost:3001"
 gateway_base_url="http://localhost:8080"
 gateway_tls_base_url="https://localhost:8081"
-kibana_base_url="http://localhost:5601"
 identity_broker_base_url="http://localhost:3010"
-jenkins_base_url="http://localhost:8070"
-e2_dashboard_base_url="http://localhost:3002"
-e2_gateway_base_url="http://localhost:8085"
 
 echo "Making scripts executable"
 chmod +x dump.sh
@@ -16,15 +12,32 @@ chmod +x sync.sh
 chmod +x publish.sh
 chmod +x update.sh
 chmod +x add-gateway.sh
+chmod +x bs.e2.sh
+chmod +x bs.jenkins.sh
+chmod +x bs.kibana.sh
+chmod +x bs.zipkin.sh
 echo "  Done"
 
-echo "Getting Dashboard Configuration"
+echo "Getting Dashboard configuration"
 dashboard_admin_api_credentials=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
 portal_root_path=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_config.portal_root_path)
 echo "  Dashboard Admin API Credentials: $dashboard_admin_api_credentials"
 echo "  Portal Root Path: $portal_root_path"
 
-echo "Importing Organisation"
+echo "Waiting for Dashboard to be ready"
+dashboard_status=""
+while [ "$dashboard_status" != "200" ]
+do
+  dashboard_status=$(curl -I $dashboard_base_url/admin/organisations -H "admin-auth: $dashboard_admin_api_credentials" 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+  
+  if [ "$dashboard_status" != "200" ]
+  then
+    sleep 1
+  fi
+done
+echo "  Done"
+
+echo "Importing organisation"
 organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d @bootstrap-data/tyk-dashboard/organisation.json \
@@ -32,21 +45,15 @@ organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
 echo $organisation_id > .organisation-id
 echo "  Organisation Id: $organisation_id"
 
-echo "Importing Organisation for environment 2"
-curl $e2_dashboard_base_url/admin/organisations/import -s \
-  -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @bootstrap-data/tyk-dashboard/organisation.json > /dev/null
-echo "  Done"
-
 echo "Creating Dashboard user"
 dashboard_user_email=$(jq -r '.email_address' bootstrap-data/tyk-dashboard/dashboard-user.json)
+dashboard_user_password=$(jq -r '.password' bootstrap-data/tyk-dashboard/dashboard-user.json)
 dashboard_user_api_response=$(curl $dashboard_base_url/admin/users -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d @bootstrap-data/tyk-dashboard/dashboard-user.json \
   | jq -r '. | {api_key:.Message, id:.Meta.id}')
 dashboard_user_id=$(echo $dashboard_user_api_response | jq -r '.id')
 dashboard_user_api_credentials=$(echo $dashboard_user_api_response | jq -r '.api_key')
-dashboard_user_password=$(jq -r '.password' bootstrap-data/tyk-dashboard/dashboard-user.json)
 curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset -s \
   -H "authorization: $dashboard_user_api_credentials" \
   --data-raw '{
@@ -59,22 +66,7 @@ echo "  Password: $dashboard_user_password"
 echo "  Dashboard API Credentials: $dashboard_user_api_credentials"
 echo "  ID: $dashboard_user_id"
 
-echo "Creating Dashboard user for environment 2"
-e2_dashboard_user_api_response=$(curl $e2_dashboard_base_url/admin/users -s \
-  -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @bootstrap-data/tyk-dashboard/dashboard-user.json \
-  | jq -r '. | {api_key:.Message, id:.Meta.id}')
-e2_dashboard_user_id=$(echo $e2_dashboard_user_api_response | jq -r '.id')
-e2_dashboard_user_api_credentials=$(echo $e2_dashboard_user_api_response | jq -r '.api_key')
-curl $e2_dashboard_base_url/api/users/$e2_dashboard_user_id/actions/reset -s \
-  -H "authorization: $e2_dashboard_user_api_credentials" \
-  --data-raw '{
-      "new_password":"'$dashboard_user_password'",
-      "user_permissions": { "IsAdmin": "admin" }
-    }' > /dev/null
-echo "  Dashboard API Credentials: $e2_dashboard_user_api_credentials"
-
-echo "Creating Dashboard User Groups"
+echo "Creating Dashboard user groups"
 curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @bootstrap-data/tyk-dashboard/usergroup-readonly.json > /dev/null
@@ -91,13 +83,13 @@ user_group_default_id=$(echo $user_group_data | jq -r .groups[1].id)
 user_group_admin_id=$(echo $user_group_data | jq -r .groups[2].id)
 echo "  Done"
 
-echo "Creating Webhooks"
+echo "Creating webhooks"
 curl $dashboard_base_url/api/hooks -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @bootstrap-data/tyk-dashboard/webhook-webhook-receiver-api-post.json > /dev/null
 echo "  Done"
 
-echo "Synchronising APIs and Policies"
+echo "Synchronising APIs and policies"
 source sync.sh > /dev/null
 echo "  Done"
 
@@ -129,7 +121,7 @@ curl $dashboard_base_url/api/portal/developers -s \
     }' > /dev/null
 echo "  Done"
 
-echo "Creating Catalogue"
+echo "Creating catalogue"
 policies=$(curl $dashboard_base_url/api/portal/policies?p=-1 -s \
   -H "Authorization:$dashboard_user_api_credentials")
 documentation_swagger_petstore_id=$(curl $dashboard_base_url/api/portal/documentation -s \
@@ -151,7 +143,7 @@ curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
   -d "$(echo $catalogue_data)" > /dev/null
 echo "  Done"
 
-echo "Creating Identity Broker Profiles"
+echo "Creating Identity Broker profiles"
 identity_broker_api_credentials=$(cat ./volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
 identity_broker_profile_tyk_dashboard_data=$(cat ./bootstrap-data/tyk-identity-broker/profile-tyk-dashboard.json | \
   sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \
@@ -162,42 +154,6 @@ identity_broker_profile_tyk_dashboard_data=$(cat ./bootstrap-data/tyk-identity-b
 curl $identity_broker_base_url/api/profiles/tyk-dashboard -s \
   -H "Authorization: $identity_broker_api_credentials" \
   -d "$(echo $identity_broker_profile_tyk_dashboard_data)" > /dev/null
-echo "  Done"
-
-echo "Waiting for Kibana to be available (please be patient)"
-kibana_status=""
-while [ "$kibana_status" != "200" ]
-do
-  kibana_status=$(curl -I $kibana_base_url/app/kibana 2>/dev/null | head -n 1 | cut -d$' ' -f2)
-  
-  if [ "$kibana_status" != "200" ]
-  then
-    echo "  Kibana not ready yet - retrying in 5 seconds..."
-    sleep 5
-  else
-    echo "  Done"
-  fi
-done
-
-echo "Setting up Kibana objects"
-curl $kibana_base_url/api/saved_objects/index-pattern/1208b8f0-815b-11ea-b0b2-c9a8a88fbfb2?overwrite=true -s \
-  -H 'Content-Type: application/json' \
-  -H 'kbn-xsrf: true' \
-  -d @bootstrap-data/kibana/index-patterns/tyk-analytics.json > /dev/null
-curl $kibana_base_url/api/saved_objects/visualization/407e91c0-8168-11ea-9323-293461ad91e5?overwrite=true -s \
-  -H 'Content-Type: application/json' \
-  -H 'kbn-xsrf: true' \
-  -d @bootstrap-data/kibana/visualizations/request-count-by-time.json > /dev/null
-echo "  Done"
-
-echo "Getting Jenkins admin password"
-jenkins_admin_password=$(docker-compose exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword)
-echo "  Done"
-
-echo "Making Jenkins CLI available"
-docker-compose exec \
-  jenkins \
-  curl -L -o /var/jenkins_home/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar > /dev/null
 echo "  Done"
 
 echo "Importing custom keys"
@@ -216,16 +172,18 @@ curl $gateway_base_url/tyk/keys/quota_key -s \
   -d @./bootstrap-data/tyk-gateway/quota-key.json > /dev/null
 echo "  Done"
 
-echo "Making test call to Basic Open API"
-bootstrap_api_status=$(curl -I $gateway_base_url/basic-open-api/get 2>/dev/null | head -n 1 | cut -d$' ' -f2)
-if [ "$bootstrap_api_status" != "200" ]
-then
-  echo "  Failed"
-else
-  echo "  Done"
-fi
-
-echo "Bootstrap complete"
+echo "Checking Gateway functionality"
+gateway_status=""
+while [ "$gateway_status" != "200" ]
+do
+  gateway_status=$(curl -I $gateway_base_url/basic-open-api/get 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+  
+  if [ "$gateway_status" != "200" ]
+  then
+    sleep 1
+  fi
+done
+echo "  Done"
 
 cat <<EOF
 
@@ -247,11 +205,9 @@ cat <<EOF
          Dashboard
                URL : $dashboard_base_url
                      $dashboard_sso_base_url (SSO)
-                     $e2_dashboard_base_url (Environment 2)
           Username : $dashboard_user_email
           Password : $dashboard_user_password
    API Credentials : $dashboard_user_api_credentials
-                     $e2_dashboard_user_api_credentials (Environment 2)
 
             Portal
                URL : $dashboard_base_url$portal_root_path
@@ -261,13 +217,5 @@ cat <<EOF
            Gateway
                URL : $gateway_base_url
                      $gateway_tls_base_url
-                     $e2_gateway_base_url (Environment 2)
-
-            Kibana
-               URL : $kibana_base_url
-
-           Jenkins
-               URL : $jenkins_base_url
-          Password : $jenkins_admin_password
 
 EOF
