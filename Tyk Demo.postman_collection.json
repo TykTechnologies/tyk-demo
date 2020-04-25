@@ -89,6 +89,76 @@
 							"response": []
 						},
 						{
+							"name": "Plugin - Blacklist",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/blacklist",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"blacklist"
+									]
+								},
+								"description": "The Blacklist plugin blocks requests, returning a `403 Forbidden` response."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Circuit Breaker",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/status/500",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"status",
+										"500"
+									]
+								},
+								"description": "The Circuit Breaker can protect API servers by blocking requests for endpoints which are consistently returning errors.\n\nThe plugin monitors the responses from the API server for errors. If the API server returns over a certain number of errors over a particular number of requests then the API Gateway will stop proxing requests to it for a number of seconds. When the circuit breaker is activated, the API Gateway returns a `503 Service Unavailable` response.\n\nIn this example, the endpoint called by this request always returns `500 Server Error` responses, so will easily trigger the circuit breaker. The circuit breaker has been set up to sample 4 requests, and if over 50% of them result in errors then the circuit breaker will be active for 15 seconds."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Body Transform",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<servers version=\"1\">\n  <server>\n    <serverName>Shanghai_VPN</serverName>\n    <serverIP>127.0.0.1</serverIP>\n  </server>\n  <server>\n    <serverName>Beijing_VPN</serverName>\n    <serverIP>127.0.0.2</serverIP>\n  </server>\n</servers>"
+								},
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/body-transform",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"body-transform"
+									]
+								},
+								"description": "The Body Transform plugin can transform data in XML and JSON formats using templates. The output format can be anything, it depends entirely on the template. Transforms can be applied to both requests and responses.\n\nThis example applies a transform on the request, changing it from XML to JSON. You can see the request body is an XML document, but the response shows that the API server receive the data as JSON - you can verify this by checking the `data` and `json` properties of the response body."
+							},
+							"response": []
+						},
+						{
 							"name": "Plugin - Modify Headers",
 							"request": {
 								"method": "GET",

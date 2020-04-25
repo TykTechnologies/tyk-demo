@@ -1,5 +1,5 @@
 {
-  "id": "5ea1c00bb1135c0001744c7a",
+  "id": "5ea3ddc09445d30001962f43",
   "name": "Plugin Demo API",
   "slug": "plugin-demo-api",
   "api_id": "4692b70056154ccb41e44af0cdd990c3",
@@ -104,8 +104,33 @@
               }
             }
           ],
+          "black_list": [
+            {
+              "path": "/anything/blacklist",
+              "method_actions": {
+                "GET": {
+                  "action": "no_action",
+                  "code": 200,
+                  "data": "",
+                  "headers": {}
+                }
+              }
+            }
+          ],
           "cache": [
             "/uuid"
+          ],
+          "transform": [
+            {
+              "template_data": {
+                "input_type": "xml",
+                "template_mode": "blob",
+                "enable_session": false,
+                "template_source": "ewp7e3JhbmdlICR4LCAkcyA6PSAuc2VydmVycy5zZXJ2ZXJ9fSAgICAie3skcy5zZXJ2ZXJOYW1lfX0iOiAie3skcy5zZXJ2ZXJJUH19Int7aWYgbm90ICR4fX0se3tlbmR9fQp7e2VuZH19fQ=="
+              },
+              "path": "/anything.",
+              "method": "POST"
+            }
           ],
           "transform_headers": [
             {
@@ -116,6 +141,15 @@
               "path": "/anything/modify-headers",
               "method": "GET",
               "act_on": false
+            }
+          ],
+          "circuit_breakers": [
+            {
+              "path": "status/500",
+              "method": "GET",
+              "threshold_percent": 0.5,
+              "samples": 4,
+              "return_to_service_after": 15
             }
           ]
         },
