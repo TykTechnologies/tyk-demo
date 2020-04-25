@@ -13,6 +13,8 @@ e2_gateway_base_url="http://localhost:8085"
 echo "Making scripts executable"
 chmod +x dump.sh
 chmod +x sync.sh
+chmod +x publish.sh
+chmod +x update.sh
 chmod +x add-gateway.sh
 echo "  Done"
 
@@ -122,7 +124,7 @@ echo "  Done"
 
 echo "Creating Portal user"
 portal_user_email=$(jq -r '.email' bootstrap-data/tyk-dashboard/portal-user.json)
-portal_user_password=$(openssl rand -base64 12)
+portal_user_password=$(jq -r '.password' bootstrap-data/tyk-dashboard/portal-user.json)
 curl $dashboard_base_url/api/portal/developers -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d '{
@@ -256,28 +258,29 @@ cat <<EOF
                              ################                         
                                ##########/                            
 
- Dashboard
-       URL : $dashboard_base_url
-             $dashboard_sso_base_url (SSO)
-             $e2_dashboard_base_url (Environment 2)
-  Username : $dashboard_user_email
-  Password : $dashboard_user_password
+         Dashboard
+               URL : $dashboard_base_url
+                     $dashboard_sso_base_url (SSO)
+                     $e2_dashboard_base_url (Environment 2)
+          Username : $dashboard_user_email
+          Password : $dashboard_user_password
+   API Credentials : $dashboard_user_api_credentials
 
-    Portal
-       URL : $dashboard_base_url$portal_root_path
-  Username : $portal_user_email
-  Password : $portal_user_password
+            Portal
+               URL : $dashboard_base_url$portal_root_path
+          Username : $portal_user_email
+          Password : $portal_user_password
 
-   Gateway
-       URL : $gateway_base_url
-             $gateway_tls_base_url
-             $e2_gateway_base_url (Environment 2)
+           Gateway
+               URL : $gateway_base_url
+                     $gateway_tls_base_url
+                     $e2_gateway_base_url (Environment 2)
 
-    Kibana
-       URL : $kibana_base_url
+            Kibana
+               URL : $kibana_base_url
 
-   Jenkins
-       URL : $jenkins_base_url
-  Password : $jenkins_admin_password
+           Jenkins
+               URL : $jenkins_base_url
+          Password : $jenkins_admin_password
 
 EOF
