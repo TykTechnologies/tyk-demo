@@ -159,6 +159,116 @@
 							"response": []
 						},
 						{
+							"name": "Plugin - Enforced Timeout (part 1)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/delay/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"delay",
+										"10"
+									]
+								},
+								"description": "The Enforced Timeout plugin will return a response from the Gateway if the API server does not response within a set time. \n\nThis request calls the `/delay/10` endpoint, which has a 10 second delay before responding. The endpoint uses the Enforced Timeout plugin, which is configured for 3 seconds, so will repsond with a `504 Gateway Timeout` before the API server can provide a response."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Enforced Timeout (part 2)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/delay/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"delay",
+										"10"
+									]
+								},
+								"description": "This endpoint has the same configuration at part 1, but because this endpoint only has a 1 second delay, it responds in time, so the API client receives the API server response and the Enforced Timeout is not activated."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - URL Rewrite (part 1)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/delay/3",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"delay",
+										"3"
+									]
+								},
+								"description": "The URL Rewrite plugin can rewrite the URL based on many different parameters. This example shows the most basic version, using the default rewrite, which is used if none of the advanced rewrite rules are triggered. In this case, it rewrites to `/anything/default-rewrite` - check the `url` property in the response body to see the URL which was called on the API server.\n\nThe advanced rewriter can perform rewriting based on many aspects of a request:\n\n- URL query\n- Header\n- Path\n- Body\n- Session metadata\n- Context data\n\nSee the other parts of the URL Rewrite example for examples of the advanced URL rewriting rules."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - URL Rewrite (part 2)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/delay/3",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"delay",
+										"3"
+									]
+								},
+								"description": "This example triggers an advanced URL rewrite rule based on the URL parameter. It checks for a parameter with the key `query` and value `rewrite`. The plugin rewrites to the URL `/anything/rewrite-query`."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - URL Rewrite (part 3)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/delay/3",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"delay",
+										"3"
+									]
+								},
+								"description": "This example triggers an advanced URL rewrite rule based on the request headers. It checks for a header with the key `Header` and value `rewrite`. The plugin rewrites to the URL `/anything/rewrite-header`."
+							},
+							"response": []
+						},
+						{
 							"name": "Plugin - Modify Headers",
 							"request": {
 								"method": "GET",
@@ -204,6 +314,260 @@
 									]
 								},
 								"description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Validate JSON (part 1)",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"lastName\": \"Hoskins\",\n\t\"age\": 71\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/validate-json",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"validate-json"
+									]
+								},
+								"description": "The Validate JSON plugin will validate the JSON in the request body against a JSON scheme defined in the plugin configuration. If the request fails validation then the API Gateway returns a `422 Unprocessable Entity` HTTP status and a detailed description of the problem in the response body.\n\nFor this example, the JSON sent in the request body did not include a `firstName` property, so the request is rejected with a response specifically referencing the missing property.\n\nFor reference, the JSON schema used in this example:\n\n```\n{\n  \"title\": \"Person\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"firstName\": {\n      \"type\": \"string\"\n    },\n    \"lastName\": {\n      \"type\": \"string\"\n    },\n    \"age\": {\n      \"description\": \"Age in years\",\n      \"type\": \"integer\",\n      \"minimum\": 0\n    }\n  },\n  \"required\": [\"firstName\", \"lastName\"]\n}\n```"
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Validate JSON (part 2)",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"firstName\": \"Bob\",\n\t\"lastName\": \"Hoskins\",\n\t\"age\": 71\n}"
+								},
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/validate-json",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"validate-json"
+									]
+								},
+								"description": "This example sends a valid payload, so is accepted and a normal response is received from the API server."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Request Size Limit (part 1)",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "1234567890"
+								},
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/request-size-limit",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"request-size-limit"
+									]
+								},
+								"description": "The Request Size Limit Plugin validates the size of the request body against defined maximum size in byte.\n\nIn this example, the plugin is configured to only allow requests with a maximum payload size of 9 bytes. The request sends a body with 10 bytes, so is rejected with a `400 Bad Request` response."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Request Size Limit (part 2)",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "123456789"
+								},
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/request-size-limit",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"request-size-limit"
+									]
+								},
+								"description": "This example succeeds because the request is 9 bytes, which the same as the configured maximum value in the plugin."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Method Transform",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/method-transform",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"method-transform"
+									]
+								},
+								"description": "The Method Transform plugin changes the HTTP method used in the request. In this example, it changes the PUT method to a POST. Check the `method` property in the response body to see the method used."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Track Endpoint",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/track-endpoint",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"track-endpoint"
+									]
+								},
+								"description": "The Track Endpoint plugin will record analytics about the number of times this individual endpoint has been requested. The analytics for this are visible in the Endpoint Popularity report in the Dashboard."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Global Version Settings",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "global-delete",
+										"value": "deleted-header",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/global-version-settings",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"global-version-settings"
+									]
+								},
+								"description": "The Global Version Settings plugin are applied to all endpoints for the version of the API. This plugin allows you to delete and add headers to the request. \n\nFor this example, the plugin will delete the header `global-delete` and will add a header `global-add` with the value `global-value`. Check the response body and you will see the added header, but not the deleted header in the `headers` array.\n\nThis plugin has been configured for the `default` version of the Plugin Demo API, so you will it taking effect on any request using this API version."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Virtual Endpoint",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/virtual-endpoint",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"virtual-endpoint"
+									]
+								},
+								"description": "The Virtual Endpoint plugin executes JavaScript to generate a response. The JavaScript is defined in the plugin or provided in a file. The JavaScript has access to special Tyk helper functions which make performing certain tasks easy:\n\n- Generating a response\n- Writing to the application log\n- Making an HTTP request\n\nThe JavaScript is executed by a JavaScript virtual machine which runs within the Gateway. When the plugin is run it provide access to the request data, session data and API configuration data. The plugin can also make requests out to other services, allowing for orchestration across multiple upstream API servers.\n\nIn this example, the plugin simply returns a basic plain text response with a `200 OK` status code."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Whitelist (part 1)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-version",
+										"value": "whitelist",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/whitelist",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"whitelist"
+									]
+								},
+								"description": "The Whitelist plugin causes the API Gateway to reject requests for any endpoints which are not explictly whitelisted. \n\nFor this example a separate version of the Plugin Demo API has been created, called `whitelist`, and it has a single endpoint defined `/anything/whitelist$`. The `$` at the end of the string is the regular expression character for 'end of the string', which if not used would mean that any paths which start `/anything/whitelist` i.e. `/anything/whitelist-123` would also be accepted."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Whitelist (part 2)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-version",
+										"type": "text",
+										"value": "whitelist"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/anything/whitelist-123",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"whitelist-123"
+									]
+								},
+								"description": "This request is rejected as the requested path `/anything/whitelist-123` has not been defined with the Whitelist plugin. The API Gateway responds with a `403 Forbidden` response."
 							},
 							"response": []
 						}
