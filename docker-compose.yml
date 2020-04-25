@@ -181,6 +181,17 @@ services:
     environment:
       - SWAGGER_HOST=http://swagger-petstore:8080
       - SWAGGER_URL=http://localhost:8080/swagger-petstore
+  zipkin:
+    image: openzipkin/zipkin-slim:latest
+    ports:
+      - 9411:9411
+    networks:
+      - tyk
+    environment:
+      - STORAGE_TYPE=elasticsearch
+      - ES_HOSTS=elasticsearch:9200
+    depends_on:
+      - elasticsearch
 
 volumes:
   redis-data:
