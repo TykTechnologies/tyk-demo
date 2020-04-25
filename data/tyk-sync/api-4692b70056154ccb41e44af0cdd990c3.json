@@ -143,6 +143,13 @@
               "act_on": false
             }
           ],
+          "hard_timeouts": [
+            {
+              "path": "/delay/{time}",
+              "method": "GET",
+              "timeout": 3
+            }
+          ],
           "circuit_breakers": [
             {
               "path": "status/500",
@@ -150,6 +157,53 @@
               "threshold_percent": 0.5,
               "samples": 4,
               "return_to_service_after": 15
+            }
+          ],
+          "url_rewrites": [
+            {
+              "path": "/anything/url-rewrite",
+              "method": "GET",
+              "match_pattern": "/anything/url-rewrite",
+              "rewrite_to": "/anything/default-rewrite",
+              "triggers": [
+                {
+                  "on": "all",
+                  "options": {
+                    "header_matches": {},
+                    "query_val_matches": {
+                      "query": {
+                        "match_rx": "rewrite"
+                      }
+                    },
+                    "path_part_matches": {},
+                    "session_meta_matches": {},
+                    "request_context_matches": {},
+                    "payload_matches": {
+                      "match_rx": ""
+                    }
+                  },
+                  "rewrite_to": "/anything/rewrite-query"
+                },
+                {
+                  "on": "all",
+                  "options": {
+                    "header_matches": {
+                      "Header": {
+                        "match_rx": "rewrite"
+                      }
+                    },
+                    "query_val_matches": {},
+                    "path_part_matches": {},
+                    "session_meta_matches": {},
+                    "request_context_matches": {},
+                    "payload_matches": {
+                      "match_rx": ""
+                    }
+                  },
+                  "rewrite_to": "/anything/rewrite-header"
+                }
+              ],
+              "MatchRegexp": null
             }
           ]
         },

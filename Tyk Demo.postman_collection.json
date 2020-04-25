@@ -159,6 +159,116 @@
 							"response": []
 						},
 						{
+							"name": "Plugin - Enforced Timeout (part 1)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/delay/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"delay",
+										"10"
+									]
+								},
+								"description": "The Enforced Timeout plugin will return a response from the Gateway if the API server does not response within a set time. \n\nThis request calls the `/delay/10` endpoint, which has a 10 second delay before responding. The endpoint uses the Enforced Timeout plugin, which is configured for 3 seconds, so will repsond with a `504 Gateway Timeout` before the API server can provide a response."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Enforced Timeout (part 2)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/delay/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"delay",
+										"10"
+									]
+								},
+								"description": "This endpoint has the same configuration at part 1, but because this endpoint only has a 1 second delay, it responds in time, so the API client receives the API server response and the Enforced Timeout is not activated."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - URL Rewrite (part 1)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/delay/3",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"delay",
+										"3"
+									]
+								},
+								"description": "The URL Rewrite plugin can rewrite the URL based on many different parameters. This example shows the most basic version, using the default rewrite, which is used if none of the advanced rewrite rules are triggered. In this case, it rewrites to `/anything/default-rewrite` - check the `url` property in the response body to see the URL which was called on the API server.\n\nThe advanced rewriter can perform rewriting based on many aspects of a request:\n\n- URL query\n- Header\n- Path\n- Body\n- Session metadata\n- Context data\n\nSee the other parts of the URL Rewrite example for examples of the advanced URL rewriting rules."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - URL Rewrite (part 2)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/delay/3",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"delay",
+										"3"
+									]
+								},
+								"description": "This example triggers an advanced URL rewrite rule based on the URL parameter. It checks for a parameter with the key `query` and value `rewrite`. The plugin rewrites to the URL `/anything/rewrite-query`."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - URL Rewrite (part 3)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/plugin-demo-api/delay/3",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"delay",
+										"3"
+									]
+								},
+								"description": "This example triggers an advanced URL rewrite rule based on the request headers. It checks for a header with the key `Header` and value `rewrite`. The plugin rewrites to the URL `/anything/rewrite-header`."
+							},
+							"response": []
+						},
+						{
 							"name": "Plugin - Modify Headers",
 							"request": {
 								"method": "GET",
