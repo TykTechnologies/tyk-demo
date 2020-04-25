@@ -90,6 +90,7 @@ The following applications are available once the system is bootstrapped:
 - [Tyk Gateway using TLS](https://localhost:8081/basic-open-api/get) (using self-signed certificate, so expect a warning)
 - [Tyk Gateway environment 2](http://localhost:8085/basic-open-api/get)
 - [Kibana](http://localhost:5601)
+- [Zipkin](http://localhost:9411)
 
 # Synchronisations of API and Policies
 
@@ -202,3 +203,9 @@ Commands can be sent to the CLI via docker. Here's an example which gets the 'AP
 ```
 docker-compose exec jenkins java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ -auth admin:f284436d222a4d73841ae92ebc5928e8 -webSocket get-job 'APIs and Policies'
 ```
+
+# Zipkin
+
+Zipkin has a [web UI](http://localhost:9411) you can use to view traces.
+
+Zipkin has been configured to use in-memory storage, so will not retain data once the contain is restarted/removed.
