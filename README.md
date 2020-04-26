@@ -1,6 +1,11 @@
 # Tyk Demo
 
-This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple demo of the Tyk stack, this includes the Gateway, the Dashboard and the Portal.
+This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple demo of the Tyk stack, this includes the Gateway, the Dashboard and the Portal. It also has:
+
+* Elasticsearch/Kibana
+* Zipkin
+* Jenkins
+* StatsD/Graphite
 
 # Getting Started
 
@@ -119,6 +124,33 @@ The following applications are available once the system is bootstrapped.
 - [Tyk Portal](http://localhost:3000/portal)
 - [Tyk Gateway](http://localhost:8080/basic-open-api/get)
 - [Tyk Gateway using TLS](https://localhost:8081/basic-open-api/get) (using self-signed certificate, so expect a warning)
+- [Tyk Identity Broker](http://localhost:3010)
+
+### SSO Dashboard
+
+**Note:** This example is not very configurable right now, since it relies on a specific Okta setup which is only configurable by the owner of the Okta account (i.e. not you!). Would be good to change this at some point to use a self-contained method which can be managed by anyone. Please feel free to implement such a change an make a pull request. Anyway, here's the SSO we have...
+
+The `dashboard-sso` container is set up to provide a Dashboard using SSO. It works in conjunction with the Identity Broker and Okta to enable this.
+
+If you go to SSO-enabled Dashboard http://localhost:3001 (in a private browser session to avoid sending any pre-existing auth cookies) it will redirect you to the Okta login page, where you can use these credentials to log in:
+
+  - Admin user:
+    - Username: `dashboard.admin@example.org`
+    - Password: `Abcd1234`
+  - Read-only user:
+    - Username: `dashboard.readonly@example.org`
+    - Password: `Abcd1234`
+  - Default user: (lowest permissions)
+    - Username: `dashboard.default@example.org`
+    - Password: `Abcd1234`
+
+This will redirect back to the Dashboard, using a temporary session created via the Identity Broker and Dashboard SSO API.
+
+Functionality is based on the `division` attribute of the Okta user profile and ID token. The value of which is matched against the `UserGroupMapping` property of the `tyk-dashboard` Identity Broker profile.
+
+### Scaling the solution
+
+Run the `add-gateway.sh` script to create a new Gateway instance. It will behave like the existing `tyk-gateway` container as it will use the same configuration. The new Gateway will be mapped on a random port, to avoid collisions.
 
 ## Tyk environment 2
 
@@ -246,29 +278,3 @@ To enable this feature, add `INSTRUMENTATION_ENABLED=1` to your Docker environme
 ### Usage
 
 Open the [Graphite Dashboard](http://localhost:8060]). Explore the 'Metrics' tree, and click on items you are interested in seeing, this will add them to the graph. Most of the Tyk items are in `stats` and `stats_counts`.  Try sending some requests through the Gateway to generate data.
-
-# SSO Dashboard
-
-**Note:** This example is not very configurable right now, since it relies on a specific Okta setup which is only configurable by the owner of the Okta account (i.e. not you!). Would be good to change this at some point to use a self-contained method which can be managed by anyone. Please feel free to implement such a change an make a pull request. Anyway, here's the SSO we have...
-
-The `dashboard-sso` container is set up to provide a Dashboard using SSO. It works in conjunction with the Identity Broker and Okta to enable this.
-
-If you go to SSO-enabled Dashboard http://localhost:3001 (in a private browser session to avoid sending any pre-existing auth cookies) it will redirect you to the Okta login page, where you can use these credentials to log in:
-
-  - Admin user:
-    - Username: `dashboard.admin@example.org`
-    - Password: `Abcd1234`
-  - Read-only user:
-    - Username: `dashboard.readonly@example.org`
-    - Password: `Abcd1234`
-  - Default user: (lowest permissions)
-    - Username: `dashboard.default@example.org`
-    - Password: `Abcd1234`
-
-This will redirect back to the Dashboard, using a temporary session created via the Identity Broker and Dashboard SSO API.
-
-Functionality is based on the `division` attribute of the Okta user profile and ID token. The value of which is matched against the `UserGroupMapping` property of the `tyk-dashboard` Identity Broker profile.
-
-# Scaling the solution
-
-Run the `add-gateway.sh` script to create a new Gateway instance. It will behave like the existing `tyk-gateway` container as it will use the same configuration. The new Gateway will be mapped on a random port, to avoid collisions.
