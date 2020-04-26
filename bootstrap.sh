@@ -16,6 +16,7 @@ chmod +x bootstrap-e2.sh
 chmod +x bootstrap-jenkins.sh
 chmod +x bootstrap-kibana.sh
 chmod +x bootstrap-zipkin.sh
+chmod +x bootstrap-graphite.sh
 echo "  Done"
 
 echo "Getting Dashboard configuration"
