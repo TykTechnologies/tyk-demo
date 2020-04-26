@@ -11,6 +11,7 @@ services:
       - ./volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
     depends_on:
       - tyk-redis
       - tyk-mongo
@@ -27,6 +28,7 @@ services:
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
       - TYK_DB_SSOCUSTOMLOGINURL=http://localhost:3010/auth/tyk-dashboard/openid-connect
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
     depends_on:
       - tyk-redis
       - tyk-mongo
@@ -37,6 +39,9 @@ services:
       - "8080:8080"
     networks:
       - tyk
+    environment:
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
+      - TYK_GW_TRACING_ENABLED=${TRACING_ENABLED}
     volumes:
       - ./volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
@@ -53,7 +58,8 @@ services:
       - ./volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
       - ./volumes/tyk-gateway/certificates:/opt/tyk-gateway/certificates
     environment:
-      - TYK_GW
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
+      - TYK_GW_TRACING_ENABLED=${TRACING_ENABLED}
     depends_on:
       - tyk-redis
   tyk-pump:
@@ -62,6 +68,8 @@ services:
       - tyk
     volumes:
       - ./volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
+    environment:
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
     depends_on:
       - tyk-redis
       - tyk-mongo
