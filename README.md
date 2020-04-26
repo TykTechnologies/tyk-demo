@@ -14,7 +14,7 @@ The `docker-compose.yml` file uses a Docker environment variable to set the dash
 DASHBOARD_LICENCE=<YOUR_LICENCE>
 ```
 
-In addition to this, some features require entries in the `.env` file. Check the "Applications Available" section, if a Docker Environment variable is required for the application, it will be listed in the "Setup" section for that application. This process is to avoid generating errors in the application logs due to the components trying to utilise a service which has not been deployed. Using Docker Environment variables allows for features to be enable and disabled without having to change the source controlled files.
+In addition to this, some features require entries in the `.env` file. Check the [Applications Available](#applications-available) section, if a Docker Environment variable is required for the application, it will be listed in the Setup section for that application. This process is to avoid generating errors in the application logs due to the components trying to utilise a service which has not been deployed. Using Docker Environment variables allows for features to be enable and disabled without having to change the source controlled files.
 
 ## Step 2: Initialise the Docker containers
 
