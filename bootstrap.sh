@@ -12,10 +12,10 @@ chmod +x sync.sh
 chmod +x publish.sh
 chmod +x update.sh
 chmod +x add-gateway.sh
-chmod +x bs.e2.sh
-chmod +x bs.jenkins.sh
-chmod +x bs.kibana.sh
-chmod +x bs.zipkin.sh
+chmod +x bootstrap-e2.sh
+chmod +x bootstrap-jenkins.sh
+chmod +x bootstrap-kibana.sh
+chmod +x bootstrap-zipkin.sh
 echo "  Done"
 
 echo "Getting Dashboard configuration"
