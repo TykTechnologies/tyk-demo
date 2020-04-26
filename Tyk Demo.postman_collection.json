@@ -13,6 +13,24 @@
 					"item": [
 						{
 							"name": "Middleware - JavaScript",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "4c477bb6-d7ec-45bd-b688-cdd2c983d527",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"pm.test(\"Body data set by JW middleware\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data).to.eql(\"Request body set by pre middleware\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [
@@ -1065,6 +1083,20 @@
 		},
 		{
 			"name": "Basic Test Request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7365fa90-561a-48c7-8cb1-6dd6f892f556",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
