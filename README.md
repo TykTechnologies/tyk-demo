@@ -141,6 +141,10 @@ It has been configured to use in-memory storage, so will not retain data once th
 
 - [Zipkin](http://localhost:9411)
 
+### Usage 
+
+To use Zipkin, open the [Zipkin Dashboard](http://localhost:9411) in a browser and click the magnifying glass icon, this will conduct a search for all available traces. You can add filters for the trace search. There should be at least one trace entry for the "Basic Open API", which is made during the bootstrap process. If you don't see any data, try changing the duration filter to longer period.
+
 ## Jenkins
 
 Jenkins is used to provide an automated way of pushing API Definitions and Policies to different Tyk environments. It uses the `tyk-sync` CLI tool and a Github repository to achieve this.
@@ -152,12 +156,12 @@ Jenkins is used to provide an automated way of pushing API Definitions and Polic
 Setting up Jenkins is a manual process:
 
 1. Browse to [Jenkins web UI](http://localhost:8070)
-2. Use the Jenkins admin credentials provided by the `bootstrap.sh` script to log in
+2. Use the Jenkins admin credentials shown in the bootstrap output to log in
 3. Install suggested plugins
 4. Add credentials: (these are needed by `tyk-sync` to push data into the e2 Dashboard)
   - Kind: Secret text
   - Scope: Global (this is just a PoC...)
-  - Secret: The e2 Dashboard API credentials, shown in `Creating Dashboard user for environment 2` section of the `bootstrap.sh` output
+  - Secret: The e2 Dashboard API credentials, shown in `Creating Dashboard user for environment 2` section of the bootstrap output
   - ID: `tyk-dash-secret`
   - Description: `Tyk Dashboard Secret`
 5. Create a new job:
@@ -174,7 +178,7 @@ Ideally, this will be automated in the future.
 
 After the setup process is complete, the CI/CD functionality can be demonstrated as follows:
 
-1. Log into the [e2 Dashboard](http://localhost:3002) (using credentials shown in `bootstrap.sh` output, and a private browser session to avoid invalidating your session cookie for the default Dashboard)
+1. Log into the [e2 Dashboard](http://localhost:3002) (using credentials shown in bootstrap output, and a private browser session to avoid invalidating your session cookie for the default Dashboard)
 2. You will see that there are no API Definitions or Policies
 3. Build the `APIs and Polcies` job in Jenkins
 4. Check the e2 Dashboard again, you will now see that it has the same API Definitions and Policies as the default Dashboard.
@@ -182,7 +186,7 @@ After the setup process is complete, the CI/CD functionality can be demonstrated
 
 ### Jenkins CLI
 
-The Jenkins CLI is set up as part of the `bootstrap.sh` process. This may be useful for importing job data etc. See [the Jenkins wiki](https://wiki.jenkins.io/display/JENKINS/Jenkins+CLI) and [Jenkins commands](http://localhost:8070/cli/) for reference.
+The Jenkins CLI is set up as part of the bootstrap process. This may be useful for importing job data etc. See [the Jenkins wiki](https://wiki.jenkins.io/display/JENKINS/Jenkins+CLI) and [Jenkins commands](http://localhost:8070/cli/) for reference.
 
 Commands can be sent to the CLI via docker. Here's an example which gets the 'APIs and Policies' Job we created, but replace `f284436d222a4d73841ae92ebc5928e8` with your Jenkins admin password:
 
