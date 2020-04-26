@@ -1,17 +1,19 @@
 #!/bin/bash
 
-echo "            Kibana"
-
 kibana_base_url="http://localhost:5601"
 kibana_status=""
+kibana_tries=0
 
 while [ "$kibana_status" != "200" ]
 do
-  kibana_status=$(curl -I $kibana_base_url/app/kibana 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+  kibana_tries=$((kibana_tries+1))
+  dot=$(printf "%-${kibana_tries}s" ".")
+  echo -ne "  Bootstrapping Kibana ${dot// /.} \r"
+  kibana_status=$(curl -I -m2 $kibana_base_url/app/kibana 2>/dev/null | head -n 1 | cut -d$' ' -f2)
   
   if [ "$kibana_status" != "200" ]
   then
-    sleep 5
+    sleep 1
   fi
 done
 
@@ -24,7 +26,10 @@ curl $kibana_base_url/api/saved_objects/visualization/407e91c0-8168-11ea-9323-29
   -H 'kbn-xsrf: true' \
   -d @bootstrap-data/kibana/visualizations/request-count-by-time.json > /dev/null
 
+echo -e "\033[2K"
+
 cat <<EOF
+            Kibana
                URL : $kibana_base_url
                
 EOF

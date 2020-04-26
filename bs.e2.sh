@@ -1,12 +1,24 @@
 #!/bin/bash
 
-echo "    Dashboard (e2)"
-
 e2_dashboard_base_url="http://localhost:3002"
 e2_gateway_base_url="http://localhost:8085"
-
 dashboard_admin_api_credentials=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
-# portal_root_path=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_config.portal_root_path)
+
+e2_status=""
+e2_tries=0
+
+while [ "$e2_status" != "200" ]
+do
+  e2_tries=$((e2_tries+1))
+  dot=$(printf "%-${e2_tries}s" ".")
+  echo -ne "  Bootstrapping Tyk Environment 2 ${dot// /.} \r"
+  e2_status=$(curl -I -m2 $e2_dashboard_base_url/admin/organisations -H "admin-auth: $dashboard_admin_api_credentials" 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+  
+  if [ "$e2_status" != "200" ]
+  then
+    sleep 1
+  fi
+done
 
 curl $e2_dashboard_base_url/admin/organisations/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
@@ -27,13 +39,16 @@ curl $e2_dashboard_base_url/api/users/$e2_dashboard_user_id/actions/reset -s \
       "user_permissions": { "IsAdmin": "admin" }
     }' > /dev/null
 
-cat <<EOF                 
+echo -e "\033[2K"
+
+cat <<EOF  
+   Env 2 Dashboard
                URL : $e2_dashboard_base_url
           Username : $dashboard_user_email
           Password : $dashboard_user_password
    API Credentials : $e2_dashboard_user_api_credentials
 
-           Gateway
-               URL : $e2_gateway_base_url (Environment 2)
+     Env 2 Gateway
+               URL : $e2_gateway_base_url
                
 EOF

@@ -216,6 +216,6 @@ cat <<EOF
 
            Gateway
                URL : $gateway_base_url
-                     $gateway_tls_base_url
+                     $gateway_tls_base_url (TLS)
 
 EOF
