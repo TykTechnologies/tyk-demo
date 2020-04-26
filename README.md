@@ -1,6 +1,11 @@
 # Tyk Demo
 
-This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple demo of the Tyk stack, this includes the Gateway, the Dashboard and the Portal.
+This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple demo of the Tyk stack, this includes the Gateway, the Dashboard and the Portal. It also has:
+
+* Elasticsearch/Kibana
+* Zipkin
+* Jenkins
+* StatsD/Graphite
 
 # Getting Started
 
