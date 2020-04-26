@@ -6,13 +6,15 @@ This repo provides an example installation of Tyk. It uses Docker Compose to pro
 
 Note that all commands provided here should be run from the root directory of the repo.
 
-## Step 1: Add your Dashboard licence
+## Step 1: Add Docker Environment variables
 
 The `docker-compose.yml` file uses a Docker environment variable to set the dashboard licence. To set this, create a file called `.env` in the root directory of the repo, then set the content of the file as follows, replacing `<YOUR_LICENCE>` with your Dashboard licence:
 
 ```
 DASHBOARD_LICENCE=<YOUR_LICENCE>
 ```
+
+In addition to this, some features require entries in the `.env` file. Check the "Applications Available" section, if a Docker Environment variable is required for the application, it will be listed in the "Setup" section for that application. This process is to avoid generating errors in the application logs due to the components trying to utilise a service which has not been deployed. Using Docker Environment variables allows for features to be enable and disabled without having to change the source controlled files.
 
 ## Step 2: Initialise the Docker containers
 
@@ -141,6 +143,12 @@ It has been configured to use in-memory storage, so will not retain data once th
 
 - [Zipkin](http://localhost:9411)
 
+### Setup
+
+Set the Tracing.Enabled value to true in the Gateway config. This will hopefully be a temporary workaround until this can be done via Docker env var.
+
+~~To enable this feature, add `TRACING_ENABLED=1` to your Docker environment file `.env`. This must be done prior to running the `docker-compose` commands.~~
+
 ### Usage 
 
 To use Zipkin, open the [Zipkin Dashboard](http://localhost:9411) in a browser and click the magnifying glass icon, this will conduct a search for all available traces. You can add filters for the trace search. There should be at least one trace entry for the "Basic Open API", which is made during the bootstrap process. If you don't see any data, try changing the duration filter to longer period.
@@ -222,6 +230,22 @@ If you want to get the changes other people have made, first pull from the repo,
 ```
 ./sync.sh
 ```
+
+## Graphite
+
+Graphite demonstrates the [instrumentation feature](https://tyk.io/docs/basic-config-and-security/report-monitor-trigger-events/instrumentation/) of Tyk whereby realtime statistic are pushed from the Dashboard, Gateway and Pump into a StatsD instance. For this example, the statistics can be seen in the [Graphite Dashboard](http://localhost:8060)
+
+* [Graphite Dashboard](http://localhost:8060)
+
+The StatsD, Carbon and Graphite are all deployed within a single container service called `graphite`.
+
+### Setup
+
+To enable this feature, add `INSTRUMENTATION_ENABLED=1` to your Docker environment file `.env`. This must be done prior to running the `docker-compose` commands.
+
+### Usage
+
+Open the [Graphite Dashboard](http://localhost:8060]). Explore the 'Metrics' tree, and click on items you are interested in seeing, this will add them to the graph. Most of the Tyk items are in `stats` and `stats_counts`.  Try sending some requests through the Gateway to generate data.
 
 # SSO Dashboard
 
