@@ -1,0 +1,13 @@
+version: '3.3'
+services:
+  graphite:
+    image: graphiteapp/graphite-statsd
+    networks:
+      - tyk
+    ports:
+      - 8060:80
+      - 2003-2004:2003-2004
+      - 8125:8125/udp
+
+networks:
+  tyk:
