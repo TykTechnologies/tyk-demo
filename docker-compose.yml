@@ -41,7 +41,7 @@ services:
       - tyk
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
-      - TYK_GW_TRACING_ENABLED=${TRACING_ENABLED}
+      - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED}
     volumes:
       - ./volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
@@ -59,7 +59,7 @@ services:
       - ./volumes/tyk-gateway/certificates:/opt/tyk-gateway/certificates
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
-      - TYK_GW_TRACING_ENABLED=${TRACING_ENABLED}
+      - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED}
     depends_on:
       - tyk-redis
   tyk-pump:
