@@ -74,6 +74,7 @@ services:
       - tyk-redis
       - tyk-mongo
       - tyk-gateway
+      - elasticsearch
   tyk-redis:
     image: redis
     volumes:
@@ -108,10 +109,19 @@ services:
     environment:
       - SWAGGER_HOST=http://swagger-petstore:8080
       - SWAGGER_URL=http://localhost:8080/swagger-petstore
-
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.8
+    environment:
+      - discovery.type=single-node
+    networks:
+      - tyk
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    
 volumes:
   redis-data:
   mongo-data:
+  elasticsearch-data:
 
 networks:
   tyk:
