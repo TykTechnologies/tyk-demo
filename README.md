@@ -4,8 +4,8 @@ This repo provides an example installation of Tyk. It uses Docker Compose to pro
 
 In the base Tyk Deployment you get:
 
-* Tyk Gateways x2
-* Tyk Dashboard x2
+* Tyk Gateways x2 (HTTP + HTTPS)
+* Tyk Dashboard x2 (Standard auth + SSO)
 * Tyk Pump
 * Tyk Identity Broker
 * Redis
