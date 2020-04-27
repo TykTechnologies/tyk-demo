@@ -1,11 +1,26 @@
 # Tyk Demo
 
-This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple demo of the Tyk stack, this includes the Gateway, the Dashboard and the Portal. It also has:
+This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple deployment.
+
+In the base Tyk Deployment you get:
+
+* Tyk Gateways x2
+* Tyk Dashboard x2
+* Tyk Pump
+* Tyk Identity Broker
+* Redis
+* MongoDB
+* Local web servers:
+  * HTTPbin
+  * Swagger Petstore
+
+It's also possible to deploy these complimentary services:
 
 * Elasticsearch/Kibana
 * Zipkin
 * Jenkins
 * StatsD/Graphite
+* 2nd Tyk environment
 
 # Getting Started
 
