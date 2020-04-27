@@ -16,11 +16,10 @@ In the base Tyk Deployment you get:
 
 It's also possible to deploy these complimentary services:
 
-* Elasticsearch/Kibana
-* Zipkin
-* Jenkins
-* StatsD/Graphite
-* 2nd Tyk environment
+* Elasticsearch/Kibana (alternative analytics reporting)
+* Zipkin (tracing)
+* Jenkins + 2nd Tyk environment (CI/CD)
+* StatsD/Graphite (Instrumentation)
 
 # Getting Started
 
