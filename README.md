@@ -167,6 +167,22 @@ The bootstrap process creates an Index Pattern and Visualization which can be us
 
 - [Kibana](http://localhost:5601)
 
+## Graphite
+
+Graphite demonstrates the [instrumentation feature](https://tyk.io/docs/basic-config-and-security/report-monitor-trigger-events/instrumentation/) of Tyk whereby realtime statistic are pushed from the Dashboard, Gateway and Pump into a StatsD instance. For this example, the statistics can be seen in the [Graphite Dashboard](http://localhost:8060)
+
+* [Graphite Dashboard](http://localhost:8060)
+
+The StatsD, Carbon and Graphite are all deployed within a single container service called `graphite`.
+
+### Setup
+
+To enable this feature, add `INSTRUMENTATION_ENABLED=1` to your Docker environment file `.env`. This must be done prior to running the `docker-compose` commands.
+
+### Usage
+
+Open the [Graphite Dashboard](http://localhost:8060]). Explore the 'Metrics' tree, and click on items you are interested in seeing, this will add them to the graph. Most of the Tyk items are in `stats` and `stats_counts`.  Try sending some requests through the Gateway to generate data.
+
 ## Zipkin
 
 Zipkin can demonstrate open tracing. It has a [web UI](http://localhost:9411) you can use to view traces.
@@ -262,19 +278,3 @@ If you want to get the changes other people have made, first pull from the repo,
 ```
 ./sync.sh
 ```
-
-## Graphite
-
-Graphite demonstrates the [instrumentation feature](https://tyk.io/docs/basic-config-and-security/report-monitor-trigger-events/instrumentation/) of Tyk whereby realtime statistic are pushed from the Dashboard, Gateway and Pump into a StatsD instance. For this example, the statistics can be seen in the [Graphite Dashboard](http://localhost:8060)
-
-* [Graphite Dashboard](http://localhost:8060)
-
-The StatsD, Carbon and Graphite are all deployed within a single container service called `graphite`.
-
-### Setup
-
-To enable this feature, add `INSTRUMENTATION_ENABLED=1` to your Docker environment file `.env`. This must be done prior to running the `docker-compose` commands.
-
-### Usage
-
-Open the [Graphite Dashboard](http://localhost:8060]). Explore the 'Metrics' tree, and click on items you are interested in seeing, this will add them to the graph. Most of the Tyk items are in `stats` and `stats_counts`.  Try sending some requests through the Gateway to generate data.
