@@ -21,6 +21,15 @@ It's also possible to deploy these complimentary services:
 * Jenkins + 2nd Tyk environment (CI/CD)
 * StatsD/Graphite (Instrumentation)
 
+# Repository Structure
+
+* `bootstrap-data`: Data used by the bootstrap scripts. Sub-directories group data on a per-application basis.
+* `data`: Data used by applications during runtime. Sub-directories group data on a per-application basis.
+* `volumes`: Data mounted into containers as volumes. Sub-directories group data on a per-application basis.
+* `bootstrap*.sh`: Bootstrap scripts to initialise deployed applications. These are closely aligned with services deployed in the Docker Compose files.
+* `docker-compose*.yml`: Docker Compose deployment definitions. Separate files allow for varied deployments. Complimentary services are defined together within the same file.
+* `dump.sh`, `publish.sh`, `sync.sh`, `update.sh`: Scripts to execute the related Tyk Sync commands via a container.
+
 # Getting Started
 
 Note that all commands provided here should be run from the root directory of the repo.
