@@ -1,5 +1,5 @@
 {
-  "id": "5ea3ddc09445d30001962f43",
+  "id": "5ea99d104a9856000149d134",
   "name": "Plugin Demo API",
   "slug": "plugin-demo-api",
   "api_id": "4692b70056154ccb41e44af0cdd990c3",
@@ -134,7 +134,9 @@
           ],
           "transform_headers": [
             {
-              "delete_headers": [],
+              "delete_headers": [
+                "Delete-Header"
+              ],
               "add_headers": {
                 "new-header": "new-header-value"
               },

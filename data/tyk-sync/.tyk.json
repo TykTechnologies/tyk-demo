@@ -2,15 +2,7 @@
   "type": "apidef",
   "files": [
     {
-      "file": "api-47e6f94f988d4e0f51e262ffd15b2954.json",
-      "oas": {}
-    },
-    {
-      "file": "api-4692b70056154ccb41e44af0cdd990c3.json",
-      "oas": {}
-    },
-    {
-      "file": "api-727dad853a8a45f64ab981154d1ffdad.json",
+      "file": "api-42b615355eaf47ca617463503f43300b.json",
       "oas": {}
     },
     {
@@ -18,7 +10,15 @@
       "oas": {}
     },
     {
-      "file": "api-42b615355eaf47ca617463503f43300b.json",
+      "file": "api-727dad853a8a45f64ab981154d1ffdad.json",
+      "oas": {}
+    },
+    {
+      "file": "api-4692b70056154ccb41e44af0cdd990c3.json",
+      "oas": {}
+    },
+    {
+      "file": "api-47e6f94f988d4e0f51e262ffd15b2954.json",
       "oas": {}
     },
     {
@@ -28,9 +28,6 @@
   ],
   "policies": [
     {
-      "file": "policy-5ea1118af4f8460001a938a0.json"
-    },
-    {
       "file": "policy-5ea2de4a62daf30001a2f0b8.json"
     },
     {
@@ -38,6 +35,9 @@
     },
     {
       "file": "policy-5ea11172f4f8460001a9389f.json"
+    },
+    {
+      "file": "policy-5ea1118af4f8460001a938a0.json"
     }
   ]
 }

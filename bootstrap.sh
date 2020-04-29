@@ -25,7 +25,7 @@ portal_root_path=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_
 echo "  Dashboard Admin API Credentials: $dashboard_admin_api_credentials"
 echo "  Portal Root Path: $portal_root_path"
 
-echo "Waiting for Dashboard to be ready"
+echo "Waiting for Dashboard API to be ready"
 dashboard_status=""
 while [ "$dashboard_status" != "200" ]
 do
@@ -157,19 +157,31 @@ curl $identity_broker_base_url/api/profiles/tyk-dashboard -s \
   -d "$(echo $identity_broker_profile_tyk_dashboard_data)" > /dev/null
 echo "  Done"
 
+echo "Waiting for Gateway API to be ready"
+gateway_api_credentials=$(cat ./volumes/tyk-gateway/tyk.conf | jq -r .secret)
+gateway_status=""
+while [ "$gateway_status" != "200" ]
+do
+  gateway_status=$(curl $gateway_base_url/tyk/keys/api_key_write_test -s -o /dev/null -w '%{http_code}' -H "x-tyk-authorization: $gateway_api_credentials" -d @./bootstrap-data/tyk-gateway/auth-key.json)
+  if [ "$gateway_status" != "200" ]
+  then
+    sleep 1
+  fi
+done
+echo "  Done"
+
 echo "Importing custom keys"
-gateway_admin_api_credentials=$(cat ./volumes/tyk-gateway/tyk.conf | jq -r .secret)
 curl $gateway_base_url/tyk/keys/auth_key -s \
-  -H "x-tyk-authorization: $gateway_admin_api_credentials" \
+  -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @./bootstrap-data/tyk-gateway/auth-key.json > /dev/null
 curl $gateway_base_url/tyk/keys/ratelimit_key -s \
-  -H "x-tyk-authorization: $gateway_admin_api_credentials" \
+  -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @./bootstrap-data/tyk-gateway/rate-limit-key.json > /dev/null
 curl $gateway_base_url/tyk/keys/throttle_key -s \
-  -H "x-tyk-authorization: $gateway_admin_api_credentials" \
+  -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @./bootstrap-data/tyk-gateway/throttle-key.json > /dev/null
 curl $gateway_base_url/tyk/keys/quota_key -s \
-  -H "x-tyk-authorization: $gateway_admin_api_credentials" \
+  -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @./bootstrap-data/tyk-gateway/quota-key.json > /dev/null
 echo "  Done"
 

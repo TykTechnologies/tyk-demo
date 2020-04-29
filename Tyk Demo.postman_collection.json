@@ -22,9 +22,40 @@
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
 											"});",
-											"pm.test(\"Body data set by JW middleware\", function () {",
+											"",
+											"pm.test(\"Body data is set by middleware\", function () {",
 											"    var jsonData = pm.response.json();",
 											"    pm.expect(jsonData.data).to.eql(\"Request body set by pre middleware\");",
+											"});",
+											"",
+											"pm.test(\"'added' URL parameter is added by middleware \", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.args.added).to.eql(\"123\");",
+											"});",
+											"",
+											"pm.test(\"'Config-Data' header is added by middleware\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Config-Data']).to.eql(\"config-value\");",
+											"});",
+											"",
+											"pm.test(\"'Accepted' header is unchanged by middleware\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Accepted']).to.eql(\"789\");",
+											"});",
+											"",
+											"pm.test(\"Request is redirected by middleware\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.url).to.contain(\"/anything/post\");",
+											"});",
+											"",
+											"pm.test(\"'Deleted' header is deleted by middleware\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Deleted']).to.eql(undefined);",
+											"});",
+											"",
+											"pm.test(\"'User-Agent' header is set by middleware\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['User-Agent']).to.eql(\"Tyk-JavaScript-Middleware\");",
 											"});"
 										],
 										"type": "text/javascript"
@@ -80,6 +111,25 @@
 					"item": [
 						{
 							"name": "Plugin - Mock Response",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d13135fc-e91e-47dd-a6a1-e902e747fd5e",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Mock response data is returned\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.mock).to.eql(\"response\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -108,6 +158,25 @@
 						},
 						{
 							"name": "Plugin - Blacklist",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2c0c2baa-5837-4750-8e23-74a1f6555d25",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Error message is 'Requested endpoint is forbidden'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error).to.eql(\"Requested endpoint is forbidden\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -130,6 +199,18 @@
 						},
 						{
 							"name": "Plugin - Circuit Breaker",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "783e48a6-7235-4973-a0cc-ff9ec672f7c7",
+										"exec": [
+											"// needs a test to verify circuit breaker functionality"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -152,6 +233,26 @@
 						},
 						{
 							"name": "Plugin - Body Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "5ee6137a-330b-4da3-adb5-363bd00386a3",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Body data transformed to JSON\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.json[\"Beijing_VPN\"]).to.eql(\"127.0.0.2\");",
+											"    pm.expect(jsonData.json[\"Shanghai_VPN\"]).to.eql(\"127.0.0.1\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [],
@@ -178,11 +279,38 @@
 						},
 						{
 							"name": "Plugin - Enforced Timeout (part 1)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ef1c95c8-1561-4735-91d3-c72d46f2b573",
+										"exec": [
+											"pm.test(\"Status code is 504\", function () {",
+											"    pm.response.to.have.status(504);",
+											"});",
+											"",
+											"pm.test(\"Response time is more than 3 seconds\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.above(3000);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 6 seconds\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(6000);",
+											"});",
+											"",
+											"pm.test(\"Error message is 'Upstream service reached hard timeout.'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error).to.eql(\"Upstream service reached hard timeout.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/delay/10",
+									"raw": "http://localhost:8080/plugin-demo-api/delay/6",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -191,20 +319,42 @@
 									"path": [
 										"plugin-demo-api",
 										"delay",
-										"10"
+										"6"
 									]
 								},
-								"description": "The Enforced Timeout plugin will return a response from the Gateway if the API server does not response within a set time. \n\nThis request calls the `/delay/10` endpoint, which has a 10 second delay before responding. The endpoint uses the Enforced Timeout plugin, which is configured for 3 seconds, so will repsond with a `504 Gateway Timeout` before the API server can provide a response."
+								"description": "The Enforced Timeout plugin will return a response from the Gateway if the API server does not response within a set time. \n\nThis request calls the `/delay/6` endpoint, which has a 6 second delay before responding. The endpoint uses the Enforced Timeout plugin, which is configured for 3 seconds, so will repsond with a `504 Gateway Timeout` before the API server can provide a response."
 							},
 							"response": []
 						},
 						{
 							"name": "Plugin - Enforced Timeout (part 2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "90f9d3ac-a408-42e2-aca4-ef31e7a43230",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response time is more than 1 second\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.above(1000);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 3 seconds\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(3000);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/delay/10",
+									"raw": "http://localhost:8080/plugin-demo-api/delay/1",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -213,7 +363,7 @@
 									"path": [
 										"plugin-demo-api",
 										"delay",
-										"10"
+										"1"
 									]
 								},
 								"description": "This endpoint has the same configuration at part 1, but because this endpoint only has a 1 second delay, it responds in time, so the API client receives the API server response and the Enforced Timeout is not activated."
@@ -222,11 +372,30 @@
 						},
 						{
 							"name": "Plugin - URL Rewrite (part 1)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "f46013df-12bc-4234-954c-8678982cb5bc",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"URL rewritten to '/anything/default-rewrite'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.url).to.contain(\"/anything/default-rewrite\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/delay/3",
+									"raw": "http://localhost:8080/plugin-demo-api/anything/url-rewrite",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -234,8 +403,8 @@
 									"port": "8080",
 									"path": [
 										"plugin-demo-api",
-										"delay",
-										"3"
+										"anything",
+										"url-rewrite"
 									]
 								},
 								"description": "The URL Rewrite plugin can rewrite the URL based on many different parameters. This example shows the most basic version, using the default rewrite, which is used if none of the advanced rewrite rules are triggered. In this case, it rewrites to `/anything/default-rewrite` - check the `url` property in the response body to see the URL which was called on the API server.\n\nThe advanced rewriter can perform rewriting based on many aspects of a request:\n\n- URL query\n- Header\n- Path\n- Body\n- Session metadata\n- Context data\n\nSee the other parts of the URL Rewrite example for examples of the advanced URL rewriting rules."
@@ -244,11 +413,30 @@
 						},
 						{
 							"name": "Plugin - URL Rewrite (part 2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ccb2b34f-845b-47df-8e36-3582d2a5260c",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"URL rewritten to '/anything/rewrite-query'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.url).to.contain(\"/anything/rewrite-query\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/delay/3",
+									"raw": "http://localhost:8080/plugin-demo-api/anything/url-rewrite?query=rewrite",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -256,8 +444,14 @@
 									"port": "8080",
 									"path": [
 										"plugin-demo-api",
-										"delay",
-										"3"
+										"anything",
+										"url-rewrite"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "rewrite"
+										}
 									]
 								},
 								"description": "This example triggers an advanced URL rewrite rule based on the URL parameter. It checks for a parameter with the key `query` and value `rewrite`. The plugin rewrites to the URL `/anything/rewrite-query`."
@@ -266,11 +460,36 @@
 						},
 						{
 							"name": "Plugin - URL Rewrite (part 3)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "b49c8655-ae46-460b-b503-ac92e73752e2",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"URL rewritten to '/anything/rewrite-header'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.url).to.contain(\"/anything/rewrite-header\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
-								"header": [],
+								"header": [
+									{
+										"key": "Header",
+										"value": "rewrite",
+										"type": "text"
+									}
+								],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/delay/3",
+									"raw": "http://localhost:8080/plugin-demo-api/anything/url-rewrite",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -278,8 +497,8 @@
 									"port": "8080",
 									"path": [
 										"plugin-demo-api",
-										"delay",
-										"3"
+										"anything",
+										"url-rewrite"
 									]
 								},
 								"description": "This example triggers an advanced URL rewrite rule based on the request headers. It checks for a header with the key `Header` and value `rewrite`. The plugin rewrites to the URL `/anything/rewrite-header`."
@@ -288,9 +507,39 @@
 						},
 						{
 							"name": "Plugin - Modify Headers",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "9b27afef-462d-42be-a855-c2dc2fc876c2",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"'New-Header' header is present\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['New-Header']).to.eql(\"new-header-value\");",
+											"});",
+											"",
+											"pm.test(\"'Delete-Header' header not present\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Delete-Header']).to.eql(undefined);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
-								"header": [],
+								"header": [
+									{
+										"key": "Delete-Header",
+										"value": "deleted-header-value",
+										"type": "text"
+									}
+								],
 								"url": {
 									"raw": "http://localhost:8080/plugin-demo-api/anything/modify-headers",
 									"protocol": "http",
@@ -304,12 +553,47 @@
 										"modify-headers"
 									]
 								},
-								"description": "To be updated"
+								"description": "This plugin can add and remove headers. In this example is adds a header called `New-Header` with the value `new-header-value`, and removes a header called `Delete-Header` which is sent in the request."
 							},
 							"response": []
 						},
 						{
 							"name": "Plugin - Cache",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "311844e2-01e9-4e54-8703-eba58ef40e4f",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response is same across two requests\", function() {",
+											"    var response1;",
+											"    var response2;",
+											"    pm.sendRequest(\"http://localhost:8080/plugin-demo-api/uuid\", function (err, response) {",
+											"        response1 =pm.response.json().uuid;",
+											"        ",
+											"         pm.sendRequest(\"http://localhost:8080/plugin-demo-api/uuid\", function (err, response) {",
+											"            response2 =pm.response.json().uuid;",
+											"            pm.expect(response1).to.eql(response2);",
+											"        });",
+											"    });",
+											"});",
+											"",
+											"pm.test(\"Cached response contains 'X-Tyk-Cached-Response' header set to '1'\", function() {",
+											"    pm.sendRequest(\"http://localhost:8080/plugin-demo-api/uuid\", function (err, response) {",
+											"         pm.sendRequest(\"http://localhost:8080/plugin-demo-api/uuid\", function (err, response) {",
+											"            pm.expect(response.headers.get(\"X-Tyk-Cached-Response\")).to.eql(\"1\");",
+											"        });",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -331,12 +615,31 @@
 										"uuid"
 									]
 								},
-								"description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
+								"description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint. If the Gateway returns a cached response then it will also a header `X-Tyk-Cached-Response` to the response with the value of `1`.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
 							},
 							"response": []
 						},
 						{
 							"name": "Plugin - Validate JSON (part 1)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e07b3037-40d5-4084-8159-8329dc6a9ed2",
+										"exec": [
+											"pm.test(\"Status code is 422\", function () {",
+											"    pm.response.to.have.status(422);",
+											"});",
+											"",
+											"pm.test(\"Error message is 'firstName: firstName is required'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error).to.eql(\"firstName: firstName is required\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [],
@@ -363,6 +666,27 @@
 						},
 						{
 							"name": "Plugin - Validate JSON (part 2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c387ad12-3765-44c5-a097-c3e1cfea5f4a",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Valid JSON data sent\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.json.age).to.eql(71);",
+											"    pm.expect(jsonData.json.firstName).to.eql(\"Bob\");",
+											"    pm.expect(jsonData.json.lastName).to.eql(\"Hoskins\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [],
@@ -389,6 +713,25 @@
 						},
 						{
 							"name": "Plugin - Request Size Limit (part 1)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "538621a0-0f0d-4b9b-bb49-0e2cdc43c012",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Error message is 'Request is too large'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error).to.eql(\"Request is too large\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [],
@@ -415,6 +758,25 @@
 						},
 						{
 							"name": "Plugin - Request Size Limit (part 2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "42ddd47a-7d1d-40e5-8cf8-450ea9b43182",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Request body is 9 bytes\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data).to.eql(\"123456789\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [],
@@ -441,6 +803,25 @@
 						},
 						{
 							"name": "Plugin - Method Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d5224045-d43b-4619-a131-8fed23bb0798",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Request method is changed to POST\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.method).to.eql(\"POST\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "PUT",
 								"header": [],
@@ -463,6 +844,20 @@
 						},
 						{
 							"name": "Plugin - Track Endpoint",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3c5a5390-d201-46ab-bdf7-2329e7cb0fe1",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -485,6 +880,25 @@
 						},
 						{
 							"name": "Plugin - Global Version Settings",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "23bcef71-0165-454a-90c1-4f369915e2a0",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"'Global-Add' header added to request\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Global-Add']).to.eql(\"global-value\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -513,6 +927,29 @@
 						},
 						{
 							"name": "Plugin - Virtual Endpoint",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ff152d5d-65a8-4bad-bdcb-20711fcc3077",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Content-Type is present and set to 'text/plain; charset=utf-8'\", function () {",
+											"    pm.response.to.have.header(\"Content-Type\");",
+											"    pm.response.to.be.header(\"Content-Type\", \"text/plain; charset=utf-8\")",
+											"});",
+											"",
+											"pm.test(\"Response body is 'Virtual endpoint response body'\", function () {",
+											"    pm.expect(pm.response.text()).to.include(\"Virtual endpoint response body\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -535,6 +972,20 @@
 						},
 						{
 							"name": "Plugin - Whitelist (part 1)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2cbf3ef9-6c2f-4fd0-983d-281e919f22aa",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -563,34 +1014,25 @@
 						},
 						{
 							"name": "Plugin - Whitelist (part 2)",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "x-api-version",
-										"type": "text",
-										"value": "whitelist"
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "03319ffc-1db3-4320-9e3f-1298f4cfc041",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Error message is 'Requested endpoint is forbidden'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error).to.eql(\"Requested endpoint is forbidden\");",
+											"});"
+										],
+										"type": "text/javascript"
 									}
-								],
-								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/whitelist-123",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"plugin-demo-api",
-										"anything",
-										"whitelist-123"
-									]
-								},
-								"description": "This request is rejected as the requested path `/anything/whitelist-123` has not been defined with the Whitelist plugin. The API Gateway responds with a `403 Forbidden` response."
-							},
-							"response": []
-						},
-						{
-							"name": "Plugin - Whitelist (part 2) Copy",
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -648,6 +1090,25 @@
 					"item": [
 						{
 							"name": "Versioning (part 1) - Mock response",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "319aeac6-87f1-47e8-be42-62f21638cc43",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Mock response body returned\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.mock).to.eql(\"response\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -676,6 +1137,30 @@
 						},
 						{
 							"name": "Versioning (part 2) - Normal response",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3332047e-a398-4d0d-b98c-3f65314a0862",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Mock response body not returned\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.mock).not.eql(\"response\");",
+											"});",
+											"",
+											"pm.test(\"Version 2 of the API was requested\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers[\"X-Api-Version\"]).to.eql(\"2\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -704,6 +1189,25 @@
 						},
 						{
 							"name": "Versioning (part 3) - Expired version",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "a3d918e6-a9f4-4392-9ee1-312300c50ca3",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Error message is 'Api Version has expired, please check documentation or contact administrator'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error).to.eql(\"Api Version has expired, please check documentation or contact administrator\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -739,6 +1243,25 @@
 					"item": [
 						{
 							"name": "Context Variables - Correlation Id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "63decd92-f9a5-4717-b8a3-e0520137b60a",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"'X-Req-Id' header is a UUID\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers[\"X-Req-Id\"]).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -767,6 +1290,22 @@
 					"item": [
 						{
 							"name": "Webhooks - Authentication Failure",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "693b2974-e166-4fd1-bd88-0df3c1981792",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"// Add test to check if webhook fired"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -859,6 +1398,59 @@
 				},
 				{
 					"name": "Rate Limit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6bfb8e51-c7a2-4221-bed0-d5c0e48653b6",
+								"exec": [
+									"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
+									"",
+									"var rateLimitTestKeyCreateRequest = {",
+									"  url: 'http://localhost:8080/tyk/keys/' + keyId,",
+									"  method: 'POST',",
+									"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
+									"  body: {",
+									"      mode: 'raw',",
+									"      raw: JSON.stringify({\"last_check\":0,\"allowance\":2,\"rate\":2,\"per\":5,\"throttle_interval\":-1,\"throttle_retry_limit\":-1,\"date_created\":\"2020-04-23T04:40:22.3984988Z\",\"expires\":0,\"quota_max\":-1,\"quota_renews\":1587616821,\"quota_remaining\":-1,\"quota_renewal_rate\":-1,\"access_rights\":{\"accbdd1b89e84ec97f4f16d4e3197d5c\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616822\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
+									"  }",
+									"};",
+									"",
+									"pm.sendRequest(rateLimitTestKeyCreateRequest, function (err, response) { ",
+									"    pm.test(\"Status code is 429\", function () {",
+									"        var rateLimitRequest = {",
+									"            url: 'http://localhost:8080/basic-protected-api/get',",
+									"            method: 'GET',",
+									"            header: 'Authorization:' + keyId",
+									"        };",
+									"        ",
+									"        pm.sendRequest(rateLimitRequest, function (err, response) {",
+									"            pm.expect(response.code).to.eql(200);",
+									"",
+									"            pm.sendRequest(rateLimitRequest, function (err, response) {",
+									"                pm.expect(response.code).to.eql(200);",
+									"",
+									"                pm.sendRequest(rateLimitRequest, function (err, response) {",
+									"                    pm.expect(response.code).to.eql(429);",
+									"                    ",
+									"                    var rateLimitTestKeyDeleteRequest = {",
+									"                        url: 'http://localhost:8080/tyk/keys/' + keyId,",
+									"                        method: 'DELETE',",
+									"                        header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
+									"                    };",
+									"                ",
+									"                    pm.sendRequest(rateLimitTestKeyDeleteRequest, function (err, response) { });",
+									"",
+									"                });",
+									"            });",
+									"        });",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
@@ -886,6 +1478,58 @@
 				},
 				{
 					"name": "Throttling",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b0f5c42d-5089-456e-bcb2-5b9eef34b5d9",
+								"exec": [
+									"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
+									"",
+									"var throttlingTestKeyCreateRequest = {",
+									"  url: 'http://localhost:8080/tyk/keys/' + keyId,",
+									"  method: 'POST',",
+									"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
+									"  body: {",
+									"      mode: 'raw',",
+									"      raw: JSON.stringify({\"last_check\":0,\"allowance\":2,\"rate\":2,\"per\":5,\"throttle_interval\":5,\"throttle_retry_limit\":2,\"date_created\":\"2020-04-23T04:41:37.0404484Z\",\"expires\":0,\"quota_max\":-1,\"quota_renews\":1587616896,\"quota_remaining\":-1,\"quota_renewal_rate\":-1,\"access_rights\":{\"accbdd1b89e84ec97f4f16d4e3197d5c\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616897\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
+									"  }",
+									"};",
+									"",
+									"pm.sendRequest(throttlingTestKeyCreateRequest, function (err, response) { ",
+									"    pm.test(\"Status code is 200\", function () {",
+									"        var throttleRequest = {",
+									"            url: 'http://localhost:8080/basic-protected-api/get',",
+									"            method: 'GET',",
+									"            header: 'Authorization:' + keyId",
+									"        };",
+									"        ",
+									"        pm.sendRequest(throttleRequest, function (err, response) {",
+									"            pm.expect(response.code).to.eql(200);",
+									"",
+									"            pm.sendRequest(throttleRequest, function (err, response) {",
+									"                pm.expect(response.code).to.eql(200);",
+									"",
+									"                pm.sendRequest(throttleRequest, function (err, response) {",
+									"                    pm.expect(response.code).to.eql(200);",
+									"                    ",
+									"                    var throttlingTestKeyDeleteRequest = {",
+									"                            url: 'http://localhost:8080/tyk/keys/' + keyId,",
+									"                            method: 'DELETE',",
+									"                            header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
+									"                        };",
+									"                    ",
+									"                    pm.sendRequest(throttlingTestKeyDeleteRequest, function (err, response) { });",
+									"                });",
+									"            });",
+									"        });",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
@@ -907,12 +1551,66 @@
 								"get"
 							]
 						},
-						"description": "This API will showcase the Throttling feature of Tyk.\n\nRate limit is set as 2 per 5 seconds. Gateway Throttling is configured for 10 times with 1 sec interval. \n\nWe can obeserve a delay in response due to throttling after the rate limit has reached."
+						"description": "This API will showcase the Throttling feature of Tyk.\n\nRate limit is set as 2 per 5 seconds. Gateway Throttling is configured for 10 times with 1 sec interval. \n\nWe can obeserve a delay in response due to throttling after the rate limit has been reached."
 					},
 					"response": []
 				},
 				{
 					"name": "Quota Limit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aa855b0f-2bd5-4bcc-802d-b70be0574a7d",
+								"exec": [
+									"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
+									"",
+									"var quotaTestKeyCreateRequest = {",
+									"    url: 'http://localhost:8080/tyk/keys/' + keyId,",
+									"    method: 'POST',",
+									"    header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({\"last_check\":0,\"allowance\":1000,\"rate\":1000,\"per\":60,\"throttle_interval\":-1,\"throttle_retry_limit\":-1,\"date_created\":\"2020-04-23T04:43:07.8812258Z\",\"expires\":0,\"quota_max\":2,\"quota_renews\":1587620587,\"quota_remaining\":2,\"quota_renewal_rate\":3600,\"access_rights\":{\"accbdd1b89e84ec97f4f16d4e3197d5c\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616987\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
+									"  }",
+									"};",
+									"",
+									"pm.sendRequest(quotaTestKeyCreateRequest, function (err, response) { ",
+									"    pm.test(\"Status code is 403\", function () {",
+									"        var quotaRequest = {",
+									"            url: 'http://localhost:8080/basic-protected-api/get',",
+									"            method: 'GET',",
+									"            header: 'Authorization:' + keyId",
+									"        };",
+									"        ",
+									"        pm.sendRequest(quotaRequest, function (err, response) {",
+									"            pm.expect(response.headers.get(\"X-Ratelimit-Remaining\")).to.eql(\"1\");",
+									"            pm.expect(response.code).to.eql(200);",
+									"            ",
+									"            pm.sendRequest(quotaRequest, function (err, response) {",
+									"                pm.expect(response.headers.get(\"X-Ratelimit-Remaining\")).to.eql(\"0\");",
+									"                pm.expect(response.code).to.eql(200);",
+									"                ",
+									"                pm.sendRequest(quotaRequest, function (err, response) {",
+									"                    pm.expect(response.code).to.eql(403);",
+									"                    ",
+									"                    var quotaTestKeyDeleteRequest = {",
+									"                        url: 'http://localhost:8080/tyk/keys/' + keyId,",
+									"                        method: 'DELETE',",
+									"                        header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
+									"                    };",
+									"                ",
+									"                    pm.sendRequest(quotaTestKeyDeleteRequest, function (err, response) { });",
+									"                });",
+									"            });",
+									"        });",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
