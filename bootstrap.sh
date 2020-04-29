@@ -177,19 +177,10 @@ curl $gateway_base_url/tyk/keys/auth_key -s \
 curl $gateway_base_url/tyk/keys/ratelimit_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @./bootstrap-data/tyk-gateway/rate-limit-key.json > /dev/null
-curl $gateway_base_url/tyk/keys/ratelimit_key_for_automated_tests -s \
-  -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @./bootstrap-data/tyk-gateway/rate-limit-key.json > /dev/null
 curl $gateway_base_url/tyk/keys/throttle_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @./bootstrap-data/tyk-gateway/throttle-key.json > /dev/null
-curl $gateway_base_url/tyk/keys/throttle_key_for_automated_tests -s \
-  -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @./bootstrap-data/tyk-gateway/throttle-key.json > /dev/null
 curl $gateway_base_url/tyk/keys/quota_key -s \
-  -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @./bootstrap-data/tyk-gateway/quota-key.json > /dev/null
-curl $gateway_base_url/tyk/keys/quota_key_for_automated_tests -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @./bootstrap-data/tyk-gateway/quota-key.json > /dev/null
 echo "  Done"
