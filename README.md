@@ -26,6 +26,7 @@ It's also possible to deploy these complimentary services:
 * `bootstrap-data`: Data used by the bootstrap scripts. Sub-directories group data on a per-application basis.
 * `data`: Data used by applications during runtime. Sub-directories group data on a per-application basis.
 * `volumes`: Data mounted into containers as volumes. Sub-directories group data on a per-application basis.
+* `Tyk Demo.postman_collection.json`: A Postman collection of requests which correspond to APIs available in the deployment.
 * `bootstrap*.sh`: Bootstrap scripts to initialise deployed applications. These are closely aligned with services deployed in the Docker Compose files.
 * `docker-compose*.yml`: Docker Compose deployment definitions. Separate files allow for varied deployments. Complimentary services are defined together within the same file.
 * `dump.sh`, `publish.sh`, `sync.sh`, `update.sh`: Scripts to execute the related Tyk Sync commands via a container.
