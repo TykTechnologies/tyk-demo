@@ -2,16 +2,17 @@
 
 kibana_base_url="http://localhost:5601"
 kibana_status=""
+kibana_status_desired="200"
 kibana_tries=0
 
-while [ "$kibana_status" != "200" ]
+while [ "$kibana_status" != "$kibana_status_desired" ]
 do
   kibana_tries=$((kibana_tries+1))
   dot=$(printf "%-${kibana_tries}s" ".")
   echo -ne "  Bootstrapping Kibana ${dot// /.} \r"
   kibana_status=$(curl -I -m2 $kibana_base_url/app/kibana 2>/dev/null | head -n 1 | cut -d$' ' -f2)
   
-  if [ "$kibana_status" != "200" ]
+  if [ "$kibana_status" != "$kibana_status_desired" ]
   then
     sleep 1
   fi

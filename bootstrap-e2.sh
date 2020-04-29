@@ -5,16 +5,17 @@ e2_gateway_base_url="http://localhost:8085"
 dashboard_admin_api_credentials=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
 
 e2_status=""
+e2_status_desired="200"
 e2_tries=0
 
-while [ "$e2_status" != "200" ]
+while [ "$e2_status" != "$e2_status_desired" ]
 do
   e2_tries=$((e2_tries+1))
   dot=$(printf "%-${e2_tries}s" ".")
   echo -ne "  Bootstrapping Tyk Environment 2 ${dot// /.} \r"
   e2_status=$(curl -I -m2 $e2_dashboard_base_url/admin/organisations -H "admin-auth: $dashboard_admin_api_credentials" 2>/dev/null | head -n 1 | cut -d$' ' -f2)
   
-  if [ "$e2_status" != "200" ]
+  if [ "$e2_status" != "$e2_status_desired" ]
   then
     sleep 1
   fi
