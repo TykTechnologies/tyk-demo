@@ -565,6 +565,11 @@
 									"script": {
 										"id": "311844e2-01e9-4e54-8703-eba58ef40e4f",
 										"exec": [
+											"var cacheRequest = {",
+											"    url: 'http://localhost:8080/plugin-demo-api/uuid',",
+											"    method: 'GET'",
+											"};",
+											"",
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
 											"});",
@@ -572,10 +577,10 @@
 											"pm.test(\"Response is same across two requests\", function() {",
 											"    var response1;",
 											"    var response2;",
-											"    pm.sendRequest(\"http://localhost:8080/plugin-demo-api/uuid\", function (err, response) {",
+											"    pm.sendRequest(cacheRequest, function (err, response) {",
 											"        response1 =pm.response.json().uuid;",
 											"        ",
-											"         pm.sendRequest(\"http://localhost:8080/plugin-demo-api/uuid\", function (err, response) {",
+											"         pm.sendRequest(cacheRequest, function (err, response) {",
 											"            response2 =pm.response.json().uuid;",
 											"            pm.expect(response1).to.eql(response2);",
 											"        });",
@@ -583,8 +588,8 @@
 											"});",
 											"",
 											"pm.test(\"Cached response contains 'X-Tyk-Cached-Response' header set to '1'\", function() {",
-											"    pm.sendRequest(\"http://localhost:8080/plugin-demo-api/uuid\", function (err, response) {",
-											"         pm.sendRequest(\"http://localhost:8080/plugin-demo-api/uuid\", function (err, response) {",
+											"    pm.sendRequest(cacheRequest, function (err, response) {",
+											"         pm.sendRequest(cacheRequest, function (err, response) {",
 											"            pm.expect(response.headers.get(\"X-Tyk-Cached-Response\")).to.eql(\"1\");",
 											"        });",
 											"    });",
@@ -1339,7 +1344,26 @@
 					"name": "Authentication",
 					"item": [
 						{
-							"name": "Token authorization - failure",
+							"name": "Token authorization - failure (part 1)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "91c134e9-47e2-4e15-b958-d2d752459c4c",
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Error message is 'Authorization field missing'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error).to.eql(\"Authorization field missing\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -1350,23 +1374,88 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/basic-security-api/",
+									"raw": "http://localhost:8080/basic-protected-api/get",
 									"protocol": "http",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
-										"basic-security-api",
-										""
+										"basic-protected-api",
+										"get"
 									]
 								},
-								"description": "This API will showcase the Token authorization feature of Tyk.\n\nToken (Key) will not be sent in the HTTP header field `Authorization` resulting in HTTP status code `401 Unauthorized` by gateway."
+								"description": "This API will showcase the Token authorization feature of Tyk.\n\nAn key is not provided in the HTTP header field `Authorization`, resulting in am HTTP status code `401 Unauthorized` returned by the Gateway."
+							},
+							"response": []
+						},
+						{
+							"name": "Token authorization - failure (part 2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "a5a96a39-1408-4bf5-b533-f0f41a3e26dd",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Error message is 'Access to this API has been disallowed'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error).to.eql(\"Access to this API has been disallowed\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "missing_key"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/basic-protected-api/get",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"basic-protected-api",
+										"get"
+									]
+								},
+								"description": "This request attempts to authenticate with a key which does not exist - `missing_key`.\n\nThis results in am HTTP status code `403 Forbidden` response from the Gateway."
 							},
 							"response": []
 						},
 						{
 							"name": "Token authorization - success",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3f3543d3-eb68-450a-80c2-960ca8283f3f",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"'auth_key' used in 'Authorization' header\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Authorization']).to.eql(\"auth_key\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -1377,18 +1466,18 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/basic-security-api/get",
+									"raw": "http://localhost:8080/basic-protected-api/get",
 									"protocol": "http",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
-										"basic-security-api",
+										"basic-protected-api",
 										"get"
 									]
 								},
-								"description": "This API will showcase the Token authorization feature of Tyk.\n\nToken (Key) will be sent in the HTTP header field `Authorization`."
+								"description": "This API showcases the Token authorization feature of Tyk.\n\nThe key is sent in the HTTP header field `Authorization`. It has been authorized access to the `Basic Protected API`, so the request is accepted by the Gateway."
 							},
 							"response": []
 						}
@@ -1647,6 +1736,30 @@
 					"item": [
 						{
 							"name": "Import custom key (part 1)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "9b21b1f6-1122-4c8b-9d00-4b2be0b0adaa",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response action is `added`\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.action).to.eql(\"added\");",
+											"});",
+											"",
+											"pm.test(\"Response key is not empty\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.key.length).to.be.above(0);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [
@@ -1684,6 +1797,25 @@
 						},
 						{
 							"name": "Import custom key (part 2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d7dd9858-230c-493f-ac7a-f68fcb331391",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Custom key was used\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers[\"Authorization\"]).to.eql(\"my-custom-key\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [
@@ -1705,7 +1837,7 @@
 										"get"
 									]
 								},
-								"description": "This request uses the custom key imported in Part 1 (which must be run prior to this) to access a protected API.\n\nThe custom key is provided in the `Authorization` header."
+								"description": "This request uses the custom key imported in Part 1 (which must be run prior to this) to access a protected API.\n\nThe custom key is provided in the `Authorization` header of the request."
 							},
 							"response": []
 						}
