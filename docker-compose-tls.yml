@@ -13,6 +13,5 @@ services:
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED}
-
-networks:
-  tyk:
+    depends_on: 
+      - tyk-redis

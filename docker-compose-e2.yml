@@ -60,6 +60,3 @@ services:
 volumes:
   e2-redis-data:
   e2-mongo-data:
-
-networks:
-  tyk:
