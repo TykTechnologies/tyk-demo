@@ -1,7 +1,7 @@
 #!/bin/bash
 
-organisation_id=$(cat .organisation-id)
-dashboard_user_api_credentials=$(cat .dashboard-user-api-credentials)
+organisation_id=$(cat .context-data/organisation-id)
+dashboard_user_api_credentials=$(cat .context-data/dashboard-user-api-credentials)
 docker run --rm \
   --network tyk-pro-docker-demo-extended_tyk \
   -v $(pwd)/data/tyk-sync:/opt/tyk-sync/data \

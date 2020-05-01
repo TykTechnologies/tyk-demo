@@ -18,6 +18,9 @@ chmod +x bootstrap-graphite.sh
 chmod +x bootstrap-sso.sh
 echo "  Done"
 
+echo "Creating directory for context data"
+mkdir .context-data
+
 echo "Getting Dashboard configuration"
 dashboard_admin_api_credentials=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
 portal_root_path=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_config.portal_root_path)
@@ -42,7 +45,7 @@ organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d @bootstrap-data/tyk-dashboard/organisation.json \
   | jq -r '.Meta')
-echo $organisation_id > .organisation-id
+echo $organisation_id > .context-data/organisation-id
 echo "  Organisation Id: $organisation_id"
 
 echo "Creating Dashboard user"
@@ -60,7 +63,7 @@ curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset -s \
       "new_password":"'$dashboard_user_password'",
       "user_permissions": { "IsAdmin": "admin" }
     }' > /dev/null
-echo $dashboard_user_api_credentials > .dashboard-user-api-credentials
+echo $dashboard_user_api_credentials > .context-data/dashboard-user-api-credentials
 echo "  Username: $dashboard_user_email"
 echo "  Password: $dashboard_user_password"
 echo "  Dashboard API Credentials: $dashboard_user_api_credentials"
@@ -81,9 +84,9 @@ user_group_data=$(curl $dashboard_base_url/api/usergroups -s \
 user_group_readonly_id=$(echo $user_group_data | jq -r .groups[0].id)
 user_group_default_id=$(echo $user_group_data | jq -r .groups[1].id)
 user_group_admin_id=$(echo $user_group_data | jq -r .groups[2].id)
-echo $user_group_readonly_id > .user_group_readonly_id
-echo $user_group_default_id > .user_group_default_id
-echo $user_group_admin_id > .user_group_admin_id
+echo $user_group_readonly_id > .context-data/user_group_readonly_id
+echo $user_group_default_id > .context-data/user_group_default_id
+echo $user_group_admin_id > .context-data/user_group_admin_id
 echo "  Done"
 
 echo "Creating webhooks"

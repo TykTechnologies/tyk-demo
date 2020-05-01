@@ -4,11 +4,11 @@ dashboard_sso_base_url="http://localhost:3001"
 identity_broker_base_url="http://localhost:3010"
 
 # Create Identity Broker Profiles
-organisation_id=$(cat .organisation-id)
-dashboard_user_api_credentials=$(cat .dashboard-user-api-credentials)
-user_group_default_id=$(cat .user_group_default_id)
-user_group_readonly_id=$(cat .user_group_readonly_id)
-user_group_admin_id=$(cat .user_group_admin_id)
+organisation_id=$(cat .context-data/organisation-id)
+dashboard_user_api_credentials=$(cat .context-data/dashboard-user-api-credentials)
+user_group_default_id=$(cat .context-data/user_group_default_id)
+user_group_readonly_id=$(cat .context-data/user_group_readonly_id)
+user_group_admin_id=$(cat .context-data/user_group_admin_id)
 identity_broker_api_credentials=$(cat ./volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
 identity_broker_profile_tyk_dashboard_data=$(cat ./bootstrap-data/tyk-identity-broker/profile-tyk-dashboard.json | \
   sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \

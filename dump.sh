@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dashboard_user_api_credentials=$(cat .dashboard-user-api-credentials)
+dashboard_user_api_credentials=$(cat .context-data/dashboard-user-api-credentials)
 docker run --rm \
   --network tyk-pro-docker-demo-extended_tyk \
   -v $(pwd)/data/tyk-sync:/opt/tyk-sync/data \

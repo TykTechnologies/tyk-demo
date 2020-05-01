@@ -1,6 +1,2 @@
 .env
-.organisation-id
-.dashboard-user-api-credentials
-.user_group_admin_id
-.user_group_default_id
-.user_group_readonly_id
+.context-data
