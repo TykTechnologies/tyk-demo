@@ -2,7 +2,6 @@
 
 dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
-gateway_tls_base_url="https://localhost:8081"
 
 echo "Making scripts executable"
 chmod +x dump.sh
@@ -16,10 +15,12 @@ chmod +x bootstrap-kibana.sh
 chmod +x bootstrap-zipkin.sh
 chmod +x bootstrap-graphite.sh
 chmod +x bootstrap-sso.sh
+chmod +x bootstrap-tls.sh
 echo "  Done"
 
 echo "Creating directory for context data"
-mkdir .context-data
+mkdir -p .context-data
+echo "  Done"
 
 echo "Getting Dashboard configuration"
 dashboard_admin_api_credentials=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
@@ -208,6 +209,5 @@ cat <<EOF
 
            Gateway
                URL : $gateway_base_url
-                     $gateway_tls_base_url (TLS)
 
 EOF

@@ -1,0 +1,18 @@
+version: '3.3'
+services:
+  tyk-gateway-tls:
+    image: tykio/tyk-gateway:latest
+    ports:
+      - "8081:8080"
+    networks:
+      - tyk
+    volumes:
+      - ./volumes/tyk-gateway/tyk-tls.conf:/opt/tyk-gateway/tyk.conf
+      - ./volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+      - ./volumes/tyk-gateway/certificates:/opt/tyk-gateway/certificates
+    environment:
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
+      - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED}
+
+networks:
+  tyk:
