@@ -20,14 +20,11 @@ curl $identity_broker_base_url/api/profiles/tyk-dashboard -s \
   -H "Authorization: $identity_broker_api_credentials" \
   -d "$(echo $identity_broker_profile_tyk_dashboard_data)" > /dev/null
 
-cat <<EOF   
-   Dashboard (SSO)
+echo "   Dashboard (SSO)
                URL : $dashboard_sso_base_url
           Username : dashboard.admin@example.org
           Password : Abcd1234
   
    Identity Broker
        Profile URL : $identity_broker_base_url/auth/tyk-dashboard/openid-connect
-               
-EOF
-                     
+"

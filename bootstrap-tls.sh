@@ -18,10 +18,6 @@ do
   fi
 done
 
-echo -e "\033[2K"
-
-cat <<EOF   
-     Gateway (TLS)
+echo -e "\033[2K            Gateway (TLS)
                URL : $gateway_tls_base_url
-               
-EOF
+"
