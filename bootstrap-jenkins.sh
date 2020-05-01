@@ -25,7 +25,6 @@ docker-compose -f dc.jenkins.yml exec \
   jenkins \
   curl -L -o /var/jenkins_home/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar > /dev/null
 
-
 echo -e "\033[2K           Jenkins
                URL : $jenkins_base_url
           Password : $jenkins_admin_password
