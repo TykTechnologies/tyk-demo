@@ -27,10 +27,12 @@ curl $kibana_base_url/api/saved_objects/visualization/407e91c0-8168-11ea-9323-29
   -H 'kbn-xsrf: true' \
   -d @bootstrap-data/kibana/visualizations/request-count-by-time.json > /dev/null
 
-echo -e "\033[2K"
+# stop the pump instance deployed by the base deployment, so it is replaced by the instance from this deployment
+docker-compose stop tyk-pump 2> /dev/null
 
-cat <<EOF
-            Kibana
+# send a test request to provide Kibana with data, since one sent in base bootstrap process will not have been picked up by elasticsearch-enabled pump
+curl -s localhost:8080/basic-open-api/get > /dev/null
+
+echo -e "\033[2K            Kibana
                URL : $kibana_base_url
-               
-EOF
+"

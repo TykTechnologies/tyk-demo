@@ -18,10 +18,6 @@ do
   fi
 done
 
-echo -e "\033[2K"
-
-cat <<EOF   
-            Zipkin
+echo -e "\033[2K            Zipkin
                URL : $zipkin_base_url
-               
-EOF
+"

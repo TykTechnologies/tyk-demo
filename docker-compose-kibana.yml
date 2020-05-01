@@ -6,6 +6,28 @@ services:
       - tyk
     ports:
       - "5601:5601"
+    depends_on:
+      - elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.8
+    environment:
+      - discovery.type=single-node
+    networks:
+      - tyk
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+  tyk-pump-elasticsearch:
+    image: tykio/tyk-pump-docker-pub:latest
+    networks:
+      - tyk
+    volumes:
+      - ./volumes/tyk-pump/pump-elasticsearch.conf:/opt/tyk-pump/pump.conf
+    environment:
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
+    depends_on:
+      - elasticsearch
+      - tyk-redis
+      - tyk-mongo
 
-networks:
-  tyk:
+volumes:
+  elasticsearch-data:

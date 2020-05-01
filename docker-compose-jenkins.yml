@@ -11,6 +11,3 @@ services:
 
 volumes:
   jenkins-data:
-
-networks:
-  tyk:

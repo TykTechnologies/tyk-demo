@@ -40,10 +40,7 @@ curl $e2_dashboard_base_url/api/users/$e2_dashboard_user_id/actions/reset -s \
       "user_permissions": { "IsAdmin": "admin" }
     }' > /dev/null
 
-echo -e "\033[2K"
-
-cat <<EOF  
-   Env 2 Dashboard
+echo -e "\033[2K   Env 2 Dashboard
                URL : $e2_dashboard_base_url
           Username : $dashboard_user_email
           Password : $dashboard_user_password
@@ -51,5 +48,4 @@ cat <<EOF
 
      Env 2 Gateway
                URL : $e2_gateway_base_url
-               
-EOF
+"

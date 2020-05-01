@@ -1,10 +1,7 @@
 #!/bin/bash
 
 dashboard_base_url="http://localhost:3000"
-dashboard_sso_base_url="http://localhost:3001"
 gateway_base_url="http://localhost:8080"
-gateway_tls_base_url="https://localhost:8081"
-identity_broker_base_url="http://localhost:3010"
 
 echo "Making scripts executable"
 chmod +x dump.sh
@@ -17,6 +14,12 @@ chmod +x bootstrap-jenkins.sh
 chmod +x bootstrap-kibana.sh
 chmod +x bootstrap-zipkin.sh
 chmod +x bootstrap-graphite.sh
+chmod +x bootstrap-sso.sh
+chmod +x bootstrap-tls.sh
+echo "  Done"
+
+echo "Creating directory for context data"
+mkdir -p .context-data
 echo "  Done"
 
 echo "Getting Dashboard configuration"
@@ -43,7 +46,7 @@ organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d @bootstrap-data/tyk-dashboard/organisation.json \
   | jq -r '.Meta')
-echo $organisation_id > .organisation-id
+echo $organisation_id > .context-data/organisation-id
 echo "  Organisation Id: $organisation_id"
 
 echo "Creating Dashboard user"
@@ -61,7 +64,7 @@ curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset -s \
       "new_password":"'$dashboard_user_password'",
       "user_permissions": { "IsAdmin": "admin" }
     }' > /dev/null
-echo $dashboard_user_api_credentials > .dashboard-user-api-credentials
+echo $dashboard_user_api_credentials > .context-data/dashboard-user-api-credentials
 echo "  Username: $dashboard_user_email"
 echo "  Password: $dashboard_user_password"
 echo "  Dashboard API Credentials: $dashboard_user_api_credentials"
@@ -82,6 +85,9 @@ user_group_data=$(curl $dashboard_base_url/api/usergroups -s \
 user_group_readonly_id=$(echo $user_group_data | jq -r .groups[0].id)
 user_group_default_id=$(echo $user_group_data | jq -r .groups[1].id)
 user_group_admin_id=$(echo $user_group_data | jq -r .groups[2].id)
+echo $user_group_readonly_id > .context-data/user_group_readonly_id
+echo $user_group_default_id > .context-data/user_group_default_id
+echo $user_group_admin_id > .context-data/user_group_admin_id
 echo "  Done"
 
 echo "Creating webhooks"
@@ -144,17 +150,17 @@ curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
   -d "$(echo $catalogue_data)" > /dev/null
 echo "  Done"
 
-echo "Creating Identity Broker profiles"
-identity_broker_api_credentials=$(cat ./volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
-identity_broker_profile_tyk_dashboard_data=$(cat ./bootstrap-data/tyk-identity-broker/profile-tyk-dashboard.json | \
-  sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \
-  sed 's/DASHBOARD_USER_API_CREDENTIALS/'"$dashboard_user_api_credentials"'/' | \
-  sed 's/DASHBOARD_USER_GROUP_DEFAULT/'"$user_group_default_id"'/' | \
-  sed 's/DASHBOARD_USER_GROUP_READONLY/'"$user_group_readonly_id"'/' | \
-  sed 's/DASHBOARD_USER_GROUP_ADMIN/'"$user_group_admin_id"'/')
-curl $identity_broker_base_url/api/profiles/tyk-dashboard -s \
-  -H "Authorization: $identity_broker_api_credentials" \
-  -d "$(echo $identity_broker_profile_tyk_dashboard_data)" > /dev/null
+echo "Waiting for Gateway API to be ready"
+gateway_api_credentials=$(cat ./volumes/tyk-gateway/tyk.conf | jq -r .secret)
+gateway_status=""
+while [ "$gateway_status" != "200" ]
+do
+  gateway_status=$(curl $gateway_base_url/tyk/keys/api_key_write_test -s -o /dev/null -w '%{http_code}' -H "x-tyk-authorization: $gateway_api_credentials" -d @./bootstrap-data/tyk-gateway/auth-key.json)
+  if [ "$gateway_status" != "200" ]
+  then
+    sleep 1
+  fi
+done
 echo "  Done"
 
 echo "Waiting for Gateway API to be ready"
@@ -217,7 +223,6 @@ cat <<EOF
 
          Dashboard
                URL : $dashboard_base_url
-                     $dashboard_sso_base_url (SSO)
           Username : $dashboard_user_email
           Password : $dashboard_user_password
    API Credentials : $dashboard_user_api_credentials
@@ -229,6 +234,5 @@ cat <<EOF
 
            Gateway
                URL : $gateway_base_url
-                     $gateway_tls_base_url (TLS)
 
 EOF

@@ -8,6 +8,3 @@ services:
       - tyk
     environment:
       - STORAGE_TYPE=mem
-
-networks:
-  tyk:
