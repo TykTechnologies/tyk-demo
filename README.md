@@ -4,10 +4,9 @@ This repo provides an example installation of Tyk. It uses Docker Compose to pro
 
 In the base Tyk Deployment you get:
 
-* Tyk Gateways x2 (HTTP + HTTPS)
-* Tyk Dashboard x2 (Standard auth + SSO)
+* Tyk Gateway
+* Tyk Dashboard
 * Tyk Pump
-* Tyk Identity Broker
 * Redis
 * MongoDB
 * Local web servers:
@@ -16,6 +15,8 @@ In the base Tyk Deployment you get:
 
 It's also possible to deploy these complimentary services:
 
+* Tyk SSO Dashboard & Tyk Identity Broker
+* Tyk Gateway with TLS configuration
 * Elasticsearch/Kibana (alternative analytics reporting)
 * Zipkin (tracing)
 * Jenkins + 2nd Tyk environment (CI/CD)
@@ -141,16 +142,19 @@ docker-compose -f docker-compose.yml -f docker-compose-kibana.yml down -v
 
 The following applications are available once the system is bootstrapped.
 
-## Tyk
+## Standard Tyk
 
 - [Tyk Dashboard](http://localhost:3000)
-- [Tyk Dashboard using SSO](http://localhost:3001)
 - [Tyk Portal](http://localhost:3000/portal)
 - [Tyk Gateway](http://localhost:8080/basic-open-api/get)
-- [Tyk Gateway using TLS](https://localhost:8081/basic-open-api/get) (using self-signed certificate, so expect a warning)
-- [Tyk Identity Broker](http://localhost:3010)
 
-### SSO Dashboard
+### Scaling the solution
+
+Run the `add-gateway.sh` script to create a new Gateway instance. It will behave like the existing `tyk-gateway` container as it will use the same configuration. The new Gateway will be mapped on a random port, to avoid collisions.
+
+## SSO Dashboard
+
+Requires `docker-compose-sso.yml` and `bootstrap-sso.sh`.
 
 **Note:** This example is not very configurable right now, since it relies on a specific Okta setup which is only configurable by the owner of the Okta account (i.e. not you!). Would be good to change this at some point to use a self-contained method which can be managed by anyone. Please feel free to implement such a change an make a pull request. Anyway, here's the SSO we have...
 
@@ -172,11 +176,19 @@ This will redirect back to the Dashboard, using a temporary session created via 
 
 Functionality is based on the `division` attribute of the Okta user profile and ID token. The value of which is matched against the `UserGroupMapping` property of the `tyk-dashboard` Identity Broker profile.
 
-### Scaling the solution
+- [Tyk SSO Dashboard](http://localhost:3001)
 
-Run the `add-gateway.sh` script to create a new Gateway instance. It will behave like the existing `tyk-gateway` container as it will use the same configuration. The new Gateway will be mapped on a random port, to avoid collisions.
+## TLS Gateway
+
+Requires `docker-compose-tls.yml` and `bootstrap-tls.sh`.
+
+This is a TLS-enabled Gateway. It uses a self-signed certificate, so make sure to instruct your HTTP client is ignore certificate verification failure.
+
+- [Tyk TLS Gateway](https://localhost:8081/basic-open-api/get)
 
 ## Tyk environment 2
+
+Requires `docker-compose-e2.yml` and `bootstrap-e2.sh`.
 
 This is intended to be used in conjunction with Jenkins. It represents a separate Tyk environment, with an independent Gateway, Dashboard, Pump and databases. We can use Jenkins to automate the deployment of API Definitions and Policies from the default environment to the e2 environment.
 
@@ -185,6 +197,8 @@ This is intended to be used in conjunction with Jenkins. It represents a separat
 
 ## Kibana
 
+Requires `docker-compose-kibana.yml` and `bootstrap-kibana.sh`.
+
 The Tyk Pump is already configured to push data to the Elasticsearch container, so Kibana can visualise this data.
 
 The bootstrap process creates an Index Pattern and Visualization which can be used to view API analytics data.
@@ -192,6 +206,8 @@ The bootstrap process creates an Index Pattern and Visualization which can be us
 - [Kibana](http://localhost:5601)
 
 ## Graphite
+
+Requires `docker-compose-graphite.yml` and `bootstrap-graphite.sh`.
 
 Graphite demonstrates the [instrumentation feature](https://tyk.io/docs/basic-config-and-security/report-monitor-trigger-events/instrumentation/) of Tyk whereby realtime statistic are pushed from the Dashboard, Gateway and Pump into a StatsD instance. For this example, the statistics can be seen in the [Graphite Dashboard](http://localhost:8060)
 
@@ -208,6 +224,8 @@ To enable this feature, add `INSTRUMENTATION_ENABLED=1` to your Docker environme
 Open the [Graphite Dashboard](http://localhost:8060]). Explore the 'Metrics' tree, and click on items you are interested in seeing, this will add them to the graph. Most of the Tyk items are in `stats` and `stats_counts`.  Try sending some requests through the Gateway to generate data.
 
 ## Zipkin
+
+Requires `docker-compose-zipkin.yml` and `bootstrap-zipkin.sh`.
 
 Zipkin can demonstrate open tracing. It has a [web UI](http://localhost:9411) you can use to view traces.
 
@@ -226,6 +244,8 @@ Set the Tracing.Enabled value to true in the Gateway config. This will hopefully
 To use Zipkin, open the [Zipkin Dashboard](http://localhost:9411) in a browser and click the magnifying glass icon, this will conduct a search for all available traces. You can add filters for the trace search. There should be at least one trace entry for the "Basic Open API", which is made during the bootstrap process. If you don't see any data, try changing the duration filter to longer period.
 
 ## Jenkins
+
+Requires `docker-compose-jenkins.yml` and `bootstrap-jenkins.sh`.
 
 Jenkins is used to provide an automated way of pushing API Definitions and Policies to different Tyk environments. It uses the `tyk-sync` CLI tool and a Github repository to achieve this.
 
