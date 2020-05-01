@@ -150,12 +150,12 @@ curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
   -d "$(echo $catalogue_data)" > /dev/null
 echo "  Done"
 
-echo "Checking Gateway functionality"
+echo "Waiting for Gateway API to be ready"
+gateway_api_credentials=$(cat ./volumes/tyk-gateway/tyk.conf | jq -r .secret)
 gateway_status=""
 while [ "$gateway_status" != "200" ]
 do
-  gateway_status=$(curl -I $gateway_base_url/basic-open-api/get 2>/dev/null | head -n 1 | cut -d$' ' -f2)
-  
+  gateway_status=$(curl $gateway_base_url/tyk/keys/api_key_write_test -s -o /dev/null -w '%{http_code}' -H "x-tyk-authorization: $gateway_api_credentials" -d @./bootstrap-data/tyk-gateway/auth-key.json)
   if [ "$gateway_status" != "200" ]
   then
     sleep 1
@@ -177,6 +177,19 @@ curl $gateway_base_url/tyk/keys/throttle_key -s \
 curl $gateway_base_url/tyk/keys/quota_key -s \
   -H "x-tyk-authorization: $gateway_admin_api_credentials" \
   -d @./bootstrap-data/tyk-gateway/quota-key.json > /dev/null
+echo "  Done"
+
+echo "Checking Gateway functionality"
+gateway_status=""
+while [ "$gateway_status" != "200" ]
+do
+  gateway_status=$(curl -I $gateway_base_url/basic-open-api/get 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+  
+  if [ "$gateway_status" != "200" ]
+  then
+    sleep 1
+  fi
+done
 echo "  Done"
 
 cat <<EOF
