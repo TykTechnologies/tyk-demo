@@ -51,7 +51,7 @@ services:
     networks:
       - tyk
     volumes:
-      - ./volumes/tyk-pump/e2-pump.conf:/opt/tyk-pump/pump.conf
+      - ./volumes/tyk-pump/pump-e2.conf:/opt/tyk-pump/pump.conf
     depends_on:
       - e2-tyk-redis
       - e2-tyk-mongo
