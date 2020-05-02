@@ -28,8 +28,8 @@ It's also possible to deploy these complimentary services:
 * `data`: Data used by applications during runtime. Sub-directories group data on a per-application basis.
 * `volumes`: Data mounted into containers as volumes. Sub-directories group data on a per-application basis.
 * `Tyk Demo.postman_collection.json`: A Postman collection of requests which correspond to APIs available in the deployment.
-* `bootstrap*.sh`: Bootstrap scripts to initialise deployed applications. These are closely aligned with services deployed in the Docker Compose files.
-* `docker-compose*.yml`: Docker Compose deployment definitions. Separate files allow for varied deployments. Complimentary services are defined together within the same file.
+* `bootstrap/*.sh`: Bootstrap scripts to initialise deployed applications. These are closely aligned with services deployed in the Docker Compose files.
+* `docker-compose/*.yml`: Docker Compose deployment definitions. Separate files allow for varied deployments. Complimentary services are defined together within the same file.
 * `dump.sh`, `publish.sh`, `sync.sh`, `update.sh`: Scripts to execute the related Tyk Sync commands via a container.
 
 # Getting Started
@@ -56,10 +56,10 @@ The `docker-compose.yml` is the base compose file, containing Tyk. To bring up t
 docker-compose up -d
 ```
 
-To include other services, there are additional compose files which are prefixed `docker-compose-` and can be included in the deployment. For example, to include Kibana:
+To include other services, there are additional compose files which are stored in the `docker-compose` directory and can be included in the deployment. For example, to include Kibana:
 
 ```
-docker-compose -f docker-compose.yml -f docker-compose-kibana.yml up -d
+docker-compose -f docker-compose.yml -f docker-compose/kibana.yml up -d
 ```
 
 Use additional `-f` flags to include more compose files as needed.
@@ -92,16 +92,16 @@ Now you can run the file:
 ./bootstrap.sh
 ```
 
-This will bootstrap the base Tyk system. If you deployed additional services as part of the `docker-compose` command, you should also bootstrap those systems too. Run the corresponding bootstrap file, they are prefixed `bootstrap-`. For example, to bootstrap Kibana:
+This will bootstrap the base Tyk system. If you deployed additional services as part of the `docker-compose` command, you should also bootstrap those systems too. Run the corresponding bootstrap file, they are stored in the `bootstrap` directory. For example, to bootstrap Kibana:
 
 ```
-./bootstrap-kibana.sh
+./bootstrap/kibana.sh
 ```
 
 **Tip:** The two commands can be run consecutively in a single statement as so:
 
 ```
-./bootstrap.sh && ./bootstrap-kibana.sh
+./bootstrap.sh && ./bootstrap/kibana.sh
 ```
 
 ## Step 5: Log into the Dashboard
@@ -135,7 +135,7 @@ docker-compose down
 If you included multiple compose files when bringing the system up, you should also include them when taking the system down. For example, to bring down Tyk and Kibana (and remove volumes):
 
 ```
-docker-compose -f docker-compose.yml -f docker-compose-kibana.yml down -v
+docker-compose -f docker-compose.yml -f docker-compose/kibana.yml down -v
 ```
 
 # Applications available
