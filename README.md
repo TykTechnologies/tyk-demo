@@ -56,7 +56,7 @@ The `docker-compose.yml` is the base compose file, containing Tyk. To bring up t
 docker-compose up -d
 ```
 
-To include other services, there are additional compose files which are prefixed `docker-compose-` and can be included in the deployment. For example, to include Kibana:
+To include other services, there are additional compose files which are stored in the `docker-compose` directory and can be included in the deployment. For example, to include Kibana:
 
 ```
 docker-compose -f docker-compose.yml -f docker-compose/kibana.yml up -d
@@ -92,7 +92,7 @@ Now you can run the file:
 ./bootstrap.sh
 ```
 
-This will bootstrap the base Tyk system. If you deployed additional services as part of the `docker-compose` command, you should also bootstrap those systems too. Run the corresponding bootstrap file, they are prefixed `bootstrap-`. For example, to bootstrap Kibana:
+This will bootstrap the base Tyk system. If you deployed additional services as part of the `docker-compose` command, you should also bootstrap those systems too. Run the corresponding bootstrap file, they are stored in the `bootstrap` directory. For example, to bootstrap Kibana:
 
 ```
 ./bootstrap/kibana.sh
