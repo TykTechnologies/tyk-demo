@@ -154,7 +154,9 @@ Run the `add-gateway.sh` script to create a new Gateway instance. It will behave
 
 ## SSO Dashboard
 
-Requires `docker-compose-sso.yml` and `bootstrap-sso.sh`.
+- [Tyk SSO Dashboard](http://localhost:3001)
+
+Requires `docker-compose/sso.yml` and `bootstrap/sso.sh`.
 
 **Note:** This example is not very configurable right now, since it relies on a specific Okta setup which is only configurable by the owner of the Okta account (i.e. not you!). Would be good to change this at some point to use a self-contained method which can be managed by anyone. Please feel free to implement such a change an make a pull request. Anyway, here's the SSO we have...
 
@@ -176,42 +178,40 @@ This will redirect back to the Dashboard, using a temporary session created via 
 
 Functionality is based on the `division` attribute of the Okta user profile and ID token. The value of which is matched against the `UserGroupMapping` property of the `tyk-dashboard` Identity Broker profile.
 
-- [Tyk SSO Dashboard](http://localhost:3001)
-
 ## TLS Gateway
-
-Requires `docker-compose-tls.yml` and `bootstrap-tls.sh`.
-
-This is a TLS-enabled Gateway. It uses a self-signed certificate, so make sure to instruct your HTTP client is ignore certificate verification failure.
 
 - [Tyk TLS Gateway](https://localhost:8081/basic-open-api/get)
 
+Requires `docker-compose-tls/yml` and `bootstrap/tls.sh`.
+
+This is a TLS-enabled Gateway. It uses a self-signed certificate, so make sure to instruct your HTTP client is ignore certificate verification failure.
+
 ## Tyk environment 2
-
-Requires `docker-compose-e2.yml` and `bootstrap-e2.sh`.
-
-This is intended to be used in conjunction with Jenkins. It represents a separate Tyk environment, with an independent Gateway, Dashboard, Pump and databases. We can use Jenkins to automate the deployment of API Definitions and Policies from the default environment to the e2 environment.
 
 - [Tyk Dashboard environment 2](http://localhost:3002)
 - [Tyk Gateway environment 2](http://localhost:8085/basic-open-api/get)
 
+Requires `docker-compose/e2.yml` and `bootstrap/e2.sh`.
+
+This is intended to be used in conjunction with Jenkins. It represents a separate Tyk environment, with an independent Gateway, Dashboard, Pump and databases. We can use Jenkins to automate the deployment of API Definitions and Policies from the default environment to the e2 environment.
+
 ## Kibana
 
-Requires `docker-compose-kibana.yml` and `bootstrap-kibana.sh`.
+- [Kibana](http://localhost:5601)
+
+Requires `docker-compose/kibana.yml` and `bootstrap/kibana.sh`.
 
 The Tyk Pump is already configured to push data to the Elasticsearch container, so Kibana can visualise this data.
 
 The bootstrap process creates an Index Pattern and Visualization which can be used to view API analytics data.
 
-- [Kibana](http://localhost:5601)
-
 ## Graphite
 
-Requires `docker-compose-graphite.yml` and `bootstrap-graphite.sh`.
+* [Graphite Dashboard](http://localhost:8060)
+
+Requires `docker-compose/graphite.yml` and `bootstrap/graphite.sh`.
 
 Graphite demonstrates the [instrumentation feature](https://tyk.io/docs/basic-config-and-security/report-monitor-trigger-events/instrumentation/) of Tyk whereby realtime statistic are pushed from the Dashboard, Gateway and Pump into a StatsD instance. For this example, the statistics can be seen in the [Graphite Dashboard](http://localhost:8060)
-
-* [Graphite Dashboard](http://localhost:8060)
 
 The StatsD, Carbon and Graphite are all deployed within a single container service called `graphite`.
 
@@ -225,13 +225,13 @@ Open the [Graphite Dashboard](http://localhost:8060]). Explore the 'Metrics' tre
 
 ## Zipkin
 
-Requires `docker-compose-zipkin.yml` and `bootstrap-zipkin.sh`.
+- [Zipkin](http://localhost:9411)
+
+Requires `docker-compose/zipkin.yml` and `bootstrap/zipkin.sh`.
 
 Zipkin can demonstrate open tracing. It has a [web UI](http://localhost:9411) you can use to view traces.
 
 It has been configured to use in-memory storage, so will not retain data once the contain is restarted/removed.
-
-- [Zipkin](http://localhost:9411)
 
 ### Setup
 
@@ -245,11 +245,11 @@ To use Zipkin, open the [Zipkin Dashboard](http://localhost:9411) in a browser a
 
 ## Jenkins
 
-Requires `docker-compose-jenkins.yml` and `bootstrap-jenkins.sh`.
+- [Jenkins](http://localhost:8070)
+
+Requires `docker-compose/jenkins.yml` and `bootstrap/jenkins.sh`.
 
 Jenkins is used to provide an automated way of pushing API Definitions and Policies to different Tyk environments. It uses the `tyk-sync` CLI tool and a Github repository to achieve this.
-
-- [Jenkins](http://localhost:8070)
 
 ### Setup
 
