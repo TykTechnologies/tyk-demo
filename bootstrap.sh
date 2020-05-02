@@ -8,14 +8,7 @@ chmod +x dump.sh
 chmod +x sync.sh
 chmod +x publish.sh
 chmod +x update.sh
-chmod +x add-gateway.sh
-chmod +x bootstrap-e2.sh
-chmod +x bootstrap-jenkins.sh
-chmod +x bootstrap-kibana.sh
-chmod +x bootstrap-zipkin.sh
-chmod +x bootstrap-graphite.sh
-chmod +x bootstrap-sso.sh
-chmod +x bootstrap-tls.sh
+chmod +x bootstrap/*.sh
 echo "  Done"
 
 echo "Creating directory for context data"

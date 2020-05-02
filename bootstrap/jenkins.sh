@@ -19,9 +19,9 @@ do
   fi
 done
 
-jenkins_admin_password=$(docker-compose -f dc.jenkins.yml exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword)
+jenkins_admin_password=$(docker-compose -f docker-compose.yml -f docker-compose/jenkins.yml exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword)
 
-docker-compose -f dc.jenkins.yml exec \
+docker-compose -f docker-compose.yml -f docker-compose/jenkins.yml exec \
   jenkins \
   curl -L -o /var/jenkins_home/jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar > /dev/null
 
