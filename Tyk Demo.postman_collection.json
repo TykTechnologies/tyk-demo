@@ -1480,6 +1480,136 @@
 								"description": "This API showcases the Token authorization feature of Tyk.\n\nThe key is sent in the HTTP header field `Authorization`. It has been authorized access to the `Basic Protected API`, so the request is accepted by the Gateway."
 							},
 							"response": []
+						},
+						{
+							"name": "JWT - shared HMAC secret",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "65ba05d6-84fa-49ef-846d-f0e9ce58b44a",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJwb2wiOiI1ZWFkNzI5NTU3NTk2MTAwMDE4MTg2ODgifQ.6PCQlEuUNrVNCswuh3J8Ks-AhvdfCtK-R-1JYlAL9Po",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/jwt-api/get",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"jwt-api",
+										"get"
+									]
+								},
+								"description": "This request uses JWT authentication using a shared HMAC secret. In this case, the secret is defined on the API definition, but it is also possible to define it separately, which allows multiple secrets to be used.\n\nThe JWT claims are processed as follows:\n\n* `sub`: This is the subject, and is used by Tyk as the identity of the API Client. Tyk creates a session based on the value provided here, which allows it to maintain state for the subject across multiple requests.\n* `pol`: This is the Id of the Policy to use, if the request is authenticated. If no Id is provided then the API Definition specifies a default Policy to use."
+							},
+							"response": []
+						},
+						{
+							"name": "JWT - shared HMAC secret with claim (part 1)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d62e05c1-ca14-4eea-aad9-efdc1ad0c9f0",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJzY28iOiJjbGFpbSJ9.yl7Z1rTgvguKWYd1ofAzpvGt3sMUSbYHt6A8YrCB1GU"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/jwt-api/anything/get-only",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"jwt-api",
+										"anything",
+										"get-only"
+									]
+								},
+								"description": "This request uses a custom claim in the JWT to define the Policy to use. In this case, the API Definition is configured to inspect the `sco` scope and match the value found there against the list defined in the API Definition. \n\nThe JWT uses a value of `claim`, which links to a Policy `JWT Scope Policy` that uses path-based permissions to limit access to only this combination of HTTP method and endpoint path `GET /anything/get-only`. Requests for other endpoints will be rejected - see part 2."
+							},
+							"response": []
+						},
+						{
+							"name": "JWT - shared HMAC secret with claim (part 2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d4373507-8df1-4a31-af74-391576e8ef14",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Error message is `Access to this resource has been disallowed`\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.error).to.eql(\"Access to this resource has been disallowed\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJzY28iOiJjbGFpbSJ9.yl7Z1rTgvguKWYd1ofAzpvGt3sMUSbYHt6A8YrCB1GU"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/jwt-api/anything/get-only",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"jwt-api",
+										"anything",
+										"get-only"
+									]
+								},
+								"description": "This request fails as it attempts to access an endpoint outside of the allowed paths defined in the policy it has been allocated. The Gateway responds with a `403 Forbidden`."
+							},
+							"response": []
 						}
 					],
 					"protocolProfileBehavior": {},
