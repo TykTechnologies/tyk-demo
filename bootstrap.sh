@@ -4,13 +4,8 @@ dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
 
 echo "Making scripts executable"
-chmod +x dump.sh
-chmod +x sync.sh
-chmod +x publish.sh
-chmod +x update.sh
+chmod +x scripts/*.sh
 chmod +x bootstrap/*.sh
-chmod +x import.sh
-chmod +x export.sh
 echo "  Done"
 
 echo "Creating directory for context data"
@@ -45,7 +40,7 @@ echo $organisation_id > .context-data/organisation-id
 echo "  Organisation Id: $organisation_id"
 
 # Import data
-./import.sh
+./scripts/import.sh
 
 echo "Creating Dashboard user"
 dashboard_user_email=$(jq -r '.email_address' bootstrap-data/tyk-dashboard/dashboard-user.json)

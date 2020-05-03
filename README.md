@@ -30,7 +30,7 @@ It's also possible to deploy these complimentary services:
 * `Tyk Demo.postman_collection.json`: A Postman collection of requests which correspond to APIs available in the deployment.
 * `bootstrap/*.sh`: Bootstrap scripts to initialise deployed applications. These are closely aligned with services deployed in the Docker Compose files.
 * `docker-compose/*.yml`: Docker Compose deployment definitions. Separate files allow for varied deployments. Complimentary services are defined together within the same file.
-* `dump.sh`, `publish.sh`, `sync.sh`, `update.sh`: Scripts to execute the related Tyk Sync commands via a container.
+* `scripts/*.sh`: Scripts to execute the useful commands.
 
 # Getting Started
 
@@ -296,8 +296,6 @@ docker-compose exec jenkins java -jar /var/jenkins_home/jenkins-cli.jar -s http:
 
 # Working with API and Policies
 
-The files in `data/tyk-sync` are API and Policy definitions which are used to store the common APIs and Policies which this demo uses.
-
 There are two scenarios for working with this data:
 
 1. You have made changes and want to commit them so that others can get them
@@ -305,20 +303,30 @@ There are two scenarios for working with this data:
 
 ## Scenario 1: Committing changes
 
-If you have changed APIs and Policies in your Dashboard, and want to commit these so other people can use them, use the `dump.sh` script, which is pre-configured to call the `tyk-sync dump` command using your local Dashboard user API credentials:
+If you have changed APIs and Policies in your Dashboard, and want to commit these so other people can use them, use the `export.sh` script.
+
+Run from the repo root directory, as so:
 
 ```
-./dump.sh
+./scripts/export.sh
 ```
 
-This will update the files in the `data/tyk-sync` directory. You can then commit these files into the repo.
+This will update the `apis.json` and `policies.json` files in the `bootstrap-data/tyk-dashboard/` directory. You can then commit these files into the repo.
+
+If you have also made changes to the Postman collection then export it and overwrite the `Tyk Demo.postman_collection.json` and commit that too.
 
 ## Scenario 2: Synchronising updates
 
-If you want to get the changes other people have made, first pull from the repo, then use the `sync.sh` script, which calls the `tyk-sync sync` command using your local `.organisation-id` and `.dashboard-user-api-credentials` files.
+If you want to get the changes other people have made, first pull from the repo, then use the `import.sh` script.
 
-**Warning:** This command is a hard sync which will **delete** any APIs and Policies from your Dashboard that do not exist in the source data.
+Run from the repo root directory, as so:
 
 ```
-./sync.sh
+./scripts/import.sh
 ```
+
+## Why not use Tyk-Sync?
+
+The Tyk Sync binary is not always kept up-to-date with the latest changes in API and Policy object, which unfortunately means that the data is exports may be missing information. This also means that when this data is imported into the system, that the objects created will also be missing this data.
+
+So, until the Tyk Sync project is updated and released in-line with the Tyk Dashboard project, it is safer to manually handle data import and export directly with the Dashboard API.
