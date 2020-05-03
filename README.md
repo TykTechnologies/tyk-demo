@@ -325,8 +325,8 @@ Run from the repo root directory, as so:
 ./scripts/import.sh
 ```
 
-## Why not use Tyk-Sync?
+## Why not use Tyk Sync?
 
-The Tyk Sync binary is not always kept up-to-date with the latest changes in API and Policy object, which unfortunately means that the data is exports may be missing information. This also means that when this data is imported into the system, that the objects created will also be missing this data.
+The Tyk Sync binary is not always kept up-to-date with the latest changes in API and Policy object, which unfortunately means that the data it exports may be missing information. This also means that when this data is imported into the system, that the objects created will also be missing this data.
 
 So, until the Tyk Sync project is updated and released in-line with the Tyk Dashboard project, it is safer to manually handle data import and export directly with the Dashboard API.
