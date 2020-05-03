@@ -15,7 +15,7 @@
       ],
       "allowed_urls": [
         {
-          "url": "/anything/get-only",
+          "url": "/anything/allowed-path",
           "methods": [
             "GET"
           ]
@@ -25,7 +25,7 @@
   },
   "hmac_enabled": false,
   "active": true,
-  "name": "JWT Scope Policy",
+  "name": "JWT Policy Restricted",
   "is_inactive": false,
   "date_created": "2020-05-02T13:19:18.675Z",
   "tags": [],
@@ -35,5 +35,5 @@
     "rate_limit": false,
     "acl": false
   },
-  "last_updated": "1588425558"
+  "last_updated": "1588490582"
 }

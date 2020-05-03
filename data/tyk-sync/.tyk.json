@@ -32,9 +32,6 @@
   ],
   "policies": [
     {
-      "file": "policy-5ea2de4a62daf30001a2f0b8.json"
-    },
-    {
       "file": "policy-5ea11155f4f8460001a9389e.json"
     },
     {
@@ -42,6 +39,9 @@
     },
     {
       "file": "policy-5ea1118af4f8460001a938a0.json"
+    },
+    {
+      "file": "policy-5ea2de4a62daf30001a2f0b8.json"
     },
     {
       "file": "policy-5ead72955759610001818688.json"

@@ -46,9 +46,9 @@
   "jwt_not_before_validation_skew": 0,
   "jwt_skip_kid": false,
   "jwt_scope_to_policy_mapping": {
-    "claim": "5ead73565759610001818689"
+    "restricted": "5ead73565759610001818689"
   },
-  "jwt_scope_claim_name": "sco",
+  "jwt_scope_claim_name": "policy_claim",
   "notifications": {
     "shared_secret": "",
     "oauth_on_keychange_url": ""
