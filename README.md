@@ -150,7 +150,7 @@ The following applications are available once the system is bootstrapped.
 
 ### Scaling the solution
 
-Run the `add-gateway.sh` script to create a new Gateway instance. It will behave like the existing `tyk-gateway` container as it will use the same configuration. The new Gateway will be mapped on a random port, to avoid collisions.
+Run the `scripts/add-gateway.sh` script to create a new Gateway instance. It will behave like the existing `tyk-gateway` container as it will use the same configuration. The new Gateway will be mapped on a random port, to avoid collisions.
 
 ## SSO Dashboard
 
