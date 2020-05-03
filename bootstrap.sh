@@ -42,6 +42,34 @@ organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
 echo $organisation_id > .context-data/organisation-id
 echo "  Organisation Id: $organisation_id"
 
+echo "Importing APIs"
+import_template_apis_base=$(cat bootstrap-data/tyk-dashboard/import-template-apis-base.json)
+import_template_api=$(cat bootstrap-data/tyk-dashboard/import-template-api.json)
+for f in data/tyk-sync/api-*.json
+do
+  api_data=$(cat $f)
+  templated_api_data=$(echo $import_template_api | jq --argjson api "$api_data" '.api_definition = $api') 
+  import_template_apis_base=$(echo $import_template_apis_base | jq --argjson api "$templated_api_data" '.apis += [$api]')
+done
+result=$(curl $dashboard_base_url/admin/apis/import -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d "$import_template_apis_base" \
+  | jq -r '.Status')
+echo "  $result"
+
+echo "Importing Policies"
+import_template_policies_base=$(cat bootstrap-data/tyk-dashboard/import-template-policies-base.json)
+for f in data/tyk-sync/policy-*.json
+do
+  policy_data=$(cat $f)
+  import_template_policies_base=$(echo $import_template_policies_base | jq --argjson policy "$policy_data" '.data += [$policy]')
+done
+result=$(curl $dashboard_base_url/admin/policies/import -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d "$import_template_policies_base" \
+  | jq -r '.Status')
+echo "  $result"
+
 echo "Creating Dashboard user"
 dashboard_user_email=$(jq -r '.email_address' bootstrap-data/tyk-dashboard/dashboard-user.json)
 dashboard_user_password=$(jq -r '.password' bootstrap-data/tyk-dashboard/dashboard-user.json)
@@ -87,10 +115,6 @@ echo "Creating webhooks"
 curl $dashboard_base_url/api/hooks -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @bootstrap-data/tyk-dashboard/webhook-webhook-receiver-api-post.json > /dev/null
-echo "  Done"
-
-echo "Synchronising APIs and policies"
-source sync.sh > /dev/null
 echo "  Done"
 
 echo "Creating Portal default settings"
