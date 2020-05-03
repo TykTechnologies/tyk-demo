@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "57945f11-5a90-4102-9eae-23c47b162e92",
+		"_postman_id": "9db4b68a-a5c8-40b0-870f-238e4b2e9843",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -17,7 +17,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4c477bb6-d7ec-45bd-b688-cdd2c983d527",
+										"id": "d221573c-7af0-4d9d-be19-7ed4be962254",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -115,7 +115,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d13135fc-e91e-47dd-a6a1-e902e747fd5e",
+										"id": "0f24eb4f-e606-42ed-b3f6-059bb4ebd45e",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -162,7 +162,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "2c0c2baa-5837-4750-8e23-74a1f6555d25",
+										"id": "974b53b0-eb6e-40b1-bec2-ca3f72707d0e",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -203,7 +203,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "783e48a6-7235-4973-a0cc-ff9ec672f7c7",
+										"id": "0655fbac-47b2-428d-b9ba-9ee31f13628f",
 										"exec": [
 											"// needs a test to verify circuit breaker functionality"
 										],
@@ -237,7 +237,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5ee6137a-330b-4da3-adb5-363bd00386a3",
+										"id": "610c8cee-4db8-4639-877a-05ba22d4013e",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -283,7 +283,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ef1c95c8-1561-4735-91d3-c72d46f2b573",
+										"id": "9acc4784-3ecc-4840-b1c4-fdf4b0e8b3d6",
 										"exec": [
 											"pm.test(\"Status code is 504\", function () {",
 											"    pm.response.to.have.status(504);",
@@ -332,7 +332,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "90f9d3ac-a408-42e2-aca4-ef31e7a43230",
+										"id": "e3fe9df3-ae8f-46d1-ad3e-fc63e822b650",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -376,7 +376,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f46013df-12bc-4234-954c-8678982cb5bc",
+										"id": "da6a66ec-a4b0-4a46-b21a-51b2e1da384e",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -417,7 +417,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ccb2b34f-845b-47df-8e36-3582d2a5260c",
+										"id": "410eddf2-fca2-4372-8a7d-888dd4c12038",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -464,7 +464,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b49c8655-ae46-460b-b503-ac92e73752e2",
+										"id": "7a2027ce-ccd4-411b-8b7a-0e0b9a6adbe7",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -511,7 +511,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9b27afef-462d-42be-a855-c2dc2fc876c2",
+										"id": "b5346d84-e2bc-479e-b440-8b0413715339",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -563,7 +563,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "311844e2-01e9-4e54-8703-eba58ef40e4f",
+										"id": "d7858146-77a7-4df2-88a6-9a0c5b6ebb91",
 										"exec": [
 											"var cacheRequest = {",
 											"    url: 'http://localhost:8080/plugin-demo-api/uuid',",
@@ -630,7 +630,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "e07b3037-40d5-4084-8159-8329dc6a9ed2",
+										"id": "c66f7cf7-6798-40d7-a290-bdd97c9d273f",
 										"exec": [
 											"pm.test(\"Status code is 422\", function () {",
 											"    pm.response.to.have.status(422);",
@@ -675,7 +675,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c387ad12-3765-44c5-a097-c3e1cfea5f4a",
+										"id": "5297f300-b0c6-4ae2-840e-f5a8959a7a7d",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -722,7 +722,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "538621a0-0f0d-4b9b-bb49-0e2cdc43c012",
+										"id": "12d5e16f-5b85-4ea5-bfb9-218e51036731",
 										"exec": [
 											"pm.test(\"Status code is 400\", function () {",
 											"    pm.response.to.have.status(400);",
@@ -767,7 +767,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "42ddd47a-7d1d-40e5-8cf8-450ea9b43182",
+										"id": "f36556f2-7ae8-458b-ac19-fbe883dc7207",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -812,7 +812,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d5224045-d43b-4619-a131-8fed23bb0798",
+										"id": "1fb13e39-988d-4eb5-979d-a801f78bb764",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -853,7 +853,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "3c5a5390-d201-46ab-bdf7-2329e7cb0fe1",
+										"id": "ced83432-5ad4-404c-97a0-23801b4a145f",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -889,7 +889,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "23bcef71-0165-454a-90c1-4f369915e2a0",
+										"id": "7cce0717-e4e3-401e-a209-f9aae271c566",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -936,7 +936,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ff152d5d-65a8-4bad-bdcb-20711fcc3077",
+										"id": "fd1e9129-8212-4a7c-a337-2ddb44be18ec",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -981,7 +981,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "2cbf3ef9-6c2f-4fd0-983d-281e919f22aa",
+										"id": "4a8be18c-afaf-4163-a103-024ccbea8d86",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1023,7 +1023,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "03319ffc-1db3-4320-9e3f-1298f4cfc041",
+										"id": "3cf54b84-b9b1-41eb-8326-d8631172f97e",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1069,7 +1069,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "acfc7e7f-570f-4d77-bc52-cecab69a4962",
+								"id": "eb07dae3-7b98-4845-bcaa-c9a4e3ffce29",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1079,7 +1079,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f4715ee1-dd68-47ce-828a-b5c9f86ead48",
+								"id": "f81952ab-8487-4e06-a0e2-5e7fa569b7c4",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1099,7 +1099,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "319aeac6-87f1-47e8-be42-62f21638cc43",
+										"id": "710fb95f-27e0-4150-8342-f60c48b727f4",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1146,7 +1146,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "3332047e-a398-4d0d-b98c-3f65314a0862",
+										"id": "0ba57ea1-5b57-430e-a6e8-936ab717381c",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1198,7 +1198,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a3d918e6-a9f4-4392-9ee1-312300c50ca3",
+										"id": "456d1ae6-3e7a-4cf2-9ecb-16fab28dfd12",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1252,7 +1252,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "63decd92-f9a5-4717-b8a3-e0520137b60a",
+										"id": "a7d6f0cb-1107-404c-925e-836c0b05d239",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1299,7 +1299,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "693b2974-e166-4fd1-bd88-0df3c1981792",
+										"id": "87a33603-0dd6-48c5-a382-261b9cafa646",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1349,7 +1349,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "91c134e9-47e2-4e15-b958-d2d752459c4c",
+										"id": "d1873999-d360-4fe1-9f89-dfff6327f9d9",
 										"exec": [
 											"pm.test(\"Status code is 401\", function () {",
 											"    pm.response.to.have.status(401);",
@@ -1395,7 +1395,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a5a96a39-1408-4bf5-b533-f0f41a3e26dd",
+										"id": "26bd1dcc-e158-4c37-b3a8-dd8af2c3990d",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1441,7 +1441,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "3f3543d3-eb68-450a-80c2-960ca8283f3f",
+										"id": "52005b10-9ba0-4fa0-bfc2-868e1f7dbc1d",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1487,7 +1487,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "65ba05d6-84fa-49ef-846d-f0e9ce58b44a",
+										"id": "f1a7b288-9211-4eff-bad5-cb5274f265c9",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1502,7 +1502,7 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJwb2wiOiI1ZWFkNzI5NTU3NTk2MTAwMDE4MTg2ODgifQ.6PCQlEuUNrVNCswuh3J8Ks-AhvdfCtK-R-1JYlAL9Po",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9sIjoiNWVhZDcyOTU1NzU5NjEwMDAxODE4Njg4In0.8xOVZJM8Qi4XySrJRMZtaNkaq-Bw3am0gLHFKAHY5OQ",
 										"type": "text"
 									}
 								],
@@ -1518,7 +1518,7 @@
 										"get"
 									]
 								},
-								"description": "This request uses JWT authentication using a shared HMAC secret. In this case, the secret is defined on the API definition, but it is also possible to define it separately, which allows multiple secrets to be used.\n\nThe JWT claims are processed as follows:\n\n* `sub`: This is the subject, and is used by Tyk as the identity of the API Client. Tyk creates a session based on the value provided here, which allows it to maintain state for the subject across multiple requests.\n* `pol`: This is the Id of the Policy to use, if the request is authenticated. If no Id is provided then the API Definition specifies a default Policy to use."
+								"description": "This request uses JWT authentication using a shared HMAC secret. In this case, the secret is defined on the API definition, but it is also possible to define it separately, which allows multiple secrets to be used.\n\nThe JWT claims are processed as follows:\n\n* `sub`: This is the subject, and is used by Tyk as the identity of the API Client. Tyk creates a session based on the value provided here, which allows it to maintain state for the subject across multiple requests.\n* `pol`: This is the Id of the Policy to use, if the request is authenticated. If no Id is provided then the API Definition specifies a default Policy to use.\n\nFor reference, the payload of the JWT:\n\n```json\n{\n  \"sub\": \"1234567890\",\n  \"pol\": \"5ead72955759610001818688\"\n}\n```"
 							},
 							"response": []
 						},
@@ -1528,7 +1528,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d62e05c1-ca14-4eea-aad9-efdc1ad0c9f0",
+										"id": "53799a29-8da3-4822-ad2f-e5abab82446a",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1544,11 +1544,11 @@
 									{
 										"key": "Authorization",
 										"type": "text",
-										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJzY28iOiJjbGFpbSJ9.yl7Z1rTgvguKWYd1ofAzpvGt3sMUSbYHt6A8YrCB1GU"
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/jwt-api/anything/get-only",
+									"raw": "http://localhost:8080/jwt-api/anything/allowed-path",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -1557,10 +1557,10 @@
 									"path": [
 										"jwt-api",
 										"anything",
-										"get-only"
+										"allowed-path"
 									]
 								},
-								"description": "This request uses a custom claim in the JWT to define the Policy to use. In this case, the API Definition is configured to inspect the `sco` scope and match the value found there against the list defined in the API Definition. \n\nThe JWT uses a value of `claim`, which links to a Policy `JWT Scope Policy` that uses path-based permissions to limit access to only this combination of HTTP method and endpoint path `GET /anything/get-only`. Requests for other endpoints will be rejected - see part 2."
+								"description": "This request uses a claim in the JWT to define the Policy to use. In this case, the API Definition is configured to inspect the `policy_claim` claim and match the value (`restricted`) against the list defined in the API Definition. \n\nIn this case, the claim matches against the `JWT Policy Restricted` Policy, which uses path-based permissions to only allow requests for `GET /anything/allowed-path`. Requests for other endpoints will be rejected - see part 2.\n\nFor reference, the payload of the JWT:\n\n```json\n{\n  \"sub\": \"1234567890\",\n  \"policy_claim\": \"restricted\"\n}\n```"
 							},
 							"response": []
 						},
@@ -1570,7 +1570,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d4373507-8df1-4a31-af74-391576e8ef14",
+										"id": "1f848342-f06b-446d-b597-5fd99fa2efcd",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1586,16 +1586,16 @@
 								}
 							],
 							"request": {
-								"method": "POST",
+								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
 										"type": "text",
-										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJzY28iOiJjbGFpbSJ9.yl7Z1rTgvguKWYd1ofAzpvGt3sMUSbYHt6A8YrCB1GU"
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/jwt-api/anything/get-only",
+									"raw": "http://localhost:8080/jwt-api/anything/restricted-path",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -1604,10 +1604,10 @@
 									"path": [
 										"jwt-api",
 										"anything",
-										"get-only"
+										"restricted-path"
 									]
 								},
-								"description": "This request fails as it attempts to access an endpoint outside of the allowed paths defined in the policy it has been allocated. The Gateway responds with a `403 Forbidden`."
+								"description": "This request fails because it attempts to access an endpoint which is not listed in the path-based permissions defined in the Policy. The Gateway responds with a `403 Forbidden`."
 							},
 							"response": []
 						}
@@ -1621,7 +1621,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "6bfb8e51-c7a2-4221-bed0-d5c0e48653b6",
+								"id": "541cc9e5-3e6f-4447-86f8-d271d6a8ac27",
 								"exec": [
 									"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 									"",
@@ -1701,7 +1701,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b0f5c42d-5089-456e-bcb2-5b9eef34b5d9",
+								"id": "f51d2db0-d520-40db-bdbc-2ee7aab7917e",
 								"exec": [
 									"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 									"",
@@ -1780,7 +1780,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "aa855b0f-2bd5-4bcc-802d-b70be0574a7d",
+								"id": "a86aa937-32c3-4e67-b780-96dd4060d968",
 								"exec": [
 									"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 									"",
@@ -1870,7 +1870,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9b21b1f6-1122-4c8b-9d00-4b2be0b0adaa",
+										"id": "c962e112-56a7-4d7a-91cf-aa88b3ed78f9",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1931,7 +1931,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d7dd9858-230c-493f-ac7a-f68fcb331391",
+										"id": "a505e7f0-f385-442e-8b5d-0384bcb7eb4e",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2047,7 +2047,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7365fa90-561a-48c7-8cb1-6dd6f892f556",
+						"id": "435fcae3-e889-4226-aff8-fc7b7f589783",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
