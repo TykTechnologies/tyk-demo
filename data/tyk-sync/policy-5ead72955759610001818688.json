@@ -1,15 +1,15 @@
 {
-  "_id": "5ead7120575961000181867e",
-  "id": "5ea2de4a62daf30001a2f0b8",
+  "_id": "5ead72955759610001818688",
+  "id": "5ead72955759610001818688",
   "org_id": "5e9d9544a1dcd60001d0ed20",
   "rate": 1000,
   "per": 60,
   "quota_max": -1,
   "quota_renewal_rate": 3600,
   "access_rights": {
-    "42b615355eaf47ca617463503f43300b": {
-      "api_name": "Swagger Petstore",
-      "api_id": "42b615355eaf47ca617463503f43300b",
+    "c7c3b826a9ec4c637ae716e00cecc010": {
+      "api_name": "JWT API",
+      "api_id": "c7c3b826a9ec4c637ae716e00cecc010",
       "versions": [
         "Default"
       ],
@@ -18,9 +18,9 @@
   },
   "hmac_enabled": false,
   "active": true,
-  "name": "Swagger Petstore Policy",
+  "name": "JWT Policy",
   "is_inactive": false,
-  "date_created": "2020-04-24T12:40:42.074Z",
+  "date_created": "2020-05-02T13:16:05.612Z",
   "tags": [],
   "key_expires_in": 0,
   "partitions": {
@@ -28,5 +28,5 @@
     "rate_limit": false,
     "acl": false
   },
-  "last_updated": "1587732042"
+  "last_updated": "1588425365"
 }
