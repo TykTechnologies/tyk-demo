@@ -2208,7 +2208,24 @@
           "meta": {}
         },
         "event_handlers": {
-          "events": {}
+          "events": {
+            "AuthFailure": [
+              {
+                "handler_name": "eh_web_hook_handler",
+                "handler_meta": {
+                  "api_model": {},
+                  "event_timeout": 60,
+                  "header_map": {},
+                  "id": "5eafa3614979f4125605e250",
+                  "method": "POST",
+                  "name": "Webhook Receiver Post",
+                  "org_id": "5e9d9544a1dcd60001d0ed20",
+                  "target_path": "http://localhost:8080/webhook-receiver/post",
+                  "template_path": ""
+                }
+              }
+            ]
+          }
         },
         "enable_batch_request_support": false,
         "enable_ip_whitelisting": false,
@@ -2243,7 +2260,23 @@
         "strip_auth_data": false,
         "enable_detailed_recording": false
       },
-      "hook_references": [],
+      "hook_references": [
+        {
+          "event_name": "AuthFailure",
+          "event_timeout": 60,
+          "hook": {
+            "api_model": {},
+            "id": "5eafa3614979f4125605e250",
+            "org_id": "5e9d9544a1dcd60001d0ed20",
+            "name": "Webhook Receiver Post",
+            "method": "POST",
+            "target_path": "http://localhost:8080/webhook-receiver/post",
+            "template_path": "",
+            "header_map": {},
+            "event_timeout": 0
+          }
+        }
+      ],
       "is_site": false,
       "sort_by": 0,
       "user_group_owners": [],
