@@ -2,7 +2,7 @@
 
 This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple deployment.
 
-In the base Tyk Deployment you get:
+In the [Standard Tyk Deployment](#standard-tyk) you get:
 
 * Tyk Gateway
 * Tyk Dashboard
@@ -15,12 +15,13 @@ In the base Tyk Deployment you get:
 
 It's also possible to deploy these complimentary services:
 
-* Tyk SSO Dashboard & Tyk Identity Broker
-* Tyk Gateway with TLS configuration
-* Elasticsearch/Kibana (alternative analytics reporting)
-* Zipkin (tracing)
-* Jenkins + 2nd Tyk environment (CI/CD)
-* StatsD/Graphite (Instrumentation)
+* [Tyk SSO Dashboard & Tyk Identity Broker](#sso-dashboard)
+* [Tyk Gateway with TLS configuration](#tls-gateway)
+* [Elasticsearch/Kibana](#kibana) (alternative analytics reporting)
+* [Zipkin](#zipkin) (tracing)
+* [Jenkins](#Jenkins) (CI/CD)
+* [2nd Tyk Environment](#tyk-environment-2) (for use with CI/CD)
+* [StatsD/Graphite](#graphite) (instrumentation)
 
 # Repository Structure
 
@@ -144,9 +145,17 @@ The following applications are available once the system is bootstrapped.
 
 ## Standard Tyk
 
+The standard Tyk deployment, with Dashboard, Gateway, Pump, Redis and MongoDB.
+
 - [Tyk Dashboard](http://localhost:3000)
 - [Tyk Portal](http://localhost:3000/portal)
 - [Tyk Gateway](http://localhost:8080/basic-open-api/get)
+
+### Requires
+
+* Docker Compose: `docker-compose.yml`
+* Bootstrap: `bootstrap.sh`
+* Docker environment variable: `DASHBOARD_LICENCE=<YOUR_LICENCE>`
 
 ### Scaling the solution
 
@@ -154,9 +163,17 @@ Run the `scripts/add-gateway.sh` script to create a new Gateway instance. It wil
 
 ## SSO Dashboard
 
-- [Tyk SSO Dashboard](http://localhost:3001)
+Provides an SSO-enabled Tyk Dashboard in conjunction with the Tyk Identity Broker and Okta. It will connect to the same databases as the Standard Tyk deployment.
 
-Requires `docker-compose/sso.yml` and `bootstrap/sso.sh`.
+- [Tyk SSO-enabled Dashboard](http://localhost:3001)
+
+### Requires
+
+* Docker Compose: `docker-compose/sso.yml`
+* Bootstrap: `bootstrap/sso.sh`
+* Docker environment variable: `DASHBOARD_LICENCE=<YOUR_LICENCE>`
+
+### SSO process 
 
 **Note:** This example is not very configurable right now, since it relies on a specific Okta setup which is only configurable by the owner of the Okta account (i.e. not you!). Would be good to change this at some point to use a self-contained method which can be managed by anyone. Please feel free to implement such a change an make a pull request. Anyway, here's the SSO we have...
 
@@ -180,44 +197,62 @@ Functionality is based on the `division` attribute of the Okta user profile and 
 
 ## TLS Gateway
 
-- [Tyk TLS Gateway](https://localhost:8081/basic-open-api/get)
-
-Requires `docker-compose-tls/yml` and `bootstrap/tls.sh`.
-
 This is a TLS-enabled Gateway. It uses a self-signed certificate, so make sure to instruct your HTTP client is ignore certificate verification failure.
 
+- [Tyk TLS Gateway](https://localhost:8081/basic-open-api/get)
+
+### Require
+
+* Docker Compose `docker-compose-tls/yml`
+* Bootstrap `bootstrap/tls.sh`
+
 ## Tyk environment 2
+
+This is intended to be used in conjunction with Jenkins. It represents a separate Tyk environment, with an independent Gateway, Dashboard, Pump and databases. We can use Jenkins to automate the deployment of API Definitions and Policies from the default environment to the "e2" environment.
 
 - [Tyk Dashboard environment 2](http://localhost:3002)
 - [Tyk Gateway environment 2](http://localhost:8085/basic-open-api/get)
 
-Requires `docker-compose/e2.yml` and `bootstrap/e2.sh`.
+### Requires
 
-This is intended to be used in conjunction with Jenkins. It represents a separate Tyk environment, with an independent Gateway, Dashboard, Pump and databases. We can use Jenkins to automate the deployment of API Definitions and Policies from the default environment to the e2 environment.
+* Docker Compose: `docker-compose/e2.yml`
+* Bootstrap: `bootstrap/e2.sh`
+* Docker environment variable: `DASHBOARD_LICENCE=<YOUR_LICENCE>`
 
 ## Kibana
 
-- [Kibana](http://localhost:5601)
+Demonstrates how analytics data can be push into 3rd party databases and reported on by 3rd party systems.
 
-Requires `docker-compose/kibana.yml` and `bootstrap/kibana.sh`.
+- [Kibana Dashboard](http://localhost:5601)
 
-The Tyk Pump is already configured to push data to the Elasticsearch container, so Kibana can visualise this data.
+### Requires
 
-The bootstrap process creates an Index Pattern and Visualization which can be used to view API analytics data.
+* Docker-compose: `docker-compose/kibana.yml`
+* Bootstrap: `bootstrap/kibana.sh`
+
+### Analytics data processing
+
+The Tyk Pump deployed with Kibana is already configured to push data to the Elasticsearch container, so Kibana can visualise this data.
+
+The bootstrap process creates an Index Pattern and Visualization which can be used to view API analytics data. It will also stop the original Tyk Pump which is deployed, so that the Elasticsearch-enabled pump can take over.
 
 ## Graphite
 
-* [Graphite Dashboard](http://localhost:8060)
-
-Requires `docker-compose/graphite.yml` and `bootstrap/graphite.sh`.
-
 Graphite demonstrates the [instrumentation feature](https://tyk.io/docs/basic-config-and-security/report-monitor-trigger-events/instrumentation/) of Tyk whereby realtime statistic are pushed from the Dashboard, Gateway and Pump into a StatsD instance. For this example, the statistics can be seen in the [Graphite Dashboard](http://localhost:8060)
 
-The StatsD, Carbon and Graphite are all deployed within a single container service called `graphite`.
+* [Graphite Dashboard](http://localhost:8060)
+
+### Requires
+
+* Docker Compose: `docker-compose/graphite.yml`
+* Bootstrap: `bootstrap/graphite.sh`
+* Docker environment variable: `INSTRUMENTATION_ENABLED=1`
 
 ### Setup
 
 To enable this feature, add `INSTRUMENTATION_ENABLED=1` to your Docker environment file `.env`. This must be done prior to running the `docker-compose` commands.
+
+The StatsD, Carbon and Graphite are all deployed within a single container service called `graphite`.
 
 ### Usage
 
@@ -225,19 +260,21 @@ Open the [Graphite Dashboard](http://localhost:8060]). Explore the 'Metrics' tre
 
 ## Zipkin
 
-- [Zipkin](http://localhost:9411)
-
-Requires `docker-compose/zipkin.yml` and `bootstrap/zipkin.sh`.
-
-Zipkin can demonstrate open tracing. It has a [web UI](http://localhost:9411) you can use to view traces.
+Zipkin can demonstrate open tracing. It has a [Dashboard](http://localhost:9411) you can use to view traces.
 
 It has been configured to use in-memory storage, so will not retain data once the contain is restarted/removed.
 
+- [Zipkin Dashboard](http://localhost:9411)
+
+### Requires
+
+* Docker Compose: `docker-compose/zipkin.yml`
+* Bootstrap: `bootstrap/zipkin.sh`
+* Docker environment variable: `TRACING_ENABLED=true`
+
 ### Setup
 
-Set the Tracing.Enabled value to true in the Gateway config. This will hopefully be a temporary workaround until this can be done via Docker env var.
-
-~~To enable this feature, add `TRACING_ENABLED=1` to your Docker environment file `.env`. This must be done prior to running the `docker-compose` commands.~~
+To enable this feature, add `TRACING_ENABLED=true` to your Docker environment file `.env`. This must be done prior to running the `docker-compose` commands.
 
 ### Usage 
 
@@ -245,11 +282,14 @@ To use Zipkin, open the [Zipkin Dashboard](http://localhost:9411) in a browser a
 
 ## Jenkins
 
-- [Jenkins](http://localhost:8070)
-
-Requires `docker-compose/jenkins.yml` and `bootstrap/jenkins.sh`.
-
 Jenkins is used to provide an automated way of pushing API Definitions and Policies to different Tyk environments. It uses the `tyk-sync` CLI tool and a Github repository to achieve this.
+
+- [Jenkins Dashboard](http://localhost:8070)
+
+### Requires
+
+* Docker Compose: `docker-compose/jenkins.yml`
+* Bootstrap: `bootstrap/jenkins.sh`
 
 ### Setup
 
@@ -294,7 +334,7 @@ Commands can be sent to the CLI via docker. Here's an example which gets the 'AP
 docker-compose exec jenkins java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ -auth admin:f284436d222a4d73841ae92ebc5928e8 -webSocket get-job 'APIs and Policies'
 ```
 
-# Working with API and Policies
+# Working with APIs and Policies
 
 There are two scenarios for working with this data:
 
