@@ -31,7 +31,7 @@ It's also possible to deploy these complimentary services:
 * `Tyk Demo.postman_collection.json`: A Postman collection of requests which correspond to APIs available in the deployment.
 * `bootstrap/*.sh`: Bootstrap scripts to initialise deployed applications. These are closely aligned with services deployed in the Docker Compose files.
 * `docker-compose/*.yml`: Docker Compose deployment definitions. Separate files allow for varied deployments. Complimentary services are defined together within the same file.
-* `scripts/*.sh`: Scripts to execute the useful commands.
+* `scripts/*.sh`: Some useful comments encapsulated in scripts.
 
 # Getting Started
 
