@@ -171,7 +171,7 @@ Provides an SSO-enabled Tyk Dashboard in conjunction with the Tyk Identity Broke
 
 ### Requires
 
-* Standard Tyk
+* [Standard Tyk](#standard-tyk)
 * Docker Compose: `docker-compose/sso.yml`
 * Bootstrap: `bootstrap/sso.sh`
 * Docker environment variable: `DASHBOARD_LICENCE=<YOUR_LICENCE>`
@@ -206,7 +206,7 @@ This is a TLS-enabled Gateway. It uses a self-signed certificate, so make sure t
 
 ### Require
 
-* Standard Tyk
+* [Standard Tyk](#standard-tyk)
 * Docker Compose `docker-compose-tls/yml`
 * Bootstrap `bootstrap/tls.sh`
 
@@ -219,7 +219,7 @@ This is intended to be used in conjunction with Jenkins. It represents a separat
 
 ### Requires
 
-* Standard Tyk
+* [Standard Tyk](#standard-tyk)
 * Docker Compose: `docker-compose/e2.yml`
 * Bootstrap: `bootstrap/e2.sh`
 * Docker environment variable: `DASHBOARD_LICENCE=<YOUR_LICENCE>`
@@ -232,7 +232,7 @@ Demonstrates how analytics data can be push into 3rd party databases and reporte
 
 ### Requires
 
-* Standard Tyk
+* [Standard Tyk](#standard-tyk)
 * Docker-compose: `docker-compose/kibana.yml`
 * Bootstrap: `bootstrap/kibana.sh`
 
@@ -250,7 +250,7 @@ Graphite demonstrates the [instrumentation feature](https://tyk.io/docs/basic-co
 
 ### Requires
 
-* Standard Tyk
+* [Standard Tyk](#standard-tyk)
 * Docker Compose: `docker-compose/graphite.yml`
 * Bootstrap: `bootstrap/graphite.sh`
 * Docker environment variable: `INSTRUMENTATION_ENABLED=1`
@@ -275,7 +275,7 @@ It has been configured to use in-memory storage, so will not retain data once th
 
 ### Requires
 
-* Standard Tyk
+* [Standard Tyk](#standard-tyk)
 * Docker Compose: `docker-compose/zipkin.yml`
 * Bootstrap: `bootstrap/zipkin.sh`
 * Docker environment variable: `TRACING_ENABLED=true`
@@ -296,7 +296,7 @@ Jenkins is used to provide an automated way of pushing API Definitions and Polic
 
 ### Requires
 
-* Standard Tyk
+* [Standard Tyk](#standard-tyk)
 * Docker Compose: `docker-compose/jenkins.yml`
 * Bootstrap: `bootstrap/jenkins.sh`
 
