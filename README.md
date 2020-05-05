@@ -141,7 +141,9 @@ docker-compose -f docker-compose.yml -f docker-compose/kibana.yml down -v
 
 # Applications available
 
-The following applications are available once the system is bootstrapped.
+The following applications are available once the system is bootstrapped. 
+
+**Note**: All applications require the Standard Tyk deployment.
 
 ## Standard Tyk
 
