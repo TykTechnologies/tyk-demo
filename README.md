@@ -35,9 +35,43 @@ It's also possible to deploy these complimentary services:
 
 # Getting Started
 
-Note that all commands provided here should be run from the root directory of the repo.
+## Step 1: Install dependencies
 
-## Step 1: Add Docker Environment variables
+### Git Large File Storage
+
+There is a large archive file as part of this repo. [LFS](https://git-lfs.github.com/) has been used to make storage and transfer of this file efficient. 
+
+This **must** be done before this repo is cloned otherwise LFS will not be available to retrieve the large files. Once it is installed you can use git commands normally.
+
+Use brew to install:
+
+```
+brew install git-lfs
+```
+
+Then initialise Git LDS with this command:
+
+```
+git lfs install
+```
+
+### JQ
+
+The bootstrap script uses JQ for extracting data from JSON object. Can be installed as follows:
+
+```
+brew install jq
+```
+
+## Step 2: Clone the repo
+
+The repo must be cloned after Git LFS is initialised.
+
+```
+git clone https://github.com/davegarvey/tyk-pro-docker-demo-extended
+```
+
+## Step 3: Add Docker Environment variables
 
 The `docker-compose.yml` file uses a Docker environment variable to set the dashboard licence. To set this, create a file called `.env` in the root directory of the repo, then set the content of the file as follows, replacing `<YOUR_LICENCE>` with your Dashboard licence:
 
@@ -47,7 +81,7 @@ DASHBOARD_LICENCE=<YOUR_LICENCE>
 
 In addition to this, some features require entries in the `.env` file. Check the [Applications Available](#applications-available) section, if a Docker Environment variable is required for the application, it will be listed in the Setup section for that application. This process is to avoid generating errors in the application logs due to the components trying to utilise a service which has not been deployed. Using Docker Environment variables allows for features to be enable and disabled without having to change the source controlled files.
 
-## Step 2: Initialise the Docker containers
+## Step 4: Initialise the Docker containers
 
 There are multiple compose files for this deployment. This is to give flexibility it terms of what is deployed.
 
@@ -69,17 +103,7 @@ Using `-d` creates the containers in detached mode, running them in the backgrou
 
 Please note that this command may take a while to complete, as Docker needs to download images and provision the containers.
 
-## Step 3: Install dependencies
-
-### JQ
-
-The bootstrap script uses JQ for extracting data from JSON object. Can be installed as follows:
-
-```
-brew install jq
-```
-
-## Step 4: Bootstrap the system
+## Step 5: Bootstrap the system
 
 Now we will run the bootstrap script, which will complete the remaining items needed to get started. But before the `bootstrap.sh` file can be run, it must be made executable:
 
