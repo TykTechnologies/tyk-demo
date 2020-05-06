@@ -21,7 +21,7 @@ services:
     networks:
       - tyk
     volumes:
-      - ./volumes/tyk-pump/pump-elasticsearch.conf:/opt/tyk-pump/pump.conf
+      - ./analytics/volumes/tyk-pump/pump-elasticsearch.conf:/opt/tyk-pump/pump.conf
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
     depends_on:

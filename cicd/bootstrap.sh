@@ -19,15 +19,15 @@ do
   fi
 done
 
-jenkins_admin_password=$(docker-compose -f docker-compose.yml -f docker-compose/jenkins.yml exec jenkins sh -c "cat /var/jenkins_home/secrets/initialAdminPassword | head -c32")
+jenkins_admin_password=$(docker-compose -f docker-compose.yml -f cicd/docker-compose.yml exec jenkins sh -c "cat /var/jenkins_home/secrets/initialAdminPassword | head -c32")
 
 # extract plugins and other configuration
-docker-compose -f docker-compose.yml -f docker-compose/jenkins.yml exec \
+docker-compose -f docker-compose.yml -f cicd/docker-compose.yml exec \
   jenkins \
   tar -xzvf /var/jenkins_home/jenkins.tar.gz -C /var/jenkins_home > /dev/null
 
 # restart contaner to allow new config and plugins to be used
-docker-compose -f docker-compose.yml -f docker-compose/jenkins.yml restart jenkins 2> /dev/null
+docker-compose -f docker-compose.yml -f cicd/docker-compose.yml restart jenkins 2> /dev/null
 
 # create job for 'APIs and Policies'
 jenkins_response=""
@@ -36,7 +36,7 @@ do
   jenkins_tries=$((jenkins_tries+1))
   dot=$(printf "%-${jenkins_tries}s" ".")
   echo -ne "  Bootstrapping Jenkins ${dot// /.} \r"
-  jenkins_response=$(docker-compose -f docker-compose.yml -f docker-compose/jenkins.yml exec jenkins bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket create-job 'apis-and-policies'</var/jenkins_home/job-apis-and-policies.xml; echo $?")
+  jenkins_response=$(docker-compose -f docker-compose.yml -f cicd/docker-compose.yml exec jenkins bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket create-job 'apis-and-policies'</var/jenkins_home/job-apis-and-policies.xml; echo $?")
 
   if [ "${jenkins_response:0:1}" != "0" ]
   then

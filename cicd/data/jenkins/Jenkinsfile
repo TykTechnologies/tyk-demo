@@ -12,8 +12,8 @@ pipeline {
             }
             steps {
                 echo "Deploying from ${env.BRANCH_NAME}"
-                sh "chmod +x ./data/jenkins/tyk-sync"
-                sh "./data/jenkins/tyk-sync sync -d http://e2-tyk-dashboard:3000 -s ${env.TYK_DASH_SECRET} -p ./data/tyk-sync"
+                sh "chmod +x ./cicd/data/jenkins/tyk-sync"
+                sh "./cicd/data/tyk-sync sync -d http://e2-tyk-dashboard:3000 -s ${env.TYK_DASH_SECRET} -p ./cicd/data/tyk-sync"
             }
         }
     }

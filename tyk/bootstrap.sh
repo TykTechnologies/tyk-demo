@@ -34,7 +34,7 @@ echo "  Done"
 echo "Importing organisation"
 organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @bootstrap-data/tyk-dashboard/organisation.json \
+  -d @tyk/data/tyk-dashboard/organisation.json \
   | jq -r '.Meta')
 echo $organisation_id > .context-data/organisation-id
 echo "  Organisation Id: $organisation_id"
@@ -43,11 +43,11 @@ echo "  Organisation Id: $organisation_id"
 ./scripts/import.sh
 
 echo "Creating Dashboard user"
-dashboard_user_email=$(jq -r '.email_address' bootstrap-data/tyk-dashboard/dashboard-user.json)
-dashboard_user_password=$(jq -r '.password' bootstrap-data/tyk-dashboard/dashboard-user.json)
+dashboard_user_email=$(jq -r '.email_address' tyk/data/tyk-dashboard/dashboard-user.json)
+dashboard_user_password=$(jq -r '.password' tyk/data/tyk-dashboard/dashboard-user.json)
 dashboard_user_api_response=$(curl $dashboard_base_url/admin/users -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @bootstrap-data/tyk-dashboard/dashboard-user.json \
+  -d @tyk/data/tyk-dashboard/dashboard-user.json \
   | jq -r '. | {api_key:.Message, id:.Meta.id}')
 dashboard_user_id=$(echo $dashboard_user_api_response | jq -r '.id')
 dashboard_user_api_credentials=$(echo $dashboard_user_api_response | jq -r '.api_key')
@@ -66,13 +66,13 @@ echo "  ID: $dashboard_user_id"
 echo "Creating Dashboard user groups"
 curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @bootstrap-data/tyk-dashboard/usergroup-readonly.json > /dev/null
+  -d @tyk/data/tyk-dashboard/usergroup-readonly.json > /dev/null
 curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @bootstrap-data/tyk-dashboard/usergroup-default.json > /dev/null
+  -d @tyk/data/tyk-dashboard/usergroup-default.json > /dev/null
 curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @bootstrap-data/tyk-dashboard/usergroup-admin.json > /dev/null
+  -d @tyk/data/tyk-dashboard/usergroup-admin.json > /dev/null
 user_group_data=$(curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials")
 user_group_readonly_id=$(echo $user_group_data | jq -r .groups[0].id)
@@ -86,7 +86,7 @@ echo "  Done"
 echo "Creating webhooks"
 curl $dashboard_base_url/api/hooks -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @bootstrap-data/tyk-dashboard/webhook-webhook-receiver-api-post.json > /dev/null
+  -d @tyk/data/tyk-dashboard/webhook-webhook-receiver-api-post.json > /dev/null
 echo "  Done"
 
 echo "Creating Portal default settings"
@@ -102,7 +102,7 @@ echo "  Done"
 echo "Creating Portal home page"
 curl $dashboard_base_url/api/portal/pages -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @bootstrap-data/tyk-dashboard/portal-home-page.json > /dev/null
+  -d @tyk/data/tyk-dashboard/portal-home-page.json > /dev/null
 echo "  Done"
 
 echo "Creating Portal user"
@@ -155,16 +155,16 @@ echo "  Done"
 echo "Importing custom keys"
 curl $gateway_base_url/tyk/keys/auth_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @./bootstrap-data/tyk-gateway/auth-key.json > /dev/null
+  -d @tyk/data/tyk-gateway/auth-key.json > /dev/null
 curl $gateway_base_url/tyk/keys/ratelimit_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @./bootstrap-data/tyk-gateway/rate-limit-key.json > /dev/null
+  -d @tyk/data/tyk-gateway/rate-limit-key.json > /dev/null
 curl $gateway_base_url/tyk/keys/throttle_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @./bootstrap-data/tyk-gateway/throttle-key.json > /dev/null
+  -d @tyk/data/tyk-gateway/throttle-key.json > /dev/null
 curl $gateway_base_url/tyk/keys/quota_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @./bootstrap-data/tyk-gateway/quota-key.json > /dev/null
+  -d @tyk/data/tyk-gateway/quota-key.json > /dev/null
 echo "  Done"
 
 echo "Checking Gateway functionality"
