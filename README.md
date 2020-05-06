@@ -207,7 +207,7 @@ This is a TLS-enabled Gateway. It uses a self-signed certificate, so make sure t
 ### Require
 
 * [Standard Tyk](#standard-tyk)
-* Docker Compose `docker-compose-tls/yml`
+* Docker Compose `docker-compose/tls.yml`
 * Bootstrap `bootstrap/tls.sh`
 
 ## Tyk environment 2
