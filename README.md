@@ -49,7 +49,7 @@ Use brew to install:
 brew install git-lfs
 ```
 
-Then initialise Git LDS with this command:
+Then initialise Git LFS with this command:
 
 ```
 git lfs install
