@@ -4,8 +4,7 @@ dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
 
 echo "Making scripts executable"
-chmod +x scripts/*.sh
-chmod +x bootstrap/*.sh
+chmod +x `ls */*.sh`
 echo "  Done"
 
 echo "Creating directory for context data"
