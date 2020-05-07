@@ -13,8 +13,8 @@ mkdir -p .context-data
 echo "  Done"
 
 echo "Getting Dashboard configuration"
-dashboard_admin_api_credentials=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
-portal_root_path=$(cat ./volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_config.portal_root_path)
+dashboard_admin_api_credentials=$(cat tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
+portal_root_path=$(cat tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_config.portal_root_path)
 echo "  Dashboard Admin API Credentials: $dashboard_admin_api_credentials"
 echo "  Portal Root Path: $portal_root_path"
 
@@ -106,8 +106,8 @@ curl $dashboard_base_url/api/portal/pages -s \
 echo "  Done"
 
 echo "Creating Portal user"
-portal_user_email=$(jq -r '.email' bootstrap-data/tyk-dashboard/portal-user.json)
-portal_user_password=$(jq -r '.password' bootstrap-data/tyk-dashboard/portal-user.json)
+portal_user_email=$(jq -r '.email' tyk/data/tyk-dashboard/portal-user.json)
+portal_user_password=$(jq -r '.password' tyk/data/tyk-dashboard/portal-user.json)
 curl $dashboard_base_url/api/portal/developers -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d '{
@@ -125,11 +125,11 @@ documentation_swagger_petstore_id=$(curl $dashboard_base_url/api/portal/document
   --data-raw '{
       "api_id":"",
       "doc_type":"swagger",
-      "documentation":"'$(cat bootstrap-data/tyk-dashboard/documentation-swagger-petstore.json | base64)'"
+      "documentation":"'$(cat tyk/data/tyk-dashboard/documentation-swagger-petstore.json | base64)'"
     }' \
   | jq -r '.Message')
 policies_swagger_petstore_id=$(echo $policies | jq -r '.Data[] | select(.name=="Swagger Petstore Policy") | .id')
-catalogue_data=$(cat ./bootstrap-data/tyk-dashboard/catalogue.json | \
+catalogue_data=$(cat tyk/data/tyk-dashboard/catalogue.json | \
   sed 's/CATALOGUE_ID/'"$catalogue_id"'/' | \
   sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \
   sed 's/CATALOGUE_SWAGGER_PETSTORE_POLICY_ID/'"$policies_swagger_petstore_id"'/' | \
@@ -140,11 +140,11 @@ curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
 echo "  Done"
 
 echo "Waiting for Gateway API to be ready"
-gateway_api_credentials=$(cat ./volumes/tyk-gateway/tyk.conf | jq -r .secret)
+gateway_api_credentials=$(cat tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
 gateway_status=""
 while [ "$gateway_status" != "200" ]
 do
-  gateway_status=$(curl $gateway_base_url/tyk/keys/api_key_write_test -s -o /dev/null -w '%{http_code}' -H "x-tyk-authorization: $gateway_api_credentials" -d @./bootstrap-data/tyk-gateway/auth-key.json)
+  gateway_status=$(curl $gateway_base_url/tyk/keys/api_key_write_test -s -o /dev/null -w '%{http_code}' -H "x-tyk-authorization: $gateway_api_credentials" -d @tyk/data/tyk-gateway/auth-key.json)
   if [ "$gateway_status" != "200" ]
   then
     sleep 1
