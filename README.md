@@ -53,7 +53,7 @@ brew install jq
 
 ## Step 2: Clone the repo
 
-The repo must be cloned after Git LFS is initialised.
+The repo must be cloned after Git LFS is initialised. This is due to LFS being needed to transfer the large files in the repo.
 
 ```
 git clone https://github.com/davegarvey/tyk-pro-docker-demo-extended
