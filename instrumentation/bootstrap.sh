@@ -1,7 +1,5 @@
 #!/bin/bash
 
-dot_count=""
-
 function bootstrap_progress {
   dot_count=$((dot_count+1))
   dots=$(printf "%-${dot_count}s" ".")
@@ -25,7 +23,7 @@ then
           rm .env.bak
      fi
      bootstrap_progress
-     
+
      # restart tyk containers to take effect
      docker-compose restart 2> /dev/null
      bootstrap_progress
