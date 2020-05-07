@@ -7,7 +7,6 @@ function bootstrap_progress {
 }
 
 dot_count=""
-
 dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
 
@@ -18,7 +17,6 @@ bootstrap_progress
 # Creating directory for context data
 mkdir -p .context-data
 bootstrap_progress
-
 
 # Getting Dashboard configuration
 dashboard_admin_api_credentials=$(cat tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
@@ -66,12 +64,6 @@ curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset -s \
     }' > /dev/null
 bootstrap_progress
 
-# echo $dashboard_user_api_credentials > .context-data/dashboard-user-api-credentials
-# echo "  Username: $dashboard_user_email"
-# echo "  Password: $dashboard_user_password"
-# echo "  Dashboard API Credentials: $dashboard_user_api_credentials"
-# echo "  ID: $dashboard_user_id"
-
 # Creating Dashboard user groups
 curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials" \
@@ -88,11 +80,6 @@ user_group_readonly_id=$(echo $user_group_data | jq -r .groups[0].id)
 user_group_default_id=$(echo $user_group_data | jq -r .groups[1].id)
 user_group_admin_id=$(echo $user_group_data | jq -r .groups[2].id)
 bootstrap_progress
-
-# echo $user_group_readonly_id > .context-data/user_group_readonly_id
-# echo $user_group_default_id > .context-data/user_group_default_id
-# echo $user_group_admin_id > .context-data/user_group_admin_id
-# echo "  Done"
 
 # Creating webhooks
 curl $dashboard_base_url/api/hooks -s \
