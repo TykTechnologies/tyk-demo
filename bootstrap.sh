@@ -1,47 +1,55 @@
 #!/bin/bash
 
+function bootstrap_progress {
+  dot_count=$((dot_count+1))
+  dots=$(printf "%-${dot_count}s" ".")
+  echo -ne "  Bootstrapping Tyk ${dots// /.} \r"
+}
+
+dot_count=""
+
 dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
 
-echo "Making scripts executable"
+# Making scripts executable
 chmod +x `ls */*.sh`
-echo "  Done"
+bootstrap_progress
 
-echo "Creating directory for context data"
+# Creating directory for context data
 mkdir -p .context-data
-echo "  Done"
+bootstrap_progress
 
-echo "Getting Dashboard configuration"
+
+# Getting Dashboard configuration
 dashboard_admin_api_credentials=$(cat tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
 portal_root_path=$(cat tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_config.portal_root_path)
-echo "  Dashboard Admin API Credentials: $dashboard_admin_api_credentials"
-echo "  Portal Root Path: $portal_root_path"
+bootstrap_progress
 
-echo "Waiting for Dashboard API to be ready"
+# Waiting for Dashboard API to be ready
 dashboard_status=""
 while [ "$dashboard_status" != "200" ]
 do
   dashboard_status=$(curl -I $dashboard_base_url/admin/organisations -H "admin-auth: $dashboard_admin_api_credentials" 2>/dev/null | head -n 1 | cut -d$' ' -f2)
-  
   if [ "$dashboard_status" != "200" ]
   then
     sleep 1
   fi
+  bootstrap_progress
 done
-echo "  Done"
 
-echo "Importing organisation"
+# Importing organisation
 organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d @tyk/data/tyk-dashboard/organisation.json \
   | jq -r '.Meta')
 echo $organisation_id > .context-data/organisation-id
-echo "  Organisation Id: $organisation_id"
+bootstrap_progress
 
 # Import data
 ./scripts/import.sh
+bootstrap_progress
 
-echo "Creating Dashboard user"
+# Creating Dashboard user
 dashboard_user_email=$(jq -r '.email_address' tyk/data/tyk-dashboard/dashboard-user.json)
 dashboard_user_password=$(jq -r '.password' tyk/data/tyk-dashboard/dashboard-user.json)
 dashboard_user_api_response=$(curl $dashboard_base_url/admin/users -s \
@@ -56,13 +64,15 @@ curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset -s \
       "new_password":"'$dashboard_user_password'",
       "user_permissions": { "IsAdmin": "admin" }
     }' > /dev/null
-echo $dashboard_user_api_credentials > .context-data/dashboard-user-api-credentials
-echo "  Username: $dashboard_user_email"
-echo "  Password: $dashboard_user_password"
-echo "  Dashboard API Credentials: $dashboard_user_api_credentials"
-echo "  ID: $dashboard_user_id"
+bootstrap_progress
 
-echo "Creating Dashboard user groups"
+# echo $dashboard_user_api_credentials > .context-data/dashboard-user-api-credentials
+# echo "  Username: $dashboard_user_email"
+# echo "  Password: $dashboard_user_password"
+# echo "  Dashboard API Credentials: $dashboard_user_api_credentials"
+# echo "  ID: $dashboard_user_id"
+
+# Creating Dashboard user groups
 curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @tyk/data/tyk-dashboard/usergroup-readonly.json > /dev/null
@@ -77,18 +87,20 @@ user_group_data=$(curl $dashboard_base_url/api/usergroups -s \
 user_group_readonly_id=$(echo $user_group_data | jq -r .groups[0].id)
 user_group_default_id=$(echo $user_group_data | jq -r .groups[1].id)
 user_group_admin_id=$(echo $user_group_data | jq -r .groups[2].id)
-echo $user_group_readonly_id > .context-data/user_group_readonly_id
-echo $user_group_default_id > .context-data/user_group_default_id
-echo $user_group_admin_id > .context-data/user_group_admin_id
-echo "  Done"
+bootstrap_progress
 
-echo "Creating webhooks"
+# echo $user_group_readonly_id > .context-data/user_group_readonly_id
+# echo $user_group_default_id > .context-data/user_group_default_id
+# echo $user_group_admin_id > .context-data/user_group_admin_id
+# echo "  Done"
+
+# Creating webhooks
 curl $dashboard_base_url/api/hooks -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @tyk/data/tyk-dashboard/webhook-webhook-receiver-api-post.json > /dev/null
-echo "  Done"
+bootstrap_progress
 
-echo "Creating Portal default settings"
+# Creating Portal default settings
 curl $dashboard_base_url/api/portal/configuration -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d "{}" > /dev/null
@@ -96,15 +108,15 @@ catalogue_id=$(curl $dashboard_base_url/api/portal/catalogue -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d '{"org_id": "'$organisation_id'"}' \
   | jq -r '.Message')
-echo "  Done"
+bootstrap_progress
 
-echo "Creating Portal home page"
+# Creating Portal home page
 curl $dashboard_base_url/api/portal/pages -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @tyk/data/tyk-dashboard/portal-home-page.json > /dev/null
-echo "  Done"
+bootstrap_progress
 
-echo "Creating Portal user"
+# Creating Portal user
 portal_user_email=$(jq -r '.email' tyk/data/tyk-dashboard/portal-user.json)
 portal_user_password=$(jq -r '.password' tyk/data/tyk-dashboard/portal-user.json)
 curl $dashboard_base_url/api/portal/developers -s \
@@ -114,9 +126,9 @@ curl $dashboard_base_url/api/portal/developers -s \
       "password": "'$portal_user_password'",
       "org_id": "'$organisation_id'"
     }' > /dev/null
-echo "  Done"
+bootstrap_progress
 
-echo "Creating catalogue"
+# Creating catalogue
 policies=$(curl $dashboard_base_url/api/portal/policies?p=-1 -s \
   -H "Authorization:$dashboard_user_api_credentials")
 documentation_swagger_petstore_id=$(curl $dashboard_base_url/api/portal/documentation -s \
@@ -136,9 +148,9 @@ catalogue_data=$(cat tyk/data/tyk-dashboard/catalogue.json | \
 curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d "$(echo $catalogue_data)" > /dev/null
-echo "  Done"
+bootstrap_progress
 
-echo "Waiting for Gateway API to be ready"
+# Waiting for Gateway API to be ready
 gateway_api_credentials=$(cat tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
 gateway_status=""
 while [ "$gateway_status" != "200" ]
@@ -148,10 +160,10 @@ do
   then
     sleep 1
   fi
+  bootstrap_progress
 done
-echo "  Done"
 
-echo "Importing custom keys"
+# Importing custom keys
 curl $gateway_base_url/tyk/keys/auth_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @tyk/data/tyk-gateway/auth-key.json > /dev/null
@@ -164,9 +176,9 @@ curl $gateway_base_url/tyk/keys/throttle_key -s \
 curl $gateway_base_url/tyk/keys/quota_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @tyk/data/tyk-gateway/quota-key.json > /dev/null
-echo "  Done"
+bootstrap_progress
 
-echo "Checking Gateway functionality"
+# Checking Gateway functionality
 gateway_status=""
 while [ "$gateway_status" != "200" ]
 do
@@ -176,10 +188,10 @@ do
   then
     sleep 1
   fi
+  bootstrap_progress
 done
-echo "  Done"
 
-cat <<EOF
+echo -e "\033[2K
 
             #####################                  ####               
             #####################                  ####               
@@ -209,5 +221,4 @@ cat <<EOF
 
            Gateway
                URL : $gateway_base_url
-
-EOF
+"
