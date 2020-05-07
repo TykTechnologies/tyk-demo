@@ -1,0 +1,16 @@
+version: '3.3'
+services:
+  jenkins:
+    image: jenkins/jenkins:lts-alpine
+    ports:
+      - 8070:8080
+    networks:
+      - tyk
+    volumes:
+      - ./cicd/volumes/jenkins/jenkins.tar.gz:/var/jenkins_home/jenkins.tar.gz
+      - ./cicd/volumes/jenkins/jenkins-cli.jar:/var/jenkins_home/jenkins-cli.jar
+      - ./cicd/volumes/jenkins/job-apis-and-policies.xml:/var/jenkins_home/job-apis-and-policies.xml
+      - jenkins-data:/var/jenkins_home
+
+volumes:
+  jenkins-data:

@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+
+    environment {
+        TYK_DASH_SECRET = credentials('tyk-dash-secret')
+    }
+
+    stages {
+        stage('deploy') {
+            when {
+                expression { env.BRANCH_NAME == 'master' }
+            }
+            steps {
+                echo "Deploying from ${env.BRANCH_NAME}"
+                sh "chmod +x ./cicd/data/jenkins/tyk-sync"
+                sh "./cicd/data/tyk-sync sync -d http://e2-tyk-dashboard:3000 -s ${env.TYK_DASH_SECRET} -p ./cicd/data/tyk-sync"
+            }
+        }
+    }
+
+    post {
+        always {
+            deleteDir()
+        }
+    }
+}

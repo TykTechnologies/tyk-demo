@@ -3,12 +3,11 @@ services:
   tyk-dashboard:
     image: tykio/tyk-dashboard:latest
     ports:
-      - "3000:3000"
-      - "5000:5000"
+      - 3000:3000
     networks:
       - tyk
     volumes:
-      - ./volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
+      - ./tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
@@ -18,15 +17,15 @@ services:
   tyk-gateway:
     image: tykio/tyk-gateway:latest
     ports:
-      - "8080:8080"
+      - 8080:8080
     networks:
       - tyk
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED}
     volumes:
-      - ./volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
-      - ./volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+      - ./tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
+      - ./tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
     depends_on:
       - tyk-redis
   tyk-pump:
@@ -34,7 +33,7 @@ services:
     networks:
       - tyk
     volumes:
-      - ./volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
+      - ./tyk/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
     depends_on:
@@ -43,20 +42,20 @@ services:
   tyk-redis:
     image: redis
     volumes:
-      - redis-data:/data
+      - tyk-redis-data:/data
     networks:
       - tyk
   tyk-mongo:
     image: mongo:3.2
     command: ["mongod", "--smallfiles"]
     volumes:
-      - mongo-data:/data/db
+      - tyk-mongo-data:/data/db
     networks:
       - tyk
   httpbin:
     image: kennethreitz/httpbin
     networks:
-        - tyk
+      - tyk
   swagger-petstore:
     image: swaggerapi/petstore:latest
     networks:
@@ -66,8 +65,8 @@ services:
       - SWAGGER_URL=http://localhost:8080/swagger-petstore
     
 volumes:
-  redis-data:
-  mongo-data:
+  tyk-redis-data:
+  tyk-mongo-data:
 
 networks:
   tyk:
