@@ -4,7 +4,6 @@ services:
     image: tykio/tyk-dashboard:latest
     ports:
       - "3001:3000"
-      - "5001:5000"
     networks:
       - tyk
     volumes:
