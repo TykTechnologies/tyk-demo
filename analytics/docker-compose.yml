@@ -5,7 +5,7 @@ services:
     networks:
       - tyk
     ports:
-      - "5601:5601"
+      - 5601:5601
     depends_on:
       - elasticsearch
   elasticsearch:

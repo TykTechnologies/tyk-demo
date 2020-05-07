@@ -3,7 +3,7 @@ services:
   tyk-dashboard:
     image: tykio/tyk-dashboard:latest
     ports:
-      - "3000:3000"
+      - 3000:3000
     networks:
       - tyk
     volumes:
@@ -17,7 +17,7 @@ services:
   tyk-gateway:
     image: tykio/tyk-gateway:latest
     ports:
-      - "8080:8080"
+      - 8080:8080
     networks:
       - tyk
     environment:

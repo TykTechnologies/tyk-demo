@@ -3,7 +3,7 @@ services:
   jenkins:
     image: jenkins/jenkins:lts-alpine
     ports:
-      - "8070:8080"
+      - 8070:8080
     networks:
       - tyk
     volumes:

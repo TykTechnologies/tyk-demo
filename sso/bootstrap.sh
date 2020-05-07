@@ -9,16 +9,17 @@ dashboard_user_api_credentials=$(cat .context-data/dashboard-user-api-credential
 user_group_default_id=$(cat .context-data/user_group_default_id)
 user_group_readonly_id=$(cat .context-data/user_group_readonly_id)
 user_group_admin_id=$(cat .context-data/user_group_admin_id)
-identity_broker_api_credentials=$(cat .sso/volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
-identity_broker_profile_tyk_dashboard_data=$(cat .sso/data/tyk-identity-broker/profile-tyk-dashboard.json | \
+identity_broker_api_credentials=$(cat sso/volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
+identity_broker_profile_tyk_dashboard_data=$(cat sso/data/tyk-identity-broker/profile-tyk-dashboard.json | \
   sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \
   sed 's/DASHBOARD_USER_API_CREDENTIALS/'"$dashboard_user_api_credentials"'/' | \
   sed 's/DASHBOARD_USER_GROUP_DEFAULT/'"$user_group_default_id"'/' | \
   sed 's/DASHBOARD_USER_GROUP_READONLY/'"$user_group_readonly_id"'/' | \
   sed 's/DASHBOARD_USER_GROUP_ADMIN/'"$user_group_admin_id"'/')
-curl $identity_broker_base_url/api/profiles/tyk-dashboard -s \
+
+curl $identity_broker_base_url/api/profiles/tyk-dashboard -s -o /dev/null \
   -H "Authorization: $identity_broker_api_credentials" \
-  -d "$(echo $identity_broker_profile_tyk_dashboard_data)" > /dev/null
+  -d "$(echo $identity_broker_profile_tyk_dashboard_data)"
 
 echo "   Dashboard (SSO)
                URL : $dashboard_sso_base_url

@@ -77,9 +77,9 @@ curl $dashboard_base_url/api/usergroups -s \
   -d @tyk/data/tyk-dashboard/usergroup-admin.json > /dev/null
 user_group_data=$(curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials")
-user_group_readonly_id=$(echo $user_group_data | jq -r .groups[0].id)
-user_group_default_id=$(echo $user_group_data | jq -r .groups[1].id)
-user_group_admin_id=$(echo $user_group_data | jq -r .groups[2].id)
+echo $user_group_data | jq -r .groups[0].id > .context-data/user_group_readonly_id
+echo $user_group_data | jq -r .groups[1].id > .context-data/user_group_default_id
+echo $user_group_data | jq -r .groups[2].id > .context-data/user_group_admin_id
 bootstrap_progress
 
 # Creating webhooks

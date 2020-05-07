@@ -3,11 +3,11 @@ services:
   tyk-dashboard-sso:
     image: tykio/tyk-dashboard:latest
     ports:
-      - "3001:3000"
+      - 3001:3000
     networks:
       - tyk
     volumes:
-      - ./sso/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
+      - ./tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
       - TYK_DB_SSOCUSTOMLOGINURL=http://localhost:3010/auth/tyk-dashboard/openid-connect
@@ -25,4 +25,4 @@ services:
     environment:
       - SESSION_SECRET=12345
     volumes:
-      - "./sso/volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf"
+      - ./sso/volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf
