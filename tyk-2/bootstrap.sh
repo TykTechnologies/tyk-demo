@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Begin Tyk environment 2 bootstrap" >.bootstrap.log
+
 function bootstrap_progress {
   dot_count=$((dot_count+1))
   dots=$(printf "%-${dot_count}s" ".")

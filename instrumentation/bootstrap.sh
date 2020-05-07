@@ -1,12 +1,14 @@
 #!/bin/bash
 
+echo "Begin instrumentation bootstrap" >>.bootstrap.log
+
 function bootstrap_progress {
   dot_count=$((dot_count+1))
   dots=$(printf "%-${dot_count}s" ".")
   echo -ne "  Bootstrapping Graphite ${dots// /.} \r"
 }
 
-# check instrumentation env var is set correctly
+echo "Check instrumentation env var is set correctly" >>.bootstrap.log
 instrumentation_setting=$(grep "INSTRUMENTATION_ENABLED" .env)
 instrumentation_setting_desired="INSTRUMENTATION_ENABLED=1"
 
@@ -15,17 +17,17 @@ then
      # if missing
      if [ ${#instrumentation_setting} == 0 ]
      then
-          # then add
+          echo "add instrumentation docker env var" >>.bootstrap.log
           echo $instrumentation_setting_desired >> .env
      else
-          # else replace (done this way to be compatible across different linux versions)
+          echo "replace instrumentation docker env var" >>.bootstrap.log
           sed -i.bak 's/'"$instrumentation_setting"'/'"$instrumentation_setting_desired"'/g' ./.env
           rm .env.bak
      fi
      bootstrap_progress
 
-     # restart tyk containers to take effect
-     docker-compose restart 2> /dev/null
+     echo "restart tyk containers to take effect" >>.bootstrap.log
+     docker-compose restart 2>> .bootstrap.log
      bootstrap_progress
 fi
 
