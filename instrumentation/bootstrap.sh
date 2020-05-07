@@ -1,6 +1,12 @@
 #!/bin/bash
 
-echo -ne "  Bootstrapping Graphite \r"
+dot_count=""
+
+function bootstrap_progress {
+  dot_count=$((dot_count+1))
+  dots=$(printf "%-${dot_count}s" ".")
+  echo -ne "  Bootstrapping Graphite ${dots// /.} \r"
+}
 
 # check instrumentation env var is set correctly
 instrumentation_setting=$(grep "INSTRUMENTATION_ENABLED" .env)
@@ -18,9 +24,11 @@ then
           sed -i.bak 's/'"$instrumentation_setting"'/'"$instrumentation_setting_desired"'/g' ./.env
           rm .env.bak
      fi
-
+     bootstrap_progress
+     
      # restart tyk containers to take effect
      docker-compose restart 2> /dev/null
+     bootstrap_progress
 fi
 
 echo -e "\033[2K          Graphite
