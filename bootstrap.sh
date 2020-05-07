@@ -1,12 +1,13 @@
 #!/bin/bash
 
+dot_count=""
+
 function bootstrap_progress {
   dot_count=$((dot_count+1))
   dots=$(printf "%-${dot_count}s" ".")
   echo -ne "  Bootstrapping Tyk ${dots// /.} \r"
 }
 
-dot_count=""
 dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
 
