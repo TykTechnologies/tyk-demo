@@ -7,7 +7,7 @@ services:
     networks:
       - tyk
     volumes:
-      - tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
+      - ./tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
       - TYK_DB_MONGOURL=mongodb://tyk2-mongo:27017/tyk_analytics
@@ -17,6 +17,31 @@ services:
     depends_on:
       - tyk2-redis
       - tyk2-mongo
+  tyk2-gateway:
+    image: tykio/tyk-gateway:latest
+    ports:
+      - "8085:8080"
+    networks:
+      - tyk
+    volumes:
+      - ./tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
+      - ./tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+    environment:
+      - TYK_GW_POLICIES_POLICYCONNECTIONSTRING=http://tyk2-dashboard:3000
+      - TYK_GW_DBAPPCONFOPTIONS_CONNECTIONSTRING=http://tyk2-dashboard:3000
+      - TYK_GW_STORAGE_HOST=tyk2-redis
+    depends_on:
+      - tyk2-redis
+  tyk2-pump:
+    image: tykio/tyk-pump-docker-pub:latest
+    networks:
+      - tyk
+    volumes:
+      - ./tyk-2/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
+    depends_on:
+      - tyk2-redis
+      - tyk2-mongo
+      - tyk2-gateway
   tyk2-mongo:
     image: mongo:3.2
     command: ["mongod", "--smallfiles"]
@@ -30,32 +55,7 @@ services:
       - tyk2-redis-data:/data
     networks:
       - tyk
-  tyk2-gateway:
-    image: tykio/tyk-gateway:latest
-    ports:
-      - "8085:8080"
-    networks:
-      - tyk
-    volumes:
-      - tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
-      - tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
-    environment:
-      - TYK_GW_POLICIES_POLICYCONNECTIONSTRING=http://tyk2-dashboard:3000
-      - TYK_GW_DBAPPCONFOPTIONS_CONNECTIONSTRING=http://tyk2-dashboard:3000
-      - TYK_GW_STORAGE_HOST=tyk2-redis
-    depends_on:
-      - tyk2-redis
-  tyk2-pump:
-    image: tykio/tyk-pump-docker-pub:latest
-    networks:
-      - tyk
-    volumes:
-      - tyk-2/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
-    depends_on:
-      - tyk2-redis
-      - tyk2-mongo
-      - tyk2-gateway
-
+    
 volumes:
   tyk2-redis-data:
   tyk2-mongo-data:

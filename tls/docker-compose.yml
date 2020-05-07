@@ -8,7 +8,7 @@ services:
       - tyk
     volumes:
       - ./tls/volumes/tyk-gateway/tyk-tls.conf:/opt/tyk-gateway/tyk.conf
-      - ./tls/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+      - ./tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
       - ./tls/volumes/tyk-gateway/certificates:/opt/tyk-gateway/certificates
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
