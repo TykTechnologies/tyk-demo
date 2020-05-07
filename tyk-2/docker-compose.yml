@@ -46,7 +46,7 @@ services:
     image: mongo:3.2
     command: ["mongod", "--smallfiles"]
     volumes:
-      - mongo2-data:/data/db
+      - tyk2-mongo-data:/data/db
     networks:
       - tyk
   tyk2-redis:

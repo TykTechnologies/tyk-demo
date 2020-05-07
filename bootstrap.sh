@@ -180,7 +180,7 @@ do
 
   if [ "$gateway_status" != "200" ]
   then
-    echo "$gateway_status" >>bootstrap.log
+    echo "Gateway status:$gateway_status" >>bootstrap.log
     sleep 1
   fi
   bootstrap_progress
@@ -214,7 +214,7 @@ do
   bootstrap_progress
 done
 
-echo "End standard Tyk bootstrap" >bootstrap.log
+echo "End standard Tyk bootstrap" >>bootstrap.log
 
 echo -e "\033[2K
 

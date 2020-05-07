@@ -6,7 +6,7 @@ The standard Tyk deployment, with Dashboard, Gateway, Pump, Redis and MongoDB.
 - [Tyk Portal](http://localhost:3000/portal)
 - [Tyk Gateway](http://localhost:8080/basic-open-api/get)
 
-This deployment is required by all feature deployments.
+This deployment is required by all feature deployments. Make sure to always include the `docker-compose.yml` and `bootstrap.sh` files for all deployments.
 
 ### Scaling the solution
 

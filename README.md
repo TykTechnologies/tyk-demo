@@ -113,7 +113,7 @@ If made additional feature deployments then you should also bootstrap those syst
 analytics/bootstrap.sh
 ```
 
-**Tip:** The two commands can be run consecutively in a single statement as so:
+**Tip:** The two commands can be run consecutively in a single statement, but make sure to always run the root bootstrap script `./bootstrap.sh` before the other bootstrap scripts:
 
 ```
 ./bootstrap.sh && ./analytics/bootstrap.sh

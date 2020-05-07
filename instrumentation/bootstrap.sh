@@ -17,16 +17,16 @@ then
      # if missing
      if [ ${#instrumentation_setting} == 0 ]
      then
-          echo "add instrumentation docker env var" >>bootstrap.log
+          echo "Add instrumentation docker env var" >>bootstrap.log
           echo $instrumentation_setting_desired >> .env
      else
-          echo "replace instrumentation docker env var" >>bootstrap.log
+          echo "Replace instrumentation docker env var" >>bootstrap.log
           sed -i.bak 's/'"$instrumentation_setting"'/'"$instrumentation_setting_desired"'/g' ./.env
           rm .env.bak
      fi
      bootstrap_progress
 
-     echo "restart tyk containers to take effect" >>bootstrap.log
+     echo "Restart tyk containers to take effect" >>bootstrap.log
      docker-compose restart 2> /dev/null
      bootstrap_progress
 fi

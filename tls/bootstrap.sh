@@ -13,7 +13,7 @@ do
   gateway_tries=$((gateway_tries+1))
   dot=$(printf "%-${gateway_tries}s" ".")
   echo -ne "  Bootstrapping Gateway (TLS) ${dot// /.} \r"
-  gateway_status=$(curl -I -k -m2 $gateway_tls_base_url/basic-open-api/get 2>>bootstrap.log | head -n 1 | cut -d$' ' -f2)
+  gateway_status=$(curl -I -s -k -m2 $gateway_tls_base_url/basic-open-api/get 2>>bootstrap.log | head -n 1 | cut -d$' ' -f2)
 
   if [ "$gateway_status" != "$gateway_status_desired" ]
   then
@@ -24,6 +24,6 @@ done
 
 echo "End tls bootstrap" >>bootstrap.log
 
-echo -e "\033[2K            Gateway (TLS)
+echo -e "\033[2K     Gateway (TLS)
                URL : $gateway_tls_base_url
 "

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Begin Tyk environment 2 bootstrap" >bootstrap.log
+echo "Begin Tyk environment 2 bootstrap" >>bootstrap.log
 
 function bootstrap_progress {
   dot_count=$((dot_count+1))
@@ -17,7 +17,7 @@ status_desired="200"
 echo "Wait for Tyk environment 2 Dashboard to respond ok" >>bootstrap.log
 while [ "$status" != "$status_desired" ]
 do
-  status=$(curl -I -m2 $dashboard2_base_url/admin/organisations -H "admin-auth: $dashboard_admin_api_credentials" 2>>bootstrap.log | head -n 1 | cut -d$' ' -f2)  
+  status=$(curl -I -s -m2 $dashboard2_base_url/admin/organisations -H "admin-auth: $dashboard_admin_api_credentials" 2>>bootstrap.log | head -n 1 | cut -d$' ' -f2)  
   if [ "$status" != "$status_desired" ]
   then
     echo "Tyk environment 2 Dashboard status:$status" >>bootstrap.log
@@ -29,15 +29,15 @@ done
 echo "Import organisation" >>bootstrap.log
 curl $dashboard2_base_url/admin/organisations/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @tyk/bootstrap/tyk-dashboard/organisation.json 2>>bootstrap.log
+  -d @tyk/data/tyk-dashboard/organisation.json 2>>bootstrap.log
 bootstrap_progress
 
 echo "Create Dashboard user" >>bootstrap.log
-dashboard_user_email=$(jq -r '.email_address' tyk/bootstrap/tyk-dashboard/dashboard-user.json)
-dashboard_user_password=$(jq -r '.password' tyk/bootstrap/tyk-dashboard/dashboard-user.json)
+dashboard_user_email=$(jq -r '.email_address' tyk/data/tyk-dashboard/dashboard-user.json)
+dashboard_user_password=$(jq -r '.password' tyk/data/tyk-dashboard/dashboard-user.json)
 dashboard2_user_api_response=$(curl $dashboard2_base_url/admin/users -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @tyk/bootstrap/tyk-dashboard/dashboard-user.json 2>>bootstrap.log \
+  -d @tyk/data/tyk-dashboard/dashboard-user.json 2>>bootstrap.log \
   | jq -r '. | {api_key:.Message, id:.Meta.id}')
 dashboard2_user_id=$(echo $dashboard2_user_api_response | jq -r '.id')
 dashboard2_user_api_credentials=$(echo $dashboard2_user_api_response | jq -r '.api_key')
@@ -50,8 +50,9 @@ curl $dashboard2_base_url/api/users/$dashboard2_user_id/actions/reset -s \
       "new_password":"'$dashboard_user_password'",
       "user_permissions": { "IsAdmin": "admin" }
     }' 2>>bootstrap.log
+bootstrap_progress
 
-echo "End Tyk environment 2 bootstrap" >bootstrap.log
+echo "End Tyk environment 2 bootstrap" >>bootstrap.log
 
 echo -e "\033[2K   Env 2 Dashboard
                URL : $dashboard2_base_url
