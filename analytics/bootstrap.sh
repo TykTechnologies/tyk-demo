@@ -3,13 +3,13 @@
 kibana_base_url="http://localhost:5601"
 kibana_status=""
 kibana_status_desired="200"
-kibana_tries=0
+dot_count=0
 
 while [ "$kibana_status" != "$kibana_status_desired" ]
 do
-  kibana_tries=$((kibana_tries+1))
-  dot=$(printf "%-${kibana_tries}s" ".")
-  echo -ne "  Bootstrapping Kibana ${dot// /.} \r"
+  dot_count=$((dot_count+1))
+  dots=$(printf "%-${dot_count}s" ".")
+  echo -ne "  Bootstrapping Kibana ${dots// /.} \r"
   kibana_status=$(curl -I -m2 $kibana_base_url/app/kibana 2>/dev/null | head -n 1 | cut -d$' ' -f2)
   
   if [ "$kibana_status" != "$kibana_status_desired" ]
