@@ -1,8 +1,8 @@
 # Tyk Demo
 
-This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple deployment.
+This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple deployment, where you can choose what features to include.
 
-In the [Standard Tyk Deployment](#standard-tyk) you get the standard Tyk components: Gateway, Dashboard, Pump. The deployment can be extended to include these features: 
+The concept is that there is a **standard deployment** of Tyk, which gives you the usual Tyk components: Gateway, Dashboard, Pump, plus the databases Redis and MongoDB. This standard deployment can be extended by including additional **feature deployments** as needed. The feature deployments cover particular scenarios for Tyk, such as:
 
 * Single sign on
 * TLS
@@ -12,12 +12,15 @@ In the [Standard Tyk Deployment](#standard-tyk) you get the standard Tyk compone
 * 2nd Tyk Environment
 * Instrumentation
 
+Each deployment has its own directory, with the necessary files to deploy the feature and a readme to describe the feature.
+
 # Repository Structure
 
-* `bootstrap.sh`: Bootstrap script for the standard Tyk deploymeny
-* `docker-compose.yml`: Docker compose definition for the standard Tyk deployment
+* `bootstrap.sh`: Bootstrap script for the Tyk standard deployment
+* `docker-compose.yml`: Docker compose definition for the Tyk standard deployment
 * `Tyk Demo.postman_collection.json`: A Postman collection of requests which correspond to APIs available in the deployment
 * `scripts/*.sh`: Some useful commands encapsulated in scripts
+* `tyk`: Files related to the Tyk standard deployment
 
 The remaining directories contain **feature deployments** which extend the standard Tyk deployment functionality. These directories contain `docker-compose.yml`, `bootstrap.sh` and `README.md` files specific to the feature being deployed. They may also contain directories called `data` or `volumes`, which hold the data necessary during bootstrapping or providing as mapped volumes into the container.
 
@@ -73,7 +76,7 @@ In addition to this, some features require entries in the `.env` file. These are
 
 There are multiple compose files for this deployment. This is to give flexibility it terms of what is deployed.
 
-The `docker-compose.yml` is the base compose file, containing Tyk. To deploy the standard Tyk installation, run the Docker Compose command:
+The `docker-compose.yml` is the base compose file, containing Tyk. To deploy the standard deployment of Tyk, run the Docker Compose command:
 
 ```
 docker-compose up -d
