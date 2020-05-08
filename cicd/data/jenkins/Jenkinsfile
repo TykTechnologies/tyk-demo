@@ -8,8 +8,7 @@ pipeline {
         stage('test') {
             steps {
                 echo "Building from ${env.BRANCH_NAME}"
-                String dashboard2UserApiCredentials = new File('/var/jenkins_home/tyk/dashboard2-user-api-credentials').text
-                echo "dash pass is ${dashboard2UserApiCredentials}"
+                echo "dash pass is $(echo /var/jenkins_home/tyk/dashboard2-user-api-credentials)"
             }
         }
         stage('deploy') {
@@ -17,11 +16,9 @@ pipeline {
                 expression { env.BRANCH_NAME == 'master' }
             }
             steps {
-                // relies on the `tyk-2` feature bootstrap.sh to write this file
-                String dashboard2UserApiCredentials = new File('/var/jenkins_home/tyk/dashboard2-user-api-credentials').text
                 echo "Deploying from ${env.BRANCH_NAME}"
                 sh "chmod +x ./cicd/data/jenkins/tyk-sync"
-                sh "./cicd/data/tyk-sync sync -d http://e2-tyk-dashboard:3000 -s ${dashboard2UserApiCredentials} -p ./cicd/data/tyk-sync"
+                sh "./cicd/data/tyk-sync sync -d http://e2-tyk-dashboard:3000 -s $(echo /var/jenkins_home/tyk/dashboard2-user-api-credentials) -p ./cicd/data/tyk-sync"
             }
         }
     }
