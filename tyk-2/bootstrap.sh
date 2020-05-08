@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Begin Tyk Environment 2 bootstrap" >>bootstrap.log
+echo "Begin Tyk Environment 2 bootstrap" >> bootstrap.log
 
 function bootstrap_progress {
   dot_count=$((dot_count+1))
