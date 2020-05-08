@@ -9,7 +9,13 @@ Jenkins is used to provide an automated way of pushing API Definitions and Polic
 For full CI/CD flow, you should deploy both this and the Tyk Environment 2 feature. Run from repo root:
 
 ```
-docker-compose -f docker-compose.yml -f tyk-2/docker-compose.yml -f cicd/docker-compose.yml up -d && ./bootstrap.sh && tyk-2/bootstrap.sh && cicd/bootstrap.sh
+docker-compose \
+  -f docker-compose.yml \
+  -f tyk-2/docker-compose.yml \
+  -f cicd/docker-compose.yml up -d && \
+./bootstrap.sh && \
+tyk-2/bootstrap.sh && \
+cicd/bootstrap.sh
 ```
 
 The `cicd/bootstrap.sh` script installs plugins and adds a job to Jenkins, but you will need to follow these steps to complete the setup:
