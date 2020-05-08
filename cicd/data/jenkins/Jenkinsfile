@@ -1,18 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        tyk2_dashboard_credentials = credentials('tyk2-dashboard-credentials')
+    }
+
     stages {
-        stage('test') {
-            steps {
-                script {
-                    def xx = readFile(file: '')
-                    String x = new File('../../tyk/dashboard2-user-api-credentials').text
-                    echo "dash:${x}"
-                }
-                echo "Testing from ${env.BRANCH_NAME}"
-                echo "dash pass is ${x}"
-            }
-        }
         stage('deploy') {
             when {
                 expression { env.BRANCH_NAME == 'master' }
@@ -21,7 +14,7 @@ pipeline {
                 
                 echo "Deploying from ${env.BRANCH_NAME}"
                 sh "chmod +x ./cicd/data/jenkins/tyk-sync"
-                sh "./cicd/data/tyk-sync sync -d http://e2-tyk-dashboard:3000 -s abc -p ./cicd/data/tyk-sync"
+                sh "./cicd/data/tyk-sync sync -d http://tyk2-dashboard:3000 -s ${env.tyk2_dashboard_credentials} -p ./cicd/data/tyk-sync"
             }
         }
     }
