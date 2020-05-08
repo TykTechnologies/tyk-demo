@@ -1,12 +1,12 @@
-## Jenkins
+## CI/CD
 
-Jenkins is used to provide an automated way of pushing API Definitions and Policies to different Tyk environments. It uses the `tyk-sync` CLI tool and a Github repository to achieve this.
+CI/CD is demonstrated using Jenkins and Tyk Sync. These provide an automated way of pushing API Definitions and Policies to different Tyk environments.
 
 - [Jenkins Dashboard](http://localhost:8070)
 
 ### Setup
 
-For full CI/CD flow, you should deploy both this and the Tyk Environment 2 feature. Run from repo root:
+This feature depends on the Tyk Environment 2 feature, so this must be deployed with this feature in order for it to work:
 
 ```
 docker-compose \
