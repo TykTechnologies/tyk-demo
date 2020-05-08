@@ -1,3 +1,4 @@
 .env
 .context-data
 bootstrap.log
+cicd/volumes/jenkins/tyk/dashboard2-user-api-credentials
