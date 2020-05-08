@@ -7,7 +7,10 @@ pipeline {
     stages {
         stage('test') {
             steps {
-                x = 'hello'
+                script {
+                    String x = new File('/var/jenkins_home/tyk/dashboard2-user-api-credentials').text
+                    echo "dash:${x}"
+                }
                 echo "Testing from ${env.BRANCH_NAME}"
                 echo "dash pass is ${x}"
             }
@@ -17,6 +20,7 @@ pipeline {
                 expression { env.BRANCH_NAME == 'master' }
             }
             steps {
+                
                 echo "Deploying from ${env.BRANCH_NAME}"
                 sh "chmod +x ./cicd/data/jenkins/tyk-sync"
                 sh "./cicd/data/tyk-sync sync -d http://e2-tyk-dashboard:3000 -s abc -p ./cicd/data/tyk-sync"
