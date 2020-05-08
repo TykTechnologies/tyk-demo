@@ -6,15 +6,25 @@ Jenkins is used to provide an automated way of pushing API Definitions and Polic
 
 ### Setup
 
-The `bootstrap.sh` script installs plugins and adds a job to Jenkins.
+For full CI/CD flow, you should deploy both this and the Tyk Environment 2 feature. Run from repo root:
 
-You will need to follow these steps to complete the setup:
+```
+docker-compose \
+  -f docker-compose.yml \
+  -f tyk-2/docker-compose.yml \
+  -f cicd/docker-compose.yml up -d && \
+./bootstrap.sh && \
+tyk-2/bootstrap.sh && \
+cicd/bootstrap.sh
+```
+
+The `cicd/bootstrap.sh` script installs plugins and adds a job to Jenkins, but you will need to follow these steps to complete the setup:
 
 1. Browse to [Jenkins web UI](http://localhost:8070)
-2. Add credentials: (these are needed by `tyk-sync` to push data into the e2 Dashboard)
+2. Add credentials: (these are needed by `tyk-sync` to push data into the Dashboard in environment 2)
   - Kind: Secret text
-  - Scope: Global (this is just a PoC...)
-  - Secret: The e2 Dashboard API credentials, shown in `Creating Dashboard user for environment 2` section of the bootstrap output
+  - Scope: Global
+  - Secret: The environment 2 Dashboard API credentials (these are displayed in the output of the `tyk-2/bootstrap.sh` script
   - ID: `tyk-dash-secret`
   - Description: `Tyk Dashboard Secret`
 
