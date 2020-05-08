@@ -12,7 +12,7 @@ The concept is that there is a **standard deployment** of Tyk, which gives you t
 * 2nd Tyk Environment
 * Instrumentation
 
-Each deployment has its own directory, with the necessary files to deploy the feature and a readme to describe the feature.
+Each feature deployment has its own directory, with the necessary files to deploy the feature and a readme to describe the feature.
 
 # Repository Structure
 
@@ -22,7 +22,7 @@ Each deployment has its own directory, with the necessary files to deploy the fe
 * `scripts/*.sh`: Some useful commands encapsulated in scripts
 * `tyk`: Files related to the Tyk standard deployment
 
-The remaining directories contain **feature deployments** which extend the standard Tyk deployment functionality. These directories contain `docker-compose.yml`, `bootstrap.sh` and `README.md` files specific to the feature being deployed. They may also contain directories called `data` or `volumes`, which hold the data necessary during bootstrapping or providing as mapped volumes into the container.
+The remaining directories contain **feature deployments** which extend the standard Tyk deployment functionality. These directories contain `docker-compose.yml`, `bootstrap.sh` and `README.md` files specific to the feature. They may also contain directories called `data` or `volumes`, which hold the data necessary during bootstrapping or providing as mapped volumes into the container.
 
 # Getting Started
 
