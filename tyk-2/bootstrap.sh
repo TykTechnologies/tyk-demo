@@ -14,16 +14,16 @@ dashboard_admin_api_credentials=$(cat tyk/volumes/tyk-dashboard/tyk_analytics.co
 status=""
 status_desired="200"
 
-echo "Wait for Tyk 2 Dashboard to respond ok" >>bootstrap.log
+echo "Wait for Tyk 2 Dashboard to respond ok" >> bootstrap.log
 while [ "$status" != "$status_desired" ]
 do
   status=$(curl -I -s -m2 $dashboard2_base_url/admin/organisations -H "admin-auth: $dashboard_admin_api_credentials" 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)  
   if [ "$status" != "$status_desired" ]
   then
-    echo "Tyk 2 Dashboard status:$status" >>bootstrap.log
+    echo "Tyk 2 Dashboard status:$status" >> bootstrap.log
     sleep 1
   else
-    echo "  Ok"
+    echo "  Ok" >> bootstrap.sh
   fi
   bootstrap_progress
 done

@@ -45,7 +45,7 @@ bootstrap_progress
 
 echo "Write Dashboard credentials file" >> bootstrap.log
 dashboard2_user_api_credentials=`cat .context-data/dashboard2-user-api-credentials`
-sed "s/CREDENTIALS_DASHBOARD2/$dashboard2_user_api_credentials/g" cicd/data/jenkins/credentials-global-template.xml > \
+sed "s/TYK2_DASHBOARD_CREDENTIALS/$dashboard2_user_api_credentials/g" cicd/data/jenkins/credentials-global-template.xml > \
   cicd/volumes/jenkins/bootstrap-import/credentials-global.xml
 
 echo "Import credentials for 'global'" >> bootstrap.log
