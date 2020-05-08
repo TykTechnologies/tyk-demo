@@ -14,6 +14,8 @@ The concept is that there is a **standard deployment** of Tyk, which gives you t
 
 Each feature deployment has its own directory, with the necessary files to deploy the feature and a readme to describe the feature.
 
+There is a focus on simplicity. Docker Compose is used to provision the containers, and bootstrap scripts are used to initialise the environment so that it is ready to use straight away - applying configuration and populating databases.
+
 # Repository Structure
 
 * `bootstrap.sh`: Bootstrap script for the Tyk standard deployment
@@ -121,6 +123,10 @@ analytics/bootstrap.sh
 ```
 ./bootstrap.sh && ./analytics/bootstrap.sh
 ```
+
+### Bootstrap logging
+
+During the bootstrap process, command output is logged to the `bootstrap.log` file.
 
 ## Step 6: Log into the Dashboard
 
