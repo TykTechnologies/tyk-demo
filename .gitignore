@@ -1,4 +1,4 @@
 .env
 .context-data
 bootstrap.log
-cicd/volumes/jenkins/tyk/dashboard2-user-api-credentials
+cicd/volumes/jenkins/bootstrap-import/credentials-global.xml

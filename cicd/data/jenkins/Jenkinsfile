@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        // relies on the `tyk-2` feature bootstrap.sh to write this file
-        TYK_DASH_SECRET = new File('/var/jenkins_home/tyk/dashboard2-user-api-credentials').text
+        tyk2_dashboard_credentials = credentials('tyk2-dashboard-credentials')
     }
 
     stages {
@@ -12,9 +11,10 @@ pipeline {
                 expression { env.BRANCH_NAME == 'master' }
             }
             steps {
+                
                 echo "Deploying from ${env.BRANCH_NAME}"
                 sh "chmod +x ./cicd/data/jenkins/tyk-sync"
-                sh "./cicd/data/tyk-sync sync -d http://e2-tyk-dashboard:3000 -s ${env.TYK_DASH_SECRET} -p ./cicd/data/tyk-sync"
+                sh "./cicd/data/jenkins/tyk-sync sync -d http://tyk2-dashboard:3000 -s ${env.tyk2_dashboard_credentials} -p ./cicd/data/tyk-sync"
             }
         }
     }
