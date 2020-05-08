@@ -14,7 +14,7 @@ pipeline {
                 
                 echo "Deploying from ${env.BRANCH_NAME}"
                 sh "chmod +x ./cicd/data/jenkins/tyk-sync"
-                sh "./cicd/data/tyk-sync sync -d http://tyk2-dashboard:3000 -s ${env.tyk2_dashboard_credentials} -p ./cicd/data/tyk-sync"
+                sh "./cicd/data/jenkins/tyk-sync sync -d http://tyk2-dashboard:3000 -s ${env.tyk2_dashboard_credentials} -p ./cicd/data/tyk-sync"
             }
         }
     }
