@@ -7,8 +7,9 @@ pipeline {
     stages {
         stage('test') {
             steps {
-                echo "Building from ${env.BRANCH_NAME}"
-                echo "dash pass is $(echo /var/jenkins_home/tyk/dashboard2-user-api-credentials)"
+                def x = "hello"
+                echo "Testing from ${env.BRANCH_NAME}"
+                echo "dash pass is ${x}"
             }
         }
         stage('deploy') {
@@ -18,7 +19,7 @@ pipeline {
             steps {
                 echo "Deploying from ${env.BRANCH_NAME}"
                 sh "chmod +x ./cicd/data/jenkins/tyk-sync"
-                sh "./cicd/data/tyk-sync sync -d http://e2-tyk-dashboard:3000 -s $(echo /var/jenkins_home/tyk/dashboard2-user-api-credentials) -p ./cicd/data/tyk-sync"
+                sh "./cicd/data/tyk-sync sync -d http://e2-tyk-dashboard:3000 -s abc -p ./cicd/data/tyk-sync"
             }
         }
     }
