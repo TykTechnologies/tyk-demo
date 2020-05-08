@@ -23,7 +23,7 @@ do
     echo "Tyk 2 Dashboard status:$status" >> bootstrap.log
     sleep 1
   else
-    echo "  Ok" >> bootstrap.sh
+    echo "  Ok" >> bootstrap.log
   fi
   bootstrap_progress
 done
