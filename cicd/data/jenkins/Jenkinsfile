@@ -5,7 +5,8 @@ pipeline {
         stage('test') {
             steps {
                 script {
-                    String x = new File('/var/jenkins_home/tyk/dashboard2-user-api-credentials').text
+                    def xx = readFile(file: '')
+                    String x = new File('../../tyk/dashboard2-user-api-credentials').text
                     echo "dash:${x}"
                 }
                 echo "Testing from ${env.BRANCH_NAME}"
