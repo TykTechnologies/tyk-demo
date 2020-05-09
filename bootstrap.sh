@@ -21,25 +21,25 @@ instrumentation_setting_enabled="INSTRUMENTATION_ENABLED=1"
 instrumentation_setting_disabled="INSTRUMENTATION_ENABLED=0"
 if [[ "${#instrumentation_service}" -eq "0" ]] && [[ $instrumentation_setting == $instrumentation_setting_enabled ]]
 then
-  echo "Setting instrumentation flag to 0" >> bootstrap.log
+  echo "  Setting instrumentation flag to 0" >> bootstrap.log
   sed -i.bak 's/'"$instrumentation_setting_enabled"'/'"$instrumentation_setting_disabled"'/g' ./.env
   rm .env.bak
-  docker-compose up --force-recreate -d 2>/dev/null
+  docker-compose up --force-recreate -d 2> /dev/null
 fi
 bootstrap_progress
 
 echo "Check for tracing misconfiguration" >> bootstrap.log
 # Prevent tracking being enabled without the Zipkin service being available
-tracing_service=$(docker-compose -f docker-compose.yml -f tracing/docker-compose.yml ps --services | grep "zipkin")
+tracing_service=$(docker-compose -f docker-compose.yml -f tracing/docker-compose.yml ps | grep "zipkin")
 tracing_setting=$(grep "TRACING_ENABLED" .env)
 tracing_setting_enabled="TRACING_ENABLED=true"
 tracing_setting_disabled="TRACING_ENABLED=false"
-if [ $tracing_service != "zipkin" ] && [[ $tracing_setting == $tracing_setting_enabled ]]
+if [[ "${#tracing_service}" -eq "0" ]] && [[ $tracing_setting == $tracing_setting_enabled ]]
 then
-  echo "Setting tracing flag to false" >> bootstrap.log
+  echo "  Setting tracing flag to false" >> bootstrap.log
   sed -i.bak 's/'"$tracing_setting_enabled"'/'"$tracing_setting_disabled"'/g' ./.env
   rm .env.bak
-  docker-compose restart 2>/dev/null
+  docker-compose up --force-recreate -d 2> /dev/null
 fi
 bootstrap_progress
 
@@ -109,6 +109,7 @@ curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset -s -o /dev/n
       "new_password":"'$dashboard_user_password'",
       "user_permissions": { "IsAdmin": "admin" }
     }' 2>> bootstrap.log
+echo "$dashboard_user_api_credentials" > .context-data/dashboard-user-api-credentials
 echo "  Dashboard User API Credentials = $dashboard_user_api_credentials" >> bootstrap.log
 bootstrap_progress
 
@@ -190,6 +191,7 @@ bootstrap_progress
 
 echo "Waiting for Gateway API to be ready" >> bootstrap.log
 gateway_api_credentials=$(cat tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
+echo "  Gateway API credentials = $gateway_api_credentials" >> bootstrap.log
 gateway_status=""
 while [ "$gateway_status" != "200" ]
 do
@@ -229,6 +231,10 @@ status=$(curl $gateway_base_url/tyk/keys/quota_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @tyk/data/tyk-gateway/quota-key.json 2>> bootstrap.log | jq -r '.status')
 echo "  Quota key:$status" >> bootstrap.log
+status=$(curl $gateway_base_url/tyk/keys/auth_basic_key -s \
+  -H "x-tyk-authorization: $gateway_api_credentials" \
+  -d @tyk/data/tyk-gateway/auth-basic-key.json 2>> bootstrap.log | jq -r '.status')
+echo "  Basic auth key:$status" >> bootstrap.log
 bootstrap_progress
 
 echo "Checking Gateway functionality" >> bootstrap.log
@@ -265,17 +271,16 @@ echo -e "\033[2K
                              ################                         
                                ##########/                            
 
-         Dashboard
+▶ Standard Tyk
+  ▷ Dashboard
                URL : $dashboard_base_url
           Username : $dashboard_user_email
           Password : $dashboard_user_password
    API Credentials : $dashboard_user_api_credentials
-
-            Portal
+  ▷ Portal
                URL : $dashboard_base_url$portal_root_path
           Username : $portal_user_email
           Password : $portal_user_password
-
-           Gateway
+  ▷ Gateway
                URL : $gateway_base_url
-"
+   API Credentials : $gateway_api_credentials"
