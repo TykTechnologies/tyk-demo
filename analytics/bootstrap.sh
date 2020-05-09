@@ -49,6 +49,9 @@ curl -s localhost:8080/basic-open-api/get -o /dev/null 2>>bootstrap.log
 
 echo "End analytics bootstrap" >>bootstrap.log
 
-echo -e "\033[2K            Kibana
+echo -e "\033[2K
+▶ Analytics
+
+  ▷ Kibana
                URL : $kibana_base_url
 "

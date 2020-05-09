@@ -33,6 +33,9 @@ fi
 
 echo "End instrumentation bootstrap" >>bootstrap.log
 
-echo -e "\033[2K          Graphite
+echo -e "\033[2K          
+▶ Instrumentation
+  
+  ▷ Graphite
                URL : http://localhost:8060
 "

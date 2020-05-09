@@ -24,11 +24,14 @@ curl $identity_broker_base_url/api/profiles/tyk-dashboard -s -o /dev/null \
 
 echo "End sso bootstrap" >>bootstrap.log
 
-echo "   Dashboard (SSO)
+echo "   
+▶ SSO
+  
+  ▷ Dashboard
                URL : $dashboard_sso_base_url
           Username : dashboard.admin@example.org
           Password : Abcd1234
-  
-   Identity Broker
+    
+  ▷ Identity Broker
        Profile URL : $identity_broker_base_url/auth/tyk-dashboard/openid-connect
 "

@@ -272,15 +272,19 @@ echo -e "\033[2K
                                ##########/                            
 
 ▶ Standard Tyk
+  
   ▷ Dashboard
                URL : $dashboard_base_url
           Username : $dashboard_user_email
           Password : $dashboard_user_password
    API Credentials : $dashboard_user_api_credentials
+  
   ▷ Portal
                URL : $dashboard_base_url$portal_root_path
           Username : $portal_user_email
           Password : $portal_user_password
+  
   ▷ Gateway
                URL : $gateway_base_url
-   API Credentials : $gateway_api_credentials"
+   API Credentials : $gateway_api_credentials
+"
