@@ -82,8 +82,9 @@ done
 
 echo "End cicd bootstrap" >> bootstrap.log
 
-echo -e "\033[2K           Jenkins
+echo -e "\033[2K 
+▶ CI/CD
+  ▷ Jenkins
                URL : $jenkins_base_url
           Username : admin
-          Password : $jenkins_admin_password
-"
+          Password : $jenkins_admin_password"
