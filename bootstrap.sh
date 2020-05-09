@@ -113,6 +113,32 @@ echo "$dashboard_user_api_credentials" > .context-data/dashboard-user-api-creden
 echo "  Dashboard User API Credentials = $dashboard_user_api_credentials" >> bootstrap.log
 bootstrap_progress
 
+echo "Updating APIs" >> bootstrap.log
+# this seems to be need to be done after an import, otherwise APIs may not be visible in certain ways
+cat tyk/data/tyk-dashboard/apis.json | jq --raw-output '.apis[].api_definition.id' | while read api_id
+do
+  api_definition=$(curl $dashboard_base_url/api/apis/$api_id -s \
+    -H "Authorization: $dashboard_user_api_credentials")
+  result=$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
+    -H "Authorization: $dashboard_user_api_credentials" \
+    --data "$api_definition" | jq -r '.Status')
+  echo "  $(echo $api_definition | jq -r '.api_definition.name'):$result" >> bootstrap.log
+done
+bootstrap_progress
+
+echo "Updating Policies" >> bootstrap.log
+# this seems to be need to be done after an import, otherwise Policies may not be visible in certain ways
+cat tyk/data/tyk-dashboard/policies.json | jq --raw-output '.Data[]._id' | while read policy_id
+do
+  policy_definition=$(curl $dashboard_base_url/api/portal/policies/$policy_id -s \
+    -H "Authorization: $dashboard_user_api_credentials")
+  result=$(curl $dashboard_base_url/api/portal/policies/$policy_id -X PUT -s \
+    -H "Authorization: $dashboard_user_api_credentials" \
+    --data "$policy_definition" | jq -r '.Status')
+  echo "  $(echo $policy_definition | jq -r '.name'):$result" >> bootstrap.log
+done
+bootstrap_progress
+
 echo "Creating Dashboard user groups" >> bootstrap.log
 result=$(curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials" \
@@ -231,9 +257,9 @@ status=$(curl $gateway_base_url/tyk/keys/quota_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @tyk/data/tyk-gateway/quota-key.json 2>> bootstrap.log | jq -r '.status')
 echo "  Quota key:$status" >> bootstrap.log
-status=$(curl $gateway_base_url/tyk/keys/auth_basic_key -s \
-  -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @tyk/data/tyk-gateway/auth-basic-key.json 2>> bootstrap.log | jq -r '.status')
+status=$(curl $dashboard_base_url/api/apis/keys/basic/basic-auth-username -s -w "%{http_code}" -o /dev/null \
+  -H "Authorization: $dashboard_user_api_credentials" \
+  -d @tyk/data/tyk-dashboard/key-basic-auth.json 2>> bootstrap.log)
 echo "  Basic auth key:$status" >> bootstrap.log
 bootstrap_progress
 
