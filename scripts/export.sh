@@ -8,9 +8,17 @@ curl $dashboard_base_url/api/apis?p=-1 -s \
   -H "Authorization:$dashboard_user_api_credentials" \
   | jq '.' \
   > tyk/data/tyk-dashboard/apis.json
+cat tyk/data/tyk-dashboard/apis.json | jq --raw-output '.apis[].api_definition.name' | while read api_name
+do
+  echo "  $api_name"
+done
 
 echo "Exporting Policies"
 curl $dashboard_base_url/api/portal/policies?p=-1 -s \
   -H "Authorization:$dashboard_user_api_credentials" \
   | jq '.' \
   > tyk/data/tyk-dashboard/policies.json
+cat tyk/data/tyk-dashboard/policies.json | jq --raw-output '.Data[].name' | while read policy_name
+do
+  echo "  $policy_name"
+done
