@@ -1344,272 +1344,356 @@
 					"name": "Authentication",
 					"item": [
 						{
-							"name": "Token authorization - failure (part 1)",
+							"name": "Authentication Token",
+							"item": [
+								{
+									"name": "Token authorization - failure (part 1)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "d1873999-d360-4fe1-9f89-dfff6327f9d9",
+												"exec": [
+													"pm.test(\"Status code is 401\", function () {",
+													"    pm.response.to.have.status(401);",
+													"});",
+													"",
+													"pm.test(\"Error message is 'Authorization field missing'\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.error).to.eql(\"Authorization field missing\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:8080/basic-protected-api/get",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"basic-protected-api",
+												"get"
+											]
+										},
+										"description": "This API will showcase the Token authorization feature of Tyk.\n\nAn key is not provided in the HTTP header field `Authorization`, resulting in am HTTP status code `401 Unauthorized` returned by the Gateway."
+									},
+									"response": []
+								},
+								{
+									"name": "Token authorization - failure (part 2)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "26bd1dcc-e158-4c37-b3a8-dd8af2c3990d",
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});",
+													"",
+													"pm.test(\"Error message is 'Access to this API has been disallowed'\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.error).to.eql(\"Access to this API has been disallowed\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"type": "text",
+												"value": "missing_key"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:8080/basic-protected-api/get",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"basic-protected-api",
+												"get"
+											]
+										},
+										"description": "This request attempts to authenticate with a key which does not exist - `missing_key`.\n\nThis results in am HTTP status code `403 Forbidden` response from the Gateway."
+									},
+									"response": []
+								},
+								{
+									"name": "Token authorization - success",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "52005b10-9ba0-4fa0-bfc2-868e1f7dbc1d",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"'auth_key' used in 'Authorization' header\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.headers['Authorization']).to.eql(\"auth_key\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "auth_key",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:8080/basic-protected-api/get",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"basic-protected-api",
+												"get"
+											]
+										},
+										"description": "This API showcases the Token authorization feature of Tyk.\n\nThe key is sent in the HTTP header field `Authorization`. It has been authorized access to the `Basic Protected API`, so the request is accepted by the Gateway."
+									},
+									"response": []
+								}
+							],
 							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "8fc46ba1-a647-47d2-b4f4-c32de2daa44b",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
 								{
 									"listen": "test",
 									"script": {
-										"id": "d1873999-d360-4fe1-9f89-dfff6327f9d9",
+										"id": "6db73cf2-9f98-4815-9033-45e904b48e67",
+										"type": "text/javascript",
 										"exec": [
-											"pm.test(\"Status code is 401\", function () {",
-											"    pm.response.to.have.status(401);",
-											"});",
-											"",
-											"pm.test(\"Error message is 'Authorization field missing'\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.error).to.eql(\"Authorization field missing\");",
-											"});"
-										],
-										"type": "text/javascript"
+											""
+										]
 									}
 								}
 							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "http://localhost:8080/basic-protected-api/get",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"basic-protected-api",
-										"get"
-									]
-								},
-								"description": "This API will showcase the Token authorization feature of Tyk.\n\nAn key is not provided in the HTTP header field `Authorization`, resulting in am HTTP status code `401 Unauthorized` returned by the Gateway."
-							},
-							"response": []
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
-							"name": "Token authorization - failure (part 2)",
-							"event": [
+							"name": "JSON Web Token",
+							"item": [
 								{
-									"listen": "test",
-									"script": {
-										"id": "26bd1dcc-e158-4c37-b3a8-dd8af2c3990d",
-										"exec": [
-											"pm.test(\"Status code is 403\", function () {",
-											"    pm.response.to.have.status(403);",
-											"});",
-											"",
-											"pm.test(\"Error message is 'Access to this API has been disallowed'\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.error).to.eql(\"Access to this API has been disallowed\");",
-											"});"
+									"name": "JWT - shared HMAC secret",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "f1a7b288-9211-4eff-bad5-cb5274f265c9",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9sIjoiNWVhZDcyOTU1NzU5NjEwMDAxODE4Njg4In0.8xOVZJM8Qi4XySrJRMZtaNkaq-Bw3am0gLHFKAHY5OQ",
+												"type": "text"
+											}
 										],
-										"type": "text/javascript"
-									}
+										"url": {
+											"raw": "http://localhost:8080/jwt-api/get",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"jwt-api",
+												"get"
+											]
+										},
+										"description": "This request uses JWT authentication using a shared HMAC secret. In this case, the secret is defined on the API definition, but it is also possible to define it separately, which allows multiple secrets to be used.\n\nThe JWT claims are processed as follows:\n\n* `sub`: This is the subject, and is used by Tyk as the identity of the API Client. Tyk creates a session based on the value provided here, which allows it to maintain state for the subject across multiple requests.\n* `pol`: This is the Id of the Policy to use, if the request is authenticated. If no Id is provided then the API Definition specifies a default Policy to use.\n\nFor reference, the payload of the JWT:\n\n```json\n{\n  \"sub\": \"1234567890\",\n  \"pol\": \"5ead72955759610001818688\"\n}\n```"
+									},
+									"response": []
+								},
+								{
+									"name": "JWT - shared HMAC secret with claim (part 1)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "53799a29-8da3-4822-ad2f-e5abab82446a",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"type": "text",
+												"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:8080/jwt-api/anything/allowed-path",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"jwt-api",
+												"anything",
+												"allowed-path"
+											]
+										},
+										"description": "This request uses a claim in the JWT to define the Policy to use. In this case, the API Definition is configured to inspect the `policy_claim` claim and match the value (`restricted`) against the list defined in the API Definition. \n\nIn this case, the claim matches against the `JWT Policy Restricted` Policy, which uses path-based permissions to only allow requests for `GET /anything/allowed-path`. Requests for other endpoints will be rejected - see part 2.\n\nFor reference, the payload of the JWT:\n\n```json\n{\n  \"sub\": \"1234567890\",\n  \"policy_claim\": \"restricted\"\n}\n```"
+									},
+									"response": []
+								},
+								{
+									"name": "JWT - shared HMAC secret with claim (part 2)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "1f848342-f06b-446d-b597-5fd99fa2efcd",
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});",
+													"",
+													"pm.test(\"Error message is `Access to this resource has been disallowed`\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.error).to.eql(\"Access to this resource has been disallowed\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"type": "text",
+												"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:8080/jwt-api/anything/restricted-path",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"jwt-api",
+												"anything",
+												"restricted-path"
+											]
+										},
+										"description": "This request fails because it attempts to access an endpoint which is not listed in the path-based permissions defined in the Policy. The Gateway responds with a `403 Forbidden`."
+									},
+									"response": []
 								}
 							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "missing_key"
-									}
-								],
-								"url": {
-									"raw": "http://localhost:8080/basic-protected-api/get",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"basic-protected-api",
-										"get"
-									]
-								},
-								"description": "This request attempts to authenticate with a key which does not exist - `missing_key`.\n\nThis results in am HTTP status code `403 Forbidden` response from the Gateway."
-							},
-							"response": []
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
-							"name": "Token authorization - success",
-							"event": [
+							"name": "Basic Authentication",
+							"item": [
 								{
-									"listen": "test",
-									"script": {
-										"id": "52005b10-9ba0-4fa0-bfc2-868e1f7dbc1d",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"'auth_key' used in 'Authorization' header\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.headers['Authorization']).to.eql(\"auth_key\");",
-											"});"
+									"name": "Basic Authentication",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "cf01d3a9-271e-4639-b72e-6ede9dc9ff10",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YmFzaWMtYXV0aC11c2VybmFtZTpiYXNpYy1hdXRoLXBhc3N3b3Jk",
+												"type": "text"
+											}
 										],
-										"type": "text/javascript"
-									}
+										"url": {
+											"raw": "http://localhost:8080/basic-authentication-api/get",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"basic-authentication-api",
+												"get"
+											]
+										},
+										"description": "This request uses basic authentication to access the Basic Authentication API. Basic authenticate is based on a username and password.\n\nThe request has an `Authorization` header which has a value comprised of a prefix `Basic` and a base64 encoded representation of the credentials. The value used is the username and password separated with a colon. In this case the username is `basic-auth-username` and the password is `basic-auth-password`, so this gives `basic-auth-username:basic-auth-password`, which is `YmFzaWMtYXV0aC11c2VybmFtZTpiYXNpYy1hdXRoLXBhc3N3b3Jk` when base64 encoded."
+									},
+									"response": []
 								}
 							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "auth_key",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "http://localhost:8080/basic-protected-api/get",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"basic-protected-api",
-										"get"
-									]
-								},
-								"description": "This API showcases the Token authorization feature of Tyk.\n\nThe key is sent in the HTTP header field `Authorization`. It has been authorized access to the `Basic Protected API`, so the request is accepted by the Gateway."
-							},
-							"response": []
-						},
-						{
-							"name": "JWT - shared HMAC secret",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "f1a7b288-9211-4eff-bad5-cb5274f265c9",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9sIjoiNWVhZDcyOTU1NzU5NjEwMDAxODE4Njg4In0.8xOVZJM8Qi4XySrJRMZtaNkaq-Bw3am0gLHFKAHY5OQ",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "http://localhost:8080/jwt-api/get",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"jwt-api",
-										"get"
-									]
-								},
-								"description": "This request uses JWT authentication using a shared HMAC secret. In this case, the secret is defined on the API definition, but it is also possible to define it separately, which allows multiple secrets to be used.\n\nThe JWT claims are processed as follows:\n\n* `sub`: This is the subject, and is used by Tyk as the identity of the API Client. Tyk creates a session based on the value provided here, which allows it to maintain state for the subject across multiple requests.\n* `pol`: This is the Id of the Policy to use, if the request is authenticated. If no Id is provided then the API Definition specifies a default Policy to use.\n\nFor reference, the payload of the JWT:\n\n```json\n{\n  \"sub\": \"1234567890\",\n  \"pol\": \"5ead72955759610001818688\"\n}\n```"
-							},
-							"response": []
-						},
-						{
-							"name": "JWT - shared HMAC secret with claim (part 1)",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "53799a29-8da3-4822-ad2f-e5abab82446a",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
-									}
-								],
-								"url": {
-									"raw": "http://localhost:8080/jwt-api/anything/allowed-path",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"jwt-api",
-										"anything",
-										"allowed-path"
-									]
-								},
-								"description": "This request uses a claim in the JWT to define the Policy to use. In this case, the API Definition is configured to inspect the `policy_claim` claim and match the value (`restricted`) against the list defined in the API Definition. \n\nIn this case, the claim matches against the `JWT Policy Restricted` Policy, which uses path-based permissions to only allow requests for `GET /anything/allowed-path`. Requests for other endpoints will be rejected - see part 2.\n\nFor reference, the payload of the JWT:\n\n```json\n{\n  \"sub\": \"1234567890\",\n  \"policy_claim\": \"restricted\"\n}\n```"
-							},
-							"response": []
-						},
-						{
-							"name": "JWT - shared HMAC secret with claim (part 2)",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "1f848342-f06b-446d-b597-5fd99fa2efcd",
-										"exec": [
-											"pm.test(\"Status code is 403\", function () {",
-											"    pm.response.to.have.status(403);",
-											"});",
-											"",
-											"pm.test(\"Error message is `Access to this resource has been disallowed`\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.error).to.eql(\"Access to this resource has been disallowed\");",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
-									}
-								],
-								"url": {
-									"raw": "http://localhost:8080/jwt-api/anything/restricted-path",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"jwt-api",
-										"anything",
-										"restricted-path"
-									]
-								},
-								"description": "This request fails because it attempts to access an endpoint which is not listed in the path-based permissions defined in the Policy. The Gateway responds with a `403 Forbidden`."
-							},
-							"response": []
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						}
 					],
 					"protocolProfileBehavior": {},
@@ -2030,7 +2114,7 @@
 										"get"
 									]
 								},
-								"description": "This request uses the HTTPS scheme to connect to the API Gateway. The Gateway is configured to listen for requests on `localhost` and use a locally stored self-signed certificate.\n\nThis is configured in the `http_server_options` section of the Gateway's configuration file.\n\n**Note:** self-signed cetificates will fail verification by an API client, which will prevent the request for working. To resolve this, configure your client to allow self-signed certificates."
+								"description": "**Prerequisite**: `tls` feature deployment.\n\nThis request uses the HTTPS scheme to connect to the API Gateway. The Gateway is configured to listen for requests on `localhost` and use a locally stored self-signed certificate.\n\nThis is configured in the `http_server_options` section of the Gateway's configuration file.\n**Note:** self-signed cetificates will fail verification by an API client, which will prevent the request for working. To resolve this, configure your client to allow self-signed certificates."
 							},
 							"response": []
 						}
