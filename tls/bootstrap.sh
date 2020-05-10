@@ -25,8 +25,8 @@ done
 echo "End tls bootstrap" >>bootstrap.log
 
 echo -e "\033[2K     
-▶ TLS
+▼ TLS
   
-  ▷ Gateway
+  ▽ Gateway
                URL : $gateway_tls_base_url
 "

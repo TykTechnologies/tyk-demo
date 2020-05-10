@@ -50,8 +50,8 @@ fi
 echo "End tracing bootstrap" >>bootstrap.log
 
 echo -e "\033[2K
-▶ Tracing
+▼ Tracing
 
-  ▷ Zipkin
+  ▽ Zipkin
                URL : $zipkin_base_url
 "

@@ -62,13 +62,13 @@ bootstrap_progress
 echo "End Tyk Environment 2 bootstrap" >> bootstrap.log
 
 echo -e "\033[2K 
-▶ Tyk Environment 2
+▼ Tyk Environment 2
 
-  ▷ Dashboard 
+  ▽ Dashboard 
                URL : $dashboard2_base_url
           Username : $dashboard_user_email
           Password : $dashboard_user_password
    API Credentials : $dashboard2_user_api_credentials
 
-  ▷ Gateway 
+  ▽ Gateway 
                URL : $gateway2_base_url"
