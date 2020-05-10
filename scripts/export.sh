@@ -27,6 +27,6 @@ do
   policy_definition=$(curl $dashboard_base_url/api/portal/policies/$policy_id -s \
     -H "Authorization:$dashboard_user_api_credentials")
   echo "  $(echo "$policy_definition" | jq -r .name)"
-  policy_data=$(echo $policy_data | jq --argjson policy_definition "$policy_definition" '.apis += [$policy_definition]')
+  policy_data=$(echo $policy_data | jq --argjson policy_definition "$policy_definition" '.Data += [$policy_definition]')
 done
 echo $policy_data | jq '.' > tyk/data/tyk-dashboard/policies.json
