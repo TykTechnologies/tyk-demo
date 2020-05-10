@@ -1,0 +1,38 @@
+{
+  "last_check": 0,
+  "certificate": null,
+  "allowance": 1000,
+  "hmac_enabled": null,
+  "hmac_string": "",
+  "basic_auth_data": {
+    "password": "basic-auth-password"
+  },
+  "rate": 1000,
+  "per": 60,
+  "throttle_interval": -1,
+  "throttle_retry_limit": -1,
+  "expires": 0,
+  "quota_max": -1,
+  "quota_renews": 1589006432,
+  "quota_remaining": -1,
+  "quota_renewal_rate": -1,
+  "access_rights": {
+    "5963f8fdedee405143f5858ea17de422": {
+      "api_id": "5963f8fdedee405143f5858ea17de422",
+      "api_name": "Basic Authentication API",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "limit": null
+    }
+  },
+  "apply_policy_id": "",
+  "apply_policies": [],
+  "tags": [],
+  "jwt_data": {
+    "secret": ""
+  },
+  "meta_data": {},
+  "alias": ""
+}
