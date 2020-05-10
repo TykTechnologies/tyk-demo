@@ -77,21 +77,6 @@ organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
   | jq -r '.Meta')
 echo $organisation_id > .context-data/organisation-id
 echo "  Org Id = $organisation_id" >> bootstrap.log
-
-bootstrap_progress
-
-echo "Importing APIs" >> bootstrap.log
-result=$(curl $dashboard_base_url/admin/apis/import -s \
-  -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "$(cat tyk/data/tyk-dashboard/apis.json)" | jq -r '.Status')
-echo "  $result" >> bootstrap.log
-bootstrap_progress
-
-echo "Importing Policies" >> bootstrap.log
-result=$(curl $dashboard_base_url/admin/policies/import -s \
-  -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "$(cat tyk/data/tyk-dashboard/policies.json)" | jq -r '.Status')
-echo "  $result" >> bootstrap.log
 bootstrap_progress
 
 echo "Creating Dashboard user" >> bootstrap.log
@@ -111,32 +96,6 @@ curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset -s -o /dev/n
     }' 2>> bootstrap.log
 echo "$dashboard_user_api_credentials" > .context-data/dashboard-user-api-credentials
 echo "  Dashboard User API Credentials = $dashboard_user_api_credentials" >> bootstrap.log
-bootstrap_progress
-
-echo "Updating APIs" >> bootstrap.log
-# this seems to be need to be done after an import, otherwise APIs may not be visible in certain ways
-cat tyk/data/tyk-dashboard/apis.json | jq --raw-output '.apis[].api_definition.id' | while read api_id
-do
-  api_definition=$(curl $dashboard_base_url/api/apis/$api_id -s \
-    -H "Authorization: $dashboard_user_api_credentials")
-  result=$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
-    -H "Authorization: $dashboard_user_api_credentials" \
-    --data "$api_definition" | jq -r '.Status')
-  echo "  $(echo $api_definition | jq -r '.api_definition.name'):$result" >> bootstrap.log
-done
-bootstrap_progress
-
-echo "Updating Policies" >> bootstrap.log
-# this seems to be need to be done after an import, otherwise Policies may not be visible in certain ways
-cat tyk/data/tyk-dashboard/policies.json | jq --raw-output '.Data[]._id' | while read policy_id
-do
-  policy_definition=$(curl $dashboard_base_url/api/portal/policies/$policy_id -s \
-    -H "Authorization: $dashboard_user_api_credentials")
-  result=$(curl $dashboard_base_url/api/portal/policies/$policy_id -X PUT -s \
-    -H "Authorization: $dashboard_user_api_credentials" \
-    --data "$policy_definition" | jq -r '.Status')
-  echo "  $(echo $policy_definition | jq -r '.name'):$result" >> bootstrap.log
-done
 bootstrap_progress
 
 echo "Creating Dashboard user groups" >> bootstrap.log
@@ -160,37 +119,45 @@ echo $user_group_data | jq -r .groups[2].id > .context-data/user_group_admin_id
 bootstrap_progress
 
 echo "Creating webhooks" >> bootstrap.log
-curl $dashboard_base_url/api/hooks -s -o /dev/null \
+result=$(curl $dashboard_base_url/api/hooks -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @tyk/data/tyk-dashboard/webhook-webhook-receiver-api-post.json 2>> bootstrap.log
+  -d @tyk/data/tyk-dashboard/webhook-webhook-receiver-api-post.json 2>> bootstrap.log | \
+  jq -r '.Status')
+echo "  $result" >> bootstrap.log
 bootstrap_progress
 
 echo "Creating Portal default settings" >> bootstrap.log
-curl $dashboard_base_url/api/portal/configuration -s -o /dev/null \
+result=$(curl $dashboard_base_url/api/portal/configuration -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d "{}" 2>> bootstrap.log
+  -d "{}" 2>> bootstrap.log | \
+  jq -r '.Status')
+echo "  $result" >> bootstrap.log
 catalogue_id=$(curl $dashboard_base_url/api/portal/catalogue -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d '{"org_id": "'$organisation_id'"}' 2>> bootstrap.log \
-  | jq -r '.Message')
+  -d '{"org_id": "'$organisation_id'"}' 2>> bootstrap.log | \
+  jq -r '.Message')
 bootstrap_progress
 
 echo "Creating Portal home page" >> bootstrap.log
-curl $dashboard_base_url/api/portal/pages -s -o /dev/null \
+result=$(curl $dashboard_base_url/api/portal/pages -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @tyk/data/tyk-dashboard/portal-home-page.json 2>> bootstrap.log
+  -d @tyk/data/tyk-dashboard/portal-home-page.json 2>> bootstrap.log | \
+  jq -r '.Status')
+echo "  $result" >> bootstrap.log
 bootstrap_progress
 
 echo "Creating Portal user" >> bootstrap.log
 portal_user_email=$(jq -r '.email' tyk/data/tyk-dashboard/portal-user.json)
 portal_user_password=$(jq -r '.password' tyk/data/tyk-dashboard/portal-user.json)
-curl $dashboard_base_url/api/portal/developers -s -o /dev/null \
+result=$(curl $dashboard_base_url/api/portal/developers -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d '{
       "email": "'$portal_user_email'",
       "password": "'$portal_user_password'",
       "org_id": "'$organisation_id'"
-    }' 2>> bootstrap.log
+    }' 2>> bootstrap.log | \
+  jq -r '.Status')
+echo "  $result" >> bootstrap.log
 bootstrap_progress
 
 echo "Creating catalogue" >> bootstrap.log
@@ -215,6 +182,69 @@ curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s -o /dev/null \
   -d "$(echo $catalogue_data)" 2>> bootstrap.log
 bootstrap_progress
 
+# Broken references occur because the ID of the data changes when it is created
+# This means the references to this data must be 'reconnected' to the new IDs
+# This is done after all the other data is imported, so we know the new IDs
+echo "Updating IDs" >> bootstrap.log
+api_data=$(cat tyk/data/tyk-dashboard/apis.json)
+echo "  Webhooks" >> bootstrap.log
+webhook_data=$(curl $dashboard_base_url/api/hooks?p=-1 -s \
+  -H "Authorization: $dashboard_user_api_credentials" | \
+  jq '.hooks[]')
+for webhook_id in $(echo $webhook_data | jq --raw-output '.id')
+do
+  # match old data using the webhook name, which is consistent
+  webhook_name=$(echo "$webhook_data" | jq -r --arg webhook_id "$webhook_id" 'select ( .id == $webhook_id ) .name')
+  echo "    $webhook_name" >> bootstrap.log
+  # Hook references
+  api_data=$(echo $api_data | jq --arg webhook_id "$webhook_id" --arg webhook_name "$webhook_name" '(.apis[].hook_references[] | select(.hook.name == $webhook_name) .hook.id) = $webhook_id')
+  # AuthFailure event handlers
+  api_data=$(echo $api_data | jq --arg webhook_id "$webhook_id" --arg webhook_name "$webhook_name" '(.apis[].api_definition.event_handlers.events.AuthFailure[]? | select(.handler_meta.name == $webhook_name) .handler_meta.id) = $webhook_id')
+done
+bootstrap_progress
+
+echo "Importing APIs" >> bootstrap.log
+result=$(curl $dashboard_base_url/admin/apis/import -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d "$api_data" | jq -r '.Status')
+echo "  $result" >> bootstrap.log
+bootstrap_progress
+
+echo "Importing Policies" >> bootstrap.log
+result=$(curl $dashboard_base_url/admin/policies/import -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d "$(cat tyk/data/tyk-dashboard/policies.json)" | jq -r '.Status')
+echo "  $result" >> bootstrap.log
+bootstrap_progress
+
+echo "Refreshing APIs" >> bootstrap.log
+# This helps correct some strange behaviour observed with imported data
+cat tyk/data/tyk-dashboard/apis.json | jq --raw-output '.apis[].api_definition.id' | while read api_id
+do
+  # Get the API definition from the Dashboard
+  api_definition=$(curl $dashboard_base_url/api/apis/$api_id -s \
+    -H "Authorization: $dashboard_user_api_credentials")
+  # Put the API definition into the Dashboard
+  result=$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
+    -H "Authorization: $dashboard_user_api_credentials" \
+    --data "$api_definition" | jq -r '.Status')
+  echo "  $(echo $api_definition | jq -r '.api_definition.name'):$result" >> bootstrap.log
+done
+bootstrap_progress
+
+echo "Refreshing Policies" >> bootstrap.log
+# This is done for good measure, as per API Definitions
+cat tyk/data/tyk-dashboard/policies.json | jq --raw-output '.Data[]._id' | while read policy_id
+do
+  policy_definition=$(curl $dashboard_base_url/api/portal/policies/$policy_id -s \
+    -H "Authorization: $dashboard_user_api_credentials")
+  result=$(curl $dashboard_base_url/api/portal/policies/$policy_id -X PUT -s \
+    -H "Authorization: $dashboard_user_api_credentials" \
+    --data "$policy_definition" | jq -r '.Status')
+  echo "  $(echo $policy_definition | jq -r '.name'):$result" >> bootstrap.log
+done
+bootstrap_progress
+
 echo "Waiting for Gateway API to be ready" >> bootstrap.log
 gateway_api_credentials=$(cat tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
 echo "  Gateway API credentials = $gateway_api_credentials" >> bootstrap.log
@@ -226,10 +256,10 @@ do
   if [ "$gateway_status" != "200" ]
   then
     echo "  Gateway status:$gateway_status" >> bootstrap.log
-    # if we get a 500 then it's probably because the Gateway hasn't reloaded when the data was imported, so force reload now
+    # if we get a 500 then it's probably because the Gateway hasn't received the reload signal from when the Dashboard data was imported, so force reload now
     if [ "$gateway_status" == "500" ]
     then
-      echo "  Reloading Gateway" >> bootstrap.log
+      echo "    Reloading Gateway" >> bootstrap.log
       curl $gateway_base_url/tyk/reload -s -o /dev/null -H "x-tyk-authorization: $gateway_api_credentials" 2>> bootstrap.log
       sleep 2
     fi
