@@ -33,16 +33,16 @@ then
      # if missing
      if [ ${#tracing_setting} == 0 ]
      then
-          echo "Add tracing docker env var" >>bootstrap.log
+          echo "  Adding tracing docker environment variable to .env file" >>bootstrap.log
           echo $tracing_setting_desired >> .env
      else
-          echo "Replace tracing docker env var" >>bootstrap.log
+          echo "  Setting tracing docker envionment variable to desired value" >>bootstrap.log
           sed -i.bak 's/'"$tracing_setting"'/'"$tracing_setting_desired"'/g' ./.env
           rm .env.bak
      fi
      bootstrap_progress
      
-     echo "Restart Tyk containers to take effect" >>bootstrap.log
+     echo "  Restarting Tyk containers to take effect" >>bootstrap.log
      docker-compose restart 2>/dev/null
      bootstrap_progress
 fi
