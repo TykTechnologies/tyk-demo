@@ -132,10 +132,14 @@ result=$(curl $dashboard_base_url/api/portal/configuration -s \
   -d "{}" 2>> bootstrap.log | \
   jq -r '.Status')
 echo "  $result" >> bootstrap.log
-catalogue_id=$(curl $dashboard_base_url/api/portal/catalogue -s \
+bootstrap_progress
+
+echo "Initialising Catalogue" >> bootstrap.log
+result=$(curl $dashboard_base_url/api/portal/catalogue -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d '{"org_id": "'$organisation_id'"}' 2>> bootstrap.log | \
-  jq -r '.Message')
+  -d '{"org_id": "'$organisation_id'"}' 2>> bootstrap.log)
+catalogue_id=$(echo "$result" | jq -r '.Message')
+echo "  $(echo "$result" | jq -r '.Status')" >> bootstrap.log
 bootstrap_progress
 
 echo "Creating Portal home page" >> bootstrap.log
@@ -160,26 +164,32 @@ result=$(curl $dashboard_base_url/api/portal/developers -s \
 echo "  $result" >> bootstrap.log
 bootstrap_progress
 
-echo "Creating catalogue" >> bootstrap.log
+echo "Creating documentation" >> bootstrap.log
 policies=$(curl $dashboard_base_url/api/portal/policies?p=-1 -s \
   -H "Authorization:$dashboard_user_api_credentials" 2>> bootstrap.log)
-documentation_swagger_petstore_id=$(curl $dashboard_base_url/api/portal/documentation -s \
+result=$(curl $dashboard_base_url/api/portal/documentation -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   --data-raw '{
       "api_id":"",
       "doc_type":"swagger",
       "documentation":"'$(cat tyk/data/tyk-dashboard/documentation-swagger-petstore.json | base64)'"
-    }' 2>> bootstrap.log \
-  | jq -r '.Message')
+    }' 2>> bootstrap.log)
+documentation_swagger_petstore_id=$(echo "$result" | jq -r '.Message')
+echo "  $(echo "$result" | jq -r '.Status')" >> bootstrap.log
+bootstrap_progress
+
+echo "Updating catalogue" >> bootstrap.log
 policies_swagger_petstore_id=$(echo $policies | jq -r '.Data[] | select(.name=="Swagger Petstore Policy") | .id')
 catalogue_data=$(cat tyk/data/tyk-dashboard/catalogue.json | \
   sed 's/CATALOGUE_ID/'"$catalogue_id"'/' | \
   sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \
   sed 's/CATALOGUE_SWAGGER_PETSTORE_POLICY_ID/'"$policies_swagger_petstore_id"'/' | \
   sed 's/CATALOGUE_SWAGGER_PETSTORE_DOCUMENTATION_ID/'"$documentation_swagger_petstore_id"'/')
-curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s -o /dev/null \
+result=$(curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d "$(echo $catalogue_data)" 2>> bootstrap.log
+  -d "$(echo $catalogue_data)" 2>> bootstrap.log | \
+  jq -r '.Status')
+echo "  $result" >> bootstrap.log
 bootstrap_progress
 
 # Broken references occur because the ID of the data changes when it is created
@@ -271,26 +281,26 @@ do
 done
 
 echo "Importing custom keys" >> bootstrap.log
-status=$(curl $gateway_base_url/tyk/keys/auth_key -s \
+result=$(curl $gateway_base_url/tyk/keys/auth_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @tyk/data/tyk-gateway/auth-key.json 2>> bootstrap.log | jq -r '.status')
-echo "  Auth key:$status" >> bootstrap.log
-status=$(curl $gateway_base_url/tyk/keys/ratelimit_key -s \
+echo "  Auth key:$result" >> bootstrap.log
+result=$(curl $gateway_base_url/tyk/keys/ratelimit_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @tyk/data/tyk-gateway/rate-limit-key.json 2>> bootstrap.log | jq -r '.status')
-echo "  Rate limit key:$status" >> bootstrap.log
-status=$(curl $gateway_base_url/tyk/keys/throttle_key -s \
+echo "  Rate limit key:$result" >> bootstrap.log
+result=$(curl $gateway_base_url/tyk/keys/throttle_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @tyk/data/tyk-gateway/throttle-key.json 2>> bootstrap.log | jq -r '.status')
-echo "  Throttle key:$status" >> bootstrap.log
-status=$(curl $gateway_base_url/tyk/keys/quota_key -s \
+echo "  Throttle key:$result" >> bootstrap.log
+result=$(curl $gateway_base_url/tyk/keys/quota_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @tyk/data/tyk-gateway/quota-key.json 2>> bootstrap.log | jq -r '.status')
-echo "  Quota key:$status" >> bootstrap.log
-status=$(curl $dashboard_base_url/api/apis/keys/basic/basic-auth-username -s -w "%{http_code}" -o /dev/null \
+echo "  Quota key:$result" >> bootstrap.log
+result=$(curl $dashboard_base_url/api/apis/keys/basic/basic-auth-username -s -w "%{http_code}" -o /dev/null \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @tyk/data/tyk-dashboard/key-basic-auth.json 2>> bootstrap.log)
-echo "  Basic auth key:$status" >> bootstrap.log
+echo "  Basic auth key:$result" >> bootstrap.log
 bootstrap_progress
 
 echo "Checking Gateway functionality" >> bootstrap.log
@@ -327,20 +337,20 @@ echo -e "\033[2K
                              ################                         
                                ##########/                            
 
-▶ Standard Tyk
+▼ Standard Tyk
   
-  ▷ Dashboard
+  ▽ Dashboard
                URL : $dashboard_base_url
           Username : $dashboard_user_email
           Password : $dashboard_user_password
    API Credentials : $dashboard_user_api_credentials
   
-  ▷ Portal
+  ▽ Portal
                URL : $dashboard_base_url$portal_root_path
           Username : $portal_user_email
           Password : $portal_user_password
   
-  ▷ Gateway
+  ▽ Gateway
                URL : $gateway_base_url
    API Credentials : $gateway_api_credentials
 "
