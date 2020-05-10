@@ -1,13 +1,10 @@
 #!/bin/bash
 
-echo "Begin standard Tyk bootstrap" > bootstrap.log
+source scripts/common.sh
+feature="Tyk"
 
-function bootstrap_progress {
-  dot_count=$((dot_count+1))
-  dots=$(printf "%-${dot_count}s" ".")
-  echo -ne "  Bootstrapping Tyk ${dots// /.} \r"
-}
-
+echo "" > bootstrap.log
+log_start_feature
 bootstrap_progress
 
 dashboard_base_url="http://localhost:3000"
@@ -64,7 +61,7 @@ do
   dashboard_status=$(curl -I $dashboard_base_url/admin/organisations -H "admin-auth: $dashboard_admin_api_credentials" -s 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
   if [ "$dashboard_status" != "200" ]
   then
-    echo "  Dashboard status:$dashboard_status" >> bootstrap.log
+    echo "  Request unsuccessful, retrying..." >> bootstrap.log
     sleep 1
   fi
   bootstrap_progress
@@ -265,7 +262,7 @@ do
 
   if [ "$gateway_status" != "200" ]
   then
-    echo "  Gateway status:$gateway_status" >> bootstrap.log
+    echo "  Request unsuccessful, retrying..." >> bootstrap.log
     # if we get a 500 then it's probably because the Gateway hasn't received the reload signal from when the Dashboard data was imported, so force reload now
     if [ "$gateway_status" == "500" ]
     then
@@ -310,7 +307,7 @@ do
   gateway_status=$(curl -I -s $gateway_base_url/basic-open-api/get 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
   if [ "$gateway_status" != "200" ]
   then
-    echo "  Gateway status:$gateway_status" >> bootstrap.log
+    echo "  Request unsuccessful, retrying..." >> bootstrap.log
     sleep 1
   else
     echo "  Ok" >> bootstrap.log
@@ -318,7 +315,7 @@ do
   bootstrap_progress
 done
 
-echo "End standard Tyk bootstrap" >> bootstrap.log
+log_end_feature
 
 echo -e "\033[2K
 
@@ -337,20 +334,16 @@ echo -e "\033[2K
                              ################                         
                                ##########/                            
 
-▼ Standard Tyk
-  
+▼ Tyk
   ▽ Dashboard
                URL : $dashboard_base_url
           Username : $dashboard_user_email
           Password : $dashboard_user_password
-   API Credentials : $dashboard_user_api_credentials
-  
+   API Credentials : $dashboard_user_api_credentials  
   ▽ Portal
                URL : $dashboard_base_url$portal_root_path
           Username : $portal_user_email
-          Password : $portal_user_password
-  
+          Password : $portal_user_password  
   ▽ Gateway
                URL : $gateway_base_url
-   API Credentials : $gateway_api_credentials
-"
+   API Credentials : $gateway_api_credentials"

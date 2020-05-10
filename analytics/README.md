@@ -1,6 +1,6 @@
 ## Kibana
 
-Demonstrates how analytics data can be push into 3rd party databases and reported on by 3rd party systems.
+Demonstrates how analytics data can be pushed into 3rd party databases and reported on by 3rd party systems. This is achieved by using pushing analytics data to ElasticSearch and reporting on it in Kibana.
 
 - [Kibana Dashboard](http://localhost:5601)
 
@@ -8,4 +8,4 @@ Demonstrates how analytics data can be push into 3rd party databases and reporte
 
 The Tyk Pump deployed with Kibana is already configured to push data to the Elasticsearch container, so Kibana can visualise this data.
 
-The bootstrap process creates an Index Pattern and Visualization which can be used to view API analytics data. It will also stop the original Tyk Pump which is deployed, so that the Elasticsearch-enabled pump can take over.
+The `analytics/bootstrap.sh` script creates an Index Pattern and Visualization which can be used to view API analytics data. It will also stop the original Pump deployed by `docker-compose.yml`, so that the Elasticsearch-enabled Pump deployed by `analytics/docker-compose.yml` can take over.

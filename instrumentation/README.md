@@ -6,9 +6,9 @@ Graphite demonstrates the [instrumentation feature](https://tyk.io/docs/basic-co
 
 ### Setup
 
-Setting the environment variable for this feature is handled by the `bootstrap.sh` script.
+Setting the environment variable for this feature is handled by the `instrumentation/bootstrap.sh` script.
 
-The Docker environment variable `TRACING_ENABLED` is automatically set to `TRUE` by the `bootstrap.sh` script.
+The Docker environment variable `TRACING_ENABLED` is automatically set to `TRUE` in the `.env` by the `instrumentation/bootstrap.sh` script.
 
 The StatsD, Carbon and Graphite are all deployed within a single container service called `graphite`.
 
