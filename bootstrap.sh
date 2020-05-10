@@ -13,7 +13,7 @@ bootstrap_progress
 dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
 
-echo "Check for instrumentaton misconfiguration" >> bootstrap.log
+echo "Checking for instrumentaton misconfiguration" >> bootstrap.log
 # Prevent instrumentation being enabled without the Graphite service being available
 instrumentation_service=$(docker-compose -f docker-compose.yml -f instrumentation/docker-compose.yml ps | grep "graphite")
 instrumentation_setting=$(grep "INSTRUMENTATION_ENABLED" .env)
@@ -28,7 +28,7 @@ then
 fi
 bootstrap_progress
 
-echo "Check for tracing misconfiguration" >> bootstrap.log
+echo "Checking for tracing misconfiguration" >> bootstrap.log
 # Prevent tracking being enabled without the Zipkin service being available
 tracing_service=$(docker-compose -f docker-compose.yml -f tracing/docker-compose.yml ps | grep "zipkin")
 tracing_setting=$(grep "TRACING_ENABLED" .env)
