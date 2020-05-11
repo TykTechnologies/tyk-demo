@@ -10,45 +10,45 @@ jenkins_status=""
 jenkins_status_desired="403"
 jenkins_tries=0
 
-echo "Waiting for Jenkins to respond ok" >> bootstrap.log
+log_message "Waiting for Jenkins to respond ok"
 # 403 indicates that at least Jenkins was able to recognise that the request was unauthorised, so we should be ok to proceed
 while [ "$jenkins_status" != "$jenkins_status_desired" ]
 do
-  jenkins_status=$(curl -I -s -m5 $jenkins_base_url 2>>bootstrap.log | head -n 1 | cut -d$' ' -f2)
+  jenkins_status=$(curl -I -s -m5 $jenkins_base_url 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
   if [ "$jenkins_status" != "$jenkins_status_desired" ]
   then
-    echo "  Request unsuccessful, retrying..." >> bootstrap.log
+    log_message "  Request unsuccessful, retrying..."
     sleep 2
   else
-    echo "  Ok" >> bootstrap.log
+    log_ok
   fi
   bootstrap_progress
 done
 
-echo "Getting Jenkins admin password" >> bootstrap.log
+log_message "Getting Jenkins admin password"
 jenkins_admin_password=$(docker-compose -f docker-compose.yml -f cicd/docker-compose.yml exec jenkins sh -c "cat /var/jenkins_home/secrets/initialAdminPassword | head -c32" 2>> bootstrap.log)
-echo "  Jenkins admin password = $jenkins_admin_password" >> bootstrap.log
+log_message "  Jenkins admin password = $jenkins_admin_password"
 bootstrap_progress
 
-echo "Extracting plugins and other configuration" >> bootstrap.log
+log_message "Extracting plugins and other configuration"
 docker-compose -f docker-compose.yml -f cicd/docker-compose.yml exec \
   jenkins \
   tar -xzvf /var/jenkins_home/jenkins.tar.gz -C /var/jenkins_home 1> /dev/null 2>> bootstrap.log
-echo "  Ok" >> bootstrap.log
+log_ok
 bootstrap_progress
 
-echo "Restarting container to allow new config and plugins to be used" >> bootstrap.log
+log_message "Restarting container to allow new config and plugins to be used"
 docker-compose -f docker-compose.yml -f cicd/docker-compose.yml restart jenkins 2> /dev/null
-echo "  Ok" >> bootstrap.log
+log_ok
 bootstrap_progress
 
-echo "Writing Dashboard credentials file" >> bootstrap.log
+log_message "Writing Dashboard credentials file"
 dashboard2_user_api_credentials=`cat .context-data/dashboard2-user-api-credentials`
 sed "s/TYK2_DASHBOARD_CREDENTIALS/$dashboard2_user_api_credentials/g" cicd/data/jenkins/credentials-global-template.xml > \
   cicd/volumes/jenkins/bootstrap-import/credentials-global.xml
-echo "  Ok" >> bootstrap.log
+log_ok
 
-echo "Importing credentials for 'global'" >> bootstrap.log
+log_message "Importing credentials for 'global'"
 jenkins_response=""
 while [ "${jenkins_response:0:1}" != "0" ]
 do
@@ -56,15 +56,15 @@ do
 
   if [ "${jenkins_response:0:1}" != "0" ]
   then
-    echo "  Request unsuccessful, retrying..." >> bootstrap.log
+    log_message "  Request unsuccessful, retrying..."
     sleep 2
   else
-    echo "  Ok" >> bootstrap.log
+    log_ok
   fi
   bootstrap_progress
 done
 
-echo "Creating job for 'APIs and Policies'" >> bootstrap.log
+log_message "Creating job for 'APIs and Policies'"
 jenkins_response=""
 while [ "${jenkins_response:0:1}" != "0" ]
 do
@@ -72,10 +72,10 @@ do
 
   if [ "${jenkins_response:0:1}" != "0" ]
   then
-    echo "  Request unsuccessful, retrying..." >> bootstrap.log
+    log_message "  Request unsuccessful, retrying..."
     sleep 2
   else
-    echo "  Ok" >> bootstrap.log
+    log_ok
   fi
   bootstrap_progress
 done

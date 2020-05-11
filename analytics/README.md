@@ -1,6 +1,6 @@
-## Kibana
+## Analytics Export
 
-Demonstrates how analytics data can be pushed into 3rd party databases and reported on by 3rd party systems. This is achieved by using pushing analytics data to ElasticSearch and reporting on it in Kibana.
+Demonstrates how analytics data can be pushed into 3rd party databases and reported on by 3rd party systems. This is achieved by using Tyk Pump to push analytics data to ElasticSearch and reporting on it in Kibana.
 
 - [Kibana Dashboard](http://localhost:5601)
 

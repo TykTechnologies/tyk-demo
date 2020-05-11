@@ -1,32 +1,32 @@
 #!/bin/bash
 
-echo "Begin tls bootstrap" >>bootstrap.log
+source scripts/common.sh
+feature="TLS"
+log_start_feature
+bootstrap_progress
 
 gateway_tls_base_url="https://localhost:8081"
 gateway_status=""
 gateway_status_desired="200"
 gateway_tries=0
 
-echo "Wait for gateway to respond ok" >>bootstrap.log
+log_message "Waiting for gateway to respond ok"
 while [ "$gateway_status" != "$gateway_status_desired" ]
 do
-  gateway_tries=$((gateway_tries+1))
-  dot=$(printf "%-${gateway_tries}s" ".")
-  echo -ne "  Bootstrapping Gateway (TLS) ${dot// /.} \r"
-  gateway_status=$(curl -I -s -k -m2 $gateway_tls_base_url/basic-open-api/get 2>>bootstrap.log | head -n 1 | cut -d$' ' -f2)
-
+  gateway_status=$(curl -I -s -k -m2 $gateway_tls_base_url/basic-open-api/get 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
   if [ "$gateway_status" != "$gateway_status_desired" ]
   then
-    echo "Gateway status:$gateway_status" >>bootstrap.log
-    sleep 1
+    log_message "  Request unsuccessful, retrying..."
+    sleep 2
+  else
+    log_ok
   fi
+  bootstrap_progress
 done
 
-echo "End tls bootstrap" >>bootstrap.log
+log_end_feature
 
 echo -e "\033[2K     
-▼ TLS
-  
+▼ TLS 
   ▽ Gateway
-               URL : $gateway_tls_base_url
-"
+               URL : $gateway_tls_base_url"

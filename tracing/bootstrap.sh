@@ -1,32 +1,29 @@
 #!/bin/bash
 
-echo "Begin tracing bootstrap" >> bootstrap.log
-
-function bootstrap_progress {
-  dot_count=$((dot_count+1))
-  dots=$(printf "%-${dot_count}s" ".")
-  echo -ne "  Bootstrapping Zipkin ${dots// /.} \r"
-}
+source scripts/common.sh
+feature="Tracing"
+log_start_feature
+bootstrap_progress
 
 zipkin_base_url="http://localhost:9411/zipkin/"
 zipkin_status=""
 zipkin_status_desired="200"
 
-echo "Waiting for zipkin to respond ok" >> bootstrap.log
+log_message "Waiting for Zipkin to respond ok"
 while [ "$zipkin_status" != "$zipkin_status_desired" ]
 do
-  zipkin_status=$(curl -I -s -m5 $zipkin_base_url 2>>bootstrap.log | head -n 1 | cut -d$' ' -f2)
+  zipkin_status=$(curl -I -s -m5 $zipkin_base_url 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
   if [ "$zipkin_status" != "$zipkin_status_desired" ]
   then
-    echo "  Zipkin status:$zipkin_status" >> bootstrap.log
-    sleep 1
+    log_message "  Request unsuccessful, retrying..."
+    sleep 2
   else
-    echo "  Ok"
+    log_ok
   fi
   bootstrap_progress
 done
 
-echo "Checking tracing env var is set correctly" >> bootstrap.log
+log_message "Checking tracing env var is set correctly"
 tracing_setting=$(grep "TRACING_ENABLED" .env)
 tracing_setting_desired="TRACING_ENABLED=true"
 if [[ $tracing_setting != $tracing_setting_desired ]]
@@ -34,23 +31,23 @@ then
   # if missing
   if [ ${#tracing_setting} == 0 ]
   then
-      echo "  Adding tracing docker environment variable to .env file" >> bootstrap.log
+      log_message "  Adding tracing docker environment variable to .env file"
       echo $tracing_setting_desired >> .env
   else
-      echo "  Setting tracing docker envionment variable to desired value" >> bootstrap.log
+      log_message "  Setting tracing docker envionment variable to desired value"
       sed -i.bak 's/'"$tracing_setting"'/'"$tracing_setting_desired"'/g' ./.env
       rm .env.bak
   fi
   bootstrap_progress
 
-  echo "  Restarting Tyk containers to take effect" >> bootstrap.log
+  log_message "  Restarting Tyk containers to take effect"
   docker-compose restart 2> /dev/null
   bootstrap_progress
 else
-  echo "  Ok"
+  log_ok
 fi
 
-echo "End tracing bootstrap" >> bootstrap.log
+log_end_feature
 
 echo -e "\033[2K
 ▼ Tracing
