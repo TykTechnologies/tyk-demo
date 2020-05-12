@@ -3,7 +3,6 @@
 source scripts/common.sh
 feature="Tyk"
 
-echo "" > bootstrap.log
 log_start_feature
 bootstrap_progress
 
@@ -12,7 +11,7 @@ gateway_base_url="http://localhost:8080"
 
 log_message "Checking for instrumentaton misconfiguration"
 # Prevent instrumentation being enabled without the Graphite service being available
-instrumentation_service=$(docker-compose -f docker-compose.yml -f instrumentation/docker-compose.yml ps | grep "graphite")
+instrumentation_service=$(docker-compose -f tyk/docker-compose.yml -f instrumentation/docker-compose.yml -p tyk-pro-docker-demo-extended ps | grep "graphite")
 instrumentation_setting=$(grep "INSTRUMENTATION_ENABLED" .env)
 instrumentation_setting_enabled="INSTRUMENTATION_ENABLED=1"
 instrumentation_setting_disabled="INSTRUMENTATION_ENABLED=0"
@@ -21,13 +20,14 @@ then
   log_message "  Setting instrumentation flag to 0"
   sed -i.bak 's/'"$instrumentation_setting_enabled"'/'"$instrumentation_setting_disabled"'/g' ./.env
   rm .env.bak
-  docker-compose up --force-recreate -d 2> /dev/null
+  log_message "  Recreating containers"
+  docker-compose -f tyk/docker-compose.yml -p tyk-pro-docker-demo-extended up --force-recreate -d --no-deps tyk-dashboard tyk-gateway tyk-pump 2> /dev/null
 fi
 bootstrap_progress
 
 log_message "Checking for tracing misconfiguration"
 # Prevent tracking being enabled without the Zipkin service being available
-tracing_service=$(docker-compose -f docker-compose.yml -f tracing/docker-compose.yml ps | grep "zipkin")
+tracing_service=$(docker-compose -f tyk/docker-compose.yml -f tracing/docker-compose.yml -p tyk-pro-docker-demo-extended ps | grep "zipkin")
 tracing_setting=$(grep "TRACING_ENABLED" .env)
 tracing_setting_enabled="TRACING_ENABLED=true"
 tracing_setting_disabled="TRACING_ENABLED=false"
@@ -36,16 +36,9 @@ then
   log_message "  Setting tracing flag to false"
   sed -i.bak 's/'"$tracing_setting_enabled"'/'"$tracing_setting_disabled"'/g' ./.env
   rm .env.bak
-  docker-compose up --force-recreate -d 2> /dev/null
+  log_message "  Recreating containers"
+  docker-compose -f tyk/docker-compose.yml -p tyk-pro-docker-demo-extended up --force-recreate -d --no-deps tyk-dashboard tyk-gateway tyk-pump 2> /dev/null
 fi
-bootstrap_progress
-
-log_message "Making scripts executable"
-chmod +x `ls */*.sh` >> bootstrap.log
-bootstrap_progress
-
-log_message "Creating directory for context data"
-mkdir -p .context-data >> bootstrap.log
 bootstrap_progress
 
 log_message "Getting Dashboard configuration"
