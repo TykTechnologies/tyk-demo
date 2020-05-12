@@ -55,7 +55,7 @@ do
   if [ "$dashboard_status" != "200" ]
   then
     log_message "  Request unsuccessful, retrying..."
-    sleep 1
+    sleep 2
   fi
   bootstrap_progress
 done
@@ -251,7 +251,7 @@ do
       curl $gateway_base_url/tyk/reload -s -o /dev/null -H "x-tyk-authorization: $gateway_api_credentials" 2>> bootstrap.log
       sleep 2
     fi
-    sleep 1
+    sleep 2
   else
     log_ok
   fi
@@ -289,7 +289,7 @@ do
   if [ "$gateway_status" != "200" ]
   then
     log_message "  Request unsuccessful, retrying..."
-    sleep 1
+    sleep 2
   else
     log_ok
   fi
