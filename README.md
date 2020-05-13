@@ -78,28 +78,6 @@ DASHBOARD_LICENCE=<YOUR_LICENCE>
 
 In addition to this, some features require entries in the `.env` file. These are set automatically by the `bootstrap.sh` files, depending on the deployment.
 
-## Step 4: Deploy the Docker containers
-
-There are multiple compose files for this deployment. This is to give flexibility it terms of what is deployed.
-
-The `docker-compose.yml` is the base compose file, containing Tyk. To deploy the standard deployment of Tyk, run the Docker Compose command:
-
-```
-docker-compose up -d
-```
-
-You can extend the deployment to demonstrate additional features. To do this, there are additional `docker-compose.yl` files which are stored in the the feature directories and can be included in the deployment. For example, to include the analytics export feature:
-
-```
-docker-compose -f docker-compose.yml -f analytics/docker-compose.yml up -d
-```
-
-Use additional `-f` flags to include more compose files as needed.
-
-Using `-d` creates the containers in detached mode, running them in the background.
-
-Please note that this command may take a while to complete, as Docker needs to download images and provision the containers.
-
 ## Step 4: Make the scripts executable
 
 There are two scripts which can be used to bring up and tear down the deployment: `up.sh` and `down.sh`.
