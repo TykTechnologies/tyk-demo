@@ -18,7 +18,7 @@ There is a focus on simplicity. Docker Compose is used to provision the containe
 
 # Repository Structure
 
-* `deployments`: Contains all the deployments available as sub-directories
+* `deployments/*`: Contains all the deployments available as sub-directories
 * `Tyk Demo.postman_collection.json`: A Postman collection of requests which correspond to APIs available in the deployment
 * `scripts/*.sh`: Some useful commands encapsulated in scripts
 * `up.sh`: Brings up the deployment
