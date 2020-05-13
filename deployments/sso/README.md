@@ -1,10 +1,18 @@
-## SSO Dashboard
+# SSO Dashboard
 
 Provides an SSO-enabled Tyk Dashboard in conjunction with the Tyk Identity Broker and Okta. It will connect to the same databases as the Standard Tyk deployment.
 
 - [Tyk SSO-enabled Dashboard](http://localhost:3001)
 
-### SSO process 
+## Setup
+
+Run the `up.sh` script with the `sso` parameter:
+
+```
+./up.sh sso
+```
+
+## Usage
 
 **Note:** This example is not very configurable right now, since it relies on a specific Okta setup which is only configurable by the owner of the Okta account (i.e. not you!). Would be good to change this at some point to use a self-contained method which can be managed by anyone. Please feel free to implement such a change an make a pull request. Anyway, here's the SSO we have...
 

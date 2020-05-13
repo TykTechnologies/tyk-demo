@@ -1,28 +1,22 @@
-## CI/CD
+# CI/CD
 
 CI/CD is demonstrated using Jenkins and Tyk Sync. These provide an automated way of pushing API Definitions and Policies to different Tyk environments.
 
 - [Jenkins Dashboard](http://localhost:8070)
 
-### Setup
+## Setup
 
-This feature depends on the Tyk Environment 2 feature, so this must be deployed with this feature in order for it to work:
+This feature depends on the Tyk Environment 2 deployment, so the two must be deployed together. The `tyk2` parameter should be provided before the `cicd` parameter, as the the CI/CD deployment requires some information from the Tyk Environment 2 deployment: 
 
 ```
-docker-compose \
-  -f docker-compose.yml \
-  -f tyk-2/docker-compose.yml \
-  -f cicd/docker-compose.yml up -d && \
-./bootstrap.sh && \
-tyk-2/bootstrap.sh && \
-cicd/bootstrap.sh
+./up.sh tyk2 cicd
 ```
 
-It's important that the `tyk-2/bootstrap.sh` is run before the `cicd/bootstrap.sh`. This is because the CI/CD feature needs to know the Dashboard API credentials of Tyk environment 2, so Tyk environment 2 needs to be bootstrapped first to generate the credentials.
+The bootstrap process installs the necessary plugins, adds a job and imports environment credentials into Jenkins. This is everything you need to get started.
 
-The `cicd/bootstrap.sh` script installs the necessary plugins, adds a job and imports environment credentials into Jenkins. This is everything you need to get started.
+It can take a while for the bootstrap process to complete. This is due to the necessary Jenkins APIs being unavailable until Jenkins has fully started.
 
-### Usage
+## Usage
 
 After the setup process is complete, the CI/CD functionality can be demonstrated as follows:
 

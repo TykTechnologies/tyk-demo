@@ -18,13 +18,17 @@ There is a focus on simplicity. Docker Compose is used to provision the containe
 
 # Repository Structure
 
-* `bootstrap.sh`: Bootstrap script for the Tyk standard deployment
-* `docker-compose.yml`: Docker compose definition for the Tyk standard deployment
+* `deployments`: Contains all the deployments available as sub-directories
 * `Tyk Demo.postman_collection.json`: A Postman collection of requests which correspond to APIs available in the deployment
 * `scripts/*.sh`: Some useful commands encapsulated in scripts
-* `tyk`: Files related to the Tyk standard deployment
+* `up.sh`: Brings up the deployment
+* `down.sh`: Takes down the deployment
 
-The remaining directories contain **feature deployments** which extend the standard Tyk deployment functionality. These directories contain `docker-compose.yml`, `bootstrap.sh` and `README.md` files specific to the feature. They may also contain directories called `data` or `volumes`, which hold the data necessary during bootstrapping or providing as mapped volumes into the container.
+## Deployments
+
+The deployment directories (`deployments/*`) contain the various deployments which can be made with this repo. The **base deployment** is in the `tyk` directory, which is a standard Tyk deployment. The other directories are **feature deployments**, which extend the **base deployment** functionality. 
+
+All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.md` files specific to the deployment. They may also contain directories called `data` or `volumes`, which hold the data necessary during bootstrapping or providing as mapped volumes into the container.
 
 # Getting Started
 
@@ -96,41 +100,49 @@ Using `-d` creates the containers in detached mode, running them in the backgrou
 
 Please note that this command may take a while to complete, as Docker needs to download images and provision the containers.
 
-## Step 5: Bootstrap the system
+## Step 4: Make the scripts executable
 
-Now we will run the bootstrap script, which will complete the remaining items needed to get started. But before the `bootstrap.sh` file can be run, it must be made executable:
+There are two scripts which can be used to bring up and tear down the deployment: `up.sh` and `down.sh`.
 
-```
-chmod +x bootstrap.sh
-```
-
-Now you can run the file:
+Make these scripts executable:
 
 ```
-./bootstrap.sh
+chmod +x up.sh down.sh
 ```
 
-This will bootstrap the standard Tyk deployment, after which you can log into the Dashboard and start using Tyk.
+## Step 5: Bring the deployment up
 
-If made additional feature deployments then you should also bootstrap those systems too. Run the corresponding `bootstrap.sh` file from the feature directory. For example, to bootstrap the analytics export feature:
-
-```
-analytics/bootstrap.sh
-```
-
-**Tip:** The two commands can be run consecutively in a single statement, but make sure to always run the root bootstrap script `./bootstrap.sh` before the other bootstrap scripts:
+To bootstrap the system we will run the `up.sh` script, which will run the necessary `docker-compose` and `bootstrap` commands to start the containers and bootstrap the system. 
 
 ```
-./bootstrap.sh && ./analytics/bootstrap.sh
+./up.sh
+```
+
+This will bring up the standard Tyk deployment, after which you can log into the Dashboard and start using Tyk.
+
+If you want to deploy the feature deployments then you should also bootstrap those systems too. Run the `up.sh` command, passing a parameter of the directory name of the feature to deploy. For example, to bootstrap the analytics feature:
+
+```
+./up.sh analytics
+```
+
+The feature names are the directory names from the `/deployments` directory.
+
+### Deploying multiple features at the same time
+
+Multiple features can be deployed at the same time by providing multiple parameters e.g.
+
+```
+./up.sh analytics instrumentation
 ```
 
 ### Bootstrap logging
 
-During the bootstrap process, command output is logged to the `bootstrap.log` file.
+During the bootstrap process, check the `bootstrap.log` file for information about the commands being run.
 
 ## Step 6: Log into the Dashboard
 
-The `bootstrap.sh` commands output any necessary information to start accessing the deployed systems. You will find your Dashboard login credentials in this output.
+The `bootstrap.sh` scripts provide credentials and other useful information in the terminal output. Check this output for the Dashboard credentials.
 
 When you log into the Dashboard, you will find the imported APIs and Policies are now available.
 
@@ -142,24 +154,18 @@ Import the `Tyk Demo.postman_collection.json` into your Postman to start making 
 
 # Resetting
 
-The purpose of the bootstrap scripts is to enable the environment to be easily set up from scratch. If you want to reset your environment then you need to remove the volumes associated with the container as well as the containers themselves.
+The purpose of the `up.sh` script is to enable the environment to be easily set up from scratch. If you want to reset your environment then you need to remove the volumes associated with the container as well as the containers themselves.
 
 To bring down the containers and delete associated volumes:
 
 ```
-docker-compose down -v
+./down.sh
 ```
 
-Or, if you want to retain the existing data then just remove the containers:
+If you used deployment parameters when running the `up.sh` script, you should also include them when taking the system down. For example, to bring down the standard Tyk and analytics export deployments:
 
 ```
-docker-compose down
-```
-
-If you included multiple compose files when bringing the system up, you should also include them when taking the system down. For example, to bring down the standard Tyk and analytics export deployments (and remove volumes):
-
-```
-docker-compose -f docker-compose.yml -f analytics/docker-compose.yml down -v
+./down.sh analytics
 ```
 
 # Working with APIs and Policies
@@ -179,7 +185,7 @@ Run from the repo root directory, as so:
 ./scripts/export.sh
 ```
 
-This will update the `apis.json` and `policies.json` files in the `bootstrap-data/tyk-dashboard/` directory. You can then commit these files into the repo.
+This will update the `apis.json` and `policies.json` files in the `deployments/tyk/data/tyk-dashboard` directory. You can then commit these files into the repo.
 
 If you have also made changes to the Postman collection then export it and overwrite the `Tyk Demo.postman_collection.json` and commit that too.
 

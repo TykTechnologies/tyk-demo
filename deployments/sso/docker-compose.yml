@@ -7,7 +7,7 @@ services:
     networks:
       - tyk
     volumes:
-      - ./tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
+      - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
       - TYK_DB_SSOCUSTOMLOGINURL=http://localhost:3010/auth/tyk-dashboard/openid-connect
@@ -25,4 +25,4 @@ services:
     environment:
       - SESSION_SECRET=12345
     volumes:
-      - ./sso/volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf
+      - ./deployments/sso/volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf

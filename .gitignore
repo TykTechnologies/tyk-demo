@@ -1,4 +1,4 @@
 .env
 .context-data
 bootstrap.log
-cicd/volumes/jenkins/bootstrap-import/credentials-global.xml
+deployments/cicd/volumes/jenkins/bootstrap-import/credentials-global.xml

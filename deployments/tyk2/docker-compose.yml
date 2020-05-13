@@ -7,7 +7,7 @@ services:
     networks:
       - tyk
     volumes:
-      - ./tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
+      - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
       - TYK_DB_MONGOURL=mongodb://tyk2-mongo:27017/tyk_analytics
@@ -24,8 +24,8 @@ services:
     networks:
       - tyk
     volumes:
-      - ./tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
-      - ./tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+      - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
+      - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
     environment:
       - TYK_GW_POLICIES_POLICYCONNECTIONSTRING=http://tyk2-dashboard:3000
       - TYK_GW_DBAPPCONFOPTIONS_CONNECTIONSTRING=http://tyk2-dashboard:3000
@@ -37,7 +37,7 @@ services:
     networks:
       - tyk
     volumes:
-      - ./tyk-2/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
+      - ./deployments/tyk2/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
     depends_on:
       - tyk2-redis
       - tyk2-mongo

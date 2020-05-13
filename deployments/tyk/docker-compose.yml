@@ -7,7 +7,7 @@ services:
     networks:
       - tyk
     volumes:
-      - ./tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
+      - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
@@ -24,8 +24,8 @@ services:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED}
     volumes:
-      - ./tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
-      - ./tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+      - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
+      - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
     depends_on:
       - tyk-redis
   tyk-pump:
@@ -33,7 +33,7 @@ services:
     networks:
       - tyk
     volumes:
-      - ./tyk/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
+      - ./deployments/tyk/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
     depends_on:

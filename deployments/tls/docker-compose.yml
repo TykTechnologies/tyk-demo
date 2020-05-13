@@ -7,9 +7,9 @@ services:
     networks:
       - tyk
     volumes:
-      - ./tls/volumes/tyk-gateway/tyk-tls.conf:/opt/tyk-gateway/tyk.conf
-      - ./tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
-      - ./tls/volumes/tyk-gateway/certificates:/opt/tyk-gateway/certificates
+      - ./deployments/tls/volumes/tyk-gateway/tyk-tls.conf:/opt/tyk-gateway/tyk.conf
+      - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+      - ./deployments/tls/volumes/tyk-gateway/certificates:/opt/tyk-gateway/certificates
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED}

@@ -1,50 +1,50 @@
 #!/bin/bash
 
 source scripts/common.sh
-feature="Tyk"
+deployment="Tyk"
 
-log_start_feature
+log_start_deployment
 bootstrap_progress
 
 dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
 
 log_message "Checking for instrumentaton misconfiguration"
-# Prevent instrumentation being enabled without the Graphite service being available
-instrumentation_service=$(docker-compose -f tyk/docker-compose.yml -f instrumentation/docker-compose.yml -p tyk-pro-docker-demo-extended ps | grep "graphite")
+instrumentation_service=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/instrumentation/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) ps | grep "graphite")
 instrumentation_setting=$(grep "INSTRUMENTATION_ENABLED" .env)
 instrumentation_setting_enabled="INSTRUMENTATION_ENABLED=1"
 instrumentation_setting_disabled="INSTRUMENTATION_ENABLED=0"
+# Prevent instrumentation being enabled without the Graphite service being available
 if [[ "${#instrumentation_service}" -eq "0" ]] && [[ $instrumentation_setting == $instrumentation_setting_enabled ]]
 then
   log_message "  Setting instrumentation flag to 0"
   sed -i.bak 's/'"$instrumentation_setting_enabled"'/'"$instrumentation_setting_disabled"'/g' ./.env
   rm .env.bak
   log_message "  Recreating containers"
-  docker-compose -f tyk/docker-compose.yml -p tyk-pro-docker-demo-extended up --force-recreate -d --no-deps tyk-dashboard tyk-gateway tyk-pump 2> /dev/null
+  recreate_all_tyk_containers
 fi
 bootstrap_progress
 
 log_message "Checking for tracing misconfiguration"
-# Prevent tracking being enabled without the Zipkin service being available
-tracing_service=$(docker-compose -f tyk/docker-compose.yml -f tracing/docker-compose.yml -p tyk-pro-docker-demo-extended ps | grep "zipkin")
+tracing_service=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/tracing/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) ps | grep "zipkin")
 tracing_setting=$(grep "TRACING_ENABLED" .env)
 tracing_setting_enabled="TRACING_ENABLED=true"
 tracing_setting_disabled="TRACING_ENABLED=false"
+# Prevent tracking being enabled without the Zipkin service being available
 if [[ "${#tracing_service}" -eq "0" ]] && [[ $tracing_setting == $tracing_setting_enabled ]]
 then
   log_message "  Setting tracing flag to false"
   sed -i.bak 's/'"$tracing_setting_enabled"'/'"$tracing_setting_disabled"'/g' ./.env
   rm .env.bak
   log_message "  Recreating containers"
-  docker-compose -f tyk/docker-compose.yml -p tyk-pro-docker-demo-extended up --force-recreate -d --no-deps tyk-dashboard tyk-gateway tyk-pump 2> /dev/null
+  recreate_all_tyk_containers
 fi
 bootstrap_progress
 
 log_message "Getting Dashboard configuration"
-dashboard_admin_api_credentials=$(cat tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret 2>> bootstrap.log)
+dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret 2>> bootstrap.log)
 log_message "  Dashboard Admin API Credentials = $dashboard_admin_api_credentials"
-portal_root_path=$(cat tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_config.portal_root_path 2>> bootstrap.log)
+portal_root_path=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_config.portal_root_path 2>> bootstrap.log)
 bootstrap_progress
 
 log_message "Waiting for Dashboard API to be ready"
@@ -63,18 +63,18 @@ done
 log_message "Importing organisation"
 organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @tyk/data/tyk-dashboard/organisation.json 2>> bootstrap.log\
+  -d @deployments/tyk/data/tyk-dashboard/organisation.json 2>> bootstrap.log\
   | jq -r '.Meta')
 echo $organisation_id > .context-data/organisation-id
 log_message "  Org Id = $organisation_id"
 bootstrap_progress
 
 log_message "Creating Dashboard user"
-dashboard_user_email=$(jq -r '.email_address' tyk/data/tyk-dashboard/dashboard-user.json)
-dashboard_user_password=$(jq -r '.password' tyk/data/tyk-dashboard/dashboard-user.json)
+dashboard_user_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/dashboard-user.json)
+dashboard_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/dashboard-user.json)
 dashboard_user_api_response=$(curl $dashboard_base_url/admin/users -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @tyk/data/tyk-dashboard/dashboard-user.json 2>> bootstrap.log \
+  -d @deployments/tyk/data/tyk-dashboard/dashboard-user.json 2>> bootstrap.log \
   | jq -r '. | {api_key:.Message, id:.Meta.id}')
 dashboard_user_id=$(echo $dashboard_user_api_response | jq -r '.id')
 dashboard_user_api_credentials=$(echo $dashboard_user_api_response | jq -r '.api_key')
@@ -91,15 +91,15 @@ bootstrap_progress
 log_message "Creating Dashboard user groups"
 result=$(curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @tyk/data/tyk-dashboard/usergroup-readonly.json 2>> bootstrap.log | jq -r '.Status')
+  -d @deployments/tyk/data/tyk-dashboard/usergroup-readonly.json 2>> bootstrap.log | jq -r '.Status')
 log_message "  Read-only group:$result"
 result=$(curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @tyk/data/tyk-dashboard/usergroup-default.json 2>> bootstrap.log | jq -r '.Status')
+  -d @deployments/tyk/data/tyk-dashboard/usergroup-default.json 2>> bootstrap.log | jq -r '.Status')
 log_message "  Default group:$result"
 result=$(curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @tyk/data/tyk-dashboard/usergroup-admin.json 2>> bootstrap.log | jq -r '.Status')
+  -d @deployments/tyk/data/tyk-dashboard/usergroup-admin.json 2>> bootstrap.log | jq -r '.Status')
 log_message "  Admin group:$result"
 user_group_data=$(curl $dashboard_base_url/api/usergroups -s -o /dev/null \
   -H "Authorization: $dashboard_user_api_credentials" 2>> bootstrap.log)
@@ -111,7 +111,7 @@ bootstrap_progress
 log_message "Creating webhooks"
 log_json_result="$(curl $dashboard_base_url/api/hooks -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @tyk/data/tyk-dashboard/webhook-webhook-receiver-api-post.json 2>> bootstrap.log)"
+  -d @deployments/tyk/data/tyk-dashboard/webhook-webhook-receiver-api-post.json 2>> bootstrap.log)"
 bootstrap_progress
 
 log_message "Creating Portal default settings"
@@ -131,12 +131,12 @@ bootstrap_progress
 log_message "Creating Portal home page"
 log_json_result="$(curl $dashboard_base_url/api/portal/pages -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @tyk/data/tyk-dashboard/portal-home-page.json 2>> bootstrap.log)"
+  -d @deployments/tyk/data/tyk-dashboard/portal-home-page.json 2>> bootstrap.log)"
 bootstrap_progress
 
 log_message "Creating Portal user"
-portal_user_email=$(jq -r '.email' tyk/data/tyk-dashboard/portal-user.json)
-portal_user_password=$(jq -r '.password' tyk/data/tyk-dashboard/portal-user.json)
+portal_user_email=$(jq -r '.email' deployments/tyk/data/tyk-dashboard/portal-user.json)
+portal_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/portal-user.json)
 log_json_result=$(curl $dashboard_base_url/api/portal/developers -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d '{
@@ -154,7 +154,7 @@ result=$(curl $dashboard_base_url/api/portal/documentation -s \
   --data-raw '{
       "api_id":"",
       "doc_type":"swagger",
-      "documentation":"'$(cat tyk/data/tyk-dashboard/documentation-swagger-petstore.json | base64)'"
+      "documentation":"'$(cat deployments/tyk/data/tyk-dashboard/documentation-swagger-petstore.json | base64)'"
     }' 2>> bootstrap.log)
 documentation_swagger_petstore_id=$(echo "$result" | jq -r '.Message')
 log_json_result $result
@@ -162,7 +162,7 @@ bootstrap_progress
 
 log_message "Updating catalogue"
 policies_swagger_petstore_id=$(echo $policies | jq -r '.Data[] | select(.name=="Swagger Petstore Policy") | .id')
-catalogue_data=$(cat tyk/data/tyk-dashboard/catalogue.json | \
+catalogue_data=$(cat deployments/tyk/data/tyk-dashboard/catalogue.json | \
   sed 's/CATALOGUE_ID/'"$catalogue_id"'/' | \
   sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \
   sed 's/CATALOGUE_SWAGGER_PETSTORE_POLICY_ID/'"$policies_swagger_petstore_id"'/' | \
@@ -174,16 +174,16 @@ bootstrap_progress
 
 # Broken references occur because the ID of the data changes when it is created
 # This means the references to this data must be 'reconnected' to the new IDs
-# This is done after all the other data is imported, so we know the new IDs
+# This is done before the APIs are imported, and after all the other data is imported, so we know the new IDs and can update the API data before importing it
 log_message "Updating IDs"
-api_data=$(cat tyk/data/tyk-dashboard/apis.json)
+api_data=$(cat deployments/tyk/data/tyk-dashboard/apis.json)
 log_message "  Webhooks"
 webhook_data=$(curl $dashboard_base_url/api/hooks?p=-1 -s \
   -H "Authorization: $dashboard_user_api_credentials" | \
   jq '.hooks[]')
 for webhook_id in $(echo $webhook_data | jq --raw-output '.id')
 do
-  # match old data using the webhook name, which is consistent
+  # Match old data using the webhook name, which is consistent
   webhook_name=$(echo "$webhook_data" | jq -r --arg webhook_id "$webhook_id" 'select ( .id == $webhook_id ) .name')
   log_message "    $webhook_name"
   # Hook references
@@ -202,12 +202,12 @@ bootstrap_progress
 log_message "Importing Policies"
 log_json_result="$(curl $dashboard_base_url/admin/policies/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "$(cat tyk/data/tyk-dashboard/policies.json)")"
+  -d "$(cat deployments/tyk/data/tyk-dashboard/policies.json)")"
 bootstrap_progress
 
 log_message "Refreshing APIs"
 # This helps correct some strange behaviour observed with imported data
-cat tyk/data/tyk-dashboard/apis.json | jq --raw-output '.apis[].api_definition.id' | while read api_id
+cat deployments/tyk/data/tyk-dashboard/apis.json | jq --raw-output '.apis[].api_definition.id' | while read api_id
 do
   # Get the API definition from the Dashboard
   api_definition=$(curl $dashboard_base_url/api/apis/$api_id -s \
@@ -222,7 +222,7 @@ bootstrap_progress
 
 log_message "Refreshing Policies"
 # This is done for good measure, as per API Definitions
-cat tyk/data/tyk-dashboard/policies.json | jq --raw-output '.Data[]._id' | while read policy_id
+cat deployments/tyk/data/tyk-dashboard/policies.json | jq --raw-output '.Data[]._id' | while read policy_id
 do
   policy_definition=$(curl $dashboard_base_url/api/portal/policies/$policy_id -s \
     -H "Authorization: $dashboard_user_api_credentials")
@@ -234,12 +234,12 @@ done
 bootstrap_progress
 
 log_message "Waiting for Gateway API to be ready"
-gateway_api_credentials=$(cat tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
+gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
 log_message "  Gateway API credentials = $gateway_api_credentials"
 gateway_status=""
 while [ "$gateway_status" != "200" ]
 do
-  gateway_status=$(curl $gateway_base_url/tyk/keys/api_key_write_test -s -o /dev/null -w "%{http_code}" -H "x-tyk-authorization: $gateway_api_credentials" -d @tyk/data/tyk-gateway/auth-key.json 2>> bootstrap.log)
+  gateway_status=$(curl $gateway_base_url/tyk/keys/api_key_write_test -s -o /dev/null -w "%{http_code}" -H "x-tyk-authorization: $gateway_api_credentials" -d @deployments/tyk/data/tyk-gateway/auth-key.json 2>> bootstrap.log)
 
   if [ "$gateway_status" != "200" ]
   then
@@ -261,23 +261,23 @@ done
 log_message "Importing custom keys"
 result=$(curl $gateway_base_url/tyk/keys/auth_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @tyk/data/tyk-gateway/auth-key.json 2>> bootstrap.log | jq -r '.status')
+  -d @deployments/tyk/data/tyk-gateway/auth-key.json 2>> bootstrap.log | jq -r '.status')
 log_message "  Auth key:$result"
 result=$(curl $gateway_base_url/tyk/keys/ratelimit_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @tyk/data/tyk-gateway/rate-limit-key.json 2>> bootstrap.log | jq -r '.status')
+  -d @deployments/tyk/data/tyk-gateway/rate-limit-key.json 2>> bootstrap.log | jq -r '.status')
 log_message "  Rate limit key:$result"
 result=$(curl $gateway_base_url/tyk/keys/throttle_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @tyk/data/tyk-gateway/throttle-key.json 2>> bootstrap.log | jq -r '.status')
+  -d @deployments/tyk/data/tyk-gateway/throttle-key.json 2>> bootstrap.log | jq -r '.status')
 log_message "  Throttle key:$result"
 result=$(curl $gateway_base_url/tyk/keys/quota_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @tyk/data/tyk-gateway/quota-key.json 2>> bootstrap.log | jq -r '.status')
+  -d @deployments/tyk/data/tyk-gateway/quota-key.json 2>> bootstrap.log | jq -r '.status')
 log_message "  Quota key:$result"
 result=$(curl $dashboard_base_url/api/apis/keys/basic/basic-auth-username -s -w "%{http_code}" -o /dev/null \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d @tyk/data/tyk-dashboard/key-basic-auth.json 2>> bootstrap.log)
+  -d @deployments/tyk/data/tyk-dashboard/key-basic-auth.json 2>> bootstrap.log)
 log_message "  Basic auth key:$result"
 bootstrap_progress
 
@@ -296,7 +296,7 @@ do
   bootstrap_progress
 done
 
-log_end_feature
+log_end_deployment
 
 echo -e "\033[2K
 

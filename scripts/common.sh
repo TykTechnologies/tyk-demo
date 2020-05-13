@@ -3,7 +3,7 @@
 function bootstrap_progress {
   dot_count=$((dot_count+1))
   dots=$(printf "%-${dot_count}s" ".")
-  echo -ne "  Bootstrapping $feature ${dots// /.} \r"
+  echo -ne "  Bootstrapping $deployment ${dots// /.} \r"
 }
 
 function log_http_result {
@@ -30,13 +30,17 @@ function log_ok {
 }
 
 function log_message {
-  echo "$1" >> bootstrap.log
+  echo "$(date -u) $1" >> bootstrap.log
 }
 
-function log_start_feature {
-  log_message "▶ START $feature bootstrap"
+function log_start_deployment {
+  log_message "START ▶ $deployment deployment bootstrap"
 }
 
-function log_end_feature {
-  log_message "▶ END $feature bootstrap"
+function log_end_deployment {
+  log_message "END ▶ $deployment deployment bootstrap"
+}
+
+function recreate_all_tyk_containers {
+  docker-compose -f deployments/tyk/docker-compose.yml -f deployments/tls/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) up --force-recreate -d --no-deps tyk-dashboard tyk-gateway tyk-pump
 }
