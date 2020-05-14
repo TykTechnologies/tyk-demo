@@ -2485,7 +2485,7 @@
                   {
                     "path": "/delay/{time}",
                     "method": "GET",
-                    "timeout": 3
+                    "timeout": 4
                   }
                 ],
                 "circuit_breakers": [

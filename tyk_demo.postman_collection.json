@@ -322,7 +322,7 @@
 										"6"
 									]
 								},
-								"description": "The Enforced Timeout plugin will return a response from the Gateway if the API server does not response within a set time. \n\nThis request calls the `/delay/6` endpoint, which has a 6 second delay before responding. The endpoint uses the Enforced Timeout plugin, which is configured for 3 seconds, so will repsond with a `504 Gateway Timeout` before the API server can provide a response."
+								"description": "The Enforced Timeout plugin will return an error response from the Gateway if the API server does not respond within a set time. \n\nThis request calls the `/delay/6` endpoint, which has a 6 second delay before responding. The endpoint uses the Enforced Timeout plugin, which is configured for 4 seconds, so will repsond with a `504 Gateway Timeout` before the API server can provide a response."
 							},
 							"response": []
 						},
