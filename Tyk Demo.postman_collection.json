@@ -1244,68 +1244,521 @@
 					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Context Variables",
+					"name": "Advanced Options",
 					"item": [
 						{
-							"name": "Context Variables - Correlation Id",
-							"event": [
+							"name": "Webhooks",
+							"item": [
 								{
-									"listen": "test",
-									"script": {
-										"id": "a7d6f0cb-1107-404c-925e-836c0b05d239",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"'X-Req-Id' header is a UUID\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.headers[\"X-Req-Id\"]).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);",
-											"});"
+									"name": "Webhooks - Authentication Failure",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "87a33603-0dd6-48c5-a382-261b9cafa646",
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});",
+													"",
+													"// Add test to check if webhook fired"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "auth-failure-key",
+												"type": "text"
+											}
 										],
-										"type": "text/javascript"
-									}
+										"url": {
+											"raw": "http://localhost:8080/basic-protected-api/get",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"basic-protected-api",
+												"get"
+											]
+										},
+										"description": "This example makes an unauthenticated request to the `Basic Protected API`. The API requires authentication so the request fails, as expected, with a `403 Forbidden` response.\n\nThe `Basic Protected API` is configured to use a webhook in the event of authentication failure. This webhook calls another API, passing information about the failed request. You can see this webhook call in the Dashboard analytics, it's made to the `Webhook Receiver` API, and will appear straight after this failed API request to `Basic Protected API`. In the analytics record, check the body of the request to see origin of the request and key which was used.\n\nWebhooks can be set up to handle lots of different types of events, such as rate limit exceeded, quota exceeded etc. They can also be configured with a cooldown time so that the events don't overload the API receiving the webhooks."
+									},
+									"response": []
 								}
 							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:8080/basic-open-api/get",
-									"protocol": "http",
-									"host": [
-										"localhost"
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Context Variables",
+							"item": [
+								{
+									"name": "Context Variables - Correlation Id",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "a7d6f0cb-1107-404c-925e-836c0b05d239",
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"'X-Req-Id' header is a UUID\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.headers[\"X-Req-Id\"]).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
 									],
-									"port": "8080",
-									"path": [
-										"basic-open-api",
-										"get"
-									]
-								},
-								"description": "Header `X-Req-Id` is injected by the Gateway, and can be seen in the response body. \n\nThe header value is a GUID representing the random id assigned to each request by the Gateway. It is configured using the Tyk context variable `$tyk_context.request_id`.\n\nThe value is accessible to various parts of the Tyk middleware chain, so can be used as a reference when processing requests."
-							},
-							"response": []
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://localhost:8080/basic-open-api/get",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"basic-open-api",
+												"get"
+											]
+										},
+										"description": "Header `X-Req-Id` is injected by the Gateway, and can be seen in the response body. \n\nThe header value is a GUID representing the random id assigned to each request by the Gateway. It is configured using the Tyk context variable `$tyk_context.request_id`.\n\nThe value is accessible to various parts of the Tyk middleware chain, so can be used as a reference when processing requests."
+									},
+									"response": []
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						}
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Webhooks",
+					"name": "Core Settings",
 					"item": [
 						{
-							"name": "Webhooks - Authentication Failure",
+							"name": "Authentication",
+							"item": [
+								{
+									"name": "Authentication Token",
+									"item": [
+										{
+											"name": "Token authorization - failure (part 1)",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "d1873999-d360-4fe1-9f89-dfff6327f9d9",
+														"exec": [
+															"pm.test(\"Status code is 401\", function () {",
+															"    pm.response.to.have.status(401);",
+															"});",
+															"",
+															"pm.test(\"Error message is 'Authorization field missing'\", function () {",
+															"    var jsonData = pm.response.json();",
+															"    pm.expect(jsonData.error).to.eql(\"Authorization field missing\");",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "http://localhost:8080/basic-protected-api/get",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8080",
+													"path": [
+														"basic-protected-api",
+														"get"
+													]
+												},
+												"description": "This API will showcase the Token authorization feature of Tyk.\n\nAn key is not provided in the HTTP header field `Authorization`, resulting in am HTTP status code `401 Unauthorized` returned by the Gateway."
+											},
+											"response": []
+										},
+										{
+											"name": "Token authorization - failure (part 2)",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "26bd1dcc-e158-4c37-b3a8-dd8af2c3990d",
+														"exec": [
+															"pm.test(\"Status code is 403\", function () {",
+															"    pm.response.to.have.status(403);",
+															"});",
+															"",
+															"pm.test(\"Error message is 'Access to this API has been disallowed'\", function () {",
+															"    var jsonData = pm.response.json();",
+															"    pm.expect(jsonData.error).to.eql(\"Access to this API has been disallowed\");",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"type": "text",
+														"value": "missing_key"
+													}
+												],
+												"url": {
+													"raw": "http://localhost:8080/basic-protected-api/get",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8080",
+													"path": [
+														"basic-protected-api",
+														"get"
+													]
+												},
+												"description": "This request attempts to authenticate with a key which does not exist - `missing_key`.\n\nThis results in am HTTP status code `403 Forbidden` response from the Gateway."
+											},
+											"response": []
+										},
+										{
+											"name": "Token authorization - success",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "52005b10-9ba0-4fa0-bfc2-868e1f7dbc1d",
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"'auth_key' used in 'Authorization' header\", function () {",
+															"    var jsonData = pm.response.json();",
+															"    pm.expect(jsonData.headers['Authorization']).to.eql(\"auth_key\");",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "auth_key",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "http://localhost:8080/basic-protected-api/get",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8080",
+													"path": [
+														"basic-protected-api",
+														"get"
+													]
+												},
+												"description": "This API showcases the Token authorization feature of Tyk.\n\nThe key is sent in the HTTP header field `Authorization`. It has been authorized access to the `Basic Protected API`, so the request is accepted by the Gateway."
+											},
+											"response": []
+										}
+									],
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"id": "8fc46ba1-a647-47d2-b4f4-c32de2daa44b",
+												"type": "text/javascript",
+												"exec": [
+													""
+												]
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"id": "6db73cf2-9f98-4815-9033-45e904b48e67",
+												"type": "text/javascript",
+												"exec": [
+													""
+												]
+											}
+										}
+									],
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
+								},
+								{
+									"name": "JSON Web Token",
+									"item": [
+										{
+											"name": "JWT - shared HMAC secret",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "f1a7b288-9211-4eff-bad5-cb5274f265c9",
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9sIjoiNWVhZDcyOTU1NzU5NjEwMDAxODE4Njg4In0.8xOVZJM8Qi4XySrJRMZtaNkaq-Bw3am0gLHFKAHY5OQ",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "http://localhost:8080/jwt-api/get",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8080",
+													"path": [
+														"jwt-api",
+														"get"
+													]
+												},
+												"description": "This request uses JWT authentication using a shared HMAC secret. In this case, the secret is defined on the API definition, but it is also possible to define it separately, which allows multiple secrets to be used.\n\nThe JWT claims are processed as follows:\n\n* `sub`: This is the subject, and is used by Tyk as the identity of the API Client. Tyk creates a session based on the value provided here, which allows it to maintain state for the subject across multiple requests.\n* `pol`: This is the Id of the Policy to use, if the request is authenticated. If no Id is provided then the API Definition specifies a default Policy to use.\n\nFor reference, the payload of the JWT:\n\n```json\n{\n  \"sub\": \"1234567890\",\n  \"pol\": \"5ead72955759610001818688\"\n}\n```"
+											},
+											"response": []
+										},
+										{
+											"name": "JWT - shared HMAC secret with claim (part 1)",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "53799a29-8da3-4822-ad2f-e5abab82446a",
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"type": "text",
+														"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
+													}
+												],
+												"url": {
+													"raw": "http://localhost:8080/jwt-api/anything/allowed-path",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8080",
+													"path": [
+														"jwt-api",
+														"anything",
+														"allowed-path"
+													]
+												},
+												"description": "This request uses a claim in the JWT to define the Policy to use. In this case, the API Definition is configured to inspect the `policy_claim` claim and match the value (`restricted`) against the list defined in the API Definition. \n\nIn this case, the claim matches against the `JWT Policy Restricted` Policy, which uses path-based permissions to only allow requests for `GET /anything/allowed-path`. Requests for other endpoints will be rejected - see part 2.\n\nFor reference, the payload of the JWT:\n\n```json\n{\n  \"sub\": \"1234567890\",\n  \"policy_claim\": \"restricted\"\n}\n```"
+											},
+											"response": []
+										},
+										{
+											"name": "JWT - shared HMAC secret with claim (part 2)",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "1f848342-f06b-446d-b597-5fd99fa2efcd",
+														"exec": [
+															"pm.test(\"Status code is 403\", function () {",
+															"    pm.response.to.have.status(403);",
+															"});",
+															"",
+															"pm.test(\"Error message is `Access to this resource has been disallowed`\", function () {",
+															"    var jsonData = pm.response.json();",
+															"    pm.expect(jsonData.error).to.eql(\"Access to this resource has been disallowed\");",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"type": "text",
+														"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
+													}
+												],
+												"url": {
+													"raw": "http://localhost:8080/jwt-api/anything/restricted-path",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8080",
+													"path": [
+														"jwt-api",
+														"anything",
+														"restricted-path"
+													]
+												},
+												"description": "This request fails because it attempts to access an endpoint which is not listed in the path-based permissions defined in the Policy. The Gateway responds with a `403 Forbidden`."
+											},
+											"response": []
+										}
+									],
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
+								},
+								{
+									"name": "Basic Authentication",
+									"item": [
+										{
+											"name": "Basic Authentication",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"id": "cf01d3a9-271e-4639-b72e-6ede9dc9ff10",
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Basic YmFzaWMtYXV0aC11c2VybmFtZTpiYXNpYy1hdXRoLXBhc3N3b3Jk",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "http://localhost:8080/basic-authentication-api/get",
+													"protocol": "http",
+													"host": [
+														"localhost"
+													],
+													"port": "8080",
+													"path": [
+														"basic-authentication-api",
+														"get"
+													]
+												},
+												"description": "This request uses basic authentication to access the Basic Authentication API. Basic authenticate is based on a username and password.\n\nThe request has an `Authorization` header which has a value comprised of a prefix `Basic` and a base64 encoded representation of the credentials. The value used is the username and password separated with a colon. In this case the username is `basic-auth-username` and the password is `basic-auth-password`, so this gives `basic-auth-username:basic-auth-password`, which is `YmFzaWMtYXV0aC11c2VybmFtZTpiYXNpYy1hdXRoLXBhc3N3b3Jk` when base64 encoded."
+											},
+											"response": []
+										}
+									],
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Rate Limit",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
-										"id": "87a33603-0dd6-48c5-a382-261b9cafa646",
+										"id": "541cc9e5-3e6f-4447-86f8-d271d6a8ac27",
 										"exec": [
-											"pm.test(\"Status code is 403\", function () {",
-											"    pm.response.to.have.status(403);",
-											"});",
+											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 											"",
-											"// Add test to check if webhook fired"
+											"var rateLimitTestKeyCreateRequest = {",
+											"  url: 'http://localhost:8080/tyk/keys/' + keyId,",
+											"  method: 'POST',",
+											"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
+											"  body: {",
+											"      mode: 'raw',",
+											"      raw: JSON.stringify({\"last_check\":0,\"allowance\":2,\"rate\":2,\"per\":5,\"throttle_interval\":-1,\"throttle_retry_limit\":-1,\"date_created\":\"2020-04-23T04:40:22.3984988Z\",\"expires\":0,\"quota_max\":-1,\"quota_renews\":1587616821,\"quota_remaining\":-1,\"quota_renewal_rate\":-1,\"access_rights\":{\"accbdd1b89e84ec97f4f16d4e3197d5c\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616822\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
+											"  }",
+											"};",
+											"",
+											"pm.sendRequest(rateLimitTestKeyCreateRequest, function (err, response) { ",
+											"    pm.test(\"Status code is 429\", function () {",
+											"        var rateLimitRequest = {",
+											"            url: 'http://localhost:8080/basic-protected-api/get',",
+											"            method: 'GET',",
+											"            header: 'Authorization:' + keyId",
+											"        };",
+											"        ",
+											"        pm.sendRequest(rateLimitRequest, function (err, response) {",
+											"            pm.expect(response.code).to.eql(200);",
+											"",
+											"            pm.sendRequest(rateLimitRequest, function (err, response) {",
+											"                pm.expect(response.code).to.eql(200);",
+											"",
+											"                pm.sendRequest(rateLimitRequest, function (err, response) {",
+											"                    pm.expect(response.code).to.eql(429);",
+											"                    ",
+											"                    var rateLimitTestKeyDeleteRequest = {",
+											"                        url: 'http://localhost:8080/tyk/keys/' + keyId,",
+											"                        method: 'DELETE',",
+											"                        header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
+											"                    };",
+											"                ",
+											"                    pm.sendRequest(rateLimitTestKeyDeleteRequest, function (err, response) { });",
+											"",
+											"                });",
+											"            });",
+											"        });",
+											"    });",
+											"});"
 										],
 										"type": "text/javascript"
 									}
@@ -1316,7 +1769,7 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "auth-failure-key",
+										"value": "ratelimit_key",
 										"type": "text"
 									}
 								],
@@ -1332,612 +1785,253 @@
 										"get"
 									]
 								},
-								"description": "This example makes an unauthenticated request to the `Basic Protected API`. The API requires authentication so the request fails, as expected, with a `403 Forbidden` response.\n\nThe `Basic Protected API` is configured to use a webhook in the event of authentication failure. This webhook calls another API, passing information about the failed request. You can see this webhook call in the Dashboard analytics, it's made to the `Webhook Receiver` API, and will appear straight after this failed API request to `Basic Protected API`. In the analytics record, check the body of the request to see origin of the request and key which was used.\n\nWebhooks can be set up to handle lots of different types of events, such as rate limit exceeded, quota exceeded etc. They can also be configured with a cooldown time so that the events don't overload the API receiving the webhooks."
+								"description": "This API will showcase the Rate limiting feature of Tyk.\n\nRate limit is set as 2 per 5 seconds. More than 2 request per 5 will result in `429  Too many requests` error from gateway."
+							},
+							"response": []
+						},
+						{
+							"name": "Throttling",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "f51d2db0-d520-40db-bdbc-2ee7aab7917e",
+										"exec": [
+											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
+											"",
+											"var throttlingTestKeyCreateRequest = {",
+											"  url: 'http://localhost:8080/tyk/keys/' + keyId,",
+											"  method: 'POST',",
+											"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
+											"  body: {",
+											"      mode: 'raw',",
+											"      raw: JSON.stringify({\"last_check\":0,\"allowance\":2,\"rate\":2,\"per\":5,\"throttle_interval\":5,\"throttle_retry_limit\":2,\"date_created\":\"2020-04-23T04:41:37.0404484Z\",\"expires\":0,\"quota_max\":-1,\"quota_renews\":1587616896,\"quota_remaining\":-1,\"quota_renewal_rate\":-1,\"access_rights\":{\"accbdd1b89e84ec97f4f16d4e3197d5c\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616897\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
+											"  }",
+											"};",
+											"",
+											"pm.sendRequest(throttlingTestKeyCreateRequest, function (err, response) { ",
+											"    pm.test(\"Status code is 200\", function () {",
+											"        var throttleRequest = {",
+											"            url: 'http://localhost:8080/basic-protected-api/get',",
+											"            method: 'GET',",
+											"            header: 'Authorization:' + keyId",
+											"        };",
+											"        ",
+											"        pm.sendRequest(throttleRequest, function (err, response) {",
+											"            pm.expect(response.code).to.eql(200);",
+											"",
+											"            pm.sendRequest(throttleRequest, function (err, response) {",
+											"                pm.expect(response.code).to.eql(200);",
+											"",
+											"                pm.sendRequest(throttleRequest, function (err, response) {",
+											"                    pm.expect(response.code).to.eql(200);",
+											"                    ",
+											"                    var throttlingTestKeyDeleteRequest = {",
+											"                            url: 'http://localhost:8080/tyk/keys/' + keyId,",
+											"                            method: 'DELETE',",
+											"                            header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
+											"                        };",
+											"                    ",
+											"                    pm.sendRequest(throttlingTestKeyDeleteRequest, function (err, response) { });",
+											"                });",
+											"            });",
+											"        });",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "throttle_key"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/basic-protected-api/get",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"basic-protected-api",
+										"get"
+									]
+								},
+								"description": "This API will showcase the Throttling feature of Tyk.\n\nRate limit is set as 2 per 5 seconds. Gateway Throttling is configured for 10 times with 1 sec interval. \n\nWe can obeserve a delay in response due to throttling after the rate limit has been reached."
+							},
+							"response": []
+						},
+						{
+							"name": "Quota Limit",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "a86aa937-32c3-4e67-b780-96dd4060d968",
+										"exec": [
+											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
+											"",
+											"var quotaTestKeyCreateRequest = {",
+											"    url: 'http://localhost:8080/tyk/keys/' + keyId,",
+											"    method: 'POST',",
+											"    header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
+											"    body: {",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify({\"last_check\":0,\"allowance\":1000,\"rate\":1000,\"per\":60,\"throttle_interval\":-1,\"throttle_retry_limit\":-1,\"date_created\":\"2020-04-23T04:43:07.8812258Z\",\"expires\":0,\"quota_max\":2,\"quota_renews\":1587620587,\"quota_remaining\":2,\"quota_renewal_rate\":3600,\"access_rights\":{\"accbdd1b89e84ec97f4f16d4e3197d5c\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616987\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
+											"  }",
+											"};",
+											"",
+											"pm.sendRequest(quotaTestKeyCreateRequest, function (err, response) { ",
+											"    pm.test(\"Status code is 403\", function () {",
+											"        var quotaRequest = {",
+											"            url: 'http://localhost:8080/basic-protected-api/get',",
+											"            method: 'GET',",
+											"            header: 'Authorization:' + keyId",
+											"        };",
+											"        ",
+											"        pm.sendRequest(quotaRequest, function (err, response) {",
+											"            pm.expect(response.headers.get(\"X-Ratelimit-Remaining\")).to.eql(\"1\");",
+											"            pm.expect(response.code).to.eql(200);",
+											"            ",
+											"            pm.sendRequest(quotaRequest, function (err, response) {",
+											"                pm.expect(response.headers.get(\"X-Ratelimit-Remaining\")).to.eql(\"0\");",
+											"                pm.expect(response.code).to.eql(200);",
+											"                ",
+											"                pm.sendRequest(quotaRequest, function (err, response) {",
+											"                    pm.expect(response.code).to.eql(403);",
+											"                    ",
+											"                    var quotaTestKeyDeleteRequest = {",
+											"                        url: 'http://localhost:8080/tyk/keys/' + keyId,",
+											"                        method: 'DELETE',",
+											"                        header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
+											"                    };",
+											"                ",
+											"                    pm.sendRequest(quotaTestKeyDeleteRequest, function (err, response) { });",
+											"                });",
+											"            });",
+											"        });",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "quota_key"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/basic-protected-api/get",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"basic-protected-api",
+										"get"
+									]
+								},
+								"description": "This API will showcase the Quota limiting feature of Tyk.\n\nQuota limit is set as 2 per hour. More than 2 request per hour will result in `403 Forbidden` error from gateway."
+							},
+							"response": []
+						},
+						{
+							"name": "Load Balancing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "b49e1199-aea6-40ee-84e8-eef2fd072f2d",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Host is either httpbin or httpbin2\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers.Host).to.match(/^httpbin2?$/)",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/load-balanced-api/get",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"load-balanced-api",
+										"get"
+									]
+								},
+								"description": "This request calls an API Definition which is configured to load balance the proxied requests across multiple upstream hosts. The API Definition specifies two hosts, `httpbin` and `httpbin2`. The Gateway uses round-robin load balancing, so each host is called in turn.\n\nCheck the `headers.Host` property of the response body, it will alternative between `httpbin` and `httpbin2`. This shows that the Gateway is load balancing the upstream requests."
+							},
+							"response": []
+						},
+						{
+							"name": "Uptime Tests",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d4ab4f3e-3f03-4197-8bee-16d0238ebee9",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Host is httpbin2\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers.Host).to.match(/^httpbin2$/)",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/uptime-test-api/get",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"uptime-test-api",
+										"get"
+									]
+								},
+								"description": "This request calls an API which uses Uptime Tests to monitor the health of the upstream hosts it is configured to proxy requests to.\n\nIn this case, it is configred load balance requests upstream to `httpbin` and `httpbin2`. An uptime test has been added to the API Definition which calls the `status/500` endpoint of the `httpbin` host. This endpoint always returns `HTTP 500` status codes, which causes the uptime test to fail, triggering the removal of the `httpbin` host from the load balancer. This means that requests sent to this API will only be proxied to the `httpbin2` host, since the `httpbin` host has been marked as unhealthy.\n\nCheck the `headers.Hosts` property of the response body. This will always show `httpbin2`.\n\nIn order for the Gateway to remove the unhealthy host from the load balancer, the API Definition must have both nn Uptime Test using the same hostname, and the `check_host_against_uptime_tests` property set to `true`. If `check_host_against_uptime_tests` is not set to `true` then the unhealthy host will not be removed from the load balancer, only an event will be raised.\n\n**Note**: To reduce the amount of warning messages in the Gateway application log generated by failing tests, the uptime tests have been configured to run every 30 seconds. This means that on initial startup, the Gateway will proxy to both hosts (`httpbin` and `httpbin2`) until the first Uptime Test is run."
 							},
 							"response": []
 						}
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Authentication",
-					"item": [
-						{
-							"name": "Authentication Token",
-							"item": [
-								{
-									"name": "Token authorization - failure (part 1)",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "d1873999-d360-4fe1-9f89-dfff6327f9d9",
-												"exec": [
-													"pm.test(\"Status code is 401\", function () {",
-													"    pm.response.to.have.status(401);",
-													"});",
-													"",
-													"pm.test(\"Error message is 'Authorization field missing'\", function () {",
-													"    var jsonData = pm.response.json();",
-													"    pm.expect(jsonData.error).to.eql(\"Authorization field missing\");",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Authorization",
-												"value": "",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "http://localhost:8080/basic-protected-api/get",
-											"protocol": "http",
-											"host": [
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"basic-protected-api",
-												"get"
-											]
-										},
-										"description": "This API will showcase the Token authorization feature of Tyk.\n\nAn key is not provided in the HTTP header field `Authorization`, resulting in am HTTP status code `401 Unauthorized` returned by the Gateway."
-									},
-									"response": []
-								},
-								{
-									"name": "Token authorization - failure (part 2)",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "26bd1dcc-e158-4c37-b3a8-dd8af2c3990d",
-												"exec": [
-													"pm.test(\"Status code is 403\", function () {",
-													"    pm.response.to.have.status(403);",
-													"});",
-													"",
-													"pm.test(\"Error message is 'Access to this API has been disallowed'\", function () {",
-													"    var jsonData = pm.response.json();",
-													"    pm.expect(jsonData.error).to.eql(\"Access to this API has been disallowed\");",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Authorization",
-												"type": "text",
-												"value": "missing_key"
-											}
-										],
-										"url": {
-											"raw": "http://localhost:8080/basic-protected-api/get",
-											"protocol": "http",
-											"host": [
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"basic-protected-api",
-												"get"
-											]
-										},
-										"description": "This request attempts to authenticate with a key which does not exist - `missing_key`.\n\nThis results in am HTTP status code `403 Forbidden` response from the Gateway."
-									},
-									"response": []
-								},
-								{
-									"name": "Token authorization - success",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "52005b10-9ba0-4fa0-bfc2-868e1f7dbc1d",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"'auth_key' used in 'Authorization' header\", function () {",
-													"    var jsonData = pm.response.json();",
-													"    pm.expect(jsonData.headers['Authorization']).to.eql(\"auth_key\");",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Authorization",
-												"value": "auth_key",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "http://localhost:8080/basic-protected-api/get",
-											"protocol": "http",
-											"host": [
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"basic-protected-api",
-												"get"
-											]
-										},
-										"description": "This API showcases the Token authorization feature of Tyk.\n\nThe key is sent in the HTTP header field `Authorization`. It has been authorized access to the `Basic Protected API`, so the request is accepted by the Gateway."
-									},
-									"response": []
-								}
-							],
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "8fc46ba1-a647-47d2-b4f4-c32de2daa44b",
-										"type": "text/javascript",
-										"exec": [
-											""
-										]
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"id": "6db73cf2-9f98-4815-9033-45e904b48e67",
-										"type": "text/javascript",
-										"exec": [
-											""
-										]
-									}
-								}
-							],
-							"protocolProfileBehavior": {},
-							"_postman_isSubFolder": true
-						},
-						{
-							"name": "JSON Web Token",
-							"item": [
-								{
-									"name": "JWT - shared HMAC secret",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "f1a7b288-9211-4eff-bad5-cb5274f265c9",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Authorization",
-												"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9sIjoiNWVhZDcyOTU1NzU5NjEwMDAxODE4Njg4In0.8xOVZJM8Qi4XySrJRMZtaNkaq-Bw3am0gLHFKAHY5OQ",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "http://localhost:8080/jwt-api/get",
-											"protocol": "http",
-											"host": [
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"jwt-api",
-												"get"
-											]
-										},
-										"description": "This request uses JWT authentication using a shared HMAC secret. In this case, the secret is defined on the API definition, but it is also possible to define it separately, which allows multiple secrets to be used.\n\nThe JWT claims are processed as follows:\n\n* `sub`: This is the subject, and is used by Tyk as the identity of the API Client. Tyk creates a session based on the value provided here, which allows it to maintain state for the subject across multiple requests.\n* `pol`: This is the Id of the Policy to use, if the request is authenticated. If no Id is provided then the API Definition specifies a default Policy to use.\n\nFor reference, the payload of the JWT:\n\n```json\n{\n  \"sub\": \"1234567890\",\n  \"pol\": \"5ead72955759610001818688\"\n}\n```"
-									},
-									"response": []
-								},
-								{
-									"name": "JWT - shared HMAC secret with claim (part 1)",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "53799a29-8da3-4822-ad2f-e5abab82446a",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Authorization",
-												"type": "text",
-												"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
-											}
-										],
-										"url": {
-											"raw": "http://localhost:8080/jwt-api/anything/allowed-path",
-											"protocol": "http",
-											"host": [
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"jwt-api",
-												"anything",
-												"allowed-path"
-											]
-										},
-										"description": "This request uses a claim in the JWT to define the Policy to use. In this case, the API Definition is configured to inspect the `policy_claim` claim and match the value (`restricted`) against the list defined in the API Definition. \n\nIn this case, the claim matches against the `JWT Policy Restricted` Policy, which uses path-based permissions to only allow requests for `GET /anything/allowed-path`. Requests for other endpoints will be rejected - see part 2.\n\nFor reference, the payload of the JWT:\n\n```json\n{\n  \"sub\": \"1234567890\",\n  \"policy_claim\": \"restricted\"\n}\n```"
-									},
-									"response": []
-								},
-								{
-									"name": "JWT - shared HMAC secret with claim (part 2)",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "1f848342-f06b-446d-b597-5fd99fa2efcd",
-												"exec": [
-													"pm.test(\"Status code is 403\", function () {",
-													"    pm.response.to.have.status(403);",
-													"});",
-													"",
-													"pm.test(\"Error message is `Access to this resource has been disallowed`\", function () {",
-													"    var jsonData = pm.response.json();",
-													"    pm.expect(jsonData.error).to.eql(\"Access to this resource has been disallowed\");",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Authorization",
-												"type": "text",
-												"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
-											}
-										],
-										"url": {
-											"raw": "http://localhost:8080/jwt-api/anything/restricted-path",
-											"protocol": "http",
-											"host": [
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"jwt-api",
-												"anything",
-												"restricted-path"
-											]
-										},
-										"description": "This request fails because it attempts to access an endpoint which is not listed in the path-based permissions defined in the Policy. The Gateway responds with a `403 Forbidden`."
-									},
-									"response": []
-								}
-							],
-							"protocolProfileBehavior": {},
-							"_postman_isSubFolder": true
-						},
-						{
-							"name": "Basic Authentication",
-							"item": [
-								{
-									"name": "Basic Authentication",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "cf01d3a9-271e-4639-b72e-6ede9dc9ff10",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Authorization",
-												"value": "Basic YmFzaWMtYXV0aC11c2VybmFtZTpiYXNpYy1hdXRoLXBhc3N3b3Jk",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "http://localhost:8080/basic-authentication-api/get",
-											"protocol": "http",
-											"host": [
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"basic-authentication-api",
-												"get"
-											]
-										},
-										"description": "This request uses basic authentication to access the Basic Authentication API. Basic authenticate is based on a username and password.\n\nThe request has an `Authorization` header which has a value comprised of a prefix `Basic` and a base64 encoded representation of the credentials. The value used is the username and password separated with a colon. In this case the username is `basic-auth-username` and the password is `basic-auth-password`, so this gives `basic-auth-username:basic-auth-password`, which is `YmFzaWMtYXV0aC11c2VybmFtZTpiYXNpYy1hdXRoLXBhc3N3b3Jk` when base64 encoded."
-									},
-									"response": []
-								}
-							],
-							"protocolProfileBehavior": {},
-							"_postman_isSubFolder": true
-						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Rate Limit",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "541cc9e5-3e6f-4447-86f8-d271d6a8ac27",
-								"exec": [
-									"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
-									"",
-									"var rateLimitTestKeyCreateRequest = {",
-									"  url: 'http://localhost:8080/tyk/keys/' + keyId,",
-									"  method: 'POST',",
-									"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
-									"  body: {",
-									"      mode: 'raw',",
-									"      raw: JSON.stringify({\"last_check\":0,\"allowance\":2,\"rate\":2,\"per\":5,\"throttle_interval\":-1,\"throttle_retry_limit\":-1,\"date_created\":\"2020-04-23T04:40:22.3984988Z\",\"expires\":0,\"quota_max\":-1,\"quota_renews\":1587616821,\"quota_remaining\":-1,\"quota_renewal_rate\":-1,\"access_rights\":{\"accbdd1b89e84ec97f4f16d4e3197d5c\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616822\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
-									"  }",
-									"};",
-									"",
-									"pm.sendRequest(rateLimitTestKeyCreateRequest, function (err, response) { ",
-									"    pm.test(\"Status code is 429\", function () {",
-									"        var rateLimitRequest = {",
-									"            url: 'http://localhost:8080/basic-protected-api/get',",
-									"            method: 'GET',",
-									"            header: 'Authorization:' + keyId",
-									"        };",
-									"        ",
-									"        pm.sendRequest(rateLimitRequest, function (err, response) {",
-									"            pm.expect(response.code).to.eql(200);",
-									"",
-									"            pm.sendRequest(rateLimitRequest, function (err, response) {",
-									"                pm.expect(response.code).to.eql(200);",
-									"",
-									"                pm.sendRequest(rateLimitRequest, function (err, response) {",
-									"                    pm.expect(response.code).to.eql(429);",
-									"                    ",
-									"                    var rateLimitTestKeyDeleteRequest = {",
-									"                        url: 'http://localhost:8080/tyk/keys/' + keyId,",
-									"                        method: 'DELETE',",
-									"                        header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
-									"                    };",
-									"                ",
-									"                    pm.sendRequest(rateLimitTestKeyDeleteRequest, function (err, response) { });",
-									"",
-									"                });",
-									"            });",
-									"        });",
-									"    });",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "ratelimit_key",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/basic-protected-api/get",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"basic-protected-api",
-								"get"
-							]
-						},
-						"description": "This API will showcase the Rate limiting feature of Tyk.\n\nRate limit is set as 2 per 5 seconds. More than 2 request per 5 will result in `429  Too many requests` error from gateway."
-					},
-					"response": []
-				},
-				{
-					"name": "Throttling",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "f51d2db0-d520-40db-bdbc-2ee7aab7917e",
-								"exec": [
-									"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
-									"",
-									"var throttlingTestKeyCreateRequest = {",
-									"  url: 'http://localhost:8080/tyk/keys/' + keyId,",
-									"  method: 'POST',",
-									"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
-									"  body: {",
-									"      mode: 'raw',",
-									"      raw: JSON.stringify({\"last_check\":0,\"allowance\":2,\"rate\":2,\"per\":5,\"throttle_interval\":5,\"throttle_retry_limit\":2,\"date_created\":\"2020-04-23T04:41:37.0404484Z\",\"expires\":0,\"quota_max\":-1,\"quota_renews\":1587616896,\"quota_remaining\":-1,\"quota_renewal_rate\":-1,\"access_rights\":{\"accbdd1b89e84ec97f4f16d4e3197d5c\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616897\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
-									"  }",
-									"};",
-									"",
-									"pm.sendRequest(throttlingTestKeyCreateRequest, function (err, response) { ",
-									"    pm.test(\"Status code is 200\", function () {",
-									"        var throttleRequest = {",
-									"            url: 'http://localhost:8080/basic-protected-api/get',",
-									"            method: 'GET',",
-									"            header: 'Authorization:' + keyId",
-									"        };",
-									"        ",
-									"        pm.sendRequest(throttleRequest, function (err, response) {",
-									"            pm.expect(response.code).to.eql(200);",
-									"",
-									"            pm.sendRequest(throttleRequest, function (err, response) {",
-									"                pm.expect(response.code).to.eql(200);",
-									"",
-									"                pm.sendRequest(throttleRequest, function (err, response) {",
-									"                    pm.expect(response.code).to.eql(200);",
-									"                    ",
-									"                    var throttlingTestKeyDeleteRequest = {",
-									"                            url: 'http://localhost:8080/tyk/keys/' + keyId,",
-									"                            method: 'DELETE',",
-									"                            header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
-									"                        };",
-									"                    ",
-									"                    pm.sendRequest(throttlingTestKeyDeleteRequest, function (err, response) { });",
-									"                });",
-									"            });",
-									"        });",
-									"    });",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "throttle_key"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/basic-protected-api/get",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"basic-protected-api",
-								"get"
-							]
-						},
-						"description": "This API will showcase the Throttling feature of Tyk.\n\nRate limit is set as 2 per 5 seconds. Gateway Throttling is configured for 10 times with 1 sec interval. \n\nWe can obeserve a delay in response due to throttling after the rate limit has been reached."
-					},
-					"response": []
-				},
-				{
-					"name": "Quota Limit",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "a86aa937-32c3-4e67-b780-96dd4060d968",
-								"exec": [
-									"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
-									"",
-									"var quotaTestKeyCreateRequest = {",
-									"    url: 'http://localhost:8080/tyk/keys/' + keyId,",
-									"    method: 'POST',",
-									"    header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
-									"    body: {",
-									"        mode: 'raw',",
-									"        raw: JSON.stringify({\"last_check\":0,\"allowance\":1000,\"rate\":1000,\"per\":60,\"throttle_interval\":-1,\"throttle_retry_limit\":-1,\"date_created\":\"2020-04-23T04:43:07.8812258Z\",\"expires\":0,\"quota_max\":2,\"quota_renews\":1587620587,\"quota_remaining\":2,\"quota_renewal_rate\":3600,\"access_rights\":{\"accbdd1b89e84ec97f4f16d4e3197d5c\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616987\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
-									"  }",
-									"};",
-									"",
-									"pm.sendRequest(quotaTestKeyCreateRequest, function (err, response) { ",
-									"    pm.test(\"Status code is 403\", function () {",
-									"        var quotaRequest = {",
-									"            url: 'http://localhost:8080/basic-protected-api/get',",
-									"            method: 'GET',",
-									"            header: 'Authorization:' + keyId",
-									"        };",
-									"        ",
-									"        pm.sendRequest(quotaRequest, function (err, response) {",
-									"            pm.expect(response.headers.get(\"X-Ratelimit-Remaining\")).to.eql(\"1\");",
-									"            pm.expect(response.code).to.eql(200);",
-									"            ",
-									"            pm.sendRequest(quotaRequest, function (err, response) {",
-									"                pm.expect(response.headers.get(\"X-Ratelimit-Remaining\")).to.eql(\"0\");",
-									"                pm.expect(response.code).to.eql(200);",
-									"                ",
-									"                pm.sendRequest(quotaRequest, function (err, response) {",
-									"                    pm.expect(response.code).to.eql(403);",
-									"                    ",
-									"                    var quotaTestKeyDeleteRequest = {",
-									"                        url: 'http://localhost:8080/tyk/keys/' + keyId,",
-									"                        method: 'DELETE',",
-									"                        header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
-									"                    };",
-									"                ",
-									"                    pm.sendRequest(quotaTestKeyDeleteRequest, function (err, response) { });",
-									"                });",
-									"            });",
-									"        });",
-									"    });",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "quota_key"
-							}
-						],
-						"url": {
-							"raw": "http://localhost:8080/basic-protected-api/get",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"basic-protected-api",
-								"get"
-							]
-						},
-						"description": "This API will showcase the Quota limiting feature of Tyk.\n\nQuota limit is set as 2 per hour. More than 2 request per hour will result in `403 Forbidden` error from gateway."
-					},
-					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
