@@ -2549,9 +2549,9 @@
                 ],
                 "virtual": [
                   {
-                    "response_function_name": "myUniqueFunctionName",
+                    "response_function_name": "virtualEndpointDemonstrationFunction",
                     "function_source_type": "blob",
-                    "function_source_uri": "ZnVuY3Rpb24gbXlVbmlxdWVGdW5jdGlvbk5hbWUocmVxdWVzdCwgc2Vzc2lvbiwgY29uZmlnKSB7CiAgdmFyIHJlc3BvbnNlT2JqZWN0ID0geyAKICAgIEJvZHk6ICJWaXJ0dWFsIGVuZHBvaW50IHJlc3BvbnNlIGJvZHkiLCAKICAgIENvZGU6IDIwMCAKICB9CiAgcmV0dXJuIFR5a0pzUmVzcG9uc2UocmVzcG9uc2VPYmplY3QsIHNlc3Npb24ubWV0YV9kYXRhKQp9",
+                    "function_source_uri": "ZnVuY3Rpb24gdmlydHVhbEVuZHBvaW50RGVtb25zdHJhdGlvbkZ1bmN0aW9uKHJlcXVlc3QsIHNlc3Npb24sIGNvbmZpZykgewogIHZhciByZXNwb25zZU9iamVjdCA9IHsgCiAgICBCb2R5OiAiVmlydHVhbCBlbmRwb2ludCByZXNwb25zZSBib2R5IiwgCiAgICBDb2RlOiAyMDAgCiAgfQogIHJldHVybiBUeWtKc1Jlc3BvbnNlKHJlc3BvbnNlT2JqZWN0LCBzZXNzaW9uLm1ldGFfZGF0YSkKfQ==",
                     "path": "/anything/virtual-endpoint",
                     "method": "GET",
                     "use_session": false,
