@@ -132,7 +132,7 @@ Import the `Tyk Demo.postman_collection.json` into your Postman to start making 
 
 # Resetting
 
-The purpose of the `up.sh` script is to enable the environment to be easily set up from scratch. If you want to reset your environment then you need to remove the volumes associated with the container as well as the containers themselves.
+If you want to reset your environment then you need to remove the volumes associated with the container as well as the containers themselves. The `down.sh` script can do this for you.
 
 To bring down the containers and delete associated volumes:
 
@@ -140,7 +140,7 @@ To bring down the containers and delete associated volumes:
 ./down.sh
 ```
 
-If you used deployment parameters when running the `up.sh` script, you should also include them when taking the system down. For example, to bring down the standard Tyk and analytics export deployments:
+If you used deployment parameters when running the `up.sh` script, you should also include them when taking the system down. For example, to bring down the standard Tyk and `analytic` deployments:
 
 ```
 ./down.sh analytics
