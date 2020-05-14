@@ -2003,7 +2003,7 @@
 											"",
 											"pm.test(\"Host is httpbin2\", function () {",
 											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.headers.Host).to.match(/^httpbin2$/)",
+											"    pm.expect(jsonData.headers.Host).to.eql(\"httpbin2\")",
 											"});"
 										],
 										"type": "text/javascript"
