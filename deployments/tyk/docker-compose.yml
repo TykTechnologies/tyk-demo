@@ -55,7 +55,9 @@ services:
   httpbin:
     image: kennethreitz/httpbin
     networks:
-      - tyk
+      tyk:
+        aliases:
+          - httpbin2
   swagger-petstore:
     image: swaggerapi/petstore:latest
     networks:
