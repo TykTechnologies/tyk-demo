@@ -19,7 +19,7 @@ There is a focus on simplicity. Docker Compose is used to provision the containe
 # Repository Structure
 
 * `deployments/*`: Contains all the deployments available as sub-directories
-* `Tyk Demo.postman_collection.json`: A Postman collection of requests which correspond to APIs available in the deployment
+* `tyk_demo.postman_collection.json`: A Postman collection of requests which correspond to APIs available in the deployment
 * `scripts/*.sh`: Some useful commands encapsulated in scripts
 * `up.sh`: Brings up the deployment
 * `down.sh`: Takes down the deployment
@@ -130,7 +130,7 @@ When you log into the Dashboard, you will find the imported APIs and Policies ar
 
 There is a Postman collection built to compliment the API definitions. This lets you start using Tyk features and functionality straight away.
 
-Import the `Tyk Demo.postman_collection.json` into your Postman to start making requests.
+Import the `tyk_demo.postman_collection.json` into your Postman to start making requests.
 
 # Resetting
 
@@ -167,7 +167,7 @@ Run from the repo root directory, as so:
 
 This will update the `apis.json` and `policies.json` files in the `deployments/tyk/data/tyk-dashboard` directory. You can then commit these files into the repo.
 
-If you have also made changes to the Postman collection then export it and overwrite the `Tyk Demo.postman_collection.json` and commit that too.
+If you have also made changes to the Postman collection then export it and overwrite the `tyk_demo.postman_collection.json` and commit that too.
 
 ## Scenario 2: Synchronising updates
 
