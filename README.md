@@ -98,17 +98,19 @@ To bootstrap the system we will run the `up.sh` script, which will run the neces
 
 This will bring up the standard Tyk deployment, after which you can log into the Dashboard and start using Tyk.
 
-If you want to deploy the feature deployments then you should also bootstrap those systems too. Run the `up.sh` command, passing a parameter of the directory name of the feature to deploy. For example, to bootstrap the analytics feature:
+### Deploying a feature
+
+If you want to deploy features, run the `up.sh` command, passing a parameter of the directory name of the feature to deploy. For example, to deploy both the base `tyk` deployment and the `analytics` feature:
 
 ```
 ./up.sh analytics
 ```
 
-The feature names are the directory names from the `/deployments` directory.
+The feature names are the directory names from the `deployments` directory.
 
 ### Deploying multiple features at the same time
 
-Multiple features can be deployed at the same time by providing multiple parameters e.g.
+Multiple features can be deployed at the same time by providing multiple feature parameters. For example, to deploy `analytics` and `instrumentation`:
 
 ```
 ./up.sh analytics instrumentation
@@ -116,7 +118,7 @@ Multiple features can be deployed at the same time by providing multiple paramet
 
 ### Bootstrap logging
 
-During the bootstrap process, check the `bootstrap.log` file for information about the commands being run.
+The bootstrap scripts provide feedback on progress in the `bootstrap.log` file.
 
 ## Step 6: Log into the Dashboard
 
