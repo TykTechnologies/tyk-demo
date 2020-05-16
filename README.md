@@ -145,7 +145,7 @@ Run from the repo root directory, as so:
 
 This will update the `apis.json` and `policies.json` files in the `deployments/tyk/data/tyk-dashboard` directory. You can then commit these files into the repo.
 
-If you have also made changes to the Postman collection then export it and overwrite the `tyk_demo.postman_collection.json` and commit that too.
+When adding functionality to this repo, please also add requests to the Postman collection to demonstrate the functionality, and add tests to the requests to validate them. Once the requests and tests are added, export the collection and overwrite the `tyk_demo.postman_collection.json` file, which can then be commited too.
 
 ## Scenario 2: Synchronising updates
 
