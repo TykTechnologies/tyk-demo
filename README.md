@@ -34,41 +34,15 @@ All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.
 
 ## Step 1: Install dependencies
 
-### Git Large File Storage
-
-There is a large archive file as part of this repo. [LFS](https://git-lfs.github.com/) has been used to make storage and transfer of this file efficient. 
-
-This **must** be done before this repo is cloned otherwise LFS will not be available to retrieve the large files. Once it is installed you can use git commands normally.
-
-Use brew to install:
-
-```
-brew install git-lfs
-```
-
-Then initialise Git LFS with this command:
-
-```
-git lfs install
-```
-
 ### JQ
 
-The bootstrap script uses JQ for extracting data from JSON object. Can be installed as follows:
+The bootstrap script uses JQ for extracting data from JSON object, it can be installed as follows:
 
 ```
 brew install jq
 ```
 
-## Step 2: Clone the repo
-
-The repo must be cloned after Git LFS is initialised. This is due to LFS being needed to transfer the large files in the repo.
-
-```
-git clone https://github.com/davegarvey/tyk-pro-docker-demo-extended
-```
-
-## Step 3: Add Docker Environment variables
+## Step 2: Add Docker Environment variables
 
 The `docker-compose.yml` file uses a Docker environment variable to set the dashboard licence. To set this, create a file called `.env` in the root directory of the repo, then set the content of the file as follows, replacing `<YOUR_LICENCE>` with your Dashboard licence:
 
@@ -78,7 +52,7 @@ DASHBOARD_LICENCE=<YOUR_LICENCE>
 
 In addition to this, some features require entries in the `.env` file. These are set automatically by the `bootstrap.sh` files, depending on the deployment.
 
-## Step 4: Make the scripts executable
+## Step 3: Make the scripts executable
 
 There are two scripts which can be used to bring up and tear down the deployment: `up.sh` and `down.sh`.
 
@@ -88,7 +62,7 @@ Make these scripts executable:
 chmod +x up.sh down.sh
 ```
 
-## Step 5: Bring the deployment up
+## Step 4: Bring the deployment up
 
 To bootstrap the system we will run the `up.sh` script, which will run the necessary `docker-compose` and `bootstrap` commands to start the containers and bootstrap the system. 
 
@@ -120,17 +94,17 @@ Multiple features can be deployed at the same time by providing multiple feature
 
 The bootstrap scripts provide feedback on progress in the `bootstrap.log` file.
 
-## Step 6: Log into the Dashboard
+## Step 5: Log into the Dashboard
 
-The `bootstrap.sh` scripts provide credentials and other useful information in the terminal output. Check this output for the Dashboard credentials.
+The bootstrap process provides credentials and other useful information in the terminal output. Check this output for the Dashboard credentials.
 
 When you log into the Dashboard, you will find the imported APIs and Policies are now available.
 
-## Step 7: Import API requests into Postman
+## Step 6: Import API requests into Postman
 
-There is a Postman collection built to compliment the API definitions. This lets you start using Tyk features and functionality straight away.
+There is a Postman collection provided which compliments the imported API definitions and Policies. This lets you demonstrate Tyk features and functionality.
 
-Import the `tyk_demo.postman_collection.json` into your Postman to start making requests.
+Import the `tyk_demo.postman_collection.json` into your [Postman](https://postman.com) to start making requests.
 
 # Resetting
 
@@ -147,6 +121,10 @@ If you used deployment parameters when running the `up.sh` script, you should al
 ```
 ./down.sh analytics
 ```
+
+# Redeploying
+
+The `up.sh` script is not intended to be run consecutively without running `down.sh` in between. The reason for this is that the `up.sh` script assumes that the system will not contain any data, so it attempts to bootstrap the system by creating data. This means that running the script repeatedly will result in duplicate data.
 
 # Working with APIs and Policies
 

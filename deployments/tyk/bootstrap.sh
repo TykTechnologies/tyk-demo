@@ -243,13 +243,14 @@ do
 
   if [ "$gateway_status" != "200" ]
   then
-    log_message "  Request unsuccessful, retrying..."
     # if we get a 500 then it's probably because the Gateway hasn't received the reload signal from when the Dashboard data was imported, so force reload now
     if [ "$gateway_status" == "500" ]
     then
-      log_message "    Reloading Gateway"
+      log_message "  Reloading Gateway due to HTTP 500 response"
       curl $gateway_base_url/tyk/reload -s -o /dev/null -H "x-tyk-authorization: $gateway_api_credentials" 2>> bootstrap.log
       sleep 2
+    else
+      log_message "  Request unsuccessful, retrying..."
     fi
     sleep 2
   else

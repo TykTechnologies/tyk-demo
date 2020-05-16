@@ -7,7 +7,6 @@ services:
     networks:
       - tyk
     volumes:
-      - ./deployments/cicd/volumes/jenkins/jenkins.tar.gz:/var/jenkins_home/jenkins.tar.gz
       - ./deployments/cicd/volumes/jenkins/jenkins-cli.jar:/var/jenkins_home/jenkins-cli.jar
       - ./deployments/cicd/volumes/jenkins/bootstrap-import:/var/jenkins_home/bootstrap-import
       - jenkins-data:/var/jenkins_home
