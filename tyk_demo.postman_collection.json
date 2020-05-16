@@ -2237,6 +2237,52 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "Dashboard Admin API",
+			"item": [
+				{
+					"name": "Get Organisations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d88cbebf-d057-47e9-9ef4-694d0c8f56ba",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "admin-auth",
+								"value": "ff8289874f5d45de945a2ea5c02580fe",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/admin/organisations",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"admin",
+								"organisations"
+							]
+						},
+						"description": "This request gets all the Organisations. These are the root objects in the Dashboard database, which other objects are linked to.\n\nOrganistaions enable multi-tenancy in the Tyk Dashboard."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "Basic Test Request",
 			"event": [
 				{
