@@ -2,3 +2,4 @@
 .context-data
 bootstrap.log
 deployments/cicd/volumes/jenkins/bootstrap-import/credentials-global.xml
+deployments/cicd/volumes/jenkins/bootstrap-import/jenkins-plugins.tar.gz
