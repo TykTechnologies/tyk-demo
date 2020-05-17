@@ -9,7 +9,8 @@ then
 fi
 
 # make scripts executable
-chmod +x `ls */*.sh` 1> /dev/null 
+chmod +x `ls scripts/*.sh` 1> /dev/null 
+chmod +x `ls deployments/*/*.sh` 1> /dev/null 
 
 # make the context data directory
 mkdir -p .context-data 1> /dev/null
