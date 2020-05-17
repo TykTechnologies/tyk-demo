@@ -11,17 +11,19 @@ function log_http_result {
   then 
     log_ok
   else 
-    log_message "  Error"
+    log_message "  ERROR: $1"
+    touch .bootstrap_error_occurred
   fi
 }
 
 function log_json_result {
   status=$(echo $1 | jq -r '.Status')
-  if [ "$status" = "OK" ] || [ "$status"= "Ok" ]
+  if [ "$status" = "OK" ] || [ "$status" = "Ok" ]
   then
     log_ok
   else
-    log_message "  Error"
+    log_message "  ERROR: $(echo $1 | jq -r '.Message')"
+    touch .bootstrap_error_occurred
   fi
 }
 
