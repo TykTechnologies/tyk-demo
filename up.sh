@@ -37,3 +37,10 @@ do
     eval "deployments/$var/bootstrap.sh"
   fi
 done
+
+# if an error was logged, report it
+if [ -f .bootstrap_error_occurred ]
+then
+  rm .bootstrap_error_occurred
+  echo "Error occurred during bootstrap, check bootstrap.log for information"
+fi
