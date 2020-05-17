@@ -1,9 +1,31 @@
 #!/bin/bash
 
+source scripts/common.sh
+
 # prevent log file from growing too big - truncate when it reaches over 10000 lines
 if [ $(wc -l < bootstrap.log) -gt 10000 ]
 then
   echo "" > bootstrap.log
+fi
+
+# make scripts executable
+chmod +x `ls */*.sh` 1> /dev/null 
+
+# make the context data directory
+mkdir -p .context-data 1> /dev/null
+
+# ensure Docker environment variables are correctly set before creating containers
+if [[ "$*" == *tracing* ]]
+then
+  set_docker_environment_value "TRACING_ENABLED" "true"
+else
+  set_docker_environment_value "TRACING_ENABLED" "false"
+fi
+if [[ "$*" == *instrumentation* ]]
+then
+  set_docker_environment_value "INSTRUMENTATION_ENABLED" "1"
+else
+  set_docker_environment_value "INSTRUMENTATION_ENABLED" "0"
 fi
 
 # create and run the docker compose command
@@ -18,12 +40,6 @@ do
 done
 command_docker_compose="$command_docker_compose -p tyk-pro-docker-demo-extended --project-directory $(pwd) up -d"
 eval $command_docker_compose
-
-# make bootstrap files executable
-chmod +x `ls */*.sh` 1> /dev/null 
-
-# make the context data directory
-mkdir -p .context-data 1> /dev/null
 
 # alway run the tyk bootstrap first
 deployments/tyk/bootstrap.sh

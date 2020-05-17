@@ -43,6 +43,20 @@ function log_end_deployment {
   log_message "END ▶ $deployment deployment bootstrap"
 }
 
-function recreate_all_tyk_containers {
-  docker-compose -f deployments/tyk/docker-compose.yml -f deployments/tls/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) up --force-recreate -d --no-deps tyk-dashboard tyk-gateway tyk-pump 2>> /dev/null
+function set_docker_environment_value {
+  setting_current_value=$(grep "$1" .env)
+  setting_desired_value="$1=$2"
+  if [ "$setting_current_value" == "" ]
+  then
+    log_message "Adding Docker environment variable: $setting_desired_value"
+    echo "$setting_desired_value" >> .env
+    
+  else
+    if [ "$setting_current_value" != "$setting_desired_value" ]
+    then
+      log_message "Updating Docker environment variable: $setting_desired_value"
+      sed -i.bak 's/'"$setting_current_value"'/'"$setting_desired_value"'/g' .env
+      rm .env.bak
+    fi
+  fi
 }

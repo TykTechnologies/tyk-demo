@@ -36,30 +36,40 @@ All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.
 
 ### JQ
 
-The bootstrap script uses JQ for extracting data from JSON object, it can be installed as follows:
+The bootstrap script uses JQ for extracting data from JSON object, it can be installed as follows.
+
+Install on OS X using Homebrew:
 
 ```
 brew install jq
 ```
 
+Install on Debian/Ubuntu using APT:
+
+```
+sudo apt-get install jq
+```
+
+See the [JQ installation page](https://stedolan.github.io/jq/download/) for other operating systems.
+
 ## Step 2: Add Docker Environment variables
 
-The `docker-compose.yml` file uses a Docker environment variable to set the dashboard licence. To set this, create a file called `.env` in the root directory of the repo, then set the content of the file as follows, replacing `<YOUR_LICENCE>` with your Dashboard licence:
+The `tyk/docker-compose.yml` and `tyk2/docker-compose.yml` files use a Docker environment variable to set the dashboard licence. To set this, create a file called `.env` in the root directory of the repo, then set the content of the file as follows, replacing `<YOUR_LICENCE>` with your Dashboard licence:
 
 ```
 DASHBOARD_LICENCE=<YOUR_LICENCE>
 ```
 
-In addition to this, some features require entries in the `.env` file. These are set automatically by the `bootstrap.sh` files, depending on the deployment.
+In addition to this, some features require entries in the `.env` file. These are set automatically by the `up.sh` file, depending on the deployment parameters.
 
 ## Step 3: Make the scripts executable
 
-There are two scripts which can be used to bring up and tear down the deployment: `up.sh` and `down.sh`.
+There are two scripts which can be used to bring up and tear down the deployment: `up.sh` and `down.sh`. The `common.sh` script also needs to be made executable. 
 
 Make these scripts executable:
 
 ```
-chmod +x up.sh down.sh
+chmod +x up.sh down.sh scripts/common.sh
 ```
 
 ## Step 4: Bring the deployment up
@@ -74,7 +84,7 @@ This will bring up the standard Tyk deployment, after which you can log into the
 
 ### Deploying a feature
 
-If you want to deploy features, run the `up.sh` command, passing a parameter of the directory name of the feature to deploy. For example, to deploy both the base `tyk` deployment and the `analytics` feature:
+If you want to deploy features, run the `up.sh` command, passing a parameter of the directory name of the feature to deploy. For example, to deploy both the standard Tyk deployment and the `analytics` deployment:
 
 ```
 ./up.sh analytics
@@ -116,7 +126,7 @@ To bring down the containers and delete associated volumes:
 ./down.sh
 ```
 
-If you used deployment parameters when running the `up.sh` script, you should also include them when taking the system down. For example, to bring down the standard Tyk and `analytic` deployments:
+If you used deployment parameters when running the `up.sh` script, you should also include them when taking the system down. For example, to bring down the standard Tyk deployment and the `analytics` deployment:
 
 ```
 ./down.sh analytics
@@ -124,7 +134,7 @@ If you used deployment parameters when running the `up.sh` script, you should al
 
 # Redeploying
 
-The `up.sh` script is not intended to be run consecutively without running `down.sh` in between. The reason for this is that the `up.sh` script assumes that the system will not contain any data, so it attempts to bootstrap the system by creating data. This means that running the script repeatedly will result in duplicate data.
+The `up.sh` script is not intended to be run consecutively without running `down.sh` in between. The reason for this is that the `up.sh` script assumes that the system will not contain any data, so it attempts to bootstrap the system by creating data. This means that running the script consecutively will likely generate errors and duplicate data.
 
 # Working with APIs and Policies
 

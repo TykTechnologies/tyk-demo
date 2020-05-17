@@ -9,42 +9,6 @@ bootstrap_progress
 dashboard_base_url="http://localhost:3000"
 gateway_base_url="http://localhost:8080"
 
-log_message "Checking for instrumentaton misconfiguration"
-instrumentation_service=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/instrumentation/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) ps | grep "graphite")
-instrumentation_setting=$(grep "INSTRUMENTATION_ENABLED" .env)
-instrumentation_setting_enabled="INSTRUMENTATION_ENABLED=1"
-instrumentation_setting_disabled="INSTRUMENTATION_ENABLED=0"
-# Prevent instrumentation being enabled without the Graphite service being available
-if [[ "${#instrumentation_service}" -eq "0" ]] && [[ $instrumentation_setting == $instrumentation_setting_enabled ]]
-then
-  log_message "  Setting instrumentation flag to 0"
-  sed -i.bak 's/'"$instrumentation_setting_enabled"'/'"$instrumentation_setting_disabled"'/g' ./.env
-  rm .env.bak
-  log_message "  Recreating containers"
-  recreate_all_tyk_containers
-else
-  log_ok
-fi
-bootstrap_progress
-
-log_message "Checking for tracing misconfiguration"
-tracing_service=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/tracing/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) ps | grep "zipkin")
-tracing_setting=$(grep "TRACING_ENABLED" .env)
-tracing_setting_enabled="TRACING_ENABLED=true"
-tracing_setting_disabled="TRACING_ENABLED=false"
-# Prevent tracking being enabled without the Zipkin service being available
-if [[ "${#tracing_service}" -eq "0" ]] && [[ $tracing_setting == $tracing_setting_enabled ]]
-then
-  log_message "  Setting tracing flag to false"
-  sed -i.bak 's/'"$tracing_setting_enabled"'/'"$tracing_setting_disabled"'/g' ./.env
-  rm .env.bak
-  log_message "  Recreating containers"
-  recreate_all_tyk_containers
-else
-  log_ok
-fi
-bootstrap_progress
-
 log_message "Getting Dashboard configuration"
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret 2>> bootstrap.log)
 log_message "  Dashboard Admin API Credentials = $dashboard_admin_api_credentials"
