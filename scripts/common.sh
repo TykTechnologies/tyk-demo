@@ -44,5 +44,5 @@ function log_end_deployment {
 }
 
 function recreate_all_tyk_containers {
-  docker-compose -f deployments/tyk/docker-compose.yml -f deployments/tls/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) up --force-recreate -d --no-deps tyk-dashboard tyk-gateway tyk-pump
+  docker-compose -f deployments/tyk/docker-compose.yml -f deployments/tls/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) up --force-recreate -d --no-deps tyk-dashboard tyk-gateway tyk-pump 2>> /dev/null
 }
