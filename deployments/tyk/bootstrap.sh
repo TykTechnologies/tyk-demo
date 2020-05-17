@@ -22,6 +22,8 @@ then
   rm .env.bak
   log_message "  Recreating containers"
   recreate_all_tyk_containers
+else
+  log_ok
 fi
 bootstrap_progress
 
@@ -38,6 +40,8 @@ then
   rm .env.bak
   log_message "  Recreating containers"
   recreate_all_tyk_containers
+else
+  log_ok
 fi
 bootstrap_progress
 
@@ -59,6 +63,7 @@ do
   fi
   bootstrap_progress
 done
+log_ok
 
 log_message "Importing organisation"
 organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
@@ -109,15 +114,15 @@ echo $user_group_data | jq -r .groups[2].id > .context-data/user_group_admin_id
 bootstrap_progress
 
 log_message "Creating webhooks"
-log_json_result="$(curl $dashboard_base_url/api/hooks -s \
+log_json_result "$(curl $dashboard_base_url/api/hooks -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @deployments/tyk/data/tyk-dashboard/webhook-webhook-receiver-api-post.json 2>> bootstrap.log)"
 bootstrap_progress
 
 log_message "Creating Portal default settings"
-log_json_result=$(curl $dashboard_base_url/api/portal/configuration -s \
+log_json_result "$(curl $dashboard_base_url/api/portal/configuration -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  -d "{}" 2>> bootstrap.log)
+  -d "{}" 2>> bootstrap.log)"
 bootstrap_progress
 
 log_message "Initialising Catalogue"
@@ -125,11 +130,11 @@ result=$(curl $dashboard_base_url/api/portal/catalogue -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d '{"org_id": "'$organisation_id'"}' 2>> bootstrap.log)
 catalogue_id=$(echo "$result" | jq -r '.Message')
-log_json_result $result
+log_json_result "$result"
 bootstrap_progress
 
 log_message "Creating Portal home page"
-log_json_result="$(curl $dashboard_base_url/api/portal/pages -s \
+log_json_result "$(curl $dashboard_base_url/api/portal/pages -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @deployments/tyk/data/tyk-dashboard/portal-home-page.json 2>> bootstrap.log)"
 bootstrap_progress
@@ -137,13 +142,13 @@ bootstrap_progress
 log_message "Creating Portal user"
 portal_user_email=$(jq -r '.email' deployments/tyk/data/tyk-dashboard/portal-user.json)
 portal_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/portal-user.json)
-log_json_result=$(curl $dashboard_base_url/api/portal/developers -s \
+log_json_result "$(curl $dashboard_base_url/api/portal/developers -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d '{
       "email": "'$portal_user_email'",
       "password": "'$portal_user_password'",
       "org_id": "'$organisation_id'"
-    }' 2>> bootstrap.log)
+    }' 2>> bootstrap.log)"
 bootstrap_progress
 
 log_message "Creating documentation"
@@ -157,17 +162,18 @@ result=$(curl $dashboard_base_url/api/portal/documentation -s \
       "documentation":"'$(cat deployments/tyk/data/tyk-dashboard/documentation-swagger-petstore.json | base64)'"
     }' 2>> bootstrap.log)
 documentation_swagger_petstore_id=$(echo "$result" | jq -r '.Message')
-log_json_result $result
+log_json_result "$result"
 bootstrap_progress
 
 log_message "Updating catalogue"
-policies_swagger_petstore_id=$(echo $policies | jq -r '.Data[] | select(.name=="Swagger Petstore Policy") | .id')
+policy_data=$(cat deployments/tyk/data/tyk-dashboard/policies.json)
+policies_swagger_petstore_id=$(echo $policy_data | jq -r '.Data[] | select(.name=="Swagger Petstore Policy") | .id')
 catalogue_data=$(cat deployments/tyk/data/tyk-dashboard/catalogue.json | \
   sed 's/CATALOGUE_ID/'"$catalogue_id"'/' | \
   sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \
   sed 's/CATALOGUE_SWAGGER_PETSTORE_POLICY_ID/'"$policies_swagger_petstore_id"'/' | \
   sed 's/CATALOGUE_SWAGGER_PETSTORE_DOCUMENTATION_ID/'"$documentation_swagger_petstore_id"'/')
-log_json_result="$(curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
+log_json_result "$(curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d "$(echo $catalogue_data)" 2>> bootstrap.log)"
 bootstrap_progress
@@ -194,15 +200,15 @@ done
 bootstrap_progress
 
 log_message "Importing APIs"
-log_json_result="$(curl $dashboard_base_url/admin/apis/import -s \
+log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d "$api_data")"
 bootstrap_progress
 
 log_message "Importing Policies"
-log_json_result="$(curl $dashboard_base_url/admin/policies/import -s \
+log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "$(cat deployments/tyk/data/tyk-dashboard/policies.json)")"
+  -d "$policy_data")"
 bootstrap_progress
 
 log_message "Refreshing APIs"
@@ -221,7 +227,7 @@ done
 bootstrap_progress
 
 log_message "Refreshing Policies"
-# This is done for good measure, as per API Definitions
+# This is done for good measure, as per API Definitions, even though it's probably not needed for Policies
 cat deployments/tyk/data/tyk-dashboard/policies.json | jq --raw-output '.Data[]._id' | while read policy_id
 do
   policy_definition=$(curl $dashboard_base_url/api/portal/policies/$policy_id -s \
