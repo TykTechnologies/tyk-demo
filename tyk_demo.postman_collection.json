@@ -205,7 +205,32 @@
 									"script": {
 										"id": "0655fbac-47b2-428d-b9ba-9ee31f13628f",
 										"exec": [
-											"// needs a test to verify circuit breaker functionality"
+											"pm.test(\"5th server error response triggers circuit breaker\", function () {",
+											"    var circuitBreakerRequest = {",
+											"      url: 'http://localhost:8080/plugin-demo-api/status/500',",
+											"      method: 'GET'",
+											"    };",
+											"    ",
+											"    pm.sendRequest(circuitBreakerRequest, function (err, response) {",
+											"        pm.response.to.have.status(500);",
+											"",
+											"        pm.sendRequest(circuitBreakerRequest, function (err, response) {",
+											"            pm.response.to.have.status(500);",
+											"            ",
+											"            pm.sendRequest(circuitBreakerRequest, function (err, response) {",
+											"                pm.response.to.have.status(500);",
+											"                ",
+											"                pm.sendRequest(circuitBreakerRequest, function (err, response) {",
+											"                    pm.response.to.have.status(500);",
+											"",
+											"                    pm.sendRequest(circuitBreakerRequest, function (err, response) {",
+											"                        pm.response.to.have.status(500);",
+											"                    });",
+											"                });",
+											"            });",
+											"        });",
+											"    });",
+											"});"
 										],
 										"type": "text/javascript"
 									}
