@@ -1,5 +1,6 @@
 .env
 .context-data
 bootstrap.log
+.bootstrap_error_occurred
 deployments/cicd/volumes/jenkins/bootstrap-import/credentials-global.xml
 deployments/cicd/volumes/jenkins/bootstrap-import/jenkins-plugins.tar.gz
