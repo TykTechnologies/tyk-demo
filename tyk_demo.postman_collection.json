@@ -152,7 +152,7 @@
 										"mock"
 									]
 								},
-								"description": "This request uses the `Mock Response` Endpoint Designer plugin to return a response directly from the Gateway when the API endpoint is called.\n\nThe mock response sets the response:\n- HTTP status code: `200 OK`\n- Body: See the mock JSON object in the response body\n- Headers: See the `Mock` header in the repsonse headers\n\nWhen the Mock Response is executed, the request does not reach the API Server.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only, see part 2 of this plugin to see what happens when version `2` is requested instead. Control of the version is"
+								"description": "This request uses the `Mock Response` Endpoint Designer plugin to return a response directly from the Gateway when the API endpoint is called.\n\nThe mock response lets you define the headers and body of the response, as well as the HTTP status code returned. In this example the mock response is configured as follows:\n- Headers: Add a `Mock` header\n- Body: Add a basic JSON object as the body\n- HTTP status code: `200 OK`\n\nWhen the Mock Response is executed, the request does not reach the API Server, as the Gateway provides the response directly to the API Client."
 							},
 							"response": []
 						},
