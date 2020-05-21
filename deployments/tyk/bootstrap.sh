@@ -70,7 +70,7 @@ result=$(curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @deployments/tyk/data/tyk-dashboard/usergroup-admin.json 2>> bootstrap.log | jq -r '.Status')
 log_message "  Admin group:$result"
-user_group_data=$(curl $dashboard_base_url/api/usergroups -s -o /dev/null \
+user_group_data=$(curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials" 2>> bootstrap.log)
 echo $user_group_data | jq -r .groups[0].id > .context-data/user_group_readonly_id
 echo $user_group_data | jq -r .groups[1].id > .context-data/user_group_default_id
