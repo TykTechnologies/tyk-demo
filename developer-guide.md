@@ -33,13 +33,19 @@ The deployment's Docker Compose file must be named `docker-compose.yml`, and con
 
 This file will be used as a parameter, alongside the base deployment's `deployments/tyk/docker-compose.yml`. This means that it only needs to contain services beyond those in the base deployment i.e. you do not need to specify a Dashboard, Gateway pump etc, as these are already in the base deployment.
 
+## Docker environment variables
+
+If the deployment makes use of Docker environment variables which would have adverse effects on the system if set incorrectly, use the `up.sh` script to verify the values and correct them as needed.
+
+The `scripts/common.sh` provides the `set_docker_environment_value` function to set Docker environment variables to desired values. Check the `up.sh` script for implementations for the `tracing` and `instrumentation` deployments.
+
 ## Bootstrap Script
 
 The bootstrapping process prepares the deployment for use, so that they can immediately be demonstrated.
 
 When creating the bootstrap for a deployment, follow these conventions:
 
-* At the start of the bootstrap process:
+* At the start of the bootstrap script:
   * Reference the `scripts/common.sh` script, as this contains useful bootstrap functions e.g. `source scripts/common.sh`
   * Set the `deployment` variable, as this is used in the `common.sh` bootstrap functions e.g. `deployment="My Deployment Name"`
   * Call the `log_start_deployment` function, to log the start of the deployment
@@ -51,7 +57,7 @@ When creating the bootstrap for a deployment, follow these conventions:
 * At the end of each step:
   * Call the `bootstrap_progress` function to provide progress feedback
   * Call either the `log_ok`, `log_json_result` or `log_http_result` function, as appropriate,to log the end of the step
-* At the end of the bootstrap process:
+* At the end of the bootstrap script:
   * Call the `log_end_deployment` function, to log the end of the deployment
   * Echo relevant information about the deployment
 
@@ -67,7 +73,7 @@ Follow these rules when displaying the deployment output:
   * In column 3, put the service name, prefixed with `▽ ` e.g. `  ▽ Service name`
   * For each piece of information you want to display:
     * Display the information as a colon separated label and value, aligned so that the colon is on column 20 e.g. `       Useful info : $variable_data`
-* Remember to end the string on the last line e.g. `"`
+* Remember to end the last line with a string terminator e.g. `"`
 
 Here is an example:
 
@@ -95,7 +101,21 @@ The deployment's `readme.md` should contain:
 
 # Scripts
 
-These scripts are available in the `scripts` directory:
+The `up.sh` and `down.sh` scripts bring the deployments up and down.
+
+Both scripts accept arguments for the deployments to include. The base Tyk deployment is hard-coded into the scripts, so there is no need to pass `tyk` as an argument.
+
+The up script has three main purposes:
+
+1. Ensure the Docker environment variables are set correctly based on the deployment arguments
+2. Run a Docker Compose command referencing the base Tyk deployment (`deployments/tyk/docker-compose.yml`) and any deployments provided as arguments
+3. Run the bootstrap script for the base Tyk deployment (`deployments/tyk/bootstrap.sh`) and any deployments provided as arguments
+
+The down script's only purpose is to run a docker-compose command to bring the deployments down. The docker-compose command include the `-v` switch, which removes the volumes, ensuring that no data is persisted.
+
+## Utilities
+
+These utility scripts are available in the `scripts` directory:
 
 * `add-gateway.sh`: Creates a new Tyk Gateway container, using the same configuration as the base Tyk deployment Gateway
 * `common.sh`: Contains functions useful for bootstrap scripts
@@ -134,7 +154,6 @@ Run from the repo root directory, as so:
 ```
 ./scripts/import.sh
 ```
-
 
 ## Why not use Tyk Sync?
 
