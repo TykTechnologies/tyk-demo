@@ -2,7 +2,7 @@
 
 This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple deployment, where you can choose what features to include.
 
-The concept is that there is a **standard deployment** of Tyk, which gives you the usual Tyk components: Gateway, Dashboard, Pump, plus the databases Redis and MongoDB. This standard deployment can be extended by including additional **feature deployments** as needed. The feature deployments cover particular scenarios for Tyk, such as:
+The concept is that there is a **base deployment** of Tyk, which gives you the usual Tyk components: Gateway, Dashboard, Pump, plus the databases Redis and MongoDB. This standard deployment can be extended by including additional **feature deployments** as needed. The feature deployments cover particular scenarios for Tyk, such as:
 
 * Single sign on
 * TLS
@@ -26,7 +26,7 @@ There is a focus on simplicity. Docker Compose is used to provision the containe
 
 ## Deployments
 
-The deployment directories (`deployments/*`) contain the various deployments which can be made with this repo. The **base deployment** is in the `tyk` directory, which is a standard Tyk deployment. The other directories are **feature deployments**, which extend the **base deployment** functionality. 
+The deployment directories (`deployments/*`) contain the various deployments which can be made with this repo. The **base deployment** is in the `deployments/tyk` directory. The other directories are **feature deployments**, which extend the base deployment functionality and require the base deployment in order to function correctly.
 
 All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.md` files specific to the deployment. They may also contain directories called `data` or `volumes`, which hold the data necessary during bootstrapping or providing as mapped volumes into the container.
 
