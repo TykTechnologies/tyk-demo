@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Uses the Dashboard API to export API and Policy definitions, overwriting data used to bootstrap the base Tyk deployment
+
 dashboard_base_url="http://localhost:3000"
 dashboard_user_api_credentials=$(cat .context-data/dashboard-user-api-credentials)
 

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Contains functions useful for bootstrap scripts
+
 function bootstrap_progress {
   dot_count=$((dot_count+1))
   dots=$(printf "%-${dot_count}s" ".")

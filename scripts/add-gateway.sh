@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Creates a new Tyk Gateway container, using the same configuration as the base Tyk deployment Gateway
+
 docker run \
   -d \
   -P \
