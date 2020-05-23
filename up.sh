@@ -3,7 +3,7 @@
 source scripts/common.sh
 
 # prevent log file from growing too big - truncate when it reaches over 10000 lines
-if [ $(wc -l < bootstrap.log) -gt 10000 ]
+if [ -f bootstrap.log ] && [  $(wc -l < bootstrap.log) -gt 10000 ]
 then
   echo "" > bootstrap.log
 fi

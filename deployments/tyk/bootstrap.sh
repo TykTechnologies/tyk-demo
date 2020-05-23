@@ -147,20 +147,24 @@ bootstrap_progress
 # This is done before the APIs are imported, and after all the other data is imported, so we know the new IDs and can update the API data before importing it
 log_message "Updating IDs"
 api_data=$(cat deployments/tyk/data/tyk-dashboard/apis.json)
-log_message "  Webhooks"
 webhook_data=$(curl $dashboard_base_url/api/hooks?p=-1 -s \
   -H "Authorization: $dashboard_user_api_credentials" | \
   jq '.hooks[]')
-for webhook_id in $(echo $webhook_data | jq --raw-output '.id')
-do
-  # Match old data using the webhook name, which is consistent
-  webhook_name=$(echo "$webhook_data" | jq -r --arg webhook_id "$webhook_id" 'select ( .id == $webhook_id ) .name')
-  log_message "    $webhook_name"
-  # Hook references
-  api_data=$(echo $api_data | jq --arg webhook_id "$webhook_id" --arg webhook_name "$webhook_name" '(.apis[].hook_references[] | select(.hook.name == $webhook_name) .hook.id) = $webhook_id')
-  # AuthFailure event handlers
-  api_data=$(echo $api_data | jq --arg webhook_id "$webhook_id" --arg webhook_name "$webhook_name" '(.apis[].api_definition.event_handlers.events.AuthFailure[]? | select(.handler_meta.name == $webhook_name) .handler_meta.id) = $webhook_id')
-done
+# only process webhooks if any exist
+if [ "$webhook_data" != "" ]
+then
+  log_message "  Webhooks"
+  for webhook_id in $(echo $webhook_data | jq --raw-output '.id')
+  do
+    # Match old data using the webhook name, which is consistent
+    webhook_name=$(echo "$webhook_data" | jq -r --arg webhook_id "$webhook_id" 'select ( .id == $webhook_id ) .name')
+    log_message "    $webhook_name"
+    # Hook references
+    api_data=$(echo $api_data | jq --arg webhook_id "$webhook_id" --arg webhook_name "$webhook_name" '(.apis[].hook_references[] | select(.hook.name == $webhook_name) .hook.id) = $webhook_id')
+    # AuthFailure event handlers
+    api_data=$(echo $api_data | jq --arg webhook_id "$webhook_id" --arg webhook_name "$webhook_name" '(.apis[].api_definition.event_handlers.events.AuthFailure[]? | select(.handler_meta.name == $webhook_name) .handler_meta.id) = $webhook_id')
+  done
+fi
 bootstrap_progress
 
 log_message "Importing APIs"
@@ -213,6 +217,12 @@ do
 
   if [ "$gateway_status" != "200" ]
   then
+    # if we get a 403 then there's an issue with authentication
+    if [ "$gateway_status" == "403" ]
+    then
+      log_message "  ERROR: Gateway returned 403 status when using key $gateway_api_credentials"
+      break
+    fi
     # if we get a 500 then it's probably because the Gateway hasn't received the reload signal from when the Dashboard data was imported, so force reload now
     if [ "$gateway_status" == "500" ]
     then
