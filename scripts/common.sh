@@ -50,9 +50,13 @@ function set_docker_environment_value {
   setting_desired_value="$1=$2"
   if [ "$setting_current_value" == "" ]
   then
+    # make sure .env file has an empty line before adding docker env var
+    if [ ! -z "$(tail -c 1 .env)" ]
+    then
+      echo "" >> .env
+    fi
     log_message "Adding Docker environment variable: $setting_desired_value"
-    echo "$setting_desired_value" >> .env
-    
+    echo "$setting_desired_value" >> .env  
   else
     if [ "$setting_current_value" != "$setting_desired_value" ]
     then
