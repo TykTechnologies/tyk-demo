@@ -68,15 +68,25 @@ function set_docker_environment_value {
 }
 
 function wait_for_response {
-  url=$1
+  url="$1"
   status=""
-  desired_status=$2
+  desired_status="$2"
+  header="$3"
+  log_message "url=$url desired_status=$desired_status header=$header"
   while [ "$status" != "$desired_status" ]
   do
-    status=$(curl -I -s -m5 $url 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
+    # header can be provided if auth is needed
+    if [ "$header" != "" ]
+    then
+      status=$(curl -k -I -s -m5 $url -H "$header" 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
+    else
+      status=$(curl -k -I -s -m5 $url $header 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
+    fi
+
+    log_message "status=$status"
     if [ "$status" != "$desired_status" ]
     then
-      log_message "  Request unsuccessful, retrying..."
+      log_message "  Request unsuccessful - desired '$desired_status', received '$status'. Retrying..."
       sleep 2
     else
       log_ok

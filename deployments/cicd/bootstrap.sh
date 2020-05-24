@@ -75,22 +75,8 @@ log_ok
 bootstrap_progress
 
 log_message "Waiting for Jenkins to respond ok"
-jenkins_status=""
 # 403 indicates that at least Jenkins was able to recognise that the request was unauthorised, so we should be ok to proceed
-jenkins_status_desired="403"
-jenkins_tries=0
-while [ "$jenkins_status" != "$jenkins_status_desired" ]
-do
-  jenkins_status=$(curl -I -s -m5 $jenkins_base_url 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
-  if [ "$jenkins_status" != "$jenkins_status_desired" ]
-  then
-    log_message "  Request unsuccessful, retrying..."
-    sleep 2
-  else
-    log_ok
-  fi
-  bootstrap_progress
-done
+wait_for_response "$jenkins_base_url" "403"
 
 log_message "Getting Jenkins admin password"
 jenkins_admin_password=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) exec jenkins sh -c "cat /var/jenkins_home/secrets/initialAdminPassword | head -c32" 2>> bootstrap.log)

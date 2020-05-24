@@ -10,20 +10,7 @@ gateway2_base_url="http://localhost:8085"
 
 log_message "Waiting for Tyk 2 Dashboard to respond ok"
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
-status=""
-status_desired="200"
-while [ "$status" != "$status_desired" ]
-do
-  status=$(curl -I -s -m2 $dashboard2_base_url/admin/organisations -H "admin-auth: $dashboard_admin_api_credentials" 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)  
-  if [ "$status" != "$status_desired" ]
-  then
-    log_message "  Request unsuccessful, retrying..."
-    sleep 2
-  else
-    log_ok
-  fi
-  bootstrap_progress
-done
+wait_for_response "$dashboard2_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
 
 log_message "Importing organisation"
 log_json_result "$(curl $dashboard2_base_url/admin/organisations/import -s \

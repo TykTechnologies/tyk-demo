@@ -16,18 +16,7 @@ portal_root_path=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf 
 bootstrap_progress
 
 log_message "Waiting for Dashboard API to be ready"
-dashboard_status=""
-while [ "$dashboard_status" != "200" ]
-do
-  dashboard_status=$(curl -I $dashboard_base_url/admin/organisations -H "admin-auth: $dashboard_admin_api_credentials" -s 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
-  if [ "$dashboard_status" != "200" ]
-  then
-    log_message "  Request unsuccessful, retrying..."
-    sleep 2
-  fi
-  bootstrap_progress
-done
-log_ok
+wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
 
 log_message "Importing organisation"
 organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
@@ -263,19 +252,7 @@ log_message "  Basic auth key:$result"
 bootstrap_progress
 
 log_message "Checking Gateway functionality"
-gateway_status=""
-while [ "$gateway_status" != "200" ]
-do
-  gateway_status=$(curl -I -s $gateway_base_url/basic-open-api/get 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
-  if [ "$gateway_status" != "200" ]
-  then
-    log_message "  Request unsuccessful, retrying..."
-    sleep 2
-  else
-    log_ok
-  fi
-  bootstrap_progress
-done
+wait_for_response "$gateway_base_url/basic-open-api/get" "200"
 
 log_end_deployment
 
