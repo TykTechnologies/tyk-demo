@@ -66,3 +66,21 @@ function set_docker_environment_value {
     fi
   fi
 }
+
+function wait_for_response {
+  url=$1
+  status=""
+  desired_status=$2
+  while [ "$status" != "$desired_status" ]
+  do
+    status=$(curl -I -s -m5 $url 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
+    if [ "$status" != "$desired_status" ]
+    then
+      log_message "  Request unsuccessful, retrying..."
+      sleep 2
+    else
+      log_ok
+    fi
+    bootstrap_progress
+  done
+}
