@@ -164,23 +164,6 @@ do
   bootstrap_progress
 done
 
-# log_message "Copying Gitea configuration to volume"
-# cp deployments/cicd/data/gitea/* deployments/cicd/volumes/gitea/data/
-# log_ok
-# bootstrap_progress
-
-# log_message "Restarting Gitea container"
-# docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) restart gitea 2> /dev/null
-# log_ok
-# bootstrap_progress
-
-# docker-compose \
-#     -f deployments/tyk/docker-compose.yml \
-#     -f deployments/cicd/docker-compose.yml \
-#     -p tyk-pro-docker-demo-extended \
-#     --project-directory $(pwd) \
-#     exec gitea sh -c "su git; unzip /data/gitea-backup.zip -d /data"
-
 log_end_deployment
 
 echo -e "\033[2K 
