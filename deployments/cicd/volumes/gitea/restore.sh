@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /data/dump
+cd /data
 mkdir gitea-dump
 unzip gitea-dump.zip -d gitea-dump
 cd gitea-dump

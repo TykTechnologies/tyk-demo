@@ -20,10 +20,12 @@ services:
     networks:
       - tyk
     volumes:
-      # - ./deployments/cicd/volumes/gitea/data:/data
-      - ./deployments/cicd/volumes/gitea/gitea-backup.zip:/data/gitea-backup.zip
-      # - ./deployments/cicd/volumes/gitea/gitea-dump.zip:/data/dump/gitea-dump.zip
-      # - ./deployments/cicd/volumes/gitea/restore.sh:/data/restore.sh
+      # - ./deployments/cicd/volumes/gitea/hello:/data/hello
+      # - ./deployments/cicd/volumes/gitea/gitea-backup.zip:/data/gitea-backup.zip
+      # - ./deployments/cicd/volumes/gitea/gitea-data.sql:/data/gitea-data.sql
+      # - ./deployments/cicd/volumes/gitea/gitea-db.sql:/data/gitea-db.sql
+      - ./deployments/cicd/volumes/gitea/gitea-dump.zip:/data/gitea-dump.zip
+      - ./deployments/cicd/volumes/gitea/restore.sh:/data/restore.sh
   
 volumes:
   jenkins-data:
