@@ -10,7 +10,7 @@ dashboard2_base_url="http://localhost:3002"
 
 log_message "Checking Tyk Environment 2 deployment exists"
 tyk2_dashboard_service=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -f deployments/tyk2/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) ps | grep "tyk2-dashboard")
-# Warn is cicd deployment is made without the tyk2 deployment
+# Warn if cicd deployment is made without the tyk2 deployment
 if [[ "${#tyk2_dashboard_service}" -eq "0" ]]
 then
   log_message "  WARNING: Tyk Environment 2 deployment not found."
