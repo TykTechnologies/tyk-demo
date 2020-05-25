@@ -9,7 +9,6 @@ services:
     volumes:
       - ./deployments/cicd/volumes/jenkins/jenkins-cli.jar:/var/jenkins_home/jenkins-cli.jar
       - ./deployments/cicd/volumes/jenkins/bootstrap-import:/var/jenkins_home/bootstrap-import
-      - jenkins-data:/var/jenkins_home
   gitea:
     image: gitea/gitea:1.11.5
     environment:
@@ -22,7 +21,3 @@ services:
     volumes:
       - ./deployments/cicd/volumes/gitea/gitea-dump.zip:/data/gitea-dump.zip
       - ./deployments/cicd/volumes/gitea/restore.sh:/data/restore.sh
-  
-volumes:
-  jenkins-data:
-  gitea-data:
