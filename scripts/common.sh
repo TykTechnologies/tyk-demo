@@ -72,7 +72,6 @@ function wait_for_response {
   status=""
   desired_status="$2"
   header="$3"
-  log_message "url=$url desired_status=$desired_status header=$header"
   while [ "$status" != "$desired_status" ]
   do
     # header can be provided if auth is needed
@@ -82,11 +81,9 @@ function wait_for_response {
     else
       status=$(curl -k -I -s -m5 $url $header 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
     fi
-
-    log_message "status=$status"
     if [ "$status" != "$desired_status" ]
     then
-      log_message "  Request unsuccessful - desired '$desired_status', received '$status'. Retrying..."
+      log_message "  Request unsuccessful: got '$status', wanted '$desired_status'. Retrying..."
       sleep 2
     else
       log_ok
