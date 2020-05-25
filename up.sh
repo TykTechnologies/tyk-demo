@@ -55,9 +55,12 @@ do
   fi
 done
 
-# if an error was logged, report it
 if [ -f .bootstrap_error_occurred ]
 then
+  # if an error was logged, report it
   rm .bootstrap_error_occurred
-  echo "Error occurred during bootstrap, check bootstrap.log for information"
+  printf "\nError occurred during bootstrap, check bootstrap.log for information\n\n"
+else
+  # Confirm bootstrap is compelete
+  printf "\nTyk bootstrap completed\n\n"
 fi
