@@ -49,7 +49,14 @@ docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-
 log_ok
 bootstrap_progress
 
-
+log_message "Setting up repository"
+wait_for_response $gitea_base_url "200"
+# delete any data which may already exist
+rm -rf deployments/cicd/data/gitea/*
+# clone repo
+git clone -q http://localhost:13000/gitea-user/tyk-data.git deployments/cicd/data/gitea/tyk-data 2>> bootstrap.log
+bootstrap_progress
+log_ok
 
 log_message "Checking Tyk Environment 2 deployment exists"
 tyk2_dashboard_service=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -f deployments/tyk2/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) ps | grep "tyk2-dashboard")
