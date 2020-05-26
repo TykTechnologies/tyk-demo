@@ -11,9 +11,9 @@ identity_broker_base_url="http://localhost:3010"
 log_message "Generating Profile data"
 organisation_id=$(cat .context-data/organisation-id)
 dashboard_user_api_credentials=$(cat .context-data/dashboard-user-api-credentials)
-user_group_default_id=$(cat .context-data/user_group_default_id)
-user_group_readonly_id=$(cat .context-data/user_group_readonly_id)
-user_group_admin_id=$(cat .context-data/user_group_admin_id)
+user_group_default_id=$(cat .context-data/user-group-default-id)
+user_group_readonly_id=$(cat .context-data/user-group-readonly-id)
+user_group_admin_id=$(cat .context-data/user-group-admin-id)
 identity_broker_api_credentials=$(cat deployments/sso/volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
 identity_broker_profile_tyk_dashboard_data=$(cat deployments/sso/data/tyk-identity-broker/profile-tyk-dashboard.json | \
   sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \

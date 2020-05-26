@@ -61,9 +61,9 @@ result=$(curl $dashboard_base_url/api/usergroups -s \
 log_message "  Admin group:$result"
 user_group_data=$(curl $dashboard_base_url/api/usergroups -s \
   -H "Authorization: $dashboard_user_api_credentials" 2>> bootstrap.log)
-echo $user_group_data | jq -r .groups[0].id > .context-data/user_group_readonly_id
-echo $user_group_data | jq -r .groups[1].id > .context-data/user_group_default_id
-echo $user_group_data | jq -r .groups[2].id > .context-data/user_group_admin_id
+echo $user_group_data | jq -r .groups[0].id > .context-data/user-group-readonly-id
+echo $user_group_data | jq -r .groups[1].id > .context-data/user-group-default-id
+echo $user_group_data | jq -r .groups[2].id > .context-data/user-group-admin-id
 bootstrap_progress
 
 log_message "Creating webhooks"
