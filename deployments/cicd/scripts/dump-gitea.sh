@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# dumps to Gitea config and repos into the mapped volume archive gitea-dump.zip
+# generates a Gitea archive dump of the configuration and repositories
+# then copies the file from the container and overwrites the tracked archive in this repo
 
 docker-compose \
     -f deployments/tyk/docker-compose.yml \
