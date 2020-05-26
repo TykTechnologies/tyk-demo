@@ -14,7 +14,7 @@ function log_http_result {
     log_ok
   else 
     log_message "  ERROR: $1"
-    touch .bootstrap_error_occurred
+    flag_error
   fi
 }
 
@@ -25,8 +25,12 @@ function log_json_result {
     log_ok
   else
     log_message "  ERROR: $(echo $1 | jq -r '.Message')"
-    touch .bootstrap_error_occurred
+    flag_error
   fi
+}
+
+function flag_error {
+  touch .bootstrap_error_occurred
 }
 
 function log_ok {
