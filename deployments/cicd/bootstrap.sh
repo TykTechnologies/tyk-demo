@@ -49,14 +49,19 @@ docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-
 log_ok
 bootstrap_progress
 
-log_message "Setting up repository"
+log_message "Waiting for Gitea to be ready after restart"
 wait_for_response $gitea_base_url "200"
-# delete any data which may already exist
-rm -rf deployments/cicd/data/gitea/*
-# clone repo
-git clone -q http://localhost:13000/gitea-user/tyk-data.git deployments/cicd/data/gitea/tyk-data 2>> bootstrap.log
 bootstrap_progress
+
+log_message "Setting up repository"
+tyk_data_repo_path="/tmp/tyk-pro-docker-demo-extended/tyk-data"
+echo $tyk_data_repo_path > .context-data/tyk-data-repo-path
+# delete any repo data which may already exist
+rm -rf $tyk_data_repo_path
+# clone repo
+git clone -q http://localhost:13000/gitea-user/tyk-data.git $tyk_data_repo_path 2>> bootstrap.log
 log_ok
+bootstrap_progress
 
 log_message "Checking Tyk Environment 2 deployment exists"
 tyk2_dashboard_service=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -f deployments/tyk2/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) ps | grep "tyk2-dashboard")
@@ -66,6 +71,7 @@ then
   log_message "  WARNING: Tyk Environment 2 deployment not found."
   log_message "           CI/CD feature will not work as intended."
   log_message "           Ensure 'tyk2' parameter is used when calling up.sh script: ./up.sh tyk2 cicd"
+  flag_error
 else
   log_ok
 fi
@@ -113,6 +119,7 @@ do
     log_message "  WARNING: Unable to make API calls to Tyk Environment 2 Dashboard."
     log_message "           CI/CD feature will not work as intended."
     log_message "           Rerun up.sh script with 'tyk2' parameter before 'cicd' parameter: ./up.sh tyk2 cicd"
+    flag_error
     break
   else
     log_message "  Request unsuccessful, retrying..."
