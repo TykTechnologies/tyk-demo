@@ -11,6 +11,9 @@ fi
 # make the context data directory
 mkdir -p .context-data 1> /dev/null
 
+# make sure error flag is not present
+rm .bootstrap_error_occurred > /dev/null
+
 # ensure Docker environment variables are correctly set before creating containers
 if [[ "$*" == *tracing* ]]
 then
@@ -54,7 +57,6 @@ done
 if [ -f .bootstrap_error_occurred ]
 then
   # if an error was logged, report it
-  rm .bootstrap_error_occurred
   printf "\nError occurred during bootstrap, check bootstrap.log for information\n\n"
 else
   # Confirm bootstrap is compelete
