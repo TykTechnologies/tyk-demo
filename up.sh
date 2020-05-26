@@ -8,11 +8,12 @@ then
   echo "" > bootstrap.log
 fi
 
-# make the context data directory
+# make the context data directory and clear and data from an existing directory
 mkdir -p .context-data 1> /dev/null
+rm .context-data/* > /dev/null
 
 # make sure error flag is not present
-rm .bootstrap_error_occurred > /dev/null
+rm .bootstrap_error_occurred 1> /dev/null
 
 # ensure Docker environment variables are correctly set before creating containers
 if [[ "$*" == *tracing* ]]
