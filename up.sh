@@ -10,10 +10,10 @@ fi
 
 # make the context data directory and clear and data from an existing directory
 mkdir -p .context-data 1> /dev/null
-rm .context-data/* > /dev/null
+rm -f .context-data/*
 
 # make sure error flag is not present
-rm .bootstrap_error_occurred 1> /dev/null
+rm -f .bootstrap_error_occurred
 
 # ensure Docker environment variables are correctly set before creating containers
 if [[ "$*" == *tracing* ]]
