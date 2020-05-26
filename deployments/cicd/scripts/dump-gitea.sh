@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# dumps to Gitea config and repos into the mapped volume archive gitea-dump.zip
+
 docker-compose \
     -f deployments/tyk/docker-compose.yml \
     -f deployments/cicd/docker-compose.yml \
