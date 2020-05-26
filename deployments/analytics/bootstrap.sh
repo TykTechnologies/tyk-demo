@@ -8,20 +8,7 @@ bootstrap_progress
 kibana_base_url="http://localhost:5601"
 
 log_message "Waiting for kibana to return desired response"
-kibana_status=""
-kibana_status_desired="200"
-while [ "$kibana_status" != "$kibana_status_desired" ]
-do
-  kibana_status=$(curl -I -s -m5 $kibana_base_url/app/kibana 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)  
-  if [ "$kibana_status" != "$kibana_status_desired" ]
-  then
-    log_message "  Request unsuccessful, retrying..."
-    sleep 2
-  else
-    log_ok
-  fi
-  bootstrap_progress
-done
+wait_for_response "$kibana_base_url/app/kibana" "200"
 
 log_message "Adding index pattern"
 log_http_result "$(curl $kibana_base_url/api/saved_objects/index-pattern/1208b8f0-815b-11ea-b0b2-c9a8a88fbfb2?overwrite=true -s -o /dev/null -w "%{http_code}" \

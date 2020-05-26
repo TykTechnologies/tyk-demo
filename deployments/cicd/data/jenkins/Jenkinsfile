@@ -11,10 +11,14 @@ pipeline {
                 expression { env.BRANCH_NAME == 'master' }
             }
             steps {
-                
-                echo "Deploying from ${env.BRANCH_NAME}"
-                sh "chmod +x ./deployments/cicd/data/jenkins/tyk-sync"
-                sh "./deployments/cicd/data/jenkins/tyk-sync sync -d http://tyk2-dashboard:3000 -s ${env.tyk2_dashboard_credentials} -p ./deployments/cicd/data/tyk-sync"
+                script {
+                    if (fileExists('.tyk.json')) {
+                        echo "Deploying from ${env.BRANCH_NAME}"
+                        sh "./tyk-sync sync -d http://tyk2-dashboard:3000 -s ${env.tyk2_dashboard_credentials} -p ."
+                    } else {
+                        echo 'No files to deploy'
+                    }
+                }
             }
         }
     }

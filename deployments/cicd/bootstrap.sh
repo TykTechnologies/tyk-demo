@@ -6,16 +6,82 @@ log_start_deployment
 bootstrap_progress
 
 jenkins_base_url="http://localhost:8070"
+gitea_base_url="http://localhost:13000"
 dashboard2_base_url="http://localhost:3002"
+
+log_message "Waiting for Gitea to be ready"
+wait_for_response $gitea_base_url "200"
+
+log_message "Initialising Gitea"
+gitea_username="gitea-user"
+gitea_password="qx3zZ9VAgyLVjemSJWeYF6e8"
+echo $gitea_username > .context-data/gitea-username
+echo $gitea_password > .context-data/gitea-password
+result=$(curl $gitea_base_url/install \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'db_type=SQLite3&db_host=localhost%3A3306&db_user=root&db_passwd=&db_name=gitea&ssl_mode=disable&charset=utf8&db_path=%2Fdata%2Fgitea%2Fgitea.db&app_name=Gitea%3A+Git+with+a+cup+of+tea&repo_root_path=%2Fdata%2Fgit%2Frepositories&lfs_root_path=%2Fdata%2Fgit%2Flfs&run_user=git&domain=localhost&ssh_port=22&http_port=13000&app_url=http%3A%2F%2Flocalhost%3A13000%2F&log_root_path=%2Fdata%2Fgitea%2Flog&smtp_host=&smtp_from=&smtp_user=&smtp_passwd=&enable_federated_avatar=on&enable_open_id_sign_in=on&enable_open_id_sign_up=on&default_allow_create_organization=on&default_enable_timetracking=on&no_reply_address=noreply.localhost&admin_name=gitea-admin&admin_passwd=x%23UF80R%26NOan&admin_confirm_passwd=x%23UF80R%26NOan&admin_email=gitea-admin%40example.org' -s -o /dev/null -w "%{http_code}")
+if [ "$result" == "302" ]
+then
+  log_ok
+else
+  log_message "  WARNING: Expected 302 status, but got $result"
+  flag_error
+fi
+bootstrap_progress
+
+log_message "Restoring Gitea database"
+docker-compose \
+    -f deployments/tyk/docker-compose.yml \
+    -f deployments/cicd/docker-compose.yml \
+    -p tyk-pro-docker-demo-extended \
+    --project-directory $(pwd) \
+    exec gitea sh -c "./data/restore.sh" 1>> /dev/null 2>> bootstrap.log
+log_ok
+bootstrap_progress
+
+log_message "Regenerating Gitea hooks"
+docker-compose \
+    -f deployments/tyk/docker-compose.yml \
+    -f deployments/cicd/docker-compose.yml \
+    -p tyk-pro-docker-demo-extended \
+    --project-directory $(pwd) \
+    exec -u git gitea sh -c "gitea admin regenerate hooks;" 1>> /dev/null 2>> bootstrap.log
+log_ok
+bootstrap_progress
+
+log_message "Restarting Gitea container"
+docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) restart gitea 2> /dev/null
+log_ok
+bootstrap_progress
+
+log_message "Waiting for Gitea to be ready after restart"
+wait_for_response $gitea_base_url "200"
+
+log_message "Setting up repository"
+gitea_tyk_data_repo_path="/tmp/tyk-pro-docker-demo-extended/tyk-data"
+echo $gitea_tyk_data_repo_path > .context-data/gitea-tyk-data-repo-path
+# delete any repo data which may already exist
+rm -rf $gitea_tyk_data_repo_path > /dev/null
+bootstrap_progress
+# clone repo
+git clone -q http://localhost:13000/gitea-user/tyk-data.git $gitea_tyk_data_repo_path 2>> bootstrap.log
+bootstrap_progress
+# commit Jenkinsfile to repo (left uncommitted until now so it can be easily edited)
+cp ./deployments/cicd/data/jenkins/Jenkinsfile $gitea_tyk_data_repo_path
+git -C $gitea_tyk_data_repo_path add . 1> /dev/null 2>> bootstrap.log
+git -C $gitea_tyk_data_repo_path commit -m "Adding Jenkinsfile" 1> /dev/null 2>> bootstrap.log
+git -C $gitea_tyk_data_repo_path push "http://$gitea_username:$gitea_password@localhost:13000/gitea-user/tyk-data.git/" 1> /dev/null 2>> bootstrap.log
+log_ok
 
 log_message "Checking Tyk Environment 2 deployment exists"
 tyk2_dashboard_service=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -f deployments/tyk2/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) ps | grep "tyk2-dashboard")
-# Warn is cicd deployment is made without the tyk2 deployment
+# Warn if cicd deployment is made without the tyk2 deployment
 if [[ "${#tyk2_dashboard_service}" -eq "0" ]]
 then
   log_message "  WARNING: Tyk Environment 2 deployment not found."
   log_message "           CI/CD feature will not work as intended."
   log_message "           Ensure 'tyk2' parameter is used when calling up.sh script: ./up.sh tyk2 cicd"
+  flag_error
 else
   log_ok
 fi
@@ -32,22 +98,8 @@ log_ok
 bootstrap_progress
 
 log_message "Waiting for Jenkins to respond ok"
-jenkins_status=""
 # 403 indicates that at least Jenkins was able to recognise that the request was unauthorised, so we should be ok to proceed
-jenkins_status_desired="403"
-jenkins_tries=0
-while [ "$jenkins_status" != "$jenkins_status_desired" ]
-do
-  jenkins_status=$(curl -I -s -m5 $jenkins_base_url 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
-  if [ "$jenkins_status" != "$jenkins_status_desired" ]
-  then
-    log_message "  Request unsuccessful, retrying..."
-    sleep 2
-  else
-    log_ok
-  fi
-  bootstrap_progress
-done
+wait_for_response "$jenkins_base_url" "403"
 
 log_message "Getting Jenkins admin password"
 jenkins_admin_password=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) exec jenkins sh -c "cat /var/jenkins_home/secrets/initialAdminPassword | head -c32" 2>> bootstrap.log)
@@ -77,6 +129,7 @@ do
     log_message "  WARNING: Unable to make API calls to Tyk Environment 2 Dashboard."
     log_message "           CI/CD feature will not work as intended."
     log_message "           Rerun up.sh script with 'tyk2' parameter before 'cicd' parameter: ./up.sh tyk2 cicd"
+    flag_error
     break
   else
     log_message "  Request unsuccessful, retrying..."
@@ -128,4 +181,8 @@ echo -e "\033[2K
   ▽ Jenkins
                URL : $jenkins_base_url
           Username : admin
-          Password : $jenkins_admin_password"
+          Password : $jenkins_admin_password
+  ▽ Gitea
+               URL : $gitea_base_url
+          Username : $gitea_username
+          Password : $gitea_password"

@@ -8,12 +8,12 @@ then
   echo "" > bootstrap.log
 fi
 
-# make scripts executable
-chmod +x `ls scripts/*.sh` 1> /dev/null 
-chmod +x `ls deployments/*/*.sh` 1> /dev/null 
-
-# make the context data directory
+# make the context data directory and clear and data from an existing directory
 mkdir -p .context-data 1> /dev/null
+rm -f .context-data/*
+
+# make sure error flag is not present
+rm -f .bootstrap_error_occurred
 
 # ensure Docker environment variables are correctly set before creating containers
 if [[ "$*" == *tracing* ]]
@@ -55,9 +55,11 @@ do
   fi
 done
 
-# if an error was logged, report it
 if [ -f .bootstrap_error_occurred ]
 then
-  rm .bootstrap_error_occurred
-  echo "Error occurred during bootstrap, check bootstrap.log for information"
+  # if an error was logged, report it
+  printf "\nError occurred during bootstrap, check bootstrap.log for information\n\n"
+else
+  # Confirm bootstrap is compelete
+  printf "\nTyk bootstrap completed\n\n"
 fi

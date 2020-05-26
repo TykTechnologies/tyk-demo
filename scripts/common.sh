@@ -14,7 +14,7 @@ function log_http_result {
     log_ok
   else 
     log_message "  ERROR: $1"
-    touch .bootstrap_error_occurred
+    flag_error
   fi
 }
 
@@ -25,8 +25,12 @@ function log_json_result {
     log_ok
   else
     log_message "  ERROR: $(echo $1 | jq -r '.Message')"
-    touch .bootstrap_error_occurred
+    flag_error
   fi
+}
+
+function flag_error {
+  touch .bootstrap_error_occurred
 }
 
 function log_ok {
@@ -65,4 +69,29 @@ function set_docker_environment_value {
       rm .env.bak
     fi
   fi
+}
+
+function wait_for_response {
+  url="$1"
+  status=""
+  desired_status="$2"
+  header="$3"
+  while [ "$status" != "$desired_status" ]
+  do
+    # header can be provided if auth is needed
+    if [ "$header" != "" ]
+    then
+      status=$(curl -k -I -s -m5 $url -H "$header" 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
+    else
+      status=$(curl -k -I -s -m5 $url $header 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
+    fi
+    if [ "$status" != "$desired_status" ]
+    then
+      log_message "  Request unsuccessful: wanted '$desired_status' but got '$status'. Retrying..."
+      sleep 2
+    else
+      log_ok
+    fi
+    bootstrap_progress
+  done
 }
