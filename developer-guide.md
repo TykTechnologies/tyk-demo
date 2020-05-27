@@ -22,6 +22,7 @@ Deployments can also contain directories, if needed:
 
 * `volumes`: Contains data for use as volumes referenced by the `docker-compose.yml` file
 * `data`: Contains data for general use e.g. during bootstrapping
+* `scripts`: Contains scripts related to bootstrapping or using the deployment
 
 Both the `volumes` and `data` directories should contain sub-directories named after services, using the service name from the `docker-compose.yml` file. 
 
