@@ -2464,7 +2464,7 @@
                       "enable_session": false,
                       "template_source": "ewp7e3JhbmdlICR4LCAkcyA6PSAuc2VydmVycy5zZXJ2ZXJ9fSAgICAie3skcy5zZXJ2ZXJOYW1lfX0iOiAie3skcy5zZXJ2ZXJJUH19Int7aWYgbm90ICR4fX0se3tlbmR9fQp7e2VuZH19fQ=="
                     },
-                    "path": "/anything.",
+                    "path": "/anything/body-transform",
                     "method": "POST"
                   }
                 ],
@@ -3334,7 +3334,7 @@
                   "api_model": {},
                   "event_timeout": 60,
                   "header_map": {},
-                  "id": "5ebd49e4d953c46e67e764d1",
+                  "id": "5ecf6d5a09d8c41bfa1564ff",
                   "method": "POST",
                   "name": "Webhook Receiver Post",
                   "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -3384,7 +3384,7 @@
           "event_timeout": 60,
           "hook": {
             "api_model": {},
-            "id": "5ebd49e4d953c46e67e764d1",
+            "id": "5ecf6d5a09d8c41bfa1564ff",
             "org_id": "5e9d9544a1dcd60001d0ed20",
             "name": "Webhook Receiver Post",
             "method": "POST",
