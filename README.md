@@ -64,17 +64,7 @@ DASHBOARD_LICENCE=<YOUR_LICENCE>
 
 In addition to this, some features require entries in the `.env` file. These are set automatically by the `up.sh` file, depending on the deployment parameters.
 
-## Step 3: Make the scripts executable
-
-There are two scripts which can be used to bring up and tear down the deployment: `up.sh` and `down.sh`. The `common.sh` script also needs to be made executable. 
-
-Make these scripts executable:
-
-```
-chmod +x up.sh down.sh scripts/common.sh
-```
-
-## Step 4: Bring the deployment up
+## Step 3: Bring the deployment up
 
 To bootstrap the system we will run the `up.sh` script, which will run the necessary `docker-compose` and `bootstrap` commands to start the containers and bootstrap the system. 
 
