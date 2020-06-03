@@ -96,13 +96,13 @@ Multiple features can be deployed at the same time by providing multiple feature
 
 The bootstrap scripts provide feedback on progress in the `bootstrap.log` file.
 
-## Step 5: Log into the Dashboard
+## Step 4: Log into the Dashboard
 
 The bootstrap process provides credentials and other useful information in the terminal output. Check this output for the Dashboard credentials.
 
 When you log into the Dashboard, you will find the imported APIs and Policies are now available.
 
-## Step 6: Import API requests into Postman
+## Step 5: Import API requests into Postman
 
 There is a Postman collection provided which compliments the imported API definitions and Policies. This lets you demonstrate Tyk features and functionality.
 
