@@ -2,6 +2,20 @@
 
 source scripts/common.sh
 
+# check .env file exists
+if [ ! -f .env ]
+then
+  echo "ERROR: Docker environment file missing. Review 'getting started' steps in README.md."
+  exit 1
+fi
+
+# check dashboard licence defined
+if ! grep -q "DASHBOARD_LICENCE=" .env
+then
+  echo "ERROR: Dashboard licence missing from Docker environment file. Review 'getting started' steps in README.md."
+  exit 1
+fi
+
 # prevent log file from growing too big - truncate when it reaches over 10000 lines
 if [ -f bootstrap.log ] && [  $(wc -l < bootstrap.log) -gt 10000 ]
 then
