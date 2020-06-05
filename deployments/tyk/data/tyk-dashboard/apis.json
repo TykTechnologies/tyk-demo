@@ -1416,7 +1416,7 @@
         "enable_proxy_protocol": false,
         "api_id": "42b615355eaf47ca617463503f43300b",
         "org_id": "5e9d9544a1dcd60001d0ed20",
-        "use_keyless": true,
+        "use_keyless": false,
         "use_oauth2": false,
         "use_openid": false,
         "openid_options": {
@@ -1494,7 +1494,7 @@
         "upstream_certificates": {},
         "pinned_public_keys": {},
         "enable_jwt": false,
-        "use_standard_auth": false,
+        "use_standard_auth": true,
         "use_go_plugin_auth": false,
         "enable_coprocess_auth": false,
         "jwt_signing_method": "",
