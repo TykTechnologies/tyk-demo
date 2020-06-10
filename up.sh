@@ -79,7 +79,6 @@ then
 fi
 
 # run bootstrap scripts for any feature deployments specified
-echo "bootstrapping the other deployments: "
 for var in "$@"
 do
   # the `tyk` deployment is already included, so don't duplicate it
