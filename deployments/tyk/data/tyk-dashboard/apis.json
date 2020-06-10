@@ -3050,7 +3050,7 @@
         "event_handlers": {
           "events": {}
         },
-        "enable_batch_request_support": false,
+        "enable_batch_request_support": true,
         "enable_ip_whitelisting": false,
         "allowed_ips": [],
         "enable_ip_blacklisting": false,
@@ -3338,7 +3338,7 @@
                   "api_model": {},
                   "event_timeout": 60,
                   "header_map": {},
-                  "id": "5eda25b972cba9ee8bf584a0",
+                  "id": "5ee0f4a2028887159a2d4e1b",
                   "method": "POST",
                   "name": "Webhook Receiver Post",
                   "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -3388,7 +3388,7 @@
           "event_timeout": 60,
           "hook": {
             "api_model": {},
-            "id": "5eda25b972cba9ee8bf584a0",
+            "id": "5ee0f4a2028887159a2d4e1b",
             "org_id": "5e9d9544a1dcd60001d0ed20",
             "name": "Webhook Receiver Post",
             "method": "POST",
