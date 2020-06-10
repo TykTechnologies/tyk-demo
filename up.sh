@@ -33,7 +33,8 @@ rm -f .context-data/*
 rm -f .bootstrap_error_occurred
 
 # clear the .bootstrap/bootstrapped_deployments from deployments
-> .bootstrap/bootstrapped_deployments
+mkdir -p .bootstrap 1> /dev/null
+echo -n > .bootstrap/bootstrapped_deployments
 
 # ensure Docker environment variables are correctly set before creating containers
 if [[ "$*" == *tracing* ]]
@@ -70,7 +71,6 @@ then
 fi
 
 # alway run the tyk bootstrap first
-echo "bootstrapping 'tyk' deployment"
 deployments/tyk/bootstrap.sh 2>> bootstrap.log
 if [ "$?" != 0 ]
 then
@@ -84,7 +84,6 @@ do
   # the `tyk` deployment is already included, so don't duplicate it
   if [ "$var" != "tyk" ]
   then
-    echo "bootstrapping: deployments/$var/bootstrap.sh"
     eval "deployments/$var/bootstrap.sh"
     if [ "$?" != 0 ]
     then
@@ -92,7 +91,6 @@ do
       exit
     else
       echo "$var" >> ./.bootstrap/bootstrapped_deployments
-      echo "$var is deployed"
     fi
   fi
 done
