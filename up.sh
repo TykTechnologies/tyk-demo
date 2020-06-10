@@ -88,7 +88,7 @@ do
     eval "deployments/$var/bootstrap.sh"
     if [ "$?" != 0 ]
     then
-      echo "Failure during bootstrap of $var (check deployments/$var/bootstrap.sh). For details check bootstrap.log"
+      echo "Error occurred during bootstrap of $var, when running deployments/$var/bootstrap.sh. Check bootstrap.log for details."
       exit
     else
       echo "$var" >> ./.bootstrap/bootstrapped_deployments
