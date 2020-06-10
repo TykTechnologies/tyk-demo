@@ -32,6 +32,9 @@ rm -f .context-data/*
 # make sure error flag is not present
 rm -f .bootstrap_error_occurred
 
+# clear the .bootstrap/bootstrapped_deployments from deployments
+> .bootstrap/bootstrapped_deployments
+
 # ensure Docker environment variables are correctly set before creating containers
 if [[ "$*" == *tracing* ]]
 then
@@ -56,11 +59,24 @@ do
     command_docker_compose="$command_docker_compose -f deployments/$var/docker-compose.yml"
   fi
 done
-command_docker_compose="$command_docker_compose -p tyk-pro-docker-demo-extended --project-directory $(pwd) up -d"
+
+echo "Starting containers: $command_docker_compose"
+command_docker_compose="$command_docker_compose -p tyk-pro-docker-demo-extended --project-directory $(pwd) up --remove-orphans -d"
 eval $command_docker_compose
+if [ "$?" != 0 ]
+then
+  echo "Error occurred when using docker-compose to bring containers up"
+  exit
+fi
 
 # alway run the tyk bootstrap first
-deployments/tyk/bootstrap.sh
+echo "bootstrapping 'tyk' deployment"
+deployments/tyk/bootstrap.sh 2>> bootstrap.log
+if [ "$?" != 0 ]
+then
+  echo "Error occurred during bootstrap of 'tyk' deployment. Check bootstrap.log for details."
+  exit
+fi
 
 # run bootstrap scripts for any feature deployments specified
 for var in "$@"
@@ -68,7 +84,16 @@ do
   # the `tyk` deployment is already included, so don't duplicate it
   if [ "$var" != "tyk" ]
   then
+    echo "bootstrapping: deployments/$var/bootstrap.sh"
     eval "deployments/$var/bootstrap.sh"
+    if [ "$?" != 0 ]
+    then
+      echo "Error occurred during bootstrap of $var, when running deployments/$var/bootstrap.sh. Check bootstrap.log for details."
+      exit
+    else
+      echo "$var" >> ./.bootstrap/bootstrapped_deployments
+      echo "$var is deployed"
+    fi
   fi
 done
 
@@ -78,5 +103,6 @@ then
   printf "\nError occurred during bootstrap, check bootstrap.log for information\n\n"
 else
   # Confirm bootstrap is compelete
-  printf "\nTyk bootstrap completed\n\n"
+  printf "\nTyk-Demo bootstrap completed\n"
+  printf "\n----------------------------\n\n"
 fi
