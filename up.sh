@@ -74,7 +74,7 @@ echo "bootstrapping 'tyk' deployment"
 deployments/tyk/bootstrap.sh 2>> bootstrap.log
 if [ "$?" != 0 ]
 then
-  echo "Failure during bootstrap of 'tyk'. For details check bootstrap.log"
+  echo "Error occurred during bootstrap of 'tyk' deployment. Check bootstrap.log for details."
   exit
 fi
 
