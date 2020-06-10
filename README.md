@@ -111,17 +111,12 @@ Import the `tyk_demo.postman_collection.json` into your [Postman](https://postma
 # Resetting
 
 If you want to reset your environment then you need to remove the volumes associated with the container as well as the containers themselves. The `down.sh` script can do this for you.
+You do not need to declare which component to remove since the `up.sh` has already registered them in `.bootstrap/bootstrapped_deployments` so the `down.sh` will just read it and stop all those services.
 
 To bring down the containers and delete associated volumes:
 
 ```
 ./down.sh
-```
-
-If you used deployment parameters when running the `up.sh` script, you should also include them when taking the system down. For example, to bring down the standard Tyk deployment and the `analytics` deployment:
-
-```
-./down.sh analytics
 ```
 
 # Redeploying
