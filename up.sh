@@ -62,7 +62,7 @@ do
 done
 
 echo "Starting containers: $command_docker_compose"
-command_docker_compose="$command_docker_compose -p tyk-pro-docker-demo-extended --project-directory $(pwd) up --remove-orphans -d"
+command_docker_compose="$command_docker_compose -p tyk-demo --project-directory $(pwd) up --remove-orphans -d"
 eval $command_docker_compose
 if [ "$?" != 0 ]
 then

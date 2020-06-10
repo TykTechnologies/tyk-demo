@@ -33,7 +33,7 @@ log_message "Restoring Gitea database"
 docker-compose \
     -f deployments/tyk/docker-compose.yml \
     -f deployments/cicd/docker-compose.yml \
-    -p tyk-pro-docker-demo-extended \
+    -p tyk-demo \
     --project-directory $(pwd) \
     exec gitea sh -c "./data/restore.sh" 1>> /dev/null 2>> bootstrap.log
 log_ok
@@ -43,14 +43,14 @@ log_message "Regenerating Gitea hooks"
 docker-compose \
     -f deployments/tyk/docker-compose.yml \
     -f deployments/cicd/docker-compose.yml \
-    -p tyk-pro-docker-demo-extended \
+    -p tyk-demo \
     --project-directory $(pwd) \
     exec -u git gitea sh -c "gitea admin regenerate hooks;" 1>> /dev/null 2>> bootstrap.log
 log_ok
 bootstrap_progress
 
 log_message "Restarting Gitea container"
-docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) restart gitea 2> /dev/null
+docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-demo --project-directory $(pwd) restart gitea 2> /dev/null
 log_ok
 bootstrap_progress
 
@@ -58,7 +58,7 @@ log_message "Waiting for Gitea to be ready after restart"
 wait_for_response $gitea_base_url "200"
 
 log_message "Setting up repository"
-gitea_tyk_data_repo_path="/tmp/tyk-pro-docker-demo-extended/tyk-data"
+gitea_tyk_data_repo_path="/tmp/tyk-demo/tyk-data"
 echo $gitea_tyk_data_repo_path > .context-data/gitea-tyk-data-repo-path
 # delete any repo data which may already exist
 rm -rf $gitea_tyk_data_repo_path > /dev/null
@@ -74,7 +74,7 @@ git -C $gitea_tyk_data_repo_path push "http://$gitea_username:$gitea_password@lo
 log_ok
 
 log_message "Checking Tyk Environment 2 deployment exists"
-tyk2_dashboard_service=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -f deployments/tyk2/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) ps | grep "tyk2-dashboard")
+tyk2_dashboard_service=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -f deployments/tyk2/docker-compose.yml -p tyk-demo --project-directory $(pwd) ps | grep "tyk2-dashboard")
 # Warn if cicd deployment is made without the tyk2 deployment
 if [[ "${#tyk2_dashboard_service}" -eq "0" ]]
 then
@@ -102,19 +102,19 @@ log_message "Waiting for Jenkins to respond ok"
 wait_for_response "$jenkins_base_url" "403"
 
 log_message "Getting Jenkins admin password"
-jenkins_admin_password=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) exec jenkins sh -c "cat /var/jenkins_home/secrets/initialAdminPassword | head -c32" 2>> bootstrap.log)
+jenkins_admin_password=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-demo --project-directory $(pwd) exec jenkins sh -c "cat /var/jenkins_home/secrets/initialAdminPassword | head -c32" 2>> bootstrap.log)
 log_message "  Jenkins admin password = $jenkins_admin_password"
 bootstrap_progress
 
 log_message "Extracting Jenkins plugins and other configuration"
-docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) exec \
+docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-demo --project-directory $(pwd) exec \
   jenkins \
   tar -xzvf /var/jenkins_home/bootstrap-import/jenkins-plugins.tar.gz -C /var/jenkins_home 1> /dev/null 2>> bootstrap.log
 log_ok
 bootstrap_progress
 
 log_message "Restarting Jenkins container to allow new config and plugins to be used"
-docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) restart jenkins 2> /dev/null
+docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-demo --project-directory $(pwd) restart jenkins 2> /dev/null
 log_ok
 bootstrap_progress
 
@@ -148,7 +148,7 @@ log_message "Importing credentials for 'global'"
 jenkins_response=""
 while [ "${jenkins_response:0:1}" != "0" ]
 do
-  jenkins_response=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) exec jenkins bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket import-credentials-as-xml system::system::jenkins < /var/jenkins_home/bootstrap-import/credentials-global.xml; echo $?")
+  jenkins_response=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-demo --project-directory $(pwd) exec jenkins bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket import-credentials-as-xml system::system::jenkins < /var/jenkins_home/bootstrap-import/credentials-global.xml; echo $?")
   if [ "${jenkins_response:0:1}" != "0" ]
   then
     log_message "  Request unsuccessful, retrying..."
@@ -163,7 +163,7 @@ log_message "Creating job for 'APIs and Policies'"
 jenkins_response=""
 while [ "${jenkins_response:0:1}" != "0" ]
 do
-  jenkins_response=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) exec jenkins bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket create-job 'apis-and-policies' < /var/jenkins_home/bootstrap-import/job-apis-and-policies.xml; echo $?")
+  jenkins_response=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -p tyk-demo --project-directory $(pwd) exec jenkins bash -c "java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket create-job 'apis-and-policies' < /var/jenkins_home/bootstrap-import/job-apis-and-policies.xml; echo $?")
   if [ "${jenkins_response:0:1}" != "0" ]
   then
     log_message "  Request unsuccessful, retrying..."
