@@ -65,7 +65,7 @@ command_docker_compose="$command_docker_compose -p tyk-pro-docker-demo-extended 
 eval $command_docker_compose
 if [ "$?" != 0 ]
 then
-  echo "Failure occured when started docker-compose"
+  echo "Error occurred when using docker-compose to bring containers up"
   exit
 fi
 
