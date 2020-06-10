@@ -18,7 +18,7 @@ echo "Running docker-compose down: " $command_docker_compose
 eval $command_docker_compose
 if [ "$?" == 0 ]
 then
-  echo "All containers were stoped and removed"
+  echo "All containers were stopped and removed"
 else
  echo "Error occurred during the following the down command."
 fi 
