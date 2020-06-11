@@ -327,7 +327,7 @@
           "cache_by_headers": []
         },
         "session_lifetime": 0,
-        "active": true,
+        "active": false,
         "internal": false,
         "auth_provider": {
           "name": "",
