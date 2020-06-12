@@ -61,7 +61,6 @@ do
   fi
 done
 
-echo "Starting containers: $command_docker_compose"
 command_docker_compose="$command_docker_compose -p tyk-demo --project-directory $(pwd) up --remove-orphans -d"
 eval $command_docker_compose
 if [ "$?" != 0 ]
@@ -69,6 +68,7 @@ then
   echo "Error occurred when using docker-compose to bring containers up"
   exit
 fi
+echo "Starting containers: $command_docker_compose"
 
 # alway run the tyk bootstrap first
 deployments/tyk/bootstrap.sh 2>> bootstrap.log
