@@ -61,8 +61,8 @@ do
   fi
 done
 
-echo "Starting containers: $command_docker_compose"
 command_docker_compose="$command_docker_compose -p tyk-demo --project-directory $(pwd) up --remove-orphans -d"
+echo "Starting containers: $command_docker_compose"
 eval $command_docker_compose
 if [ "$?" != 0 ]
 then
