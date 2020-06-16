@@ -54,7 +54,16 @@ sudo apt-get install jq
 
 See the [JQ installation page](https://stedolan.github.io/jq/download/) for other operating systems.
 
-## Step 2: Add Docker Environment variables
+## Step 2: Map Tyk hostnames to localhost IP
+
+Update the `/etc/hosts` file to contain host entries for the Tyk Dashboard and Portal:
+
+```
+127.0.0.1   tyk-portal.localhost
+127.0.0.1   tyk-dashboard.localhost
+```
+
+## Step 3: Add Docker Environment variables
 
 The `tyk/docker-compose.yml` and `tyk2/docker-compose.yml` files use a Docker environment variable to set the dashboard licence. To set this, create a file called `.env` in the root directory of the repo, then set the content of the file as follows, replacing `<YOUR_LICENCE>` with your Dashboard licence:
 
@@ -64,7 +73,7 @@ DASHBOARD_LICENCE=<YOUR_LICENCE>
 
 In addition to this, some features require entries in the `.env` file. These are set automatically by the `up.sh` file, depending on the deployment parameters.
 
-## Step 3: Bring the deployment up
+## Step 4: Bring the deployment up
 
 To bootstrap the system we will run the `up.sh` script, which will run the necessary `docker-compose` and `bootstrap` commands to start the containers and bootstrap the system. 
 
@@ -96,13 +105,13 @@ Multiple features can be deployed at the same time by providing multiple feature
 
 The bootstrap scripts provide feedback on progress in the `bootstrap.log` file.
 
-## Step 4: Log into the Dashboard
+## Step 5: Log into the Dashboard
 
 The bootstrap process provides credentials and other useful information in the terminal output. Check this output for the Dashboard credentials.
 
 When you log into the Dashboard, you will find the imported APIs and Policies are now available.
 
-## Step 5: Import API requests into Postman
+## Step 6: Import API requests into Postman
 
 There is a Postman collection provided which compliments the imported API definitions and Policies. This lets you demonstrate Tyk features and functionality.
 
