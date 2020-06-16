@@ -43,7 +43,7 @@ Run the `dump-tyk.sh` script:
 
 This script uses Tyk Sync to extract the API and Policy definitions, and write them to the `tyk-data` git repository directory. This data is then ready to be added, committed and pushed to Gitea, so it can then be consumed by Jenkins.
 
-The `tyk-data` local repository directory is `/tmp/tyk-pro-docker-demo-extended/tyk-data`.
+The `tyk-data` local repository directory is `/tmp/tyk-demo/tyk-data`.
 
 #### 3. Push updates to the repository
 

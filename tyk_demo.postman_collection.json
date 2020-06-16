@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9db4b68a-a5c8-40b0-870f-238e4b2e9843",
+		"_postman_id": "47441dfa-69a6-4c47-afe6-5a3e3e0b4590",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -17,7 +17,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d221573c-7af0-4d9d-be19-7ed4be962254",
+										"id": "bd7e1f22-3680-4f89-9ca3-4087e889ea96",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -115,7 +115,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "0f24eb4f-e606-42ed-b3f6-059bb4ebd45e",
+										"id": "84923368-e448-4a4c-b34b-97a905e46866",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -162,7 +162,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "974b53b0-eb6e-40b1-bec2-ca3f72707d0e",
+										"id": "0b1dec21-146f-4125-b81d-8313d0bbbb31",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -203,7 +203,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "0655fbac-47b2-428d-b9ba-9ee31f13628f",
+										"id": "0511586b-396e-441b-869a-f0a05ce635f4",
 										"exec": [
 											"pm.test(\"5th server error response triggers circuit breaker\", function () {",
 											"    var circuitBreakerRequest = {",
@@ -262,7 +262,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "610c8cee-4db8-4639-877a-05ba22d4013e",
+										"id": "6bf2f11f-bd1e-4728-ae87-9e13f1e9d421",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -308,7 +308,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9acc4784-3ecc-4840-b1c4-fdf4b0e8b3d6",
+										"id": "c5bbb502-12c9-4ad6-aff8-da16b20e2708",
 										"exec": [
 											"pm.test(\"Status code is 504\", function () {",
 											"    pm.response.to.have.status(504);",
@@ -357,7 +357,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "e3fe9df3-ae8f-46d1-ad3e-fc63e822b650",
+										"id": "1e28bb3e-08d5-4bb1-b9fe-feb041fe15cc",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -401,7 +401,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "da6a66ec-a4b0-4a46-b21a-51b2e1da384e",
+										"id": "905f35b8-e6d4-4dbb-9ac2-92ae685d54ea",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -442,7 +442,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "410eddf2-fca2-4372-8a7d-888dd4c12038",
+										"id": "8f522a28-7226-481c-81a8-c0a168799ea8",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -489,7 +489,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7a2027ce-ccd4-411b-8b7a-0e0b9a6adbe7",
+										"id": "44fbc060-6baf-4acd-b4f1-4d56f42e60a0",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -536,7 +536,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b5346d84-e2bc-479e-b440-8b0413715339",
+										"id": "138af158-72a6-4e2e-8e2f-3bbc93237dff",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -588,7 +588,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d7858146-77a7-4df2-88a6-9a0c5b6ebb91",
+										"id": "f4bbd554-b792-43fe-8845-5c0a3180ba1a",
 										"exec": [
 											"var cacheRequest = {",
 											"    url: 'http://localhost:8080/plugin-demo-api/uuid',",
@@ -655,7 +655,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c66f7cf7-6798-40d7-a290-bdd97c9d273f",
+										"id": "22cd7a49-318b-4bb3-8dfb-864d1b3657f8",
 										"exec": [
 											"pm.test(\"Status code is 422\", function () {",
 											"    pm.response.to.have.status(422);",
@@ -700,7 +700,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5297f300-b0c6-4ae2-840e-f5a8959a7a7d",
+										"id": "bcd24369-a412-4b10-84bb-340e586ac511",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -747,7 +747,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "12d5e16f-5b85-4ea5-bfb9-218e51036731",
+										"id": "adb5f443-8afa-487d-b7e6-d95ab57c0e08",
 										"exec": [
 											"pm.test(\"Status code is 400\", function () {",
 											"    pm.response.to.have.status(400);",
@@ -792,7 +792,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f36556f2-7ae8-458b-ac19-fbe883dc7207",
+										"id": "50caea29-d4c2-4c8f-8c6b-4fde1305f342",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -837,7 +837,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "1fb13e39-988d-4eb5-979d-a801f78bb764",
+										"id": "e7c74988-3893-4639-8ade-5e41804396a9",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -878,7 +878,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ced83432-5ad4-404c-97a0-23801b4a145f",
+										"id": "9d623292-47bb-4486-813f-7c1274a852dc",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -914,7 +914,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7cce0717-e4e3-401e-a209-f9aae271c566",
+										"id": "d09b4394-551f-47fa-b951-4d59aa235de1",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -961,7 +961,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fd1e9129-8212-4a7c-a337-2ddb44be18ec",
+										"id": "084e470f-b110-4d6b-b312-c94dfa46ec1f",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1006,7 +1006,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4a8be18c-afaf-4163-a103-024ccbea8d86",
+										"id": "7c2302b6-a13f-4132-b082-bafc56564752",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1048,7 +1048,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "3cf54b84-b9b1-41eb-8326-d8631172f97e",
+										"id": "37ef5cce-b486-4266-80fd-bd9c982806ec",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1094,7 +1094,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "eb07dae3-7b98-4845-bcaa-c9a4e3ffce29",
+								"id": "65396c3f-087e-48bf-8397-7786b6f94c11",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1104,7 +1104,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f81952ab-8487-4e06-a0e2-5e7fa569b7c4",
+								"id": "f870fe1f-df18-4441-91df-0fef0850bc3e",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1124,7 +1124,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "710fb95f-27e0-4150-8342-f60c48b727f4",
+										"id": "15e769b7-4219-4ef6-8810-f033079861ad",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1171,7 +1171,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "0ba57ea1-5b57-430e-a6e8-936ab717381c",
+										"id": "7ca771ca-edc7-4bdc-9fd5-297aced6cb3d",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1223,7 +1223,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "456d1ae6-3e7a-4cf2-9ecb-16fab28dfd12",
+										"id": "15b88e97-b6ba-4d41-8fe5-621e5083dda8",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1280,7 +1280,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "87a33603-0dd6-48c5-a382-261b9cafa646",
+												"id": "77ad7f91-528b-428a-8b26-81ab8e10e18c",
 												"exec": [
 													"pm.test(\"Status code is 403\", function () {",
 													"    pm.response.to.have.status(403);",
@@ -1330,7 +1330,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "a7d6f0cb-1107-404c-925e-836c0b05d239",
+												"id": "932b9aa4-5534-40fe-be48-2d15bb0a7de1",
 												"exec": [
 													"pm.test(\"Status code is 200\", function () {",
 													"    pm.response.to.have.status(200);",
@@ -1387,7 +1387,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "d1873999-d360-4fe1-9f89-dfff6327f9d9",
+														"id": "d77a576d-ebc0-4b73-951a-66f2d8c55664",
 														"exec": [
 															"pm.test(\"Status code is 401\", function () {",
 															"    pm.response.to.have.status(401);",
@@ -1433,7 +1433,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "26bd1dcc-e158-4c37-b3a8-dd8af2c3990d",
+														"id": "1c4f50d7-1f44-46cd-94ec-b09377182aa8",
 														"exec": [
 															"pm.test(\"Status code is 403\", function () {",
 															"    pm.response.to.have.status(403);",
@@ -1479,7 +1479,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "52005b10-9ba0-4fa0-bfc2-868e1f7dbc1d",
+														"id": "f372b9ae-ad2b-4708-b97b-8ee0d77448f9",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1524,7 +1524,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "8fc46ba1-a647-47d2-b4f4-c32de2daa44b",
+												"id": "fa420743-8071-43fb-8723-5f4b0e1cc246",
 												"type": "text/javascript",
 												"exec": [
 													""
@@ -1534,7 +1534,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "6db73cf2-9f98-4815-9033-45e904b48e67",
+												"id": "a86fc552-eca1-4f65-8c53-02497650394f",
 												"type": "text/javascript",
 												"exec": [
 													""
@@ -1554,7 +1554,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "f1a7b288-9211-4eff-bad5-cb5274f265c9",
+														"id": "cdb56af0-d9da-4485-8cd7-fcf7b313d849",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1595,7 +1595,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "53799a29-8da3-4822-ad2f-e5abab82446a",
+														"id": "915a9928-2913-44c3-bdb5-2304618a5074",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1637,7 +1637,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "1f848342-f06b-446d-b597-5fd99fa2efcd",
+														"id": "79c99ac9-27e1-4eb3-a9b6-f85a3ae96e17",
 														"exec": [
 															"pm.test(\"Status code is 403\", function () {",
 															"    pm.response.to.have.status(403);",
@@ -1691,7 +1691,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "cf01d3a9-271e-4639-b72e-6ede9dc9ff10",
+														"id": "ce79fc00-d5fe-4086-9d86-4ae4a7e7e55c",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1740,7 +1740,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "541cc9e5-3e6f-4447-86f8-d271d6a8ac27",
+										"id": "718c86da-e2e4-4ec6-8aff-e110019ca0cc",
 										"exec": [
 											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 											"",
@@ -1820,7 +1820,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f51d2db0-d520-40db-bdbc-2ee7aab7917e",
+										"id": "23586ef8-1d1e-4837-9710-1a1e5762a1da",
 										"exec": [
 											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 											"",
@@ -1899,7 +1899,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a86aa937-32c3-4e67-b780-96dd4060d968",
+										"id": "7747958b-f1cf-47d3-abc4-bb69f49a1a04",
 										"exec": [
 											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 											"",
@@ -1980,7 +1980,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b49e1199-aea6-40ee-84e8-eef2fd072f2d",
+										"id": "251595bf-f76c-4246-a75e-d767ba852c0a",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2037,7 +2037,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d4ab4f3e-3f03-4197-8bee-16d0238ebee9",
+										"id": "bd415236-0729-45ed-9c9c-41bb66ce1a11",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2067,7 +2067,7 @@
 										"get"
 									]
 								},
-								"description": "This request calls an API which uses Uptime Tests to monitor the health of the upstream hosts it is configured to proxy requests to.\n\nIn this case, it is configred load balance requests upstream to `httpbin` and `httpbin2`. An uptime test has been added to the API Definition which calls the `status/500` endpoint of the `httpbin` host. This endpoint always returns `HTTP 500` status codes, which causes the uptime test to fail, triggering the removal of the `httpbin` host from the load balancer. This means that requests sent to this API will only be proxied to the `httpbin2` host, since the `httpbin` host has been marked as unhealthy.\n\nCheck the `headers.Hosts` property of the response body. This will always show `httpbin2`.\n\nIn order for the Gateway to remove the unhealthy host from the load balancer, the API Definition must have both nn Uptime Test using the same hostname, and the `check_host_against_uptime_tests` property set to `true`. If `check_host_against_uptime_tests` is not set to `true` then the unhealthy host will not be removed from the load balancer, only an event will be raised.\n\n**Note**: To reduce the amount of warning messages in the Gateway application log generated by failing tests, the uptime tests have been configured to run every 30 seconds. This means that on initial startup, the Gateway will proxy to both hosts (`httpbin` and `httpbin2`) until the first Uptime Test is run."
+								"description": "**Note:** The API for this request must be activated before running the request. The API is inactive by default to prevent failing uptime tests from repeatedly generating error messages in the application logs. To activate the API, log in to the Dashboard, edit the 'Uptime Test API', set `active` to `true` (you can click the 'API Inactive' button) then update the API.\n\n***\n\nThis request calls an API which uses Uptime Tests to monitor the health of the upstream hosts it is configured to proxy requests to.\n\nIn this case, it is configred load balance requests upstream to `httpbin` and `httpbin2`. An uptime test has been added to the API Definition which calls the `status/500` endpoint of the `httpbin` host. This endpoint always returns `HTTP 500` status codes, which causes the uptime test to fail, triggering the removal of the `httpbin` host from the load balancer. This means that requests sent to this API will only be proxied to the `httpbin2` host, since the `httpbin` host has been marked as unhealthy.\n\nCheck the `headers.Hosts` property of the response body. This will always show `httpbin2`.\n\nIn order for the Gateway to remove the unhealthy host from the load balancer, the API Definition must have both nn Uptime Test using the same hostname, and the `check_host_against_uptime_tests` property set to `true`. If `check_host_against_uptime_tests` is not set to `true` then the unhealthy host will not be removed from the load balancer, only an event will be raised.\n\n**Note**: To reduce the amount of warning messages in the Gateway application log generated by failing tests, the uptime tests have been configured to run every 30 seconds. This means that on initial startup, the Gateway will proxy to both hosts (`httpbin` and `httpbin2`) until the first Uptime Test is run."
 							},
 							"response": []
 						}
@@ -2090,7 +2090,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c962e112-56a7-4d7a-91cf-aa88b3ed78f9",
+										"id": "6541f72b-13cf-42d0-993a-bc3c53b3eb7f",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2151,7 +2151,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a505e7f0-f385-442e-8b5d-0384bcb7eb4e",
+										"id": "199f0adf-892d-40ce-85bd-50d0132269c2",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2270,7 +2270,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d88cbebf-d057-47e9-9ef4-694d0c8f56ba",
+								"id": "921cf3ff-452e-4003-bb55-e480f52f175c",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2308,12 +2308,84 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "Gateway Functionality",
+			"item": [
+				{
+					"name": "Batch request processing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "084ea9b3-1ca6-41db-a3f0-0a6a4451bd85",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"relative_url for 1st response is /get\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData[0].relative_url).to.eql(\"/get\");",
+									"});",
+									"",
+									"pm.test(\"code for 1st response is 200\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData[0].code).to.eql(200);",
+									"});",
+									"",
+									"pm.test(\"relative_url for 2nd response is /uuid\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData[1].relative_url).to.eql(\"/uuid\");",
+									"});",
+									"",
+									"pm.test(\"code for 2nd response is 200\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData[1].code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"requests\": [\n      {\n        \"method\": \"GET\",\n        \"headers\": {\n          \"batch-request\": \"1\"\n        },\n        \"body\": \"\",\n        \"relative_url\": \"/get\"\n      },\n      {\n        \"method\": \"GET\",\n        \"headers\": {},\n        \"body\": \"\",\n        \"relative_url\": \"/uuid\"\n      }\n    ],\n    \"suppress_parallel_execution\": true\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/basic-open-api/tyk/batch/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"basic-open-api",
+								"tyk",
+								"batch",
+								""
+							]
+						},
+						"description": "This request calls the special `/tyk/batch` endpoint, which enables the Gateway to make multiple API requests baesd on a single API request received from the client. The special batch endpoint path is added to the listen path for the API, and must end with a trailing slash.\n\nWhen calling the batch endpoint, the API client must specify the requests that the Gateway will make. In this case, the body defines two requests which go to `/uuid` and `/get`. The request for `/get` also adds a custom header with the key `batch-request`. \n\nThe `suppress_parallel_execution` property defines whether the Gateway will send the requests sequentially or in parallel - in this case the setting is `true`, so the Gateway will send the requests in in sequence, which means the response data will be in the same sequence.\n\nThe response body contains data about the responses the Gateway received for the requests. The `requests` property contains the response data, showing the URL called, HTTP status, headers and body data received.\n\nThe batch request functionality must be enabled on the API definition by setting `enable_batch_request_support` to `true`."
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "Basic Test Request",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "435fcae3-e889-4226-aff8-fc7b7f589783",
+						"id": "a6176da1-f05d-4965-992a-afc7bf551350",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",

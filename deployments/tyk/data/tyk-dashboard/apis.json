@@ -327,7 +327,7 @@
           "cache_by_headers": []
         },
         "session_lifetime": 0,
-        "active": true,
+        "active": false,
         "internal": false,
         "auth_provider": {
           "name": "",
@@ -1416,7 +1416,7 @@
         "enable_proxy_protocol": false,
         "api_id": "42b615355eaf47ca617463503f43300b",
         "org_id": "5e9d9544a1dcd60001d0ed20",
-        "use_keyless": true,
+        "use_keyless": false,
         "use_oauth2": false,
         "use_openid": false,
         "openid_options": {
@@ -1494,7 +1494,7 @@
         "upstream_certificates": {},
         "pinned_public_keys": {},
         "enable_jwt": false,
-        "use_standard_auth": false,
+        "use_standard_auth": true,
         "use_go_plugin_auth": false,
         "enable_coprocess_auth": false,
         "jwt_signing_method": "",
@@ -1575,7 +1575,7 @@
         "proxy": {
           "preserve_host_header": false,
           "listen_path": "/swagger-petstore",
-          "target_url": "http://swagger-petstore:8080/",
+          "target_url": "http://swagger-petstore:8080/api/",
           "disable_strip_slash": false,
           "strip_listen_path": true,
           "enable_load_balancing": false,
@@ -1656,10 +1656,14 @@
         "expire_analytics_after": 0,
         "response_processors": [],
         "CORS": {
-          "enable": false,
-          "allowed_origins": [],
+          "enable": true,
+          "allowed_origins": [
+            "http://localhost:3000"
+          ],
           "allowed_methods": [],
-          "allowed_headers": [],
+          "allowed_headers": [
+            "*"
+          ],
           "exposed_headers": [],
           "allow_credentials": false,
           "max_age": 24,
@@ -3046,7 +3050,7 @@
         "event_handlers": {
           "events": {}
         },
-        "enable_batch_request_support": false,
+        "enable_batch_request_support": true,
         "enable_ip_whitelisting": false,
         "allowed_ips": [],
         "enable_ip_blacklisting": false,
@@ -3334,7 +3338,7 @@
                   "api_model": {},
                   "event_timeout": 60,
                   "header_map": {},
-                  "id": "5ecf6d5a09d8c41bfa1564ff",
+                  "id": "5ee0f4a2028887159a2d4e1b",
                   "method": "POST",
                   "name": "Webhook Receiver Post",
                   "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -3384,7 +3388,7 @@
           "event_timeout": 60,
           "hook": {
             "api_model": {},
-            "id": "5ecf6d5a09d8c41bfa1564ff",
+            "id": "5ee0f4a2028887159a2d4e1b",
             "org_id": "5e9d9544a1dcd60001d0ed20",
             "name": "Webhook Receiver Post",
             "method": "POST",

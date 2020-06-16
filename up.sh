@@ -2,6 +2,23 @@
 
 source scripts/common.sh
 
+# check .env file exists
+if [ ! -f .env ]
+then
+  echo "ERROR: Docker environment file missing. Review 'getting started' steps in README.md."
+  exit 1
+fi
+
+# check dashboard licence defined
+if ! grep -q "DASHBOARD_LICENCE=" .env
+then
+  echo "ERROR: Dashboard licence missing from Docker environment file. Review 'getting started' steps in README.md."
+  exit 1
+fi
+
+# check that jq is available
+command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: JQ is required, but it's not installed. Review 'getting started' steps in README.md."; exit 1; }
+
 # prevent log file from growing too big - truncate when it reaches over 10000 lines
 if [ -f bootstrap.log ] && [  $(wc -l < bootstrap.log) -gt 10000 ]
 then
@@ -14,6 +31,10 @@ rm -f .context-data/*
 
 # make sure error flag is not present
 rm -f .bootstrap_error_occurred
+
+# clear the .bootstrap/bootstrapped_deployments from deployments
+mkdir -p .bootstrap 1> /dev/null
+echo -n > .bootstrap/bootstrapped_deployments
 
 # ensure Docker environment variables are correctly set before creating containers
 if [[ "$*" == *tracing* ]]
@@ -39,11 +60,23 @@ do
     command_docker_compose="$command_docker_compose -f deployments/$var/docker-compose.yml"
   fi
 done
-command_docker_compose="$command_docker_compose -p tyk-pro-docker-demo-extended --project-directory $(pwd) up -d"
+
+command_docker_compose="$command_docker_compose -p tyk-demo --project-directory $(pwd) up --remove-orphans -d"
+echo "Starting containers: $command_docker_compose"
 eval $command_docker_compose
+if [ "$?" != 0 ]
+then
+  echo "Error occurred when using docker-compose to bring containers up"
+  exit
+fi
 
 # alway run the tyk bootstrap first
-deployments/tyk/bootstrap.sh
+deployments/tyk/bootstrap.sh 2>> bootstrap.log
+if [ "$?" != 0 ]
+then
+  echo "Error occurred during bootstrap of 'tyk' deployment. Check bootstrap.log for details."
+  exit
+fi
 
 # run bootstrap scripts for any feature deployments specified
 for var in "$@"
@@ -52,6 +85,13 @@ do
   if [ "$var" != "tyk" ]
   then
     eval "deployments/$var/bootstrap.sh"
+    if [ "$?" != 0 ]
+    then
+      echo "Error occurred during bootstrap of $var, when running deployments/$var/bootstrap.sh. Check bootstrap.log for details."
+      exit
+    else
+      echo "$var" >> ./.bootstrap/bootstrapped_deployments
+    fi
   fi
 done
 
@@ -61,5 +101,6 @@ then
   printf "\nError occurred during bootstrap, check bootstrap.log for information\n\n"
 else
   # Confirm bootstrap is compelete
-  printf "\nTyk bootstrap completed\n\n"
+  printf "\nTyk-Demo bootstrap completed\n"
+  printf "\n----------------------------\n\n"
 fi

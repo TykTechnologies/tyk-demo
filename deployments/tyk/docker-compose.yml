@@ -41,6 +41,8 @@ services:
       - tyk-mongo
   tyk-redis:
     image: redis
+    ports:
+    - "6379:6379"
     volumes:
       - tyk-redis-data:/data
     networks:
@@ -48,6 +50,8 @@ services:
   tyk-mongo:
     image: mongo:3.2
     command: ["mongod", "--smallfiles"]
+    ports:
+    - "27017:27017"
     volumes:
       - tyk-mongo-data:/data/db
     networks:
@@ -65,7 +69,7 @@ services:
     environment:
       - SWAGGER_HOST=http://swagger-petstore:8080
       - SWAGGER_URL=http://localhost:8080/swagger-petstore
-    
+
 volumes:
   tyk-redis-data:
   tyk-mongo-data:

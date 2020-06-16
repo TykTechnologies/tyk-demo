@@ -2,7 +2,7 @@
 
 # Uses the Dashboard Admin API to import API and Policy definitions, using data used to bootstrap the base Tyk deployment
 
-dashboard_base_url="http://localhost:3000"
+dashboard_base_url="http://tyk-dashboard.localhost:3000"
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
 
 echo "Importing APIs"

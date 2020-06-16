@@ -26,7 +26,7 @@ bootstrap_progress
 
 log_message "Stopping the pump instance deployed by the base deployment"
 # so it is replaced by the instance from this deployment
-docker-compose -f deployments/tyk/docker-compose.yml -p tyk-pro-docker-demo-extended --project-directory $(pwd) stop tyk-pump 2> /dev/null
+docker-compose -f deployments/tyk/docker-compose.yml -p tyk-demo --project-directory $(pwd) stop tyk-pump 2> /dev/null
 log_ok
 bootstrap_progress
 

@@ -6,14 +6,14 @@
 docker-compose \
     -f deployments/tyk/docker-compose.yml \
     -f deployments/cicd/docker-compose.yml \
-    -p tyk-pro-docker-demo-extended \
+    -p tyk-demo \
     --project-directory $(pwd) \
     exec -u git gitea sh -c "cd /data/gitea; rm gitea-dump.zip; gitea dump -c /data/gitea/conf/app.ini --f gitea-dump.zip"
 
 gitea_container_id=$(docker-compose \
     -f deployments/tyk/docker-compose.yml \
     -f deployments/cicd/docker-compose.yml \
-    -p tyk-pro-docker-demo-extended \
+    -p tyk-demo \
     --project-directory $(pwd) \
     ps -q gitea)
 

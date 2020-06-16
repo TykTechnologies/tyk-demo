@@ -54,7 +54,16 @@ sudo apt-get install jq
 
 See the [JQ installation page](https://stedolan.github.io/jq/download/) for other operating systems.
 
-## Step 2: Add Docker Environment variables
+## Step 2: Map Tyk hostnames to localhost IP
+
+Update the `/etc/hosts` file to contain host entries for the Tyk Dashboard and Portal:
+
+```
+127.0.0.1   tyk-portal.localhost
+127.0.0.1   tyk-dashboard.localhost
+```
+
+## Step 3: Add Docker Environment variables
 
 The `tyk/docker-compose.yml` and `tyk2/docker-compose.yml` files use a Docker environment variable to set the dashboard licence. To set this, create a file called `.env` in the root directory of the repo, then set the content of the file as follows, replacing `<YOUR_LICENCE>` with your Dashboard licence:
 
@@ -63,16 +72,6 @@ DASHBOARD_LICENCE=<YOUR_LICENCE>
 ```
 
 In addition to this, some features require entries in the `.env` file. These are set automatically by the `up.sh` file, depending on the deployment parameters.
-
-## Step 3: Make the scripts executable
-
-There are two scripts which can be used to bring up and tear down the deployment: `up.sh` and `down.sh`. The `common.sh` script also needs to be made executable. 
-
-Make these scripts executable:
-
-```
-chmod +x up.sh down.sh scripts/common.sh
-```
 
 ## Step 4: Bring the deployment up
 
@@ -121,17 +120,12 @@ Import the `tyk_demo.postman_collection.json` into your [Postman](https://postma
 # Resetting
 
 If you want to reset your environment then you need to remove the volumes associated with the container as well as the containers themselves. The `down.sh` script can do this for you.
+You do not need to declare which component to remove since the `up.sh` has already registered them in `.bootstrap/bootstrapped_deployments` so the `down.sh` will just read it and stop all those services.
 
 To bring down the containers and delete associated volumes:
 
 ```
 ./down.sh
-```
-
-If you used deployment parameters when running the `up.sh` script, you should also include them when taking the system down. For example, to bring down the standard Tyk deployment and the `analytics` deployment:
-
-```
-./down.sh analytics
 ```
 
 # Redeploying
