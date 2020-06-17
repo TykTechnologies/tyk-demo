@@ -126,6 +126,7 @@ The `up.sh` script is not intended to be run consecutively without running `down
 # Troubleshooting
 
 **1. Application error when opening the documentation in the portal**
+
 You will also see an error in the field that has the base64 encode of the OAS in the cataloge document.
 Since the value cannot be base64 *decoded* it means that the base64 *encoding* failed during bootstrap.
 One possible reason is that you are using brew's base64 binary. You can run `whereis base64` to find out. The expected pass should be `/usr/bin/base64`since brew's version inserts `\r` to the output rather than just output the base64 encoding as is.
