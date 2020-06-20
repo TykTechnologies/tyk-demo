@@ -53,9 +53,9 @@ sudo apt-get install jq
 
 See the [JQ installation page](https://stedolan.github.io/jq/download/) for other operating systems.
 
-## Step 2: Map Tyk Deno hostnames to localhost IP
+## Step 2: Map Tyk Demo hostnames to localhost IP
 
-Update the `/etc/hosts` file to contain host entries for the Tyk Dashboard and Portal. The `update-hosts.sh` script will add these for you:
+Run the `update-hosts.sh` script to add host entries for the Tyk Dashboard and Portal to `/etc/hosts`:
 
 ```
 sudo ./scripts/update-hosts.sh
