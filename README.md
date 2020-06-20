@@ -54,21 +54,18 @@ sudo apt-get install jq
 
 See the [JQ installation page](https://stedolan.github.io/jq/download/) for other operating systems.
 
-## Step 2: Map Tyk hostnames to localhost IP
+## Step 2: Map Tyk Deno hostnames to localhost IP
 
-Update the `/etc/hosts` file to contain host entries for the Tyk Dashboard and Portal:
+Update the `/etc/hosts` file to contain host entries for the Tyk Dashboard and Portal. The `update-hosts.sh` script will add these for you:
 
 ```
-127.0.0.1   tyk-portal.localhost
-127.0.0.1   tyk-dashboard.localhost
-127.0.0.1   tyk-gateway.localhost
-127.0.0.1   custom-domain.localhost
+sudo ./scripts/update-hosts.sh
 ```
 
-These custom hostnames will be used by:
+The custom hostnames will be used by the Dashboard and Gateway to:
 
-- Tyk Dashboard to differentiate between requests for the Dashboard and Portal
-- Tyk Gateway to identify the API being requests when using custom domains 
+- Differentiate between requests for the Dashboard and Portal
+- Identify the API being requests when using custom domains 
 
 ## Step 3: Add Docker Environment variables
 
