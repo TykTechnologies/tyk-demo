@@ -6,7 +6,8 @@ deployment="Tyk"
 log_start_deployment
 bootstrap_progress
 
-dashboard_base_url="http://localhost:3000"
+dashboard_base_url="http://tyk-dashboard.localhost:3000"
+portal_base_url="http://tyk-portal.localhost:3000"
 gateway_base_url="http://localhost:8080"
 
 log_message "Getting Dashboard configuration"
@@ -280,7 +281,7 @@ echo -e "\033[2K
           Password : $dashboard_user_password
    API Credentials : $dashboard_user_api_credentials  
   ▽ Portal
-               URL : $dashboard_base_url$portal_root_path
+               URL : $portal_base_url$portal_root_path
           Username : $portal_user_email
           Password : $portal_user_password  
   ▽ Gateway
