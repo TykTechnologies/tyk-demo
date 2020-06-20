@@ -152,11 +152,14 @@ When adding functionality to this repo, please also add requests to the Postman 
 
 ## Scenario 2: Synchronising updates
 
-The simplest and best-practice approach to simple bring the environment down, pull the repo then bring it back up again. The up script includes an API and Policy import step.
+The simplest and best-practice approach is to simply bring the environment down, pull the repo then bring it back up again. The `up.sh` script includes an API and Policy import step, so all latest data will be imported:
 
-If you want to get the changes other people have made, first pull from the repo, then use the import script.
+```
+./down.sh
+./up.sh
+```
 
-Run from the repo root directory, as so:
+Alternatively, you can import data into and existing deployment by first pulling the repo, then using the import script:
 
 ```
 ./scripts/import.sh
@@ -164,6 +167,4 @@ Run from the repo root directory, as so:
 
 ## Why not use Tyk Sync?
 
-The Tyk Sync binary is not always kept up-to-date with the latest changes in API and Policy object, which unfortunately means that the data it exports may be missing information. This also means that when this data is imported into the system, that the objects created will also be missing this data.
-
-So, until the Tyk Sync project is updated and released in-line with the Tyk Dashboard project, it is safer to manually handle data import and export directly with the Dashboard API.
+The Tyk Sync binary is not always kept up-to-date with the latest changes in API and Policy object, which unfortunately means that the data it exports may be missing information. This also means that when this data is imported into the system, that the objects created will also be missing this data. This issue will be addressed in a future release of Tyk Sync. In the mean time, it is safer to manually handle data import and export directly with the Dashboard API.

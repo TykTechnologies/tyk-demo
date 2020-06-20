@@ -5,7 +5,6 @@ This repo provides an example installation of Tyk. It uses Docker Compose to pro
 The concept is that there is a **base deployment** of Tyk, which gives you the usual Tyk components: Gateway, Dashboard, Pump, plus the databases Redis and MongoDB. This standard deployment can be extended by including additional **feature deployments** as needed. The feature deployments cover particular scenarios for Tyk, such as:
 
 * Single sign on
-* TLS
 * Analytics export
 * Tracking
 * CI/CD
@@ -16,7 +15,7 @@ Each feature deployment has its own directory, with the necessary files to deplo
 
 There is a focus on simplicity. Docker Compose is used to provision the containers, and bootstrap scripts are used to initialise the environment so that it is ready to use straight away - applying configuration and populating data.
 
-See the [Developer Guide](developer-guide.md) for information on how to work with this repo.
+See the [Developer Guide](developer-guide.md) for information on how to contribute to and extend this repository.
 
 # Repository Structure
 
@@ -54,21 +53,18 @@ sudo apt-get install jq
 
 See the [JQ installation page](https://stedolan.github.io/jq/download/) for other operating systems.
 
-## Step 2: Map Tyk hostnames to localhost IP
+## Step 2: Map Tyk Demo hostnames to localhost IP
 
-Update the `/etc/hosts` file to contain host entries for the Tyk Dashboard and Portal:
+Run the `update-hosts.sh` script to add host entries for the Tyk Dashboard and Portal to `/etc/hosts`:
 
 ```
-127.0.0.1   tyk-portal.localhost
-127.0.0.1   tyk-dashboard.localhost
-127.0.0.1   tyk-gateway.localhost
-127.0.0.1   custom-domain.localhost
+sudo ./scripts/update-hosts.sh
 ```
 
-These custom hostnames will be used by:
+The custom hostnames will be used by the Dashboard and Gateway to:
 
-- Tyk Dashboard to differentiate between requests for the Dashboard and Portal
-- Tyk Gateway to identify the API being requests when using custom domains 
+- Differentiate between requests for the Dashboard and Portal
+- Identify the API being requests when using custom domains 
 
 ## Step 3: Add Docker Environment variables
 
@@ -79,6 +75,8 @@ DASHBOARD_LICENCE=<YOUR_LICENCE>
 ```
 
 In addition to this, some features require entries in the `.env` file. These are set automatically by the `up.sh` file, depending on the deployment parameters.
+
+**Note**: For a full experience, your Dashboard licence should be valid for at least two Gateways, otherwise features/examples which require multiple Gateways will not work.
 
 ## Step 4: Bring the deployment up
 
