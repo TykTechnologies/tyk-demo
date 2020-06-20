@@ -2025,7 +2025,8 @@
         "CORS": {
           "enable": true,
           "allowed_origins": [
-            "http://localhost:3000"
+            "http://localhost:3000",
+            "http://tyk-portal.localhost:3000"
           ],
           "allowed_methods": [],
           "allowed_headers": [
@@ -3720,7 +3721,7 @@
                   "api_model": {},
                   "event_timeout": 60,
                   "header_map": {},
-                  "id": "5eed8352372b7025da0fab41",
+                  "id": "5eed9528919013dbc9d1d7a8",
                   "method": "POST",
                   "name": "Webhook Receiver Post",
                   "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -3770,7 +3771,7 @@
           "event_timeout": 60,
           "hook": {
             "api_model": {},
-            "id": "5eed8352372b7025da0fab41",
+            "id": "5eed9528919013dbc9d1d7a8",
             "org_id": "5e9d9544a1dcd60001d0ed20",
             "name": "Webhook Receiver Post",
             "method": "POST",
