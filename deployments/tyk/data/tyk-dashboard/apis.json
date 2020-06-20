@@ -3156,7 +3156,9 @@
         "domain": "",
         "certificates": [],
         "do_not_track": false,
-        "tags": [],
+        "tags": [
+          "tyk-gateway-2"
+        ],
         "enable_context_vars": false,
         "config_data": {},
         "tag_headers": [],
@@ -3440,7 +3442,9 @@
         "domain": "",
         "certificates": [],
         "do_not_track": false,
-        "tags": [],
+        "tags": [
+          "tyk-gateway-2"
+        ],
         "enable_context_vars": true,
         "config_data": {},
         "tag_headers": [],
@@ -3721,7 +3725,7 @@
                   "api_model": {},
                   "event_timeout": 60,
                   "header_map": {},
-                  "id": "5eed9528919013dbc9d1d7a8",
+                  "id": "5eee2438deb6fb145097d89b",
                   "method": "POST",
                   "name": "Webhook Receiver Post",
                   "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -3771,7 +3775,7 @@
           "event_timeout": 60,
           "hook": {
             "api_model": {},
-            "id": "5eed9528919013dbc9d1d7a8",
+            "id": "5eee2438deb6fb145097d89b",
             "org_id": "5e9d9544a1dcd60001d0ed20",
             "name": "Webhook Receiver Post",
             "method": "POST",

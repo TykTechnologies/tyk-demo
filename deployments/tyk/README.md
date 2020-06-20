@@ -37,6 +37,6 @@ This is acheived using a public/private key pair. The Gateway has the public key
 
 ### TLS Gateway
 
-The TLS-enabled Gateway uses a self-signed certificate, so make sure to instruct your HTTP client is ignore certificate verification failure.
+The TLS-enabled Gateway (`tyk-gateway-2`) uses a self-signed certificate. This requires that your HTTP client ignores certificate verification errors when accessing this Gateway.
 
 - [Tyk TLS Gateway](https://tyk-gateway-2.localhost:8081/basic-open-api/get)

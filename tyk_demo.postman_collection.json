@@ -1371,103 +1371,190 @@
 					"name": "Advanced Options",
 					"item": [
 						{
-							"name": "Webhooks",
-							"item": [
+							"name": "Webhooks - Authentication Failure",
+							"event": [
 								{
-									"name": "Webhooks - Authentication Failure",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "fcaed98e-bed7-44db-9958-09520bd3cd91",
-												"exec": [
-													"pm.test(\"Status code is 403\", function () {",
-													"    pm.response.to.have.status(403);",
-													"});",
-													"",
-													"// Add test to check if webhook fired"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Authorization",
-												"value": "auth-failure-key",
-												"type": "text"
-											}
+									"listen": "test",
+									"script": {
+										"id": "fcaed98e-bed7-44db-9958-09520bd3cd91",
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"// Add test to check if webhook fired"
 										],
-										"url": {
-											"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
-											"protocol": "http",
-											"host": [
-												"tyk-gateway",
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"basic-protected-api",
-												"get"
-											]
-										},
-										"description": "This example makes an unauthenticated request to the `Basic Protected API`. The API requires authentication so the request fails, as expected, with a `403 Forbidden` response.\n\nThe `Basic Protected API` is configured to use a webhook in the event of authentication failure. This webhook calls another API, passing information about the failed request. You can see this webhook call in the Dashboard analytics, it's made to the `Webhook Receiver` API, and will appear straight after this failed API request to `Basic Protected API`. In the analytics record, check the body of the request to see origin of the request and key which was used.\n\nWebhooks can be set up to handle lots of different types of events, such as rate limit exceeded, quota exceeded etc. They can also be configured with a cooldown time so that the events don't overload the API receiving the webhooks."
-									},
-									"response": []
+										"type": "text/javascript"
+									}
 								}
 							],
-							"protocolProfileBehavior": {},
-							"_postman_isSubFolder": true
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "auth-failure-key",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
+									"protocol": "http",
+									"host": [
+										"tyk-gateway",
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"basic-protected-api",
+										"get"
+									]
+								},
+								"description": "This example makes an unauthenticated request to the `Basic Protected API`. The API requires authentication so the request fails, as expected, with a `403 Forbidden` response.\n\nThe `Basic Protected API` is configured to use a webhook in the event of authentication failure. This webhook calls another API, passing information about the failed request. You can see this webhook call in the Dashboard analytics, it's made to the `Webhook Receiver` API, and will appear straight after this failed API request to `Basic Protected API`. In the analytics record, check the body of the request to see origin of the request and key which was used.\n\nWebhooks can be set up to handle lots of different types of events, such as rate limit exceeded, quota exceeded etc. They can also be configured with a cooldown time so that the events don't overload the API receiving the webhooks."
+							},
+							"response": []
 						},
 						{
-							"name": "Context Variables",
-							"item": [
+							"name": "Context Variables - Correlation Id",
+							"event": [
 								{
-									"name": "Context Variables - Correlation Id",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"id": "58d95f9b-297b-49ae-abbf-48638aad40e2",
-												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"'X-Req-Id' header is a UUID\", function () {",
-													"    var jsonData = pm.response.json();",
-													"    pm.expect(jsonData.headers[\"X-Req-Id\"]).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "http://tyk-gateway.localhost:8080/basic-open-api/get",
-											"protocol": "http",
-											"host": [
-												"tyk-gateway",
-												"localhost"
-											],
-											"port": "8080",
-											"path": [
-												"basic-open-api",
-												"get"
-											]
-										},
-										"description": "Header `X-Req-Id` is injected by the Gateway, and can be seen in the response body. \n\nThe header value is a GUID representing the random id assigned to each request by the Gateway. It is configured using the Tyk context variable `$tyk_context.request_id`.\n\nThe value is accessible to various parts of the Tyk middleware chain, so can be used as a reference when processing requests."
-									},
-									"response": []
+									"listen": "test",
+									"script": {
+										"id": "58d95f9b-297b-49ae-abbf-48638aad40e2",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"'X-Req-Id' header is a UUID\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers[\"X-Req-Id\"]).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
 								}
 							],
-							"protocolProfileBehavior": {},
-							"_postman_isSubFolder": true
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://tyk-gateway.localhost:8080/basic-open-api/get",
+									"protocol": "http",
+									"host": [
+										"tyk-gateway",
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"basic-open-api",
+										"get"
+									]
+								},
+								"description": "Header `X-Req-Id` is injected by the Gateway, and can be seen in the response body. \n\nThe header value is a GUID representing the random id assigned to each request by the Gateway. It is configured using the Tyk context variable `$tyk_context.request_id`.\n\nThe value is accessible to various parts of the Tyk middleware chain, so can be used as a reference when processing requests."
+							},
+							"response": []
+						},
+						{
+							"name": "Segmentation (part 1) - Tags match",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e423cd78-32ba-419a-9f65-25fa264757f7",
+										"exec": [
+											"pm.test(\"Status code is 200 for tyk-gateway-2\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"var segmentationTestRequest = {",
+											"    url: 'http://tyk-gateway.localhost:8080/basic-open-api/get',",
+											"    method: 'GET'",
+											"};",
+											"",
+											"pm.sendRequest(segmentationTestRequest, function (err, response) { ",
+											"    pm.test(\"Status code is 200 for tyk-gateway\", function () {",
+											"        pm.expect(response.code).to.eql(200);",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://tyk-gateway-2.localhost:8081/basic-open-api/get",
+									"protocol": "https",
+									"host": [
+										"tyk-gateway-2",
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"basic-open-api",
+										"get"
+									]
+								},
+								"description": "This request demonstrates the segmentation feature. It calls the **Basic Open API**, which has the `tyk-gateway-2` segment tag applied to it. \n\nThis means that the API will only be loaded by Gateways which are configured to use tags and also have the same tag (i.e. `tyk-gateway-2`). Gateways which have `node_is_segmented` set to `false` in `tyk.conf` (i.e. `tyk-gateway`) will load all API Definitions regardless of their tags.\n\nSee part 2 for an example of an API which is not available on both Gateways."
+							},
+							"response": []
+						},
+						{
+							"name": "Segmentation (part 2) - Tags do not match",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "68e2f706-b88a-489a-82d8-fb5327f52353",
+										"exec": [
+											"pm.test(\"Status code is 404 for tyk-gateway-2\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"var segmentationTestRequest = {",
+											"    url: 'http://tyk-gateway.localhost:8080/basic-protected-api/get',",
+											"    method: 'GET',",
+											"    header: 'Authorization: auth_key'",
+											"};",
+											"",
+											"pm.sendRequest(segmentationTestRequest, function (err, response) { ",
+											"    pm.test(\"Status code is 200 for tyk-gateway\", function () {",
+											"        pm.expect(response.code).to.eql(200);",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "auth_key"
+									}
+								],
+								"url": {
+									"raw": "https://tyk-gateway-2.localhost:8081/basic-protected-api/get",
+									"protocol": "https",
+									"host": [
+										"tyk-gateway-2",
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"basic-protected-api",
+										"get"
+									]
+								},
+								"description": "This request shows that `tyk-gateway-2` is not able to proxy requests for the **Basic Protected API**. \n\nA `404 Not Found` response is returned when this API is requested. This is because the API does not have any segmentation tags applied, and `tyk-gateway-2` has the segmentation tag `tyk-gateway-2`, which means that it will only load API Definitions which also have this tag. \n\n**Basic Protected API** is available through `tyk-gateway`, as it does not have segmentation enabled. This is demonstrated in the test."
+							},
+							"response": []
 						}
 					],
 					"protocolProfileBehavior": {},
