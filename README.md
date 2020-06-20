@@ -61,7 +61,14 @@ Update the `/etc/hosts` file to contain host entries for the Tyk Dashboard and P
 ```
 127.0.0.1   tyk-portal.localhost
 127.0.0.1   tyk-dashboard.localhost
+127.0.0.1   tyk-gateway.localhost
+127.0.0.1   custom-domain.localhost
 ```
+
+These custom hostnames will be used by:
+
+- Tyk Dashboard to differentiate between requests for the Dashboard and Portal
+- Tyk Gateway to identify the API being requests when using custom domains 
 
 ## Step 3: Add Docker Environment variables
 

@@ -77,9 +77,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/javascript-middleware-api/post?deleted=deleted-value&accepted=456",
+									"raw": "http://tyk-gateway.localhost:8080/javascript-middleware-api/post?deleted=deleted-value&accepted=456",
 									"protocol": "http",
 									"host": [
+										"tyk-gateway",
 										"localhost"
 									],
 									"port": "8080",
@@ -140,9 +141,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/mock",
 									"protocol": "http",
 									"host": [
+										"tyk-gateway",
 										"localhost"
 									],
 									"port": "8080",
@@ -181,10 +183,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/blacklist",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/blacklist",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -207,7 +209,7 @@
 										"exec": [
 											"pm.test(\"5th server error response triggers circuit breaker\", function () {",
 											"    var circuitBreakerRequest = {",
-											"      url: 'http://localhost:8080/plugin-demo-api/status/500',",
+											"      url: 'http://tyk-gateway.localhost:8080/plugin-demo-api/status/500',",
 											"      method: 'GET'",
 											"    };",
 											"    ",
@@ -240,10 +242,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/status/500",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/status/500",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -286,10 +288,10 @@
 									"raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<servers version=\"1\">\n  <server>\n    <serverName>Shanghai_VPN</serverName>\n    <serverIP>127.0.0.1</serverIP>\n  </server>\n  <server>\n    <serverName>Beijing_VPN</serverName>\n    <serverIP>127.0.0.2</serverIP>\n  </server>\n</servers>"
 								},
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/body-transform",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/body-transform",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -335,10 +337,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/delay/6",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/delay/6",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -379,10 +381,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/delay/1",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/delay/1",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -420,10 +422,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/url-rewrite",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/url-rewrite",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -461,10 +463,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/url-rewrite?query=rewrite",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/url-rewrite?query=rewrite",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -514,10 +516,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/url-rewrite",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/url-rewrite",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -566,10 +568,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/modify-headers",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/modify-headers",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -591,7 +593,7 @@
 										"id": "f4bbd554-b792-43fe-8845-5c0a3180ba1a",
 										"exec": [
 											"var cacheRequest = {",
-											"    url: 'http://localhost:8080/plugin-demo-api/uuid',",
+											"    url: 'http://tyk-gateway.localhost:8080/plugin-demo-api/uuid',",
 											"    method: 'GET'",
 											"};",
 											"",
@@ -634,10 +636,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/uuid",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/uuid",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -669,10 +671,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/basic-protected-api/anything/ignored",
+									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/anything/ignored",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -705,10 +707,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/basic-protected-api/anything/not-ignored",
+									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/anything/not-ignored",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -750,10 +752,10 @@
 									"raw": "{\n\t\"lastName\": \"Hoskins\",\n\t\"age\": 71\n}"
 								},
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/validate-json",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/validate-json",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -797,10 +799,10 @@
 									"raw": "{\n\t\"firstName\": \"Bob\",\n\t\"lastName\": \"Hoskins\",\n\t\"age\": 71\n}"
 								},
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/validate-json",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/validate-json",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -842,10 +844,10 @@
 									"raw": "1234567890"
 								},
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/request-size-limit",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/request-size-limit",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -887,10 +889,10 @@
 									"raw": "123456789"
 								},
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/request-size-limit",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/request-size-limit",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -928,10 +930,10 @@
 								"method": "PUT",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/method-transform",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/method-transform",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -964,10 +966,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/track-endpoint",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/track-endpoint",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -1011,10 +1013,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/global-version-settings",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/global-version-settings",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -1056,10 +1058,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/virtual-endpoint",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/virtual-endpoint",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -1098,10 +1100,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/whitelist",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/whitelist",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -1145,10 +1147,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/whitelist-123",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/whitelist-123",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -1221,10 +1223,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/mock",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -1273,10 +1275,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/mock",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -1320,10 +1322,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/plugin-demo-api/anything/mock",
+									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/mock",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -1374,10 +1376,10 @@
 											}
 										],
 										"url": {
-											"raw": "http://localhost:8080/basic-protected-api/get",
+											"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
 											"protocol": "http",
 											"host": [
-												"localhost"
+												"tyk-gateway","localhost"
 											],
 											"port": "8080",
 											"path": [
@@ -1421,10 +1423,10 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "http://localhost:8080/basic-open-api/get",
+											"raw": "http://tyk-gateway.localhost:8080/basic-open-api/get",
 											"protocol": "http",
 											"host": [
-												"localhost"
+												"tyk-gateway","localhost"
 											],
 											"port": "8080",
 											"path": [
@@ -1484,10 +1486,10 @@
 													}
 												],
 												"url": {
-													"raw": "http://localhost:8080/basic-protected-api/get",
+													"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
 													"protocol": "http",
 													"host": [
-														"localhost"
+														"tyk-gateway","localhost"
 													],
 													"port": "8080",
 													"path": [
@@ -1530,10 +1532,10 @@
 													}
 												],
 												"url": {
-													"raw": "http://localhost:8080/basic-protected-api/get",
+													"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
 													"protocol": "http",
 													"host": [
-														"localhost"
+														"tyk-gateway","localhost"
 													],
 													"port": "8080",
 													"path": [
@@ -1576,10 +1578,10 @@
 													}
 												],
 												"url": {
-													"raw": "http://localhost:8080/basic-protected-api/get",
+													"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
 													"protocol": "http",
 													"host": [
-														"localhost"
+														"tyk-gateway","localhost"
 													],
 													"port": "8080",
 													"path": [
@@ -1646,10 +1648,10 @@
 													}
 												],
 												"url": {
-													"raw": "http://localhost:8080/jwt-api/get",
+													"raw": "http://tyk-gateway.localhost:8080/jwt-api/get",
 													"protocol": "http",
 													"host": [
-														"localhost"
+														"tyk-gateway","localhost"
 													],
 													"port": "8080",
 													"path": [
@@ -1687,10 +1689,10 @@
 													}
 												],
 												"url": {
-													"raw": "http://localhost:8080/jwt-api/anything/allowed-path",
+													"raw": "http://tyk-gateway.localhost:8080/jwt-api/anything/allowed-path",
 													"protocol": "http",
 													"host": [
-														"localhost"
+														"tyk-gateway","localhost"
 													],
 													"port": "8080",
 													"path": [
@@ -1734,10 +1736,10 @@
 													}
 												],
 												"url": {
-													"raw": "http://localhost:8080/jwt-api/anything/restricted-path",
+													"raw": "http://tyk-gateway.localhost:8080/jwt-api/anything/restricted-path",
 													"protocol": "http",
 													"host": [
-														"localhost"
+														"tyk-gateway","localhost"
 													],
 													"port": "8080",
 													"path": [
@@ -1783,10 +1785,10 @@
 													}
 												],
 												"url": {
-													"raw": "http://localhost:8080/basic-authentication-api/get",
+													"raw": "http://tyk-gateway.localhost:8080/basic-authentication-api/get",
 													"protocol": "http",
 													"host": [
-														"localhost"
+														"tyk-gateway","localhost"
 													],
 													"port": "8080",
 													"path": [
@@ -1817,7 +1819,7 @@
 											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 											"",
 											"var rateLimitTestKeyCreateRequest = {",
-											"  url: 'http://localhost:8080/tyk/keys/' + keyId,",
+											"  url: 'http://tyk-gateway.localhost:8080/tyk/keys/' + keyId,",
 											"  method: 'POST',",
 											"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
 											"  body: {",
@@ -1829,7 +1831,7 @@
 											"pm.sendRequest(rateLimitTestKeyCreateRequest, function (err, response) { ",
 											"    pm.test(\"Status code is 429\", function () {",
 											"        var rateLimitRequest = {",
-											"            url: 'http://localhost:8080/basic-protected-api/get',",
+											"            url: 'http://tyk-gateway.localhost:8080/basic-protected-api/get',",
 											"            method: 'GET',",
 											"            header: 'Authorization:' + keyId",
 											"        };",
@@ -1844,7 +1846,7 @@
 											"                    pm.expect(response.code).to.eql(429);",
 											"                    ",
 											"                    var rateLimitTestKeyDeleteRequest = {",
-											"                        url: 'http://localhost:8080/tyk/keys/' + keyId,",
+											"                        url: 'http://tyk-gateway.localhost:8080/tyk/keys/' + keyId,",
 											"                        method: 'DELETE',",
 											"                        header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
 											"                    };",
@@ -1871,10 +1873,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/basic-protected-api/get",
+									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -1897,7 +1899,7 @@
 											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 											"",
 											"var throttlingTestKeyCreateRequest = {",
-											"  url: 'http://localhost:8080/tyk/keys/' + keyId,",
+											"  url: 'http://tyk-gateway.localhost:8080/tyk/keys/' + keyId,",
 											"  method: 'POST',",
 											"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
 											"  body: {",
@@ -1909,7 +1911,7 @@
 											"pm.sendRequest(throttlingTestKeyCreateRequest, function (err, response) { ",
 											"    pm.test(\"Status code is 200\", function () {",
 											"        var throttleRequest = {",
-											"            url: 'http://localhost:8080/basic-protected-api/get',",
+											"            url: 'http://tyk-gateway.localhost:8080/basic-protected-api/get',",
 											"            method: 'GET',",
 											"            header: 'Authorization:' + keyId",
 											"        };",
@@ -1924,7 +1926,7 @@
 											"                    pm.expect(response.code).to.eql(200);",
 											"                    ",
 											"                    var throttlingTestKeyDeleteRequest = {",
-											"                            url: 'http://localhost:8080/tyk/keys/' + keyId,",
+											"                            url: 'http://tyk-gateway.localhost:8080/tyk/keys/' + keyId,",
 											"                            method: 'DELETE',",
 											"                            header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
 											"                        };",
@@ -1950,10 +1952,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/basic-protected-api/get",
+									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -1976,7 +1978,7 @@
 											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 											"",
 											"var quotaTestKeyCreateRequest = {",
-											"    url: 'http://localhost:8080/tyk/keys/' + keyId,",
+											"    url: 'http://tyk-gateway.localhost:8080/tyk/keys/' + keyId,",
 											"    method: 'POST',",
 											"    header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
 											"    body: {",
@@ -1988,7 +1990,7 @@
 											"pm.sendRequest(quotaTestKeyCreateRequest, function (err, response) { ",
 											"    pm.test(\"Status code is 403\", function () {",
 											"        var quotaRequest = {",
-											"            url: 'http://localhost:8080/basic-protected-api/get',",
+											"            url: 'http://tyk-gateway.localhost:8080/basic-protected-api/get',",
 											"            method: 'GET',",
 											"            header: 'Authorization:' + keyId",
 											"        };",
@@ -2005,7 +2007,7 @@
 											"                    pm.expect(response.code).to.eql(403);",
 											"                    ",
 											"                    var quotaTestKeyDeleteRequest = {",
-											"                        url: 'http://localhost:8080/tyk/keys/' + keyId,",
+											"                        url: 'http://tyk-gateway.localhost:8080/tyk/keys/' + keyId,",
 											"                        method: 'DELETE',",
 											"                        header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
 											"                    };",
@@ -2031,10 +2033,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/basic-protected-api/get",
+									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -2062,7 +2064,7 @@
 											"    var response1Host;",
 											"    var response2Host;",
 											"    var loadBalancedRequest = {",
-											"        url: 'http://localhost:8080/load-balanced-api/get',",
+											"        url: 'http://tyk-gateway.localhost:8080/load-balanced-api/get',",
 											"        method: 'GET'",
 											"    };",
 											"    ",
@@ -2088,10 +2090,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/load-balanced-api/get",
+									"raw": "http://tyk-gateway.localhost:8080/load-balanced-api/get",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -2128,10 +2130,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/uptime-test-api/get",
+									"raw": "http://tyk-gateway.localhost:8080/uptime-test-api/get",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -2140,6 +2142,41 @@
 									]
 								},
 								"description": "**Note:** The API for this request must be activated before running the request. The API is inactive by default to prevent failing uptime tests from repeatedly generating error messages in the application logs. To activate the API, log in to the Dashboard, edit the 'Uptime Test API', set `active` to `true` (you can click the 'API Inactive' button) then update the API.\n\n***\n\nThis request calls an API which uses Uptime Tests to monitor the health of the upstream hosts it is configured to proxy requests to.\n\nIn this case, it is configred load balance requests upstream to `httpbin` and `httpbin2`. An uptime test has been added to the API Definition which calls the `status/500` endpoint of the `httpbin` host. This endpoint always returns `HTTP 500` status codes, which causes the uptime test to fail, triggering the removal of the `httpbin` host from the load balancer. This means that requests sent to this API will only be proxied to the `httpbin2` host, since the `httpbin` host has been marked as unhealthy.\n\nCheck the `headers.Hosts` property of the response body. This will always show `httpbin2`.\n\nIn order for the Gateway to remove the unhealthy host from the load balancer, the API Definition must have both nn Uptime Test using the same hostname, and the `check_host_against_uptime_tests` property set to `true`. If `check_host_against_uptime_tests` is not set to `true` then the unhealthy host will not be removed from the load balancer, only an event will be raised.\n\n**Note**: To reduce the amount of warning messages in the Gateway application log generated by failing tests, the uptime tests have been configured to run every 30 seconds. This means that on initial startup, the Gateway will proxy to both hosts (`httpbin` and `httpbin2`) until the first Uptime Test is run."
+							},
+							"response": []
+						},
+						{
+							"name": "Custom Domain",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "911b1759-f4ef-492a-aca9-c66ba592858e",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://custom-domain.localhost:8080/get",
+									"protocol": "http",
+									"host": [
+										"custom-domain",
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"get"
+									]
+								},
+								"description": "This request is uses a custom hostname to demonstrate the **Custom Domain** functionality. This enables API Defintions to be mapped against the hostname and the path of the request. In this instance, there is an API Definition which is configured to use Custom Domain `custom-domain.localhost` and path `/`. This allows the path for the upstream API to be the only element in the request path i.e. `/get`, since the Gateway no longer has to rely on the path as the only means to identify the API being requested."
 							},
 							"response": []
 						}
@@ -2201,10 +2238,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8080/tyk/keys/my-custom-key",
+									"raw": "http://tyk-gateway.localhost:8080/tyk/keys/my-custom-key",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -2248,10 +2285,10 @@
 									}
 								],
 								"url": {
-									"raw": "http://localhost:8080/basic-protected-api/get",
+									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
 									"protocol": "http",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8080",
 									"path": [
@@ -2276,10 +2313,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:8081/plugin-demo-api/anything/mock",
+									"raw": "https://tyk-gateway.localhost:8081/plugin-demo-api/anything/mock",
 									"protocol": "https",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8081",
 									"path": [
@@ -2311,10 +2348,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:8081/basic-open-api/get",
+									"raw": "https://tyk-gateway.localhost:8081/basic-open-api/get",
 									"protocol": "https",
 									"host": [
-										"localhost"
+										"tyk-gateway","localhost"
 									],
 									"port": "8081",
 									"path": [
@@ -2362,8 +2399,10 @@
 							}
 						],
 						"url": {
-							"raw": "localhost:3000/admin/organisations",
+							"raw": "http://tyk-dashboard.localhost:3000/admin/organisations",
+							"protocol":"http",
 							"host": [
+								"tyk-dashboard",
 								"localhost"
 							],
 							"port": "3000",
@@ -2431,9 +2470,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/basic-open-api/tyk/batch/",
+							"raw": "http://tyk-gateway.localhost:8080/basic-open-api/tyk/batch/",
 							"protocol": "http",
 							"host": [
+								"tyk-gateway",
 								"localhost"
 							],
 							"port": "8080",
@@ -2471,9 +2511,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/basic-open-api/get",
+					"raw": "http://tyk-gateway.localhost:8080/basic-open-api/get",
 					"protocol": "http",
 					"host": [
+						"tyk-gateway",
 						"localhost"
 					],
 					"port": "8080",
