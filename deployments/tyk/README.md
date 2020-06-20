@@ -2,9 +2,9 @@
 
 The standard Tyk deployment, with Dashboard, Gateway, Pump, Redis and MongoDB.
 
-- [Tyk Dashboard](http://localhost:3000)
-- [Tyk Portal](http://localhost:3000/portal)
-- [Tyk Gateway](http://localhost:8080/basic-open-api/get)
+- [Tyk Dashboard](http://tyk-dashboard.localhost:3000)
+- [Tyk Portal](http://tyk-portal.localhost:3000/portal)
+- [Tyk Gateway](http://tyk-gateway.localhost:8080/basic-open-api/get)
 
 ## Setup
 
@@ -16,7 +16,7 @@ This deployment is required by all other deployments. It is automatically deploy
 
 ## Usage
 
-The bootstrap process imports sample data to demonstrate how APIs and Policies can be configured. Log into the [Tyk Dashboard](http://localhost:3000) to start using the product.
+The bootstrap process imports sample data to demonstrate how APIs and Policies can be configured. Log into the [Tyk Dashboard](http://tyk-dashboard.localhost:3000) to start using the product.
 
 ### Querying the APIs
 

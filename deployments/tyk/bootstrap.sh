@@ -8,7 +8,7 @@ bootstrap_progress
 
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 portal_base_url="http://tyk-portal.localhost:3000"
-gateway_base_url="http://localhost:8080"
+gateway_base_url="http://tyk-gateway.localhost:8080"
 
 log_message "Getting Dashboard configuration"
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret 2>> bootstrap.log)
