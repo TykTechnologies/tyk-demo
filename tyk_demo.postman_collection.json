@@ -2291,10 +2291,10 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://custom-domain.localhost:8080/get",
+									"raw": "http://tyk-custom-domain.localhost:8080/get",
 									"protocol": "http",
 									"host": [
-										"custom-domain",
+										"tyk-custom-domain",
 										"localhost"
 									],
 									"port": "8080",
