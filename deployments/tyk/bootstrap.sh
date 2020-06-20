@@ -9,6 +9,7 @@ bootstrap_progress
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 portal_base_url="http://tyk-portal.localhost:3000"
 gateway_base_url="http://tyk-gateway.localhost:8080"
+gateway2_base_url="https://tyk-gateway-2.localhost:8081"
 
 log_message "Getting Dashboard configuration"
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret 2>> bootstrap.log)
@@ -255,6 +256,10 @@ bootstrap_progress
 log_message "Checking Gateway functionality"
 wait_for_response "$gateway_base_url/basic-open-api/get" "200"
 
+log_message "Checking Gateway 2 functionality"
+gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
+wait_for_response "$gateway2_base_url/basic-open-api/get" "200"
+
 log_end_deployment
 
 echo -e "\033[2K
@@ -286,4 +291,7 @@ echo -e "\033[2K
           Password : $portal_user_password  
   ▽ Gateway
                URL : $gateway_base_url
-   API Credentials : $gateway_api_credentials"
+   API Credentials : $gateway_api_credentials
+  ▽ Gateway 2
+               URL : $gateway2_base_url  
+   API Credentials : $gateway2_api_credentials"
