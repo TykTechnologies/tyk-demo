@@ -116,7 +116,7 @@ The bootstrap process provides credentials and other useful information in the t
 
 When you log into the Dashboard, you will find the imported APIs and Policies are now available.
 
-## Step 6: Import API requests into Postman
+## Step 6 (optional): Import API requests into Postman
 
 There is a Postman collection provided which compliments the imported API definitions and Policies. This lets you demonstrate Tyk features and functionality.
 
