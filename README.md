@@ -131,3 +131,11 @@ To bring down the containers and delete associated volumes:
 # Redeploying
 
 The `up.sh` script is not intended to be run consecutively without running `down.sh` in between. The reason for this is that the `up.sh` script assumes that the system will not contain any data, so it attempts to bootstrap the system by creating data. This means that running the script consecutively will likely generate errors and duplicate data.
+
+# Troubleshooting
+
+**1. Application error when opening the documentation in the portal**
+
+You will also see an error in the field that has the base64 encode of the OAS in the catalogue document.
+Since the value cannot be base64 *decoded* it means that the base64 *encoding* failed during bootstrap.
+One possible reason is that you are using Brew's base64 binary, since Brew's version inserts `\r` to the output rather than just output the base64 encoding as is. You can run `whereis base64` to find out. The expected path should be `/usr/bin/base64`.

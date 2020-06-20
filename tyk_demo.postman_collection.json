@@ -650,6 +650,78 @@
 							"response": []
 						},
 						{
+							"name": "Plugin - Ignore (part 1)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "cf9faaa8-d793-4ac1-bb15-d05a2d68b308",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/basic-protected-api/anything/ignored",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"basic-protected-api",
+										"anything",
+										"ignored"
+									]
+								},
+								"description": "This request uses the **Ignore** Endpoint Designer plugin to access a protected API without providing any credentials. This API is configured to require the Client to authenticate using a token, with only the `/anything/ignored` path using the **Ignore** plugin. All other paths require authentication - see part 2.\n\nThe **Ignore** plugin instructs the Gateway to ignore the authentication settings defined in the API Definition. This allows API Clients to access ignored endpoints without providing any credentials. By default the plugin is case-sensitive, but can be configured to be case-insensitive when matching the path.\n\nThis plugin is useful in scenarios where there is a particular endpoint on the API Server that you would like to provide unauthenticated access to while keeping other endpoints protected. An authentication endpoint is a good example, where the Gateway will allow unauthenticated Clients to authenticate via the ignored endpoint, but require authentication for all other endpoints."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Ignore (part 2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "d5adca40-9d4e-4072-9e4f-8c48173d344a",
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/basic-protected-api/anything/not-ignored",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"basic-protected-api",
+										"anything",
+										"not-ignored"
+									]
+								},
+								"description": "This part of the **Ignore** Endpoint Designer plugin example shows that endpoints of this protected API cannot be accessed by authenticated clients.\n\nThe requested path `/anything/not-ignored` has no entry in the Endpoint Designer, so generates a `401 Unauthorized` response to unauthenticated clients."
+							},
+							"response": []
+						},
+						{
 							"name": "Plugin - Validate JSON (part 1)",
 							"event": [
 								{

@@ -3229,7 +3229,22 @@
                 "black_list": []
               },
               "use_extended_paths": true,
-              "extended_paths": {},
+              "extended_paths": {
+                "ignored": [
+                  {
+                    "path": "/anything/ignored",
+                    "ignore_case": false,
+                    "method_actions": {
+                      "GET": {
+                        "action": "no_action",
+                        "code": 200,
+                        "data": "",
+                        "headers": {}
+                      }
+                    }
+                  }
+                ]
+              },
               "global_headers": {},
               "global_headers_remove": [],
               "ignore_endpoint_case": false,
@@ -3338,7 +3353,7 @@
                   "api_model": {},
                   "event_timeout": 60,
                   "header_map": {},
-                  "id": "5ee0f4a2028887159a2d4e1b",
+                  "id": "5eed8352372b7025da0fab41",
                   "method": "POST",
                   "name": "Webhook Receiver Post",
                   "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -3388,7 +3403,7 @@
           "event_timeout": 60,
           "hook": {
             "api_model": {},
-            "id": "5ee0f4a2028887159a2d4e1b",
+            "id": "5eed8352372b7025da0fab41",
             "org_id": "5e9d9544a1dcd60001d0ed20",
             "name": "Webhook Receiver Post",
             "method": "POST",
