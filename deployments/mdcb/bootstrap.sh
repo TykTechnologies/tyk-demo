@@ -47,7 +47,8 @@ docker-compose \
     -p tyk-demo \
     --project-directory $(pwd) \
     up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway 2> /dev/null
-log
+log_ok
+bootstrap_progress
 
 # check status of worker Gateway
 log_message "Checking status of Worker Gateway"
