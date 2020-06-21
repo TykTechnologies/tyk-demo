@@ -13,13 +13,21 @@ MDCB architecture creates a Control Plane and a Data Plane:
 
 ## Setup
 
+### Licence
+
 MDCB requires its own licence. Provide your licence as a `MDCB_LICENCE` property in the `.env` file:
 
 ```
 MDCB_LICENCE=<YOUR_MDCB_LICENCE>
 ```
 
-Run the `up.sh` script with the `mdcb` parameter:
+### Access to Docker image
+
+The MDCB image used by this deployment is hosted in a private repository. Access to this repository must be requested via your Tyk account manager.
+
+### Bootstrap
+
+To use this deployment, run the `up.sh` script with the `mdcb` parameter:
 
 ```
 ./up.sh mdcb
