@@ -37,6 +37,10 @@ To use this deployment, run the `up.sh` script with the `mdcb` parameter:
 ./up.sh mdcb
 ```
 
+### Postman Collection
+
+You can import the deployment-specific Postman collection `tyk_demo_mdcb.postman_collection.json`.
+
 ## Usage
 
 One of the benefits of MDCB is that it provides Gateways in the Data Plane with reliancy against network partitions. If the Worker Gateway becomes disconnected from MDCB it will use the locally available Worker Redis to continue operating.

@@ -16,6 +16,8 @@ Deployments must contain the following files:
 * `bootstrap.sh`: A bootstrap script which prepares the deployment so that it's ready to use
 * `readme.md`: A readme file which describes how the deployment can be used
 
+Optionally, a Postman collection can be provided, containing deployment-specific requests. This file should be named `tyk_demo_<DEPLOYMENT_NAME>.postman_collection.json` e.g. for the `mdcb` deployment, the file is called `tyk_demo_mdcb.postman_collection.json`.
+
 ## Directories
 
 Deployments can also contain directories, if needed:
