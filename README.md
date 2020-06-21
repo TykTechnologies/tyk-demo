@@ -35,6 +35,12 @@ All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.
 
 ## Step 1: Install dependencies
 
+### Docker
+
+Docker is required. Follow the [Docker installation guide](https://docs.docker.com/get-docker/) for your platform.
+
+Docker Compose is required. If you're installing on Mac or Windows, then Docker Compose is already included as part of the base Docker install, so you don't need to do anything else. For Linux, follow the [Docker Compose installation guide](https://docs.docker.com/compose/install/).
+
 ### JQ
 
 The bootstrap script uses JQ for extracting data from JSON object, it can be installed as follows.
