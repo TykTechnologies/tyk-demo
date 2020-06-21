@@ -6,5 +6,13 @@
     "cname": "tyk-portal.localhost:3000",
     "apis": [],
     "sso_enabled": true,
-    "hybrid_enabled": true
+    "hybrid_enabled": true,
+    "event_options": {
+        "key_event": {
+            "redis": true
+        },
+        "hashed_key_event": {
+            "redis": true
+        }
+    }
 }
