@@ -1,0 +1,46 @@
+{
+	"info": {
+		"_postman_id": "df8d6afb-eed5-4dcc-906f-2e6a7e89e3de",
+		"name": "Tyk Demo - MDCB",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Basic Test Request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "539d4ce1-8a88-40cf-91a9-b03880e30ffb",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://tyk-worker-gateway.localhost:8084/basic-open-api/get",
+					"protocol": "http",
+					"host": [
+						"tyk-worker-gateway",
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"basic-open-api",
+						"get"
+					]
+				},
+				"description": "This is a basic test request to check that the MDCB Worker Gateway is working ok.\n\nA `200 OK` status code and JSON response should be received in the response."
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

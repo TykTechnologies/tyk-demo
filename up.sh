@@ -84,13 +84,12 @@ do
   # the `tyk` deployment is already included, so don't duplicate it
   if [ "$var" != "tyk" ]
   then
+    echo "$var" >> ./.bootstrap/bootstrapped_deployments
     eval "deployments/$var/bootstrap.sh"
     if [ "$?" != 0 ]
     then
       echo "Error occurred during bootstrap of $var, when running deployments/$var/bootstrap.sh. Check bootstrap.log for details."
       exit
-    else
-      echo "$var" >> ./.bootstrap/bootstrapped_deployments
     fi
   fi
 done

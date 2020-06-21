@@ -13,7 +13,7 @@ do
   fi
 done < $bootstrapped_deployments_file
 fi
-command_docker_compose="$command_docker_compose -p tyk-demo --project-directory $(pwd) down -v"
+command_docker_compose="$command_docker_compose -p tyk-demo --project-directory $(pwd) down -v --remove-orphans"
 echo "Running docker-compose down: " $command_docker_compose
 eval $command_docker_compose
 if [ "$?" == 0 ]
