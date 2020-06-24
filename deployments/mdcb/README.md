@@ -1,10 +1,10 @@
 # Multi Data Centre Bridge
 
-Uses Tyk Multi Data Centre Bridge (MDCB) to provide isolation and reliance to a Gateway. 
+This deployment uses Tyk Multi Data Centre Bridge (MDCB) to provide isolation and resiliance to a worker Gateway. 
 
 - [Tyk Worker Gateway](http://tyk-mdcb-gateway.localhost:8084)
 
-The Worker Gateway, connected to MDCB, is bound to a single Organisation, so cannot access data from other Organisations. It also benefits from its own Redis instance, which it uses to cache data from the primary Redis in the `tyk` deployment.
+The worker Gateway, connected to MDCB, is bound to a single Organisation, so cannot access data from other Organisations. It also benefits from its own Redis instance, which it uses to cache data from the primary Redis in the `tyk` deployment.
 
 MDCB architecture creates a Control Plane and a Data Plane:
 
