@@ -145,8 +145,19 @@ The `up.sh` script is not intended to be run consecutively without running `down
 
 # Troubleshooting
 
-**1. Application error when opening the documentation in the portal**
+### Application error when opening the documentation in the portal
 
 You will also see an error in the field that has the base64 encode of the OAS in the catalogue document.
 Since the value cannot be base64 *decoded* it means that the base64 *encoding* failed during bootstrap.
 One possible reason is that you are using Brew's base64 binary, since Brew's version inserts `\r` to the output rather than just output the base64 encoding as is. You can run `whereis base64` to find out. The expected path should be `/usr/bin/base64`.
+
+### Bootstrap gets stuck with `Request unsuccessful: wanted '200'...` message
+
+It is normal to see this message in the `bootstrap.log` file. It appears when the bootstrap script is waiting for a service to become available before proceeding to the next step. The number of times the message is repeated depends on the performance of your system, as errors are usually due to waiting for a service to start up. So you may find that this message is repeated many times, but will eventually stop and the bootstrap process moves on.
+
+If the message repeats without moving on then the service being tested is experiencing a problem. In this situation you should:
+
+- check for error messages in the container logs of the service being tested
+- ensure Docker has sufficient resources to run the deployment (particularly when combining multiple deployments together)
+
+These steps will help you diagnose the source of the problem.
