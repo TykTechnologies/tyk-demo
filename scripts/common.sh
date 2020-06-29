@@ -87,7 +87,7 @@ function wait_for_response {
     fi
     if [ "$status" != "$desired_status" ]
     then
-      log_message "  Request unsuccessful: wanted '$desired_status' but got '$status'. Retrying..."
+      log_message "  Request unsuccessful: called '$url' wanted '$desired_status' but got '$status'. Retrying..."
       sleep 2
     else
       log_ok
