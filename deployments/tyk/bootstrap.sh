@@ -253,7 +253,7 @@ result=$(curl $dashboard_base_url/api/apis/keys/basic/basic-auth-username -s -w 
 log_message "  Basic auth key:$result"
 bootstrap_progress
 
-log_message "Reloading Gateway group"
+log_message "Reloading Gateway group to ensure latest configuration is loaded"
 sleep 2
 result=$(curl $gateway_base_url/tyk/reload/group -s \
   -H "x-tyk-authorization: $gateway_api_credentials" | jq -r '.status')
