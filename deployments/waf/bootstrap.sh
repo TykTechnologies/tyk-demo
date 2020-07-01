@@ -5,6 +5,6 @@ deployment="Waf"
 log_start_deployment
 log_end_deployment
 echo -e "\033[2K
-▼ Waf
-  ▽ waf
-       Running on Port 8500"
+▼ Web Application Firewall
+  ▽ ModSecurity
+               URL : http://localhost:8500"
