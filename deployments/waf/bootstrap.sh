@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source scripts/common.sh
-deployment="Waf"
+deployment="Web Application Firewall"
 log_start_deployment
 log_end_deployment
 echo -e "\033[2K
