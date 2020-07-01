@@ -142,7 +142,7 @@
           "events": {}
         },
         "proxy": {
-          "target_url": "http://httpbin.org/",
+          "target_url": "http://httpbin/",
           "service_discovery": {
             "endpoint_returns_list": false,
             "cache_timeout": 0,
