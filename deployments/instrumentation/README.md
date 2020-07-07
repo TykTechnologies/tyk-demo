@@ -16,7 +16,7 @@ The StatsD, Carbon and Graphite applications are all deployed within a single co
 
 ### Environment variable
 
-The Docker environment variable `TRACING_ENABLED` is required to be set to `TRUE` in the `.env` file. The bootstrap process will set this automatically when running the `up.sh` script.
+The Docker environment variable `INSTRUMENTATION_ENABLED` is required to be set to `1` in the `.env` file. The bootstrap process will set this automatically when running the `up.sh` script.
 
 ## Usage
 
