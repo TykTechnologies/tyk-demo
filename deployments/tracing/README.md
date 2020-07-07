@@ -16,9 +16,7 @@ Run the `up.sh` script with the `tracing` parameter:
 
 ### Environment variable
 
-The Docker environment variable `INSTRUMENTATION_ENABLED` is required to be set to `1` in the `.env` file.
-
-The bootstrap process will set this automatically, but this will then only affect the containers for the `tyk` deployment as it will only restart those containers. If you want to use instrumentation on the other Tyk containers then set the value manually before running the `up.sh` script.
+The Docker environment variable `TRACING_ENABLED` is required to be set to `true` in the `.env` file. The bootstrap process will set this automatically when running the `up.sh` script.
 
 ## Usage 
 
