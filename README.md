@@ -128,6 +128,17 @@ There is a Postman collection provided which compliments the imported API defini
 
 Import the `tyk_demo.postman_collection.json` into your [Postman](https://postman.com) to start making requests.
 
+# Controlling the docker deployment
+Using Makefile you can run a few useful commands with less typing and in a more generic way.
+- To see the available options in the Makefile - run `make`
+- To bootstrap, instead of `./up.sh` run `make boot`
+- To bootstrap with various deployments, instead of `./up.sh analytics sso` run `make boot deploy="analytics sso"`
+- Make really shines when it comes to long commands like docker ps when you need to set the project directory.
+  - To get the list of all services, simply run `make ps`
+  - To restart all the services, run `make restart`
+  - To see the logs of the gateway, run `make gateway-log`
+  - To check the gateway's liveliness, run `make hello`
+
 # Resetting
 
 If you want to reset your environment then you need to remove the volumes associated with the container as well as the containers themselves. The `down.sh` script can do this for you.
