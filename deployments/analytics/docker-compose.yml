@@ -17,13 +17,13 @@ services:
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
   tyk-pump-elasticsearch:
-    image: tykio/tyk-pump-docker-pub:latest
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-latest}
     networks:
       - tyk
     volumes:
       - ./deployments/analytics/volumes/tyk-pump/pump-elasticsearch.conf:/opt/tyk-pump/pump.conf
     environment:
-      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
     depends_on:
       - elasticsearch
       - tyk-redis

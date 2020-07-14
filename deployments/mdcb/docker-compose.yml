@@ -1,26 +1,26 @@
 version: '3.3'
 services:
   tyk-mdcb:
-    image: tykio/tyk-mdcb-docker:latest
+    image: tykio/tyk-mdcb-docker:${MDCB_VERSION:-latest}
     networks:
       - tyk
     volumes:
       - ./deployments/mdcb/volumes/tyk-mdcb/tyk_sink.conf:/opt/tyk-sink/tyk_sink.conf
     environment:
-      - TYK_MDCB_LICENSE=${MDCB_LICENCE}
+      - TYK_MDCB_LICENSE=${MDCB_LICENCE:?Please set MDCB_LICENCE in .env}
     depends_on:
       - tyk-redis
       - tyk-mongo
   tyk-worker-gateway:
-    image: tykio/tyk-gateway:latest
+    image: tykio/tyk-gateway:${GATEWAY_WORKER_VERSION:-latest}
     ports:
       - 8084:8080
     networks:
       - tyk
     environment:
-      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
-      - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED}
-      - TYK_GW_SLAVEOPTIONS_APIKEY=${MDCB_USER_API_CREDENTIALS}
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
+      - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-0}
+      - TYK_GW_SLAVEOPTIONS_APIKEY=${MDCB_USER_API_CREDENTIALS:?}
     volumes:
       - ./deployments/mdcb/volumes/tyk-worker-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs

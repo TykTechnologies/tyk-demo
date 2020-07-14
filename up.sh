@@ -9,13 +9,6 @@ then
   exit 1
 fi
 
-# check dashboard licence defined
-if ! grep -q "DASHBOARD_LICENCE=" .env
-then
-  echo "ERROR: Dashboard licence missing from Docker environment file. Review 'getting started' steps in README.md."
-  exit 1
-fi
-
 # check that jq is available
 command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: JQ is required, but it's not installed. Review 'getting started' steps in README.md."; exit 1; }
 
@@ -40,14 +33,10 @@ echo -n > .bootstrap/bootstrapped_deployments
 if [[ "$*" == *tracing* ]]
 then
   set_docker_environment_value "TRACING_ENABLED" "true"
-else
-  set_docker_environment_value "TRACING_ENABLED" "false"
 fi
 if [[ "$*" == *instrumentation* ]]
 then
   set_docker_environment_value "INSTRUMENTATION_ENABLED" "1"
-else
-  set_docker_environment_value "INSTRUMENTATION_ENABLED" "0"
 fi
 
 # create and run the docker compose command

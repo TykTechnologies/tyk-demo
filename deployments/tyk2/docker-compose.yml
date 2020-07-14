@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   tyk2-dashboard:
-    image: tykio/tyk-dashboard:latest
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-latest}
     ports:
       - 3002:3000
     networks:
@@ -9,7 +9,7 @@ services:
     volumes:
       - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
     environment:
-      - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
+      - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Please set DASHBOARD_LICENCE in .env}
       - TYK_DB_MONGOURL=mongodb://tyk2-mongo:27017/tyk_analytics
       - TYK_DB_REDISHOST=tyk2-redis
       - TYK_DB_TYKAPICONFIG_HOST=http://tyk2-gateway
