@@ -23,14 +23,8 @@ services:
     networks:
       - tyk
     environment:
-      - TYK_GW_TRACER_OPTIONS_DISABLED=false
-      - TYK_GW_TRACER_OPTIONS_SERVICENAME="tyk-gateway"
-      - TYK_GW_TRACER_OPTIONS_RPCMETRICS=false
-      - TYK_GW_TRACER_OPTIONS_REPORTER_LOCALAGENTHOSTPORT="jaeger:6831"
-      - TYK_GW_TRACER_OPTIONS_REPORTER_LOGSPANS=true
       - TYK_LOGLEVEL=${GATEWAY_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
-      - TYK_TRACING=${TRACING_ENABLED:-0}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-0}
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
