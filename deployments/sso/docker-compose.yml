@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   tyk-dashboard-sso:
-    image: tykio/tyk-dashboard:${DASHBOARD|_SSO_VERSION:-latest}
+    image: tykio/tyk-dashboard:${DASHBOARD_SSO_VERSION:-latest}
     ports:
       - 3001:3000
     networks:
