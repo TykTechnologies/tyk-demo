@@ -17,7 +17,7 @@ There is a focus on simplicity. Docker Compose is used to provision the containe
 
 See the [Developer Guide](developer-guide.md) for information on how to contribute to and extend this repository.
 
-**Please note:** This repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system.
+> :warning: Please note that this repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system.
 
 # Repository Structure
 
