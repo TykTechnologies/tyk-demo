@@ -84,7 +84,7 @@ DASHBOARD_LICENCE=<YOUR_LICENCE>
 
 In addition to this, some features require entries in the `.env` file. These are set automatically by the `up.sh` file, depending on the deployment parameters.
 
-**Note**: For a full experience, your Dashboard licence should be valid for at least two Gateways, otherwise features/examples which require multiple Gateways will not work.
+> :information_source: Your Tyk licence must be valid for at least two Gateways.
 
 ## Step 4: Bring the deployment up
 
