@@ -50,6 +50,10 @@ do
   fi
 done
 
+echo "$command_docker_compose -p tyk-demo --project-directory $(pwd)" > .bootstrap/docker-compose-prefix-command
+echo "my .bootstrap/docker-compose-prefix-command: "
+cat .bootstrap/docker-compose-prefix-command
+echo -n "----"
 command_docker_compose="$command_docker_compose -p tyk-demo --project-directory $(pwd) up --remove-orphans -d"
 echo "Starting containers: $command_docker_compose"
 eval $command_docker_compose
