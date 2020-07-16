@@ -145,6 +145,14 @@ To bring down the containers and delete associated volumes:
 
 The `up.sh` script is not intended to be run consecutively without running `down.sh` in between. The reason for this is that the `up.sh` script assumes that the system will not contain any data, so it attempts to bootstrap the system by creating data. This means that running the script consecutively will likely generate errors and duplicate data.
 
+# Check running containers, logs, restart
+
+It is difficult to use the usual docker-compose command in this project since we have various files and project directory. To make commands such as `ps` or `restart` easier to run I have created the script `./docker-compose-command.sh`. You can use it in the same way as you would with docker-compose:
+- To check runnng processes: `./docker-compose-command.sh ps`
+- To restart the gateway: `./docker-compose-command.sh restart tyk-gateway`
+- To tail the logs in the redis container: `./docker-compose-command.sh logs -f tyk-redis`
+- To bash into redis container: `./docker-compose-command.sh exec tyk-redis bash`
+
 # Troubleshooting
 
 ### Application error when opening the documentation in the portal
