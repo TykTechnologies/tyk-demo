@@ -80,7 +80,7 @@ sudo ./scripts/update-hosts.sh
 The custom hostnames will be used by the Dashboard and Gateway to:
 
 - Differentiate between requests for the Dashboard and Portal
-- Identify the API being requested when using custom domains 
+- Identify the API being requests when using custom domains
 
 ## Step 3: Add Docker Environment variables
 
