@@ -27,7 +27,7 @@ services:
         aliases:
           - tyk-custom-domain.com
     environment:
-      - TYK_LOGLEVEL=${GATEWAY_LOGLEVE:-info}
+      - TYK_LOGLEVEL=${GATEWAY_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-0}
     volumes:
