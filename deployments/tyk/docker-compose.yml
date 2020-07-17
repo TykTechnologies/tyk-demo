@@ -11,7 +11,7 @@ services:
       - ./deployments/tyk/volumes/tyk-dashboard/private-key.pem:/opt/tyk-dashboard/private-key.pem
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Dashboard licence missing from Docker environment file .env. Review The Getting Started steps in README.md.}  
-      - TYK_LOGLEVEL=${DASHBOARD_LOGLEVEL:-info}
+      - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
     depends_on:
       - tyk-redis
@@ -23,7 +23,7 @@ services:
     networks:
       - tyk
     environment:
-      - TYK_LOGLEVEL=${GATEWAY_LOGLEVEL:-info}
+      - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-0}
     volumes:
@@ -39,7 +39,7 @@ services:
     networks:
       - tyk
     environment:
-      - TYK_LOGLEVEL=${GATEWAY2_LOGLEVEL:-info}
+      - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-0}
     volumes:
@@ -57,7 +57,7 @@ services:
       - ./deployments/tyk/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:?0}
-      - TYK_LOGLEVEL=${PUMP_TYK_LOGLEVEL:-info}
+      - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
     depends_on:
       - tyk-redis
       - tyk-mongo

@@ -14,11 +14,12 @@ services:
       - TYK_DB_REDISHOST=tyk2-redis
       - TYK_DB_TYKAPICONFIG_HOST=http://tyk2-gateway
       - TYK_DB_HOSTCONFIG_OVERRIDEHOSTNAME=localhost:8085
+      - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
     depends_on:
       - tyk2-redis
       - tyk2-mongo
   tyk2-gateway:
-    image: tykio/tyk-gateway:latest
+    image: tykio/tyk-gateway:${TYK2_GATEWAY_VERSION:-latest}
     ports:
       - 8085:8080
     networks:
@@ -30,14 +31,17 @@ services:
       - TYK_GW_POLICIES_POLICYCONNECTIONSTRING=http://tyk2-dashboard:3000
       - TYK_GW_DBAPPCONFOPTIONS_CONNECTIONSTRING=http://tyk2-dashboard:3000
       - TYK_GW_STORAGE_HOST=tyk2-redis
+      - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
     depends_on:
       - tyk2-redis
   tyk2-pump:
-    image: tykio/tyk-pump-docker-pub:latest
+    image: tykio/tyk-pump-docker-pub:${TYK2_PUMP_VERSION:-latest}
     networks:
       - tyk
     volumes:
       - ./deployments/tyk2/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
+    environment:
+      - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
     depends_on:
       - tyk2-redis
       - tyk2-mongo

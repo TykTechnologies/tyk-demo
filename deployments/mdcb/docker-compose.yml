@@ -8,6 +8,7 @@ services:
       - ./deployments/mdcb/volumes/tyk-mdcb/tyk_sink.conf:/opt/tyk-sink/tyk_sink.conf
     environment:
       - TYK_MDCB_LICENSE=${MDCB_LICENCE:?Please set MDCB_LICENCE in .env}
+      - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
     depends_on:
       - tyk-redis
       - tyk-mongo
