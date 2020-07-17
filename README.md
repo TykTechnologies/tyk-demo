@@ -17,7 +17,7 @@ There is a focus on simplicity. Docker Compose is used to provision the containe
 
 See the [Developer Guide](developer-guide.md) for information on how to contribute to and extend this repository.
 
-> :warning: Please note that this repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system.
+**Please note:** This repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system.
 
 # Repository Structure
 
@@ -84,7 +84,7 @@ DASHBOARD_LICENCE=<YOUR_LICENCE>
 
 In addition to this, some features require entries in the `.env` file. These are set automatically by the `up.sh` file, depending on the deployment parameters.
 
-> :information_source: Your Tyk licence must be valid for at least two Gateways.
+**Note**: For a full experience, your Dashboard licence should be valid for at least two Gateways, otherwise features/examples which require multiple Gateways will not work.
 
 ## Step 4: Bring the deployment up
 
