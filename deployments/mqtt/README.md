@@ -26,4 +26,4 @@ Note the nodes say `connected` underneath.  Tyk is actually intercepting the tra
 
 Let's test the connection.  Follow these steps.
 
-[rednode-debug-steps](./nodered-debug-steps.png)
+![rednode-debug-steps](./nodered-debug-steps.png)
