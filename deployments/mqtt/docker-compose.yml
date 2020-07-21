@@ -1,0 +1,20 @@
+version: "3.3"
+services:
+  mosquitto:
+    image: eclipse-mosquitto:1.6.10
+    networks:
+      - tyk
+    volumes:
+      - ./deployments/mqtt/volumes/mosquitto/config:/mosquitto/config
+    ports:
+      - 1883:1883
+      - 9001:9001
+  nodered:
+    image: nodered/node-red:1.1.2
+    networks:
+      - tyk
+
+    volumes:
+      - ./deployments/mqtt/volumes/nodered/data/flows.json:/data/flows.json
+    ports:
+    - 1880:1880
