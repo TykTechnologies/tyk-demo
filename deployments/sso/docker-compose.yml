@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   tyk-dashboard-sso:
-    image: tykio/tyk-dashboard:latest
+    image: tykio/tyk-dashboard:v3.0.0
     ports:
       - 3001:3000
     networks:

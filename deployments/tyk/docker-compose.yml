@@ -1,12 +1,13 @@
 version: '3.3'
 services:
   tyk-dashboard:
-    image: tykio/tyk-dashboard:latest
+    image: tykio/tyk-dashboard:v3.0.0
     ports:
       - 3000:3000
     networks:
       - tyk
     volumes:
+      - ./deployments/tyk/volumes/tyk-dashboard/catalogue.html:/opt/tyk-dashboard/portal/templates/catalogue.html
       - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
       - ./deployments/tyk/volumes/tyk-dashboard/private-key.pem:/opt/tyk-dashboard/private-key.pem
     environment:
@@ -16,7 +17,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-gateway:
-    image: tykio/tyk-gateway:latest
+    image: tykio/tyk-gateway:v3.0.0
     ports:
       - 8080:8080
     networks:
@@ -31,7 +32,7 @@ services:
     depends_on:
       - tyk-redis
   tyk-gateway-2:
-    image: tykio/tyk-gateway:latest
+    image: tykio/tyk-gateway:v3.0.0
     ports:
       - 8081:8080
     networks:
