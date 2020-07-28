@@ -9,6 +9,7 @@ bootstrap_progress
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 portal_base_url="http://tyk-portal.localhost:3000"
 gateway_base_url="http://tyk-gateway.localhost:8080"
+gateway_base_url_tcp="tyk-gateway.localhost:8086"
 gateway2_base_url="https://tyk-gateway-2.localhost:8081"
 
 log_message "Getting Dashboard configuration"
@@ -298,6 +299,7 @@ echo -e "\033[2K
           Password : $portal_user_password  
   ▽ Gateway
                URL : $gateway_base_url
+          URL(TCP) : $gateway_base_url_tcp
    API Credentials : $gateway_api_credentials
   ▽ Gateway 2
                URL : $gateway2_base_url  
