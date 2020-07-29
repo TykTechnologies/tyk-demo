@@ -16,6 +16,15 @@ then
   exit 1
 fi
 
+# check hostnames exist
+for i in "${tyk_demo_hostnames[@]}"
+do
+  if ! grep -q "$i" /etc/hosts; then
+    echo "ERROR: /etc/hosts is missing entry for $i. Run this command to update: sudo ./scripts/update-hosts.sh"
+    exit 1
+  fi
+done
+
 # check that jq is available
 command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: JQ is required, but it's not installed. Review 'getting started' steps in README.md."; exit 1; }
 
