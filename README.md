@@ -23,6 +23,7 @@ See the [Developer Guide](developer-guide.md) for information on how to contribu
 
 * `deployments/*`: Contains all the deployments available as sub-directories
 * `tyk_demo.postman_collection.json`: A Postman collection of requests which correspond to APIs available in the deployment
+* `test.postman_environment.json`: Set of environment variables, for use when running tests with Newman
 * `scripts/*.sh`: Some useful commands encapsulated in scripts
 * `up.sh`: Brings up the deployment
 * `down.sh`: Takes down the deployment
