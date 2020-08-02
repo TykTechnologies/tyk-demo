@@ -16,6 +16,8 @@ function onExit {
 
 trap onExit EXIT;
 
+# Provide the 'test' environment variables, so newman can target the correct hosts from within the docker network
+# Insecure is used due to self-signed certificates
 docker run -t --rm \
     --network tyk-demo_tyk \
     -v $(pwd)/tyk_demo.postman_collection.json:/etc/postman/tyk_demo.postman_collection.json \
