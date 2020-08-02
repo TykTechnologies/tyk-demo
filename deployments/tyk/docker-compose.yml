@@ -21,7 +21,9 @@ services:
       - 8080:8080
       - 8086:8086
     networks:
-      - tyk
+      tyk:
+        aliases:
+          - tyk-custom-domain.localhost
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED}
