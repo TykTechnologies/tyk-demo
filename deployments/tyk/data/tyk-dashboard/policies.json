@@ -1,31 +1,25 @@
 {
   "Data": [
     {
-      "auth_type": "authToken",
+      "auth_type": "other",
+      "auth_types": null,
+      "state": "active",
+      "access_rights_array": [],
+      "graphql_enabled": false,
       "_id": "5ead7120575961000181867f",
       "id": "5ea11155f4f8460001a9389e",
+      "name": "Rate Limit Policy",
       "org_id": "5e9d9544a1dcd60001d0ed20",
       "rate": 2,
       "per": 5,
-      "throttle_interval": 0,
-      "throttle_retry_limit": 0,
       "quota_max": -1,
       "quota_renewal_rate": 3600,
-      "access_rights": {
-        "accbdd1b89e84ec97f4f16d4e3197d5c": {
-          "api_name": "Basic Protected API",
-          "api_id": "accbdd1b89e84ec97f4f16d4e3197d5c",
-          "versions": [
-            "Default"
-          ],
-          "allowed_urls": [],
-          "limit": null,
-          "allowance_scope": ""
-        }
-      },
+      "throttle_interval": 0,
+      "throttle_retry_limit": 0,
+      "max_query_depth": 0,
+      "access_rights": {},
       "hmac_enabled": false,
       "active": true,
-      "name": "Rate Limit Policy",
       "is_inactive": false,
       "date_created": "2020-04-23T03:53:57.116Z",
       "tags": [],
@@ -33,6 +27,7 @@
       "partitions": {
         "quota": false,
         "rate_limit": false,
+        "complexity": false,
         "acl": false,
         "per_api": false
       },
@@ -40,31 +35,25 @@
       "meta_data": {}
     },
     {
-      "auth_type": "authToken",
+      "auth_type": "other",
+      "auth_types": null,
+      "state": "active",
+      "access_rights_array": [],
+      "graphql_enabled": false,
       "_id": "5ead71205759610001818680",
       "id": "5ea11172f4f8460001a9389f",
+      "name": "Throttling Policy",
       "org_id": "5e9d9544a1dcd60001d0ed20",
       "rate": 2,
       "per": 5,
-      "throttle_interval": 0,
-      "throttle_retry_limit": 0,
       "quota_max": -1,
       "quota_renewal_rate": 3600,
-      "access_rights": {
-        "accbdd1b89e84ec97f4f16d4e3197d5c": {
-          "api_name": "Basic Protected API",
-          "api_id": "accbdd1b89e84ec97f4f16d4e3197d5c",
-          "versions": [
-            "Default"
-          ],
-          "allowed_urls": [],
-          "limit": null,
-          "allowance_scope": ""
-        }
-      },
+      "throttle_interval": 0,
+      "throttle_retry_limit": 0,
+      "max_query_depth": 0,
+      "access_rights": {},
       "hmac_enabled": false,
       "active": true,
-      "name": "Throttling Policy",
       "is_inactive": false,
       "date_created": "2020-04-23T03:54:26.303Z",
       "tags": [],
@@ -72,6 +61,7 @@
       "partitions": {
         "quota": false,
         "rate_limit": false,
+        "complexity": false,
         "acl": false,
         "per_api": false
       },
@@ -79,31 +69,25 @@
       "meta_data": {}
     },
     {
-      "auth_type": "authToken",
+      "auth_type": "other",
+      "auth_types": null,
+      "state": "active",
+      "access_rights_array": [],
+      "graphql_enabled": false,
       "_id": "5ead71205759610001818681",
       "id": "5ea1118af4f8460001a938a0",
+      "name": "Quota Policy",
       "org_id": "5e9d9544a1dcd60001d0ed20",
       "rate": 1000,
       "per": 60,
-      "throttle_interval": 0,
-      "throttle_retry_limit": 0,
       "quota_max": 2,
       "quota_renewal_rate": 3600,
-      "access_rights": {
-        "accbdd1b89e84ec97f4f16d4e3197d5c": {
-          "api_name": "Basic Protected API",
-          "api_id": "accbdd1b89e84ec97f4f16d4e3197d5c",
-          "versions": [
-            "Default"
-          ],
-          "allowed_urls": [],
-          "limit": null,
-          "allowance_scope": ""
-        }
-      },
+      "throttle_interval": 0,
+      "throttle_retry_limit": 0,
+      "max_query_depth": 0,
+      "access_rights": {},
       "hmac_enabled": false,
       "active": true,
-      "name": "Quota Policy",
       "is_inactive": false,
       "date_created": "2020-04-23T03:54:50.808Z",
       "tags": [],
@@ -111,6 +95,7 @@
       "partitions": {
         "quota": false,
         "rate_limit": false,
+        "complexity": false,
         "acl": false,
         "per_api": false
       },
@@ -118,31 +103,25 @@
       "meta_data": {}
     },
     {
-      "auth_type": "authToken",
+      "auth_type": "other",
+      "auth_types": null,
+      "state": "active",
+      "access_rights_array": [],
+      "graphql_enabled": false,
       "_id": "5ead7120575961000181867e",
       "id": "5ead7120575961000181867e",
+      "name": "Swagger Petstore Policy",
       "org_id": "5e9d9544a1dcd60001d0ed20",
       "rate": 1000,
       "per": 60,
-      "throttle_interval": 0,
-      "throttle_retry_limit": 0,
       "quota_max": -1,
       "quota_renewal_rate": 3600,
-      "access_rights": {
-        "42b615355eaf47ca617463503f43300b": {
-          "api_name": "Swagger Petstore",
-          "api_id": "42b615355eaf47ca617463503f43300b",
-          "versions": [
-            "Default"
-          ],
-          "allowed_urls": [],
-          "limit": null,
-          "allowance_scope": ""
-        }
-      },
+      "throttle_interval": 0,
+      "throttle_retry_limit": 0,
+      "max_query_depth": 0,
+      "access_rights": {},
       "hmac_enabled": false,
       "active": true,
-      "name": "Swagger Petstore Policy",
       "is_inactive": false,
       "date_created": "2020-04-24T12:40:42.074Z",
       "tags": [],
@@ -150,6 +129,7 @@
       "partitions": {
         "quota": false,
         "rate_limit": false,
+        "complexity": false,
         "acl": false,
         "per_api": false
       },
@@ -157,31 +137,25 @@
       "meta_data": {}
     },
     {
-      "auth_type": "jwt",
+      "auth_type": "other",
+      "auth_types": null,
+      "state": "active",
+      "access_rights_array": [],
+      "graphql_enabled": false,
       "_id": "5ead72955759610001818688",
       "id": "5ead72955759610001818688",
+      "name": "JWT Policy",
       "org_id": "5e9d9544a1dcd60001d0ed20",
       "rate": 1000,
       "per": 60,
-      "throttle_interval": 0,
-      "throttle_retry_limit": 0,
       "quota_max": -1,
       "quota_renewal_rate": 3600,
-      "access_rights": {
-        "c7c3b826a9ec4c637ae716e00cecc010": {
-          "api_name": "JWT API",
-          "api_id": "c7c3b826a9ec4c637ae716e00cecc010",
-          "versions": [
-            "Default"
-          ],
-          "allowed_urls": [],
-          "limit": null,
-          "allowance_scope": ""
-        }
-      },
+      "throttle_interval": 0,
+      "throttle_retry_limit": 0,
+      "max_query_depth": 0,
+      "access_rights": {},
       "hmac_enabled": false,
       "active": true,
-      "name": "JWT Policy",
       "is_inactive": false,
       "date_created": "2020-05-02T13:16:05.612Z",
       "tags": [],
@@ -189,6 +163,7 @@
       "partitions": {
         "quota": false,
         "rate_limit": false,
+        "complexity": false,
         "acl": false,
         "per_api": false
       },
@@ -196,38 +171,25 @@
       "meta_data": {}
     },
     {
-      "auth_type": "jwt",
+      "auth_type": "other",
+      "auth_types": null,
+      "state": "active",
+      "access_rights_array": [],
+      "graphql_enabled": false,
       "_id": "5ead73565759610001818689",
       "id": "5ead73565759610001818689",
+      "name": "JWT Policy Restricted",
       "org_id": "5e9d9544a1dcd60001d0ed20",
       "rate": 1000,
       "per": 60,
-      "throttle_interval": 0,
-      "throttle_retry_limit": 0,
       "quota_max": -1,
       "quota_renewal_rate": 3600,
-      "access_rights": {
-        "c7c3b826a9ec4c637ae716e00cecc010": {
-          "api_name": "JWT API",
-          "api_id": "c7c3b826a9ec4c637ae716e00cecc010",
-          "versions": [
-            "Default"
-          ],
-          "allowed_urls": [
-            {
-              "url": "/anything/allowed-path",
-              "methods": [
-                "GET"
-              ]
-            }
-          ],
-          "limit": null,
-          "allowance_scope": ""
-        }
-      },
+      "throttle_interval": 0,
+      "throttle_retry_limit": 0,
+      "max_query_depth": 0,
+      "access_rights": {},
       "hmac_enabled": false,
       "active": true,
-      "name": "JWT Policy Restricted",
       "is_inactive": false,
       "date_created": "2020-05-02T13:19:18.675Z",
       "tags": [],
@@ -235,6 +197,7 @@
       "partitions": {
         "quota": false,
         "rate_limit": false,
+        "complexity": false,
         "acl": false,
         "per_api": false
       },
@@ -242,31 +205,25 @@
       "meta_data": {}
     },
     {
-      "auth_type": "ba",
+      "auth_type": "other",
+      "auth_types": null,
+      "state": "active",
+      "access_rights_array": [],
+      "graphql_enabled": false,
       "_id": "5eb6349543f0440001373f5c",
       "id": "",
+      "name": "Basic Authentication Policy",
       "org_id": "5e9d9544a1dcd60001d0ed20",
       "rate": 1000,
       "per": 60,
-      "throttle_interval": -1,
-      "throttle_retry_limit": -1,
       "quota_max": -1,
       "quota_renewal_rate": 3600,
-      "access_rights": {
-        "5963f8fdedee405143f5858ea17de422": {
-          "api_name": "Basic Authentication API",
-          "api_id": "5963f8fdedee405143f5858ea17de422",
-          "versions": [
-            "Default"
-          ],
-          "allowed_urls": [],
-          "limit": null,
-          "allowance_scope": ""
-        }
-      },
+      "throttle_interval": -1,
+      "throttle_retry_limit": -1,
+      "max_query_depth": 0,
+      "access_rights": {},
       "hmac_enabled": false,
       "active": true,
-      "name": "Basic Authentication Policy",
       "is_inactive": false,
       "date_created": "2020-05-09T04:41:57.292Z",
       "tags": [],
@@ -274,6 +231,7 @@
       "partitions": {
         "quota": false,
         "rate_limit": false,
+        "complexity": false,
         "acl": false,
         "per_api": false
       },
