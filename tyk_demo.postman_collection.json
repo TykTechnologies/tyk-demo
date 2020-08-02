@@ -2015,7 +2015,7 @@
 											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 											"",
 											"var throttlingTestKeyCreateRequest = {",
-											"  url: 'http://' + tykGatewayHost + 'tyk/keys/' + keyId,",
+											"  url: 'http://' + tykGatewayHost + '/tyk/keys/' + keyId,",
 											"  method: 'POST',",
 											"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
 											"  body: {",
