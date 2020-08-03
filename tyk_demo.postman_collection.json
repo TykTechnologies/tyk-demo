@@ -2671,5 +2671,49 @@
 			"response": []
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "c5e7deb6-ce81-4847-8636-e7a490090c68",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "5eb43755-4ce0-4fb0-adfc-07cfd7d3d919",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "c2edf0b2-b255-475c-995c-b8777bd2df28",
+			"key": "tyk-gateway.host",
+			"value": "tyk-gateway.localhost:8080"
+		},
+		{
+			"id": "b4fbba24-1c77-4ef5-ab54-6887b8e05ec1",
+			"key": "tyk-gateway-2.host",
+			"value": "tyk-gateway-2.localhost:8080"
+		},
+		{
+			"id": "466a3a9e-5629-4569-957d-6f47e4aa122a",
+			"key": "tyk-custom-domain.host",
+			"value": "tyk-custom-domain.localhost:8080"
+		},
+		{
+			"id": "9def5301-6063-43f2-b9e4-1b605c89a541",
+			"key": "tyk-dashboard.host",
+			"value": "tyk-dashboard.localhost:3000"
+		}
+	],
 	"protocolProfileBehavior": {}
 }
