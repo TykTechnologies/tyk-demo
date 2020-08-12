@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "485dddee-8ef4-4cc9-9691-dcaa4c1b49dc",
+		"_postman_id": "93ac9826-7214-4b23-8b29-9d2b2c3b92bb",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -17,7 +17,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "785b934b-33c0-4475-be5c-36f18fbe2730",
+										"id": "8db59ae7-8353-40ed-a5bc-145911c7401f",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -114,7 +114,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "df4873d7-7968-40a7-96c7-c3f6921e280e",
+										"id": "016e1b73-7d3f-411a-aa90-9f8a7e83fa88",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -160,7 +160,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "edc2f893-240e-43fb-9628-a429747a489d",
+										"id": "2db4e08d-954d-4c1e-8bd9-fb524b406def",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -200,7 +200,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a0df37ab-6530-4c34-899c-e98fe62413cf",
+										"id": "a2dc88a3-a450-4aeb-a25d-f967342ce8cf",
 										"exec": [
 											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
 											"",
@@ -272,7 +272,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "b1176ecb-e3af-419a-af11-22b3a73078d5",
+										"id": "75d7406c-9297-46d0-8cca-e91c6069bb44",
 										"exec": [
 											""
 										],
@@ -305,7 +305,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "df20293b-6d83-4b8c-aa3d-37c2cb28c717",
+										"id": "dac23876-49ab-4812-bc86-c5fbd829fcd1",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -350,7 +350,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a03a9667-bee8-4c07-bd84-24b265942d9e",
+										"id": "bc00510d-ec64-46a2-b089-ac8e74abe39f",
 										"exec": [
 											"pm.test(\"Status code is 504\", function () {",
 											"    pm.response.to.have.status(504);",
@@ -398,7 +398,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4ddd419f-4c22-447f-abe4-58d4d9dc453a",
+										"id": "58de2253-22c4-4281-8890-9cb64821985e",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -441,7 +441,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ba9f5b54-4323-4814-a6da-ececa4a73322",
+										"id": "41206f86-f6b2-4f4e-97b6-47d606bfbb29",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -481,7 +481,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "32c0d29e-25c0-4673-8998-e20834dbf6e4",
+										"id": "ec1424d1-ccfb-4bde-bb51-d4e271cb8fdd",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -527,7 +527,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b8364373-5a54-47e9-8a6a-c7579ce639dc",
+										"id": "9b32511d-c1ad-4161-8da3-9474925532b9",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -573,7 +573,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "33af8685-eb0b-40f5-8439-725d9afbdb12",
+										"id": "f8226352-8194-4dda-bfc8-7d7aa1666d09",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -624,7 +624,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "1ecade8b-483f-4a17-8ffc-b325a2889c6b",
+										"id": "0ad99490-a450-4916-b626-c6a9c13cdb01",
 										"exec": [
 											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
 											"",
@@ -692,7 +692,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "970c6689-057a-40f3-b528-c873cb3bfe72",
+										"id": "64793037-6041-48cf-9228-97bdbdaf7683",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -727,7 +727,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "3e0c1dfe-9dfe-43ab-93dd-3241f385eb3c",
+										"id": "f97cc1f5-4a2a-4585-bc63-84b0dfdee21c",
 										"exec": [
 											"pm.test(\"Status code is 401\", function () {",
 											"    pm.response.to.have.status(401);",
@@ -762,7 +762,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "33783251-284b-4c9d-8661-1cac8015acfb",
+										"id": "2f121c6c-8cec-48fc-b532-0768e7d2a75e",
 										"exec": [
 											"pm.test(\"Status code is 422\", function () {",
 											"    pm.response.to.have.status(422);",
@@ -806,7 +806,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f1b33c74-9cec-49a3-8110-e715087dc34c",
+										"id": "a427550f-9b0f-4f23-809b-103c807a6795",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -852,7 +852,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9d904595-c209-4cf4-8036-7491d35d0b14",
+										"id": "05edf128-4633-4db9-bd60-382e2762a6bd",
 										"exec": [
 											"pm.test(\"Status code is 400\", function () {",
 											"    pm.response.to.have.status(400);",
@@ -896,7 +896,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ef05ad17-df6e-4b0b-a33a-63fcf53a316c",
+										"id": "30fbb011-53c2-4730-bc27-d2fed7d5a76b",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -940,7 +940,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "43504950-8586-4d79-a675-423bd68f178b",
+										"id": "12d2bd09-696e-471c-b364-3826401e9129",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -980,7 +980,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "e5c6b9a1-ae15-45b4-ae3e-082883356967",
+										"id": "d7b8dc14-b37c-460f-8f97-0a5c3503552d",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1015,7 +1015,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a4fa780f-adab-49b9-bf53-daa4baa9b0c7",
+										"id": "d96514db-bb3d-4e4d-aaec-c81429c7ce83",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1061,7 +1061,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "1e799f57-f3af-4446-ba6d-a112b5e1e5b5",
+										"id": "55a31289-8a76-426f-9473-fc2493aece87",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1105,7 +1105,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "336880ba-e76b-4b69-bc77-4e72af2d8637",
+										"id": "7f41e4ae-d172-4ca7-945d-90e619f274df",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1146,7 +1146,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "48c5abfd-97b4-44e7-9d38-bd6c44f59558",
+										"id": "b1a5855b-52de-4d34-b66d-7a519c89e01f",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1191,7 +1191,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0323ae7c-2a00-4ab2-b795-4049a94267c5",
+								"id": "eaca56a3-7d15-4cd2-b4eb-0e62d1d1899a",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1201,7 +1201,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "88cdf683-0ddd-4221-8182-9f2ec56ff08d",
+								"id": "cfc1f861-cfc2-4bee-ac29-31ea27bfd0cd",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1221,7 +1221,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7fa64e6d-639b-43db-946b-ab3b87ee0aed",
+										"id": "eb66bc20-d586-4c72-9e89-d34ede39b862",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1267,7 +1267,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4c55214b-d717-4490-b7f0-aa02675c271e",
+										"id": "f0c3c0b8-674f-4f00-8864-910b3e9e2e90",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1318,7 +1318,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c106d5fa-f4e4-4e90-8e44-2dea7ec86142",
+										"id": "618d41cb-5cb8-4c11-8875-83a025872aab",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1371,7 +1371,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4d0eddd5-05be-48f5-ae54-f6bda847d38d",
+										"id": "45a36bd1-703b-43b4-a501-60dc9ec8a756",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1413,7 +1413,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a8797c79-4e96-4781-82c2-1d26b8a522d6",
+										"id": "68115319-ca17-4486-86eb-b61d106ad7e7",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1452,7 +1452,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "250c379e-adb7-40c9-a427-c611a5156a58",
+										"id": "4527b06e-3ea8-406c-a172-0d347e91f01c",
 										"exec": [
 											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
 											"",
@@ -1499,7 +1499,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "265a93bc-8c6b-4c8b-85f0-de1098518845",
+										"id": "ee7fba37-e923-4103-8f5f-3909e0e7e5d2",
 										"exec": [
 											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
 											"",
@@ -1566,7 +1566,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "2e6b86cf-33d2-42d3-a6ac-00a5cc080187",
+														"id": "7ae4bfeb-a93e-4891-a1cd-e7bd91edb1d8",
 														"exec": [
 															"pm.test(\"Status code is 401\", function () {",
 															"    pm.response.to.have.status(401);",
@@ -1611,7 +1611,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "877c67d6-69ea-479b-b291-980ce04793cd",
+														"id": "1b9af711-7448-4fcb-a914-a999a0a66246",
 														"exec": [
 															"pm.test(\"Status code is 403\", function () {",
 															"    pm.response.to.have.status(403);",
@@ -1656,7 +1656,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "0fa581f6-5b15-4fc4-a6f2-b411b6641e01",
+														"id": "8fdf4416-962c-47ad-911b-887ad956bd94",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1700,7 +1700,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "630c5e81-9a0f-4790-9a1a-1d43469a3dbe",
+												"id": "19183815-bc8b-4e2e-874d-0c963c36b9bc",
 												"type": "text/javascript",
 												"exec": [
 													""
@@ -1710,7 +1710,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "a4aa35aa-5d8d-4fad-ac23-777bbd772f68",
+												"id": "77d1ed9d-6e48-434c-ae9a-b20f480a7f0c",
 												"type": "text/javascript",
 												"exec": [
 													""
@@ -1730,7 +1730,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "225db76a-a289-449f-9b30-9da04dc1b2e4",
+														"id": "ccf9e750-a7bf-497c-adb6-9004370afa4d",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1770,7 +1770,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "98189d8f-5615-4c1d-b463-7016ee29cecf",
+														"id": "830ee829-8f00-4cd0-821d-288f44fc2821",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1811,7 +1811,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "8cb8dd04-6dea-4b6a-8bd5-5ec5699cc5fe",
+														"id": "30c15dc9-7efc-49f7-8fc5-624c996c0f47",
 														"exec": [
 															"pm.test(\"Status code is 403\", function () {",
 															"    pm.response.to.have.status(403);",
@@ -1864,7 +1864,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "7f064f78-c01e-4652-9c9f-7ed9703662e8",
+														"id": "9d303ce5-26a3-4cf7-9ed6-30d8dc80de1a",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1912,7 +1912,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6247c4a6-97ac-4e29-8d5b-1336a0d524f5",
+										"id": "9cd7dc61-dafd-4286-a95e-9458e324d9a3",
 										"exec": [
 											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
 											"",
@@ -2006,7 +2006,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "e1b3cdfa-6ee7-4dba-a298-5a016fedfa22",
+										"id": "dd26cb59-d1d9-460f-a273-089434871b29",
 										"exec": [
 											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
 											"",
@@ -2086,7 +2086,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ab09b4e8-9319-44c1-a1f3-b04620da2445",
+										"id": "52ea6b6a-1022-4baa-a753-a99706894858",
 										"exec": [
 											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
 											"",
@@ -2168,7 +2168,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5a90dfc2-ae1e-4fc4-aba5-0c6705fc6cb7",
+										"id": "616d11d9-4fd0-42d2-984b-e314995718f5",
 										"exec": [
 											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
 											"",
@@ -2226,7 +2226,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d57d1c90-4661-49b3-9de5-183fa668a5c4",
+										"id": "937d9607-3ad6-4ecd-8ea7-44f8e67fbed4",
 										"exec": [
 											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
 											"",
@@ -2278,7 +2278,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "e0d4206d-2a4d-4b89-9b4b-ac34c4174b58",
+										"id": "aeda5234-d0b8-48ef-a312-d34d76b2d6ad",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2308,6 +2308,161 @@
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
+				},
+				{
+					"name": "GraphQL",
+					"item": [
+						{
+							"name": "GraphQL - Proxy to external GraphQL API (part 1)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fe722795-003c-42a6-ba66-2128221c64e5",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Country data returned\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.country.code).to.eql(\"GB\");",
+											"    pm.expect(jsonData.data.country.name).to.eql(\"United Kingdom\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\n  country(code: \"GB\") {\n    code\n    name\n  }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/graphql-countries/",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"graphql-countries",
+										""
+									]
+								},
+								"description": "This request demonstrates the Gateways ability to proxy GraphQL requests to a target GraphQL API. It calls the **GraphQL Countries** API, which is configured to proxy requests to an external GraphQL API https://countries.trevorblades.com/.\n\nThe body of the request is a GraphQL query, which requests a **country** object which has a **code** equal to **GB**, returning the fields **code** and **name**. The API Definition is set up to only allow these fields, even though the target API contains many additional fields.\n\nThe **Country** data returned in the response matches the code **GB**."
+							},
+							"response": []
+						},
+						{
+							"name": "GraphQL - Proxy to external GraphQL API (part 2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ce77a547-c1bc-4eeb-a94c-cfe86ba0de44",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Contextual error message: Currency field not defined\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"field: currency not defined on type: Country\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\n  country(code: \"GB\") {\n    code\n    name\n    currency\n  }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/graphql-countries/",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"graphql-countries",
+										""
+									]
+								},
+								"description": "Part 2 of the GraphQL requests makes a request for a field which does not exist in the *Schema* defined on the API Definition.\n\nThe **currency** field does not exist in the schema, and as such the request is rejected by the Gateway, returning an HTTP 400 response. The target API does actually have this field, but since the API Gateway does not list it in the schema it cannot be requested.\n\nThe response contains a contextual error message which identifies that the **currency** field is not defined for the type **Country**. This allows the API Client is understand why the request was rejected."
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Universal Data Graph",
+					"item": [
+						{
+							"name": "Unversal Data Graph - Composed API",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3596de11-8b4b-4b79-b40d-cda770a66034",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Combined data is returned\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.country.code).to.eql(\"GB\");",
+											"    pm.expect(jsonData.data.country.name).to.eql(\"United Kingdom\");",
+											"    pm.expect(jsonData.data.country.pop).to.eql(65110000);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\n  country(code: \"GB\") {\n    code\n    name\n    pop\n  }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/universal-data-graph-composed/",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"universal-data-graph-composed",
+										""
+									]
+								},
+								"description": "This request is for a composed GraphQL API. This means that the Gateway takes the request and generates the response by calling multiple upstream APIs and combining the responses together.\n\nThe **Universal Data Graph** can target APIs already defined in Tyk and also external APIs. The API Definition for the API called in this example uses **DataSources** to target two APIs. One is another GraphQL API, **GraphQL Countries**, which already exists as an API Definition. The other is a REST API which is not defined as an API Definition, and is defined as a URL which the Universal Data Graph will make a request to.\n\nAll the data is combined in to a single response. The schema in the API Definition defines how this is achieved:\n\n- The Universal Data Graph takes the query contained in the body of the request and provides the **code** property as an **argument** to the GraphQL Countries API. It also uses the code as an argument in the request to the REST API, placing the value in the URL called by the Universal Data Graph.\n- The data returned by the REST API is mapped on the API's schema by using a **field mapping**. This maps the field **population** in the REST API response to the **pop** property in the API's schema. Field mapping enables fields to be renamed to fit with the desired schema."
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -2324,7 +2479,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "33b6cfc8-a84c-4757-8cff-0c6315485064",
+										"id": "4dd49f13-da83-4b92-8c79-f5d28a6b3a84",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2384,7 +2539,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "688c28fe-ba2d-40bf-8318-094098a0605e",
+										"id": "2bdc0614-7233-4804-9b32-36a2e2cdf64e",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2436,7 +2591,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6016a2f1-1b33-4f9d-bd1d-b2636108d40c",
+										"id": "14f5cad6-64df-40ce-8968-16f0ea17544d",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2484,7 +2639,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "424608f6-25f4-4369-ac93-6043ceefc12c",
+										"id": "cb93bb12-7489-449f-8152-d26e90c0c609",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2528,7 +2683,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3274596c-29a4-4cb3-a149-c5da219dc121",
+								"id": "e416d39d-6b03-4d4f-94c4-448eb8d8f1e4",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2574,7 +2729,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5b079f5c-ac54-4d08-b8ac-d62e947ca341",
+								"id": "73ad5bf2-233c-4e7a-9b77-735aa6926b71",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2642,7 +2797,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "2d55c8eb-ed8f-4d23-b56e-50a64af0f6c3",
+						"id": "10d0c84c-ce55-4e48-960e-a54d235277da",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -2675,7 +2830,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "c5e7deb6-ce81-4847-8636-e7a490090c68",
+				"id": "6de3e26c-174c-4cb7-b7de-e6779d2cf7a0",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -2685,7 +2840,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "5eb43755-4ce0-4fb0-adfc-07cfd7d3d919",
+				"id": "7646dbaf-f457-4933-a53b-4cadad161df3",
 				"type": "text/javascript",
 				"exec": [
 					""
