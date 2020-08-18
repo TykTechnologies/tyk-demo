@@ -1,0 +1,23 @@
+version: '3.3'
+services:
+  jenkins:
+    image: jenkins/jenkins:lts-alpine
+    ports:
+      - 8070:8080
+    networks:
+      - tyk
+    volumes:
+      - ./deployments/cicd/volumes/jenkins/jenkins-cli.jar:/var/jenkins_home/jenkins-cli.jar
+      - ./deployments/cicd/volumes/jenkins/bootstrap-import:/var/jenkins_home/bootstrap-import
+  gitea:
+    image: gitea/gitea:1.11.5
+    environment:
+      - HTTP_PORT=13000
+    ports:
+      - "13000:13000"
+      - "127.0.0.1:2222:22"
+    networks:
+      - tyk
+    volumes:
+      - ./deployments/cicd/volumes/gitea/gitea-dump.zip:/data/gitea-dump.zip
+      - ./deployments/cicd/volumes/gitea/restore.sh:/data/restore.sh

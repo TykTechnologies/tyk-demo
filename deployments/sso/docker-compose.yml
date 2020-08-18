@@ -12,17 +12,19 @@ services:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
       - TYK_DB_SSOCUSTOMLOGINURL=http://localhost:3010/auth/tyk-dashboard/openid-connect
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
+      - TYK_LOGLEVEL=${TIB_TYK_LOGLEVEL}
     depends_on:
       - tyk-identity-broker
       - tyk-mongo
       - tyk-redis
   tyk-identity-broker:
-    image: tykio/tyk-identity-broker:latest
+    image: tykio/tyk-identity-broker:${TIB_VERSION}
     networks:
       - tyk
     ports:
       - 3010:3010
     environment:
       - SESSION_SECRET=12345
+      - TYK_LOGLEVEL=${TIB_TYK_LOGLEVEL}
     volumes:
       - ./deployments/sso/volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf

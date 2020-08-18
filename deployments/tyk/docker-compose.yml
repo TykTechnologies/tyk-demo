@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   tyk-dashboard:
-    image: tykio/tyk-dashboard:latest
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION}
     ports:
       - 3000:3000
     networks:
@@ -11,19 +11,27 @@ services:
       - ./deployments/tyk/volumes/tyk-dashboard/private-key.pem:/opt/tyk-dashboard/private-key.pem
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
+      - TYK_LOGLEVEL=${DASHBOARD_LOGLEVEL}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
     depends_on:
       - tyk-redis
       - tyk-mongo
   tyk-gateway:
-    image: tykio/tyk-gateway:latest
+    image: tykio/tyk-gateway:${GATEWAY_VERSION}
     ports:
       - 8080:8080
     networks:
       - tyk
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
+      - TYK_TRACING=${TRACING_ENABLED}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED}
+      - TYK_GW_TRACER_OPTIONS_DISABLED=false
+      - TYK_GW_TRACER_OPTIONS_SERVICENAME="tyk-gateway"
+      - TYK_GW_TRACER_OPTIONS_RPCMETRICS=false
+      - TYK_GW_TRACER_OPTIONS_REPORTER_LOCALAGENTHOSTPORT="jaeger:6831"
+      - TYK_GW_TRACER_OPTIONS_REPORTER_LOGSPANS=true
+      - TYK_LOGLEVEL=${GATEWAY_LOGLEVEL}
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
@@ -31,12 +39,13 @@ services:
     depends_on:
       - tyk-redis
   tyk-gateway-2:
-    image: tykio/tyk-gateway:latest
+    image: tykio/tyk-gateway:${GATEWAY2_VERSION}
     ports:
       - 8081:8080
     networks:
       - tyk
     environment:
+      - TYK_LOGLEVEL=${GATEWAY2_LOGLEVEL}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED}
     volumes:
@@ -47,13 +56,14 @@ services:
       - tyk-redis
       - tyk-gateway
   tyk-pump:
-    image: tykio/tyk-pump-docker-pub:latest
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION}
     networks:
       - tyk
     volumes:
       - ./deployments/tyk/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
+      - TYK_LOGLEVEL=${PUMP_TYK_LOGLEVEL}  
     depends_on:
       - tyk-redis
       - tyk-mongo
