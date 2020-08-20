@@ -9,6 +9,7 @@ services:
     volumes:
       - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
       - ./deployments/tyk/volumes/tyk-dashboard/private-key.pem:/opt/tyk-dashboard/private-key.pem
+      - ./deployments/tyk/volumes/tyk-dashboard/catalogue.html:/opt/tyk-dashboard/portal/templates/catalogue.html
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Dashboard licence missing from Docker environment file .env. Review The Getting Started steps in README.md.}  
       - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
@@ -20,8 +21,11 @@ services:
     image: tykio/tyk-gateway:${GATEWAY_VERSION:-latest}
     ports:
       - 8080:8080
+      - 8086:8086
     networks:
-      - tyk
+      tyk:
+        aliases:
+          - tyk-custom-domain.localhost
     environment:
       - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}

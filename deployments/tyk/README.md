@@ -40,3 +40,9 @@ This is acheived using a public/private key pair. The Gateway has the public key
 The TLS-enabled Gateway (`tyk-gateway-2`) uses a self-signed certificate. This requires that your HTTP client ignores certificate verification errors when accessing this Gateway.
 
 - [Tyk TLS Gateway](https://tyk-gateway-2.localhost:8081/basic-open-api/get)
+
+### RBAC API Portal Catalogue
+
+The Dashboard has a slightly modified API Catalogue template.  If you publish a policy and name it "Internal API", it won't be visible to any developers unless they have the correct role.
+
+Try viewing the API Catalogue with a developer, then add the "internal" role to the Developer Profile, and see the outcome with values "0" and "1".

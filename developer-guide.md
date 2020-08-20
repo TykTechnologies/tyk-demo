@@ -130,6 +130,7 @@ These utility scripts are available in the `scripts` directory:
 * `common.sh`: Contains functions useful for bootstrap scripts
 * `export.sh`: Uses the Dashboard API to export API and Policy definitions, overwriting data used to bootstrap the base Tyk deployment
 * `import.sh`: Uses the Dashboard Admin API to import API and Policy definitions, using data used to bootstrap the base Tyk deployment
+* `test.sh`: Uses a Newman container to run the Postman collection tests
 
 # Working with API and Policy data
 
@@ -140,9 +141,11 @@ There are two scenarios for working with this data:
 
 ## Scenario 1: Committing changes
 
+Before you commit anything to the repo, please check that all tests are working correctly. Run the `./scripts/test.sh`, if any tests fail then please resolve the issue before committing.
+
 If you have changed APIs and Policies in your Dashboard, and want to commit these so other people can use them, use the export script.
 
-Run from the repo root directory, as so:
+To export the data, run the export script from the repo root directory, as so:
 
 ```
 ./scripts/export.sh

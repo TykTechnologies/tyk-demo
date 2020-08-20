@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "eae1ba33-87b1-4299-be85-09aa773bb685",
+		"_postman_id": "93ac9826-7214-4b23-8b29-9d2b2c3b92bb",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -17,7 +17,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "04d9444b-4539-4747-9cc9-991b1fee3e3a",
+										"id": "8db59ae7-8353-40ed-a5bc-145911c7401f",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -77,13 +77,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/javascript-middleware-api/post?deleted=deleted-value&accepted=456",
+									"raw": "http://{{tyk-gateway.host}}/javascript-middleware-api/post?deleted=deleted-value&accepted=456",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"javascript-middleware-api",
 										"post"
@@ -116,7 +114,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f908c327-dc0c-4f81-acd7-d228bf076c8c",
+										"id": "016e1b73-7d3f-411a-aa90-9f8a7e83fa88",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -141,13 +139,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/mock",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/mock",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -164,7 +160,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b38b2ad1-ebcb-477f-aa9f-bf04f7e071c1",
+										"id": "2db4e08d-954d-4c1e-8bd9-fb524b406def",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -183,13 +179,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/blacklist",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/blacklist",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -206,34 +200,81 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "51c6d9b7-fe8a-499a-aeed-605cd781fbf1",
+										"id": "a2dc88a3-a450-4aeb-a25d-f967342ce8cf",
 										"exec": [
-											"pm.test(\"5th server error response triggers circuit breaker\", function () {",
-											"    var circuitBreakerRequest = {",
-											"      url: 'http://tyk-gateway.localhost:8080/plugin-demo-api/status/500',",
-											"      method: 'GET'",
-											"    };",
-											"    ",
-											"    pm.sendRequest(circuitBreakerRequest, function (err, response) {",
-											"        pm.response.to.have.status(500);",
+											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
 											"",
+											"var circuitBreakerRequest = {",
+											"    url: 'http://' + tykGatewayHost + '/plugin-demo-api/status/500',",
+											"    method: 'GET'",
+											"};",
+											"",
+											"// Before we can test this properly, we must trigger the circuit breaker so that the actual test can start from a consistent position.",
+											"// So we call the API until we get a 503, which should be a maximum of 5 attempts, at which point we wait for the service to come back online and then perform the test.",
+											"pm.sendRequest(circuitBreakerRequest, function (err, response) {",
+											"    if (response.code == 503) {",
+											"        setTimeout(performTest, 5000);",
+											"    } else {",
 											"        pm.sendRequest(circuitBreakerRequest, function (err, response) {",
-											"            pm.response.to.have.status(500);",
-											"            ",
+											"            if (response.code == 503) {",
+											"                setTimeout(performTest, 5000);",
+											"            } else {",
+											"                pm.sendRequest(circuitBreakerRequest, function (err, response) {",
+											"                    if (response.code == 503) {",
+											"                        setTimeout(performTest, 5000);",
+											"                    } else {",
+											"                        pm.sendRequest(circuitBreakerRequest, function (err, response) {",
+											"                            if (response.code == 503) {",
+											"                                setTimeout(performTest, 5000);",
+											"                            } else {",
+											"                                pm.sendRequest(circuitBreakerRequest, function (err, response) {",
+											"                                    if (response.code == 503) {",
+											"                                        setTimeout(performTest, 5000);",
+											"                                    } ",
+											"                                });",
+											"                            }",
+											"                        });",
+											"                    }",
+											"                });",
+											"            } ",
+											"        });",
+											"    }  ",
+											"});",
+											"",
+											"function performTest() {",
+											"    pm.test(\"5th server error response triggers circuit breaker\", function () {",
+											"        // first 4 tests should be 500s, which triggers the circuit breaker so the fifth test is 503.",
+											"        pm.sendRequest(circuitBreakerRequest, function (err, response) {",
+											"            pm.expect(response.code).to.eql(500);",
+											"",
 											"            pm.sendRequest(circuitBreakerRequest, function (err, response) {",
-											"                pm.response.to.have.status(500);",
+											"                pm.expect(response.code).to.eql(500);",
 											"                ",
 											"                pm.sendRequest(circuitBreakerRequest, function (err, response) {",
-											"                    pm.response.to.have.status(500);",
-											"",
+											"                    pm.expect(response.code).to.eql(500);",
+											"                    ",
 											"                    pm.sendRequest(circuitBreakerRequest, function (err, response) {",
-											"                        pm.response.to.have.status(500);",
+											"                        pm.expect(response.code).to.eql(500);",
+											"",
+											"                        pm.sendRequest(circuitBreakerRequest, function (err, response) {",
+											"                            pm.expect(response.code).to.eql(503);",
+											"                        });",
 											"                    });",
 											"                });",
 											"            });",
 											"        });",
 											"    });",
-											"});"
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "75d7406c-9297-46d0-8cca-e91c6069bb44",
+										"exec": [
+											""
 										],
 										"type": "text/javascript"
 									}
@@ -243,13 +284,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/status/500",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/status/500",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"status",
@@ -266,7 +305,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b6b75def-1b46-469a-8fc3-7107969e0943",
+										"id": "dac23876-49ab-4812-bc86-c5fbd829fcd1",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -290,13 +329,11 @@
 									"raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<servers version=\"1\">\n  <server>\n    <serverName>Shanghai_VPN</serverName>\n    <serverIP>127.0.0.1</serverIP>\n  </server>\n  <server>\n    <serverName>Beijing_VPN</serverName>\n    <serverIP>127.0.0.2</serverIP>\n  </server>\n</servers>"
 								},
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/body-transform",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/body-transform",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -313,7 +350,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fcddc89e-0c8b-476f-bbce-3c51440b824f",
+										"id": "bc00510d-ec64-46a2-b089-ac8e74abe39f",
 										"exec": [
 											"pm.test(\"Status code is 504\", function () {",
 											"    pm.response.to.have.status(504);",
@@ -340,13 +377,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/delay/6",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/delay/6",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"delay",
@@ -363,7 +398,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "75f0287e-b14a-4728-963d-56663e449c55",
+										"id": "58de2253-22c4-4281-8890-9cb64821985e",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -385,13 +420,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/delay/1",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/delay/1",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"delay",
@@ -408,7 +441,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "cff4fff4-abe1-4783-877c-7665a1072c2d",
+										"id": "41206f86-f6b2-4f4e-97b6-47d606bfbb29",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -427,13 +460,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/url-rewrite",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/url-rewrite",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -450,7 +481,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c2356786-7cbf-49cb-95fb-c6799b6dfe89",
+										"id": "ec1424d1-ccfb-4bde-bb51-d4e271cb8fdd",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -469,13 +500,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/url-rewrite?query=rewrite",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/url-rewrite?query=rewrite",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -498,7 +527,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "2f74f775-af0b-4092-b3fc-835282c3eebb",
+										"id": "9b32511d-c1ad-4161-8da3-9474925532b9",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -523,13 +552,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/url-rewrite",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/url-rewrite",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -546,7 +573,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d25256d5-6e05-4396-bf2a-edf34e537f83",
+										"id": "f8226352-8194-4dda-bfc8-7d7aa1666d09",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -576,13 +603,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/modify-headers",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/modify-headers",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -599,10 +624,12 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "84725e8f-8f41-4d55-961f-7e62b5476149",
+										"id": "0ad99490-a450-4916-b626-c6a9c13cdb01",
 										"exec": [
+											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"",
 											"var cacheRequest = {",
-											"    url: 'http://tyk-gateway.localhost:8080/plugin-demo-api/uuid',",
+											"    url: 'http://' + tykGatewayHost + '/plugin-demo-api/uuid',",
 											"    method: 'GET'",
 											"};",
 											"",
@@ -645,13 +672,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/uuid",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/uuid",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"uuid"
@@ -667,7 +692,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "e75932d8-6cdf-4f1f-b65f-349b347614bb",
+										"id": "64793037-6041-48cf-9228-97bdbdaf7683",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -681,13 +706,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/anything/ignored",
+									"raw": "http://{{tyk-gateway.host}}/basic-protected-api/anything/ignored",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"basic-protected-api",
 										"anything",
@@ -704,7 +727,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ef741f29-fab5-4d6c-a740-d9d46daeeba5",
+										"id": "f97cc1f5-4a2a-4585-bc63-84b0dfdee21c",
 										"exec": [
 											"pm.test(\"Status code is 401\", function () {",
 											"    pm.response.to.have.status(401);",
@@ -718,13 +741,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/anything/not-ignored",
+									"raw": "http://{{tyk-gateway.host}}/basic-protected-api/anything/not-ignored",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"basic-protected-api",
 										"anything",
@@ -741,7 +762,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "eff6fd89-8c07-4ecf-99bf-0fcb4e0abf3e",
+										"id": "2f121c6c-8cec-48fc-b532-0768e7d2a75e",
 										"exec": [
 											"pm.test(\"Status code is 422\", function () {",
 											"    pm.response.to.have.status(422);",
@@ -764,13 +785,11 @@
 									"raw": "{\n\t\"lastName\": \"Hoskins\",\n\t\"age\": 71\n}"
 								},
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/validate-json",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/validate-json",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -787,7 +806,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6232bd2f-58ec-4197-b95a-6952a11289ec",
+										"id": "a427550f-9b0f-4f23-809b-103c807a6795",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -812,13 +831,11 @@
 									"raw": "{\n\t\"firstName\": \"Bob\",\n\t\"lastName\": \"Hoskins\",\n\t\"age\": 71\n}"
 								},
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/validate-json",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/validate-json",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -835,7 +852,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "e98da6bc-576a-4a93-9c99-7493560b97c2",
+										"id": "05edf128-4633-4db9-bd60-382e2762a6bd",
 										"exec": [
 											"pm.test(\"Status code is 400\", function () {",
 											"    pm.response.to.have.status(400);",
@@ -858,13 +875,11 @@
 									"raw": "1234567890"
 								},
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/request-size-limit",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/request-size-limit",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -881,7 +896,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "21b830fb-1506-4807-b21b-67920fecfbf6",
+										"id": "30fbb011-53c2-4730-bc27-d2fed7d5a76b",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -904,13 +919,11 @@
 									"raw": "123456789"
 								},
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/request-size-limit",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/request-size-limit",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -927,7 +940,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fc033b5b-4faa-487d-aeaa-6800bdcda1c8",
+										"id": "12d2bd09-696e-471c-b364-3826401e9129",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -946,13 +959,11 @@
 								"method": "PUT",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/method-transform",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/method-transform",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -969,7 +980,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "bea03ac4-0903-437b-8d28-f00aff4883bc",
+										"id": "d7b8dc14-b37c-460f-8f97-0a5c3503552d",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -983,13 +994,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/track-endpoint",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/track-endpoint",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -1006,7 +1015,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "278c9899-4e0e-4911-9007-f3a758c3e7d5",
+										"id": "d96514db-bb3d-4e4d-aaec-c81429c7ce83",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1031,13 +1040,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/global-version-settings",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/global-version-settings",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -1054,7 +1061,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "00e34591-7028-4d5e-9007-7bd2ba36a984",
+										"id": "55a31289-8a76-426f-9473-fc2493aece87",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1077,13 +1084,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/virtual-endpoint",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/virtual-endpoint",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -1100,7 +1105,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f87671be-1500-4e72-b850-93e576d697dc",
+										"id": "7f41e4ae-d172-4ca7-945d-90e619f274df",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1120,13 +1125,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/whitelist",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/whitelist",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -1143,7 +1146,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ee8243e5-380e-48ea-b474-cfdbf75e2db8",
+										"id": "b1a5855b-52de-4d34-b66d-7a519c89e01f",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1168,13 +1171,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/whitelist-123",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/whitelist-123",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -1190,7 +1191,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "f4d3a388-5efc-4679-b3a4-803989b67ce3",
+								"id": "eaca56a3-7d15-4cd2-b4eb-0e62d1d1899a",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1200,7 +1201,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "91d2bbbb-3472-4b86-87f8-a6392d81d45f",
+								"id": "cfc1f861-cfc2-4bee-ac29-31ea27bfd0cd",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1220,7 +1221,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d8a108eb-422a-4827-a28d-5943d8bb5495",
+										"id": "eb66bc20-d586-4c72-9e89-d34ede39b862",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1245,13 +1246,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/mock",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/mock",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -1268,7 +1267,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "782fdf3c-ff5b-478f-9a52-1c234efb2179",
+										"id": "f0c3c0b8-674f-4f00-8864-910b3e9e2e90",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1298,13 +1297,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/mock",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/mock",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -1321,7 +1318,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "013ad91b-40d4-4b35-94df-1267adfff360",
+										"id": "618d41cb-5cb8-4c11-8875-83a025872aab",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1346,13 +1343,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/plugin-demo-api/anything/mock",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/mock",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -1376,7 +1371,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fcaed98e-bed7-44db-9958-09520bd3cd91",
+										"id": "45a36bd1-703b-43b4-a501-60dc9ec8a756",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1398,13 +1393,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
+									"raw": "http://{{tyk-gateway.host}}/basic-protected-api/get",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"basic-protected-api",
 										"get"
@@ -1420,7 +1413,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "58d95f9b-297b-49ae-abbf-48638aad40e2",
+										"id": "68115319-ca17-4486-86eb-b61d106ad7e7",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1439,13 +1432,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/basic-open-api/get",
+									"raw": "http://{{tyk-gateway.host}}/basic-open-api/get",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"basic-open-api",
 										"get"
@@ -1461,14 +1452,16 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "e423cd78-32ba-419a-9f65-25fa264757f7",
+										"id": "4527b06e-3ea8-406c-a172-0d347e91f01c",
 										"exec": [
+											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"",
 											"pm.test(\"Status code is 200 for tyk-gateway-2\", function () {",
 											"    pm.response.to.have.status(200);",
 											"});",
 											"",
 											"var segmentationTestRequest = {",
-											"    url: 'http://tyk-gateway.localhost:8080/basic-open-api/get',",
+											"    url: 'http://' + tykGatewayHost + '/basic-open-api/get',",
 											"    method: 'GET'",
 											"};",
 											"",
@@ -1486,13 +1479,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://tyk-gateway-2.localhost:8081/basic-open-api/get",
+									"raw": "https://{{tyk-gateway-2.host}}/basic-open-api/get",
 									"protocol": "https",
 									"host": [
-										"tyk-gateway-2",
-										"localhost"
+										"{{tyk-gateway-2.host}}"
 									],
-									"port": "8081",
 									"path": [
 										"basic-open-api",
 										"get"
@@ -1508,14 +1499,16 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "68e2f706-b88a-489a-82d8-fb5327f52353",
+										"id": "ee7fba37-e923-4103-8f5f-3909e0e7e5d2",
 										"exec": [
+											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"",
 											"pm.test(\"Status code is 404 for tyk-gateway-2\", function () {",
 											"    pm.response.to.have.status(404);",
 											"});",
 											"",
 											"var segmentationTestRequest = {",
-											"    url: 'http://tyk-gateway.localhost:8080/basic-protected-api/get',",
+											"    url: 'http://' + tykGatewayHost + '/basic-protected-api/get',",
 											"    method: 'GET',",
 											"    header: 'Authorization: auth_key'",
 											"};",
@@ -1540,13 +1533,11 @@
 									}
 								],
 								"url": {
-									"raw": "https://tyk-gateway-2.localhost:8081/basic-protected-api/get",
+									"raw": "https://{{tyk-gateway-2.host}}/basic-protected-api/get",
 									"protocol": "https",
 									"host": [
-										"tyk-gateway-2",
-										"localhost"
+										"{{tyk-gateway-2.host}}"
 									],
-									"port": "8081",
 									"path": [
 										"basic-protected-api",
 										"get"
@@ -1575,7 +1566,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "8631ed79-e2c7-4cf8-9871-17c7f0373081",
+														"id": "7ae4bfeb-a93e-4891-a1cd-e7bd91edb1d8",
 														"exec": [
 															"pm.test(\"Status code is 401\", function () {",
 															"    pm.response.to.have.status(401);",
@@ -1600,13 +1591,11 @@
 													}
 												],
 												"url": {
-													"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
+													"raw": "http://{{tyk-gateway.host}}/basic-protected-api/get",
 													"protocol": "http",
 													"host": [
-														"tyk-gateway",
-														"localhost"
+														"{{tyk-gateway.host}}"
 													],
-													"port": "8080",
 													"path": [
 														"basic-protected-api",
 														"get"
@@ -1622,7 +1611,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "758770fd-db29-4916-866f-535f45b7dc90",
+														"id": "1b9af711-7448-4fcb-a914-a999a0a66246",
 														"exec": [
 															"pm.test(\"Status code is 403\", function () {",
 															"    pm.response.to.have.status(403);",
@@ -1647,13 +1636,11 @@
 													}
 												],
 												"url": {
-													"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
+													"raw": "http://{{tyk-gateway.host}}/basic-protected-api/get",
 													"protocol": "http",
 													"host": [
-														"tyk-gateway",
-														"localhost"
+														"{{tyk-gateway.host}}"
 													],
-													"port": "8080",
 													"path": [
 														"basic-protected-api",
 														"get"
@@ -1669,7 +1656,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "731accdb-98b1-4f9c-891b-46eb6232be0e",
+														"id": "8fdf4416-962c-47ad-911b-887ad956bd94",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1694,13 +1681,11 @@
 													}
 												],
 												"url": {
-													"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
+													"raw": "http://{{tyk-gateway.host}}/basic-protected-api/get",
 													"protocol": "http",
 													"host": [
-														"tyk-gateway",
-														"localhost"
+														"{{tyk-gateway.host}}"
 													],
-													"port": "8080",
 													"path": [
 														"basic-protected-api",
 														"get"
@@ -1715,7 +1700,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "89ab5165-28fb-4581-b45b-3884cf635457",
+												"id": "19183815-bc8b-4e2e-874d-0c963c36b9bc",
 												"type": "text/javascript",
 												"exec": [
 													""
@@ -1725,7 +1710,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "9b804664-f0bb-4342-a9e5-85443efb8274",
+												"id": "77d1ed9d-6e48-434c-ae9a-b20f480a7f0c",
 												"type": "text/javascript",
 												"exec": [
 													""
@@ -1745,7 +1730,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "b3fea561-a5b4-44d8-8a57-e2fe1ebe34db",
+														"id": "ccf9e750-a7bf-497c-adb6-9004370afa4d",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1765,13 +1750,11 @@
 													}
 												],
 												"url": {
-													"raw": "http://tyk-gateway.localhost:8080/jwt-api/get",
+													"raw": "http://{{tyk-gateway.host}}/jwt-api/get",
 													"protocol": "http",
 													"host": [
-														"tyk-gateway",
-														"localhost"
+														"{{tyk-gateway.host}}"
 													],
-													"port": "8080",
 													"path": [
 														"jwt-api",
 														"get"
@@ -1787,7 +1770,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "77e260ff-9a77-4cfe-bfa4-590bc8c6f66b",
+														"id": "830ee829-8f00-4cd0-821d-288f44fc2821",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1807,13 +1790,11 @@
 													}
 												],
 												"url": {
-													"raw": "http://tyk-gateway.localhost:8080/jwt-api/anything/allowed-path",
+													"raw": "http://{{tyk-gateway.host}}/jwt-api/anything/allowed-path",
 													"protocol": "http",
 													"host": [
-														"tyk-gateway",
-														"localhost"
+														"{{tyk-gateway.host}}"
 													],
-													"port": "8080",
 													"path": [
 														"jwt-api",
 														"anything",
@@ -1830,7 +1811,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "05b76dec-0f7f-46fc-b08b-74951b4f71e9",
+														"id": "30c15dc9-7efc-49f7-8fc5-624c996c0f47",
 														"exec": [
 															"pm.test(\"Status code is 403\", function () {",
 															"    pm.response.to.have.status(403);",
@@ -1855,13 +1836,11 @@
 													}
 												],
 												"url": {
-													"raw": "http://tyk-gateway.localhost:8080/jwt-api/anything/restricted-path",
+													"raw": "http://{{tyk-gateway.host}}/jwt-api/anything/restricted-path",
 													"protocol": "http",
 													"host": [
-														"tyk-gateway",
-														"localhost"
+														"{{tyk-gateway.host}}"
 													],
-													"port": "8080",
 													"path": [
 														"jwt-api",
 														"anything",
@@ -1885,7 +1864,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "3dac6829-db58-412c-aa48-4ef7cc5aa267",
+														"id": "9d303ce5-26a3-4cf7-9ed6-30d8dc80de1a",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1905,13 +1884,11 @@
 													}
 												],
 												"url": {
-													"raw": "http://tyk-gateway.localhost:8080/basic-authentication-api/get",
+													"raw": "http://{{tyk-gateway.host}}/basic-authentication-api/get",
 													"protocol": "http",
 													"host": [
-														"tyk-gateway",
-														"localhost"
+														"{{tyk-gateway.host}}"
 													],
-													"port": "8080",
 													"path": [
 														"basic-authentication-api",
 														"get"
@@ -1935,8 +1912,10 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "3013aa34-35c8-4d06-8a9a-4d89d5f7e34b",
+										"id": "9cd7dc61-dafd-4286-a95e-9458e324d9a3",
 										"exec": [
+											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"",
 											"// make a random id to use as our key id",
 											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 											"",
@@ -1944,7 +1923,7 @@
 											"// key uses the random id, so it doesn't interfere with any other keys",
 											"// key has a rate limit of 2 requests every 10 seconds",
 											"var rateLimitTestKeyCreateRequest = {",
-											"  url: 'http://tyk-gateway.localhost:8080/tyk/keys/' + keyId,",
+											"  url: 'http://' + tykGatewayHost + '/tyk/keys/' + keyId,",
 											"  method: 'POST',",
 											"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
 											"  body: {",
@@ -1956,12 +1935,12 @@
 											"// create the test key",
 											"pm.sendRequest(rateLimitTestKeyCreateRequest, function (err, response) { ",
 											"    ",
-											"    // test key is create, so we can start using it in tests",
+											"    // test key is now created, so we can start using it in tests",
 											"    pm.test(\"Status code is 429\", function () {",
 											"",
 											"        // rate limit request object, using test key",
 											"        var rateLimitRequest = {",
-											"            url: 'http://tyk-gateway.localhost:8080/basic-protected-api/get',",
+											"            url: 'http://' + tykGatewayHost + '/basic-protected-api/get',",
 											"            method: 'GET',",
 											"            header: 'Authorization:' + keyId",
 											"        };",
@@ -1980,7 +1959,7 @@
 											"                    ",
 											"                    // tidy up - delete test key",
 											"                    var rateLimitTestKeyDeleteRequest = {",
-											"                        url: 'http://tyk-gateway.localhost:8080/tyk/keys/' + keyId,",
+											"                        url: 'http://' + tykGatewayHost + '/tyk/keys/' + keyId,",
 											"                        method: 'DELETE',",
 											"                        header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
 											"                    };",
@@ -2007,13 +1986,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
+									"raw": "http://{{tyk-gateway.host}}/basic-protected-api/get",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"basic-protected-api",
 										"get"
@@ -2029,12 +2006,14 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "affbe98e-6f35-4030-b19c-4237f4b41ac7",
+										"id": "dd26cb59-d1d9-460f-a273-089434871b29",
 										"exec": [
+											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"",
 											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 											"",
 											"var throttlingTestKeyCreateRequest = {",
-											"  url: 'http://tyk-gateway.localhost:8080/tyk/keys/' + keyId,",
+											"  url: 'http://' + tykGatewayHost + '/tyk/keys/' + keyId,",
 											"  method: 'POST',",
 											"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
 											"  body: {",
@@ -2046,7 +2025,7 @@
 											"pm.sendRequest(throttlingTestKeyCreateRequest, function (err, response) { ",
 											"    pm.test(\"Status code is 200\", function () {",
 											"        var throttleRequest = {",
-											"            url: 'http://tyk-gateway.localhost:8080/basic-protected-api/get',",
+											"            url: 'http://' + tykGatewayHost + '/basic-protected-api/get',",
 											"            method: 'GET',",
 											"            header: 'Authorization:' + keyId",
 											"        };",
@@ -2061,7 +2040,7 @@
 											"                    pm.expect(response.code).to.eql(200);",
 											"                    ",
 											"                    var throttlingTestKeyDeleteRequest = {",
-											"                            url: 'http://tyk-gateway.localhost:8080/tyk/keys/' + keyId,",
+											"                            url: 'http://' + tykGatewayHost + '/tyk/keys/' + keyId,",
 											"                            method: 'DELETE',",
 											"                            header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
 											"                        };",
@@ -2087,13 +2066,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
+									"raw": "http://{{tyk-gateway.host}}/basic-protected-api/get",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"basic-protected-api",
 										"get"
@@ -2109,12 +2086,14 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "03037e39-06d0-4dfc-87f1-7d9cb6d83485",
+										"id": "52ea6b6a-1022-4baa-a753-a99706894858",
 										"exec": [
+											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"",
 											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 											"",
 											"var quotaTestKeyCreateRequest = {",
-											"    url: 'http://tyk-gateway.localhost:8080/tyk/keys/' + keyId,",
+											"    url: 'http://' + tykGatewayHost + '/tyk/keys/' + keyId,",
 											"    method: 'POST',",
 											"    header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
 											"    body: {",
@@ -2126,7 +2105,7 @@
 											"pm.sendRequest(quotaTestKeyCreateRequest, function (err, response) { ",
 											"    pm.test(\"Status code is 403\", function () {",
 											"        var quotaRequest = {",
-											"            url: 'http://tyk-gateway.localhost:8080/basic-protected-api/get',",
+											"            url: 'http://' + tykGatewayHost + '/basic-protected-api/get',",
 											"            method: 'GET',",
 											"            header: 'Authorization:' + keyId",
 											"        };",
@@ -2143,7 +2122,7 @@
 											"                    pm.expect(response.code).to.eql(403);",
 											"                    ",
 											"                    var quotaTestKeyDeleteRequest = {",
-											"                        url: 'http://tyk-gateway.localhost:8080/tyk/keys/' + keyId,",
+											"                        url: 'http://' + tykGatewayHost + '/tyk/keys/' + keyId,",
 											"                        method: 'DELETE',",
 											"                        header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
 											"                    };",
@@ -2169,13 +2148,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
+									"raw": "http://{{tyk-gateway.host}}/basic-protected-api/get",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"basic-protected-api",
 										"get"
@@ -2191,8 +2168,10 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "62eecaee-babf-41a8-8ddb-dbe92ae6b40d",
+										"id": "616d11d9-4fd0-42d2-984b-e314995718f5",
 										"exec": [
+											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"",
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
 											"});",
@@ -2201,7 +2180,7 @@
 											"    var response1Host;",
 											"    var response2Host;",
 											"    var loadBalancedRequest = {",
-											"        url: 'http://tyk-gateway.localhost:8080/load-balanced-api/get',",
+											"        url: 'http://' + tykGatewayHost + '/load-balanced-api/get',",
 											"        method: 'GET'",
 											"    };",
 											"    ",
@@ -2227,13 +2206,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/load-balanced-api/get",
+									"raw": "http://{{tyk-gateway.host}}/load-balanced-api/get",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"load-balanced-api",
 										"get"
@@ -2249,10 +2226,12 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "bb44658c-4bcb-4182-aa1f-2e1ddf83586a",
+										"id": "937d9607-3ad6-4ecd-8ea7-44f8e67fbed4",
 										"exec": [
+											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"",
 											"var uptimeTestAPIRequest = {",
-											"  url: 'http://tyk-gateway.localhost:8080/uptime-test-api/get',",
+											"  url: 'http://' + tykGatewayHost + '/uptime-test-api/get',",
 											"  method: 'GET'",
 											"};",
 											"",
@@ -2279,13 +2258,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/uptime-test-api/get",
+									"raw": "http://{{tyk-gateway.host}}/uptime-test-api/get",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"uptime-test-api",
 										"get"
@@ -2301,7 +2278,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6348830c-b0b7-43f1-8129-5cda89a2e1d4",
+										"id": "aeda5234-d0b8-48ef-a312-d34d76b2d6ad",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2315,18 +2292,171 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-custom-domain.localhost:8080/get",
+									"raw": "http://{{tyk-custom-domain.host}}/get",
 									"protocol": "http",
 									"host": [
-										"tyk-custom-domain",
-										"localhost"
+										"{{tyk-custom-domain.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"get"
 									]
 								},
 								"description": "This request is uses a custom hostname to demonstrate the **Custom Domain** functionality. This enables API Defintions to be mapped against the hostname and the path of the request. In this instance, there is an API Definition which is configured to use Custom Domain `custom-domain.localhost` and path `/`. This allows the path for the upstream API to be the only element in the request path i.e. `/get`, since the Gateway no longer has to rely on the path as the only means to identify the API being requested."
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "GraphQL",
+					"item": [
+						{
+							"name": "GraphQL - Proxy to external GraphQL API (part 1)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "fe722795-003c-42a6-ba66-2128221c64e5",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Country data returned\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.country.code).to.eql(\"GB\");",
+											"    pm.expect(jsonData.data.country.name).to.eql(\"United Kingdom\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\n  country(code: \"GB\") {\n    code\n    name\n  }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/graphql-countries/",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"graphql-countries",
+										""
+									]
+								},
+								"description": "This request demonstrates the Gateways ability to proxy GraphQL requests to a target GraphQL API. It calls the **GraphQL Countries** API, which is configured to proxy requests to an external GraphQL API https://countries.trevorblades.com/.\n\nThe body of the request is a GraphQL query, which requests a **country** object which has a **code** equal to **GB**, returning the fields **code** and **name**. The API Definition is set up to only allow these fields, even though the target API contains many additional fields.\n\nThe **Country** data returned in the response matches the code **GB**."
+							},
+							"response": []
+						},
+						{
+							"name": "GraphQL - Proxy to external GraphQL API (part 2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ce77a547-c1bc-4eeb-a94c-cfe86ba0de44",
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Contextual error message: Currency field not defined\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.errors[0].message).to.eql(\"field: currency not defined on type: Country\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\n  country(code: \"GB\") {\n    code\n    name\n    currency\n  }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/graphql-countries/",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"graphql-countries",
+										""
+									]
+								},
+								"description": "Part 2 of the GraphQL requests makes a request for a field which does not exist in the *Schema* defined on the API Definition.\n\nThe **currency** field does not exist in the schema, and as such the request is rejected by the Gateway, returning an HTTP 400 response. The target API does actually have this field, but since the API Gateway does not list it in the schema it cannot be requested.\n\nThe response contains a contextual error message which identifies that the **currency** field is not defined for the type **Country**. This allows the API Client is understand why the request was rejected."
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Universal Data Graph",
+					"item": [
+						{
+							"name": "Unversal Data Graph - Composed API",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3596de11-8b4b-4b79-b40d-cda770a66034",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Combined data is returned\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.country.code).to.eql(\"GB\");",
+											"    pm.expect(jsonData.data.country.name).to.eql(\"United Kingdom\");",
+											"    pm.expect(jsonData.data.country.pop).to.eql(65110000);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\n  country(code: \"GB\") {\n    code\n    name\n    pop\n  }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/universal-data-graph-composed/",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"universal-data-graph-composed",
+										""
+									]
+								},
+								"description": "This request is for a composed GraphQL API. This means that the Gateway takes the request and generates the response by calling multiple upstream APIs and combining the responses together.\n\nThe **Universal Data Graph** can target APIs already defined in Tyk and also external APIs. The API Definition for the API called in this example uses **DataSources** to target two APIs. One is another GraphQL API, **GraphQL Countries**, which already exists as an API Definition. The other is a REST API which is not defined as an API Definition, and is defined as a URL which the Universal Data Graph will make a request to.\n\nAll the data is combined in to a single response. The schema in the API Definition defines how this is achieved:\n\n- The Universal Data Graph takes the query contained in the body of the request and provides the **code** property as an **argument** to the GraphQL Countries API. It also uses the code as an argument in the request to the REST API, placing the value in the URL called by the Universal Data Graph.\n- The data returned by the REST API is mapped on the API's schema by using a **field mapping**. This maps the field **population** in the REST API response to the **pop** property in the API's schema. Field mapping enables fields to be renamed to fit with the desired schema."
 							},
 							"response": []
 						}
@@ -2349,7 +2479,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9a9eb135-e743-468c-ac60-13225d30b7d0",
+										"id": "4dd49f13-da83-4b92-8c79-f5d28a6b3a84",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2388,13 +2518,11 @@
 									}
 								},
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/tyk/keys/my-custom-key",
+									"raw": "http://{{tyk-gateway.host}}/tyk/keys/my-custom-key",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"tyk",
 										"keys",
@@ -2411,7 +2539,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f93e276b-e950-40f2-bcaf-70ca43124815",
+										"id": "2bdc0614-7233-4804-9b32-36a2e2cdf64e",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2436,13 +2564,11 @@
 									}
 								],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/basic-protected-api/get",
+									"raw": "http://{{tyk-gateway.host}}/basic-protected-api/get",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"basic-protected-api",
 										"get"
@@ -2461,17 +2587,29 @@
 					"item": [
 						{
 							"name": "Send request to additional Gateway",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "14f5cad6-64df-40ce-8968-16f0ea17544d",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://tyk-gateway.localhost:8081/plugin-demo-api/anything/mock",
+									"raw": "https://{{tyk-gateway-2.host}}/plugin-demo-api/anything/mock",
 									"protocol": "https",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway-2.host}}"
 									],
-									"port": "8081",
 									"path": [
 										"plugin-demo-api",
 										"anything",
@@ -2497,17 +2635,29 @@
 					"item": [
 						{
 							"name": "TLS request to Gateway",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "cb93bb12-7489-449f-8152-d26e90c0c609",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://tyk-gateway.localhost:8081/basic-open-api/get",
+									"raw": "https://{{tyk-gateway-2.host}}/basic-open-api/get",
 									"protocol": "https",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway-2.host}}"
 									],
-									"port": "8081",
 									"path": [
 										"basic-open-api",
 										"get"
@@ -2533,7 +2683,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a99fef6c-8866-4a0a-a939-6a32da6cfa04",
+								"id": "e416d39d-6b03-4d4f-94c4-448eb8d8f1e4",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2553,13 +2703,11 @@
 							}
 						],
 						"url": {
-							"raw": "http://tyk-dashboard.localhost:3000/admin/organisations",
+							"raw": "http://{{tyk-dashboard.host}}/admin/organisations",
 							"protocol": "http",
 							"host": [
-								"tyk-dashboard",
-								"localhost"
+								"{{tyk-dashboard.host}}"
 							],
-							"port": "3000",
 							"path": [
 								"admin",
 								"organisations"
@@ -2581,7 +2729,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "0957ce41-308e-4cb8-afd6-9bb69699fa00",
+								"id": "73ad5bf2-233c-4e7a-9b77-735aa6926b71",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2624,13 +2772,11 @@
 							}
 						},
 						"url": {
-							"raw": "http://tyk-gateway.localhost:8080/basic-open-api/tyk/batch/",
+							"raw": "http://{{tyk-gateway.host}}/basic-open-api/tyk/batch/",
 							"protocol": "http",
 							"host": [
-								"tyk-gateway",
-								"localhost"
+								"{{tyk-gateway.host}}"
 							],
-							"port": "8080",
 							"path": [
 								"basic-open-api",
 								"tyk",
@@ -2651,7 +2797,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "b60a79e2-c837-4191-82f5-2f58f0e8c1a8",
+						"id": "10d0c84c-ce55-4e48-960e-a54d235277da",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -2665,13 +2811,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://tyk-gateway.localhost:8080/basic-open-api/get",
+					"raw": "http://{{tyk-gateway.host}}/basic-open-api/get",
 					"protocol": "http",
 					"host": [
-						"tyk-gateway",
-						"localhost"
+						"{{tyk-gateway.host}}"
 					],
-					"port": "8080",
 					"path": [
 						"basic-open-api",
 						"get"
@@ -2680,6 +2824,50 @@
 				"description": "This is a basic test request to check that the Gateway is working ok.\n\nA `200 OK` status code and JSON response should be received in the response."
 			},
 			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "6de3e26c-174c-4cb7-b7de-e6779d2cf7a0",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "7646dbaf-f457-4933-a53b-4cadad161df3",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "9c5e7e7c-e6c0-42ec-8108-d6268ad97d21",
+			"key": "tyk-gateway.host",
+			"value": "tyk-gateway.localhost:8080"
+		},
+		{
+			"id": "726162a4-41ed-49dc-9534-539cbd914acb",
+			"key": "tyk-gateway-2.host",
+			"value": "tyk-gateway-2.localhost:8081"
+		},
+		{
+			"id": "0e184762-18d9-453f-9535-8da77ec72729",
+			"key": "tyk-custom-domain.host",
+			"value": "tyk-custom-domain.localhost:8080"
+		},
+		{
+			"id": "90c3e986-3562-4a45-9187-edf05554f7d9",
+			"key": "tyk-dashboard.host",
+			"value": "tyk-dashboard.localhost:3000"
 		}
 	],
 	"protocolProfileBehavior": {}

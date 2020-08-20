@@ -31,7 +31,7 @@ services:
       - tyk-mdcb
       - tyk-dashboard
   tyk-worker-redis:
-    image: redis
+    image: redis:6.0.4
     volumes:
       - tyk-worker-redis-data:/data
     networks:
