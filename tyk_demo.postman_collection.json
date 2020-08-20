@@ -2850,22 +2850,22 @@
 	],
 	"variable": [
 		{
-			"id": "c2edf0b2-b255-475c-995c-b8777bd2df28",
+			"id": "9c5e7e7c-e6c0-42ec-8108-d6268ad97d21",
 			"key": "tyk-gateway.host",
 			"value": "tyk-gateway.localhost:8080"
 		},
 		{
-			"id": "b4fbba24-1c77-4ef5-ab54-6887b8e05ec1",
+			"id": "726162a4-41ed-49dc-9534-539cbd914acb",
 			"key": "tyk-gateway-2.host",
-			"value": "tyk-gateway-2.localhost:8080"
+			"value": "tyk-gateway-2.localhost:8081"
 		},
 		{
-			"id": "466a3a9e-5629-4569-957d-6f47e4aa122a",
+			"id": "0e184762-18d9-453f-9535-8da77ec72729",
 			"key": "tyk-custom-domain.host",
 			"value": "tyk-custom-domain.localhost:8080"
 		},
 		{
-			"id": "9def5301-6063-43f2-b9e4-1b605c89a541",
+			"id": "90c3e986-3562-4a45-9187-edf05554f7d9",
 			"key": "tyk-dashboard.host",
 			"value": "tyk-dashboard.localhost:3000"
 		}
