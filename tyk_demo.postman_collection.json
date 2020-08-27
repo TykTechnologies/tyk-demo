@@ -202,7 +202,7 @@
 									"script": {
 										"id": "a2dc88a3-a450-4aeb-a25d-f967342ce8cf",
 										"exec": [
-											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
 											"var circuitBreakerRequest = {",
 											"    url: 'http://' + tykGatewayHost + '/plugin-demo-api/status/500',",
@@ -626,7 +626,7 @@
 									"script": {
 										"id": "0ad99490-a450-4916-b626-c6a9c13cdb01",
 										"exec": [
-											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
 											"var cacheRequest = {",
 											"    url: 'http://' + tykGatewayHost + '/plugin-demo-api/uuid',",
@@ -1454,7 +1454,7 @@
 									"script": {
 										"id": "4527b06e-3ea8-406c-a172-0d347e91f01c",
 										"exec": [
-											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
 											"pm.test(\"Status code is 200 for tyk-gateway-2\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1501,7 +1501,7 @@
 									"script": {
 										"id": "ee7fba37-e923-4103-8f5f-3909e0e7e5d2",
 										"exec": [
-											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
 											"pm.test(\"Status code is 404 for tyk-gateway-2\", function () {",
 											"    pm.response.to.have.status(404);",
@@ -1914,7 +1914,7 @@
 									"script": {
 										"id": "9cd7dc61-dafd-4286-a95e-9458e324d9a3",
 										"exec": [
-											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
 											"// make a random id to use as our key id",
 											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
@@ -2008,7 +2008,7 @@
 									"script": {
 										"id": "dd26cb59-d1d9-460f-a273-089434871b29",
 										"exec": [
-											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
 											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 											"",
@@ -2088,7 +2088,7 @@
 									"script": {
 										"id": "52ea6b6a-1022-4baa-a753-a99706894858",
 										"exec": [
-											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
 											"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
 											"",
@@ -2170,7 +2170,7 @@
 									"script": {
 										"id": "616d11d9-4fd0-42d2-984b-e314995718f5",
 										"exec": [
-											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2228,7 +2228,7 @@
 									"script": {
 										"id": "937d9607-3ad6-4ecd-8ea7-44f8e67fbed4",
 										"exec": [
-											"var tykGatewayHost = pm.environment.get(\"tyk-gateway.host\");",
+											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
 											"var uptimeTestAPIRequest = {",
 											"  url: 'http://' + tykGatewayHost + '/uptime-test-api/get',",
@@ -2850,22 +2850,22 @@
 	],
 	"variable": [
 		{
-			"id": "9c5e7e7c-e6c0-42ec-8108-d6268ad97d21",
+			"id": "d21d7f3c-00c6-4c35-8691-b368eebb75ea",
 			"key": "tyk-gateway.host",
 			"value": "tyk-gateway.localhost:8080"
 		},
 		{
-			"id": "726162a4-41ed-49dc-9534-539cbd914acb",
+			"id": "3787d72d-7625-4f73-a722-cdcd4ceef826",
 			"key": "tyk-gateway-2.host",
 			"value": "tyk-gateway-2.localhost:8081"
 		},
 		{
-			"id": "0e184762-18d9-453f-9535-8da77ec72729",
+			"id": "b48f2c34-d7a4-410f-b8c4-1cbfb63eed8e",
 			"key": "tyk-custom-domain.host",
 			"value": "tyk-custom-domain.localhost:8080"
 		},
 		{
-			"id": "90c3e986-3562-4a45-9187-edf05554f7d9",
+			"id": "d4413095-935c-4089-b8e1-a1435dbedc99",
 			"key": "tyk-dashboard.host",
 			"value": "tyk-dashboard.localhost:3000"
 		}
