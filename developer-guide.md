@@ -141,7 +141,7 @@ There are two scenarios for working with this data:
 
 ## Scenario 1: Committing changes
 
-Before you commit anything to the repo, please check that all tests are working correctly. Run the `./scripts/test.sh`, if any tests fail then please resolve the issue before committing.
+Before you commit anything to the repo, you must check that **all tests are working correctly**. Run the `./scripts/test.sh`, if any tests fail then please resolve the issue before committing.
 
 If you have changed APIs and Policies in your Dashboard, and want to commit these so other people can use them, use the export script.
 
