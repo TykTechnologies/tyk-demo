@@ -326,12 +326,12 @@ echo -e "\033[2K
                Username : $dashboard_user_email
                Password : $dashboard_user_password
         API Credentials : $dashboard_user_api_credentials
-    ▾ Acme Organisation
+    ▾ $organisation_2_name Organisation
                Username : $dashboard_user_organisation_2_email
                Password : $dashboard_user_organisation_2_password
         API Credentials : $dashboard_user_organisation_2_api_credentials
   ▽ Portal
-    ▾ $organisation_2_name Organisation
+    ▾ $organisation_name Organisation
                     URL : $portal_base_url$portal_root_path
                Username : $portal_user_email
                Password : $portal_user_password  
