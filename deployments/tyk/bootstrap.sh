@@ -299,18 +299,17 @@ log_message "  Basic auth key:$result"
 bootstrap_progress
 
 log_message "Reloading Gateway group to ensure latest configuration is loaded"
-sleep 2
-result=$(curl $gateway_base_url/tyk/reload/group -s \
+sleep 5 # waiting 5 seconds makes the following reload command more reliable
+result=$(curl $gateway_base_url/tyk/reload/group?block=true -s \
   -H "x-tyk-authorization: $gateway_api_credentials" | jq -r '.status')
 log_message "  $result"
 
 log_message "Checking Gateway functionality"
-sleep 2
 wait_for_response "$gateway_base_url/basic-open-api/get" "200"
 
 log_message "Checking Gateway 2 functionality"
-gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
 wait_for_response "$gateway2_base_url/basic-open-api/get" "200"
+gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
 
 log_end_deployment
 
