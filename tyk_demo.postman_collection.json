@@ -2623,6 +2623,61 @@
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Health Check",
+					"item": [
+						{
+							"name": "Gateway Health Check",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c4ca499e-b617-4ade-b3a2-058bc9a482fe",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Gateway status is pass\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.status).to.eql(\"pass\");",
+											"});",
+											"",
+											"pm.test(\"Dashboard status is pass\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.details[\"dashboard\"].status).to.eql(\"pass\");",
+											"});",
+											"",
+											"pm.test(\"Redis status is pass\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.details[\"redis\"].status).to.eql(\"pass\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/hello",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"hello"
+									]
+								},
+								"description": "This request calls the Gateway's health check endpoint. The default endpoint for this is `/hello`, but this can be altered by setting the `health_check_endpoint_name` value in the Gateway's configuration file `tyk.conf`.\n\nThe health check endpoint can be used by network components, such as load balancers, to avoid sending traffic to unhealthy instances.\n\nThe endpoint implements the [Heath Check Response Format](https://tools.ietf.org/id/draft-inadarei-api-health-check-01.html) defined by the IETF. This provides information about both the Gateway's health and the health of the Gateway's dependencies. The dependencies are Redis and, depending on configuration, the Tyk Dashboard or Multi Data Centre Bridge.\n\nThe `status` property returned in the response body can have the following values:\n- `pass`: healthy\n- `fail`: unhealthy\n- `warn`: healthy, with some concerns\n\nIn this scenario, the `status` returned in the body should be `pass`, as the Gateway and it's dependancies, `dashboard` and `redis`, should not be experiencing any problems."
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
