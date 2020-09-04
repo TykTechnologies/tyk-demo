@@ -2678,6 +2678,51 @@
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Multi-tenancy",
+					"item": [
+						{
+							"name": "Basic Test Request for Acme Organisation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2f85f29d-239b-434e-b44a-2e1d7231e549",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Acme organisation header is present\", function () {",
+											"    pm.expect(pm.response.headers.get('Organisation')).to.eql('Acme');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/httpbin-acme/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"httpbin-acme",
+										"get"
+									]
+								},
+								"description": "This request makes a request for a basic API set up in the Acme Organisation. This is to demonstrate that Tyk can handle multiple tenants in a single deployment. The response contains a custom header `Organisation: Acme` which is injected by the Gateway for the API definition managed by the Acme Organisation.\n\nWhen a tenant logs into the Dashboard, they can only access and manage data within their own Organisation.\n\nAPIs from mulitple Organisations can be deployed to the same set of Gateways. Alternatively, API tagging or MDCB deployments can be used to segregate APIs onto separate Gateways."
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -2899,6 +2944,39 @@
 							]
 						},
 						"description": "This request calls the special `/tyk/batch` endpoint, which enables the Gateway to make multiple API requests baesd on a single API request received from the client. The special batch endpoint path is added to the listen path for the API, and must end with a trailing slash.\n\nWhen calling the batch endpoint, the API client must specify the requests that the Gateway will make. In this case, the body defines two requests which go to `/uuid` and `/get`. The request for `/get` also adds a custom header with the key `batch-request`. \n\nThe `suppress_parallel_execution` property defines whether the Gateway will send the requests sequentially or in parallel - in this case the setting is `true`, so the Gateway will send the requests in in sequence, which means the response data will be in the same sequence.\n\nThe response body contains data about the responses the Gateway received for the requests. The `requests` property contains the response data, showing the URL called, HTTP status, headers and body data received.\n\nThe batch request functionality must be enabled on the API definition by setting `enable_batch_request_support` to `true`."
+					},
+					"response": []
+				},
+				{
+					"name": "Hot reload",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-tyk-authorization",
+								"value": "28d220fd77974a4facfb07dc1e49c2aa",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/tyk/reload/group?block=true",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"tyk",
+								"reload",
+								"group"
+							],
+							"query": [
+								{
+									"key": "block",
+									"value": "true"
+								}
+							]
+						},
+						"description": "This request forces the Gateways to reload their API and Policies from the Dashboard. During this process the Gateway can continue serving requests.\n\nThe reload is automatically handled when using the Dashboard to manage APIs and Policies. But this functionality can be useful for CI/CD or when the Gateway is not managed by the Dashboard."
 					},
 					"response": []
 				}
