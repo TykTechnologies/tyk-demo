@@ -15,4 +15,4 @@ log_end_deployment
 echo -e "\033[2K
 ▼ Tracing
   ▽ Zipkin
-               URL : $zipkin_base_url"
+                    URL : $zipkin_base_url"

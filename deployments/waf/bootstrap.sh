@@ -7,4 +7,4 @@ log_end_deployment
 echo -e "\033[2K
 ▼ Web Application Firewall
   ▽ ModSecurity
-               URL : http://localhost:8500"
+                    URL : http://localhost:8500"

@@ -179,10 +179,10 @@ log_end_deployment
 echo -e "\033[2K 
 ▼ CI/CD
   ▽ Jenkins
-               URL : $jenkins_base_url
-          Username : admin
-          Password : $jenkins_admin_password
+                    URL : $jenkins_base_url
+               Username : admin
+               Password : $jenkins_admin_password
   ▽ Gitea
-               URL : $gitea_base_url
-          Username : $gitea_username
-          Password : $gitea_password"
+                    URL : $gitea_base_url
+               Username : $gitea_username
+               Password : $gitea_password"

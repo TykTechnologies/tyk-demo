@@ -13,4 +13,4 @@ log_end_deployment
 echo -e "\033[2K          
 ▼ Instrumentation
   ▽ Graphite
-               URL : http://localhost:8060"
+                    URL : http://localhost:8060"

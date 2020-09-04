@@ -75,7 +75,8 @@ Follow these rules when displaying the deployment output:
 * For each service you want to display:
   * In column 3, put the service name, prefixed with `▽ ` e.g. `  ▽ Service name`
   * For each piece of information you want to display:
-    * Display the information as a colon separated label and value, aligned so that the colon is on column 20 e.g. `       Useful info : $variable_data`
+    * Display the information as a colon separated label and value, aligned so that the colon is on column 25 e.g. `            Useful info : $variable_data`
+  * If you need to embed additional information you can use the small triangle `▾` and `▿` characters
 * Remember to end the last line with a string terminator e.g. `"`
 
 Here is an example:
@@ -84,10 +85,12 @@ Here is an example:
 echo -e "\033[2K
 ▼ Deployment name
   ▽ Service name
-       Useful info : $variable_data
-        Other info : hardcoded data
+            Useful info : $variable_data
+             Other info : hardcoded data
+    ▾ Embedded object
+         With some info : $variable_data_2
   ▽ Another service
-         More data : $another_variable"
+              More data : $another_variable"
 ```
 
 Following these rules will allow the displayed data to be aligned uniformly with other bootstrap output.
