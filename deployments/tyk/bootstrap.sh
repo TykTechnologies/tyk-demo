@@ -43,7 +43,7 @@ echo $organisation_2_name > .context-data/organisation-2-name
 log_message "  $organisation_2_name Org Id = $organisation_2_id"
 bootstrap_progress
 
-log_message "Creating Dashboard user"
+log_message "Creating Dashboard user for organisation $organisation_name"
 dashboard_user_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/dashboard-user.json)
 dashboard_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/dashboard-user.json)
 dashboard_user_api_response=$(curl $dashboard_base_url/admin/users -s \
@@ -62,7 +62,7 @@ echo "$dashboard_user_api_credentials" > .context-data/dashboard-user-api-creden
 log_message "  Dashboard User API Credentials = $dashboard_user_api_credentials"
 bootstrap_progress
 
-log_message "Creating Dashboard user for Organisation 2"
+log_message "Creating Dashboard user for organisation $organisation_2_name"
 dashboard_user_organisation_2_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json)
 dashboard_user_organisation_2_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json)
 dashboard_user_organisation_2_api_response=$(curl $dashboard_base_url/admin/users -s \
@@ -80,6 +80,44 @@ curl $dashboard_base_url/api/users/$dashboard_user_organisation_2_id/actions/res
 echo "$dashboard_user_organisation_2_api_credentials" > .context-data/dashboard-user-organisations-2-api-credentials
 log_message "  Dashboard User API Credentials = $dashboard_user_organisation_2_api_credentials"
 bootstrap_progress
+
+log_message "Creating multi-organisation user"
+# generic info
+dashboard_multi_organisation_user_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/dashboard-user-multi-organisation.json)
+dashboard_multi_organisation_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/dashboard-user-multi-organisation.json)
+# first user
+dashboard_multi_organisation_user_api_response=$(curl $dashboard_base_url/admin/users -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d @deployments/tyk/data/tyk-dashboard/dashboard-user-multi-organisation.json 2>> bootstrap.log \
+  | jq -r '. | {api_key:.Message, id:.Meta.id}')
+dashboard_multi_organisation_user_1_id=$(echo $dashboard_multi_organisation_user_api_response | jq -r '.id')
+dashboard_multi_organisation_user_1_api_credentials=$(echo $dashboard_multi_organisation_user_api_response | jq -r '.api_key')
+curl $dashboard_base_url/api/users/$dashboard_multi_organisation_user_1_id/actions/reset -s -o /dev/null \
+  -H "authorization: $dashboard_multi_organisation_user_1_api_credentials" \
+  --data-raw '{
+      "new_password":"'$dashboard_multi_organisation_user_password'",
+      "user_permissions": { "IsAdmin": "admin" }
+    }' 2>> bootstrap.log
+echo "$dashboard_multi_organisation_user_1_api_credentials" > .context-data/dashboard-multi-organisation-user-api-credentials
+log_message "  Dashboard Multi-Organisation User 1 API Credentials = $dashboard_multi_organisation_user_1_api_credentials"
+bootstrap_progress
+# second user - swapping the organisation id
+dashboard_multi_organisation_user_api_response=$(curl $dashboard_base_url/admin/users -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d "$(cat deployments/tyk/data/tyk-dashboard/dashboard-user-multi-organisation.json | sed 's/'"$organisation_id"'/'"$organisation_2_id"'/')" 2>> bootstrap.log \
+  | jq -r '. | {api_key:.Message, id:.Meta.id}')
+dashboard_multi_organisation_user_2_id=$(echo $dashboard_multi_organisation_user_api_response | jq -r '.id')
+dashboard_multi_organisation_user_2_api_credentials=$(echo $dashboard_multi_organisation_user_api_response | jq -r '.api_key')
+curl $dashboard_base_url/api/users/$dashboard_multi_organisation_user_2_id/actions/reset -s -o /dev/null \
+  -H "authorization: $dashboard_multi_organisation_user_2_api_credentials" \
+  --data-raw '{
+      "new_password":"'$dashboard_multi_organisation_user_password'",
+      "user_permissions": { "IsAdmin": "admin" }
+    }' 2>> bootstrap.log
+echo "$dashboard_multi_organisation_user_2_api_credentials" > .context-data/dashboard-multi-organisation-user-api-credentials
+log_message "  Dashboard Multi-Organisation User 2 API Credentials = $dashboard_multi_organisation_user_2_api_credentials"
+bootstrap_progress
+
 
 log_message "Creating Dashboard user groups"
 result=$(curl $dashboard_base_url/api/usergroups -s \
@@ -341,6 +379,9 @@ echo -e "\033[2K
                Username : $dashboard_user_organisation_2_email
                Password : $dashboard_user_organisation_2_password
         API Credentials : $dashboard_user_organisation_2_api_credentials
+    ▾ Multi-Organisation User
+               Username : $dashboard_multi_organisation_user_email
+               Password : $dashboard_multi_organisation_user_password
   ▽ Portal
     ▾ $organisation_name Organisation
                     URL : $portal_base_url$portal_root_path
