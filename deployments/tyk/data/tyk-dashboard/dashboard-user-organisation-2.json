@@ -1,7 +1,7 @@
 {
-	"first_name": "Admin",
-	"last_name": "User",
-	"email_address": "admin-user-org2@example.org",
+	"first_name": "Acme",
+	"last_name": "Admin",
+	"email_address": "acme-admin@example.org",
 	"org_id": "6e9d9544a1dcd60001d0ed21",
 	"active": true,
 	"password": "3LEsHO1jv1dt9Xgf",

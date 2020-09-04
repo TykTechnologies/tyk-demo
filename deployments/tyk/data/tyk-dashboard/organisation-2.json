@@ -1,9 +1,9 @@
 {
     "id": "6e9d9544a1dcd60001d0ed21",
-    "owner_name": "Organisation 2",
+    "owner_name": "Acme",
     "owner_slug": "",
     "cname_enabled": false,
-    "cname": "tyk-portal-org2.localhost:3000",
+    "cname": "acme-portal.localhost:3000",
     "apis": [],
     "sso_enabled": true,
     "hybrid_enabled": true,

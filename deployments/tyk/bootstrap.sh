@@ -26,8 +26,10 @@ organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d @deployments/tyk/data/tyk-dashboard/organisation.json 2>> bootstrap.log\
   | jq -r '.Meta')
+organisation_name=$(jq -r '.owner_name' deployments/tyk/data/tyk-dashboard/organisation.json)
 echo $organisation_id > .context-data/organisation-id
-log_message "  Org Id = $organisation_id"
+echo $organisation_name > .context-data/organisation-name
+log_message "  $organisation_name Org Id = $organisation_id"
 bootstrap_progress
 
 log_message "Creating Dashboard user"
@@ -259,8 +261,10 @@ organisation_2_id=$(curl $dashboard_base_url/admin/organisations/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d @deployments/tyk/data/tyk-dashboard/organisation-2.json 2>> bootstrap.log\
   | jq -r '.Meta')
+organisation_2_name=$(jq -r '.owner_name' deployments/tyk/data/tyk-dashboard/organisation-2.json)
 echo $organisation_2_id > .context-data/organisation-2-id
-log_message "  Org 2 Id = $organisation_2_id"
+echo $organisation_2_name > .context-data/organisation-2-name
+log_message "  $organisation_2_name Org Id = $organisation_2_id"
 bootstrap_progress
 
 log_message "Creating Dashboard user for Organisation 2"
@@ -318,16 +322,16 @@ echo -e "\033[2K
 ▼ Tyk
   ▽ Dashboard
                     URL : $dashboard_base_url
-    ▾ Organisation 1
+    ▾ $organisation_name Organisation
                Username : $dashboard_user_email
                Password : $dashboard_user_password
         API Credentials : $dashboard_user_api_credentials
-    ▾ Organisation 2
+    ▾ Acme Organisation
                Username : $dashboard_user_organisation_2_email
                Password : $dashboard_user_organisation_2_password
         API Credentials : $dashboard_user_organisation_2_api_credentials
   ▽ Portal
-    ▾ Organisation 1
+    ▾ $organisation_2_name Organisation
                     URL : $portal_base_url$portal_root_path
                Username : $portal_user_email
                Password : $portal_user_password  
