@@ -254,6 +254,34 @@ result=$(curl $dashboard_base_url/api/apis/keys/basic/basic-auth-username -s -w 
 log_message "  Basic auth key:$result"
 bootstrap_progress
 
+log_message "Importing organisation 2"
+organisation_2_id=$(curl $dashboard_base_url/admin/organisations/import -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d @deployments/tyk/data/tyk-dashboard/organisation-2.json 2>> bootstrap.log\
+  | jq -r '.Meta')
+echo $organisation_2_id > .context-data/organisation-2-id
+log_message "  Org 2 Id = $organisation_2_id"
+bootstrap_progress
+
+log_message "Creating Dashboard user for Organisation 2"
+dashboard_user_organisation_2_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json)
+dashboard_user_organisation_2_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json)
+dashboard_user_organisation_2_api_response=$(curl $dashboard_base_url/admin/users -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d @deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json 2>> bootstrap.log \
+  | jq -r '. | {api_key:.Message, id:.Meta.id}')
+dashboard_user_organisation_2_id=$(echo $dashboard_user_organisation_2_api_response | jq -r '.id')
+dashboard_user_organisation_2_api_credentials=$(echo $dashboard_user_organisation_2_api_response | jq -r '.api_key')
+curl $dashboard_base_url/api/users/$dashboard_user_organisation_2_id/actions/reset -s -o /dev/null \
+  -H "authorization: $dashboard_user_organisation_2_api_credentials" \
+  --data-raw '{
+      "new_password":"'$dashboard_user_organisation_2_password'",
+      "user_permissions": { "IsAdmin": "admin" }
+    }' 2>> bootstrap.log
+echo "$dashboard_user_organisation_2_api_credentials" > .context-data/dashboard-user-organisations-2-api-credentials
+log_message "  Dashboard User API Credentials = $dashboard_user_organisation_2_api_credentials"
+bootstrap_progress
+
 log_message "Reloading Gateway group to ensure latest configuration is loaded"
 sleep 2
 result=$(curl $gateway_base_url/tyk/reload/group -s \
@@ -289,18 +317,24 @@ echo -e "\033[2K
 
 ▼ Tyk
   ▽ Dashboard
-               URL : $dashboard_base_url
-          Username : $dashboard_user_email
-          Password : $dashboard_user_password
-   API Credentials : $dashboard_user_api_credentials  
+                    URL : $dashboard_base_url
+    ▾ Organisation 1
+               Username : $dashboard_user_email
+               Password : $dashboard_user_password
+        API Credentials : $dashboard_user_api_credentials
+    ▾ Organisation 2
+               Username : $dashboard_user_organisation_2_email
+               Password : $dashboard_user_organisation_2_password
+        API Credentials : $dashboard_user_organisation_2_api_credentials
   ▽ Portal
-               URL : $portal_base_url$portal_root_path
-          Username : $portal_user_email
-          Password : $portal_user_password  
+    ▾ Organisation 1
+                    URL : $portal_base_url$portal_root_path
+               Username : $portal_user_email
+               Password : $portal_user_password  
   ▽ Gateway
-               URL : $gateway_base_url
-          URL(TCP) : $gateway_base_url_tcp
-   API Credentials : $gateway_api_credentials
+                    URL : $gateway_base_url
+               URL(TCP) : $gateway_base_url_tcp
+        API Credentials : $gateway_api_credentials
   ▽ Gateway 2
-               URL : $gateway2_base_url  
-   API Credentials : $gateway2_api_credentials"
+                    URL : $gateway2_base_url  
+        API Credentials : $gateway2_api_credentials"
