@@ -55,3 +55,11 @@ The TLS-enabled Gateway (`tyk-gateway-2`) uses a self-signed certificate. This r
 The Dashboard has a slightly modified API Catalogue template.  If you publish a policy and name it "Internal API", it won't be visible to any developers unless they have the correct role.
 
 Try viewing the API Catalogue with a developer, then add the "internal" role to the Developer Profile, and see the outcome with values "0" and "1".
+
+### Multi-Organisation User
+
+[Multi-Organiation Users](https://tyk.io/docs/release-notes/version-2.8/#multi-organisation-users) can access multiple Organisations, unlike normal users, who are limited to a single Organisation.
+
+This is made possible by creating an account in each Organisation that has the same username (email address). When this user authenticates with the Dashboard they are presented with a list of Organisations they can access. Selecting an Organisation will then log them into the Dashboard in that Organisational context - it is not possible to log into multiple Organisations at the same time.
+
+To try this out, run the `up.sh` script then log into the Dashboard using the credentials shown for the **Multi-Organisation User**.
