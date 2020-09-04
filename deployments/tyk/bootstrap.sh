@@ -32,6 +32,17 @@ echo $organisation_name > .context-data/organisation-name
 log_message "  $organisation_name Org Id = $organisation_id"
 bootstrap_progress
 
+log_message "Importing organisation 2"
+organisation_2_id=$(curl $dashboard_base_url/admin/organisations/import -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d @deployments/tyk/data/tyk-dashboard/organisation-2.json 2>> bootstrap.log\
+  | jq -r '.Meta')
+organisation_2_name=$(jq -r '.owner_name' deployments/tyk/data/tyk-dashboard/organisation-2.json)
+echo $organisation_2_id > .context-data/organisation-2-id
+echo $organisation_2_name > .context-data/organisation-2-name
+log_message "  $organisation_2_name Org Id = $organisation_2_id"
+bootstrap_progress
+
 log_message "Creating Dashboard user"
 dashboard_user_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/dashboard-user.json)
 dashboard_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/dashboard-user.json)
@@ -49,6 +60,25 @@ curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset -s -o /dev/n
     }' 2>> bootstrap.log
 echo "$dashboard_user_api_credentials" > .context-data/dashboard-user-api-credentials
 log_message "  Dashboard User API Credentials = $dashboard_user_api_credentials"
+bootstrap_progress
+
+log_message "Creating Dashboard user for Organisation 2"
+dashboard_user_organisation_2_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json)
+dashboard_user_organisation_2_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json)
+dashboard_user_organisation_2_api_response=$(curl $dashboard_base_url/admin/users -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d @deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json 2>> bootstrap.log \
+  | jq -r '. | {api_key:.Message, id:.Meta.id}')
+dashboard_user_organisation_2_id=$(echo $dashboard_user_organisation_2_api_response | jq -r '.id')
+dashboard_user_organisation_2_api_credentials=$(echo $dashboard_user_organisation_2_api_response | jq -r '.api_key')
+curl $dashboard_base_url/api/users/$dashboard_user_organisation_2_id/actions/reset -s -o /dev/null \
+  -H "authorization: $dashboard_user_organisation_2_api_credentials" \
+  --data-raw '{
+      "new_password":"'$dashboard_user_organisation_2_password'",
+      "user_permissions": { "IsAdmin": "admin" }
+    }' 2>> bootstrap.log
+echo "$dashboard_user_organisation_2_api_credentials" > .context-data/dashboard-user-organisations-2-api-credentials
+log_message "  Dashboard User API Credentials = $dashboard_user_organisation_2_api_credentials"
 bootstrap_progress
 
 log_message "Creating Dashboard user groups"
@@ -161,16 +191,28 @@ then
 fi
 bootstrap_progress
 
-log_message "Importing APIs"
+log_message "Importing APIs for organisation: $organisation_name"
 log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d "$api_data")"
 bootstrap_progress
 
-log_message "Importing Policies"
+log_message "Importing APIs for organisation: $organisation_2_name"
+log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d "$(cat deployments/tyk/data/tyk-dashboard/apis-organisation-2.json)")"
+bootstrap_progress
+
+log_message "Importing Policies for organisation: $organisation_name"
 log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d "$policy_data")"
+bootstrap_progress
+
+log_message "Importing Policies for organisation: $organisation_2_name"
+log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d "$(cat deployments/tyk/data/tyk-dashboard/policies-organisation-2.json)")"
 bootstrap_progress
 
 log_message "Refreshing APIs"
@@ -254,36 +296,6 @@ result=$(curl $dashboard_base_url/api/apis/keys/basic/basic-auth-username -s -w 
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @deployments/tyk/data/tyk-dashboard/key-basic-auth.json 2>> bootstrap.log)
 log_message "  Basic auth key:$result"
-bootstrap_progress
-
-log_message "Importing organisation 2"
-organisation_2_id=$(curl $dashboard_base_url/admin/organisations/import -s \
-  -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @deployments/tyk/data/tyk-dashboard/organisation-2.json 2>> bootstrap.log\
-  | jq -r '.Meta')
-organisation_2_name=$(jq -r '.owner_name' deployments/tyk/data/tyk-dashboard/organisation-2.json)
-echo $organisation_2_id > .context-data/organisation-2-id
-echo $organisation_2_name > .context-data/organisation-2-name
-log_message "  $organisation_2_name Org Id = $organisation_2_id"
-bootstrap_progress
-
-log_message "Creating Dashboard user for Organisation 2"
-dashboard_user_organisation_2_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json)
-dashboard_user_organisation_2_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json)
-dashboard_user_organisation_2_api_response=$(curl $dashboard_base_url/admin/users -s \
-  -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json 2>> bootstrap.log \
-  | jq -r '. | {api_key:.Message, id:.Meta.id}')
-dashboard_user_organisation_2_id=$(echo $dashboard_user_organisation_2_api_response | jq -r '.id')
-dashboard_user_organisation_2_api_credentials=$(echo $dashboard_user_organisation_2_api_response | jq -r '.api_key')
-curl $dashboard_base_url/api/users/$dashboard_user_organisation_2_id/actions/reset -s -o /dev/null \
-  -H "authorization: $dashboard_user_organisation_2_api_credentials" \
-  --data-raw '{
-      "new_password":"'$dashboard_user_organisation_2_password'",
-      "user_permissions": { "IsAdmin": "admin" }
-    }' 2>> bootstrap.log
-echo "$dashboard_user_organisation_2_api_credentials" > .context-data/dashboard-user-organisations-2-api-credentials
-log_message "  Dashboard User API Credentials = $dashboard_user_organisation_2_api_credentials"
 bootstrap_progress
 
 log_message "Reloading Gateway group to ensure latest configuration is loaded"
