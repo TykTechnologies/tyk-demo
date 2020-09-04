@@ -228,7 +228,9 @@
               "extended_paths": {},
               "global_headers": {},
               "global_headers_remove": [],
-              "global_response_headers": {},
+              "global_response_headers": {
+                "Organisation": "Acme"
+              },
               "global_response_headers_remove": [],
               "ignore_endpoint_case": false,
               "global_size_limit": 0,
@@ -337,7 +339,12 @@
         "blacklisted_ips": [],
         "dont_set_quota_on_create": false,
         "expire_analytics_after": 0,
-        "response_processors": [],
+        "response_processors": [
+          {
+            "name": "header_injector",
+            "options": {}
+          }
+        ],
         "CORS": {
           "enable": false,
           "allowed_origins": [],
