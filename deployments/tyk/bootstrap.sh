@@ -26,11 +26,24 @@ organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d @deployments/tyk/data/tyk-dashboard/organisation.json 2>> bootstrap.log\
   | jq -r '.Meta')
+organisation_name=$(jq -r '.owner_name' deployments/tyk/data/tyk-dashboard/organisation.json)
 echo $organisation_id > .context-data/organisation-id
-log_message "  Org Id = $organisation_id"
+echo $organisation_name > .context-data/organisation-name
+log_message "  $organisation_name Org Id = $organisation_id"
 bootstrap_progress
 
-log_message "Creating Dashboard user"
+log_message "Importing organisation 2"
+organisation_2_id=$(curl $dashboard_base_url/admin/organisations/import -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d @deployments/tyk/data/tyk-dashboard/organisation-2.json 2>> bootstrap.log\
+  | jq -r '.Meta')
+organisation_2_name=$(jq -r '.owner_name' deployments/tyk/data/tyk-dashboard/organisation-2.json)
+echo $organisation_2_id > .context-data/organisation-2-id
+echo $organisation_2_name > .context-data/organisation-2-name
+log_message "  $organisation_2_name Org Id = $organisation_2_id"
+bootstrap_progress
+
+log_message "Creating Dashboard user for organisation $organisation_name"
 dashboard_user_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/dashboard-user.json)
 dashboard_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/dashboard-user.json)
 dashboard_user_api_response=$(curl $dashboard_base_url/admin/users -s \
@@ -48,6 +61,63 @@ curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset -s -o /dev/n
 echo "$dashboard_user_api_credentials" > .context-data/dashboard-user-api-credentials
 log_message "  Dashboard User API Credentials = $dashboard_user_api_credentials"
 bootstrap_progress
+
+log_message "Creating Dashboard user for organisation $organisation_2_name"
+dashboard_user_organisation_2_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json)
+dashboard_user_organisation_2_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json)
+dashboard_user_organisation_2_api_response=$(curl $dashboard_base_url/admin/users -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d @deployments/tyk/data/tyk-dashboard/dashboard-user-organisation-2.json 2>> bootstrap.log \
+  | jq -r '. | {api_key:.Message, id:.Meta.id}')
+dashboard_user_organisation_2_id=$(echo $dashboard_user_organisation_2_api_response | jq -r '.id')
+dashboard_user_organisation_2_api_credentials=$(echo $dashboard_user_organisation_2_api_response | jq -r '.api_key')
+curl $dashboard_base_url/api/users/$dashboard_user_organisation_2_id/actions/reset -s -o /dev/null \
+  -H "authorization: $dashboard_user_organisation_2_api_credentials" \
+  --data-raw '{
+      "new_password":"'$dashboard_user_organisation_2_password'",
+      "user_permissions": { "IsAdmin": "admin" }
+    }' 2>> bootstrap.log
+echo "$dashboard_user_organisation_2_api_credentials" > .context-data/dashboard-user-organisations-2-api-credentials
+log_message "  Dashboard User API Credentials = $dashboard_user_organisation_2_api_credentials"
+bootstrap_progress
+
+log_message "Creating multi-organisation user"
+# generic info
+dashboard_multi_organisation_user_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/dashboard-user-multi-organisation.json)
+dashboard_multi_organisation_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/dashboard-user-multi-organisation.json)
+# first user
+dashboard_multi_organisation_user_api_response=$(curl $dashboard_base_url/admin/users -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d @deployments/tyk/data/tyk-dashboard/dashboard-user-multi-organisation.json 2>> bootstrap.log \
+  | jq -r '. | {api_key:.Message, id:.Meta.id}')
+dashboard_multi_organisation_user_1_id=$(echo $dashboard_multi_organisation_user_api_response | jq -r '.id')
+dashboard_multi_organisation_user_1_api_credentials=$(echo $dashboard_multi_organisation_user_api_response | jq -r '.api_key')
+curl $dashboard_base_url/api/users/$dashboard_multi_organisation_user_1_id/actions/reset -s -o /dev/null \
+  -H "authorization: $dashboard_multi_organisation_user_1_api_credentials" \
+  --data-raw '{
+      "new_password":"'$dashboard_multi_organisation_user_password'",
+      "user_permissions": { "IsAdmin": "admin" }
+    }' 2>> bootstrap.log
+echo "$dashboard_multi_organisation_user_1_api_credentials" > .context-data/dashboard-multi-organisation-user-api-credentials
+log_message "  Dashboard Multi-Organisation User 1 API Credentials = $dashboard_multi_organisation_user_1_api_credentials"
+bootstrap_progress
+# second user - swapping the organisation id
+dashboard_multi_organisation_user_api_response=$(curl $dashboard_base_url/admin/users -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d "$(cat deployments/tyk/data/tyk-dashboard/dashboard-user-multi-organisation.json | sed 's/'"$organisation_id"'/'"$organisation_2_id"'/')" 2>> bootstrap.log \
+  | jq -r '. | {api_key:.Message, id:.Meta.id}')
+dashboard_multi_organisation_user_2_id=$(echo $dashboard_multi_organisation_user_api_response | jq -r '.id')
+dashboard_multi_organisation_user_2_api_credentials=$(echo $dashboard_multi_organisation_user_api_response | jq -r '.api_key')
+curl $dashboard_base_url/api/users/$dashboard_multi_organisation_user_2_id/actions/reset -s -o /dev/null \
+  -H "authorization: $dashboard_multi_organisation_user_2_api_credentials" \
+  --data-raw '{
+      "new_password":"'$dashboard_multi_organisation_user_password'",
+      "user_permissions": { "IsAdmin": "admin" }
+    }' 2>> bootstrap.log
+echo "$dashboard_multi_organisation_user_2_api_credentials" > .context-data/dashboard-multi-organisation-user-api-credentials
+log_message "  Dashboard Multi-Organisation User 2 API Credentials = $dashboard_multi_organisation_user_2_api_credentials"
+bootstrap_progress
+
 
 log_message "Creating Dashboard user groups"
 result=$(curl $dashboard_base_url/api/usergroups -s \
@@ -159,16 +229,28 @@ then
 fi
 bootstrap_progress
 
-log_message "Importing APIs"
+log_message "Importing APIs for organisation: $organisation_name"
 log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d "$api_data")"
 bootstrap_progress
 
-log_message "Importing Policies"
+log_message "Importing APIs for organisation: $organisation_2_name"
+log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d "$(cat deployments/tyk/data/tyk-dashboard/apis-organisation-2.json)")"
+bootstrap_progress
+
+log_message "Importing Policies for organisation: $organisation_name"
 log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d "$policy_data")"
+bootstrap_progress
+
+log_message "Importing Policies for organisation: $organisation_2_name"
+log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
+  -H "admin-auth: $dashboard_admin_api_credentials" \
+  -d "$(cat deployments/tyk/data/tyk-dashboard/policies-organisation-2.json)")"
 bootstrap_progress
 
 log_message "Refreshing APIs"
@@ -255,18 +337,17 @@ log_message "  Basic auth key:$result"
 bootstrap_progress
 
 log_message "Reloading Gateway group to ensure latest configuration is loaded"
-sleep 2
-result=$(curl $gateway_base_url/tyk/reload/group -s \
+sleep 5 # waiting 5 seconds makes the following reload command more reliable
+result=$(curl $gateway_base_url/tyk/reload/group?block=true -s \
   -H "x-tyk-authorization: $gateway_api_credentials" | jq -r '.status')
 log_message "  $result"
 
 log_message "Checking Gateway functionality"
-sleep 2
 wait_for_response "$gateway_base_url/basic-open-api/get" "200"
 
 log_message "Checking Gateway 2 functionality"
-gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
 wait_for_response "$gateway2_base_url/basic-open-api/get" "200"
+gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
 
 log_end_deployment
 
@@ -289,18 +370,27 @@ echo -e "\033[2K
 
 ▼ Tyk
   ▽ Dashboard
-               URL : $dashboard_base_url
-          Username : $dashboard_user_email
-          Password : $dashboard_user_password
-   API Credentials : $dashboard_user_api_credentials  
+                    URL : $dashboard_base_url
+    ▾ $organisation_name Organisation
+               Username : $dashboard_user_email
+               Password : $dashboard_user_password
+        API Credentials : $dashboard_user_api_credentials
+    ▾ $organisation_2_name Organisation
+               Username : $dashboard_user_organisation_2_email
+               Password : $dashboard_user_organisation_2_password
+        API Credentials : $dashboard_user_organisation_2_api_credentials
+    ▾ Multi-Organisation User
+               Username : $dashboard_multi_organisation_user_email
+               Password : $dashboard_multi_organisation_user_password
   ▽ Portal
-               URL : $portal_base_url$portal_root_path
-          Username : $portal_user_email
-          Password : $portal_user_password  
+    ▾ $organisation_name Organisation
+                    URL : $portal_base_url$portal_root_path
+               Username : $portal_user_email
+               Password : $portal_user_password  
   ▽ Gateway
-               URL : $gateway_base_url
-          URL(TCP) : $gateway_base_url_tcp
-   API Credentials : $gateway_api_credentials
+                    URL : $gateway_base_url
+               URL(TCP) : $gateway_base_url_tcp
+        API Credentials : $gateway_api_credentials
   ▽ Gateway 2
-               URL : $gateway2_base_url  
-   API Credentials : $gateway2_api_credentials"
+                    URL : $gateway2_base_url  
+        API Credentials : $gateway2_api_credentials"

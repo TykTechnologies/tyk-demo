@@ -1,0 +1,18 @@
+{
+    "id": "6e9d9544a1dcd60001d0ed21",
+    "owner_name": "Acme",
+    "owner_slug": "",
+    "cname_enabled": false,
+    "cname": "acme-portal.localhost:3000",
+    "apis": [],
+    "sso_enabled": true,
+    "hybrid_enabled": true,
+    "event_options": {
+        "key_event": {
+            "redis": true
+        },
+        "hashed_key_event": {
+            "redis": true
+        }
+    }
+}

@@ -26,7 +26,7 @@ MDCB_LICENCE=<YOUR_MDCB_LICENCE>
 
 The bootstrap process will fail if the licence is not present.
 
-### Access to Docker image
+### Access to MDCB Docker image
 
 The MDCB image used by this deployment, `tykio/tyk-mdcb-docker`, is hosted in a private repository. Request access to this repository via your Tyk account manager.
 
