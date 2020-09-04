@@ -1,0 +1,50 @@
+{
+	"info": {
+		"_postman_id": "490a96e6-baef-49e5-bca9-63a66f930713",
+		"name": "Tyk Demo - Analytics",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Analytics Sharding",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b0e24e1a-243f-4dd5-b1ac-0be55f4af0ca",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Acme organisation header is present\", function () {",
+							"    pm.expect(pm.response.headers.get('Organisation')).to.eql('Acme');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://tyk-gateway.localhost:8080/httpbin-acme/get",
+					"protocol": "http",
+					"host": [
+						"tyk-gateway",
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"httpbin-acme",
+						"get"
+					]
+				},
+				"description": "This request demonstrates *analytics sharding*. It sends a request to an API owned by the Acme Organisation. This organisation's id has been added to the skip filter list in the Pump's configuration for ElasticSearch, which means Acme's analytics data **is not** recorded in ElasticSearch. However, Acme's analytics data **is** recorded in MongoDB, as this does not have any filters set up, so will process all API analytics data.\n\nThis can be verified:\n1. Send this example request to generate analytics data\n2. Check that Acme's analytics data **does not** exist in Kibana:\n    - Go to the [Discover page](http://localhost:5601/app/kibana#/discover)\n    - Check that analytics data for this request does not exist - there should be no data containing an `org_id` with the value of `6e9d9544a1dcd60001d0ed21` (Acme's org id)\n    - Note: It is recommended to add a filter to *exclude* data where `api_name` is `mqtt-test`, as this API generates a lot of analytics data which will make it harder to spot the data for this demonstration\n3. Check that Acme's analytics data **does** exist in Tyk Dashboard:\n    - Go to the [Log Browser report](http://tyk-dashboard.localhost:3000/#/logs/) when logged in as the Acme organisation\n    - Check that data sent by this request exists\n4. Send a request using the **Basic Test Request** from the **Tyk Demo** Postman collection, then repeat steps 2 and 3 to see that the data appears in both Kibana and Tyk Dashboard\n\nThe configuration for analytics sharding is performed through the Pump's configuration file. Organisation and API ids can be added to arrays which will act as allow or deny lists. In this example, Acme's orgaisation id (`6e9d9544a1dcd60001d0ed21`) is added to the `filters.skip_org_ids` array in the `elasticsearch` section. For example:\n\n```\n    \"elasticsearch\": {\n      \"type\": \"elasticsearch\",\n      \"filters\": {\n        \"api_ids\": [],\n        \"org_ids\": [],\n        \"skip_api_ids\": [],\n        \"skip_org_ids\": [\n          \"6e9d9544a1dcd60001d0ed21\"\n        ]\n      }\n      ...\n```"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

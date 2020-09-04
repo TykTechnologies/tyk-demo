@@ -7,6 +7,6 @@ log_end_deployment
 echo -e "\033[2K
 ▼ MQTT
   ▽ Node-Red
-               URL : http://localhost:1880
+                    URL : http://localhost:1880
   ▽ Mosquitto (Broker)
-               URL : http://localhost:1883"
+                    URL : http://localhost:1883"

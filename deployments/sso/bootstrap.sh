@@ -34,15 +34,16 @@ log_end_deployment
 echo -e "\033[2K
 ▼ SSO
   ▽ Dashboard
-               URL : $dashboard_sso_base_url
-    ▿ Admin user
-          Username : dashboard.admin@example.org
-          Password : Abcd1234
-    ▿ Read-only user
-          Username : dashboard.readonly@example.org
-          Password : Abcd1234
-    ▿ Default user
-          Username : dashboard.default@example.org
-          Password : Abcd1234
+    ▾ Organisation 1
+                    URL : $dashboard_sso_base_url
+      ▿ Admin user
+               Username : dashboard.admin@example.org
+               Password : Abcd1234
+      ▿ Read-only user
+               Username : dashboard.readonly@example.org
+               Password : Abcd1234
+      ▿ Default user
+               Username : dashboard.default@example.org
+               Password : Abcd1234
   ▽ Identity Broker
        Profile URL : $identity_broker_base_url/auth/tyk-dashboard/openid-connect"

@@ -40,4 +40,4 @@ log_end_deployment
 echo -e "\033[2K
 ▼ Analytics
   ▽ Kibana
-               URL : $kibana_base_url"
+                    URL : $kibana_base_url"

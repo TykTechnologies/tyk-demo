@@ -365,7 +365,7 @@
         "graphql": {
           "enabled": true,
           "execution_mode": "proxyOnly",
-          "schema": "type Query {\n  country(code: ID!): Country\n}\n\ntype Country {\n  code: ID!\n  name: String!\n}",
+          "schema": "type Query {\n country(code: ID!): Country\n}\n\ntype Country {\n code: ID!\n name: String!\n}",
           "type_field_configurations": [],
           "playground": {
             "enabled": false,
@@ -744,7 +744,7 @@
         "graphql": {
           "enabled": true,
           "execution_mode": "executionEngine",
-          "schema": "type Country {\n  code: ID\n  name: String\n  pop: Int\n}\n\ntype Query {\n  country(code: ID!): Country\n}\n",
+          "schema": "type Country {\n code: ID\n name: String\n pop: Int\n}\n\ntype Query {\n country(code: ID!): Country\n}\n",
           "type_field_configurations": [
             {
               "type_name": "Query",
@@ -5419,7 +5419,7 @@
                   "api_model": {},
                   "event_timeout": 60,
                   "header_map": {},
-                  "id": "5f3390e6a4e1ac4471ecaa22",
+                  "id": "5f51ea13c03394127e96c98d",
                   "method": "POST",
                   "name": "Webhook Receiver Post",
                   "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -5479,7 +5479,7 @@
           "event_timeout": 60,
           "hook": {
             "api_model": {},
-            "id": "5f3390e6a4e1ac4471ecaa22",
+            "id": "5f51ea13c03394127e96c98d",
             "org_id": "5e9d9544a1dcd60001d0ed20",
             "name": "Webhook Receiver Post",
             "method": "POST",

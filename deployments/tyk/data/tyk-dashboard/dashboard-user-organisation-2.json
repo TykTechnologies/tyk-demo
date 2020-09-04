@@ -1,0 +1,12 @@
+{
+	"first_name": "Acme",
+	"last_name": "Admin",
+	"email_address": "acme-admin@example.org",
+	"org_id": "6e9d9544a1dcd60001d0ed21",
+	"active": true,
+	"password": "3LEsHO1jv1dt9Xgf",
+	"user_permissions": {
+			"IsAdmin": "admin",
+			"ResetPassword": "admin"
+	}
+}

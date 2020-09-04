@@ -17,7 +17,7 @@ services:
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
   tyk-pump-elasticsearch:
-    image: tykio/tyk-pump-docker-pub:v0.8.5
+    image: tykio/tyk-pump-docker-pub:v1.0.0
     networks:
       - tyk
     volumes:

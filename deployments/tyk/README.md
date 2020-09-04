@@ -27,6 +27,15 @@ Import the `Tyk Demo.postman_collection.json` file into Postman to gain access t
 
 Run the `scripts/add-gateway.sh` script to create a new Gateway instance. It will behave like the existing `tyk-gateway` container as it will use the same configuration. The new Gateway will be mapped on a random port, to avoid collisions.
 
+### Multi-tenancy
+
+There are two Organisations in the deployment who operate as separate tenants:
+
+- Tyk Demo
+- Acme
+
+The Organisations have separate users accounts with which to access the Dashboard. When using the Dashboard, users can only access and manage data which belongs to their Organisation.
+
 ## Features
 
 ### Secure Payloads
