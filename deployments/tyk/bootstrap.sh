@@ -337,17 +337,39 @@ log_message "  Basic auth key:$result"
 bootstrap_progress
 
 log_message "Reloading Gateway group to ensure latest configuration is loaded"
-sleep 5 # waiting 5 seconds makes the following reload command more reliable
-result=$(curl $gateway_base_url/tyk/reload/group?block=true -s \
-  -H "x-tyk-authorization: $gateway_api_credentials" | jq -r '.status')
-log_message "  $result"
+hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
+bootstrap_progress
 
 log_message "Checking Gateway functionality"
-wait_for_response "$gateway_base_url/basic-open-api/get" "200"
+result=""
+while [ "$result" != "0" ]
+do
+  wait_for_response "$gateway_base_url/basic-open-api/get" "200" "" 3
+  result="$?"
+  if [ "$result" != "0" ]
+  then
+    log_message "  Gateway not returning desired response, attempting hot reload"
+    hot_reload "$gateway_base_url" "$gateway_api_credentials" 
+    sleep 2
+  fi
+done
+bootstrap_progress
 
 log_message "Checking Gateway 2 functionality"
-wait_for_response "$gateway2_base_url/basic-open-api/get" "200"
 gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
+result=""
+while [ "$result" != "0" ]
+do
+  wait_for_response "$gateway2_base_url/basic-open-api/get" "200" "" 3
+  result="$?"
+  if [ "$result" != "0" ]
+  then
+    log_message "  Gateway not returning desired response, attempting hot reload"
+    hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
+    sleep 2
+  fi
+done
+bootstrap_progress
 
 log_end_deployment
 

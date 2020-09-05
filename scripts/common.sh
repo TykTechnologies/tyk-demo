@@ -82,35 +82,44 @@ function wait_for_response {
   attempt_max="$4"
   attempt_count=0
   
+  log_message "  Expecting $2 response from $1"
+
   while [ "$status" != "$desired_status" ]
   do
     attempt_count=$((attempt_count+1))
+
     # header can be provided if auth is needed
     if [ "$header" != "" ]
     then
       status=$(curl -k -I -s -m5 $url -H "$header" 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
     else
-      status=$(curl -k -I -s -m5 $url $header 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
+      status=$(curl -k -I -s -m5 $url 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
     fi
-    if [ "$status" != "$desired_status" ]
+
+    bootstrap_progress    
+
+    if [ "$status" == "$desired_status" ]
     then
-      log_message "  Request unsuccessful: called '$url' wanted '$desired_status' but got '$status'."
-      echo "att=$attempt_count max=$attempt_max"
+      log_message "  Ok, received $status"
+      return 0
+    else
+      log_message "  Attempt $attempt_count unsuccessful, got '$status'"
       # if we reached max attempts, then exit with non-zero result
       if [ "$attempt_count" = "$attempt_max" ]
       then
         log_message "  Maximum retry count reached. Aborting."
         return 1
-      else
-        log_message "  Retrying..."
+      else # pause and try again
+        if [ "$attempt_max" != "" ]
+        then
+          log_message "  Retrying... (max retry is $attempt_max)"
+        else
+          log_message "  Retrying..."
+        fi
+        sleep 2
       fi
-      sleep 2
     fi
-    bootstrap_progress    
   done
-  
-  log_ok
-  return 0
 }
 
 function hot_reload {
@@ -121,12 +130,21 @@ function hot_reload {
 
   if [ "$group" = "group" ]
   then
+    log_message "  Sending group reload request to $1"
     result=$(curl $1/tyk/reload/group?block=true -s \
       -H "x-tyk-authorization: $2" | jq -r '.status')
   else
+    log_message "  Sending reload request to $1"
     result=$(curl $1/tyk/reload?block=true -s \
       -H "x-tyk-authorization: $2" | jq -r '.status')
   fi
 
-  return $result
+  if [ "$result" = "ok" ]
+  then
+    log_message "  Reload request successfully sent"
+    return 0
+  else
+    log_message "  Reload request failed"
+    return 1
+  fi
 }
