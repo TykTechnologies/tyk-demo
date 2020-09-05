@@ -16,6 +16,8 @@ log_message "Getting Dashboard configuration"
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret 2>> bootstrap.log)
 log_message "  Dashboard Admin API Credentials = $dashboard_admin_api_credentials"
 portal_root_path=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_config.portal_root_path 2>> bootstrap.log)
+gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
+gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
 bootstrap_progress
 
 log_message "Waiting for Dashboard API to be ready"
@@ -281,43 +283,45 @@ do
 done
 bootstrap_progress
 
-log_message "Waiting for Gateway API to be ready"
-gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
-log_message "  Gateway API credentials = $gateway_api_credentials"
-gateway_status=""
-while [ "$gateway_status" != "200" ]
+log_message "Checking Gateway functionality"
+result=""
+while [ "$result" != "0" ]
 do
-  gateway_status=$(curl $gateway_base_url/tyk/keys/api_key_write_test -s -o /dev/null -w "%{http_code}" -H "x-tyk-authorization: $gateway_api_credentials" -d @deployments/tyk/data/tyk-gateway/auth-key.json 2>> bootstrap.log)
-
-  if [ "$gateway_status" != "200" ]
+  wait_for_response "$gateway_base_url/basic-open-api/get" "200" "" 3
+  result="$?"
+  if [ "$result" != "0" ]
   then
-    # if we get a 403 then there's an issue with authentication
-    if [ "$gateway_status" == "403" ]
-    then
-      log_message "  ERROR: Gateway returned 403 status when using key $gateway_api_credentials"
-      break
-    fi
-    # if we get a 500 then it's probably because the Gateway hasn't received the reload signal from when the Dashboard data was imported, so force reload now
-    if [ "$gateway_status" == "500" ]
-    then
-      log_message "  Reloading Gateway due to HTTP 500 response"
-      curl $gateway_base_url/tyk/reload -s -o /dev/null -H "x-tyk-authorization: $gateway_api_credentials" 2>> bootstrap.log
-      sleep 2
-    else
-      log_message "  Request unsuccessful, retrying..."
-    fi
+    log_message "  Gateway not returning desired response, attempting hot reload"
+    hot_reload "$gateway_base_url" "$gateway_api_credentials" 
     sleep 2
-  else
-    log_ok
   fi
-  bootstrap_progress
 done
+bootstrap_progress
+
+log_message "Checking Gateway 2 functionality"
+result=""
+while [ "$result" != "0" ]
+do
+  wait_for_response "$gateway2_base_url/basic-open-api/get" "200" "" 3
+  result="$?"
+  if [ "$result" != "0" ]
+  then
+    log_message "  Gateway not returning desired response, attempting hot reload"
+    hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
+    sleep 2
+  fi
+done
+bootstrap_progress
 
 log_message "Importing custom keys"
 result=$(curl $gateway_base_url/tyk/keys/auth_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @deployments/tyk/data/tyk-gateway/auth-key.json 2>> bootstrap.log | jq -r '.status')
 log_message "  Auth key:$result"
+result=$(curl $gateway_base_url/tyk/keys/auth_key_analytics_on -s \
+  -H "x-tyk-authorization: $gateway_api_credentials" \
+  -d @deployments/tyk/data/tyk-gateway/auth-key-analytics-on.json 2>> bootstrap.log | jq -r '.status')
+log_message "  Auth key (analytics on):$result"
 result=$(curl $gateway_base_url/tyk/keys/ratelimit_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @deployments/tyk/data/tyk-gateway/rate-limit-key.json 2>> bootstrap.log | jq -r '.status')
@@ -336,18 +340,20 @@ result=$(curl $dashboard_base_url/api/apis/keys/basic/basic-auth-username -s -w 
 log_message "  Basic auth key:$result"
 bootstrap_progress
 
-log_message "Reloading Gateway group to ensure latest configuration is loaded"
-sleep 5 # waiting 5 seconds makes the following reload command more reliable
-result=$(curl $gateway_base_url/tyk/reload/group?block=true -s \
-  -H "x-tyk-authorization: $gateway_api_credentials" | jq -r '.status')
-log_message "  $result"
-
-log_message "Checking Gateway functionality"
-wait_for_response "$gateway_base_url/basic-open-api/get" "200"
-
-log_message "Checking Gateway 2 functionality"
-wait_for_response "$gateway2_base_url/basic-open-api/get" "200"
-gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
+log_message "Sending API requests to generate analytics data"
+# global analytics off
+curl $gateway_base_url/basic-open-api/get -s -o /dev/null 
+# global analytics on
+curl $gateway2_base_url/basic-open-api/get -s -k -o /dev/null
+# api analytics off
+curl $gateway_base_url/detailed-analytics-off/get -s -o /dev/null
+# api analytics on
+curl $gateway_base_url/detailed-analytics-on/get -s -o /dev/null 
+# key analytics off
+curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key" -o /dev/null 
+# key analytics on
+curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key_analytics_on" -o /dev/null 
+log_ok
 
 log_end_deployment
 

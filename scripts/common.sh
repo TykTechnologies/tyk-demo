@@ -79,22 +79,72 @@ function wait_for_response {
   status=""
   desired_status="$2"
   header="$3"
+  attempt_max="$4"
+  attempt_count=0
+  
+  log_message "  Expecting $2 response from $1"
+
   while [ "$status" != "$desired_status" ]
   do
+    attempt_count=$((attempt_count+1))
+
     # header can be provided if auth is needed
     if [ "$header" != "" ]
     then
       status=$(curl -k -I -s -m5 $url -H "$header" 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
     else
-      status=$(curl -k -I -s -m5 $url $header 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
+      status=$(curl -k -I -s -m5 $url 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
     fi
-    if [ "$status" != "$desired_status" ]
+
+    bootstrap_progress    
+
+    if [ "$status" == "$desired_status" ]
     then
-      log_message "  Request unsuccessful: called '$url' wanted '$desired_status' but got '$status'. Retrying..."
-      sleep 2
+      log_message "    Attempt $attempt_count succeeded, received '$status'"
+      return 0
     else
-      log_ok
+      if [ "$attempt_max" != "" ]
+      then
+        log_message "    Attempt $attempt_count of $attempt_max unsuccessful, got '$status'"
+      else
+        log_message "    Attempt $attempt_count unsuccessful, received '$status'"
+      fi
+
+      # if max attempts reached, then exit with non-zero result
+      if [ "$attempt_count" = "$attempt_max" ]
+      then
+        log_message "    Maximum retry count reached. Aborting."
+        return 1
+      fi
+      
+      sleep 2
     fi
-    bootstrap_progress
   done
+}
+
+function hot_reload {
+  gateway_host="$1"
+  gateway_secret="$2"
+  group="$3"
+  result=""
+
+  if [ "$group" = "group" ]
+  then
+    log_message "  Sending group reload request to $1"
+    result=$(curl $1/tyk/reload/group?block=true -s -k \
+      -H "x-tyk-authorization: $2" | jq -r '.status')
+  else
+    log_message "  Sending reload request to $1"
+    result=$(curl $1/tyk/reload?block=true -s -k \
+      -H "x-tyk-authorization: $2" | jq -r '.status')
+  fi
+
+  if [ "$result" = "ok" ]
+  then
+    log_message "    Reload request successfully sent"
+    return 0
+  else
+    log_message "    Reload request failed: $result"
+    return 1
+  fi
 }
