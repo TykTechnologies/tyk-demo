@@ -318,6 +318,10 @@ result=$(curl $gateway_base_url/tyk/keys/auth_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @deployments/tyk/data/tyk-gateway/auth-key.json 2>> bootstrap.log | jq -r '.status')
 log_message "  Auth key:$result"
+result=$(curl $gateway_base_url/tyk/keys/auth_key_analytics_on -s \
+  -H "x-tyk-authorization: $gateway_api_credentials" \
+  -d @deployments/tyk/data/tyk-gateway/auth-key-analytics-on.json 2>> bootstrap.log | jq -r '.status')
+log_message "  Auth key (analytics on):$result"
 result=$(curl $gateway_base_url/tyk/keys/ratelimit_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @deployments/tyk/data/tyk-gateway/rate-limit-key.json 2>> bootstrap.log | jq -r '.status')
@@ -335,6 +339,21 @@ result=$(curl $dashboard_base_url/api/apis/keys/basic/basic-auth-username -s -w 
   -d @deployments/tyk/data/tyk-dashboard/key-basic-auth.json 2>> bootstrap.log)
 log_message "  Basic auth key:$result"
 bootstrap_progress
+
+log_message "Sending API requests to generate analytics data"
+# global analytics off
+curl $gateway_base_url/basic-open-api/get -s -o /dev/null
+# global analytics on
+curl $gateway2_base_url/basic-open-api/get -s -k -o /dev/null
+# api analytics off
+curl $gateway_base_url/detailed-analytics-off/get -s -o /dev/null
+# api analytics on
+curl $gateway_base_url/detailed-analytics-on/get -s -o /dev/null
+# key analytics off
+curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key" -o /dev/null
+# key analytics on
+curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key_analytics_on" -o /dev/null
+log_ok
 
 log_end_deployment
 
