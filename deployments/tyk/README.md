@@ -63,3 +63,17 @@ Try viewing the API Catalogue with a developer, then add the "internal" role to 
 This is made possible by creating an account in each Organisation that has the same username (email address). When this user authenticates with the Dashboard they are presented with a list of Organisations they can access. Selecting an Organisation will then log them into the Dashboard in that Organisational context - it is not possible to log into multiple Organisations at the same time.
 
 To try this out, run the `up.sh` script then log into the Dashboard using the credentials shown for the **Multi-Organisation User**.
+
+### Detailed Analytics Logging
+
+[Detailed analytics logging](https://tyk.io/docs/analytics-and-reporting/useful-debug-modes/#enabling-detailed-logging) is a feature which records the full HTTP request and response payloads as part of the analytics data.
+
+This feature can be enabled at three levels:
+
+1. Global (Gateway)
+2. API
+3. Key
+
+When a request/response is processed, if any of the levels is enabled, then the detailed analytics data will be logged.
+
+The bootstrap script sends requests for each scenario, which you can see in the Log Browser report. There are also requests in the Postman collection - see *API Definition* > *Detailed Analytics Logging* for more information.
