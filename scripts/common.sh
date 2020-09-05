@@ -100,24 +100,24 @@ function wait_for_response {
 
     if [ "$status" == "$desired_status" ]
     then
-      log_message "  Ok, received $status"
+      log_message "    Attempt $attempt_count succeeded, received '$status'"
       return 0
     else
-      log_message "  Attempt $attempt_count unsuccessful, got '$status'"
-      # if we reached max attempts, then exit with non-zero result
+      if [ "$attempt_max" != "" ]
+      then
+        log_message "    Attempt $attempt_count of $attempt_max unsuccessful, got '$status'"
+      else
+        log_message "    Attempt $attempt_count unsuccessful, received '$status'"
+      fi
+
+      # if max attempts reached, then exit with non-zero result
       if [ "$attempt_count" = "$attempt_max" ]
       then
-        log_message "  Maximum retry count reached. Aborting."
+        log_message "    Maximum retry count reached. Aborting."
         return 1
-      else # pause and try again
-        if [ "$attempt_max" != "" ]
-        then
-          log_message "  Retrying... (max retry is $attempt_max)"
-        else
-          log_message "  Retrying..."
-        fi
-        sleep 2
       fi
+
+      sleep 2
     fi
   done
 }
@@ -131,20 +131,20 @@ function hot_reload {
   if [ "$group" = "group" ]
   then
     log_message "  Sending group reload request to $1"
-    result=$(curl $1/tyk/reload/group?block=true -s \
+    result=$(curl $1/tyk/reload/group?block=true -s -k \
       -H "x-tyk-authorization: $2" | jq -r '.status')
   else
     log_message "  Sending reload request to $1"
-    result=$(curl $1/tyk/reload?block=true -s \
+    result=$(curl $1/tyk/reload?block=true -s -k \
       -H "x-tyk-authorization: $2" | jq -r '.status')
   fi
 
   if [ "$result" = "ok" ]
   then
-    log_message "  Reload request successfully sent"
+    log_message "    Reload request successfully sent"
     return 0
   else
-    log_message "  Reload request failed"
+    log_message "    Reload request failed: $result"
     return 1
   fi
 }
