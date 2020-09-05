@@ -2463,6 +2463,145 @@
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Detailed Analytics Logging",
+					"item": [
+						{
+							"name": "Detailed Analytics - Off, Global",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/basic-open-api/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"basic-open-api",
+										"get"
+									]
+								},
+								"description": "This request shows how [detailed analytics logging](https://tyk.io/docs/analytics-and-reporting/useful-debug-modes/#enabling-detailed-logging) can be configured at a **global** (Gateway) level. Detailed analytics data will be recorded if it is enabled at any of the three levels - global, API and key.\n\nThis example *does not* record detailed analytics data because it:\n- goes to an API Gateway that does not have detailed analytics recording enabled (**global** level), and\n- calls an API Definition that does not have detailed analytics recording enabled (**API** level), and\n- uses no API key, so cannot have detailed analytics recording enabled at **key** level"
+							},
+							"response": []
+						},
+						{
+							"name": "Detailed Analytics - On, Global",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{tyk-gateway-2.host}}/basic-open-api/get",
+									"protocol": "https",
+									"host": [
+										"{{tyk-gateway-2.host}}"
+									],
+									"path": [
+										"basic-open-api",
+										"get"
+									]
+								},
+								"description": "This request shows how [detailed analytics logging](https://tyk.io/docs/analytics-and-reporting/useful-debug-modes/#enabling-detailed-logging) can be configured at a **global** (Gateway) level. Detailed analytics data will be recorded if it is enabled at any of the three levels - global, API and key.\n\nThis example *does* record detailed analytics data because it:\n- goes to an API Gateway that has detailed analytics recording enabled (**global** level)"
+							},
+							"response": []
+						},
+						{
+							"name": "Detailed Analytics - Off, API",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/detailed-analytics-off/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"detailed-analytics-off",
+										"get"
+									]
+								},
+								"description": "This request shows how [detailed analytics logging](https://tyk.io/docs/analytics-and-reporting/useful-debug-modes/#enabling-detailed-logging) can be configured at an **API** level. Detailed analytics data will be recorded if it is enabled at any of the three levels - global, API and key.\n\nThis example *does not* record detailed analytics data because it:\n- goes to an API Gateway that does not have detailed analytics recording enabled (**global** level), and\n- calls an API Definition that does not have detailed analytics recording enabled (**API** level), and\n- uses no API key, so cannot have detailed analytics recording enabled at **key** level"
+							},
+							"response": []
+						},
+						{
+							"name": "Detailed Analytics - On, API",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/detailed-analytics-on/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"detailed-analytics-on",
+										"get"
+									]
+								},
+								"description": "This request shows how [detailed analytics logging](https://tyk.io/docs/analytics-and-reporting/useful-debug-modes/#enabling-detailed-logging) can be configured at an **API** level. Detailed analytics data will be recorded if it is enabled at any of the three levels - global, API and key.\n\nThis example *does* record detailed analytics data because it:\n- goes to an API Gateway that does not have detailed analytics recording enabled (**global** level), but\n- calls an API Definition that has detailed analytics recording enabled (**API** level)"
+							},
+							"response": []
+						},
+						{
+							"name": "Detailed Analytics - Off, Key",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "auth_key",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/basic-protected-api/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"basic-protected-api",
+										"get"
+									]
+								},
+								"description": "This request shows how [detailed analytics logging](https://tyk.io/docs/analytics-and-reporting/useful-debug-modes/#enabling-detailed-logging) can be configured at a **Key** level. Detailed analytics data will be recorded if it is enabled at any of the three levels - global, API and key.\n\nThis example *does not* record detailed analytics data because it:\n- goes to an API Gateway that does not have detailed analytics recording enabled (**global** level), and\n- calls an API Definition that does not have detailed analytics recording enabled (**API** level), and\n- uses an API key that does not have detailed analytics recording enabled (**key** level)"
+							},
+							"response": []
+						},
+						{
+							"name": "Detailed Analytics - On, Key",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "auth_key_analytics_on"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/basic-protected-api/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"basic-protected-api",
+										"get"
+									]
+								},
+								"description": "This request shows how [detailed analytics logging](https://tyk.io/docs/analytics-and-reporting/useful-debug-modes/#enabling-detailed-logging) can be configured at a **Key** level. Detailed analytics data will be recorded if it is enabled at any of the three levels - global, API and key.\n\nThis example *does* record detailed analytics data because it:\n- goes to an API Gateway that does not have detailed analytics recording enabled (**global** level), and\n- calls an API Definition that does not have detailed analytics recording enabled (**API** level), but\n- uses an API key that has detailed analytics recording enabled (**key** level)"
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
