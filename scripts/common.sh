@@ -79,8 +79,12 @@ function wait_for_response {
   status=""
   desired_status="$2"
   header="$3"
+  attempt_max="$4"
+  attempt_count=0
+  
   while [ "$status" != "$desired_status" ]
   do
+    attempt_count=$((attempt_count+1))
     # header can be provided if auth is needed
     if [ "$header" != "" ]
     then
@@ -90,11 +94,39 @@ function wait_for_response {
     fi
     if [ "$status" != "$desired_status" ]
     then
-      log_message "  Request unsuccessful: called '$url' wanted '$desired_status' but got '$status'. Retrying..."
+      log_message "  Request unsuccessful: called '$url' wanted '$desired_status' but got '$status'."
+      echo "att=$attempt_count max=$attempt_max"
+      # if we reached max attempts, then exit with non-zero result
+      if [ "$attempt_count" = "$attempt_max" ]
+      then
+        log_message "  Maximum retry count reached. Aborting."
+        return 1
+      else
+        log_message "  Retrying..."
+      fi
       sleep 2
-    else
-      log_ok
     fi
-    bootstrap_progress
+    bootstrap_progress    
   done
+  
+  log_ok
+  return 0
+}
+
+function hot_reload {
+  gateway_host="$1"
+  gateway_secret="$2"
+  group="$3"
+  result=""
+
+  if [ "$group" = "group" ]
+  then
+    result=$(curl $1/tyk/reload/group?block=true -s \
+      -H "x-tyk-authorization: $2" | jq -r '.status')
+  else
+    result=$(curl $1/tyk/reload?block=true -s \
+      -H "x-tyk-authorization: $2" | jq -r '.status')
+  fi
+
+  return $result
 }
