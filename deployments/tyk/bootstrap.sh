@@ -271,16 +271,23 @@ done
 bootstrap_progress
 
 log_message "Refreshing Policies"
-# This is done for good measure, as per API Definitions, even though it's probably not needed for Policies
-cat deployments/tyk/data/tyk-dashboard/policies.json | jq --raw-output '.Data[]._id' | while read policy_id
+# Policies need to be 'refreshed' using the original policies.json data as the admin import endpoint does not correctly import all the data from the v3 policy schema
+policies_data=$(cat deployments/tyk/data/tyk-dashboard/policies.json)
+echo $policies_data | jq --raw-output '.Data[]._id' | while read policy_id
 do
-  policy_definition=$(curl $dashboard_base_url/api/portal/policies/$policy_id -s \
-    -H "Authorization: $dashboard_user_api_credentials")
-  result=$(curl $dashboard_base_url/api/portal/policies/$policy_id -X PUT -s \
+  policy_data=$(echo $policies_data | jq --arg pol_id "$policy_id" '.Data[] | select( ._id == $pol_id )')
+  policy_name=$(echo $policy_data | jq -r '.name')
+  policy_graphql_update_data=$(jq --arg pol_id "$policy_id" --argjson pol_data "$policy_data" '.variables.id = $pol_id | .variables.input = $pol_data' deployments/tyk/data/tyk-dashboard/update-policy-graphql-template.json)
+
+  result=$(curl $dashboard_base_url/graphql -s \
     -H "Authorization: $dashboard_user_api_credentials" \
-    --data "$policy_definition" | jq -r '.Status')
-  log_message "  $(echo $policy_definition | jq -r '.name'):$result"
+    --data "$policy_graphql_update_data" | jq -r '.data.update_policy.status')
+  log_message "  $policy_name:$result"
 done
+bootstrap_progress
+
+log_message "Reloading Gateways"
+hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
 bootstrap_progress
 
 log_message "Checking Gateway functionality"
