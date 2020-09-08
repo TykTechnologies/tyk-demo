@@ -11,7 +11,7 @@ services:
       - ./deployments/tyk/volumes/tyk-dashboard/private-key.pem:/opt/tyk-dashboard/private-key.pem
       - ./deployments/tyk/volumes/tyk-dashboard/catalogue.html:/opt/tyk-dashboard/portal/templates/catalogue.html
     environment:
-      - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Dashboard licence missing from Docker environment file .env. Review The Getting Started steps in README.md.}  
+      - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Dashboard licence missing from Docker environment file .env. Review The Getting Started steps in README.md.}
       - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
     depends_on:
@@ -103,4 +103,3 @@ volumes:
 
 networks:
   tyk:
-
