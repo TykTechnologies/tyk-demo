@@ -137,10 +137,24 @@
       "meta_data": {}
     },
     {
-      "auth_type": "other",
-      "auth_types": null,
+      "auth_type": "jwt",
+      "auth_types": [
+        "jwt"
+      ],
       "state": "active",
-      "access_rights_array": [],
+      "access_rights_array": [
+        {
+          "api_name": "JWT API",
+          "api_id": "c7c3b826a9ec4c637ae716e00cecc010",
+          "versions": [
+            "Default"
+          ],
+          "allowed_urls": [],
+          "restricted_types": [],
+          "limit": null,
+          "allowance_scope": ""
+        }
+      ],
       "graphql_enabled": false,
       "_id": "5ead72955759610001818688",
       "id": "5ead72955759610001818688",
@@ -153,7 +167,19 @@
       "throttle_interval": 0,
       "throttle_retry_limit": 0,
       "max_query_depth": 0,
-      "access_rights": {},
+      "access_rights": {
+        "c7c3b826a9ec4c637ae716e00cecc010": {
+          "api_name": "JWT API",
+          "api_id": "c7c3b826a9ec4c637ae716e00cecc010",
+          "versions": [
+            "Default"
+          ],
+          "allowed_urls": [],
+          "restricted_types": [],
+          "limit": null,
+          "allowance_scope": ""
+        }
+      },
       "hmac_enabled": false,
       "active": true,
       "is_inactive": false,
@@ -167,14 +193,35 @@
         "acl": true,
         "per_api": false
       },
-      "last_updated": "1596360105",
+      "last_updated": "1599546399",
       "meta_data": {}
     },
     {
-      "auth_type": "other",
-      "auth_types": null,
+      "auth_type": "jwt",
+      "auth_types": [
+        "jwt"
+      ],
       "state": "active",
-      "access_rights_array": [],
+      "access_rights_array": [
+        {
+          "api_name": "JWT API",
+          "api_id": "c7c3b826a9ec4c637ae716e00cecc010",
+          "versions": [
+            "Default"
+          ],
+          "allowed_urls": [
+            {
+              "url": "/anything/allowed-path",
+              "methods": [
+                "GET"
+              ]
+            }
+          ],
+          "restricted_types": [],
+          "limit": null,
+          "allowance_scope": ""
+        }
+      ],
       "graphql_enabled": false,
       "_id": "5ead73565759610001818689",
       "id": "5ead73565759610001818689",
@@ -187,7 +234,26 @@
       "throttle_interval": 0,
       "throttle_retry_limit": 0,
       "max_query_depth": 0,
-      "access_rights": {},
+      "access_rights": {
+        "c7c3b826a9ec4c637ae716e00cecc010": {
+          "api_name": "JWT API",
+          "api_id": "c7c3b826a9ec4c637ae716e00cecc010",
+          "versions": [
+            "Default"
+          ],
+          "allowed_urls": [
+            {
+              "url": "/anything/allowed-path",
+              "methods": [
+                "GET"
+              ]
+            }
+          ],
+          "restricted_types": [],
+          "limit": null,
+          "allowance_scope": ""
+        }
+      },
       "hmac_enabled": false,
       "active": true,
       "is_inactive": false,
@@ -201,7 +267,7 @@
         "acl": true,
         "per_api": false
       },
-      "last_updated": "1596360148",
+      "last_updated": "1599545957",
       "meta_data": {}
     },
     {

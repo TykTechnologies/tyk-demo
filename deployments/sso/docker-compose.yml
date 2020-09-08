@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   tyk-dashboard-sso:
-    image: tykio/tyk-dashboard:v3.0.0
+    image: tykio/tyk-dashboard:v3.0.1
     ports:
       - 3001:3000
     networks:
@@ -17,7 +17,7 @@ services:
       - tyk-mongo
       - tyk-redis
   tyk-identity-broker:
-    image: tykio/tyk-identity-broker:latest
+    image: tykio/tyk-identity-broker:v1.0.0
     networks:
       - tyk
     ports:
