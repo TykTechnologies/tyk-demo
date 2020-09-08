@@ -25,7 +25,7 @@ services:
     networks:
       tyk:
         aliases:
-          - tyk-custom-domain.localhost
+          - tyk-custom-domain.com
     environment:
       - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}

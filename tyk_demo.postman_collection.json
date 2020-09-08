@@ -3193,7 +3193,7 @@
 		{
 			"id": "b48f2c34-d7a4-410f-b8c4-1cbfb63eed8e",
 			"key": "tyk-custom-domain.host",
-			"value": "tyk-custom-domain.localhost:8080"
+			"value": "tyk-custom-domain.com:8080"
 		},
 		{
 			"id": "d4413095-935c-4089-b8e1-a1435dbedc99",
