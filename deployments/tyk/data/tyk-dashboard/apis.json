@@ -2294,7 +2294,7 @@
           "options_passthrough": false,
           "debug": false
         },
-        "domain": "tyk-custom-domain.localhost",
+        "domain": "tyk-custom-domain.com",
         "certificates": [],
         "do_not_track": false,
         "tags": [],
