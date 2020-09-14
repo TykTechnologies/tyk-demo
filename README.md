@@ -2,6 +2,16 @@
 
 This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple deployment, where you can choose what features to include.
 
+It has been built to enable the sharing of knowledge and combining of effort amongst client-facing technical Tyk folks.
+
+See the [Developer Guide](developer-guide.md) for information on how to contribute to and extend this repository.
+
+> :warning: Please note that this repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system or approach.
+
+If you encounter a problem using this repository, please try to fix it yourself and create a pull request so that others can benefit.
+
+# Concept
+
 The concept is that there is a **base deployment** of Tyk, which gives you the usual Tyk components: Gateway, Dashboard, Pump, plus the databases Redis and MongoDB. This standard deployment can be extended by including additional **feature deployments** as needed. The feature deployments cover particular scenarios for Tyk, such as:
 
 * Single sign on
@@ -15,9 +25,6 @@ Each feature deployment has its own directory, with the necessary files to deplo
 
 There is a focus on simplicity. Docker Compose is used to provision the containers, and bootstrap scripts are used to initialise the environment so that it is ready to use straight away - applying configuration and populating data.
 
-See the [Developer Guide](developer-guide.md) for information on how to contribute to and extend this repository.
-
-> :warning: Please note that this repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system.
 
 # Repository Structure
 
