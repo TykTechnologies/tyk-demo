@@ -10,7 +10,7 @@ See the [Developer Guide](developer-guide.md) for information on how to contribu
 
 If you encounter a problem using this repository, please try to fix it yourself and create a pull request so that others can benefit.
 
-# Concept
+# Overview
 
 The concept is that there is a **base deployment** of Tyk, which gives you the usual Tyk components: Gateway, Dashboard, Pump, plus the databases Redis and MongoDB. This standard deployment can be extended by including additional **feature deployments** as needed. The feature deployments cover particular scenarios for Tyk, such as:
 
@@ -26,7 +26,7 @@ Each feature deployment has its own directory, with the necessary files to deplo
 There is a focus on simplicity. Docker Compose is used to provision the containers, and bootstrap scripts are used to initialise the environment so that it is ready to use straight away - applying configuration and populating data.
 
 
-# Repository Structure
+## Repository Structure
 
 * `deployments/*`: Contains all the deployments available as sub-directories
 * `tyk_demo.postman_collection.json`: A Postman collection of requests which correspond to APIs available in the deployment
