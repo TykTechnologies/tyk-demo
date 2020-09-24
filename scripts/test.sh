@@ -24,5 +24,5 @@ docker run -t --rm \
     -v $(pwd)/test.postman_environment.json:/etc/postman/test.postman_environment.json \
     postman/newman:alpine \
     run "/etc/postman/tyk_demo.postman_collection.json" \
-    --environment=/etc/postman/test.postman_environment.json \
+    --environment /etc/postman/test.postman_environment.json \
     --insecure

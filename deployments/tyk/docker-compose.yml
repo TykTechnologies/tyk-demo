@@ -24,7 +24,7 @@ services:
     networks:
       tyk:
         aliases:
-          - tyk-custom-domain.localhost
+          - tyk-custom-domain.com
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED}
