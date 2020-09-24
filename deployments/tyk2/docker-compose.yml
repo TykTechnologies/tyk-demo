@@ -47,7 +47,7 @@ services:
       - tyk2-mongo
       - tyk2-gateway
   tyk2-mongo:
-    image: mongo:3.2
+    image: mongo:4.0
     command: ["mongod", "--smallfiles"]
     volumes:
       - tyk2-mongo-data:/data/db
