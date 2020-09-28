@@ -641,10 +641,10 @@
 											"    var response1;",
 											"    var response2;",
 											"    pm.sendRequest(cacheRequest, function (err, response) {",
-											"        response1 =pm.response.json().uuid;",
+											"        response1 = response.json().uuid;",
 											"        ",
 											"         pm.sendRequest(cacheRequest, function (err, response) {",
-											"            response2 =pm.response.json().uuid;",
+											"            response2 = response.json().uuid;",
 											"            pm.expect(response1).to.eql(response2);",
 											"        });",
 											"    });",
@@ -3088,6 +3088,25 @@
 				},
 				{
 					"name": "Hot reload",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d98f1379-9ade-489b-b1f2-3d0f2aae2502",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Body status value is ok\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"ok\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
@@ -3116,6 +3135,96 @@
 							]
 						},
 						"description": "This request forces the Gateways to reload their API and Policies from the Dashboard. During this process the Gateway can continue serving requests.\n\nThe reload is automatically handled when using the Dashboard to manage APIs and Policies. But this functionality can be useful for CI/CD or when the Gateway is not managed by the Dashboard."
+					},
+					"response": []
+				},
+				{
+					"name": "Cache invalidation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "57b32d2a-6ad4-4308-9f3e-9fad6c411b4f",
+								"exec": [
+									"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
+									"",
+									"// this test relies on the \"/plugin-demo-api/uuid\" endpoint using the cache plugin",
+									"var cacheRequest = {",
+									"    url: 'http://' + tykGatewayHost + '/plugin-demo-api/uuid',",
+									"    method: 'GET'",
+									"};",
+									"",
+									"var cacheInvalidationRequest = {",
+									"    url: 'http://' + tykGatewayHost + '/tyk/cache/4692b70056154ccb41e44af0cdd990c3',",
+									"    method: 'DELETE',",
+									"    header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
+									"};",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Body message value is 'cache invalidated'\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.eql(\"cache invalidated\");",
+									"});",
+									"",
+									"pm.test(\"Response differs after cache is cleared\", function() {",
+									"    var response1;",
+									"    var response2;",
+									"    var response3;",
+									"",
+									"    pm.sendRequest(cacheRequest, function (err, response) {",
+									"        // store the first response",
+									"        response1=response.json().uuid;",
+									"",
+									"        pm.sendRequest(cacheRequest, function (err, response) {",
+									"            // store the second response",
+									"            response2=response.json().uuid;",
+									"",
+									"            // check that response 1 and 2 are the same - i.e. the caching works",
+									"            pm.expect(response1).to.eql(response2);",
+									"",
+									"            // invalidate the cache",
+									"            pm.sendRequest(cacheInvalidationRequest, function (err, response) {",
+									"                pm.sendRequest(cacheRequest, function (err, response) {",
+									"                    // store the third response",
+									"                    response3=response.json().uuid;",
+									"",
+									"                    // check that the responses 2 and 3 are different - i.e. the cache invalidation works",
+									"                    pm.expect(response2).to.not.eql(response3);",
+									"                });",
+									"            });",
+									"        });",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-tyk-authorization",
+								"value": "28d220fd77974a4facfb07dc1e49c2aa",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/tyk/cache/4692b70056154ccb41e44af0cdd990c3",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"tyk",
+								"cache",
+								"4692b70056154ccb41e44af0cdd990c3"
+							]
+						},
+						"description": "This request calls the cache invalidation Gateway API endpoint, which invalidates the cached responses for an API which have been stored by the Gateway. \n\nThis is done on a per-API basis, with the API id provided as the last part of the URL path - in this case `4692b70056154ccb41e44af0cdd990c3`. This clears any cached responses the Gateway has stored for the API. If successful, the API client will receive a response with a `200 OK` HTTP status, and a body message stating `cache invalidated`.\n\nThe cached data will be removed from Redis, so will affect any other Gateways which are using the same Redis instance.\n\nThe process of cache invalidation can also be initiated through the Dashboard API."
 					},
 					"response": []
 				}
@@ -3181,22 +3290,22 @@
 	],
 	"variable": [
 		{
-			"id": "d21d7f3c-00c6-4c35-8691-b368eebb75ea",
+			"id": "613862e4-4688-4bd5-b903-82a42bc5140e",
 			"key": "tyk-gateway.host",
 			"value": "tyk-gateway.localhost:8080"
 		},
 		{
-			"id": "3787d72d-7625-4f73-a722-cdcd4ceef826",
+			"id": "ea0c86f2-b8d7-43f4-93a8-d148bee91970",
 			"key": "tyk-gateway-2.host",
 			"value": "tyk-gateway-2.localhost:8081"
 		},
 		{
-			"id": "b48f2c34-d7a4-410f-b8c4-1cbfb63eed8e",
+			"id": "92c9eccd-f8af-4e6b-9c6a-f75bcee5dc0e",
 			"key": "tyk-custom-domain.host",
 			"value": "tyk-custom-domain.com:8080"
 		},
 		{
-			"id": "d4413095-935c-4089-b8e1-a1435dbedc99",
+			"id": "36acef1d-5efa-4794-b47b-1cbcd82c9c8a",
 			"key": "tyk-dashboard.host",
 			"value": "tyk-dashboard.localhost:3000"
 		}
