@@ -75,13 +75,14 @@ log_ok
 
 log_message "Checking Tyk Environment 2 deployment exists"
 tyk2_dashboard_service=$(docker-compose -f deployments/tyk/docker-compose.yml -f deployments/cicd/docker-compose.yml -f deployments/tyk2/docker-compose.yml -p tyk-demo --project-directory $(pwd) ps | grep "tyk2-dashboard")
-# Warn if cicd deployment is made without the tyk2 deployment
+# Fail if cicd deployment is made without the tyk2 deployment
 if [[ "${#tyk2_dashboard_service}" -eq "0" ]]
 then
-  log_message "  WARNING: Tyk Environment 2 deployment not found."
-  log_message "           CI/CD feature will not work as intended."
-  log_message "           Ensure 'tyk2' parameter is used when calling up.sh script: ./up.sh tyk2 cicd"
+  log_message "  ERROR: Tyk Environment 2 deployment not found."
+  log_message "         CI/CD feature will not work as intended."
+  log_message "         Ensure 'tyk2' parameter is used when calling up.sh script: ./up.sh tyk2 cicd"
   flag_error
+  exit 1
 else
   log_ok
 fi
