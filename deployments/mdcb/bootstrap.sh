@@ -50,10 +50,34 @@ docker-compose \
 log_ok
 bootstrap_progress
 
+# verify MDCB container is running
+log_message "Checking status of MDCB container"
+mdcb_status=$(docker ps -a --filter "name=tyk-demo_tyk-mdcb_1" --format "{{.Status}}")
+log_message "  MDCB container status is: $mdcb_status"
+if [[ $mdcb_status != Up* ]]
+then
+  log_message "  ERROR: MDCB container not in desired status. Exiting."
+  log_message "  Suggest checking MDCB container log for more information. Perhaps the MDCB licence has expired?"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
 # check status of worker Gateway
 log_message "Checking status of Worker Gateway"
 worker_gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
-wait_for_response "$worker_gateway_base_url/basic-open-api/get" "200"
+result=""
+while [ "$result" != "0" ]
+do
+  wait_for_response "$worker_gateway_base_url/basic-open-api/get" "200" "" 3
+  result="$?"
+  if [ "$result" != "0" ]
+  then
+    log_message "  Gateway not returning desired response, attempting hot reload"
+    hot_reload "$worker_gateway_base_url" "$worker_gateway_api_credentials" 
+    sleep 2
+  fi
+done
 
 log_end_deployment
 
