@@ -24,8 +24,9 @@ if [ "$result" == "302" ]
 then
   log_ok
 else
-  log_message "  WARNING: Expected 302 status, but got $result"
-  flag_error
+  log_message "  ERROR: Expected 302 status, but got $result"
+  log_message "  Please check Gitea container logs for more information"
+  exit 1
 fi
 bootstrap_progress
 
@@ -81,7 +82,6 @@ then
   log_message "  ERROR: Tyk Environment 2 deployment not found."
   log_message "         CI/CD feature will not work as intended."
   log_message "         Ensure 'tyk2' parameter is used when calling up.sh script: ./up.sh tyk2 cicd"
-  flag_error
   exit 1
 else
   log_ok
@@ -127,10 +127,11 @@ do
   result=$(curl $dashboard2_base_url/api/apis -s -o /dev/null -w "%{http_code}" -H "authorization: $dashboard2_user_api_credentials" 2>> bootstrap.log)
   if [ "$result" == "401" ]
   then
-    log_message "  WARNING: Unable to make API calls to Tyk Environment 2 Dashboard."
-    log_message "           CI/CD feature will not work as intended."
-    log_message "           Rerun up.sh script with 'tyk2' parameter before 'cicd' parameter: ./up.sh tyk2 cicd"
-    flag_error
+    log_message "  ERROR: Unable to make API calls to Tyk Environment 2 Dashboard."
+    log_message "         CI/CD feature will not work as intended."
+    log_message "         Rerun up.sh script with 'tyk2' parameter before 'cicd' parameter: ./up.sh tyk2 cicd"
+    log_message "         If 'tyk2' was provided, then check the tyk2_dashboard container logs for more information"
+    exit 1
     break
   else
     log_message "  Request unsuccessful, retrying..."

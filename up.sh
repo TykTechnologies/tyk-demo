@@ -38,9 +38,6 @@ fi
 mkdir -p .context-data 1> /dev/null
 rm -f .context-data/*
 
-# make sure error flag is not present
-rm -f .bootstrap_error_occurred
-
 # clear the .bootstrap/bootstrapped_deployments from deployments
 mkdir -p .bootstrap 1> /dev/null
 echo -n > .bootstrap/bootstrapped_deployments
@@ -107,12 +104,6 @@ do
   fi
 done
 
-if [ -f .bootstrap_error_occurred ]
-then
-  # if an error was logged, report it
-  printf "\nError occurred during bootstrap, check bootstrap.log for information\n\n"
-else
-  # Confirm bootstrap is compelete
-  printf "\nTyk-Demo bootstrap completed\n"
-  printf "\n----------------------------\n\n"
-fi
+# Confirm bootstrap is compelete
+printf "\nTyk-Demo bootstrap completed\n"
+printf "\n----------------------------\n\n"
