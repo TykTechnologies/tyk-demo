@@ -74,7 +74,7 @@ do
   if [ "$result" != "0" ]
   then
     log_message "  Gateway not returning desired response, attempting hot reload"
-    hot_reload "$worker_gateway_base_url" "$worker_gateway_api_credentials"
+    hot_reload "$worker_gateway_base_url" "$worker_gateway_api_credentials" 
     sleep 2
   fi
 done

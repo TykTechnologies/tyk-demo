@@ -6,7 +6,7 @@ It has been built to enable the sharing of knowledge and combining of effort amo
 
 See the [Developer Guide](developer-guide.md) for information on how to contribute to and extend this repository.
 
-> :warning: Please note that this repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system or approach.
+:warning: Please note that this repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system or approach. 
 
 If you encounter a problem using this repository, please try to fix it yourself and create a pull request so that others can benefit.
 

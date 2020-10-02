@@ -314,7 +314,7 @@ do
   if [ "$result" != "0" ]
   then
     log_message "  Gateway not returning desired response, attempting hot reload"
-    hot_reload "$gateway2_base_url" "$gateway2_api_credentials"
+    hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
     sleep 2
   fi
 done
@@ -349,19 +349,19 @@ bootstrap_progress
 
 log_message "Sending API requests to generate analytics data"
 # global analytics off
-curl $gateway_base_url/basic-open-api/get -s -o /dev/null
+curl $gateway_base_url/basic-open-api/get -s -o /dev/null 
 # global analytics on
 curl $gateway2_base_url/basic-open-api/get -s -k -o /dev/null
 # api analytics off
 curl $gateway_base_url/detailed-analytics-off/get -s -o /dev/null
 # api analytics on
-curl $gateway_base_url/detailed-analytics-on/get -s -o /dev/null
+curl $gateway_base_url/detailed-analytics-on/get -s -o /dev/null 
 # key analytics off
-curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key" -o /dev/null
+curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key" -o /dev/null 
 # key analytics on
-curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key_analytics_on" -o /dev/null
+curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key_analytics_on" -o /dev/null 
 # enforce timeout plugin
-curl $gateway_base_url/plugin-demo-api/delay/6 -s -o /dev/null
+curl $gateway_base_url/plugin-demo-api/delay/6 -s -o /dev/null 
 log_ok
 
 log_end_deployment

@@ -92,8 +92,6 @@ function wait_for_response {
       status=$(curl -k -I -s -m5 $url 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
     fi
 
-    bootstrap_progress
-
     if [ "$status" == "$desired_status" ]
     then
       log_message "    Attempt $attempt_count succeeded, received '$status'"

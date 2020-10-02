@@ -38,9 +38,6 @@ fi
 mkdir -p .context-data 1> /dev/null
 rm -f .context-data/*
 
-# make sure error flag is not present
-rm -f .bootstrap_error_occurred
-
 # clear the .bootstrap/bootstrapped_deployments from deployments
 mkdir -p .bootstrap 1> /dev/null
 echo -n > .bootstrap/bootstrapped_deployments
