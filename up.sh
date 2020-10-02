@@ -47,7 +47,7 @@ if [[ "$*" == *tracing* ]]
 then
   set_docker_environment_value "TRACING_ENABLED" "true"
 else
-  set_docker_environment_value "TRACING_ENABLED" "false" 
+  set_docker_environment_value "TRACING_ENABLED" "false"
 fi
 
 if [[ "$*" == *instrumentation* ]]
