@@ -46,10 +46,15 @@ echo -n > .bootstrap/bootstrapped_deployments
 if [[ "$*" == *tracing* ]]
 then
   set_docker_environment_value "TRACING_ENABLED" "true"
+else
+  set_docker_environment_value "TRACING_ENABLED" "false" 
 fi
+
 if [[ "$*" == *instrumentation* ]]
 then
   set_docker_environment_value "INSTRUMENTATION_ENABLED" "1"
+else
+  set_docker_environment_value "INSTRUMENTATION_ENABLED" "0"
 fi
 
 # create and run the docker compose command
