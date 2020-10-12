@@ -14,7 +14,7 @@ Run the `up.sh` script with the `sso` parameter:
 
 ## Usage
 
-### OpenID Connect SSO for Tyk Dashboard SSO
+### OpenID Connect for Tyk Dashboard login
 
 **Note:** This example is not very configurable right now, since it relies on a specific Okta setup which is only configurable by the owner of the Okta account (i.e. not you!). Would be good to change this at some point to use a self-contained method which can be managed by anyone. Please feel free to implement such a change an make a pull request. Anyway, here's the SSO we have...
 
@@ -36,7 +36,7 @@ This will redirect back to the Dashboard, using a temporary session created via 
 
 Functionality is based on the `division` attribute of the Okta user profile and ID token. The value of which is matched against the `UserGroupMapping` property of the `tyk-dashboard` Identity Broker profile.
 
-### LDAP for token generation
+### LDAP for API Token generation
 
 This example uses an LDAP server to verify credentials before providing an API key.
 
