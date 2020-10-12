@@ -26,3 +26,9 @@ services:
       - SESSION_SECRET=12345
     volumes:
       - ./deployments/sso/volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf
+  ldap-server:
+    image: dwimberger/ldap-ad-it:latest
+    networks:
+      - tyk
+    volumes:
+      - ./deployments/sso/volumes/ldap-server/users.ldif:/ldap/users.ldif
