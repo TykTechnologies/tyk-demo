@@ -1,0 +1,81 @@
+{
+	"info": {
+		"_postman_id": "3d3b169a-1ef8-42e3-b5b1-c4d6b1eb3a55",
+		"name": "Tyk Demo - SSO",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "LDAP - Generate API key",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "password",
+							"value": "secret",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "test",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3010/auth/ldap-token/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3010",
+					"path": [
+						"auth",
+						"ldap-token",
+						"1"
+					]
+				},
+				"description": "This request generates an API key using credentials authenticated with LDAP.\n\nThe request goes to the Identity Broker, which is configured to verify the credentials provided as body values. In this example the body contains two values, `username` set to `test`, and `password` set to `secret`. The Identity Broker takes these values and converts it into an LDAP query as defined in the TIB profile.\n\nThe URL reqested defines what the Identity Broker will do with the request. In this case, the path starts `/auth/ldap-server` which means that the `ldap-server` profile will be used to process the request. The `1` at the end of the path has no significance.\nThe profile is configured to generate an API key which is associated with a specific Policy, which defines the access rights and other values imposed on the key."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "d07fac22-2de4-4a1c-a077-0247d253ccfc",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "e66c6bce-384f-4a95-9266-8216a1d8a06e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "0c72957c-85a4-417c-ad09-ba3a3ca7673c",
+			"key": "tyk-identity-broker.host",
+			"value": "localhost:3010"
+		},
+		{
+			"id": "74ed7a6d-8824-4a3b-803c-a21738825dee",
+			"key": "tyk-dashboard.host",
+			"value": "tyk-dashboard.localhost:3000"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
