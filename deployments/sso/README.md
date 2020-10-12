@@ -14,7 +14,7 @@ Run the `up.sh` script with the `sso` parameter:
 
 ## Usage
 
-### OpenID Connect SSO for Tyk Dashboard SSO
+### OpenID Connect SSO for Tyk Dashboard SSO
 
 **Note:** This example is not very configurable right now, since it relies on a specific Okta setup which is only configurable by the owner of the Okta account (i.e. not you!). Would be good to change this at some point to use a self-contained method which can be managed by anyone. Please feel free to implement such a change an make a pull request. Anyway, here's the SSO we have...
 
