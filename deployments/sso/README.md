@@ -42,4 +42,6 @@ This example uses an LDAP server to verify credentials before providing an API k
 
 The `ldap-server` container is the LDAP server, it loads the configuration file `./volumes/ldap-server/users.ldif`, which is mapped into the container as a volume.
 
+The `./data/tyk-identity-broker/profile-ldap-token.json` TIB Profile is set up to use the `ldap-server` to authenticate the request.
+
 See the `LDAP - Generate API key` request in the `./tyk_demo_sso.postman_collections.json` file for an example.
