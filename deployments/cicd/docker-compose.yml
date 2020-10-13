@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   jenkins:
-    image: jenkins/jenkins:lts-alpine
+    image: jenkins/jenkins:2.249.2-lts-alpine
     ports:
       - 8070:8080
     networks:

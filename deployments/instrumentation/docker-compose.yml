@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   graphite:
-    image: graphiteapp/graphite-statsd
+    image: graphiteapp/graphite-statsd:1.1.7-6
     networks:
       - tyk
     ports:
