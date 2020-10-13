@@ -30,7 +30,7 @@ There is a focus on simplicity. Docker Compose is used to provision the containe
 
 * `deployments/*`: Contains all the deployments available as sub-directories
 * `tyk_demo.postman_collection.json`: A Postman collection of requests which correspond to APIs available in the deployment
-* `test.postman_environment.json`: Set of environment variables, for use when running tests with Newman
+* `test.postman_environment.json`: Set of environment variables, for use when running tests with a Newman container within a Docker deployment
 * `scripts/*.sh`: Some useful commands encapsulated in scripts
 * `up.sh`: Brings up the deployment
 * `down.sh`: Takes down the deployment
@@ -53,7 +53,7 @@ Docker Compose is required. If you're installing on Mac or Windows, then Docker 
 
 ### JQ
 
-The bootstrap script uses JQ for extracting data from JSON object, it can be installed as follows.
+The bootstrap script uses JQ for extracting data from JSON objects, it can be installed as follows.
 
 Install on OS X using Homebrew:
 
@@ -80,7 +80,7 @@ sudo ./scripts/update-hosts.sh
 The custom hostnames will be used by the Dashboard and Gateway to:
 
 - Differentiate between requests for the Dashboard and Portal
-- Identify the API being requested when using custom domains 
+- Identify the API being requested when using custom domains
 
 ## Step 3: Add Docker Environment variables
 

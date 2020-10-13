@@ -14,24 +14,23 @@
 					"mode": "urlencoded",
 					"urlencoded": [
 						{
-							"key": "password",
-							"value": "secret",
+							"key": "username",
+							"value": "test",
 							"type": "text"
 						},
 						{
-							"key": "username",
-							"value": "test",
+							"key": "password",
+							"value": "secret",
 							"type": "text"
 						}
 					]
 				},
 				"url": {
-					"raw": "http://localhost:3010/auth/ldap-token/1",
+					"raw": "http://{{tyk-identity-broker.host}}/auth/ldap-token/1",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"{{tyk-identity-broker.host}}"
 					],
-					"port": "3010",
 					"path": [
 						"auth",
 						"ldap-token",
@@ -67,12 +66,12 @@
 	],
 	"variable": [
 		{
-			"id": "b63d1afd-e2d8-4493-8381-2df7225ca9ff",
+			"id": "64638bbd-2c10-4fe2-91ea-002faabd9eda",
 			"key": "tyk-identity-broker.host",
 			"value": "localhost:3010"
 		},
 		{
-			"id": "b416ae83-5a33-4f66-a0e8-3ba7dc3a47d0",
+			"id": "f4775614-6c19-4823-976b-4e99b6bbb977",
 			"key": "tyk-dashboard.host",
 			"value": "tyk-dashboard.localhost:3000"
 		}

@@ -36,6 +36,10 @@ This will redirect back to the Dashboard, using a temporary session created via 
 
 Functionality is based on the `division` attribute of the Okta user profile and ID token. The value of which is matched against the `UserGroupMapping` property of the `tyk-dashboard` Identity Broker profile.
 
+#### Logging out
+
+Note that if you choose to log out of the Tyk Dashboard, it will automatically redirect you to the SSO login page, which is still authenticated, so will validate your request and redirect you back to the Dashboard with a new session.
+
 ### LDAP for API Token generation
 
 This example uses an LDAP server to verify credentials before providing an API key.
