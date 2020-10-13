@@ -28,11 +28,8 @@ done
 # check that jq is available
 command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: JQ is required, but it's not installed. Review 'getting started' steps in README.md."; exit 1; }
 
-# prevent log file from growing too big - truncate when it reaches over 10000 lines
-if [ -f bootstrap.log ] && [  $(wc -l < bootstrap.log) -gt 10000 ]
-then
-  echo "" > bootstrap.log
-fi
+# restart bootstrap log file
+echo -n > bootstrap.log
 
 # make the context data directory and clear and data from an existing directory
 mkdir -p .context-data 1> /dev/null
