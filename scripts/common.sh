@@ -99,7 +99,7 @@ function wait_for_response {
     else
       if [ "$attempt_max" != "" ]
       then
-        log_message "    Attempt $attempt_count of $attempt_max unsuccessful, got '$status'"
+        log_message "    Attempt $attempt_count of $attempt_max unsuccessful, received '$status'"
       else
         log_message "    Attempt $attempt_count unsuccessful, received '$status'"
       fi
