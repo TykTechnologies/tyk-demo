@@ -8,6 +8,7 @@ bootstrap_progress
 
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 portal_base_url="http://tyk-portal.localhost:3000"
+portal_organisation_2_base_url="http://acme-portal.localhost:3000"
 gateway_base_url="http://tyk-gateway.localhost:8080"
 gateway_base_url_tcp="tyk-gateway.localhost:8086"
 gateway2_base_url="https://tyk-gateway-2.localhost:8081"
@@ -22,6 +23,8 @@ bootstrap_progress
 
 log_message "Waiting for Dashboard API to be ready"
 wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
+
+# Organisations
 
 log_message "Importing organisation"
 organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
@@ -44,6 +47,8 @@ echo $organisation_2_id > .context-data/organisation-2-id
 echo $organisation_2_name > .context-data/organisation-2-name
 log_message "  $organisation_2_name Org Id = $organisation_2_id"
 bootstrap_progress
+
+# Users
 
 log_message "Creating Dashboard user for organisation $organisation_name"
 dashboard_user_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/dashboard-user.json)
@@ -120,6 +125,7 @@ echo "$dashboard_multi_organisation_user_2_api_credentials" > .context-data/dash
 log_message "  Dashboard Multi-Organisation User 2 API Credentials = $dashboard_multi_organisation_user_2_api_credentials"
 bootstrap_progress
 
+# User Groups
 
 log_message "Creating Dashboard user groups"
 result=$(curl $dashboard_base_url/api/usergroups -s \
@@ -141,19 +147,25 @@ echo $user_group_data | jq -r .groups[1].id > .context-data/user-group-default-i
 echo $user_group_data | jq -r .groups[2].id > .context-data/user-group-admin-id
 bootstrap_progress
 
+# Webhooks
+
 log_message "Creating webhooks"
 log_json_result "$(curl $dashboard_base_url/api/hooks -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @deployments/tyk/data/tyk-dashboard/webhook-webhook-receiver-api-post.json 2>> bootstrap.log)"
 bootstrap_progress
 
-log_message "Creating Portal default settings"
+# Portals
+
+log_message "Creating Portal for organisation $organisation_name"
+
+log_message "  Creating Portal default settings"
 log_json_result "$(curl $dashboard_base_url/api/portal/configuration -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d "{}" 2>> bootstrap.log)"
 bootstrap_progress
 
-log_message "Initialising Catalogue"
+log_message "  Initialising Catalogue"
 result=$(curl $dashboard_base_url/api/portal/catalogue -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d '{"org_id": "'$organisation_id'"}' 2>> bootstrap.log)
@@ -161,13 +173,13 @@ catalogue_id=$(echo "$result" | jq -r '.Message')
 log_json_result "$result"
 bootstrap_progress
 
-log_message "Creating Portal home page"
+log_message "  Creating Portal home page"
 log_json_result "$(curl $dashboard_base_url/api/portal/pages -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @deployments/tyk/data/tyk-dashboard/portal-home-page.json 2>> bootstrap.log)"
 bootstrap_progress
 
-log_message "Creating Portal user"
+log_message "  Creating Portal user"
 portal_user_email=$(jq -r '.email' deployments/tyk/data/tyk-dashboard/portal-user.json)
 portal_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/portal-user.json)
 log_json_result "$(curl $dashboard_base_url/api/portal/developers -s \
@@ -179,7 +191,7 @@ log_json_result "$(curl $dashboard_base_url/api/portal/developers -s \
     }' 2>> bootstrap.log)"
 bootstrap_progress
 
-log_message "Creating documentation"
+log_message "  Creating documentation"
 policies=$(curl $dashboard_base_url/api/portal/policies?p=-1 -s \
   -H "Authorization:$dashboard_user_api_credentials" 2>> bootstrap.log)
 result=$(curl $dashboard_base_url/api/portal/documentation -s \
@@ -193,7 +205,7 @@ documentation_swagger_petstore_id=$(echo "$result" | jq -r '.Message')
 log_json_result "$result"
 bootstrap_progress
 
-log_message "Updating catalogue"
+log_message "  Updating catalogue"
 policy_data=$(cat deployments/tyk/data/tyk-dashboard/policies.json)
 policies_swagger_petstore_id=$(echo $policy_data | jq -r '.Data[] | select(.name=="Swagger Petstore Policy") | .id')
 catalogue_data=$(cat deployments/tyk/data/tyk-dashboard/catalogue.json | \
@@ -205,6 +217,42 @@ log_json_result "$(curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d "$(echo $catalogue_data)" 2>> bootstrap.log)"
 bootstrap_progress
+
+log_message "Creating Portal for organisation $organisation_2_name"
+
+log_message "  Creating Portal default settings"
+log_json_result "$(curl $dashboard_base_url/api/portal/configuration -s \
+  -H "Authorization: $dashboard_user_organisation_2_api_credentials" \
+  -d "{}" 2>> bootstrap.log)"
+bootstrap_progress
+
+log_message "  Initialising Catalogue"
+result=$(curl $dashboard_base_url/api/portal/catalogue -s \
+  -H "Authorization: $dashboard_user_organisation_2_api_credentials" \
+  -d '{"org_id": "'$organisation_2_id'"}' 2>> bootstrap.log)
+catalogue_id=$(echo "$result" | jq -r '.Message')
+log_json_result "$result"
+bootstrap_progress
+
+log_message "  Creating Portal home page"
+log_json_result "$(curl $dashboard_base_url/api/portal/pages -s \
+  -H "Authorization: $dashboard_user_organisation_2_api_credentials" \
+  -d @deployments/tyk/data/tyk-dashboard/portal-home-page.json 2>> bootstrap.log)"
+bootstrap_progress
+
+log_message "  Creating Portal user"
+portal_user_email=$(jq -r '.email' deployments/tyk/data/tyk-dashboard/portal-user.json)
+portal_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/portal-user.json)
+log_json_result "$(curl $dashboard_base_url/api/portal/developers -s \
+  -H "Authorization: $dashboard_user_organisation_2_api_credentials" \
+  -d '{
+      "email": "'$portal_user_email'",
+      "password": "'$portal_user_password'",
+      "org_id": "'$organisation_2_id'"
+    }' 2>> bootstrap.log)"
+bootstrap_progress
+
+# APIs & Policies
 
 # Broken references occur because the ID of the data changes when it is created
 # This means the references to this data must be 'reconnected' to the new IDs
@@ -286,6 +334,8 @@ do
 done
 bootstrap_progress
 
+# System
+
 log_message "Reloading Gateways"
 hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
 bootstrap_progress
@@ -364,6 +414,11 @@ curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key_analy
 curl $gateway_base_url/plugin-demo-api/delay/6 -s -o /dev/null 
 log_ok
 
+log_message "Restarting Dashboard container to ensure Portal URLs are loaded ok"
+docker restart tyk-demo_tyk-dashboard_1
+log_ok
+bootstrap_progress
+
 log_end_deployment
 
 echo -e "\033[2K
@@ -400,6 +455,10 @@ echo -e "\033[2K
   ▽ Portal
     ▾ $organisation_name Organisation
                     URL : $portal_base_url$portal_root_path
+               Username : $portal_user_email
+               Password : $portal_user_password  
+    ▾ $organisation_2_name Organisation
+                    URL : $portal_organisation_2_base_url$portal_root_path
                Username : $portal_user_email
                Password : $portal_user_password  
   ▽ Gateway
