@@ -1,0 +1,81 @@
+{
+	"info": {
+		"_postman_id": "3d3b169a-1ef8-42e3-b5b1-c4d6b1eb3a55",
+		"name": "Tyk Demo - SSO",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "LDAP - Generate API key",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "password",
+							"value": "secret",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "test",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3010/auth/ldap-token/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3010",
+					"path": [
+						"auth",
+						"ldap-token",
+						"1"
+					]
+				},
+				"description": "This request generates an API key using credentials authenticated with LDAP.\n\nThe request goes to the Identity Broker, which is configured to verify the credentials provided as body values. In this example the body contains two values, `username` set to `test`, and `password` set to `secret`. The Identity Broker takes these values and converts it into an LDAP query as defined in the TIB profile.\n\nThe URL reqested defines what the Identity Broker will do with the request. In this case, the path starts `/auth/ldap-server` which means that the `ldap-server` profile will be used to process the request. The `1` at the end of the path has no significance.\nThe profile is configured to generate an API key which is associated with a specific Policy, which defines the access rights and other values imposed on the key.\n\nIf the request is successful then a HTTP 200 response is returned with the response body containing the new key, as the value of the `key_id` property, for example:\n```\n{\n    \"key_id\": \"eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6Ijc2Y2UxYmE2MGUyOTQ2Mjg4NzA4Y2IzNGRlZTAyYWNiIiwiaCI6Im11cm11cjY0In0=\"\n}\n```"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "d07fac22-2de4-4a1c-a077-0247d253ccfc",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "e66c6bce-384f-4a95-9266-8216a1d8a06e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "b63d1afd-e2d8-4493-8381-2df7225ca9ff",
+			"key": "tyk-identity-broker.host",
+			"value": "localhost:3010"
+		},
+		{
+			"id": "b416ae83-5a33-4f66-a0e8-3ba7dc3a47d0",
+			"key": "tyk-dashboard.host",
+			"value": "tyk-dashboard.localhost:3000"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
