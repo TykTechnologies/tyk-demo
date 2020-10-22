@@ -2862,6 +2862,72 @@
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Single Sign-On",
+					"item": [
+						{
+							"name": "Dashboard SSO - request login token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "e66aea99-87de-4454-8850-8782c1d89da8",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Message confirms SSO Nonce created\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.Message).to.eql(\"SSO Nonce created\");",
+											"});",
+											"",
+											"pm.test(\"SSO nonce not empty\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.Meta).length.greaterThan(0);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "b7764aeda1e4437261b672c0edab5a81",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"ForSection\": \"dashboard\",\n  \"OrgID\": \"5e9d9544a1dcd60001d0ed20\",\n  \"EmailAddress\": \"\",\n  \"GroupID\": \"5f8ff13d046775000175a8c3\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-dashboard.host}}/api/sso",
+									"protocol": "http",
+									"host": [
+										"{{tyk-dashboard.host}}"
+									],
+									"path": [
+										"api",
+										"sso"
+									]
+								},
+								"description": "This request calls the standard Dashboard API SSO endpoint to generate a one-time use login token.\n\nThe request body specifies the context in which the login token can be used:\n- `ForSection`: Either `dashboard` or `portal`\n- `OrgId`: Defines the Organisation context for the session\n- `EmailAddress`: If provided, will lookup the email address and log in the session as that user\n- `GroupId`: If provided, will lookup the user group and assign it to the session\n\nIf the request is successful, the response will have a `200 OK` status and the body will contain a property called `Meta`, the value of which is the login token. This token can then be used to call the SSO endpoint of the Dashboard or Portal to generate the session and log into the application.\n\nThe request uses a Dashboard User's API access token to authenticate the request via the `authorization` header.\n\n### Using the login token\n\nCreate the SSO login URL by combining the SSO endpoint URL (http://tyk-dashboard.localhost:3000/tap?nonce=) with the login token value (`Meta` property returned the response). Use the resulting URL your browser. You will then be logged into the Dashboard.\n\nFor example http://tyk-dashboard.localhost:3000/tap?nonce=M2U5YmRkNjUtZjNjYy00OWZmLTcwNjEtNzJkMjRjODc3MmZk (Note, this URL will not work, it's just an example.)"
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -3290,22 +3356,22 @@
 	],
 	"variable": [
 		{
-			"id": "613862e4-4688-4bd5-b903-82a42bc5140e",
+			"id": "c7084e2f-150b-4e9f-9872-4f4640729980",
 			"key": "tyk-gateway.host",
 			"value": "tyk-gateway.localhost:8080"
 		},
 		{
-			"id": "ea0c86f2-b8d7-43f4-93a8-d148bee91970",
+			"id": "262a8213-b852-4231-ad5e-1a47f17c97db",
 			"key": "tyk-gateway-2.host",
 			"value": "tyk-gateway-2.localhost:8081"
 		},
 		{
-			"id": "92c9eccd-f8af-4e6b-9c6a-f75bcee5dc0e",
+			"id": "6be5549f-59ca-4a12-b8e2-21b7c350c6f0",
 			"key": "tyk-custom-domain.host",
 			"value": "tyk-custom-domain.com:8080"
 		},
 		{
-			"id": "36acef1d-5efa-4794-b47b-1cbcd82c9c8a",
+			"id": "126fbe6d-15d8-4a64-ad48-5fabbc2635cd",
 			"key": "tyk-dashboard.host",
 			"value": "tyk-dashboard.localhost:3000"
 		}
