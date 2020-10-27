@@ -8,13 +8,14 @@ services:
       - tyk
     volumes:
       - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
+      - ./deployments/tyk/volumes/tyk-dashboard/private-key.pem:/opt/tyk-dashboard/private-key.pem
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Please set DASHBOARD_LICENCE in .env}
       - TYK_DB_MONGOURL=mongodb://tyk2-mongo:27017/tyk_analytics
       - TYK_DB_REDISHOST=tyk2-redis
       - TYK_DB_TYKAPICONFIG_HOST=http://tyk2-gateway
       - TYK_DB_HOSTCONFIG_OVERRIDEHOSTNAME=localhost:8085
-      - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
+      - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}      
     depends_on:
       - tyk2-redis
       - tyk2-mongo
@@ -27,6 +28,7 @@ services:
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+      - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
     environment:
       - TYK_GW_POLICIES_POLICYCONNECTIONSTRING=http://tyk2-dashboard:3000
       - TYK_GW_DBAPPCONFOPTIONS_CONNECTIONSTRING=http://tyk2-dashboard:3000
