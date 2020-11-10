@@ -28,18 +28,12 @@ done
 # check that jq is available
 command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: JQ is required, but it's not installed. Review 'getting started' steps in README.md."; exit 1; }
 
-# prevent log file from growing too big - truncate when it reaches over 10000 lines
-if [ -f bootstrap.log ] && [  $(wc -l < bootstrap.log) -gt 10000 ]
-then
-  echo "" > bootstrap.log
-fi
+# restart bootstrap log file
+echo -n > bootstrap.log
 
 # make the context data directory and clear and data from an existing directory
 mkdir -p .context-data 1> /dev/null
 rm -f .context-data/*
-
-# make sure error flag is not present
-rm -f .bootstrap_error_occurred
 
 # clear the .bootstrap/bootstrapped_deployments from deployments
 mkdir -p .bootstrap 1> /dev/null
@@ -52,6 +46,7 @@ then
 else
   set_docker_environment_value "TRACING_ENABLED" "false"
 fi
+
 if [[ "$*" == *instrumentation* ]]
 then
   set_docker_environment_value "INSTRUMENTATION_ENABLED" "1"
@@ -107,12 +102,6 @@ do
   fi
 done
 
-if [ -f .bootstrap_error_occurred ]
-then
-  # if an error was logged, report it
-  printf "\nError occurred during bootstrap, check bootstrap.log for information\n\n"
-else
-  # Confirm bootstrap is compelete
-  printf "\nTyk-Demo bootstrap completed\n"
-  printf "\n----------------------------\n\n"
-fi
+# Confirm bootstrap is compelete
+printf "\nTyk-Demo bootstrap completed\n"
+printf "\n----------------------------\n\n"

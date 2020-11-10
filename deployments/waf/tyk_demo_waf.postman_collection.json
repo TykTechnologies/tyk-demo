@@ -1,0 +1,163 @@
+{
+	"info": {
+		"_postman_id": "eeb6bf53-3960-4bb4-aaf0-0a1f1239dfb5",
+		"name": "Tyk Demo - WAF",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Check WAF is operational (part 1)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b8e091fa-5bf4-429b-af47-84fbb05fddd6",
+						"exec": [
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"hello world\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8500",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8500"
+				},
+				"description": "This request checks that the Web Application Firewall (WAF) is operational.\n\nIt should return a HTTP 200 response with the body text `hello world`."
+			},
+			"response": []
+		},
+		{
+			"name": "Dangerous request direct to WAF (part 2)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e35f2848-c599-49c2-b2b6-271fe944c0bb",
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8500/?param=\"<script>alert(1);</script>\"",
+					"host": [
+						"localhost"
+					],
+					"port": "8500",
+					"path": [
+						""
+					],
+					"query": [
+						{
+							"key": "param",
+							"value": "\"<script>alert(1);</script>\""
+						}
+					]
+				},
+				"description": "This request sends a dangerous request to the WAF. The request is considered dangerous as it includes a script as a querystring parameter.\n\nThe WAF blocks this request, returning an HTTP `403 Forbidden` response."
+			},
+			"response": []
+		},
+		{
+			"name": "Clean request via Tyk (part 3)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9497f7bc-b1be-4c0d-9832-7016ff2c61ac",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/waf/ip",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"waf",
+						"ip"
+					]
+				},
+				"description": "This request is sent to the Tyk API Gateway, requesting an API which has been configured to use the WAF when processing the request. \n\nThis is achieved using JavaScript middleware, which calls the WAF endpoint as in part 2. If the WAF provides an HTTP `200 OK` response to the Gateway then the request is ok to proceed, otherwise the Gateway blocks the request. The code for this middleware can be seen in `./deployments/tyk/volumes/tyk-gateway/middleware/waf.js`. It is associated with the `pre` stage hook on the *WAF Protected API* definition.\n\nIn this example, the request is allowed, as the request does not contain any elements which are detected as being dangerous. See part 4 for an example of a dangerous request being blocked."
+			},
+			"response": []
+		},
+		{
+			"name": "Dangerous request via Tyk (part 4)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a5902804-e15d-4cc8-b974-208783e9cb2f",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body test is Bad request!\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.eql(\"Bad request!\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/waf/ip?param=\"<script>alert(1);</script>\"",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"waf",
+						"ip"
+					],
+					"query": [
+						{
+							"key": "param",
+							"value": "\"<script>alert(1);</script>\""
+						}
+					]
+				},
+				"description": "This request is blocked by the Gateway, as the check made to the WAF by `pre` hook JavaScript middleware returns an error (as per part 2). The Gateway blocks the request, returning a HTTP 400 response.\n\nThe error response is defined in the JavaScript middleware, so it can be customised to use the desired HTTP status code, headers and body."
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

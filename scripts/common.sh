@@ -17,7 +17,7 @@ function log_http_result {
     log_ok
   else 
     log_message "  ERROR: $1"
-    flag_error
+    exit 1
   fi
 }
 
@@ -28,12 +28,8 @@ function log_json_result {
     log_ok
   else
     log_message "  ERROR: $(echo $1 | jq -r '.Message')"
-    flag_error
+    exit 1
   fi
-}
-
-function flag_error {
-  touch .bootstrap_error_occurred
 }
 
 function log_ok {
@@ -81,7 +77,7 @@ function wait_for_response {
   header="$3"
   attempt_max="$4"
   attempt_count=0
-  
+
   log_message "  Expecting $2 response from $1"
 
   while [ "$status" != "$desired_status" ]
@@ -96,8 +92,6 @@ function wait_for_response {
       status=$(curl -k -I -s -m5 $url 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
     fi
 
-    bootstrap_progress    
-
     if [ "$status" == "$desired_status" ]
     then
       log_message "    Attempt $attempt_count succeeded, received '$status'"
@@ -105,7 +99,7 @@ function wait_for_response {
     else
       if [ "$attempt_max" != "" ]
       then
-        log_message "    Attempt $attempt_count of $attempt_max unsuccessful, got '$status'"
+        log_message "    Attempt $attempt_count of $attempt_max unsuccessful, received '$status'"
       else
         log_message "    Attempt $attempt_count unsuccessful, received '$status'"
       fi
@@ -116,7 +110,7 @@ function wait_for_response {
         log_message "    Maximum retry count reached. Aborting."
         return 1
       fi
-      
+
       sleep 2
     fi
   done

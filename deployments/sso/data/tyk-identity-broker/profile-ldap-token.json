@@ -1,0 +1,22 @@
+{
+    "ActionType": "GenerateTemporaryAuthToken",
+    "ID": "ldap-token",
+    "IdentityHandlerConfig": {
+        "DashboardCredential": "DASHBOARD_USER_API_CREDENTIALS",
+        "TokenAuth": {
+            "BaseAPIID": "accbdd1b89e84ec97f4f16d4e3197d5c"
+        }
+    },
+    "MatchedPolicyID": "5f83cfd378ab040001d3d824",
+    "OrgID": "ORGANISATION_ID",
+    "ProviderConfig": {
+        "FailureRedirect": "DASHBOARD_HOST/failure",
+        "LDAPAttributes": [],
+        "LDAPPort": "10389",
+        "LDAPServer": "ldap-server",
+        "LDAPUserDN": "uid=*USERNAME*,ou=users,dc=tyk,dc=io"
+    },
+    "ProviderName": "ADProvider",
+    "ReturnURL": "",
+    "Type": "redirect"
+}

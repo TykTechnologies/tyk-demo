@@ -1,24 +1,26 @@
 version: '3.3'
 services:
   tyk2-dashboard:
-    image: tykio/tyk-dashboard:v3.0.1
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v3.1.0}
     ports:
       - 3002:3000
     networks:
       - tyk
     volumes:
       - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
+      - ./deployments/tyk/volumes/tyk-dashboard/private-key.pem:/opt/tyk-dashboard/private-key.pem
     environment:
-      - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE}
+      - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Please set DASHBOARD_LICENCE in .env}
       - TYK_DB_MONGOURL=mongodb://tyk2-mongo:27017/tyk_analytics
       - TYK_DB_REDISHOST=tyk2-redis
       - TYK_DB_TYKAPICONFIG_HOST=http://tyk2-gateway
       - TYK_DB_HOSTCONFIG_OVERRIDEHOSTNAME=localhost:8085
+      - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}      
     depends_on:
       - tyk2-redis
       - tyk2-mongo
   tyk2-gateway:
-    image: tykio/tyk-gateway:v3.0.1
+    image: tykio/tyk-gateway:${TYK2_GATEWAY_VERSION:-v3.1.0}
     ports:
       - 8085:8080
     networks:
@@ -26,18 +28,22 @@ services:
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+      - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
     environment:
       - TYK_GW_POLICIES_POLICYCONNECTIONSTRING=http://tyk2-dashboard:3000
       - TYK_GW_DBAPPCONFOPTIONS_CONNECTIONSTRING=http://tyk2-dashboard:3000
       - TYK_GW_STORAGE_HOST=tyk2-redis
+      - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
     depends_on:
       - tyk2-redis
   tyk2-pump:
-    image: tykio/tyk-pump-docker-pub:v1.0.0
+    image: tykio/tyk-pump-docker-pub:${TYK2_PUMP_VERSION:-v1.0.0}
     networks:
       - tyk
     volumes:
       - ./deployments/tyk2/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
+    environment:
+      - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
     depends_on:
       - tyk2-redis
       - tyk2-mongo
@@ -50,7 +56,7 @@ services:
     networks:
       - tyk
   tyk2-redis:
-    image: redis
+    image: redis:6.0.4
     volumes:
       - tyk2-redis-data:/data
     networks:
