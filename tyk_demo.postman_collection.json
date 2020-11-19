@@ -2896,8 +2896,8 @@
 								"method": "POST",
 								"header": [
 									{
-										"key": "Authorization",
-										"value": "b7764aeda1e4437261b672c0edab5a81",
+										"key": "admin-auth",
+										"value": "ff8289874f5d45de945a2ea5c02580fe",
 										"type": "text"
 									}
 								],
@@ -2911,17 +2911,17 @@
 									}
 								},
 								"url": {
-									"raw": "http://{{tyk-dashboard.host}}/api/sso",
+									"raw": "http://{{tyk-dashboard.host}}/admin/sso",
 									"protocol": "http",
 									"host": [
 										"{{tyk-dashboard.host}}"
 									],
 									"path": [
-										"api",
+										"admin",
 										"sso"
 									]
 								},
-								"description": "This request calls the standard Dashboard API SSO endpoint to generate a one-time use login token.\n\nThe request body specifies the context in which the login token can be used:\n- `ForSection`: Either `dashboard` or `portal`\n- `OrgId`: Defines the Organisation context for the session\n- `EmailAddress`: If provided, will lookup the email address and log in the session as that user\n- `GroupId`: If provided, will lookup the user group and assign it to the session\n\nIf the request is successful, the response will have a `200 OK` status and the body will contain a property called `Meta`, the value of which is the login token. This token can then be used to call the SSO endpoint of the Dashboard or Portal to generate the session and log into the application.\n\nThe request uses a Dashboard User's API access token to authenticate the request via the `authorization` header.\n\n### Using the login token\n\nCreate the SSO login URL by combining the SSO endpoint URL (http://tyk-dashboard.localhost:3000/tap?nonce=) with the login token value (`Meta` property returned the response). Use the resulting URL your browser. You will then be logged into the Dashboard.\n\nFor example http://tyk-dashboard.localhost:3000/tap?nonce=M2U5YmRkNjUtZjNjYy00OWZmLTcwNjEtNzJkMjRjODc3MmZk (Note, this URL will not work, it's just an example.)"
+								"description": "This request calls the Dashboard Admin API SSO endpoint to generate a one-time use login token.\n\nThe request body specifies the context in which the login token can be used:\n- `ForSection`: Either `dashboard` or `portal`\n- `OrgId`: Defines the Organisation context for the session\n- `EmailAddress`: If provided, will lookup the email address and log in the session as that user\n- `GroupId`: If provided, will lookup the user group and assign it to the session\n\nIf the request is successful, the response will have a `200 OK` status and the body will contain a property called `Meta`, the value of which is the login token. This token can then be used to call the SSO endpoint of the Dashboard or Portal to generate the session and log into the application.\n\nThe Standard Dashboard API can also be used for SSO, as it has an equivilant SSO endpoint `/api/sso`, which requires authentication using a Dashboard User's API access token via the `authorization` header.\n\n### Using the login token\n\nCreate the SSO login URL by combining the SSO endpoint URL (http://tyk-dashboard.localhost:3000/tap?nonce=) with the login token value (`Meta` property returned the response) e.g. `ZDhlNDY4ODktMzU2MC00ZmQwLTY5Y2MtZTcxYzNkNGYzYTJl`. Use the resulting URL your browser. You will then be logged into the Dashboard.\n\nFor example http://tyk-dashboard.localhost:3000/tap?nonce=ZDhlNDY4ODktMzU2MC00ZmQwLTY5Y2MtZTcxYzNkNGYzYTJl (Note, this URL will not work, it's just an example.)"
 							},
 							"response": []
 						}
@@ -3356,22 +3356,22 @@
 	],
 	"variable": [
 		{
-			"id": "c7084e2f-150b-4e9f-9872-4f4640729980",
+			"id": "3848c05c-eaa5-49a9-ae0a-5fe42d7e79bf",
 			"key": "tyk-gateway.host",
 			"value": "tyk-gateway.localhost:8080"
 		},
 		{
-			"id": "262a8213-b852-4231-ad5e-1a47f17c97db",
+			"id": "4feea36d-24e7-42dd-b290-7cdb9a17398b",
 			"key": "tyk-gateway-2.host",
 			"value": "tyk-gateway-2.localhost:8081"
 		},
 		{
-			"id": "6be5549f-59ca-4a12-b8e2-21b7c350c6f0",
+			"id": "d1136ed5-9c68-4a5f-937c-ef72d5974ca5",
 			"key": "tyk-custom-domain.host",
 			"value": "tyk-custom-domain.com:8080"
 		},
 		{
-			"id": "126fbe6d-15d8-4a64-ad48-5fabbc2635cd",
+			"id": "29e98d57-4362-412b-99a9-cccc9da423cb",
 			"key": "tyk-dashboard.host",
 			"value": "tyk-dashboard.localhost:3000"
 		}
