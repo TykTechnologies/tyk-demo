@@ -619,7 +619,7 @@
 							"response": []
 						},
 						{
-							"name": "Plugin - Cache",
+							"name": "Plugin - Cache (part 1)",
 							"event": [
 								{
 									"listen": "test",
@@ -682,7 +682,74 @@
 										"uuid"
 									]
 								},
-								"description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint. If the Gateway returns a cached response then it will also a header `X-Tyk-Cached-Response` to the response with the value of `1`.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
+								"description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint. If the Gateway returns a cached response then it will also return a header `X-Tyk-Cached-Response` in the response with the value of `1`.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - Cache (part 2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "4fbe9b1c-61b6-4188-8a6f-e58b6fdd254b",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
+											"",
+											"// use a unique value in the path to create a new cache, so it doesn't interfere with postman-generated request",
+											"var cacheEndpointRequest = {",
+											"    url: 'http://' + tykGatewayHost + '/plugin-demo-api/cache-slow-endpoint?unique=' + pm.variables.replaceIn('{{$randomUUID}}'),",
+											"    method: 'GET'",
+											"};",
+											"",
+											"pm.test(\"Cached endpoint results in faster response\", function () {",
+											"    pm.sendRequest(cacheEndpointRequest, function (err, response) {",
+											"        pm.expect(response.code).to.eql(200);",
+											"        // upstream endpoint has 3 second delay, so should be above 3 seconds for the first request",
+											"        pm.expect(response.responseTime).to.be.above(3000);",
+											"        // response should not have cache header",
+											"        pm.expect(response.headers.get(\"X-Tyk-Cached-Response\")).to.be.undefined;",
+											"",
+											"        pm.sendRequest(cacheEndpointRequest, function (err, response) {",
+											"            // second request is within rate limit",
+											"            pm.expect(response.code).to.eql(200);",
+											"            // this request should be dealt with by cache, so should be (much) less than 3 seconds",
+											"            pm.expect(response.responseTime).to.be.below(3000);",
+											"            // response should have cache header",
+											"            pm.expect(response.headers.get(\"X-Tyk-Cached-Response\")).to.eql(\"1\");",
+											"        });",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-api-version",
+										"type": "text",
+										"value": "Default"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/cache-slow-endpoint",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"plugin-demo-api",
+										"cache-slow-endpoint"
+									]
+								},
+								"description": "This example uses the cache plugin to cache a slow endpoint, to provide a faster response.\n\nIt calls an endpoint which has a 3 second delay in responding, simulating a slow response. With caching enabled at the Gateway, the Gateway will cache the response so that subsequent requests which occur within the cache lifetime are served quickly, without the need to request another response from the slow endpoint.\n\nIn this case, the API cache configuration is set to 5 seconds, so the first request will take over 3 seconds to return, as it is fetched from the slow endpoint, but requests made during the following 5 seconds will be served from the cache, resulting in a much faster response. Try clicking the send button several times to see this in action."
 							},
 							"response": []
 						},
@@ -3356,22 +3423,22 @@
 	],
 	"variable": [
 		{
-			"id": "3848c05c-eaa5-49a9-ae0a-5fe42d7e79bf",
+			"id": "0b8dfbac-13ac-44da-8934-497f2f60029b",
 			"key": "tyk-gateway.host",
 			"value": "tyk-gateway.localhost:8080"
 		},
 		{
-			"id": "4feea36d-24e7-42dd-b290-7cdb9a17398b",
+			"id": "051d6761-66fe-4023-af40-6133740878e1",
 			"key": "tyk-gateway-2.host",
 			"value": "tyk-gateway-2.localhost:8081"
 		},
 		{
-			"id": "d1136ed5-9c68-4a5f-937c-ef72d5974ca5",
+			"id": "88eeb9e8-257b-455d-93d2-0bd74db02998",
 			"key": "tyk-custom-domain.host",
 			"value": "tyk-custom-domain.com:8080"
 		},
 		{
-			"id": "29e98d57-4362-412b-99a9-cccc9da423cb",
+			"id": "2070de42-2880-4049-ac99-4af4d95683d2",
 			"key": "tyk-dashboard.host",
 			"value": "tyk-dashboard.localhost:3000"
 		}
