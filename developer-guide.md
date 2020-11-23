@@ -135,41 +135,43 @@ These utility scripts are available in the `scripts` directory:
 * `import.sh`: Uses the Dashboard Admin API to import API and Policy definitions, using data used to bootstrap the base Tyk deployment
 * `test.sh`: Uses a Newman container to run the Postman collection tests
 
-# Working with API and Policy data
+# Working with APIs, Policies and Postman data
 
 There are two scenarios for working with this data:
 
 1. You have made changes and want to commit them so that others can get them
 2. You want to get the changes other people have made
 
-## Scenario 1: Committing changes
+## Scenario 1: Committing changes to remote
 
-Before you commit anything to the repo, you must check that **all tests are working correctly**. Run the `./scripts/test.sh`, if any tests fail then please resolve the issue before committing.
+In this scenario you have made updates to the repo which you want to commit back to master.
 
-If you have changed APIs and Policies in your Dashboard, and want to commit these so other people can use them, use the export script.
+Before making a pull request, please check that **all tests are working correctly**. Run the `./scripts/test.sh`, if any tests fail then please resolve.
 
-To export the data, run the export script from the repo root directory, as so:
+If you have made changes to APIs or Policies, you can run the export script to update the version controlled data files:
 
 ```
 ./scripts/export.sh
 ```
 
-This will update the `apis.json` and `policies.json` files in the `deployments/tyk/data/tyk-dashboard` directory. You can then commit these files into the repo.
+This will update the `apis.json` and `policies.json` files in the `deployments/tyk/data/tyk-dashboard` directory.
 
-When adding functionality to this repo, please also add requests to the Postman collection to demonstrate the functionality, including a description and tests necessary to validate the response. Once the requests and tests are added, export the collection and overwrite the `tyk_demo.postman_collection.json` file, which can then be committed too.
+When adding functionality to this repo, please also add requests to the Postman collection to demonstrate the functionality. Include a description and enough tests to validate the response. Export the collection and overwrite the `tyk_demo.postman_collection.json` file.
 
-## Scenario 2: Synchronising updates
+## Scenario 2: Synchronising updates from remote
 
 The simplest and best-practice approach is to simply bring the environment down, pull the repo then bring it back up again. The `up.sh` script includes an API and Policy import step, so all latest data will be imported:
 
 ```
 ./down.sh
+git pull
 ./up.sh
 ```
 
-Alternatively, you can import data into and existing deployment by first pulling the repo, then using the import script:
+Alternatively, you can import data into an existing deployment by first pulling the repo, then using the import script:
 
 ```
+git pull
 ./scripts/import.sh
 ```
 
