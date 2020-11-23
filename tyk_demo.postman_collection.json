@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "6d7a550e-5a84-49b0-a46a-5276db9b882b",
+		"_postman_id": "cea69c48-41db-44c7-9909-a56cc8ee1c84",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -17,7 +17,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "0c5d08cc-1542-4b2c-bbd2-b8795b889745",
+										"id": "9aa202e6-4a32-47a3-9986-6ba1c45f58ef",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -114,7 +114,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fcc66315-c0ed-4b24-a593-64a8e69d798f",
+										"id": "10f99a99-aebf-44da-adf9-e1e3346e0eb8",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -160,7 +160,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b7e2c514-08b9-42f6-bd0f-b68213c8ef6f",
+										"id": "7287d096-2a3d-4c3e-8236-b56b26bd60c3",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -200,7 +200,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9fbc675a-618b-42d6-881d-b5b707cbf601",
+										"id": "059fd5ce-3e4d-486d-b147-26b54f9ce805",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -272,7 +272,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "8dde2033-f23f-49f9-a70c-f00a03053dab",
+										"id": "5863c69f-8356-486c-a94d-7aebad6841e4",
 										"exec": [
 											""
 										],
@@ -305,7 +305,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7d5a5446-81fc-41c1-b18a-812f6b56b0c6",
+										"id": "2ba73b77-e2a5-488e-9363-7e9007221f66",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -350,7 +350,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "31e22a36-6aca-4565-8f7a-c01f8dfedbc6",
+										"id": "154b4608-84a7-473a-86fd-cf18f1e9aecf",
 										"exec": [
 											"pm.test(\"Status code is 504\", function () {",
 											"    pm.response.to.have.status(504);",
@@ -398,7 +398,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a27f5cff-f440-4221-8468-5309980d4d5c",
+										"id": "abedceac-fa50-4237-812d-463aef4ce6b5",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -441,7 +441,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "488bb4e6-dcac-4faf-9a3f-4a734407bc09",
+										"id": "b13c16be-1e4e-44cd-9279-156c72a9885b",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -481,7 +481,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4adb071c-40c6-43da-b9a7-4dc11e3d988b",
+										"id": "c9218aeb-65d0-431e-9245-d8fd8ec06c99",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -527,7 +527,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f4676a06-1eb9-4f1e-ab7d-3a968282e87c",
+										"id": "013a6a35-edd9-4baa-8958-c98d0a227143",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -573,7 +573,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "221d1c86-694c-4a33-a085-8df3aff966ff",
+										"id": "588c4c05-ba6b-440f-9d80-36453323136a",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -619,12 +619,12 @@
 							"response": []
 						},
 						{
-							"name": "Plugin - Cache (part 1)",
+							"name": "Plugin - Cache",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
-										"id": "265a7459-3dcf-4b1b-a2f0-cd2d80500672",
+										"id": "96c65e63-74a6-47bc-9f2e-c42068923ced",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -682,74 +682,7 @@
 										"uuid"
 									]
 								},
-								"description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint. If the Gateway returns a cached response then it will also return a header `X-Tyk-Cached-Response` in the response with the value of `1`.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
-							},
-							"response": []
-						},
-						{
-							"name": "Plugin - Cache (part 2)",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "4fbe9b1c-61b6-4188-8a6f-e58b6fdd254b",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
-											"",
-											"// use a unique value in the path to create a new cache, so it doesn't interfere with postman-generated request",
-											"var cacheEndpointRequest = {",
-											"    url: 'http://' + tykGatewayHost + '/plugin-demo-api/cache-slow-endpoint?unique=' + pm.variables.replaceIn('{{$randomUUID}}'),",
-											"    method: 'GET'",
-											"};",
-											"",
-											"pm.test(\"Cached endpoint results in faster response\", function () {",
-											"    pm.sendRequest(cacheEndpointRequest, function (err, response) {",
-											"        pm.expect(response.code).to.eql(200);",
-											"        // upstream endpoint has 3 second delay, so should be above 3 seconds for the first request",
-											"        pm.expect(response.responseTime).to.be.above(3000);",
-											"        // response should not have cache header",
-											"        pm.expect(response.headers.get(\"X-Tyk-Cached-Response\")).to.be.undefined;",
-											"",
-											"        pm.sendRequest(cacheEndpointRequest, function (err, response) {",
-											"            // second request is within rate limit",
-											"            pm.expect(response.code).to.eql(200);",
-											"            // this request should be dealt with by cache, so should be (much) less than 3 seconds",
-											"            pm.expect(response.responseTime).to.be.below(3000);",
-											"            // response should have cache header",
-											"            pm.expect(response.headers.get(\"X-Tyk-Cached-Response\")).to.eql(\"1\");",
-											"        });",
-											"    });",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "x-api-version",
-										"type": "text",
-										"value": "Default"
-									}
-								],
-								"url": {
-									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/cache-slow-endpoint",
-									"protocol": "http",
-									"host": [
-										"{{tyk-gateway.host}}"
-									],
-									"path": [
-										"plugin-demo-api",
-										"cache-slow-endpoint"
-									]
-								},
-								"description": "This example uses the cache plugin to cache a slow endpoint, to provide a faster response.\n\nIt calls an endpoint which has a 3 second delay in responding, simulating a slow response. With caching enabled at the Gateway, the Gateway will cache the response so that subsequent requests which occur within the cache lifetime are served quickly, without the need to request another response from the slow endpoint.\n\nIn this case, the API cache configuration is set to 5 seconds, so the first request will take over 3 seconds to return, as it is fetched from the slow endpoint, but requests made during the following 5 seconds will be served from the cache, resulting in a much faster response. Try clicking the send button several times to see this in action."
+								"description": "This request uses the `Cache` Endpoint Designer plugin to return a cached response directly from the Gateway when the API endpoint is called.\n\n- Global Cache is enabled\n- Response from Upstream will be cached for 5 seconds\n\n\nWhen this API executed, the response from upstream API server will be cached and served for upto 5 seconds to the subsequest requests made to same Endpoint. If the Gateway returns a cached response then it will also a header `X-Tyk-Cached-Response` to the response with the value of `1`.\n\nThis plugin is defined in the Endpoint Designer of the API Definition. It is set to execute on requests for the `Default` version of the API only."
 							},
 							"response": []
 						},
@@ -759,7 +692,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "907376d3-6662-4164-ac46-0591190d6971",
+										"id": "38e584fd-85a0-4025-a1f4-9d2f2c6407e2",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -794,7 +727,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7881b8ad-b4a1-4bfd-920e-aea61c246ee6",
+										"id": "07853194-b6b3-4326-90eb-035da051fe26",
 										"exec": [
 											"pm.test(\"Status code is 401\", function () {",
 											"    pm.response.to.have.status(401);",
@@ -829,7 +762,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "425c62f3-a559-4a56-8b1a-8b90848dfe74",
+										"id": "d3275888-5d70-43a9-941d-fc032deeeee9",
 										"exec": [
 											"pm.test(\"Status code is 422\", function () {",
 											"    pm.response.to.have.status(422);",
@@ -873,7 +806,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f890fbf8-814f-4782-95da-a000655712af",
+										"id": "c70e6ce2-0f5a-4563-a82d-d7c25e4ae8ad",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -919,7 +852,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "460789c6-c9c8-4d10-926c-cf6abe14156b",
+										"id": "02c468c9-cfc4-4f50-8ab8-47d8227d34f4",
 										"exec": [
 											"pm.test(\"Status code is 400\", function () {",
 											"    pm.response.to.have.status(400);",
@@ -963,7 +896,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "8a428010-b907-4f92-99bd-14ea9e157db1",
+										"id": "18342165-4955-4a5a-810b-7b6e0c808f72",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1007,7 +940,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "694a0fd5-fbb7-4637-b7b0-31943b28a02c",
+										"id": "ab8cc446-3eb6-4091-b999-54c436c3d150",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1047,7 +980,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "01a10452-358a-4477-908b-6175ac96f98e",
+										"id": "956a847e-5552-4455-9f0a-57983914fe00",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1082,7 +1015,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7fc50120-eaef-49f9-b522-553f965fb461",
+										"id": "a4f73d23-3ecb-4a02-b02c-2789b3353956",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1128,7 +1061,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a6273f88-1ddc-4465-a987-2875229c39ad",
+										"id": "1da7b072-cc1c-4359-901b-9a0d94a8c6d3",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1172,7 +1105,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4eaaeb57-1c50-4390-ad7f-594b885e7ed5",
+										"id": "80582b61-8eaf-4f4b-9010-99a19f4600fc",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1213,7 +1146,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "b5e6a096-0f0e-437e-9a3e-32e60f98c612",
+										"id": "0b3cde8b-2140-4ccf-a6ce-60d165c5f5aa",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1258,7 +1191,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "78a36b8d-ec51-4f38-aeae-dbf98c36d0f6",
+								"id": "ffc5e93e-aec4-442a-a55a-19fa3191ba2f",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1268,7 +1201,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "35bac06d-ba2f-4c10-936a-f83c0da75f67",
+								"id": "869619b0-af6d-4380-acd9-d303285d5c70",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1288,7 +1221,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5571eede-ef02-4f4e-9899-f8452cf72fea",
+										"id": "58fef69e-92fa-45f8-9469-538d69960ccf",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1334,7 +1267,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7f071acb-4bbf-45a0-b747-f1b3842de540",
+										"id": "8877248f-103c-4502-bfb4-e904b50bb337",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1385,7 +1318,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a9aac512-9fc5-406a-88fc-02e46f2669fd",
+										"id": "4b46b9a0-bb5c-48bd-9ac5-5bde038c7379",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1438,7 +1371,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "600d5361-6b44-461f-957f-26e0953dd0cc",
+										"id": "548d5986-6c92-49cf-8c15-def3dc6c083b",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1480,7 +1413,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "587d24b0-a221-491d-a06f-37acc2a00ad2",
+										"id": "f7634b26-7e11-4ef3-875c-3c153ccfd4b4",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1519,7 +1452,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ec53b659-83e3-403f-ad69-6407a496aa85",
+										"id": "a2d86f33-73e0-4635-9fee-59dc02dd4900",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -1566,7 +1499,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d71766b7-714b-4bd4-8185-ebede8202f7c",
+										"id": "8897ce4a-0b98-40b9-84bd-d0ab4d5d5fae",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -1633,7 +1566,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "c4ca499e-b617-4ade-b3a2-058bc9a482fe",
+														"id": "ed69843a-572e-42bd-a682-5815918a397b",
 														"exec": [
 															"pm.test(\"Status code is 401\", function () {",
 															"    pm.response.to.have.status(401);",
@@ -1678,7 +1611,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "72307fe0-718f-4099-a9ca-26cce8776f31",
+														"id": "c5318e8a-bc89-4d55-b190-0cda5d9c8376",
 														"exec": [
 															"pm.test(\"Status code is 403\", function () {",
 															"    pm.response.to.have.status(403);",
@@ -1723,7 +1656,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "e9926fc8-c54f-4c2a-b599-207a0811a473",
+														"id": "0600d950-befd-4568-b153-882b22b8c7d8",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1767,7 +1700,7 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "2b8e7a3b-6f5e-4f14-bbe4-32281896c5de",
+												"id": "b2bc82f4-340b-417b-9ff8-e9d9e3c68153",
 												"type": "text/javascript",
 												"exec": [
 													""
@@ -1777,7 +1710,7 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "a3f21e2f-6d9e-465a-88a6-2613558cd5de",
+												"id": "29a5dce5-9f4c-4452-bda6-03f47710215b",
 												"type": "text/javascript",
 												"exec": [
 													""
@@ -1797,7 +1730,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "a08b94be-02c3-44d4-b151-9105eda43958",
+														"id": "37d3ae9e-3d1d-4e0d-9d22-abff0508487a",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1837,7 +1770,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "f718400b-d78d-4483-9ef4-172e86589c16",
+														"id": "ae7c0299-cc70-43ee-9ad6-f2ef2a9045e8",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1878,7 +1811,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "1c4f63d9-5b23-4edc-a079-9d273689f0a9",
+														"id": "ede70031-fd1e-4a17-a08b-096b71491a4a",
 														"exec": [
 															"pm.test(\"Status code is 403\", function () {",
 															"    pm.response.to.have.status(403);",
@@ -1931,7 +1864,7 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "11dcd046-6972-47bb-980d-765ecd6024ce",
+														"id": "43c3aac8-a5f8-4302-bfd8-e56a130a3755",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1979,7 +1912,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c372a6fc-0894-49e2-afbf-299a02d24e8e",
+										"id": "75227b34-b7ed-4c8d-947b-4227ac274bd8",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -2073,7 +2006,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f6d3606e-0df0-4855-aa85-bdc61be58229",
+										"id": "69ef71d8-e0c3-47db-8957-a293bfba7f23",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -2153,7 +2086,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "30eee60c-d3c1-4b1b-a75a-3ee740d049bd",
+										"id": "af10144d-5f07-48c9-887b-8a1626a1ba53",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -2235,7 +2168,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "2a5afb7f-af83-40b9-a826-b583652b1433",
+										"id": "bbf21f01-070d-4782-b867-decba23eb8b7",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -2293,7 +2226,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c6a1b820-cb04-4b9b-b395-56f7c0467dce",
+										"id": "08e40186-0c02-46d3-b02a-1582229435fe",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -2345,7 +2278,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "8eb84857-aa1c-48f5-8f15-7ed6e8abc706",
+										"id": "5ef9088a-8862-4641-af9a-b2a749d64781",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2385,7 +2318,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9e8b7fd7-9e66-437a-9d5c-9509fbda86d5",
+										"id": "f530fc00-1c08-4c59-8ba2-bcc6d42e676a",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2432,7 +2365,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7d7b6520-68a3-46eb-b838-a91ce05c0b35",
+										"id": "8f3fe0a5-f5cc-47de-96e7-1d90ad4fbb25",
 										"exec": [
 											"pm.test(\"Status code is 400\", function () {",
 											"    pm.response.to.have.status(400);",
@@ -2471,6 +2404,57 @@
 								"description": "Part 2 of the GraphQL requests makes a request for a field which does not exist in the *Schema* defined on the API Definition.\n\nThe **currency** field does not exist in the schema, and as such the request is rejected by the Gateway, returning an HTTP 400 response. The target API does actually have this field, but since the API Gateway does not list it in the schema it cannot be requested.\n\nThe response contains a contextual error message which identifies that the **currency** field is not defined for the type **Country**. This allows the API Client is understand why the request was rejected."
 							},
 							"response": []
+						},
+						{
+							"name": "GraphQL - Combine 3 separate REST responses",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "47255639-da7d-4dff-b4d0-b7677d0d0846",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"pm.test(\"Data for user ID 1 is returned\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.user.id).to.eql(1);",
+											"    pm.expect(jsonData.data.user.posts[0].id).to.eql(1);",
+											"    pm.expect(jsonData.data.user.posts[0].comments[0].id).to.eql(1);",
+											"    pm.expect(jsonData.data.user.name).to.eql(\"Leanne Graham\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query{\n  user(id: 1){\n    id\n    name\n    email\n    posts{\n      id\n      title\n      body\n      comments{\n        id\n        name\n        email\n        body\n        }\n      }\n   }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/graphql-posts/",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"graphql-posts",
+										""
+									]
+								},
+								"description": "This GraphQL API illustrates, with a single request, the ability to combine 3 requests destined for 3 DataSources (all of which are of type REST) listed below:\n* <div style=\"display: inline\">https://jsonplaceholder.typicode.com/users/{{.arguments.id}} </div>\n* <div style=\"display: inline\">https://jsonplaceholder.typicode.com/posts?userId={{.object.id}} </div>\n* <div style=\"display: inline\">https://jsonplaceholder.typicode.com/comments?postId={{.object.id}} </div>\n\nKey Concept #1 - GraphQL\n\nGraphQL is able to make calls to multiple DataSources with a single request to the following upstream endpoints: \n* /users \n* /posts \n* /comments\n \nKey Concept #2 - Universal Data Graph\n\nUniversal Data Graph uses what are known as **arguments** which are values used in the URL by the DataSource to retreive data. In the call to the **/users** endpoint, an argument is passed to reference the ID of the user. The GraphQL engine takes the argument with the name **id** and uses it in the URL to make the request to the REST API."
+							},
+							"response": []
 						}
 					],
 					"protocolProfileBehavior": {},
@@ -2485,7 +2469,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4d46117b-4dcb-4f71-9de7-3540f2bdf3bc",
+										"id": "f88fe995-b737-407b-a1f2-ccc4de9eb19c",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2685,7 +2669,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f785f811-7313-4910-9535-bdd5673c2993",
+										"id": "f9860392-4ef6-4a03-9c11-37772943c233",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2745,7 +2729,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "3792f944-9ccb-4bc1-8807-d70b998671df",
+										"id": "0277109e-7c0e-444c-8404-6743588983f6",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2797,7 +2781,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "21e1423b-9dfc-4592-bf71-8ca12fc5d8da",
+										"id": "44c75ea8-104a-47eb-9d9a-f1fc7b6467d0",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2839,7 +2823,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c4ca499e-b617-4ade-b3a2-058bc9a482fe",
+										"id": "110628d7-9483-4526-aa54-acc1fe171e54",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2894,7 +2878,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "2f85f29d-239b-434e-b44a-2e1d7231e549",
+										"id": "bc4a1268-7c20-4f96-a380-9ae73ee26fc0",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2929,72 +2913,6 @@
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Single Sign-On",
-					"item": [
-						{
-							"name": "Dashboard SSO - request login token",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"id": "e66aea99-87de-4454-8850-8782c1d89da8",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Message confirms SSO Nonce created\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.Message).to.eql(\"SSO Nonce created\");",
-											"});",
-											"",
-											"pm.test(\"SSO nonce not empty\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.Meta).length.greaterThan(0);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "admin-auth",
-										"value": "ff8289874f5d45de945a2ea5c02580fe",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"ForSection\": \"dashboard\",\n  \"OrgID\": \"5e9d9544a1dcd60001d0ed20\",\n  \"EmailAddress\": \"\",\n  \"GroupID\": \"5f8ff13d046775000175a8c3\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://{{tyk-dashboard.host}}/admin/sso",
-									"protocol": "http",
-									"host": [
-										"{{tyk-dashboard.host}}"
-									],
-									"path": [
-										"admin",
-										"sso"
-									]
-								},
-								"description": "This request calls the Dashboard Admin API SSO endpoint to generate a one-time use login token.\n\nThe request body specifies the context in which the login token can be used:\n- `ForSection`: Either `dashboard` or `portal`\n- `OrgId`: Defines the Organisation context for the session\n- `EmailAddress`: If provided, will lookup the email address and log in the session as that user\n- `GroupId`: If provided, will lookup the user group and assign it to the session\n\nIf the request is successful, the response will have a `200 OK` status and the body will contain a property called `Meta`, the value of which is the login token. This token can then be used to call the SSO endpoint of the Dashboard or Portal to generate the session and log into the application.\n\nThe Standard Dashboard API can also be used for SSO, as it has an equivilant SSO endpoint `/api/sso`, which requires authentication using a Dashboard User's API access token via the `authorization` header.\n\n### Using the login token\n\nCreate the SSO login URL by combining the SSO endpoint URL (http://tyk-dashboard.localhost:3000/tap?nonce=) with the login token value (`Meta` property returned the response) e.g. `ZDhlNDY4ODktMzU2MC00ZmQwLTY5Y2MtZTcxYzNkNGYzYTJl`. Use the resulting URL your browser. You will then be logged into the Dashboard.\n\nFor example http://tyk-dashboard.localhost:3000/tap?nonce=ZDhlNDY4ODktMzU2MC00ZmQwLTY5Y2MtZTcxYzNkNGYzYTJl (Note, this URL will not work, it's just an example.)"
-							},
-							"response": []
-						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -3011,7 +2929,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d0288b83-72b1-4b9b-be50-6fd1332f761a",
+										"id": "c9b32388-96a6-4e12-a312-27c56cc90b41",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -3052,7 +2970,7 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c4ca499e-b617-4ade-b3a2-058bc9a482fe",
+										"id": "afca0d70-ba1e-4c04-b9d1-a887dc4ba41a",
 										"exec": [
 											"pm.test(\"Status code is 401\", function () {",
 											"    pm.response.to.have.status(401);",
@@ -3114,7 +3032,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5f33c116-b78b-4bb9-955a-013b654fdf8e",
+								"id": "eadb4074-3961-49e0-b9fa-38f019991ed1",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3160,7 +3078,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "56891239-2cd4-440d-8b21-11bda78f3b69",
+								"id": "ad817ac2-aafc-4c6c-93ad-36c078ac3a1e",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3225,7 +3143,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d98f1379-9ade-489b-b1f2-3d0f2aae2502",
+								"id": "8f9804e6-8c63-40d9-86d2-89784fd03635",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3277,7 +3195,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "57b32d2a-6ad4-4308-9f3e-9fad6c411b4f",
+								"id": "dfbb8480-70a6-44ae-a483-92d146fdbef0",
 								"exec": [
 									"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 									"",
@@ -3370,7 +3288,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "34fbd32d-5247-4f50-9f9f-a7245202d641",
+						"id": "015d365d-52b1-4320-9bc0-e9831c7f7326",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -3403,7 +3321,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "38d8c1ca-a7d2-40c3-8a13-47bc218af3fd",
+				"id": "846680a6-ad4c-4ac3-85dd-c4416b836ad2",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -3413,7 +3331,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "16fa544e-0d0d-4060-a21a-a903127456da",
+				"id": "29084aad-563f-49f5-91bb-9b50a506dd66",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -3423,22 +3341,22 @@
 	],
 	"variable": [
 		{
-			"id": "0b8dfbac-13ac-44da-8934-497f2f60029b",
+			"id": "613862e4-4688-4bd5-b903-82a42bc5140e",
 			"key": "tyk-gateway.host",
 			"value": "tyk-gateway.localhost:8080"
 		},
 		{
-			"id": "051d6761-66fe-4023-af40-6133740878e1",
+			"id": "ea0c86f2-b8d7-43f4-93a8-d148bee91970",
 			"key": "tyk-gateway-2.host",
 			"value": "tyk-gateway-2.localhost:8081"
 		},
 		{
-			"id": "88eeb9e8-257b-455d-93d2-0bd74db02998",
+			"id": "92c9eccd-f8af-4e6b-9c6a-f75bcee5dc0e",
 			"key": "tyk-custom-domain.host",
 			"value": "tyk-custom-domain.com:8080"
 		},
 		{
-			"id": "2070de42-2880-4049-ac99-4af4d95683d2",
+			"id": "36acef1d-5efa-4794-b47b-1cbcd82c9c8a",
 			"key": "tyk-dashboard.host",
 			"value": "tyk-dashboard.localhost:3000"
 		}
