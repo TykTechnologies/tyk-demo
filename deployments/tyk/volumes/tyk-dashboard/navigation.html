@@ -1,0 +1,94 @@
+{{define "navigation"}}
+
+{{ $org_id := .OrgId}}
+{{ $page := .}}
+<nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{ $page.PortalRoot }}">{{ if .PageSettings.PortalName }} {{else}} Tyk Developer Portal {{end}}</a>
+        </div>
+
+        <div id="navbar" class="navbar-collapse collapse">
+        	<ul class="nav navbar-nav">
+        	  {{ range $index, $menuItem := .Menus.Main}}
+        	  <li><a href="{{ $page.PortalRoot }}{{$menuItem.URL}}">{{$menuItem.Title}}</a></li>
+        	  {{ end }}
+
+            {{ if .PortalConfig.CatalogueLoginOnly }}
+              {{ if .UserData }}
+          	  <li><a href="{{ $page.PortalRoot }}apis/">API Catalogue</a></li>
+              {{ end }}
+            {{ else }}
+              <li><a href="{{ $page.PortalRoot }}apis/">API Catalogue</a></li>
+            {{ end }}
+
+            {{ if .OAuthEnabled }}
+              <li><a href="{{ $page.PortalRoot }}oauth-clients/">OAuth clients</a></li>
+            {{ end }}
+
+        	  {{ if not .PortalConfig.DisableSignup }}
+        	  	{{ if not .UserData }}
+        	  	<li><a href="{{ $page.PortalRoot }}register/">Register</a></li>
+        	  	{{ end }}
+        	  {{ end }}
+        	  {{ if not .PortalConfig.DisableLogin }}
+        	  	{{ if not .UserData }}
+        	  	<li><a href="{{ $page.PortalRoot }}login/">Login</a></li>
+        	  	{{ end }}
+        	  {{ end }}
+            </ul>
+
+        {{ if .UserData }}
+        	<ul class="nav navbar-nav navbar-right">
+
+<li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="account" aria-expanded="true">Account <span class="caret"></span></a>
+              <ul class="dropdown-menu" aria-labelledby="account">
+
+                <li><a href="{{ .PortalRoot }}member/">API Dashboard</a></li>
+                <li><a href="{{ .PortalRoot }}member/profile/">Edit profile</a></li>
+
+                <li class="divider"></li>
+                <li><a href="{{ .PortalRoot }}logout/">Log out</a></li>
+
+              </ul>
+            </li>
+
+
+
+            </ul>
+
+
+
+
+
+
+
+        {{ else }}
+
+        {{ if .PortalConfig.DisableLogin }}
+
+		{{ else }}
+          <!-- <form class="navbar-form navbar-right" action="{{ $page.PortalRoot }}login" method="POST">
+            <div class="form-group">
+              <input type="text" placeholder="Email" name="username" id="username" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" name="password" id="password" class="form-control">
+            </div>
+            <input type="submit" class="btn btn-success" value="Sign in">
+          </form> -->
+        {{end}}
+
+        {{ end }}
+        </div><!--/.navbar-collapse -->
+      </div>
+    </nav>
+
+{{ end }}
