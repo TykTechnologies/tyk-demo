@@ -53,4 +53,6 @@ echo -e "\033[2K
 ▼ Analytics
   ▽ Splunk
                     URL : $splunk_base_url
+               Username : admin
+               Password : mypassword
         Collector Token : $splunk_token"
