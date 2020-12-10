@@ -3,6 +3,7 @@
 Demonstrates how analytics data can be pushed into 3rd party databases and reported on by 3rd party systems. This is achieved by using Tyk Pump to push analytics data to Splunk.
 
 - [Splunk Dashboard](http://localhost:8000)
+- [Splunk Dashboard Tyk data](http://localhost:8000/en-GB/app/search/search?q=search%20host%3D%22tyk-splunk%3A8088%22)
 
 ## Setup
 
@@ -32,3 +33,9 @@ The bootstrap process creates a HTTP Event Collector which can be used to view A
 In this deployment, the Pump configuration for Splunk contains a `filters` section that has the id for the Acme Organisation in the *skip* list. This means that the Pump will not send any analytics data for Acme-related APIs to Splunk. The filters can be set up to specify Organisations and APIs to either include or exclude.
 
 See the **Analytics Sharding** request in the `tyk_demo_analytics_splunk.postman_collection` Postman collection for a working example.
+
+### Viewing the analytics data in Splunk
+
+To view the analytics data, it is best to search for the `tyk-splunk` host, this will show all the records which have been sent to the Splunk instance.
+
+- [View the Tyk Splunk analytics data](http://localhost:8000/en-GB/app/search/search?q=search%20host%3D%22tyk-splunk%3A8088%22)
