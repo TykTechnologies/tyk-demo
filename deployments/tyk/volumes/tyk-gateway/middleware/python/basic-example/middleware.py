@@ -10,13 +10,6 @@ def PreMiddlewareFunction(request, session, spec):
 
 
 @Hook
-def PostKeyAuthMiddlewareFunction(request, session, spec):
-    tyk.log("Python plugin: PostKeyAuth hook called", "info")
-    request.add_header("Python-Plugin-PostKeyAuth-Hook", "PostKeyAuth Hook")
-    return request, session
-
-
-@Hook
 def PostMiddlewareFunction(request, session, spec):
     tyk.log("Python plugin: Post hook called", "info")
     request.add_header("Python-Plugin-Post-Hook", "Post Hook")

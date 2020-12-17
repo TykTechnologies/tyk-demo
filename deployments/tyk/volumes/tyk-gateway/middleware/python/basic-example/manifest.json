@@ -8,11 +8,6 @@
                 "name": "PreMiddlewareFunction"
             }
         ],
-        "post_key_auth": [
-            {
-                "name": "PostKeyAuthMiddlewareFunction"
-            }
-        ],
         "post": [
             {
                 "name": "PostMiddlewareFunction"
