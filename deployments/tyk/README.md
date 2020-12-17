@@ -83,3 +83,5 @@ The bootstrap script sends requests for each scenario, which you can see in the 
 [Python middleware](https://tyk.io/docs/plugins/supported-languages/rich-plugins/python/python/) is implemented for the *Python Middleware API*. It is a basic implementation which adds headers to the request and response, and adds log entries to the Gateway's application log. See the *Middleware - Python* request (API Definition > Middleware > Middleware - Python) in the Postman collection for an example.
 
 The plugin is bundled and deployed during the bootstrap script for this deployment. The bundle file is hosted on an Apache instance from which the Gateway downloads the asset. The bundle is signed using the Gateway's private key, which is then verifies using the public key when processing the bundle.
+
+The source and manifest file for the plugin are available in `deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example`.
