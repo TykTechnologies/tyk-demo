@@ -369,6 +369,15 @@ do
     hot_reload "$gateway_base_url" "$gateway_api_credentials"
     sleep 2
   fi
+
+  wait_for_response "$gateway_base_url/python-middleware-api/get" "200" "" 3
+  result="$?"
+  if [ "$result" != "0" ]
+  then
+    log_message "  Gateway not returning desired response, attempting hot reload"
+    hot_reload "$gateway_base_url" "$gateway_api_credentials"
+    sleep 2
+  fi
 done
 bootstrap_progress
 
@@ -380,7 +389,7 @@ do
   result="$?"
   if [ "$result" != "0" ]
   then
-    log_message "  Gateway not returning desired response, attempting hot reload"
+    log_message "  Gateway 2 not returning desired response, attempting hot reload"
     hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
     sleep 2
   fi
