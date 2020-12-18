@@ -85,3 +85,46 @@ The bootstrap script sends requests for each scenario, which you can see in the 
 During the bootstrap script, the Gateway is used to create a plugin bundle, which it signs with its private key so that it can be validated before the Gateway loads it. The plugin is then copied to an Apache server to make it available to the Gateway at runtime when the *Python Middleware API* is requested.
 
 The source and manifest file for the plugin are available in `deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example`.
+
+### JWT scopes example
+
+This example is using elliptic curve keys.
+It also demo the usage of scopes
+The scope claim name is `"aud"` and the expected scopes are `"client_id_x-readonly" ` and `"client_id_x-readwrite" `. 
+If you have one of these claims then you use the `jwks RO policy readonly` or `jwks RW policy readonly`. 
+If you don't have  `"aud"` claim then you use the default policy `jwt no access (default) policy` which has access only to one path `/anything/dummy-path` so you can test it and see for yourself that any other path returns `"Access to this resource has been disallowed"`
+If you do have `"aud"` but with another scode you will get `"error": "key not authorized: no matching policy found in scope claim"`
+ 
+
+#### The ES keys
+These are the keys for your convinience. You can use them to create the JWT
+
+##### Private key
+
+./deployments/tyk/data/tyk-dashboard/private-es.pem
+-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIASNlN+KUOZ1+X/HV8jxghdImvyDOCk8Ncw0ohEGG9/PoAoGCCqGSM49
+AwEHoUQDQgAEE1kdQIudWMzfq2uf0qs/a/57jdLl6GQ3Do75mvX98xPm1ewc7bHv
+jGOynmFaWtYyS/wAQgSkdbJ3WPTsj6XKIw==
+-----END EC PRIVATE KEY-----
+
+##### Public key
+./deployments/tyk/data/tyk-dashboard/public-es.pem
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEE1kdQIudWMzfq2uf0qs/a/57jdLl
+6GQ3Do75mvX98xPm1ewc7bHvjGOynmFaWtYyS/wAQgSkdbJ3WPTsj6XKIw==
+-----END PUBLIC KEY-----
+
+#### Example:
+
+The JWT
+`eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYXV0IjoiY2xpZW50X2lkX3gtcmVhZG9ubHkifQ.jfjFViM4i-00sRyUjMSTI33RxD9Qnw9UKE5yXwfTOIgKcBOU8QXl0kBKVgTa1scHGgo-7OnxzXNLOeJ8BtyYGA`
+
+```json
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "aut": "client_id_x-readonly"
+}
+```
+
