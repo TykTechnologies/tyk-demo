@@ -137,140 +137,6 @@
       "meta_data": {}
     },
     {
-      "auth_type": "jwt",
-      "auth_types": [
-        "jwt"
-      ],
-      "state": "active",
-      "access_rights_array": [
-        {
-          "api_name": "JWT API",
-          "api_id": "c7c3b826a9ec4c637ae716e00cecc010",
-          "versions": [
-            "Default"
-          ],
-          "allowed_urls": [],
-          "restricted_types": [],
-          "limit": null,
-          "allowance_scope": ""
-        }
-      ],
-      "graphql_enabled": false,
-      "_id": "5ead72955759610001818688",
-      "id": "5ead72955759610001818688",
-      "name": "JWT Policy",
-      "org_id": "5e9d9544a1dcd60001d0ed20",
-      "rate": 1000,
-      "per": 60,
-      "quota_max": -1,
-      "quota_renewal_rate": 3600,
-      "throttle_interval": 0,
-      "throttle_retry_limit": 0,
-      "max_query_depth": 0,
-      "access_rights": {
-        "c7c3b826a9ec4c637ae716e00cecc010": {
-          "api_name": "JWT API",
-          "api_id": "c7c3b826a9ec4c637ae716e00cecc010",
-          "versions": [
-            "Default"
-          ],
-          "allowed_urls": [],
-          "restricted_types": [],
-          "limit": null,
-          "allowance_scope": ""
-        }
-      },
-      "hmac_enabled": false,
-      "active": true,
-      "is_inactive": false,
-      "date_created": "2020-05-02T13:16:05.612Z",
-      "tags": [],
-      "key_expires_in": 0,
-      "partitions": {
-        "quota": true,
-        "rate_limit": true,
-        "complexity": true,
-        "acl": true,
-        "per_api": false
-      },
-      "last_updated": "1599573980",
-      "meta_data": {}
-    },
-    {
-      "auth_type": "jwt",
-      "auth_types": [
-        "jwt"
-      ],
-      "state": "active",
-      "access_rights_array": [
-        {
-          "api_name": "JWT API",
-          "api_id": "c7c3b826a9ec4c637ae716e00cecc010",
-          "versions": [
-            "Default"
-          ],
-          "allowed_urls": [
-            {
-              "url": "/anything/allowed-path",
-              "methods": [
-                "GET"
-              ]
-            }
-          ],
-          "restricted_types": [],
-          "limit": null,
-          "allowance_scope": ""
-        }
-      ],
-      "graphql_enabled": false,
-      "_id": "5ead73565759610001818689",
-      "id": "5ead73565759610001818689",
-      "name": "JWT Policy Restricted",
-      "org_id": "5e9d9544a1dcd60001d0ed20",
-      "rate": 1000,
-      "per": 60,
-      "quota_max": -1,
-      "quota_renewal_rate": 3600,
-      "throttle_interval": 0,
-      "throttle_retry_limit": 0,
-      "max_query_depth": 0,
-      "access_rights": {
-        "c7c3b826a9ec4c637ae716e00cecc010": {
-          "api_name": "JWT API",
-          "api_id": "c7c3b826a9ec4c637ae716e00cecc010",
-          "versions": [
-            "Default"
-          ],
-          "allowed_urls": [
-            {
-              "url": "/anything/allowed-path",
-              "methods": [
-                "GET"
-              ]
-            }
-          ],
-          "restricted_types": [],
-          "limit": null,
-          "allowance_scope": ""
-        }
-      },
-      "hmac_enabled": false,
-      "active": true,
-      "is_inactive": false,
-      "date_created": "2020-05-02T13:19:18.675Z",
-      "tags": [],
-      "key_expires_in": 0,
-      "partitions": {
-        "quota": true,
-        "rate_limit": true,
-        "complexity": true,
-        "acl": true,
-        "per_api": false
-      },
-      "last_updated": "1599551908",
-      "meta_data": {}
-    },
-    {
       "auth_type": "other",
       "auth_types": null,
       "state": "active",
@@ -362,6 +228,260 @@
         "per_api": false
       },
       "last_updated": "1602473939",
+      "meta_data": {}
+    },
+    {
+      "auth_type": "other",
+      "auth_types": null,
+      "state": "active",
+      "access_rights_array": [],
+      "graphql_enabled": false,
+      "_id": "5fdb97b10b3f290001d422be",
+      "id": "5fdb97b10b3f290001d422be",
+      "name": "auth pol",
+      "org_id": "5e9d9544a1dcd60001d0ed20",
+      "rate": 1000,
+      "per": 60,
+      "quota_max": -1,
+      "quota_renewal_rate": -1,
+      "throttle_interval": -1,
+      "throttle_retry_limit": -1,
+      "max_query_depth": -1,
+      "access_rights": {},
+      "hmac_enabled": false,
+      "active": true,
+      "is_inactive": false,
+      "date_created": "2020-12-17T17:38:57.061Z",
+      "tags": [],
+      "key_expires_in": 0,
+      "partitions": {
+        "quota": true,
+        "rate_limit": true,
+        "complexity": true,
+        "acl": true,
+        "per_api": false
+      },
+      "last_updated": "1608226872",
+      "meta_data": {}
+    },
+    {
+      "auth_type": "jwt",
+      "auth_types": [
+        "jwt"
+      ],
+      "state": "active",
+      "access_rights_array": [
+        {
+          "api_name": "jwt scopes example",
+          "api_id": "60cd1d91ac3d4e4646c5d9e623a7f048",
+          "versions": [
+            "Default"
+          ],
+          "allowed_urls": [
+            {
+              "url": "/anything/dummy-path",
+              "methods": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE",
+                "OPTIONS",
+                "HEAD"
+              ]
+            }
+          ],
+          "restricted_types": [],
+          "limit": null,
+          "allowance_scope": ""
+        }
+      ],
+      "graphql_enabled": false,
+      "_id": "5fdcac2e0b3f290001d422c1",
+      "id": "5fdcac2e0b3f290001d422c1",
+      "name": "jwt no access (default) policy",
+      "org_id": "5e9d9544a1dcd60001d0ed20",
+      "rate": 1,
+      "per": 60,
+      "quota_max": 1,
+      "quota_renewal_rate": 3600,
+      "throttle_interval": -1,
+      "throttle_retry_limit": -1,
+      "max_query_depth": -1,
+      "access_rights": {
+        "60cd1d91ac3d4e4646c5d9e623a7f048": {
+          "api_name": "jwt scopes example",
+          "api_id": "60cd1d91ac3d4e4646c5d9e623a7f048",
+          "versions": [
+            "Default"
+          ],
+          "allowed_urls": [
+            {
+              "url": "/anything/dummy-path",
+              "methods": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE",
+                "OPTIONS",
+                "HEAD"
+              ]
+            }
+          ],
+          "restricted_types": [],
+          "limit": null,
+          "allowance_scope": ""
+        }
+      },
+      "hmac_enabled": false,
+      "active": true,
+      "is_inactive": false,
+      "date_created": "2020-12-18T13:18:38.107Z",
+      "tags": [],
+      "key_expires_in": 604800,
+      "partitions": {
+        "quota": true,
+        "rate_limit": true,
+        "complexity": true,
+        "acl": true,
+        "per_api": false
+      },
+      "last_updated": "1608302636",
+      "meta_data": {}
+    },
+    {
+      "auth_type": "jwt",
+      "auth_types": [
+        "jwt"
+      ],
+      "state": "active",
+      "access_rights_array": [
+        {
+          "api_name": "jwt scopes example",
+          "api_id": "60cd1d91ac3d4e4646c5d9e623a7f048",
+          "versions": [
+            "Default"
+          ],
+          "allowed_urls": [
+            {
+              "url": "/(.*)",
+              "methods": [
+                "GET"
+              ]
+            }
+          ],
+          "restricted_types": [],
+          "limit": null,
+          "allowance_scope": ""
+        }
+      ],
+      "graphql_enabled": false,
+      "_id": "5fdcac610b3f290001d422c2",
+      "id": "5fdcac610b3f290001d422c2",
+      "name": "jwks RO policy",
+      "org_id": "5e9d9544a1dcd60001d0ed20",
+      "rate": 2,
+      "per": 60,
+      "quota_max": 2,
+      "quota_renewal_rate": 3600,
+      "throttle_interval": -1,
+      "throttle_retry_limit": -1,
+      "max_query_depth": -1,
+      "access_rights": {
+        "60cd1d91ac3d4e4646c5d9e623a7f048": {
+          "api_name": "jwt scopes example",
+          "api_id": "60cd1d91ac3d4e4646c5d9e623a7f048",
+          "versions": [
+            "Default"
+          ],
+          "allowed_urls": [
+            {
+              "url": "/(.*)",
+              "methods": [
+                "GET"
+              ]
+            }
+          ],
+          "restricted_types": [],
+          "limit": null,
+          "allowance_scope": ""
+        }
+      },
+      "hmac_enabled": false,
+      "active": true,
+      "is_inactive": false,
+      "date_created": "2020-12-18T13:19:29.466Z",
+      "tags": [],
+      "key_expires_in": 0,
+      "partitions": {
+        "quota": true,
+        "rate_limit": true,
+        "complexity": true,
+        "acl": true,
+        "per_api": false
+      },
+      "last_updated": "1608297626",
+      "meta_data": {}
+    },
+    {
+      "auth_type": "jwt",
+      "auth_types": [
+        "jwt"
+      ],
+      "state": "active",
+      "access_rights_array": [
+        {
+          "api_name": "jwt scopes example",
+          "api_id": "60cd1d91ac3d4e4646c5d9e623a7f048",
+          "versions": [
+            "Default"
+          ],
+          "allowed_urls": [],
+          "restricted_types": [],
+          "limit": null,
+          "allowance_scope": ""
+        }
+      ],
+      "graphql_enabled": false,
+      "_id": "5fdcac870b3f290001d422c3",
+      "id": "",
+      "name": "jwks RW policy",
+      "org_id": "5e9d9544a1dcd60001d0ed20",
+      "rate": 10,
+      "per": 60,
+      "quota_max": 10,
+      "quota_renewal_rate": 3600,
+      "throttle_interval": -1,
+      "throttle_retry_limit": -1,
+      "max_query_depth": -1,
+      "access_rights": {
+        "60cd1d91ac3d4e4646c5d9e623a7f048": {
+          "api_name": "jwt scopes example",
+          "api_id": "60cd1d91ac3d4e4646c5d9e623a7f048",
+          "versions": [
+            "Default"
+          ],
+          "allowed_urls": [],
+          "restricted_types": [],
+          "limit": null,
+          "allowance_scope": ""
+        }
+      },
+      "hmac_enabled": false,
+      "active": true,
+      "is_inactive": false,
+      "date_created": "2020-12-18T13:20:07.276Z",
+      "tags": [],
+      "key_expires_in": 0,
+      "partitions": {
+        "quota": true,
+        "rate_limit": true,
+        "complexity": true,
+        "acl": true,
+        "per_api": false
+      },
+      "last_updated": "1608297607",
       "meta_data": {}
     }
   ],

@@ -31,6 +31,7 @@ services:
       - TYK_LOGLEVEL=${GATEWAY_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-0}
+      - TYK_GW_ENABLEHASHEDKEYSLISTING=${MY_TYK_GW_ENABLEHASHEDKEYSLISTING:-false}
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
