@@ -1,0 +1,13 @@
+version: '3.3'
+services:
+  mailserver:
+    image: marcopas/docker-mailslurper
+    networks:
+      - tyk
+    ports:
+      - "2500:2500"
+      - "8089:8080"
+      - "8085:8085"
+    deploy:
+      restart_policy:
+        condition: any
