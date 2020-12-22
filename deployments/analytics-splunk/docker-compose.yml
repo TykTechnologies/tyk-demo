@@ -1,0 +1,31 @@
+version: '3.3'
+services:
+  tyk-splunk:
+    image: splunk/splunk:latest
+    ports:
+      - 8000:8000
+      - 8088:8088
+      - 8089:8089
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_PASSWORD=mypassword
+    networks:
+     - tyk
+    volumes:
+      - splunk-data:/opt/splunk/var
+      - splunk-data:/opt/splunk/etc
+  tyk-splunk-pump:
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.0.1}
+    networks:
+      - tyk
+    volumes:
+      - ./deployments/analytics-splunk/volumes/tyk-pump/splunk-pump.conf:/opt/tyk-pump/pump.conf
+    environment:
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
+    depends_on:
+      - tyk-splunk
+      - tyk-redis
+      - tyk-mongo
+
+volumes:
+  splunk-data:

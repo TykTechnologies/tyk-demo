@@ -21,10 +21,27 @@ gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq 
 gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
 bootstrap_progress
 
-log_message "Waiting for Dashboard API to be ready"
-wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
+# Python plugin
+
+log_message "Building Python plugin bundle"
+docker exec tyk-demo_tyk-gateway_1 sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1>> /dev/null 2>> bootstrap.log
+log_ok
+bootstrap_progress
+
+log_message "Copying Python bundle to http-server"
+docker cp tyk-demo_tyk-gateway_1:/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip
+log_ok
+bootstrap_progress
+
+log_message "Removing Python bundle intermediate assets"
+rm deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
+log_ok
+bootstrap_progress
 
 # Organisations
+
+log_message "Waiting for Dashboard API to be ready"
+wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
 
 log_message "Importing organisation"
 organisation_id=$(curl $dashboard_base_url/admin/organisations/import -s \
@@ -352,6 +369,15 @@ do
     hot_reload "$gateway_base_url" "$gateway_api_credentials"
     sleep 2
   fi
+
+  wait_for_response "$gateway_base_url/python-middleware-api/get" "200" "" 3
+  result="$?"
+  if [ "$result" != "0" ]
+  then
+    log_message "  Gateway not returning desired response, attempting hot reload"
+    hot_reload "$gateway_base_url" "$gateway_api_credentials"
+    sleep 2
+  fi
 done
 bootstrap_progress
 
@@ -363,7 +389,7 @@ do
   result="$?"
   if [ "$result" != "0" ]
   then
-    log_message "  Gateway not returning desired response, attempting hot reload"
+    log_message "  Gateway 2 not returning desired response, attempting hot reload"
     hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
     sleep 2
   fi

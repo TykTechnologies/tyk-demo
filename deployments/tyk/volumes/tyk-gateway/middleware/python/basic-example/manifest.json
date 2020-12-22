@@ -1,0 +1,23 @@
+{
+    "file_list": [
+        "middleware.py"
+    ],
+    "custom_middleware": {
+        "pre": [
+            {
+                "name": "PreMiddlewareFunction"
+            }
+        ],
+        "post": [
+            {
+                "name": "PostMiddlewareFunction"
+            }
+        ],
+        "response": [
+            {
+                "name": "ResponseMiddlewareFunction"
+            }
+        ],
+        "driver": "python"
+    }
+}

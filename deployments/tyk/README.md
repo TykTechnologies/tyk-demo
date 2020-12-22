@@ -77,3 +77,11 @@ This feature can be enabled at three levels:
 When a request/response is processed, if any of the levels is enabled, then the detailed analytics data will be logged.
 
 The bootstrap script sends requests for each scenario, which you can see in the Log Browser report. There are also requests in the Postman collection - see *API Definition* > *Detailed Analytics Logging* for more information.
+
+### Python Middleware
+
+[Python middleware](https://tyk.io/docs/plugins/supported-languages/rich-plugins/python/python/) is implemented for the *Python Middleware API*. It is a basic implementation which adds headers to the request and response, and adds log entries to the Gateway's application log. See the *Middleware - Python* request (API Definition > Middleware > Middleware - Python) in the Postman collection for an example.
+
+During the bootstrap script, the Gateway is used to create a plugin bundle, which it signs with its private key so that it can be validated before the Gateway loads it. The plugin is then copied to an Apache server to make it available to the Gateway at runtime when the *Python Middleware API* is requested.
+
+The source and manifest file for the plugin are available in `deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example`.

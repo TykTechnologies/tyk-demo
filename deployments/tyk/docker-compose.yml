@@ -10,6 +10,7 @@ services:
       - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
       - ./deployments/tyk/volumes/tyk-dashboard/private-key.pem:/opt/tyk-dashboard/private-key.pem
       - ./deployments/tyk/volumes/tyk-dashboard/catalogue.html:/opt/tyk-dashboard/portal/templates/catalogue.html
+      - ./deployments/tyk/volumes/tyk-dashboard/navigation.html:/opt/tyk-dashboard/portal/templates/navigation.html
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Dashboard licence missing from Docker environment file .env. Review The Getting Started steps in README.md.}
       - TYK_LOGLEVEL=${DASHBOARD_LOGLEVEL:-info}
@@ -69,7 +70,7 @@ services:
   tyk-redis:
     image: redis:6.0.4
     ports:
-    - "6379:6379"
+      - "6379:6379"
     volumes:
       - tyk-redis-data:/data
     networks:
@@ -78,7 +79,7 @@ services:
     image: mongo:4.0
     command: ["mongod", "--smallfiles"]
     ports:
-    - "27017:27017"
+      - "27017:27017"
     volumes:
       - tyk-mongo-data:/data/db
     networks:
@@ -96,6 +97,14 @@ services:
     environment:
       - SWAGGER_HOST=http://swagger-petstore:8080
       - SWAGGER_URL=http://localhost:8080/swagger-petstore
+  http-server:
+    image: httpd:2.4.46-alpine
+    networks:
+      - tyk
+    volumes:
+      - ./deployments/tyk/volumes/http-server:/usr/local/apache2/htdocs
+    ports:
+      - "8088:80"
 
 volumes:
   tyk-redis-data:

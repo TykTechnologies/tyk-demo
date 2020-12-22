@@ -29,7 +29,6 @@ There is a focus on simplicity. Docker Compose is used to provision the containe
 ## Repository Structure
 
 * `deployments/*`: Contains all the deployments available as sub-directories
-* `tyk_demo.postman_collection.json`: A Postman collection of requests which correspond to APIs available in the deployment
 * `test.postman_environment.json`: Set of environment variables, for use when running tests with a Newman container within a Docker deployment
 * `scripts/*.sh`: Some useful commands encapsulated in scripts
 * `up.sh`: Brings up the deployment
@@ -132,11 +131,11 @@ The bootstrap process provides credentials and other useful information in the t
 
 When you log into the Dashboard, you will find the imported APIs and Policies are now available.
 
-## Step 6 (optional): Import API requests into Postman
+## Step 6 (optional): Import Postman collection
 
-There is a Postman collection provided which compliments the imported API definitions and Policies. This lets you demonstrate Tyk features and functionality.
+There are Postman collections which compliment the deployments. They contain many example requests which demonstrate Tyk features and functionality in the deployments. If a deployment has a collection it will be in the deployment directory.
 
-Import the `tyk_demo.postman_collection.json` into your [Postman](https://postman.com) to start making requests.
+The collection for the base *Tyk* Deployment is called `tyk_demo.postman_collection.json`. Import it into [Postman](https://postman.com) to start making requests.
 
 # Resetting
 
