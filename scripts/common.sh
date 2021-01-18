@@ -142,3 +142,53 @@ function hot_reload {
     return 1
   fi
 }
+
+function check_licence_expiry {
+  # read licence line from .env file
+  licence_line=$(grep "$1=" .env)
+  # extract the part containing the base64 encoded payload
+  licence_payload_encoded=$(echo $licence_line | sed -E 's/^[^\.]+\.([^\.]+)\.[^\.]+$/\1/')
+  # decode the payload
+  licence_payload_decoded=$(echo $licence_payload_encoded | base64 -d)
+  # closing bracket needs to be added as it gets cut off from original value due to no new line character at end of the decoded string (I think... I probably did something wrong, but it seems to work ok)
+  licence_payload_decoded_fixed="$licence_payload_decoded}" 
+  # now we can read the licence expiry (as unix time)
+  licence_expiry=$(echo $licence_payload_decoded_fixed | jq -r '.exp') 
+  
+  # get timestamp for now, to compare against licence expiry against
+  now=$(date '+%s') 
+  # calculate the number of seconds remaining for the licence
+  licence_seconds_remaining=$(expr $licence_expiry - $now)
+  # calculate the number of days remaining for the licence (this sets a global variable, allowing the value to be used elsewhere)
+  licence_days_remaining=$(expr $licence_seconds_remaining / 86400)
+  # this variable is used to check whether the licence has got at least this number of seconds remaining
+  minimum_licence_seconds_required=$2
+
+  # if a time limit is not provided
+  if [[ "$minimum_licence_seconds_required" -eq "0" ]]; then
+    # default time limit to 0, meaning that the function will return false only if the licence has expired
+    minimum_licence_seconds_required=0
+  fi
+
+  # check if licence time remaining (in seconds) is less or equal to the time limit
+  if [[ "$licence_seconds_remaining" -le "$minimum_licence_seconds_required" ]]; then
+    return 1; # does not meet requirements
+  else
+    return 0; # meets requirements
+  fi
+}
+
+function get_licence_remaining_time_from_env {
+  # process scripted step by step for clarity
+  licence_line=$(grep "$1=" .env)
+  licence_payload_encoded=$(echo $licence_line | sed -E 's/^[^\.]+\.([^\.]+)\.[^\.]+$/\1/')
+  licence_payload_decoded=$(echo $licence_payload_encoded | base64 -d)
+  licence_payload_decoded_fixed="$licence_payload_decoded}" # closing bracket needs to be added as it gets cut off from original value due to no new line character at end of the decoded string (I think...)
+  licence_expiry=$(echo $licence_payload_decoded_fixed | jq -r '.exp')
+  now=$(date '+%s')
+  licence_remaining=$(expr $licence_expiry - $now)
+
+  # returns the number of seconds remaining
+  echo "licrem:$licence_remaining"
+  return $licence_remaining
+}
