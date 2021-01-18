@@ -16,6 +16,8 @@ then
   exit 1
 fi
 
+licence=$(grep "DASHBOARD_LICENCE=" .env | sed -E 's/^[^\.]+\.([^\.]+)\.[^\.]+$/\1/' | base64 -d)
+
 # check hostnames exist
 for i in "${tyk_demo_hostnames[@]}"
 do
