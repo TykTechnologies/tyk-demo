@@ -143,17 +143,15 @@ function hot_reload {
   fi
 }
 
-function check_licence_expiry {
+check_licence_expiry() {
   # read licence line from .env file
   licence_line=$(grep "$1=" .env)
-  # extract the part containing the base64 encoded payload
-  licence_payload_encoded=$(echo $licence_line | sed -E 's/^[^\.]+\.([^\.]+)\.[^\.]+$/\1/')
-  # decode the payload
-  licence_payload_decoded=$(echo $licence_payload_encoded | base64 -d)
-  # closing bracket needs to be added as it gets cut off from original value due to no new line character at end of the decoded string (I think... I probably did something wrong, but it seems to work ok)
-  licence_payload_decoded_fixed="$licence_payload_decoded}" 
-  # now we can read the licence expiry (as unix time)
-  licence_expiry=$(echo $licence_payload_decoded_fixed | jq -r '.exp') 
+  # extract licence JWT
+  encoded_licence_jwt=$(echo $licence_line | sed -E 's/^[A-Z_]+=(.+)$/\1/')
+  # decode licence payload
+  decoded_licence_payload=$(decode_jwt $encoded_licence_jwt)
+  # read licence expiry
+  licence_expiry=$(echo $decoded_licence_payload | jq -r '.exp')   
   
   # get timestamp for now, to compare against licence expiry against
   now=$(date '+%s') 
@@ -161,34 +159,31 @@ function check_licence_expiry {
   licence_seconds_remaining=$(expr $licence_expiry - $now)
   # calculate the number of days remaining for the licence (this sets a global variable, allowing the value to be used elsewhere)
   licence_days_remaining=$(expr $licence_seconds_remaining / 86400)
+  log_message "  Licence $1 has $licence_days_remaining days remaining"
+
   # this variable is used to check whether the licence has got at least this number of seconds remaining
   minimum_licence_seconds_required=$2
-
   # if a time limit is not provided
   if [[ "$minimum_licence_seconds_required" -eq "0" ]]; then
     # default time limit to 0, meaning that the function will return false only if the licence has expired
     minimum_licence_seconds_required=0
   fi
 
-  # check if licence time remaining (in seconds) is less or equal to the time limit
+  # check if licence time remaining (in seconds) is less or equal to the minimum required
   if [[ "$licence_seconds_remaining" -le "$minimum_licence_seconds_required" ]]; then
     return 1; # does not meet requirements
   else
-    return 0; # meets requirements
+    return 0; # does meet requirements
   fi
 }
 
-function get_licence_remaining_time_from_env {
-  # process scripted step by step for clarity
-  licence_line=$(grep "$1=" .env)
-  licence_payload_encoded=$(echo $licence_line | sed -E 's/^[^\.]+\.([^\.]+)\.[^\.]+$/\1/')
-  licence_payload_decoded=$(echo $licence_payload_encoded | base64 -d)
-  licence_payload_decoded_fixed="$licence_payload_decoded}" # closing bracket needs to be added as it gets cut off from original value due to no new line character at end of the decoded string (I think...)
-  licence_expiry=$(echo $licence_payload_decoded_fixed | jq -r '.exp')
-  now=$(date '+%s')
-  licence_remaining=$(expr $licence_expiry - $now)
-
-  # returns the number of seconds remaining
-  echo "licrem:$licence_remaining"
-  return $licence_remaining
+_decode_base64_url() {
+  local len=$((${#1} % 4))
+  local result="$1"
+  if [ $len -eq 2 ]; then result="$1"'=='
+  elif [ $len -eq 3 ]; then result="$1"'=' 
+  fi
+  echo "$result" | tr '_-' '/+' | base64 -d
 }
+
+decode_jwt() { _decode_base64_url $(echo -n $1 | cut -d "." -f ${2:-2}) | jq .; }

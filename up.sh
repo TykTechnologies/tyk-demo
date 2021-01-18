@@ -12,13 +12,6 @@ then
   exit 1
 fi
 
-# check dashboard licence defined
-if ! grep -q "DASHBOARD_LICENCE=" .env
-then
-  echo "ERROR: Dashboard licence missing from Docker environment file. Review 'getting started' steps in README.md."
-  exit 1
-fi
-
 # check hostnames exist
 for i in "${tyk_demo_hostnames[@]}"
 do
@@ -30,16 +23,6 @@ done
 
 # check that jq is available
 command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: JQ is required, but it's not installed. Review 'getting started' steps in README.md."; exit 1; }
-
-# check the Dashboard licence has not expired 
-licence_days_remaining=0
-check_licence_expiry "DASHBOARD_LICENCE"
-if [[ "$?" -eq "1" ]]; then
-  echo "ERROR: Tyk Dashboard licence has expired. Update DASHBOARD_LICENCE variable in .env file with a new licence."
-  exit 1
-else
-  log_message "Tyk Dashboard licence has $licence_days_remaining days remaining"
-fi
 
 # make the context data directory and clear and data from an existing directory
 mkdir -p .context-data 1> /dev/null
@@ -111,13 +94,6 @@ do
     fi
   fi
 done
-
-# output warning if licence due to expire within 14 days
-# 1209600 is the number of seconds in 14 days
-check_licence_expiry "DASHBOARD_LICENCE" 1209600
-if [[ "$?" -eq "1" ]]; then
-  echo "WARNING: Tyk Dashboard licence has $licence_days_remaining days remaining. Renew DASHBOARD_LICENCE in .env file."
-fi
 
 # Confirm bootstrap is compelete
 printf "\nTyk-Demo bootstrap completed\n"
