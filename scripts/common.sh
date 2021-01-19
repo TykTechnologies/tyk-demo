@@ -165,16 +165,8 @@ check_licence_expiry() {
     log_message "  Licence $1 has $licence_days_remaining days remaining"
   fi
 
-  # this variable is used to check whether the licence has got at least this number of seconds remaining
-  minimum_licence_seconds_required=$2
-  # if a minimum number is not provided
-  if [[ "$minimum_licence_seconds_required" -eq "0" ]]; then
-    # set default minimum to 0, meaning that the function will return failure only if the licence has expired
-    minimum_licence_seconds_required=0
-  fi
-
-  # check if licence time remaining (in seconds) is less or equal to the minimum required
-  if [[ "$licence_seconds_remaining" -le "$minimum_licence_seconds_required" ]]; then
+  # check if licence time remaining (in seconds) is less or equal to 0
+  if [[ "$licence_seconds_remaining" -le "0" ]]; then
     return 1; # does not meet requirements
   else
     return 0; # does meet requirements
