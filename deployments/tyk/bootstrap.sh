@@ -23,11 +23,13 @@ log_ok
 bootstrap_progress
 
 log_message "Checking Dashboard licence expiry"
+licence_days_remaining=0
 check_licence_expiry "DASHBOARD_LICENCE"
 if [[ "$?" -eq "1" ]]; then
   echo "ERROR: Tyk Dashboard licence has expired. Update DASHBOARD_LICENCE variable in .env file with a new licence."
   exit 1
 fi
+dashboard_licence_days_remaining=$licence_days_remaining
 bootstrap_progress
 
 log_message "Getting Dashboard configuration"
@@ -482,7 +484,8 @@ echo -e "\033[2K
                                ##########/                            
 
 ▼ Tyk
-  ▽ Dashboard
+  ▽ Dashboard 
+                Licence : $dashboard_licence_days_remaining days remaining
                     URL : $dashboard_base_url
     ▾ $organisation_name Organisation
                Username : $dashboard_user_email
