@@ -142,3 +142,44 @@ function hot_reload {
     return 1
   fi
 }
+
+check_licence_expiry() {
+  # read licence line from .env file
+  licence_line=$(grep "$1=" .env)
+  # extract licence JWT
+  encoded_licence_jwt=$(echo $licence_line | sed -E 's/^[A-Z_]+=(.+)$/\1/')
+  # decode licence payload
+  decoded_licence_payload=$(decode_jwt $encoded_licence_jwt)
+  # read licence expiry
+  licence_expiry=$(echo $decoded_licence_payload | jq -r '.exp')   
+  
+  # get timestamp for now, to compare licence expiry against
+  now=$(date '+%s') 
+  # calculate the number of seconds remaining for the licence
+  licence_seconds_remaining=$(expr $licence_expiry - $now)
+  # calculate the number of days remaining for the licence (this sets a global variable, allowing the value to be used elsewhere)
+  licence_days_remaining=$(expr $licence_seconds_remaining / 86400)
+  if [[ "$licence_days_remaining" -le "7" ]]; then
+    log_message "  WARNING: Licence $1 only has $licence_days_remaining days remaining"
+  else
+    log_message "  Licence $1 has $licence_days_remaining days remaining"
+  fi
+
+  # check if licence time remaining (in seconds) is less or equal to 0
+  if [[ "$licence_seconds_remaining" -le "0" ]]; then
+    return 1; # does not meet requirements
+  else
+    return 0; # does meet requirements
+  fi
+}
+
+_decode_base64_url() {
+  local len=$((${#1} % 4))
+  local result="$1"
+  if [ $len -eq 2 ]; then result="$1"'=='
+  elif [ $len -eq 3 ]; then result="$1"'=' 
+  fi
+  echo "$result" | tr '_-' '/+' | base64 -d
+}
+
+decode_jwt() { _decode_base64_url $(echo -n $1 | cut -d "." -f ${2:-2}) | jq .; }

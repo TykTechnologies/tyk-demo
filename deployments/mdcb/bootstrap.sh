@@ -9,14 +9,25 @@ bootstrap_progress
 worker_gateway_base_url="http://tyk-worker-gateway.localhost:8084"
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 
-# check MDCB licence defined
-log_message "Checking MDCB licence is present"
+# check MDCB licence exists
+log_message "Checking MDCB licence exists"
 if ! grep -q "MDCB_LICENCE=" .env
 then
-  echo "ERROR: MDCB licence missing from Docker environment file. Review 'Setup' steps in deployments/mdcb/README.md."
+  echo "ERROR: MDCB licence missing from Docker environment file. Add a licence to the MDCB_LICENCE variable in the .env file."
   exit 1
 fi
 log_ok
+bootstrap_progress
+
+# check the MDCB licence expiry
+log_message "Checking MDCB licence expiry"
+licence_days_remaining=0
+check_licence_expiry "MDCB_LICENCE"
+if [[ "$?" -eq "1" ]]; then
+  echo "ERROR: Tyk MDCB licence has expired. Update MDCB_LICENCE variable in .env file with a new licence."
+  exit 1
+fi
+mdcb_licence_days_remaining=$licence_days_remaining
 bootstrap_progress
 
 # set up MDCB user in Dashboard
@@ -84,6 +95,7 @@ log_end_deployment
 echo -e "\033[2K 
 ▼ MDCB
   ▽ Multi Data Centre Bridge
+                Licence : $mdcb_licence_days_remaining days remaining
         API Credentials : $dashboard_mdcb_user_api_credentials
   ▽ Worker Gateway
                     URL : $worker_gateway_base_url

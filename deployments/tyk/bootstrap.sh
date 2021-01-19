@@ -13,6 +13,25 @@ gateway_base_url="http://tyk-gateway.localhost:8080"
 gateway_base_url_tcp="tyk-gateway.localhost:8086"
 gateway2_base_url="https://tyk-gateway-2.localhost:8081"
 
+log_message "Checking Dashboard licence exists"
+if ! grep -q "DASHBOARD_LICENCE=" .env
+then
+  echo "ERROR: Dashboard licence missing from Docker environment file. Add a licence to the DASHBOARD_LICENCE variable in the .env file."
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Checking Dashboard licence expiry"
+licence_days_remaining=0
+check_licence_expiry "DASHBOARD_LICENCE"
+if [[ "$?" -eq "1" ]]; then
+  echo "ERROR: Tyk Dashboard licence has expired. Update DASHBOARD_LICENCE variable in .env file with a new licence."
+  exit 1
+fi
+dashboard_licence_days_remaining=$licence_days_remaining
+bootstrap_progress
+
 log_message "Getting Dashboard configuration"
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret 2>> bootstrap.log)
 log_message "  Dashboard Admin API Credentials = $dashboard_admin_api_credentials"
@@ -465,7 +484,8 @@ echo -e "\033[2K
                                ##########/                            
 
 ▼ Tyk
-  ▽ Dashboard
+  ▽ Dashboard 
+                Licence : $dashboard_licence_days_remaining days remaining
                     URL : $dashboard_base_url
     ▾ $organisation_name Organisation
                Username : $dashboard_user_email

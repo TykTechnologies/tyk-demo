@@ -2,17 +2,13 @@
 
 source scripts/common.sh
 
+# restart bootstrap log file
+echo -n > bootstrap.log
+
 # check .env file exists
 if [ ! -f .env ]
 then
   echo "ERROR: Docker environment file missing. Review 'getting started' steps in README.md."
-  exit 1
-fi
-
-# check dashboard licence defined
-if ! grep -q "DASHBOARD_LICENCE=" .env
-then
-  echo "ERROR: Dashboard licence missing from Docker environment file. Review 'getting started' steps in README.md."
   exit 1
 fi
 
@@ -27,9 +23,6 @@ done
 
 # check that jq is available
 command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: JQ is required, but it's not installed. Review 'getting started' steps in README.md."; exit 1; }
-
-# restart bootstrap log file
-echo -n > bootstrap.log
 
 # make the context data directory and clear and data from an existing directory
 mkdir -p .context-data 1> /dev/null
