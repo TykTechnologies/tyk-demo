@@ -153,7 +153,7 @@ check_licence_expiry() {
   # read licence expiry
   licence_expiry=$(echo $decoded_licence_payload | jq -r '.exp')   
   
-  # get timestamp for now, to compare against licence expiry against
+  # get timestamp for now, to compare licence expiry against
   now=$(date '+%s') 
   # calculate the number of seconds remaining for the licence
   licence_seconds_remaining=$(expr $licence_expiry - $now)
@@ -163,9 +163,9 @@ check_licence_expiry() {
 
   # this variable is used to check whether the licence has got at least this number of seconds remaining
   minimum_licence_seconds_required=$2
-  # if a time limit is not provided
+  # if a minimum number is not provided
   if [[ "$minimum_licence_seconds_required" -eq "0" ]]; then
-    # default time limit to 0, meaning that the function will return false only if the licence has expired
+    # set default minimum to 0, meaning that the function will return failure only if the licence has expired
     minimum_licence_seconds_required=0
   fi
 
