@@ -13,7 +13,7 @@ dashboard_base_url="http://tyk-dashboard.localhost:3000"
 log_message "Checking MDCB licence exists"
 if ! grep -q "MDCB_LICENCE=" .env
 then
-  echo "ERROR: MDCB licence missing from Docker environment file. Review 'Setup' steps in deployments/mdcb/README.md."
+  echo "ERROR: MDCB licence missing from Docker environment file. Add a licence to the DASHBOARD_LICENCE variable in the .env file."
   exit 1
 fi
 log_ok

@@ -16,7 +16,7 @@ gateway2_base_url="https://tyk-gateway-2.localhost:8081"
 log_message "Checking Dashboard licence exists"
 if ! grep -q "DASHBOARD_LICENCE=" .env
 then
-  echo "ERROR: Dashboard licence missing from Docker environment file. Review 'getting started' steps in README.md."
+  echo "ERROR: Dashboard licence missing from Docker environment file. Add a licence to the DASHBOARD_LICENCE variable in the .env file."
   exit 1
 fi
 log_ok
