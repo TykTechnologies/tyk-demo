@@ -159,7 +159,11 @@ check_licence_expiry() {
   licence_seconds_remaining=$(expr $licence_expiry - $now)
   # calculate the number of days remaining for the licence (this sets a global variable, allowing the value to be used elsewhere)
   licence_days_remaining=$(expr $licence_seconds_remaining / 86400)
-  log_message "  Licence $1 has $licence_days_remaining days remaining"
+  if [[ "$licence_days_remaining" -le "7" ]]; then
+    log_message "  WARNING: Licence $1 only has $licence_days_remaining days remaining"
+  else
+    log_message "  Licence $1 has $licence_days_remaining days remaining"
+  fi
 
   # this variable is used to check whether the licence has got at least this number of seconds remaining
   minimum_licence_seconds_required=$2
