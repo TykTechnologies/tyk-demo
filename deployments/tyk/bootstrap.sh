@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 source scripts/common.sh
 deployment="Tyk"
 
@@ -53,7 +54,7 @@ log_ok
 bootstrap_progress
 
 log_message "Removing Python bundle intermediate assets"
-rm deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
+rm -r deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
 log_ok
 bootstrap_progress
 
@@ -230,15 +231,19 @@ bootstrap_progress
 log_message "  Creating documentation"
 policies=$(curl $dashboard_base_url/api/portal/policies?p=-1 -s \
   -H "Authorization:$dashboard_user_api_credentials" 2>> bootstrap.log)
+echo -n '{
+          "api_id":"",
+          "doc_type":"swagger",
+          "documentation":"' >/tmp/swagger_encoded.out
+cat deployments/tyk/data/tyk-dashboard/documentation-swagger-petstore.json | base64 >>/tmp/swagger_encoded.out
+echo '"}' >>/tmp/swagger_encoded.out
 result=$(curl $dashboard_base_url/api/portal/documentation -s \
   -H "Authorization: $dashboard_user_api_credentials" \
-  --data-raw '{
-      "api_id":"",
-      "doc_type":"swagger",
-      "documentation":"'$(cat deployments/tyk/data/tyk-dashboard/documentation-swagger-petstore.json | base64)'"
-    }' 2>> bootstrap.log)
+  -d "@/tmp/swagger_encoded.out" \
+     2>> bootstrap.log)
 documentation_swagger_petstore_id=$(echo "$result" | jq -r '.Message')
 log_json_result "$result"
+rm /tmp/swagger_encoded.out
 bootstrap_progress
 
 log_message "  Updating catalogue"
@@ -316,27 +321,31 @@ fi
 bootstrap_progress
 
 log_message "Importing APIs for organisation: $organisation_name"
+echo $api_data >/tmp/api_data.out
 log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "$api_data")"
+  -d "@/tmp/api_data.out")"
+rm /tmp/api_data.out
 bootstrap_progress
 
 log_message "Importing APIs for organisation: $organisation_2_name"
 log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "$(cat deployments/tyk/data/tyk-dashboard/apis-organisation-2.json)")"
+  -d "@deployments/tyk/data/tyk-dashboard/apis-organisation-2.json")"
 bootstrap_progress
 
 log_message "Importing Policies for organisation: $organisation_name"
+echo $policy_data >/tmp/policy_data.out
 log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "$policy_data")"
+  -d "@/tmp/policy_data.out")"
+rm /tmp/policy_data.out
 bootstrap_progress
 
 log_message "Importing Policies for organisation: $organisation_2_name"
 log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "$(cat deployments/tyk/data/tyk-dashboard/policies-organisation-2.json)")"
+  -d "@deployments/tyk/data/tyk-dashboard/policies-organisation-2.json")"
 bootstrap_progress
 
 log_message "Refreshing APIs"
@@ -362,11 +371,12 @@ do
   policy_data=$(echo $policies_data | jq --arg pol_id "$policy_id" '.Data[] | select( ._id == $pol_id )')
   policy_name=$(echo $policy_data | jq -r '.name')
   policy_graphql_update_data=$(jq --arg pol_id "$policy_id" --argjson pol_data "$policy_data" '.variables.id = $pol_id | .variables.input = $pol_data' deployments/tyk/data/tyk-dashboard/update-policy-graphql-template.json)
-
+  echo $policy_graphql_update_data >/tmp/policy_graphql_update_data.out  
   result=$(curl $dashboard_base_url/graphql -s \
     -H "Authorization: $dashboard_user_api_credentials" \
-    --data "$policy_graphql_update_data" | jq -r '.data.update_policy.status')
+    -d "@/tmp/policy_graphql_update_data.out" | jq -r '.data.update_policy.status')
   log_message "  $policy_name:$result"
+  rm /tmp/policy_graphql_update_data.out  
 done
 bootstrap_progress
 
