@@ -16,9 +16,9 @@ services:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Dashboard licence missing from Docker environment file .env. Review The Getting Started steps in README.md.}
       - TYK_LOGLEVEL=${DASHBOARD_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
-      - TYK_DB_AUDIT_ENABLED=${DB_AUDIT_ENABLED:?please enable auditing}
-      - TYK_DB_AUDIT_PATH=${DB_AUDIT_PATH:-"/opt/tyk-dashboard/audit.log"}
-      - TYK_DB_AUDIT_DETAILEDRECORDING=${DB_AUDIT_DETAILEDRECORDING:?error audit}
+      - TYK_DB_AUDIT_ENABLED=${DB_AUDIT_ENABLED:-0}
+      - TYK_DB_AUDIT_PATH=${DB_AUDIT_PATH:-""}
+      - TYK_DB_AUDIT_DETAILEDRECORDING=${DB_AUDIT_DETAILEDRECORDING:-false}
               
     depends_on:
       - tyk-redis
