@@ -91,7 +91,7 @@ The source and manifest file for the plugin are available in `deployments/tyk/vo
 This example is using elliptic curve keys.
 It also demo the usage of scopes
 The scope claim name is `"aud"` and the expected scopes are `"client_id_x-readonly" ` and `"client_id_x-readwrite" `. 
-If you have one of these claims then you use the `jwks RO policy readonly` or `jwks RW policy readonly`. 
+If you have one of these claims then you use the `jwks RO policy` or `jwks RW policy`. 
 If you don't have  `"aud"` claim then you use the default policy `jwt no access (default) policy` which has access only to one path `/anything/dummy-path` so you can test it and see for yourself that any other path returns `"Access to this resource has been disallowed"`
 If you do have `"aud"` but with another scode you will get `"error": "key not authorized: no matching policy found in scope claim"`
  
@@ -124,7 +124,7 @@ The JWT
 {
   "sub": "1234567890",
   "name": "John Doe",
-  "aut": "client_id_x-readonly"
+  "aud": "client_id_x-readonly"
 }
 ```
 
