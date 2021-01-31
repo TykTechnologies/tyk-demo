@@ -12,7 +12,7 @@ MDCB architecture creates a Control Plane and a Data Plane:
 - MDCB is the link between the Planes
 
 The worker Gateway can be accessed here:
-- [Tyk Worker Gateway](http://tyk-mdcb-gateway.localhost:8084)
+- [Tyk Worker Gateway](http://tyk-worker-gateway.localhost:8084)
 
 ## Setup
 
