@@ -11,10 +11,15 @@ services:
       - ./deployments/tyk/volumes/tyk-dashboard/private-key.pem:/opt/tyk-dashboard/private-key.pem
       - ./deployments/tyk/volumes/tyk-dashboard/catalogue.html:/opt/tyk-dashboard/portal/templates/catalogue.html
       - ./deployments/tyk/volumes/tyk-dashboard/navigation.html:/opt/tyk-dashboard/portal/templates/navigation.html
+      - ./deployments/tyk/volumes/tyk-dashboard/audit.log:/opt/tyk-dashboard/audit.log
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Dashboard licence missing from Docker environment file .env. Review The Getting Started steps in README.md.}
       - TYK_LOGLEVEL=${DASHBOARD_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
+      - TYK_DB_AUDIT_ENABLED=${DB_AUDIT_ENABLED:-0}
+      - TYK_DB_AUDIT_PATH=${DB_AUDIT_PATH:-""}
+      - TYK_DB_AUDIT_DETAILEDRECORDING=${DB_AUDIT_DETAILEDRECORDING:-false}
+              
     depends_on:
       - tyk-redis
       - tyk-mongo
@@ -31,6 +36,7 @@ services:
       - TYK_LOGLEVEL=${GATEWAY_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-0}
+      - TYK_GW_ENABLEHTTPPROFILER=${GW_ENABLEHTTPPROFILER:-false}
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
