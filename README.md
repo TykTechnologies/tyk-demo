@@ -45,7 +45,7 @@ All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.
 The `docker-compose.yml` files in this repo use a Docker environment variable to set environment variable in tyk-dashboard, tyk-gateway and tyk-pump. 
 To set them, create a file called `.env` in the root directory of the repo. 
 You can use `.env.example` as a starting point for your `.env` file. 
-Just remember to update the licenses of the tyk-dashboard to yours and if you are testing Tyk's multi data centre capabilities (AKA MDCB) also set `MDCB_LICENCE` license variable.  
+Just remember to add the licenses for the Dashboard as the `DASHBOARD_LICENCE` variable, and if you are testing Tyk's multi data centre capabilities (AKA MDCB) also set `MDCB_LICENCE` license variable.
 
 If you want to change configs in tyk component but avoid diffs in the git repo, then the best way would be to add environment variables to `.env`.
 If we already use these environment variables in tyk-demo, then you'll see them in the `docker-compose.yaml` file.
