@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   tyk2-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v3.1.0}
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v3.1.2}
     ports:
       - 3002:3000
     networks:
@@ -13,14 +13,14 @@ services:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Please set DASHBOARD_LICENCE in .env}
       - TYK_DB_MONGOURL=mongodb://tyk2-mongo:27017/tyk_analytics
       - TYK_DB_REDISHOST=tyk2-redis
-      - TYK_DB_TYKAPICONFIG_HOST=http://tyk2-gateway
+      - TYK_DB_TYKAPI_HOST=http://tyk2-gateway
       - TYK_DB_HOSTCONFIG_OVERRIDEHOSTNAME=localhost:8085
       - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}      
     depends_on:
       - tyk2-redis
       - tyk2-mongo
   tyk2-gateway:
-    image: tykio/tyk-gateway:${TYK2_GATEWAY_VERSION:-v3.1.0}
+    image: tykio/tyk-gateway:${TYK2_GATEWAY_VERSION:-v3.1.2}
     ports:
       - 8085:8080
     networks:

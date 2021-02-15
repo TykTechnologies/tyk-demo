@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   tyk-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v3.1.0}
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v3.1.2}
     ports:
       - 3000:3000
     networks:
@@ -24,7 +24,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-gateway:
-    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v3.1.0}
+    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v3.1.2}
     ports:
       - 8080:8080
       - 8086:8086
@@ -45,7 +45,7 @@ services:
     depends_on:
       - tyk-redis
   tyk-gateway-2:
-    image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v3.1.0}
+    image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v3.1.2}
     ports:
       - 8081:8080
     networks:
