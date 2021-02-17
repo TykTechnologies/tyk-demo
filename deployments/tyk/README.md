@@ -85,3 +85,21 @@ The bootstrap script sends requests for each scenario, which you can see in the 
 During the bootstrap script, the Gateway is used to create a plugin bundle, which it signs with its private key so that it can be validated before the Gateway loads it. The plugin is then copied to an Apache server to make it available to the Gateway at runtime when the *Python Middleware API* is requested.
 
 The source and manifest file for the plugin are available in `deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example`.
+
+### WebSockets
+
+WebSocket proxying is demonstrated using the *WebSocket* API Definition. It's configured to proxy to the `ws://echo.websocket.org` server (note: internet access is required for this example), which will echo back any message it receives.
+
+To see a live demonstration, open the [WebSocket Test page](http://localhost:8088/websocket-test.html), which is included in this deployment, in a browser. When this page loads, it automatically opens a WebSocket connection with the API Gateway and uses JavaScript to send a message. The Gateway proxies the message to the upstream server and returns the response to the web page, which is displayed in on the page. If all goes well, it will look something like this:
+
+```
+CONNECTED to ws://tyk-gateway.localhost:8080/websocket/
+
+SENT: Hello, world!
+
+RESPONSE: Hello, world!
+
+DISCONNECTED
+```
+
+The source code for the WebSocket Test page can be found in `deployments/tyk/volumes/http-server/websocket-test.html`.
