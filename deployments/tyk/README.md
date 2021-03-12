@@ -90,7 +90,7 @@ The source and manifest file for the plugin are available in `deployments/tyk/vo
 
 WebSocket proxying is demonstrated using the *WebSocket* API Definition. It's configured to proxy to the `ws://echo.websocket.org` server (note: internet access is required for this example), which will echo back any message it receives.
 
-To see a live demonstration, open the [WebSocket Test page](http://localhost:8088/websocket-test.html), which is included in this deployment, in a browser. When this page loads, it automatically opens a WebSocket connection with the API Gateway and uses JavaScript to send a message. The Gateway proxies the message to the upstream server and returns the response to the web page, which is displayed in on the page. If all goes well, it will look something like this:
+To see a live demonstration, open the [WebSocket Test page](http://localhost:8888/websocket-test.html), which is included in this deployment, in a browser. When this page loads, it automatically opens a WebSocket connection with the API Gateway and uses JavaScript to send a message. The Gateway proxies the message to the upstream server and returns the response to the web page, which is displayed in on the page. If all goes well, it will look something like this:
 
 ```
 CONNECTED to ws://tyk-gateway.localhost:8080/websocket/
