@@ -110,7 +110,7 @@ services:
     volumes:
       - ./deployments/tyk/volumes/http-server:/usr/local/apache2/htdocs
     ports:
-      - "8088:80"
+      - "8888:80"
 
 volumes:
   tyk-redis-data:
