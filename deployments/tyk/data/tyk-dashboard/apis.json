@@ -6157,16 +6157,15 @@
                     "method": "GET",
                     "threshold_percent": 0.5,
                     "samples": 4,
-                    "return_to_service_after": 3,
-                    "disable_half_open_state": false
+                    "return_to_service_after": 3
                   }
                 ],
                 "url_rewrites": [
                   {
-                    "path": "/cache-slow-endpoint",
+                    "path": "anything/looping",
                     "method": "GET",
-                    "match_pattern": "/cache-slow-endpoint",
-                    "rewrite_to": "/delay/3",
+                    "match_pattern": "anything/looping",
+                    "rewrite_to": "tyk://727dad853a8a45f64ab981154d1ffdad/get",
                     "triggers": []
                   },
                   {
@@ -6216,6 +6215,13 @@
                         "rewrite_to": "/anything/rewrite-header"
                       }
                     ]
+                  },
+                  {
+                    "path": "/cache-slow-endpoint",
+                    "method": "GET",
+                    "match_pattern": "/cache-slow-endpoint",
+                    "rewrite_to": "/delay/3",
+                    "triggers": []
                   }
                 ],
                 "virtual": [
@@ -7054,7 +7060,7 @@
                   "api_model": {},
                   "event_timeout": 60,
                   "header_map": {},
-                  "id": "6024c45896a0af3d1e3c506c",
+                  "id": "6059804b4a36db44b319f70b",
                   "method": "POST",
                   "name": "Webhook Receiver Post",
                   "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -7114,7 +7120,7 @@
           "event_timeout": 60,
           "hook": {
             "api_model": {},
-            "id": "6024c45896a0af3d1e3c506c",
+            "id": "6059804b4a36db44b319f70b",
             "org_id": "5e9d9544a1dcd60001d0ed20",
             "name": "Webhook Receiver Post",
             "method": "POST",
