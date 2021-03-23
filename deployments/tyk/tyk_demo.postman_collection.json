@@ -17,7 +17,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "508dbfb5-023a-4acc-9945-df51709f7db5",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -97,7 +96,7 @@
 										}
 									]
 								},
-								"description": "Calls the `JavaScript Middleware API`, which executes two JavaScript middleware functions at the `pre` and `post` hooks.\n\nThe `pre` function does the following:\n- Writes to the API Gateway application log\n- Adds `User-Agent` header\n- Deletes `Deleted` header\n- Adds `added` URL parameter\n- Deletes `deleted` URL parameter\n- Changes the request body - see `data` property of response object\n- Changes the requested URL - see `url` property of response object\n\nThe `post` function does the following:\n- Writes to the API Gateway application log\n- Adds `config-data` header using value taken from API definition `config data`"
+								"description": "Calls the `JavaScript Middleware API`, which executes two JavaScript middleware functions at the `pre` and `post` hooks.\n\nThe `pre` function does the following:\n- Writes to the API Gateway application log\n- Adds `User-Agent` header\n- Deletes `Deleted` header\n- Adds `added` URL parameter\n- Deletes `deleted` URL parameter\n- Changes the request body - see `data` property of response object\n- Changes the requested URL - see `url` property of response object\n\nThe `post` function does the following:\n- Writes to the API Gateway application log\n- Adds `config-data` header using value taken from API definition `config data`\n- Makes a separate HTTP request and writes the resulting response code and body to the API Gateway application log"
 							},
 							"response": []
 						},
@@ -107,7 +106,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5b20154a-bbfc-4f78-9feb-90d47f0f9534",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -149,9 +147,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Endpoint Designer",
@@ -162,7 +158,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c12d2f1b-0991-4375-9836-4182b7004827",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -208,7 +203,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "a74d0499-653e-4e6e-b69c-8e0d85856742",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -248,7 +242,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "1b0efae8-9b5f-4970-b03e-5c4d4165b8d5",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -320,7 +313,6 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "cfa3718f-8613-4d6f-aea1-0cbf400a2dbc",
 										"exec": [
 											""
 										],
@@ -353,7 +345,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "25822554-f4e8-44a2-b095-ca91ffe42750",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -398,7 +389,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "15bcf384-e3fc-42c5-bf71-19b31f5eca54",
 										"exec": [
 											"pm.test(\"Status code is 504\", function () {",
 											"    pm.response.to.have.status(504);",
@@ -446,7 +436,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "fc2e62e5-192e-4290-bc19-57bb605b23ec",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -489,7 +478,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "bb57aa1e-184a-4857-a459-26838575fef1",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -529,7 +517,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6b2d4197-b2d5-40f0-b61d-0ae9dcaed550",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -575,7 +562,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c8256f54-6619-4c6a-b84f-0f8dbfc0f26c",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -621,7 +607,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "0e07de28-7770-43fe-9e21-2f8c72225aaf",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -672,7 +657,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5142d6f9-e937-4d8c-9d5b-e63d86cf59be",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -740,7 +724,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "21dfc144-e1bf-4e54-a928-edf38953cf2a",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -807,7 +790,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "de7d7052-848e-4d1d-ba84-663c8067ebf4",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -842,7 +824,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "1fdd9810-acc6-445b-a6bb-8856cc105f47",
 										"exec": [
 											"pm.test(\"Status code is 401\", function () {",
 											"    pm.response.to.have.status(401);",
@@ -877,7 +858,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "bc67b20b-2fa0-4be7-a41e-0cad93d8941e",
 										"exec": [
 											"pm.test(\"Status code is 422\", function () {",
 											"    pm.response.to.have.status(422);",
@@ -921,7 +901,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4997d1e9-247f-485e-9a81-0a0097fbcbd4",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -967,7 +946,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "578d0fb7-1c6d-49fa-82da-521443e104e2",
 										"exec": [
 											"pm.test(\"Status code is 400\", function () {",
 											"    pm.response.to.have.status(400);",
@@ -1011,7 +989,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "e8b4cd7a-28af-4d80-8cc1-acbd5cb05b6c",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1055,7 +1032,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "1cede973-4b19-4f92-99a1-aab633b9c249",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1095,7 +1071,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "0c41cd0c-bf3c-419b-80ea-b04942d65b4c",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1130,7 +1105,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6d82e7d5-2016-4b9a-9c29-d27932e3c4ae",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1176,7 +1150,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "2f384643-b315-42dc-990a-2028a486a9c3",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1220,7 +1193,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7d873677-ea95-4c42-92b4-85ca8b449c59",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1261,7 +1233,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "1fda95a5-3a10-4604-bbf1-552a88098955",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1306,7 +1277,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "e3b2dc48-7f25-4195-8887-1601943c4525",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1316,16 +1286,13 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "feb25cb7-1f83-432e-acee-6d1e5566da6d",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Versioning",
@@ -1336,7 +1303,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "17603477-48ba-4811-81b1-53e539889b3e",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1382,7 +1348,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "24c24cb5-37fb-4c06-8a58-e76cb47c54fd",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1433,7 +1398,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c7efdc6c-1caf-41f2-9203-df2e48830586",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1473,9 +1437,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Advanced Options",
@@ -1486,7 +1448,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "81daa555-95ac-4ab4-b053-400b17db89c2",
 										"exec": [
 											"pm.test(\"Status code is 403\", function () {",
 											"    pm.response.to.have.status(403);",
@@ -1528,7 +1489,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9df20b71-58ab-4272-a4e5-c608b39fda16",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -1567,7 +1527,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d11c95a4-1ea4-4c74-83e2-6872c4455937",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -1614,7 +1573,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "13d47fb8-70a7-488a-bdd6-50eae766bd49",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -1662,9 +1620,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Core Settings",
@@ -1681,7 +1637,6 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "f054c8a6-f82f-40d8-8c7c-db408f78c31d",
 														"exec": [
 															"pm.test(\"Status code is 401\", function () {",
 															"    pm.response.to.have.status(401);",
@@ -1726,7 +1681,6 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "30981313-4c2e-4f51-8bbd-570e199be6dd",
 														"exec": [
 															"pm.test(\"Status code is 403\", function () {",
 															"    pm.response.to.have.status(403);",
@@ -1771,7 +1725,6 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "bc303c79-ce96-457a-a116-f5c99e93f9b9",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1815,7 +1768,6 @@
 										{
 											"listen": "prerequest",
 											"script": {
-												"id": "42693c62-de57-442e-a62b-76ad722a2dc1",
 												"type": "text/javascript",
 												"exec": [
 													""
@@ -1825,16 +1777,13 @@
 										{
 											"listen": "test",
 											"script": {
-												"id": "a7fea48a-5a9a-4701-a9cc-4deac72a1fc2",
 												"type": "text/javascript",
 												"exec": [
 													""
 												]
 											}
 										}
-									],
-									"protocolProfileBehavior": {},
-									"_postman_isSubFolder": true
+									]
 								},
 								{
 									"name": "JSON Web Token",
@@ -1845,7 +1794,6 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "cae7f603-a1ea-42e0-8b88-ed7505d51ed5",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1885,7 +1833,6 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "e28e0b48-902d-42f7-b3ed-7f7d2d76cc5f",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -1926,7 +1873,6 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "532410c9-6704-4ec4-9b3f-a7d06a3b5525",
 														"exec": [
 															"pm.test(\"Status code is 403\", function () {",
 															"    pm.response.to.have.status(403);",
@@ -1966,9 +1912,7 @@
 											},
 											"response": []
 										}
-									],
-									"protocolProfileBehavior": {},
-									"_postman_isSubFolder": true
+									]
 								},
 								{
 									"name": "Basic Authentication",
@@ -1979,7 +1923,6 @@
 												{
 													"listen": "test",
 													"script": {
-														"id": "3f17c7c5-efaf-48b9-ab73-b62360072a27",
 														"exec": [
 															"pm.test(\"Status code is 200\", function () {",
 															"    pm.response.to.have.status(200);",
@@ -2013,13 +1956,9 @@
 											},
 											"response": []
 										}
-									],
-									"protocolProfileBehavior": {},
-									"_postman_isSubFolder": true
+									]
 								}
-							],
-							"protocolProfileBehavior": {},
-							"_postman_isSubFolder": true
+							]
 						},
 						{
 							"name": "Rate Limit",
@@ -2027,7 +1966,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "bd709a26-2c76-45f9-9ff5-8ff7334103a7",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -2121,7 +2059,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c91d38d0-bd7d-479d-a8da-fa00530eea16",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -2201,7 +2138,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f95bf91f-0ba6-4124-8a1d-789b50b84101",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -2283,7 +2219,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c17ed48d-70ef-48e5-9412-2223bef8fb56",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -2341,7 +2276,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "0c48b320-64df-471a-81a5-8f45eb5c5a07",
 										"exec": [
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"",
@@ -2393,7 +2327,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f2c3bee7-8532-43c5-a8ab-6d0ef63cc376",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2420,9 +2353,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "GraphQL",
@@ -2433,7 +2364,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "1785d609-2b72-4ab9-a7ec-2f3338817662",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2480,7 +2410,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c506523a-d9bf-4ecf-84ea-29bf23246911",
 										"exec": [
 											"pm.test(\"Status code is 400\", function () {",
 											"    pm.response.to.have.status(400);",
@@ -2526,7 +2455,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "caac86f3-45ed-4bbe-b183-858229835eed",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2568,9 +2496,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Universal Data Graph",
@@ -2581,7 +2507,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7b336289-54e1-4209-8abd-586f4db6bbbf",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2623,9 +2548,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Detailed Analytics Logging",
@@ -2762,12 +2685,9 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "System Management",
@@ -2781,7 +2701,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7480b4aa-397b-4a13-9078-2ba78971ee61",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2841,7 +2760,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c648ecc4-a18b-48d3-81e8-29e44b7a4dcc",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2880,9 +2798,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Scaling",
@@ -2893,7 +2809,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5cdb862e-97b7-4207-a93f-eb8dda85c377",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2922,9 +2837,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Health Check",
@@ -2935,7 +2848,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4defc2d0-ce54-4071-b65b-3729172dd15f",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -2977,9 +2889,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Multi-tenancy",
@@ -2990,7 +2900,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f4856e42-de08-4167-9c4c-904497fc3db0",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -3022,9 +2931,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Single Sign-On",
@@ -3035,7 +2942,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "90072c72-5109-4f0e-bf6c-d42dc3a0376f",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -3088,12 +2994,9 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Gateway Configuration",
@@ -3107,7 +3010,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "70caf7f4-7eca-4472-9c71-450ba05a444c",
 										"exec": [
 											"pm.test(\"Status code is 200\", function () {",
 											"    pm.response.to.have.status(200);",
@@ -3135,9 +3037,7 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Error Templates",
@@ -3148,7 +3048,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ec5720b5-d2a6-457e-b496-9b93cf7fd063",
 										"exec": [
 											"pm.test(\"Status code is 401\", function () {",
 											"    pm.response.to.have.status(401);",
@@ -3194,12 +3093,9 @@
 							},
 							"response": []
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Dashboard Admin API",
@@ -3210,7 +3106,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "531fdd1b-e1d0-4266-b78c-1fb9271800f1",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3244,8 +3139,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Gateway Functionality",
@@ -3256,7 +3150,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c4c7b31f-702f-49df-8b44-e22d14080426",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3321,7 +3214,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "9d947403-395a-4610-b443-4b4758f1318f",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3373,7 +3265,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "5d8632f8-91dd-4032-9805-044f210f4eea",
 								"exec": [
 									"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 									"",
@@ -3457,8 +3348,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Basic Test Request",
@@ -3466,7 +3356,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "35144a26-6531-42fd-b6a5-46791a1df8f8",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -3499,7 +3388,6 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "43587842-6653-4f4f-8e86-b1892934448f",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -3509,7 +3397,6 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "2a83b7dc-7ba8-48bb-addd-709871fda03e",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -3519,25 +3406,20 @@
 	],
 	"variable": [
 		{
-			"id": "0b8dfbac-13ac-44da-8934-497f2f60029b",
 			"key": "tyk-gateway.host",
 			"value": "tyk-gateway.localhost:8080"
 		},
 		{
-			"id": "051d6761-66fe-4023-af40-6133740878e1",
 			"key": "tyk-gateway-2.host",
 			"value": "tyk-gateway-2.localhost:8081"
 		},
 		{
-			"id": "88eeb9e8-257b-455d-93d2-0bd74db02998",
 			"key": "tyk-custom-domain.host",
 			"value": "tyk-custom-domain.com:8080"
 		},
 		{
-			"id": "2070de42-2880-4049-ac99-4af4d95683d2",
 			"key": "tyk-dashboard.host",
 			"value": "tyk-dashboard.localhost:3000"
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }

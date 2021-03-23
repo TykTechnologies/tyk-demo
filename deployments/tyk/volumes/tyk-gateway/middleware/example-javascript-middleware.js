@@ -30,6 +30,20 @@ exampleJavaScriptMiddlewarePostHook.NewProcessRequest(function(request, session,
 
   request.SetHeaders["config-data"] = spec.config_data.config_key;
 
+  // Make a separate HTTP request, and log the response code and body
+  requestObject = {
+    "Method": "GET",
+    "Domain": "http://httpbin",
+    "Resource": "/anything/async-http-request"
+  }
+
+  response = TykMakeHttpRequest(JSON.stringify(requestObject))
+
+  usableResponse = JSON.parse(response);
+
+  log("Separate Response Code: " + usableResponse.Code);
+  log("Seperate Response Body: " + usableResponse.Body); 
+
   // You must return both the request and session metadata    
   return exampleJavaScriptMiddlewarePostHook.ReturnData(request, {});
 });
