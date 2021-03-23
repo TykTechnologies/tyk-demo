@@ -473,7 +473,7 @@
 							"response": []
 						},
 						{
-							"name": "Plugin - URL Rewrite (part 1)",
+							"name": "Plugin - URL Rewrite (part 1 - basic rewrite)",
 							"event": [
 								{
 									"listen": "test",
@@ -512,7 +512,7 @@
 							"response": []
 						},
 						{
-							"name": "Plugin - URL Rewrite (part 2)",
+							"name": "Plugin - URL Rewrite (part 2 - URL parameter)",
 							"event": [
 								{
 									"listen": "test",
@@ -557,7 +557,7 @@
 							"response": []
 						},
 						{
-							"name": "Plugin - URL Rewrite (part 3)",
+							"name": "Plugin - URL Rewrite (part 3 - request header)",
 							"event": [
 								{
 									"listen": "test",
@@ -598,6 +598,51 @@
 									]
 								},
 								"description": "This example triggers an advanced URL rewrite rule based on the request headers. It checks for a header with the key `Header` and value `rewrite`. The plugin rewrites to the URL `/anything/rewrite-header`."
+							},
+							"response": []
+						},
+						{
+							"name": "Plugin - URL Rewrite (part 4 - looping)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"URL rewritten to '/get'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.url).to.contain(\"/get\");",
+											"});",
+											"",
+											"pm.test(\"X-Req-Id header was injected into request\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers[\"X-Req-Id\"]).to.not.be.empty;",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/looping",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"looping"
+									]
+								},
+								"description": "This example shows how the looping functionality can be used to change the API Definition executed by the API Gateway.\n\nLooping requests use the `tyk` URL scheme to efficiently process changes in API Definition context without having to generate additional HTTP requests.\n\nIn this case, the request calls the *Plugin Demo API* endpoint `/anything/looping`, which is configured to rewrite the URL using the `tyk` scheme, the ID of the API Definition to loop to (the *Basic Open API*) and the path `get`: `tyk://727dad853a8a45f64ab981154d1ffdad/get`.\n\nWe can verify the looping effect by checking the response body received:\n- `url` shows `http://httpbin/get` which is the target host of the *Basic Open API* combined with the path from the URL rewrite rule.\n- `headers.X-Req-Id` is a value injected by the *Basic Open API*."
 							},
 							"response": []
 						},
