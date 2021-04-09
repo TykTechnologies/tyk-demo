@@ -47,9 +47,7 @@ To set them, create a file called `.env` in the root directory of the repo.
 You can use `.env.example` as a starting point for your `.env` file. 
 Just remember to add the licenses for the Dashboard as the `DASHBOARD_LICENCE` variable, and if you are testing Tyk's multi data centre capabilities (AKA MDCB) also set `MDCB_LICENCE` license variable.
 
-If you want to change configs in tyk component but avoid diffs in the git repo, then the best way would be to add environment variables to `.env`.
-If we already use these environment variables in tyk-demo, then you'll see them in the `docker-compose.yaml` file.
-If they are new variables, please feel free to submit a PR with the updated `docker-compose.yaml`.
+If you want to change configs in tyk component but avoid diffs in the git repo, just add environment variables to `.env` (No need to update `docker-compose.yaml` any more).
 
 
 # Getting Started
