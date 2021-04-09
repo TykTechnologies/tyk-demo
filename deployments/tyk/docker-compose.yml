@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.8'
 services:
   tyk-dashboard:
     image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v3.1.2}
@@ -16,10 +16,8 @@ services:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Dashboard licence missing from Docker environment file .env. Review The Getting Started steps in README.md.}
       - TYK_LOGLEVEL=${DASHBOARD_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
-      - TYK_DB_AUDIT_ENABLED=${DB_AUDIT_ENABLED:-0}
-      - TYK_DB_AUDIT_PATH=${DB_AUDIT_PATH:-""}
-      - TYK_DB_AUDIT_DETAILEDRECORDING=${DB_AUDIT_DETAILEDRECORDING:-false}
-              
+    env_file:
+    - .env
     depends_on:
       - tyk-redis
       - tyk-mongo
@@ -35,8 +33,8 @@ services:
     environment:
       - TYK_LOGLEVEL=${GATEWAY_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
-      - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-0}
-      - TYK_GW_ENABLEHTTPPROFILER=${GW_ENABLEHTTPPROFILER:-false}
+    env_file:
+    - .env
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
@@ -53,7 +51,8 @@ services:
     environment:
       - TYK_LOGLEVEL=${GATEWAY2_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
-      - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-0}
+    env_file:
+    - .env
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk-2.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
@@ -63,6 +62,8 @@ services:
       - tyk-gateway
   tyk-pump:
     image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.0.1}
+    ports:
+    - 8083:8083
     networks:
       - tyk
     volumes:
@@ -70,6 +71,8 @@ services:
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:?0}
       - TYK_LOGLEVEL=${PUMP_TYK_LOGLEVEL:-info}
+    env_file:
+    - .env
     depends_on:
       - tyk-redis
       - tyk-mongo
