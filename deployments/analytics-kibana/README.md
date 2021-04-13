@@ -28,4 +28,4 @@ The bootstrap process creates an Index Pattern and Visualization which can be us
 
 In this deployment, the Pump configuration for Elasticsearch contains a `filters` section that has the id for the Acme Organisation in the *skip* list. This means that the Pump will not send any analytics data for Acme-related APIs to Elasticsearch. The filters can be set up to specify Organisations and APIs to either include or exclude.
 
-See the **Analytics Sharding** request in the `tyk_demo_analytics.postman_collection` Postman collection for a working example.
+See the **Analytics Sharding** request in the `tyk_demo_analytics_kibana.postman_collection` Postman collection for a working example.
