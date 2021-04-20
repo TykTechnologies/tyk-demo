@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 # Stop on first error
 set -e;
@@ -20,7 +20,7 @@ trap onExit EXIT;
 # Insecure is used due to self-signed certificates
 docker run -t --rm \
     --network tyk-demo_tyk \
-    -v $(pwd)/tyk_demo.postman_collection.json:/etc/postman/tyk_demo.postman_collection.json \
+    -v $(pwd)/deployments/tyk/tyk_demo.postman_collection.json:/etc/postman/tyk_demo.postman_collection.json \
     -v $(pwd)/test.postman_environment.json:/etc/postman/test.postman_environment.json \
     postman/newman:alpine \
     run "/etc/postman/tyk_demo.postman_collection.json" \

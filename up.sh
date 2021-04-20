@@ -68,7 +68,7 @@ eval $command_docker_compose
 if [ "$?" != 0 ]
 then
   echo "Error occurred when using docker-compose to bring containers up"
-  exit
+  exit 1
 fi
 
 # alway run the tyk bootstrap first
@@ -76,7 +76,7 @@ deployments/tyk/bootstrap.sh 2>> bootstrap.log
 if [ "$?" != 0 ]
 then
   echo "Error occurred during bootstrap of 'tyk' deployment. Check bootstrap.log for details."
-  exit
+  exit 1
 fi
 
 # run bootstrap scripts for any feature deployments specified
@@ -90,7 +90,7 @@ do
     if [ "$?" != 0 ]
     then
       echo "Error occurred during bootstrap of $var, when running deployments/$var/bootstrap.sh. Check bootstrap.log for details."
-      exit
+      exit 1
     fi
   fi
 done
