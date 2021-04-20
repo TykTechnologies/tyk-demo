@@ -64,7 +64,7 @@ function set_docker_environment_value {
     if [ "$setting_current_value" != "$setting_desired_value" ]
     then
       log_message "Updating Docker environment variable: $setting_desired_value"
-      sed -i.bak 's/'"$setting_current_value"'/'"$setting_desired_value"'/g' .env
+      sudo sed -i.bak 's/'"$setting_current_value"'/'"$setting_desired_value"'/g' .env
       rm .env.bak
     fi
   fi
