@@ -17,8 +17,10 @@ jobs:
           FILE_DATA: "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}"
       - run: sudo ./scripts/update-hosts.sh
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+      - name: Bootstrap Tyk
         run: |
-          ls ${{ github.workspace }}
           sudo ./up.sh
+      - name: Run Postman tests
+        run: |
+          sudo ./scripts/test.sh
       - run: echo "🍏 This job's status is ${{ job.status }}."
