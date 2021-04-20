@@ -1,3 +1,5 @@
+[![Tyk Demo API Tests](https://github.com/TykTechnologies/tyk-demo/actions/workflows/tyk-demo-tests.yml/badge.svg)](https://github.com/TykTechnologies/tyk-demo/actions/workflows/tyk-demo-tests.yml)
+
 # Tyk Demo
 
 This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple deployment, where you can choose what features to include.
