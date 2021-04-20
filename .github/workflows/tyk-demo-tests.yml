@@ -1,7 +1,7 @@
-name: Tyk Demo Tests
+name: Tyk Demo API Tests
 on: [push]
 jobs:
-  Test-Tyk-Demo:
+  Tyk-Demo-Api-Tests:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
