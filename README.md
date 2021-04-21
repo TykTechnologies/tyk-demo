@@ -162,7 +162,11 @@ To bring down the containers and delete associated volumes:
 
 # Redeploying
 
-The `up.sh` script is not intended to be run consecutively without running `down.sh` in between. The reason for this is that the `up.sh` script assumes that the system will not contain any data, so it attempts to bootstrap the system by creating data. This means that running the script consecutively will likely generate errors and duplicate data.
+The `up.sh` script is not intended to be run consecutively without running `down.sh` in between. The reason for this is that the `up.sh` script assumes that the system will not contain any data, so it attempts to bootstrap the system by creating data. This means that running the script consecutively will likely generate errors and duplicate data. For this reason, if you want to bring down the environment and recreate it, it is recommended to combine the `down.sh` and `up.sh` commands:
+
+```
+./down.sh && ./up.sh
+```
 
 # Check running containers, logs, restart
 
