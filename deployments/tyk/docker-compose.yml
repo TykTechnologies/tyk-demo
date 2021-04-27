@@ -33,6 +33,7 @@ services:
     environment:
       - TYK_LOGLEVEL=${GATEWAY_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
+      - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-false}
     env_file:
     - .env
     volumes:
@@ -51,6 +52,7 @@ services:
     environment:
       - TYK_LOGLEVEL=${GATEWAY2_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
+      - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-false}
     env_file:
     - .env
     volumes:
