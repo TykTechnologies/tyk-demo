@@ -24,7 +24,7 @@ The bootstrap process creates an Index Pattern and Visualization which can be us
 
 ### Analytics sharding
 
-[Analytics sharding](https://tyk.io/docs/tyk-configuration-reference/tyk-pump-configuration/tyk-pump-configuration/#sharding-analytics-to-different-data-sinks) enables the Pump to filter analytics data so it only processes data for specific APIs or Organisations.
+[Analytics sharding](https://tyk.io/docs/tyk-pump/configuration/#sharding-analytics-to-different-data-sinks) enables the Pump to filter analytics data so it only processes data for specific APIs or Organisations.
 
 In this deployment, the Pump configuration for Elasticsearch contains a `filters` section that has the id for the Acme Organisation in the *skip* list. This means that the Pump will not send any analytics data for Acme-related APIs to Elasticsearch. The filters can be set up to specify Organisations and APIs to either include or exclude.
 
