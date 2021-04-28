@@ -13,7 +13,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-worker-gateway:
-    image: docker.tyk.io/tyk-gateway/tyk-gateway:${GATEWAY_WORKER_VERSION:-v3.1.0}
+    image: tykio/tyk-gateway:${GATEWAY_WORKER_VERSION:-v3.1.2}
     ports:
       - 8084:8080
     networks:

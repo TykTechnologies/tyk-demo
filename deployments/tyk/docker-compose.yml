@@ -22,7 +22,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-gateway:
-    image: docker.tyk.io/tyk-gateway/tyk-gateway:${GATEWAY_VERSION:-v3.1.2}
+    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v3.1.2}
     ports:
       - 8080:8080
       - 8086:8086
@@ -44,7 +44,7 @@ services:
     depends_on:
       - tyk-redis
   tyk-gateway-2:
-    image: docker.tyk.io/tyk-gateway/tyk-gateway:${GATEWAY2_VERSION:-v3.1.2}
+    image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v3.1.2}
     ports:
       - 8081:8080
     networks:
