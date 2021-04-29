@@ -96,7 +96,8 @@ echo -e "\033[2K
 ▼ MDCB
   ▽ Multi Data Centre Bridge
                 Licence : $mdcb_licence_days_remaining days remaining
-        API Credentials : $dashboard_mdcb_user_api_credentials
+   Dash API Credentials : $dashboard_mdcb_user_api_credentials
   ▽ Worker Gateway
                     URL : $worker_gateway_base_url
-        API Credentials : $worker_gateway_api_credentials"
+        API Credentials : $worker_gateway_api_credentials
+       API AuthZ Header : x-tyk-authorization"

@@ -54,5 +54,6 @@ echo -e "\033[2K
                Username : $dashboard_user_email
                Password : $dashboard_user_password
         API Credentials : $dashboard2_user_api_credentials
+   Authorization header : x-tyk-authorization
   ▽ Gateway 
                     URL : $gateway2_base_url"
