@@ -497,7 +497,7 @@ echo -e "\033[2K
   ▽ Dashboard 
                 Licence : $dashboard_licence_days_remaining days remaining
                     URL : $dashboard_base_url
-        API AuthN Header: Authorization
+       API AuthZ Header : Authorization
     ▾ $organisation_name Organisation
                Username : $dashboard_user_email
                Password : $dashboard_user_password
@@ -522,8 +522,8 @@ echo -e "\033[2K
                     URL : $gateway_base_url
                URL(TCP) : $gateway_base_url_tcp
         API Credentials : $gateway_api_credentials
-       API AuthN Header : x-tyk-authorization
+       API AuthZ Header : x-tyk-authorization
   ▽ Gateway 2
                     URL : $gateway2_base_url  
         API Credentials : $gateway2_api_credentials
-       API AuthN Header : x-tyk-authorization"
+       API AuthZ Header : x-tyk-authorization"

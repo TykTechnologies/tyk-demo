@@ -100,4 +100,4 @@ echo -e "\033[2K
   ▽ Worker Gateway
                     URL : $worker_gateway_base_url
         API Credentials : $worker_gateway_api_credentials
-       API AuthN Header : x-tyk-authorization"
+       API AuthZ Header : x-tyk-authorization"
