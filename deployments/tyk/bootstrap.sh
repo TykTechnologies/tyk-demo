@@ -497,20 +497,18 @@ echo -e "\033[2K
   ▽ Dashboard 
                 Licence : $dashboard_licence_days_remaining days remaining
                     URL : $dashboard_base_url
+        API AuthN Header: Authorization
     ▾ $organisation_name Organisation
                Username : $dashboard_user_email
                Password : $dashboard_user_password
         API Credentials : $dashboard_user_api_credentials
-   Authorization header : Authorization
     ▾ $organisation_2_name Organisation
                Username : $dashboard_user_organisation_2_email
                Password : $dashboard_user_organisation_2_password
         API Credentials : $dashboard_user_organisation_2_api_credentials
-   Authorization header : Authorization
     ▾ Multi-Organisation User
                Username : $dashboard_multi_organisation_user_email
                Password : $dashboard_multi_organisation_user_password
-   Authorization header : Authorization
   ▽ Portal
     ▾ $organisation_name Organisation
                     URL : $portal_base_url$portal_root_path
@@ -524,8 +522,8 @@ echo -e "\033[2K
                     URL : $gateway_base_url
                URL(TCP) : $gateway_base_url_tcp
         API Credentials : $gateway_api_credentials
-   Authorization header : x-tyk-authorization
+       API AuthN Header : x-tyk-authorization
   ▽ Gateway 2
                     URL : $gateway2_base_url  
         API Credentials : $gateway2_api_credentials
-   Authorization header : x-tyk-authorization"
+       API AuthN Header : x-tyk-authorization"
