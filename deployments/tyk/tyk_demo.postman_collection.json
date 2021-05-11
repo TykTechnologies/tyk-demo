@@ -3392,6 +3392,50 @@
 						"description": "This request calls the cache invalidation Gateway API endpoint, which invalidates the cached responses for an API which have been stored by the Gateway. \n\nThis is done on a per-API basis, with the API id provided as the last part of the URL path - in this case `4692b70056154ccb41e44af0cdd990c3`. This clears any cached responses the Gateway has stored for the API. If successful, the API client will receive a response with a `200 OK` HTTP status, and a body message stating `cache invalidated`.\n\nThe cached data will be removed from Redis, so will affect any other Gateways which are using the same Redis instance.\n\nThe process of cache invalidation can also be initiated through the Dashboard API."
 					},
 					"response": []
+				},
+				{
+					"name": "Secret store - Local",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    // this also essentially tests that the listen path is working",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Target host is httpbin\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.headers.Host).to.eql(\"httpbin\");",
+									"});",
+									"",
+									"pm.test(\"Secret header is set\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.headers[\"Secret-Header\"]).to.eql(\"secret-header-value\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/secret-path/get",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"secret-path",
+								"get"
+							]
+						},
+						"description": "This request calls the **Secret API**, which has its *listen path* and *target URL* set using secret values taken from the Gateway's configuration file. It also injects a header called `Secret-Header` with the value `secret-header-value`.\n\nThe values are stored in a key/value array called `secrets` in the Gateway's configuration file `tyk.conf`:\n```\n  \"secrets\": {\n    \"target_url\": \"http://httpbin/\",\n    \"listen_path\": \"/secret-path/\"\n    \"header\": \"secret-header-value\"\n  }\n```\n\nThese values can be used as values in the API Definition.\n- When setting the *listen path* and *target URL*, the syntax is `secrets://value` where `value` is the key for the `secrets` array e.g. `secrets://target_url`. \n- When used in other contexts, such as setting a header value, the syntax is `$secret_conf.value` e.g. `$secret_conf.header`.\n\nThe Gateway can also pull key/value pairs from secret stores such as Vault and Consul. See https://tyk.io/docs/tyk-configuration-reference/kv-store/ for more information."
+					},
+					"response": []
 				}
 			]
 		},
