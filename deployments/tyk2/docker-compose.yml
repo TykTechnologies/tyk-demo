@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   tyk2-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v3.1.2}
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v3.2.0}
     ports:
       - 3002:3000
     networks:
@@ -20,7 +20,7 @@ services:
       - tyk2-redis
       - tyk2-mongo
   tyk2-gateway:
-    image: tykio/tyk-gateway:${TYK2_GATEWAY_VERSION:-v3.1.2}
+    image: tykio/tyk-gateway:${TYK2_GATEWAY_VERSION:-v3.2.1}
     ports:
       - 8085:8080
     networks:
