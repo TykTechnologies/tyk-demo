@@ -13,6 +13,7 @@ portal_organisation_2_base_url="http://acme-portal.localhost:3000"
 gateway_base_url="http://tyk-gateway.localhost:8080"
 gateway_base_url_tcp="tyk-gateway.localhost:8086"
 gateway2_base_url="https://tyk-gateway-2.localhost:8081"
+gateway_image_tag=$(docker ps --filter "name=tyk-demo_tyk-gateway_1" --format "{{.Image}}" | awk -F':' '{print $2}')
 
 log_message "Checking Dashboard licence exists"
 if ! grep -q "DASHBOARD_LICENCE=" .env
@@ -55,6 +56,13 @@ bootstrap_progress
 
 log_message "Removing Python bundle intermediate assets"
 rm -r deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
+log_ok
+bootstrap_progress
+
+# Go plugin
+
+log_message "Building Go plugin"
+docker run --rm -v $PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/example:/plugin-source tykio/tyk-plugin-compiler:$gateway_image_tag example-go-plugin.so
 log_ok
 bootstrap_progress
 
@@ -386,7 +394,7 @@ log_message "Reloading Gateways"
 hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
 bootstrap_progress
 
-log_message "Checking Gateway functionality"
+log_message "Checking Gateway - Basic API access"
 result=""
 while [ "$result" != "0" ]
 do
@@ -398,7 +406,13 @@ do
     hot_reload "$gateway_base_url" "$gateway_api_credentials"
     sleep 2
   fi
+done
+bootstrap_progress
 
+log_message "Checking Gateway - Python middleware"
+result=""
+while [ "$result" != "0" ]
+do
   wait_for_response "$gateway_base_url/python-middleware-api/get" "200" "" 3
   result="$?"
   if [ "$result" != "0" ]
@@ -410,7 +424,22 @@ do
 done
 bootstrap_progress
 
-log_message "Checking Gateway 2 functionality"
+log_message "Checking Gateway - Go plugin"
+result=""
+while [ "$result" != "0" ]
+do
+  wait_for_response "$gateway_base_url/go-plugin-api/get" "200" "" 3
+  result="$?"
+  if [ "$result" != "0" ]
+  then
+    log_message "  Gateway not returning desired response, attempting hot reload"
+    hot_reload "$gateway_base_url" "$gateway_api_credentials"
+    sleep 2
+  fi
+done
+bootstrap_progress
+
+log_message "Checking Gateway 2 - Basic API access"
 result=""
 while [ "$result" != "0" ]
 do
