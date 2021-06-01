@@ -394,7 +394,7 @@ log_message "Reloading Gateways"
 hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
 bootstrap_progress
 
-log_message "Checking Gateway functionality"
+log_message "Checking Gateway - Basic API access"
 result=""
 while [ "$result" != "0" ]
 do
@@ -406,7 +406,13 @@ do
     hot_reload "$gateway_base_url" "$gateway_api_credentials"
     sleep 2
   fi
+done
+bootstrap_progress
 
+log_message "Checking Gateway - Python middleware"
+result=""
+while [ "$result" != "0" ]
+do
   wait_for_response "$gateway_base_url/python-middleware-api/get" "200" "" 3
   result="$?"
   if [ "$result" != "0" ]
@@ -418,7 +424,22 @@ do
 done
 bootstrap_progress
 
-log_message "Checking Gateway 2 functionality"
+log_message "Checking Gateway - Go plugin"
+result=""
+while [ "$result" != "0" ]
+do
+  wait_for_response "$gateway_base_url/go-plugin-api/get" "200" "" 3
+  result="$?"
+  if [ "$result" != "0" ]
+  then
+    log_message "  Gateway not returning desired response, attempting hot reload"
+    hot_reload "$gateway_base_url" "$gateway_api_credentials"
+    sleep 2
+  fi
+done
+bootstrap_progress
+
+log_message "Checking Gateway 2 - Basic API access"
 result=""
 while [ "$result" != "0" ]
 do
