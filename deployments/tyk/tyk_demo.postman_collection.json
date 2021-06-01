@@ -171,13 +171,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/go-plugin-api/get",
+									"raw": "http://{{tyk-gateway.host}}/go-plugin-api/get",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"go-plugin-api",
 										"get"
