@@ -146,6 +146,46 @@
 								"description": "This request calls the Python Middleware API, which uses Python to inject a custom header into the request as it is processed by the Gateway.\n\nThis middleware is configured to be activated at the `pre`, `post` and `response` hooks.\n\nThe request goes the `/get` endpoint. The server adds the headers it received into the response body - the custom headers are shown as `\"Python-Plugin-Pre-Hook\": \"Pre Hook\"` and `\"Python-Plugin-Post-Hook\": \"Post Hook\"`.\n\nThe plugin response hook adds a custom header to the response, called `Python-Plugin-Response-Hook`. It also logs the response status code to the Gateway application log. Check the Gateway's application log for entries prefixed with `Python plugin:`.\n\nThe plugin is bundled using the Gateway CLI, which outputs a signed compressed archive. This signature is then verified by the Gateway when it loads the Python plugin."
 							},
 							"response": []
+						},
+						{
+							"name": "Middleware - Go",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Foo Bar header is present\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers.Foo).to.eql(\"Bar\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://tyk-gateway.localhost:8080/go-plugin-api/get",
+									"protocol": "http",
+									"host": [
+										"tyk-gateway",
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"go-plugin-api",
+										"get"
+									]
+								},
+								"description": "This request calls the Go Plugin API, which uses Go to inject a custom header into the response as it is processed by the Gateway.\n\nThis plugin is configured to be activated at the `post` hook.\n\nThe request goes the `/get` endpoint. The server adds the headers it received into the response body - the custom header is shown as `\"Foo\": \"Bar\"`.\n\nThe plugin is built during the Tyk Demo bootstrap, which uses a special container to build the Go shared object (`.so`) library file, using the same Go version as that used to build the Gateway. This shared library can then be loaded by the Gateway at runtime, and the `AddFooBarHeader` function executed."
+							},
+							"response": []
 						}
 					]
 				},
