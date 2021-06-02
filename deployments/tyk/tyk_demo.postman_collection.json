@@ -161,6 +161,11 @@
 											"pm.test(\"Foo Bar header is present\", function () {",
 											"    var jsonData = pm.response.json();",
 											"    pm.expect(jsonData.headers.Foo).to.eql(\"Bar\");",
+											"});",
+											"",
+											"pm.test(\"Hello World header is present\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers.Hello).to.eql(\"World\");",
 											"});"
 										],
 										"type": "text/javascript"
@@ -181,7 +186,7 @@
 										"get"
 									]
 								},
-								"description": "This request calls the Go Plugin API, which uses Go to inject a custom header into the response as it is processed by the Gateway.\n\nThis plugin is configured to be activated at the `post` hook.\n\nThe request goes the `/get` endpoint. The server adds the headers it received into the response body - the custom header is shown as `\"Foo\": \"Bar\"`.\n\nThe plugin is built during the Tyk Demo bootstrap, which uses a special container to build the Go shared object (`.so`) library file, using the same Go version as that used to build the Gateway. This shared library can then be loaded by the Gateway at runtime, and the `AddFooBarHeader` function executed."
+								"description": "This request calls the Go Plugin API, which uses Go to inject a custom headers into the request as it is processed by the Gateway.\n\nThis API is configured to activate the plugin at the `pre` and `post` hooks.\n\nThe request goes the `/get` endpoint, where the server adds the headers it received into the response body - the custom headers are shown as `\"Hello\": \"World\"` and `\"Foo\": \"Bar\"`.\n\nThe plugin is built during the Tyk Demo bootstrap, which uses a special container to build the Go shared object (`.so`) library file, using the same Go version as that used to build the Gateway. This shared library can then be loaded by the Gateway at runtime, and the `AddHelloWorldHeader` and `AddFooBarHeader` functions executed."
 							},
 							"response": []
 						}
@@ -2036,6 +2041,94 @@
 													]
 												},
 												"description": "This request uses basic authentication to access the Basic Authentication API. Basic authenticate is based on a username and password.\n\nThe request has an `Authorization` header which has a value comprised of a prefix `Basic` and a base64 encoded representation of the credentials. The value used is the username and password separated with a colon. In this case the username is `basic-auth-username` and the password is `basic-auth-password`, so this gives `basic-auth-username:basic-auth-password`, which is `YmFzaWMtYXV0aC11c2VybmFtZTpiYXNpYy1hdXRoLXBhc3N3b3Jk` when base64 encoded."
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Custom Authentication",
+									"item": [
+										{
+											"name": "Custom Authentication - Go Plugin (part 1)",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"Custom key used for authentication\", function () {",
+															"    var jsonData = pm.response.json();",
+															"    pm.expect(jsonData.headers.Authorization).to.eql('abc');",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "abc",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "http://{{tyk-gateway.host}}/go-auth-plugin-api/get",
+													"protocol": "http",
+													"host": [
+														"{{tyk-gateway.host}}"
+													],
+													"path": [
+														"go-auth-plugin-api",
+														"get"
+													]
+												},
+												"description": "This request calls an API which is configured to use a Go plugin to perform authentication.\n\nThe plugin source is located at `/deployments/tyk/volumes/tyk-gateway/plugins/go/session/session-go-plugin.go`, and the resulting shared object file is referenced from `auth_check` section of the API Definition.\n\nThe functionality is very basic. It checks that the `Authorization` header contains the value `123`. If it does, then it created a session for the request, otherwise it rejects the request with an HTTP 403 response (see part 2).\n\nThe API is also configured to call the Go plugin function `LogSession` at the `post_key_auth` hook. This function writes the session alias into the Gateway application log. If you check the log when this example is called, you will see the session alias printed:\n\n```\nSession alias: abc-session\n```"
+											},
+											"response": []
+										},
+										{
+											"name": "Custom Authentication - Go Plugin (part 2)",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 403\", function () {",
+															"    pm.response.to.have.status(403);",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "def",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "http://{{tyk-gateway.host}}/go-auth-plugin-api/get",
+													"protocol": "http",
+													"host": [
+														"{{tyk-gateway.host}}"
+													],
+													"path": [
+														"go-auth-plugin-api",
+														"get"
+													]
+												},
+												"description": "This request uses an invalid key, so fails with an HTTP 403 response."
 											},
 											"response": []
 										}

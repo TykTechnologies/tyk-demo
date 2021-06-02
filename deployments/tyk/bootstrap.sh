@@ -61,8 +61,13 @@ bootstrap_progress
 
 # Go plugin
 
-log_message "Building Go plugin using tag $gateway_image_tag"
+log_message "Building Example Go Plugin using tag $gateway_image_tag"
 docker run --rm -v $PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/example:/plugin-source tykio/tyk-plugin-compiler:$gateway_image_tag example-go-plugin.so
+log_ok
+bootstrap_progress
+
+log_message "Building Session Go Plugin using tag $gateway_image_tag"
+docker run --rm -v $PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/session:/plugin-source tykio/tyk-plugin-compiler:$gateway_image_tag session-go-plugin.so
 log_ok
 bootstrap_progress
 
