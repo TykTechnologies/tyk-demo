@@ -61,8 +61,13 @@ bootstrap_progress
 
 # Go plugin
 
-log_message "Building Go plugin using tag $gateway_image_tag"
+log_message "Building Example Go Plugin using tag $gateway_image_tag"
 docker run --rm -v $PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/example:/plugin-source tykio/tyk-plugin-compiler:$gateway_image_tag example-go-plugin.so
+log_ok
+bootstrap_progress
+
+log_message "Building Session Go Plugin using tag $gateway_image_tag"
+docker run --rm -v $PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/session:/plugin-source tykio/tyk-plugin-compiler:$gateway_image_tag session-go-plugin.so
 log_ok
 bootstrap_progress
 
@@ -356,37 +361,37 @@ log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
   -d "@deployments/tyk/data/tyk-dashboard/policies-organisation-2.json")"
 bootstrap_progress
 
-log_message "Refreshing APIs"
-# This helps correct some strange behaviour observed with imported data
-cat deployments/tyk/data/tyk-dashboard/apis.json | jq --raw-output '.apis[].api_definition.id' | while read api_id
-do
-  # Get the API definition from the Dashboard
-  api_definition=$(curl $dashboard_base_url/api/apis/$api_id -s \
-    -H "Authorization: $dashboard_user_api_credentials")
-  # Put the API definition into the Dashboard
-  result=$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
-    -H "Authorization: $dashboard_user_api_credentials" \
-    --data "$api_definition" | jq -r '.Status')
-  log_message "  $(echo $api_definition | jq -r '.api_definition.name'):$result"
-done
-bootstrap_progress
+# log_message "Refreshing APIs"
+# # This helps correct some strange behaviour observed with imported data
+# cat deployments/tyk/data/tyk-dashboard/apis.json | jq --raw-output '.apis[].api_definition.id' | while read api_id
+# do
+#   # Get the API definition from the Dashboard
+#   api_definition=$(curl $dashboard_base_url/api/apis/$api_id -s \
+#     -H "Authorization: $dashboard_user_api_credentials")
+#   # Put the API definition into the Dashboard
+#   result=$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
+#     -H "Authorization: $dashboard_user_api_credentials" \
+#     --data "$api_definition" | jq -r '.Status')
+#   log_message "  $(echo $api_definition | jq -r '.api_definition.name'):$result"
+# done
+# bootstrap_progress
 
-log_message "Refreshing Policies"
-# Policies need to be 'refreshed' using the original policies.json data as the admin import endpoint does not correctly import all the data from the v3 policy schema
-policies_data=$(cat deployments/tyk/data/tyk-dashboard/policies.json)
-echo $policies_data | jq --raw-output '.Data[]._id' | while read policy_id
-do
-  policy_data=$(echo $policies_data | jq --arg pol_id "$policy_id" '.Data[] | select( ._id == $pol_id )')
-  policy_name=$(echo $policy_data | jq -r '.name')
-  policy_graphql_update_data=$(jq --arg pol_id "$policy_id" --argjson pol_data "$policy_data" '.variables.id = $pol_id | .variables.input = $pol_data' deployments/tyk/data/tyk-dashboard/update-policy-graphql-template.json)
-  echo $policy_graphql_update_data >/tmp/policy_graphql_update_data.out  
-  result=$(curl $dashboard_base_url/graphql -s \
-    -H "Authorization: $dashboard_user_api_credentials" \
-    -d "@/tmp/policy_graphql_update_data.out" | jq -r '.data.update_policy.status')
-  log_message "  $policy_name:$result"
-  rm /tmp/policy_graphql_update_data.out  
-done
-bootstrap_progress
+# log_message "Refreshing Policies"
+# # Policies need to be 'refreshed' using the original policies.json data as the admin import endpoint does not correctly import all the data from the v3 policy schema
+# policies_data=$(cat deployments/tyk/data/tyk-dashboard/policies.json)
+# echo $policies_data | jq --raw-output '.Data[]._id' | while read policy_id
+# do
+#   policy_data=$(echo $policies_data | jq --arg pol_id "$policy_id" '.Data[] | select( ._id == $pol_id )')
+#   policy_name=$(echo $policy_data | jq -r '.name')
+#   policy_graphql_update_data=$(jq --arg pol_id "$policy_id" --argjson pol_data "$policy_data" '.variables.id = $pol_id | .variables.input = $pol_data' deployments/tyk/data/tyk-dashboard/update-policy-graphql-template.json)
+#   echo $policy_graphql_update_data >/tmp/policy_graphql_update_data.out  
+#   result=$(curl $dashboard_base_url/graphql -s \
+#     -H "Authorization: $dashboard_user_api_credentials" \
+#     -d "@/tmp/policy_graphql_update_data.out" | jq -r '.data.update_policy.status')
+#   log_message "  $policy_name:$result"
+#   rm /tmp/policy_graphql_update_data.out  
+# done
+# bootstrap_progress
 
 # System
 
