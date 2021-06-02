@@ -2040,6 +2040,94 @@
 											"response": []
 										}
 									]
+								},
+								{
+									"name": "Custom Authentication",
+									"item": [
+										{
+											"name": "Custom Authentication - Go Plugin (part 1)",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"Custom key used for authentication\", function () {",
+															"    var jsonData = pm.response.json();",
+															"    pm.expect(jsonData.headers.Authorization).to.eql('abc');",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "abc",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "http://{{tyk-gateway.host}}/go-auth-plugin-api/get",
+													"protocol": "http",
+													"host": [
+														"{{tyk-gateway.host}}"
+													],
+													"path": [
+														"go-auth-plugin-api",
+														"get"
+													]
+												},
+												"description": "This request calls an API which is configured to use a Go plugin to perform authentication.\n\nThe plugin source is located at `/deployments/tyk/volumes/tyk-gateway/plugins/go/session/session-go-plugin.go`, and the resulting shared object file is referenced from `auth_check` section of the API Definition.\n\nThe functionality is very basic. It checks that the `Authorization` header contains the value `123`. If it does, then it created a session for the request, otherwise it rejects the request with an HTTP 403 response (see part 2)."
+											},
+											"response": []
+										},
+										{
+											"name": "Custom Authentication - Go Plugin (part 2)",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 403\", function () {",
+															"    pm.response.to.have.status(403);",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "def",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "http://{{tyk-gateway.host}}/go-auth-plugin-api/get",
+													"protocol": "http",
+													"host": [
+														"{{tyk-gateway.host}}"
+													],
+													"path": [
+														"go-auth-plugin-api",
+														"get"
+													]
+												},
+												"description": "This request uses an invalid key, so fails with an HTTP 403 response."
+											},
+											"response": []
+										}
+									]
 								}
 							]
 						},
