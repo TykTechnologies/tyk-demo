@@ -678,7 +678,14 @@
         "disable_rate_limit": false,
         "disable_quota": false,
         "custom_middleware": {
-          "pre": [],
+          "pre": [
+            {
+              "name": "AddFooBarHeader2",
+              "path": "plugins/go/example/example-go-plugin.so",
+              "require_session": false,
+              "raw_body_only": false
+            }
+          ],
           "post": [
             {
               "name": "AddFooBarHeader",
@@ -8242,7 +8249,7 @@
                   "api_model": {},
                   "event_timeout": 60,
                   "header_map": {},
-                  "id": "60b6f53d0583f5be56836b31",
+                  "id": "60b6f866e294408ea4ebdd55",
                   "method": "POST",
                   "name": "Webhook Receiver Post",
                   "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -8302,7 +8309,7 @@
           "event_timeout": 60,
           "hook": {
             "api_model": {},
-            "id": "60b6f53d0583f5be56836b31",
+            "id": "60b6f866e294408ea4ebdd55",
             "org_id": "5e9d9544a1dcd60001d0ed20",
             "name": "Webhook Receiver Post",
             "method": "POST",

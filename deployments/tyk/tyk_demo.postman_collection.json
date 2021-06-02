@@ -161,6 +161,11 @@
 											"pm.test(\"Foo Bar header is present\", function () {",
 											"    var jsonData = pm.response.json();",
 											"    pm.expect(jsonData.headers.Foo).to.eql(\"Bar\");",
+											"});",
+											"",
+											"pm.test(\"Hello World header is present\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers.Hello).to.eql(\"World\");",
 											"});"
 										],
 										"type": "text/javascript"
@@ -181,7 +186,7 @@
 										"get"
 									]
 								},
-								"description": "This request calls the Go Plugin API, which uses Go to inject a custom header into the response as it is processed by the Gateway.\n\nThis plugin is configured to be activated at the `post` hook.\n\nThe request goes the `/get` endpoint. The server adds the headers it received into the response body - the custom header is shown as `\"Foo\": \"Bar\"`.\n\nThe plugin is built during the Tyk Demo bootstrap, which uses a special container to build the Go shared object (`.so`) library file, using the same Go version as that used to build the Gateway. This shared library can then be loaded by the Gateway at runtime, and the `AddFooBarHeader` function executed."
+								"description": "This request calls the Go Plugin API, which uses Go to inject a custom headers into the request as it is processed by the Gateway.\n\nThis API is configured to activate the plugin at the `pre` and `post` hooks.\n\nThe request goes the `/get` endpoint, where the server adds the headers it received into the response body - the custom headers are shown as `\"Hello\": \"World\"` and `\"Foo\": \"Bar\"`.\n\nThe plugin is built during the Tyk Demo bootstrap, which uses a special container to build the Go shared object (`.so`) library file, using the same Go version as that used to build the Gateway. This shared library can then be loaded by the Gateway at runtime, and the `AddHelloWorldHeader` and `AddFooBarHeader` functions executed."
 							},
 							"response": []
 						}
