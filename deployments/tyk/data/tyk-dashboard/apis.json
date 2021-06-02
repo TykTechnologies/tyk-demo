@@ -687,7 +687,7 @@
         "custom_middleware": {
           "pre": [
             {
-              "name": "AddFooBarHeader2",
+              "name": "AddHelloWorldHeader",
               "path": "plugins/go/example/example-go-plugin.so",
               "require_session": false,
               "raw_body_only": false
