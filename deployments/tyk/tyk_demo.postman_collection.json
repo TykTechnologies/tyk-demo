@@ -2089,7 +2089,7 @@
 														"get"
 													]
 												},
-												"description": "This request calls an API which is configured to use a Go plugin to perform authentication.\n\nThe plugin source is located at `/deployments/tyk/volumes/tyk-gateway/plugins/go/session/session-go-plugin.go`, and the resulting shared object file is referenced from `auth_check` section of the API Definition.\n\nThe functionality is very basic. It checks that the `Authorization` header contains the value `123`. If it does, then it created a session for the request, otherwise it rejects the request with an HTTP 403 response (see part 2)."
+												"description": "This request calls an API which is configured to use a Go plugin to perform authentication.\n\nThe plugin source is located at `/deployments/tyk/volumes/tyk-gateway/plugins/go/session/session-go-plugin.go`, and the resulting shared object file is referenced from `auth_check` section of the API Definition.\n\nThe functionality is very basic. It checks that the `Authorization` header contains the value `123`. If it does, then it created a session for the request, otherwise it rejects the request with an HTTP 403 response (see part 2).\n\nThe API is also configured to call the Go plugin function `LogSession` at the `post_key_auth` hook. This function writes the session alias into the Gateway application log. If you check the log when this example is called, you will see the session alias printed:\n\n```\nSession alias: abc-session\n```"
 											},
 											"response": []
 										},

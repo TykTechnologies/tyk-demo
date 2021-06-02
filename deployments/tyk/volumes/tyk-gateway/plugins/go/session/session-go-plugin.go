@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/TykTechnologies/tyk/ctx"
@@ -38,6 +39,12 @@ func MyPluginAuthCheck(rw http.ResponseWriter, r *http.Request) {
 
 	// auth was successful, add session and key to request's context so other middlewares can use it
 	ctx.SetSession(r, session, key, true)
+}
+
+func LogSession(rw http.ResponseWriter, r *http.Request) {
+	session := ctx.GetSession(r)
+
+	logger.Info(fmt.Println("Session alias:", session.Alias))
 }
 
 // called once plugin is loaded, this is where we put all initialization work for plugin
