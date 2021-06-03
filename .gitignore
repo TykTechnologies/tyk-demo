@@ -6,6 +6,5 @@ deployments/cicd/volumes/jenkins/bootstrap-import/credentials-global.xml
 deployments/cicd/volumes/jenkins/bootstrap-import/jenkins-plugins.tar.gz
 deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
 deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.so
-deployments/tyk/volumes/tyk-gateway/plugins/go/session/session-go-plugin.so
 deployments/tyk/volumes/http-server/python-basic-example.zip
 deployments/tyk/volumes/tyk-gateway/middleware/bundles
