@@ -101,22 +101,6 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	logger.Info("Session created for request")
 }
 
-func Authenticate2(rw http.ResponseWriter, r *http.Request) {
-	store := storage.RedisCluster{KeyPrefix: "apikey-"}
-
-	authKey := r.Header.Get("Authorization")
-
-	hashedKey := storage.HashKey(authKey)
-
-	sessionJson, _ := store.GetKey(hashedKey)
-
-	sessionObject := &user.SessionState{}
-
-	json.Unmarshal([]byte(sessionJson), &sessionObject)
-
-	ctx.SetSession(r, sessionObject, hashedKey, false)
-}
-
 // AddHelloWorldHeader adds custom "Hello: World" header to the request
 func AddHelloWorldHeader(rw http.ResponseWriter, r *http.Request) {
 	r.Header.Add("Hello", "World")
