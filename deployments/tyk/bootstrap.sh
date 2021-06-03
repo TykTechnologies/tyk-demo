@@ -66,11 +66,6 @@ docker run --rm -v $PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/example:/
 log_ok
 bootstrap_progress
 
-log_message "Building Session Go Plugin using tag $gateway_image_tag"
-docker run --rm -v $PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/session:/plugin-source tykio/tyk-plugin-compiler:$gateway_image_tag session-go-plugin.so
-log_ok
-bootstrap_progress
-
 # Organisations
 
 log_message "Waiting for Dashboard API to be ready"
@@ -433,7 +428,7 @@ log_message "Checking Gateway - Go plugin"
 result=""
 while [ "$result" != "0" ]
 do
-  wait_for_response "$gateway_base_url/go-plugin-api/get" "200" "" 3
+  wait_for_response "$gateway_base_url/go-plugin-api-no-auth/get" "200" "" 3
   result="$?"
   if [ "$result" != "0" ]
   then
@@ -480,6 +475,10 @@ result=$(curl $gateway_base_url/tyk/keys/quota_key -s \
   -H "x-tyk-authorization: $gateway_api_credentials" \
   -d @deployments/tyk/data/tyk-gateway/quota-key.json 2>> bootstrap.log | jq -r '.status')
 log_message "  Quota key:$result"
+result=$(curl $gateway_base_url/tyk/keys/go_plugin_key -s \
+  -H "x-tyk-authorization: $gateway_api_credentials" \
+  -d @deployments/tyk/data/tyk-gateway/go-plugin-key.json 2>> bootstrap.log | jq -r '.status')
+log_message "  Go Plugin key:$result"
 result=$(curl $dashboard_base_url/api/apis/keys/basic/basic-auth-username -s -w "%{http_code}" -o /dev/null \
   -H "Authorization: $dashboard_user_api_credentials" \
   -d @deployments/tyk/data/tyk-dashboard/key-basic-auth.json 2>> bootstrap.log)
