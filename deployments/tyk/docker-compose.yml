@@ -41,7 +41,7 @@ services:
       - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
       - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
       - ./deployments/tyk/volumes/tyk-gateway/plugins:/opt/tyk-gateway/plugins
-      - ./deployments/tyk/volumes/tyk-gateway/templates/error_401.json:/opt/tyk-gateway/templates/error_401.json
+      - ./deployments/tyk/volumes/tyk-gateway/templates/:/opt/tyk-gateway/templates/
     depends_on:
       - tyk-redis
   tyk-gateway-2:

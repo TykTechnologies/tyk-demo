@@ -1,0 +1,4 @@
+{
+    "customErrorTemplate": "This is a custom error response template for HTTP 403 responses using JSON",
+    "error": "{{.Message}}"
+}

@@ -1,0 +1,14 @@
+version: '3.3'
+services:
+  www-ngrok:
+    image: ${NGROK_IMAGE:-wernight}/ngrok:latest
+    networks:
+      - tyk
+    ports:
+      - 4551:4551
+    environment:
+      - DOMAIN=tyk-gateway
+      - PORT=8080
+    deploy:
+      restart_policy:
+        condition: any
