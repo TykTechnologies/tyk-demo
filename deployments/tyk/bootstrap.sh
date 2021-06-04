@@ -62,8 +62,16 @@ bootstrap_progress
 # Go plugin
 
 log_message "Building Example Go Plugin using tag $gateway_image_tag"
-docker run --rm -v $PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/example:/plugin-source tykio/tyk-plugin-compiler:$gateway_image_tag example-go-plugin.so
-log_ok
+go_plugin_build_version=$(cat .bootstrap/go-plugin-build-version)
+if [ "$go_plugin_build_version" != "$gateway_image_tag" ]
+then
+  docker run --rm -v $PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/example:/plugin-source tykio/tyk-plugin-compiler:$gateway_image_tag example-go-plugin.so
+  echo $gateway_image_tag > .bootstrap/go-plugin-build-version
+  log_ok
+else
+  # if you want to force a recompile of the plugin .so file, delete the .bootstrap/go-plugin-build-version file, or run the docker command manually
+  log_message "  Skipping as already built for Gateway image tag"
+fi
 bootstrap_progress
 
 # Organisations
