@@ -63,6 +63,7 @@ bootstrap_progress
 
 log_message "Building Example Go Plugin using tag $gateway_image_tag"
 go_plugin_build_version=$(cat .bootstrap/go-plugin-build-version)
+# only build the plugin if the currently built version is different to the Gateway version
 if [ "$go_plugin_build_version" != "$gateway_image_tag" ]
 then
   docker run --rm -v $PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/example:/plugin-source tykio/tyk-plugin-compiler:$gateway_image_tag example-go-plugin.so
