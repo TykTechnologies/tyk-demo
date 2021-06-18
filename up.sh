@@ -48,7 +48,7 @@ else
 fi
 
 # create and run the docker compose command
-command_docker_compose="docker compose -f deployments/tyk/docker-compose.yml"
+command_docker_compose="docker-compose -f deployments/tyk/docker-compose.yml"
 for var in "$@"
 do
   #   the `tyk` deployment is already included, so don't duplicate it
