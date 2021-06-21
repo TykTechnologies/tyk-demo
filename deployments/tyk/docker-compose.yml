@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   tyk-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v3.2.0}
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v3.2.1}
     ports:
       - 3000:3000
     networks:
@@ -34,6 +34,9 @@ services:
       - TYK_LOGLEVEL=${GATEWAY_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-false}
+      - TYK_GW_HTTPSERVEROPTIONS_ENABLEHTTP2=true
+      - TYK_GW_PROXYENABLEHTTP2=true
+      - TYK_GW_HTTPSERVEROPTIONS_FLUSHINTERVAL=1
     env_file:
     - .env
     volumes:
