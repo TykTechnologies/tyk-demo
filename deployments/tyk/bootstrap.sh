@@ -14,6 +14,8 @@ gateway_base_url="http://tyk-gateway.localhost:8080"
 gateway_base_url_tcp="tyk-gateway.localhost:8086"
 gateway2_base_url="https://tyk-gateway-2.localhost:8081"
 gateway_image_tag=$(docker ps --filter "name=tyk-demo_tyk-gateway_1" --format "{{.Image}}" | awk -F':' '{print $2}')
+gateway2_image_tag=$(docker ps --filter "name=tyk-demo_tyk-gateway-2_1" --format "{{.Image}}" | awk -F':' '{print $2}')
+dashboard_image_tag=$(docker ps --filter "name=tyk-demo_tyk-dashboard_1" --format "{{.Image}}" | awk -F':' '{print $2}')
 
 log_message "Checking Dashboard licence exists"
 if ! grep -q "DASHBOARD_LICENCE=" .env
@@ -68,6 +70,8 @@ go_plugin_filename="example-go-plugin.so"
 go_plugin_path="$go_plugin_directory/$go_plugin_filename"
 # only build the plugin if the currently built version is different to the Gateway version or the plugin shared object file does not exist
 if [ "$go_plugin_build_version" != "$gateway_image_tag" ] || [ ! -f $go_plugin_path ]; then
+  log_message "  Go plugin path: $go_plugin_path"
+  log_message "  Tyk plugin compiler version: $gateway_image_tag"
   docker run --rm -v $go_plugin_directory:/plugin-source tykio/tyk-plugin-compiler:$gateway_image_tag $go_plugin_filename
   plugin_container_exit_code="$?"
   if [[ "$plugin_container_exit_code" -ne "0" ]]; then
@@ -543,7 +547,7 @@ echo -e "\033[2K
                                ##########/                            
 
 ▼ Tyk
-  ▽ Dashboard 
+  ▽ Dashboard ($dashboard_image_tag)
                 Licence : $dashboard_licence_days_remaining days remaining
                     URL : $dashboard_base_url
        API AuthZ Header : Authorization
@@ -558,7 +562,7 @@ echo -e "\033[2K
     ▾ Multi-Organisation User
                Username : $dashboard_multi_organisation_user_email
                Password : $dashboard_multi_organisation_user_password
-  ▽ Portal
+  ▽ Portal ($dashboard_image_tag)
     ▾ $organisation_name Organisation
                     URL : $portal_base_url$portal_root_path
                Username : $portal_user_email
@@ -567,12 +571,12 @@ echo -e "\033[2K
                     URL : $portal_organisation_2_base_url$portal_root_path
                Username : $portal_user_email
                Password : $portal_user_password  
-  ▽ Gateway
+  ▽ Gateway ($gateway_image_tag)
                     URL : $gateway_base_url
                URL(TCP) : $gateway_base_url_tcp
         API Credentials : $gateway_api_credentials
        API AuthZ Header : x-tyk-authorization
-  ▽ Gateway 2
+  ▽ Gateway 2 ($gateway2_image_tag)
                     URL : $gateway2_base_url  
         API Credentials : $gateway2_api_credentials
        API AuthZ Header : x-tyk-authorization"
