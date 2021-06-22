@@ -18,6 +18,6 @@ Get the ip from the output of the bootstrap script (`./up.sh`)
 
 To get the ip at any time, run the following:
 ```
-$ curl localhost:4551/api/tunnels | jq ".tunnels[0].public_url" --raw-output
-https://<ngrok-allocated-ip>.ngrok.io
+$ curl localhost:4551/api/tunnels --silent| jq ".tunnels[0].public_url" --raw-output
+https://<dynamic-ngrok-allocated-ip>.ngrok.io
 ```
