@@ -2095,7 +2095,7 @@
 													"listen": "test",
 													"script": {
 														"exec": [
-															"pm.test(\"Status code is 403\", function () {",
+															"pm.test(\"Status code is 401\", function () {",
 															"    pm.response.to.have.status(401);",
 															"});"
 														],
