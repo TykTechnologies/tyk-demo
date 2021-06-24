@@ -61,29 +61,12 @@ rm -r deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle
 log_ok
 bootstrap_progress
 
-# Go plugin
+# Go plugins
 
-log_message "Building Example Go Plugin using tag $gateway_image_tag"
-go_plugin_build_version=$(cat .bootstrap/go-plugin-build-version)
-go_plugin_directory="$PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/example"
-go_plugin_filename="example-go-plugin.so"
-go_plugin_path="$go_plugin_directory/$go_plugin_filename"
-# only build the plugin if the currently built version is different to the Gateway version or the plugin shared object file does not exist
-if [ "$go_plugin_build_version" != "$gateway_image_tag" ] || [ ! -f $go_plugin_path ]; then
-  log_message "  Go plugin path: $go_plugin_path"
-  log_message "  Tyk plugin compiler version: $gateway_image_tag"
-  docker run --rm -v $go_plugin_directory:/plugin-source tykio/tyk-plugin-compiler:$gateway_image_tag $go_plugin_filename
-  plugin_container_exit_code="$?"
-  if [[ "$plugin_container_exit_code" -ne "0" ]]; then
-    log_message "  ERROR: Tyk Plugin Compiler container returned error code: $plugin_container_exit_code"
-    exit 1
-  fi
-  echo $gateway_image_tag > .bootstrap/go-plugin-build-version
-  log_ok
-else
-  # if you want to force a recompile of the plugin .so file, delete the .bootstrap/go-plugin-build-version file, or run the docker command manually
-  log_message "  Skipping as already built for Gateway image tag"
-fi
+build_go_plugin "example-go-plugin.so" "example"
+bootstrap_progress
+
+build_go_plugin "jwt-go-plugin.so" "jwt"
 bootstrap_progress
 
 # Organisations
