@@ -184,6 +184,50 @@
 								"description": "This request calls the Go Plugin API, which uses Go to inject a custom header into the request as it is processed by the Gateway.\n\nThis API is configured to activate the plugin at the `post` hook.\n\nThe request goes the `/get` endpoint, where the server adds the headers it received into the response body - the custom header is shown as `\"Hello\": \"World\"`.\n\nThe plugin is built during the Tyk Demo bootstrap, which uses a special container to build the Go shared object (`.so`) library file, using the same Go version as that used to build the Gateway. This shared library can then be loaded by the Gateway at runtime, and the `AddHelloWorldHeader` function executed."
 							},
 							"response": []
+						},
+						{
+							"name": "Middleware - Go - JWT Parse",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"JWT policy id 1234 is in response\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers[\"X-Jwt-Policy-Id\"]).to.eql(\"1234\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJwb2wiOiIxMjM0In0.mVTg74U89kBGvTKGCSLlFjdp9dQEeeypYf1hFcCOljg",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/go-plugin-api-jwt-parse/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"go-plugin-api-jwt-parse",
+										"get"
+									]
+								},
+								"description": "This request uses a Go plugin to take the JWT provided in the `authorization` header, parse it, extract the value of the `pol` payload property then add the value to the request as a header.\n\nThe value can be see in the `headers.X-Jwt-Policy-Id` JSON property of the response body.\n\nThe API itself doesn't use authentication or process the JWT in any other way. It's purely an example of using a Go plugin."
+							},
+							"response": []
 						}
 					]
 				},
