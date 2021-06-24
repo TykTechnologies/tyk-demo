@@ -8,3 +8,4 @@ deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
 deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.so
 deployments/tyk/volumes/http-server/python-basic-example.zip
 deployments/tyk/volumes/tyk-gateway/middleware/bundles
+deployments/tyk/volumes/tyk-gateway/plugins/go/jwt/jwt-go-plugin.so
