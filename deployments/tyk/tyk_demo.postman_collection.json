@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "49ba173e-c792-4fc8-a977-ab2834d29081",
+		"_postman_id": "eb970a9e-ec29-4414-9b27-2aa35cf11895",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2760,6 +2760,53 @@
 									]
 								},
 								"description": "This request is for a composed GraphQL API. This means that the Gateway takes the request and generates the response by calling multiple upstream APIs and combining the responses together.\n\nThe **Universal Data Graph** can target APIs already defined in Tyk and also external APIs. The API Definition for the API called in this example uses **DataSources** to target two APIs. One is another GraphQL API, **GraphQL Countries**, which already exists as an API Definition. The other is a REST API which is not defined as an API Definition, and is defined as a URL which the Universal Data Graph will make a request to.\n\nAll the data is combined in to a single response. The schema in the API Definition defines how this is achieved:\n\n- The Universal Data Graph takes the query contained in the body of the request and provides the **code** property as an **argument** to the GraphQL Countries API. It also uses the code as an argument in the request to the REST API, placing the value in the URL called by the Universal Data Graph.\n- The data returned by the REST API is mapped on the API's schema by using a **field mapping**. This maps the field **population** in the REST API response to the **pop** property in the API's schema. Field mapping enables fields to be renamed to fit with the desired schema."
+							},
+							"response": []
+						},
+						{
+							"name": "GraphQL - Combine 3 separate REST responses using UDG v2 engine",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"pm.test(\"Data for user ID 1 is returned\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.user.id).to.eql(1);",
+											"    pm.expect(jsonData.data.user.posts[0].id).to.eql(1);",
+											"    pm.expect(jsonData.data.user.posts[0].comments[0].id).to.eql(1);",
+											"    pm.expect(jsonData.data.user.name).to.eql(\"Leanne Graham\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query{\n  user(id: 1){\n    id\n    name\n    email\n    posts{\n      id\n      title\n      body\n      comments{\n        id\n        name\n        email\n        body\n        }\n      }\n   }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/graphql-posts/",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"graphql-posts",
+										""
+									]
+								},
+								"description": "This GraphQL API illustrates, with a single request, the ability to combine 3 requests destined for 3 DataSources (all of which are of type REST) listed below:\n* <div style=\"display: inline\">https://jsonplaceholder.typicode.com/users/{{.arguments.id}} </div>\n* <div style=\"display: inline\">https://jsonplaceholder.typicode.com/posts?userId={{.object.id}} </div>\n* <div style=\"display: inline\">https://jsonplaceholder.typicode.com/comments?postId={{.object.id}} </div>\n\nKey Concept #1 - GraphQL\n\nGraphQL is able to make calls to multiple DataSources with a single request to the following upstream endpoints:\n* /users\n* /posts\n* /comments\n\nKey Concept #2 - Universal Data Graph\n\nUniversal Data Graph uses what are known as **arguments** which are values used in the URL by the DataSource to retreive data. In the call to the **/users** endpoint, an argument is passed to reference the ID of the user. The GraphQL engine takes the argument with the name **id** and uses it in the URL to make the request to the REST API."
 							},
 							"response": []
 						}
