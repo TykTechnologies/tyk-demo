@@ -152,6 +152,7 @@
           "allowed_urls": [],
           "restricted_types": [],
           "limit": null,
+          "field_access_rights": [],
           "allowance_scope": ""
         }
       ],
@@ -177,6 +178,7 @@
           "allowed_urls": [],
           "restricted_types": [],
           "limit": null,
+          "field_access_rights": [],
           "allowance_scope": ""
         }
       },
@@ -219,6 +221,7 @@
           ],
           "restricted_types": [],
           "limit": null,
+          "field_access_rights": [],
           "allowance_scope": ""
         }
       ],
@@ -251,6 +254,7 @@
           ],
           "restricted_types": [],
           "limit": null,
+          "field_access_rights": [],
           "allowance_scope": ""
         }
       },
@@ -320,6 +324,7 @@
           "allowed_urls": [],
           "restricted_types": [],
           "limit": null,
+          "field_access_rights": [],
           "allowance_scope": ""
         }
       ],
@@ -345,6 +350,7 @@
           "allowed_urls": [],
           "restricted_types": [],
           "limit": null,
+          "field_access_rights": [],
           "allowance_scope": ""
         }
       },
