@@ -77,6 +77,12 @@ function wait_for_response {
   header="$3"
   attempt_max="$4"
   attempt_count=0
+  http_method="GET"
+
+  if [ $5 != "" ]
+  then
+    http_method="$5"
+  fi
 
   log_message "  Expecting $2 response from $1"
 
@@ -89,7 +95,7 @@ function wait_for_response {
     then
       status=$(curl -k -I -s -m5 $url -H "$header" 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
     else
-      status=$(curl -k -I -s -m5 $url 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
+      status=$(curl -k -I -s -m5 -X $http_method $url 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
     fi
 
     if [ "$status" == "$desired_status" ]

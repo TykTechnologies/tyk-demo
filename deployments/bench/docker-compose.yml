@@ -1,0 +1,9 @@
+version: '3.3'
+services:
+  bench:
+    image: mangomm/go-bench-suite
+    ports:
+      - 8889:8000
+    networks:
+      - tyk
+    entrypoint: ./go-bench-suite upstream
