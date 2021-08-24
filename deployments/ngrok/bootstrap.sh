@@ -3,7 +3,8 @@
 source scripts/common.sh
 deployment="Ngrok for tyk gateway on port 8080"
 log_start_deployment
-ngrok_ip_api_endpoint="http://localhost:4551/api/tunnels"
+ngrok_url="http://localhost:4040"
+ngrok_ip_api_endpoint="$ngrok_url/api/tunnels"
 
 log_message "Getting the ngrok allocated IP for tyk-gateway:8080"
 
@@ -11,6 +12,8 @@ access_ip=$(curl --fail --silent --show-error ${ngrok_ip_api_endpoint} | jq ".tu
 
 log_end_deployment
 echo -e "\033[2K
-▼ Ngrok for tyk gateway on port 8080
-  ▽ www-ngrok
-                    URL : $access_ip"
+▼ Ngrok
+  ▽ Tunnel
+                    URL : $access_ip
+  ▽ Dashboard
+                    URL : $ngrok_url"
