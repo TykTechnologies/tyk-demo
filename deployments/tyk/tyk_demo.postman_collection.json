@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "eb970a9e-ec29-4414-9b27-2aa35cf11895",
+		"_postman_id": "4cc4a373-ace8-4543-9e98-10b14db58271",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2796,13 +2796,13 @@
 									}
 								},
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/graphql-posts/",
+									"raw": "http://{{tyk-gateway.host}}/graphql-posts-v2/",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
 									],
 									"path": [
-										"graphql-posts",
+										"graphql-posts-v2",
 										""
 									]
 								},
