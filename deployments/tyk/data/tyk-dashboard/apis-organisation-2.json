@@ -282,6 +282,7 @@
             "ssl_insecure_skip_verify": false,
             "ssl_ciphers": [],
             "ssl_min_version": 0,
+            "ssl_max_version": 0,
             "ssl_force_common_name_check": false,
             "proxy_url": ""
           }
@@ -372,11 +373,19 @@
         "graphql": {
           "enabled": false,
           "execution_mode": "proxyOnly",
+          "version": "",
           "schema": "",
           "type_field_configurations": [],
           "playground": {
             "enabled": false,
             "path": ""
+          },
+          "engine": {
+            "field_configs": [],
+            "data_sources": []
+          },
+          "proxy": {
+            "auth_headers": {}
           }
         }
       },
