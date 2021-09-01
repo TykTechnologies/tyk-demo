@@ -64,12 +64,16 @@ outside the tyk docker network.
 ## Postman Collection
 
 To test and see some data in Datadog portal, just run a few api calls via Tyk and then you create graphs in datadog based on 
-that traffic.
+that traffic:
+
+1. Install hey, a tiny program to do some load to a web application.
+`brew install hey`
+
+2. Run load test to a service behind Tyk
 `hey -n 2000 http://tyk-gateway.localhost:8080/basic-open-api/ip`
 
 
 If you run it with bench suite you can use the bench upstream to test Tyk response time:
-
 
 1. Start Tyk demo with bench suit and datadog
 `./up.sh analytics-datadog bench`
