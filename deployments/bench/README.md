@@ -17,6 +17,9 @@ Note: The bench suite is exposed on port 8889 and internally on port 8000
 
 - To test and compare response time with and without Tyk in the middle:
 
+  - Install hey, a tiny program to do some load to a web application
+    `brew install hey`
+
   - Test the upstream bench suite
     ```
     hey -n 2000 http://bench:8889/json/valid -H "X-Delay: 2s"
