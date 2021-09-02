@@ -2,7 +2,6 @@ version: '3.3'
 services:
   dd-agent:
     image: gcr.io/datadoghq/agent:latest
-    #image: datadog/dogstatsd:latest
     networks:
     - tyk
     ports:
