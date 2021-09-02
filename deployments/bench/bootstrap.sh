@@ -5,7 +5,7 @@ deployment="Bench-suite"
 log_start_deployment
 bootstrap_progress
 
-bench_suite_base_url="http://bench:8889"
+bench_suite_base_url="http://go-bench-suite.localhost:8889"
 echo "bench_suite_base_url: " $bench_suite_base_url
 bench_suite_url=$bench_suite_base_url"/size/1KB"
 echo "bench_suite_url: " $bench_suite_url
