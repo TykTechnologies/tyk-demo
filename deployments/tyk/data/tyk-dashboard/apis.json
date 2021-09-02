@@ -1,16 +1,16 @@
 {
   "apis": [
     {
-      "created_at": "2021-08-04T12:09:46Z",
+      "created_at": "2021-08-02T14:11:12Z",
       "api_model": {},
       "api_definition": {
-        "id": "610a838a03ca38000122e111",
-        "name": "bench-uptream",
-        "slug": "bench-uptream",
+        "id": "6107fd00c957f10001ce7b7d",
+        "name": "GraphQL posts v2",
+        "slug": "graphql-posts-v2",
         "listen_port": 0,
         "protocol": "",
         "enable_proxy_protocol": false,
-        "api_id": "3eb291ec5985490c4970452401fb7bc2",
+        "api_id": "c3ce4a87d0eb472761fbf565af80a634",
         "org_id": "5e9d9544a1dcd60001d0ed20",
         "use_keyless": true,
         "use_oauth2": false,
@@ -257,8 +257,8 @@
         },
         "proxy": {
           "preserve_host_header": false,
-          "listen_path": "/bench-uptream/",
-          "target_url": "http://bench:8000/",
+          "listen_path": "/graphql-posts-v2/",
+          "target_url": "",
           "disable_strip_slash": true,
           "strip_listen_path": true,
           "enable_load_balancing": false,
@@ -376,18 +376,105 @@
         "strip_auth_data": false,
         "enable_detailed_recording": false,
         "graphql": {
-          "enabled": false,
-          "execution_mode": "proxyOnly",
+          "enabled": true,
+          "execution_mode": "executionEngine",
           "version": "2",
-          "schema": "",
+          "schema": "type Comment {\n  id: Int\n  name: String\n  email: String\n  body: String\n}\n\ntype Post {\n  id: Int\n  title: String\n  body: String\n  comments: [Comment]\n}\n\ntype Query {\n  user(id: Int!): User\n}\n\ntype User {\n  id: Int\n  name: String\n  email: String\n  posts: [Post]\n}\n",
+          "last_schema_update": "2021-08-02T14:13:23.995Z",
           "type_field_configurations": [],
           "playground": {
             "enabled": false,
             "path": ""
           },
           "engine": {
-            "field_configs": [],
-            "data_sources": []
+            "field_configs": [
+              {
+                "type_name": "Query",
+                "field_name": "user",
+                "disable_default_mapping": true,
+                "path": [
+                  ""
+                ]
+              },
+              {
+                "type_name": "User",
+                "field_name": "posts",
+                "disable_default_mapping": true,
+                "path": [
+                  ""
+                ]
+              },
+              {
+                "type_name": "Post",
+                "field_name": "comments",
+                "disable_default_mapping": true,
+                "path": [
+                  ""
+                ]
+              }
+            ],
+            "data_sources": [
+              {
+                "kind": "REST",
+                "name": "User",
+                "internal": false,
+                "root_fields": [
+                  {
+                    "type": "Query",
+                    "fields": [
+                      "user"
+                    ]
+                  }
+                ],
+                "config": {
+                  "url": "https://jsonplaceholder.typicode.com/users/{{.arguments.id}}",
+                  "method": "GET",
+                  "body": "",
+                  "headers": {},
+                  "default_type_name": "User"
+                }
+              },
+              {
+                "kind": "REST",
+                "name": "Posts",
+                "internal": false,
+                "root_fields": [
+                  {
+                    "type": "User",
+                    "fields": [
+                      "posts"
+                    ]
+                  }
+                ],
+                "config": {
+                  "url": "https://jsonplaceholder.typicode.com/posts?userId={{.object.id}}",
+                  "method": "GET",
+                  "body": "",
+                  "headers": {},
+                  "default_type_name": "Post"
+                }
+              },
+              {
+                "kind": "REST",
+                "name": "Comments",
+                "internal": false,
+                "root_fields": [
+                  {
+                    "type": "Post",
+                    "fields": [
+                      "comments"
+                    ]
+                  }
+                ],
+                "config": {
+                  "url": "https://jsonplaceholder.typicode.com/comments?postId={{.object.id}}",
+                  "method": "GET",
+                  "body": "",
+                  "headers": {},
+                  "default_type_name": "Comment"
+                }
+              }
+            ]
           },
           "proxy": {
             "auth_headers": {}
@@ -9247,7 +9334,7 @@
                   "api_model": {},
                   "event_timeout": 60,
                   "header_map": {},
-                  "id": "610a81295ff54006789937a8",
+                  "id": "6107f818ac579fc6442c15db",
                   "method": "POST",
                   "name": "Webhook Receiver Post",
                   "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -9315,7 +9402,7 @@
           "event_timeout": 60,
           "hook": {
             "api_model": {},
-            "id": "610a81295ff54006789937a8",
+            "id": "6107f818ac579fc6442c15db",
             "org_id": "5e9d9544a1dcd60001d0ed20",
             "name": "Webhook Receiver Post",
             "method": "POST",
