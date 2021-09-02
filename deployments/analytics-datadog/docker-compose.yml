@@ -1,0 +1,36 @@
+version: '3.3'
+services:
+  dd-agent:
+    image: gcr.io/datadoghq/agent:latest
+    networks:
+    - tyk
+    ports:
+      - 8126:8126/udp
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - /etc/passwd:/etc/passwd:ro
+      - ./deployments/analytics-datadog/data/datadog.yaml:/etc/datadog-agent/datadog.yaml
+    env_file:
+      - .env
+
+  tyk-pump-datadog:
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.4.0}
+    networks:
+      - tyk
+    volumes:
+      - ./deployments/analytics-datadog/volumes/tyk-pump/pump-datadog.conf:/opt/tyk-pump/pump.conf
+    environment:
+      - TYK_INSTRUMENTATION=0
+      - TYK_LOGLEVEL=${PUMP_DATADOG_LOGLEVEL:-debug}
+    env_file:
+      - .env
+    depends_on:
+      - dd-agent
+
+volumes:
+  datadog-data:
+
+networks:
+  tyk:
