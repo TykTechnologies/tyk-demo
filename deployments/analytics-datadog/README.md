@@ -16,7 +16,9 @@ Datadog agent is running in docker (/deployments/analytics-datadog/docker-compos
 DogstatsD i.e. StatsD daemon that listens for statistics sent over UDP and forward them to the Datadog site, so you can
 create graphs and analyse your data in the Datadog portal.
 The DogstatsD is enabled in `/deployments/analytics-datadog/data/datadog.yaml`, on port `8126`. This port is also exposed 
-outside the tyk docker network. 
+outside the tyk docker network.
+
+The metrics Tyk sends to Datadog can be found under the `tyk` namespace.
 
 ## Setup
 
