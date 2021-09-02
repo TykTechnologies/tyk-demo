@@ -79,7 +79,7 @@ function wait_for_response {
   attempt_count=0
   http_method="GET"
 
-  if [ $5 != "" ]
+  if [ "$5" != "" ]
   then
     http_method="$5"
   fi
