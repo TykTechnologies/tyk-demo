@@ -14,6 +14,8 @@ docker-compose -f deployments/tyk/docker-compose.yml -p tyk-demo --project-direc
 log_ok
 bootstrap_progress
 
+log_end_deployment
+
 echo -e "\033[2K
 ▼ Analytics - Datadog
   ▽ Datadog
