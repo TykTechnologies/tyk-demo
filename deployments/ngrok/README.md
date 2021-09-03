@@ -1,10 +1,10 @@
-# Ngrok 
+# ngrok 
 
- This deployment runs Ngrok docker image
+ This deployment runs ngrok docker image
 
  Using it generates an external IP you can use as a custom domain. Check "ngrok-custom-domain" api to see how to do that.
 
-- [Ngrok dashboard](http://localhost:4040)
+- [ngrok dashboard](http://localhost:4040)
 
 ## Setup
 
@@ -23,7 +23,7 @@ APIs can be access through the tunnel hostname with the same paths as accessing 
 - Gateway URL: http://tyk-gateway.localhost:8080/basic-open-api/get
 - Tunnel URL: http://11e3-103-252-202-110.ngrok.io/basic-open-api/get
 
-Requests sent via the tunnel will be recorded on the [Ngrok dashboard](http://localhost:4040). Try sending some requests through the tunnel URL then check the Dashboard to see the recorded data.
+Requests sent via the tunnel will be recorded on the [ngrok dashboard](http://localhost:4040). Try sending some requests through the tunnel URL then check the Dashboard to see the recorded data.
 
 ### Getting the tunnel URL
 
@@ -34,12 +34,15 @@ curl localhost:4040/api/tunnels --silent| jq ".tunnels[0].public_url" --raw-outp
 
 This will display the tunnel URL e.g. `https://<dynamic-ngrok-allocated-ip>.ngrok.io`.
 
-The tunnel IP can also be seen in the [Ngrok Dashboard](http://localhost:4040).
+The tunnel IP can also be seen in the [ngrok Dashboard](http://localhost:4040).
 
-### Renewing the Ngrok session
+### Renewing the ngrok session
 
-Anonymous Ngrok sessions are capped at 2 hours. So after 2 hours you will need to restart the Ngrok container to get a new IP:
+Anonymous ngrok sessions are capped at 2 hours. So after 2 hours you will need to restart the ngrok container to get a new IP:
 `./docker-compose-command.sh restart www-ngrok`
 
 Then, to get the new IP use
-`curl localhost:4040/api/tunnels --silent | jq ".tunnels[0].public_url" --raw-output`
+
+```
+curl localhost:4040/api/tunnels --silent | jq ".tunnels[0].public_url" --raw-output
+```
