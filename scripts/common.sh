@@ -149,6 +149,14 @@ function hot_reload {
   fi
 }
 
+set_context_data() {
+  echo $4 > .context-data/$1-$2-$3
+}
+
+get_context_data() {
+  echo $(cat .context-data/$1-$2-$3)
+}
+
 check_licence_expiry() {
   # read licence line from .env file
   licence_line=$(grep "$1=" .env)
@@ -214,14 +222,43 @@ build_go_plugin() {
   fi
 }
 
+create_organisation() {
+  local organistaion_data_path="$1"
+  local api_key="$2"
+  local organisation_id=$(jq -r '.id' $organistaion_data_path)
+  local organisation_name=$(jq -r '.owner_name' $organistaion_data_path)
+
+  # create organisation in Tyk Dashboard database
+  log_message "  Creating Organisation: $organisation_name"
+  local api_response=$(curl $dashboard_base_url/admin/organisations/import -s \
+    -H "admin-auth: $api_key" \
+    -d @$organistaion_data_path 2>> bootstrap.log)
+
+  # validate result
+  log_json_result "$api_response"
+  
+  # add details to global variables and context data
+  # organisation_names+=("$organisation_name")
+  # organisation_ids+=("$organisation_id")
+  # local organisation_count=${#organisation_ids[@]}
+  # echo $organisation_id > ".context-data/organisation-$organisation_count-id"
+  # echo $organisation_name > ".context-data/organisation-$organisation_count-name"
+  set_context_data "$data_group" "organisation-id" "$index" "$organisation_id"
+  set_context_data "$data_group" "organisation-name" "$index" "$organisation_name"
+
+  log_message "    Name: $organisation_name"
+  log_message "    Id: $organisation_id"
+}
+
 create_dashboard_user() {
   local dashboard_user_data_path="$1"
+  local api_key="$2"
   local dashboard_user_password=$(jq -r '.password' $dashboard_user_data_path)
   
   # create user in Tyk Dashboard database
   log_message "  Creating Dashboard User: $(jq -r '.email_address' $dashboard_user_data_path)"
   local api_response=$(curl $dashboard_base_url/admin/users -s \
-    -H "admin-auth: $dashboard_admin_api_credentials" \
+    -H "admin-auth: $api_key" \
     -d @$dashboard_user_data_path 2>> bootstrap.log)
 
   # validate result
@@ -240,11 +277,14 @@ create_dashboard_user() {
   log_message "    Organisation Id: $dashboard_user_organisation_id"
 
   # add data to global variables and context data
-  dashboard_user_emails+=("$dashboard_user_email")
-  dashboard_user_passwords+=("$dashboard_user_password")
-  dashboard_user_api_keys+=("$dashboard_user_api_key")
-  local dashboard_user_count=${#dashboard_user_emails[@]}
-  echo "$dashboard_user_api_key" > ".context-data/dashboard-user-$dashboard_user_count-api-key"
+  # dashboard_user_emails+=("$dashboard_user_email")
+  # dashboard_user_passwords+=("$dashboard_user_password")
+  # dashboard_user_api_keys+=("$dashboard_user_api_key")
+  # local dashboard_user_count=${#dashboard_user_emails[@]}
+  set_context_data "$data_group" "dashboard-user-email" "$index" "$dashboard_user_email"
+  set_context_data "$data_group" "dashboard-user-password" "$index" "$dashboard_user_password"
+  set_context_data "$data_group" "dashboard-user-api-key" "$index" "$dashboard_user_api_key"
+  # echo "$dashboard_user_api_key" > ".context-data/dashboard-user-$dashboard_user_count-api-key"
 
   # reset the password
   log_message "  Resetting password for $dashboard_user_email"
@@ -258,35 +298,6 @@ create_dashboard_user() {
   log_json_result "$api_response"
 
   log_message "    Password: $dashboard_user_password"
-
-  return 0;
-}
-
-create_organisation() {
-  local organistaion_data_path="$1"
-  local organisation_id=$(jq -r '.id' $organistaion_data_path)
-  local organisation_name=$(jq -r '.owner_name' $organistaion_data_path)
-
-  # create organisation in Tyk Dashboard database
-  log_message "  Creating Organisation: $organisation_name"
-  local api_response=$(curl $dashboard_base_url/admin/organisations/import -s \
-    -H "admin-auth: $dashboard_admin_api_credentials" \
-    -d @$organistaion_data_path 2>> bootstrap.log)
-
-  # validate result
-  log_json_result "$api_response"
-  
-  # add details to global variables and context data
-  organisation_names+=("$organisation_name")
-  organisation_ids+=("$organisation_id")
-  local organisation_count=${#organisation_ids[@]}
-  echo $organisation_id > ".context-data/organisation-$organisation_count-id"
-  echo $organisation_name > ".context-data/organisation-$organisation_count-name"
-
-  log_message "    Name: $organisation_name"
-  log_message "    Id: $organisation_id"
-
-  return 0;
 }
 
 create_user_group() {
@@ -307,9 +318,10 @@ create_user_group() {
   local user_group_id=$(echo "$api_response" | jq -r '.Meta')
 
   # add details to global variables and context data
-  dashboard_user_group_ids+=("$user_group_id")
-  dashboard_user_group_count=${#dashboard_user_group_ids[@]}
-  echo $user_group_id > ".context-data/dashboard-user-group-$dashboard_user_group_count-id"
+  # dashboard_user_group_ids+=("$user_group_id")
+  # dashboard_user_group_count=${#dashboard_user_group_ids[@]}
+  # echo $user_group_id > ".context-data/dashboard-user-group-$dashboard_user_group_count-id"
+  set_context_data "$data_group" "dashboard-user-group-id" "$index" "$user_group_id"
 
   log_message "    Id: $user_group_id"
 
@@ -329,8 +341,101 @@ create_webhook() {
 
   # validate result
   log_json_result "$api_response"
+}
+
+initialise_portal() {
+  local organisation_id="$1"
+  local api_key="$2"
+
+  log_message "  Creating default settings"
+  local api_response=$(curl $dashboard_base_url/api/portal/configuration -s \
+    -H "Authorization: $api_key" \
+    -d "{}" 2>> bootstrap.log)
+  log_json_result "$api_response"
+
+  log_message "  Initialising Catalogue"
+  api_response=$(curl $dashboard_base_url/api/portal/catalogue -s \
+     -H "Authorization: $api_key" \
+    -d '{"org_id": "'$organisation_id'"}' 2>> bootstrap.log)
+  log_json_result "$api_response"
   
-  # webhook endpoint does not contain any further data to extract or display
+  catalogue_id=$(echo "$api_response" | jq -r '.Message')
+  log_message "    Id: $catalogue_id"
+}
+
+create_portal_page(){
+  local page_data_path="$1"
+  local api_key="$2"
+  local page_title=$(jq -r '.title' $page_data_path)
+
+  log_message "  Creating Page: $page_title"
+
+  api_response=$(curl $dashboard_base_url/api/portal/pages -s \
+    -H "Authorization: $api_key" \
+    -d @$page_data_path 2>> bootstrap.log)
+  log_json_result "$api_response"
+}
+
+create_portal_developer(){
+  local developer_data_path="$1"
+  local api_key="$2"
+  local developer_email=$(jq -r '.email' $developer_data_path)
+  local developer_password=$(jq -r '.password' $developer_data_path)
+  log_message "  Creating Developer: $developer_email"
+
+  api_response=$(curl $dashboard_base_url/api/portal/developers -s \
+    -H "Authorization: $api_key" \
+    -d @$developer_data_path 2>> bootstrap.log)
+  log_json_result "$api_response"
+
+  log_message "    Password: $developer_password"
+}
+
+create_portal() {
+
+
+  TODO: refactor this code
+
+
+
+  # log_message "  Creating documentation"
+  # policies=$(curl $dashboard_base_url/api/portal/policies?p=-1 -s \
+  #   -H "Authorization:$dashboard_user_api_credentials" 2>> bootstrap.log)
+  # echo -n '{
+  #           "api_id":"",
+  #           "doc_type":"swagger",
+  #           "documentation":"' >/tmp/swagger_encoded.out
+  # cat deployments/tyk/data/tyk-dashboard/documentation-swagger-petstore.json | base64 >>/tmp/swagger_encoded.out
+  # echo '"}' >>/tmp/swagger_encoded.out
+  # result=$(curl $dashboard_base_url/api/portal/documentation -s \
+  #   -H "Authorization: $dashboard_user_api_credentials" \
+  #   -d "@/tmp/swagger_encoded.out" \
+  #     2>> bootstrap.log)
+  # documentation_swagger_petstore_id=$(echo "$result" | jq -r '.Message')
+  # log_json_result "$result"
+  # rm /tmp/swagger_encoded.out
+  # bootstrap_progress
+
+  # log_message "  Updating catalogue"
+  # policy_data=$(cat deployments/tyk/data/tyk-dashboard/policies.json)
+  # policies_swagger_petstore_id=$(echo $policy_data | jq -r '.Data[] | select(.name=="Swagger Petstore Policy") | .id')
+  # catalogue_data=$(cat deployments/tyk/data/tyk-dashboard/catalogue.json | \
+  #   sed 's/CATALOGUE_ID/'"$catalogue_id"'/' | \
+  #   sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \
+  #   sed 's/CATALOGUE_SWAGGER_PETSTORE_POLICY_ID/'"$policies_swagger_petstore_id"'/' | \
+  #   sed 's/CATALOGUE_SWAGGER_PETSTORE_DOCUMENTATION_ID/'"$documentation_swagger_petstore_id"'/')
+  # log_json_result "$(curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
+  #   -H "Authorization: $dashboard_user_api_credentials" \
+  #   -d "$(echo $catalogue_data)" 2>> bootstrap.log)"
+  # bootstrap_progress
+
+
+
+
+
+
+
+
 
   return 0;
 }

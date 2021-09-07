@@ -72,69 +72,98 @@ bootstrap_progress
 # build_go_plugin "jwt-go-plugin.so" "jwt"
 # bootstrap_progress
 
-# Organisations
-log_message "Creating Organisations"
-organisation_ids=()
-organisation_names=()
+# organisation_ids=()
+# organisation_names=()
+# dashboard_user_emails=()
+# dashboard_user_passwords=()
+# dashboard_user_api_keys=()
+# dashboard_user_group_ids=()
+# organisation_id=""
+# organisation_name=""
+# dashboard_user_email=""
+# dashboard_user_password=""
+# dashboard_user_api_key=""
+# dashboard_user_group_id=""
 
-for file in deployments/tyk/data/tyk-dashboard/organisations/*; do
-  if [[ -f $file ]]; then
-    create_organisation "$file"
-    if [[ "$?" == "1" ]]; then
-      echo "ERROR: Failed to create Organisation"
-      exit 1;
-    fi
+for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
+  if [[ -d $data_group_path ]]; then
+    log_message "Processing data in $data_group_path"
+    data_group="${data_group_path##*/}"
+
+    # Organisation
+    log_message "Creating Organisation"
+    index=1
+    create_organisation "$data_group_path/organisation.json" "$dashboard_admin_api_credentials"
     bootstrap_progress
+    organisation_id=$(get_context_data "$data_group" "organisation-id" "1")
+
+    # Dashboard Users
+    log_message "Creating Dashboard Users"
+    index=1
+    for file in $data_group_path/users/*; do
+      if [[ -f $file ]]; then
+        create_dashboard_user "$file" "$dashboard_admin_api_credentials"
+        index=$((index + 1))
+        bootstrap_progress
+      fi
+    done
+    dashboard_user_api_key=$(get_context_data "$data_group" "dashboard-user-api-key" "1")
+
+    # User Groups
+    log_message "Creating Dashboard User Groups"
+    index=1
+    for file in $data_group_path/user-groups/*; do
+      if [[ -f $file ]]; then
+        create_user_group "$file" "$dashboard_user_api_key"
+        index=$((index + 1))
+        bootstrap_progress
+      fi
+    done
+
+    # Webhooks
+    log_message "Creating Webhooks"
+    index=1
+    for file in $data_group_path/webhooks/*; do
+      if [[ -f $file ]]; then
+        create_webhook "$file" "$dashboard_user_api_key"
+        index=$((index + 1))
+        bootstrap_progress
+      fi
+    done
+
+    # Portal
+    log_message "Initialising Portal"
+    initialise_portal "$organisation_id" "$dashboard_user_api_key"
+    bootstrap_progress
+    
+    log_message "Creating Portal Pages"
+    index=1
+    for file in $data_group_path/portal/pages/*; do
+      if [[ -f $file ]]; then
+        create_portal_page "$file" "$dashboard_user_api_key"
+        index=$((index + 1))
+        bootstrap_progress        
+      fi
+    done
+
+    log_message "Creating Portal Developers"
+    index=1
+    for file in $data_group_path/portal/developers/*; do
+      if [[ -f $file ]]; then
+        create_portal_developer "$file" "$dashboard_user_api_key"
+        index=$((index + 1))
+        bootstrap_progress        
+      fi
+    done
+
   fi
 done
 
-# Dashboard Users
-log_message "Creating Dashboard Users"
-dashboard_user_emails=()
-dashboard_user_passwords=()
-dashboard_user_api_keys=()
 
-for file in deployments/tyk/data/tyk-dashboard/users/*; do
-  if [[ -f $file ]]; then
-    create_dashboard_user "$file"
-    if [[ "$?" != "0" ]]; then
-      echo "ERROR: Failed to create Dashboard User"
-      exit 1;
-    fi
-    bootstrap_progress
-  fi
-done
 
-# User Groups
-log_message "Creating Dashboard User Groups"
-dashboard_user_group_ids=()
 
-for file in deployments/tyk/data/tyk-dashboard/user-groups/*; do
-  if [[ -f $file ]]; then
-    create_user_group "$file" "${dashboard_user_api_keys[0]}"
-    if [[ "$?" != "0" ]]; then
-      echo "ERROR: Failed to create Dashboard User Group"
-      exit 1;
-    fi
-    bootstrap_progress
-  fi
-done
 
-# Webhooks
-log_message "Creating webhooks"
 
-for file in deployments/tyk/data/tyk-dashboard/webhooks/*; do
-  if [[ -f $file ]]; then
-    create_webhook "$file" "${dashboard_user_api_keys[0]}"
-    if [[ "$?" != "0" ]]; then
-      echo "ERROR: Failed to create Dashboard Webhook"
-      exit 1;
-    fi
-    bootstrap_progress
-  fi
-done
-
-# Portals
 
 log_message "Creating Portal for organisation $organisation_name"
 
