@@ -95,7 +95,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     index=1
     create_organisation "$data_group_path/organisation.json" "$dashboard_admin_api_credentials"
     bootstrap_progress
-    organisation_id=$(get_context_data "$data_group" "organisation-id" "1")
+    organisation_id=$(get_context_data "$data_group" "organisation" "1" "id")
 
     # Dashboard Users
     log_message "Creating Dashboard Users"
@@ -107,7 +107,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
         bootstrap_progress
       fi
     done
-    dashboard_user_api_key=$(get_context_data "$data_group" "dashboard-user-api-key" "1")
+    dashboard_user_api_key=$(get_context_data "$data_group" "dashboard-user" "1" "api-key")
 
     # User Groups
     log_message "Creating Dashboard User Groups"

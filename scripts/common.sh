@@ -150,11 +150,11 @@ function hot_reload {
 }
 
 set_context_data() {
-  echo $4 > .context-data/$1-$2-$3
+  echo $5 > .context-data/$1-$2-$3-$4
 }
 
 get_context_data() {
-  echo $(cat .context-data/$1-$2-$3)
+  echo $(cat .context-data/$1-$2-$3-$4)
 }
 
 check_licence_expiry() {
@@ -243,8 +243,8 @@ create_organisation() {
   # local organisation_count=${#organisation_ids[@]}
   # echo $organisation_id > ".context-data/organisation-$organisation_count-id"
   # echo $organisation_name > ".context-data/organisation-$organisation_count-name"
-  set_context_data "$data_group" "organisation-id" "$index" "$organisation_id"
-  set_context_data "$data_group" "organisation-name" "$index" "$organisation_name"
+  set_context_data "$data_group" "organisation" "$index" "id" "$organisation_id"
+  set_context_data "$data_group" "organisation" "$index" "name" "$organisation_name"
 
   log_message "    Name: $organisation_name"
   log_message "    Id: $organisation_id"
@@ -281,9 +281,9 @@ create_dashboard_user() {
   # dashboard_user_passwords+=("$dashboard_user_password")
   # dashboard_user_api_keys+=("$dashboard_user_api_key")
   # local dashboard_user_count=${#dashboard_user_emails[@]}
-  set_context_data "$data_group" "dashboard-user-email" "$index" "$dashboard_user_email"
-  set_context_data "$data_group" "dashboard-user-password" "$index" "$dashboard_user_password"
-  set_context_data "$data_group" "dashboard-user-api-key" "$index" "$dashboard_user_api_key"
+  set_context_data "$data_group" "dashboard-user" "$index" "email" "$dashboard_user_email"
+  set_context_data "$data_group" "dashboard-user" "$index" "password" "$dashboard_user_password"
+  set_context_data "$data_group" "dashboard-user" "$index" "api-key" "$dashboard_user_api_key"
   # echo "$dashboard_user_api_key" > ".context-data/dashboard-user-$dashboard_user_count-api-key"
 
   # reset the password
@@ -321,7 +321,7 @@ create_user_group() {
   # dashboard_user_group_ids+=("$user_group_id")
   # dashboard_user_group_count=${#dashboard_user_group_ids[@]}
   # echo $user_group_id > ".context-data/dashboard-user-group-$dashboard_user_group_count-id"
-  set_context_data "$data_group" "dashboard-user-group-id" "$index" "$user_group_id"
+  set_context_data "$data_group" "dashboard-user-group" "$index" "id" "$user_group_id"
 
   log_message "    Id: $user_group_id"
 
@@ -394,7 +394,7 @@ create_portal_developer(){
 create_portal() {
 
 
-  TODO: refactor this code
+  # TODO: refactor this code
 
 
 
