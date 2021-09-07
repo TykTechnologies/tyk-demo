@@ -243,7 +243,7 @@ create_dashboard_user() {
   dashboard_user_emails+=("$dashboard_user_email")
   dashboard_user_passwords+=("$dashboard_user_password")
   dashboard_user_api_keys+=("$dashboard_user_api_key")
-  local dashboard_user_count=${#dashboard_user_usernames[@]}
+  local dashboard_user_count=${#dashboard_user_emails[@]}
   echo "$dashboard_user_api_key" > ".context-data/dashboard-user-$dashboard_user_count-api-key"
 
   # reset the password
@@ -279,7 +279,7 @@ create_organisation() {
   # add details to global variables and context data
   organisation_names+=("$organisation_name")
   organisation_ids+=("$organisation_id")
-  local organisation_count=${#organisationIds[@]}
+  local organisation_count=${#organisation_ids[@]}
   echo $organisation_id > ".context-data/organisation-$organisation_count-id"
   echo $organisation_name > ".context-data/organisation-$organisation_count-name"
 
