@@ -315,3 +315,22 @@ create_user_group() {
 
   return 0;
 }
+
+create_webhook() {
+  local webhook_data_path="$1"
+  local api_key="$2"
+  local webhook_name=$(jq -r '.name' $webhook_data_path)
+
+  # create webhook in Tyk Dashboard database
+  log_message "  Creating Webhook: $webhook_name"
+  local api_response=$(curl $dashboard_base_url/api/hooks -s \
+    -H "Authorization: $api_key" \
+    -d @$webhook_data_path 2>> bootstrap.log)
+
+  # validate result
+  log_json_result "$api_response"
+  
+  # webhook endpoint does not contain any further data to extract or display
+
+  return 0;
+}

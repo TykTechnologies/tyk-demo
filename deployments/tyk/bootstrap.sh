@@ -97,7 +97,7 @@ dashboard_user_api_keys=()
 for file in deployments/tyk/data/tyk-dashboard/users/*; do
   if [[ -f $file ]]; then
     create_dashboard_user "$file"
-    if [[ "$?" == "1" ]]; then
+    if [[ "$?" != "0" ]]; then
       echo "ERROR: Failed to create Dashboard User"
       exit 1;
     fi
@@ -111,9 +111,8 @@ dashboard_user_group_ids=()
 
 for file in deployments/tyk/data/tyk-dashboard/user-groups/*; do
   if [[ -f $file ]]; then
-    echo "APIKEY: ${dashboard_user_api_keys[0]}"
     create_user_group "$file" "${dashboard_user_api_keys[0]}"
-    if [[ "$?" == "1" ]]; then
+    if [[ "$?" != "0" ]]; then
       echo "ERROR: Failed to create Dashboard User Group"
       exit 1;
     fi
@@ -121,33 +120,19 @@ for file in deployments/tyk/data/tyk-dashboard/user-groups/*; do
   fi
 done
 
-
-# result=$(curl $dashboard_base_url/api/usergroups -s \
-#   -H "Authorization: $dashboard_user_api_credentials" \
-#   -d @deployments/tyk/data/tyk-dashboard/usergroup-readonly.json 2>> bootstrap.log | jq -r '.Status')
-# log_message "  Read-only group:$result"
-# result=$(curl $dashboard_base_url/api/usergroups -s \
-#   -H "Authorization: $dashboard_user_api_credentials" \
-#   -d @deployments/tyk/data/tyk-dashboard/usergroup-default.json 2>> bootstrap.log | jq -r '.Status')
-# log_message "  Default group:$result"
-# result=$(curl $dashboard_base_url/api/usergroups -s \
-#   -H "Authorization: $dashboard_user_api_credentials" \
-#   -d @deployments/tyk/data/tyk-dashboard/usergroup-admin.json 2>> bootstrap.log | jq -r '.Status')
-# log_message "  Admin group:$result"
-# user_group_data=$(curl $dashboard_base_url/api/usergroups -s \
-#   -H "Authorization: $dashboard_user_api_credentials" 2>> bootstrap.log)
-# echo $user_group_data | jq -r .groups[0].id > .context-data/user-group-readonly-id
-# echo $user_group_data | jq -r .groups[1].id > .context-data/user-group-default-id
-# echo $user_group_data | jq -r .groups[2].id > .context-data/user-group-admin-id
-# bootstrap_progress
-
 # Webhooks
-
 log_message "Creating webhooks"
-log_json_result "$(curl $dashboard_base_url/api/hooks -s \
-  -H "Authorization: $dashboard_user_api_credentials" \
-  -d @deployments/tyk/data/tyk-dashboard/webhook-webhook-receiver-api-post.json 2>> bootstrap.log)"
-bootstrap_progress
+
+for file in deployments/tyk/data/tyk-dashboard/webhooks/*; do
+  if [[ -f $file ]]; then
+    create_webhook "$file" "${dashboard_user_api_keys[0]}"
+    if [[ "$?" != "0" ]]; then
+      echo "ERROR: Failed to create Dashboard Webhook"
+      exit 1;
+    fi
+    bootstrap_progress
+  fi
+done
 
 # Portals
 
