@@ -26,9 +26,9 @@ organisation_id=$(cat .context-data/organisation-id)
 dashboard_user_api_credentials=$(cat .context-data/dashboard-user-api-credentials)
 log_message "  Organisation id: $organisation_id"
 log_message "  Dashboard User API Credentials: $dashboard_user_api_credentials"
-user_group_default_id=$(cat .context-data/user-group-default-id)
-user_group_readonly_id=$(cat .context-data/user-group-readonly-id)
-user_group_admin_id=$(cat .context-data/user-group-admin-id)
+user_group_readonly_id=$(cat .context-data/dashboard-user-group-1-id)
+user_group_default_id=$(cat .context-data/dashboard-user-group-2-id)
+user_group_admin_id=$(cat .context-data/dashboard-user-group-3-id)
 identity_broker_profile_tyk_dashboard_data=$(cat deployments/sso/data/tyk-identity-broker/profile-tyk-dashboard.json | \
   sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \
   sed 's/DASHBOARD_USER_API_CREDENTIALS/'"$dashboard_user_api_credentials"'/' | \

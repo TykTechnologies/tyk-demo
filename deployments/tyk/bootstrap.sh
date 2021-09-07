@@ -73,15 +73,15 @@ bootstrap_progress
 # bootstrap_progress
 
 # Organisations
-log_message "Importing Organisations"
+log_message "Creating Organisations"
 organisation_ids=()
 organisation_names=()
 
 for file in deployments/tyk/data/tyk-dashboard/organisations/*; do
   if [[ -f $file ]]; then
-    import_organisation "$file"
+    create_organisation "$file"
     if [[ "$?" == "1" ]]; then
-      echo "ERROR: Failed to import Organisation"
+      echo "ERROR: Failed to create Organisation"
       exit 1;
     fi
     bootstrap_progress
@@ -92,9 +92,9 @@ done
 log_message "Creating Dashboard Users"
 dashboard_user_emails=()
 dashboard_user_passwords=()
-dashboard_user_api_credentials=()
+dashboard_user_api_keys=()
 
-for file in deployments/tyk/data/tyk-dashboard/dashboard-users/*; do
+for file in deployments/tyk/data/tyk-dashboard/users/*; do
   if [[ -f $file ]]; then
     create_dashboard_user "$file"
     if [[ "$?" == "1" ]]; then
@@ -106,26 +106,40 @@ for file in deployments/tyk/data/tyk-dashboard/dashboard-users/*; do
 done
 
 # User Groups
+log_message "Creating Dashboard User Groups"
+dashboard_user_group_ids=()
 
-log_message "Creating Dashboard user groups"
-result=$(curl $dashboard_base_url/api/usergroups -s \
-  -H "Authorization: $dashboard_user_api_credentials" \
-  -d @deployments/tyk/data/tyk-dashboard/usergroup-readonly.json 2>> bootstrap.log | jq -r '.Status')
-log_message "  Read-only group:$result"
-result=$(curl $dashboard_base_url/api/usergroups -s \
-  -H "Authorization: $dashboard_user_api_credentials" \
-  -d @deployments/tyk/data/tyk-dashboard/usergroup-default.json 2>> bootstrap.log | jq -r '.Status')
-log_message "  Default group:$result"
-result=$(curl $dashboard_base_url/api/usergroups -s \
-  -H "Authorization: $dashboard_user_api_credentials" \
-  -d @deployments/tyk/data/tyk-dashboard/usergroup-admin.json 2>> bootstrap.log | jq -r '.Status')
-log_message "  Admin group:$result"
-user_group_data=$(curl $dashboard_base_url/api/usergroups -s \
-  -H "Authorization: $dashboard_user_api_credentials" 2>> bootstrap.log)
-echo $user_group_data | jq -r .groups[0].id > .context-data/user-group-readonly-id
-echo $user_group_data | jq -r .groups[1].id > .context-data/user-group-default-id
-echo $user_group_data | jq -r .groups[2].id > .context-data/user-group-admin-id
-bootstrap_progress
+for file in deployments/tyk/data/tyk-dashboard/user-groups/*; do
+  if [[ -f $file ]]; then
+    echo "APIKEY: ${dashboard_user_api_keys[0]}"
+    create_user_group "$file" "${dashboard_user_api_keys[0]}"
+    if [[ "$?" == "1" ]]; then
+      echo "ERROR: Failed to create Dashboard User Group"
+      exit 1;
+    fi
+    bootstrap_progress
+  fi
+done
+
+
+# result=$(curl $dashboard_base_url/api/usergroups -s \
+#   -H "Authorization: $dashboard_user_api_credentials" \
+#   -d @deployments/tyk/data/tyk-dashboard/usergroup-readonly.json 2>> bootstrap.log | jq -r '.Status')
+# log_message "  Read-only group:$result"
+# result=$(curl $dashboard_base_url/api/usergroups -s \
+#   -H "Authorization: $dashboard_user_api_credentials" \
+#   -d @deployments/tyk/data/tyk-dashboard/usergroup-default.json 2>> bootstrap.log | jq -r '.Status')
+# log_message "  Default group:$result"
+# result=$(curl $dashboard_base_url/api/usergroups -s \
+#   -H "Authorization: $dashboard_user_api_credentials" \
+#   -d @deployments/tyk/data/tyk-dashboard/usergroup-admin.json 2>> bootstrap.log | jq -r '.Status')
+# log_message "  Admin group:$result"
+# user_group_data=$(curl $dashboard_base_url/api/usergroups -s \
+#   -H "Authorization: $dashboard_user_api_credentials" 2>> bootstrap.log)
+# echo $user_group_data | jq -r .groups[0].id > .context-data/user-group-readonly-id
+# echo $user_group_data | jq -r .groups[1].id > .context-data/user-group-default-id
+# echo $user_group_data | jq -r .groups[2].id > .context-data/user-group-admin-id
+# bootstrap_progress
 
 # Webhooks
 

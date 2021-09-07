@@ -218,37 +218,38 @@ create_dashboard_user() {
   local dashboard_user_data_path="$1"
   local dashboard_user_password=$(jq -r '.password' $dashboard_user_data_path)
   
-  # add user to Tyk Dashboard database
-  log_message "  Creating Dashboard User $(jq -r '.email_address' $dashboard_user_data_path)"
+  # create user in Tyk Dashboard database
+  log_message "  Creating Dashboard User: $(jq -r '.email_address' $dashboard_user_data_path)"
   local api_response=$(curl $dashboard_base_url/admin/users -s \
     -H "admin-auth: $dashboard_admin_api_credentials" \
     -d @$dashboard_user_data_path 2>> bootstrap.log)
 
+  # validate result
   log_json_result "$api_response"
 
   # extract user data from response
   local dashboard_user_id=$(echo $api_response | jq -r '.Meta.id')
   local dashboard_user_email=$(echo $api_response | jq -r '.Meta.email_address')
-  local dashboard_user_api_credentials=$(echo $api_response | jq -r '.Meta.access_key')
+  local dashboard_user_api_key=$(echo $api_response | jq -r '.Meta.access_key')
   local dashboard_user_organisation_id=$(echo $api_response | jq -r '.Meta.org_id')
 
   # log user data
   log_message "    Id: $dashboard_user_id"
   log_message "    Email: $dashboard_user_email"
-  log_message "    API Credentials: $dashboard_user_api_credentials"
+  log_message "    API Key: $dashboard_user_api_key"
   log_message "    Organisation Id: $dashboard_user_organisation_id"
 
   # add data to global variables and context data
-  dashboard_user_usernames+=("$dashboard_user_email")
+  dashboard_user_emails+=("$dashboard_user_email")
   dashboard_user_passwords+=("$dashboard_user_password")
-  dashboard_user_api_credentials+=("$dashboard_user_api_credentials")
+  dashboard_user_api_keys+=("$dashboard_user_api_key")
   local dashboard_user_count=${#dashboard_user_usernames[@]}
-  echo "$dashboard_user_api_credentials" > ".context-data/dashboard-user-$dashboard_user_count-api-credentials"
+  echo "$dashboard_user_api_key" > ".context-data/dashboard-user-$dashboard_user_count-api-key"
 
   # reset the password
   log_message "  Resetting password for $dashboard_user_email"
   api_response=$(curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset -s \
-    -H "authorization: $dashboard_user_api_credentials" \
+    -H "authorization: $dashboard_user_api_key" \
     --data-raw '{
         "new_password":"'$dashboard_user_password'",
         "user_permissions": { "IsAdmin": "admin" }
@@ -261,28 +262,56 @@ create_dashboard_user() {
   return 0;
 }
 
-import_organisation() {
+create_organisation() {
   local organistaion_data_path="$1"
-  local organisation_id=$(jq -r '.id' $file)
-  local organisation_name=$(jq -r '.owner_name' $file)
+  local organisation_id=$(jq -r '.id' $organistaion_data_path)
+  local organisation_name=$(jq -r '.owner_name' $organistaion_data_path)
 
-  # import organisation into Tyk Dashboard database
-  log_message "  Importing Organisation $organisation_name"
+  # create organisation in Tyk Dashboard database
+  log_message "  Creating Organisation: $organisation_name"
   local api_response=$(curl $dashboard_base_url/admin/organisations/import -s \
     -H "admin-auth: $dashboard_admin_api_credentials" \
     -d @$organistaion_data_path 2>> bootstrap.log)
 
+  # validate result
   log_json_result "$api_response"
   
   # add details to global variables and context data
   organisation_names+=("$organisation_name")
   organisation_ids+=("$organisation_id")
-  organisation_count=${#organisationIds[@]}
-  echo $organisation_id > ".context-data/organisation-id-$organisation_count"
-  echo $organisation_name > ".context-data/organisation-name-$organisation_count"
+  local organisation_count=${#organisationIds[@]}
+  echo $organisation_id > ".context-data/organisation-$organisation_count-id"
+  echo $organisation_name > ".context-data/organisation-$organisation_count-name"
 
   log_message "    Name: $organisation_name"
   log_message "    Id: $organisation_id"
+
+  return 0;
+}
+
+create_user_group() {
+  local user_group_data_path="$1"
+  local api_key="$2"
+  local user_group_name=$(jq -r '.name' $user_group_data_path)
+
+  # create user group in Tyk Dashboard database
+  log_message "  Creating User Group: $user_group_name"
+  local api_response=$(curl $dashboard_base_url/api/usergroups -s \
+    -H "Authorization: $api_key" \
+    -d @$user_group_data_path 2>> bootstrap.log)
+
+  # validate result
+  log_json_result "$api_response"
+  
+  # extract data from response
+  local user_group_id=$(echo "$api_response" | jq -r '.Meta')
+
+  # add details to global variables and context data
+  dashboard_user_group_ids+=("$user_group_id")
+  dashboard_user_group_count=${#dashboard_user_group_ids[@]}
+  echo $user_group_id > ".context-data/dashboard-user-group-$dashboard_user_group_count-id"
+
+  log_message "    Id: $user_group_id"
 
   return 0;
 }
