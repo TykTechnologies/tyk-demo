@@ -6,7 +6,7 @@
 	"active": true,
 	"password": "3LEsHO1jv1dt9Xgf",
 	"user_permissions": {
-			"IsAdmin": "admin",
-			"ResetPassword": "admin"
+		"IsAdmin": "admin",
+		"ResetPassword": "admin"
 	}
 }
