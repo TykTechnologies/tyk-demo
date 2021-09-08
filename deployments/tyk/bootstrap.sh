@@ -130,6 +130,15 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
       fi
     done
 
+    # APIs
+    log_message "Creating APIs"
+    for file in $data_group_path/apis/*; do
+      if [[ -f $file ]]; then
+        create_api "$file" "$dashboard_admin_api_credentials"
+        bootstrap_progress
+      fi
+    done
+
     # Portal
     log_message "Initialising Portal"
     initialise_portal "$organisation_id" "$dashboard_user_api_key"

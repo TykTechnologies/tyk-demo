@@ -369,7 +369,7 @@ initialise_portal() {
   log_message "    Id: $catalogue_id"
 }
 
-create_portal_page(){
+create_portal_page() {
   local page_data_path="$1"
   local api_key="$2"
   local page_title=$(jq -r '.title' $page_data_path)
@@ -381,7 +381,7 @@ create_portal_page(){
     -d @$page_data_path 2>> bootstrap.log)"
 }
 
-create_portal_developer(){
+create_portal_developer() {
   local developer_data_path="$1"
   local api_key="$2"
   local developer_email=$(jq -r '.email' $developer_data_path)
@@ -396,7 +396,7 @@ create_portal_developer(){
   log_message "    Password: $developer_password"
 }
 
-create_portal_documentation(){
+create_portal_documentation() {
   local documentation_data_path="$1"
   local api_key="$2"
   local documentation_title=$(jq -r '.info.title' $documentation_data_path)
@@ -426,7 +426,7 @@ create_portal_documentation(){
   echo "$documentation_id"
 }
 
-create_portal_catalogue(){
+create_portal_catalogue() {
   local catalogue_data_path="$1"
   local api_key="$2"
   local documentation_id="$3"
@@ -447,4 +447,20 @@ create_portal_catalogue(){
   log_json_result "$(curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
     -H "Authorization: $api_key" \
     -d "$updated_catalogue" 2>> bootstrap.log)"
+}
+
+create_api() {
+  local api_data_path="$1"
+  local api_key="$2"
+  local api_name=$(jq -r '.api_definition.name' $api_data_path)
+
+  log_message "  Creating API: $api_name"
+
+  request_payload=$(jq --slurpfile new_api $api_data_path '.apis += $new_api' <<< "{ \"apis\": [] }")
+
+  api_response="$(curl $dashboard_base_url/admin/apis/import -s \
+    -H "admin-auth: $api_key" \
+    -d "$request_payload" 2>> bootstrap.log)"
+
+  log_json_result "$api_response"
 }
