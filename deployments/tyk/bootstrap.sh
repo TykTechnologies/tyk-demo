@@ -92,8 +92,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
 
     # Organisation
     log_message "Creating Organisation"
-    index=1
-    create_organisation "$data_group_path/organisation.json" "$dashboard_admin_api_credentials"
+    create_organisation "$data_group_path/organisation.json" "$dashboard_admin_api_credentials" "$data_group" "1"
     bootstrap_progress
     organisation_id=$(get_context_data "$data_group" "organisation" "1" "id")
 
@@ -102,11 +101,13 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     index=1
     for file in $data_group_path/users/*; do
       if [[ -f $file ]]; then
-        create_dashboard_user "$file" "$dashboard_admin_api_credentials"
+        create_dashboard_user "$file" "$dashboard_admin_api_credentials" "$data_group" "$index"
         index=$((index + 1))
         bootstrap_progress
       fi
     done
+
+    # first user added should be an admin, so that it's key can be used for Dashboard API calls
     dashboard_user_api_key=$(get_context_data "$data_group" "dashboard-user" "1" "api-key")
 
     # User Groups
@@ -114,7 +115,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     index=1
     for file in $data_group_path/user-groups/*; do
       if [[ -f $file ]]; then
-        create_user_group "$file" "$dashboard_user_api_key"
+        create_user_group "$file" "$dashboard_user_api_key" "$data_group" "$index"
         index=$((index + 1))
         bootstrap_progress
       fi
@@ -122,11 +123,9 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
 
     # Webhooks
     log_message "Creating Webhooks"
-    index=1
     for file in $data_group_path/webhooks/*; do
       if [[ -f $file ]]; then
         create_webhook "$file" "$dashboard_user_api_key"
-        index=$((index + 1))
         bootstrap_progress
       fi
     done
@@ -137,132 +136,46 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     bootstrap_progress
     
     log_message "Creating Portal Pages"
-    index=1
     for file in $data_group_path/portal/pages/*; do
       if [[ -f $file ]]; then
         create_portal_page "$file" "$dashboard_user_api_key"
-        index=$((index + 1))
         bootstrap_progress        
       fi
     done
 
     log_message "Creating Portal Developers"
-    index=1
     for file in $data_group_path/portal/developers/*; do
       if [[ -f $file ]]; then
         create_portal_developer "$file" "$dashboard_user_api_key"
-        index=$((index + 1))
         bootstrap_progress        
       fi
     done
 
+    log_message "Creating Portal Catalogues"
+    for directory in $data_group_path/portal/catalogues/*; do
+      if [[ -d $directory ]]; then
+        documentation_path="$directory/documentation.json"
+        documentation_id=""
+        if [[ -f $documentation_path ]]; then
+          documentation_id=$(create_portal_documentation "$documentation_path" "$dashboard_user_api_key")
+        fi
+        bootstrap_progress        
+
+        catalogue_path="$directory/catalogue.json"
+        if [[ -f $catalogue_path ]]; then
+          create_portal_catalogue "$catalogue_path" "$dashboard_user_api_key" "$documentation_id"
+        else
+          log_message "ERROR: catalogue file missing: $catalogue_path"
+          exit 1
+        fi
+        bootstrap_progress        
+      fi
+    done
+
+
   fi
 done
 
-
-
-
-
-
-
-log_message "Creating Portal for organisation $organisation_name"
-
-log_message "  Creating Portal default settings"
-log_json_result "$(curl $dashboard_base_url/api/portal/configuration -s \
-  -H "Authorization: $dashboard_user_api_credentials" \
-  -d "{}" 2>> bootstrap.log)"
-bootstrap_progress
-
-log_message "  Initialising Catalogue"
-result=$(curl $dashboard_base_url/api/portal/catalogue -s \
-  -H "Authorization: $dashboard_user_api_credentials" \
-  -d '{"org_id": "'$organisation_id'"}' 2>> bootstrap.log)
-catalogue_id=$(echo "$result" | jq -r '.Message')
-log_json_result "$result"
-bootstrap_progress
-
-log_message "  Creating Portal home page"
-log_json_result "$(curl $dashboard_base_url/api/portal/pages -s \
-  -H "Authorization: $dashboard_user_api_credentials" \
-  -d @deployments/tyk/data/tyk-dashboard/portal-home-page.json 2>> bootstrap.log)"
-bootstrap_progress
-
-log_message "  Creating Portal user"
-portal_user_email=$(jq -r '.email' deployments/tyk/data/tyk-dashboard/portal-user.json)
-portal_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/portal-user.json)
-log_json_result "$(curl $dashboard_base_url/api/portal/developers -s \
-  -H "Authorization: $dashboard_user_api_credentials" \
-  -d '{
-      "email": "'$portal_user_email'",
-      "password": "'$portal_user_password'",
-      "org_id": "'$organisation_id'"
-    }' 2>> bootstrap.log)"
-bootstrap_progress
-
-log_message "  Creating documentation"
-policies=$(curl $dashboard_base_url/api/portal/policies?p=-1 -s \
-  -H "Authorization:$dashboard_user_api_credentials" 2>> bootstrap.log)
-echo -n '{
-          "api_id":"",
-          "doc_type":"swagger",
-          "documentation":"' >/tmp/swagger_encoded.out
-cat deployments/tyk/data/tyk-dashboard/documentation-swagger-petstore.json | base64 >>/tmp/swagger_encoded.out
-echo '"}' >>/tmp/swagger_encoded.out
-result=$(curl $dashboard_base_url/api/portal/documentation -s \
-  -H "Authorization: $dashboard_user_api_credentials" \
-  -d "@/tmp/swagger_encoded.out" \
-     2>> bootstrap.log)
-documentation_swagger_petstore_id=$(echo "$result" | jq -r '.Message')
-log_json_result "$result"
-rm /tmp/swagger_encoded.out
-bootstrap_progress
-
-log_message "  Updating catalogue"
-policy_data=$(cat deployments/tyk/data/tyk-dashboard/policies.json)
-policies_swagger_petstore_id=$(echo $policy_data | jq -r '.Data[] | select(.name=="Swagger Petstore Policy") | .id')
-catalogue_data=$(cat deployments/tyk/data/tyk-dashboard/catalogue.json | \
-  sed 's/CATALOGUE_ID/'"$catalogue_id"'/' | \
-  sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \
-  sed 's/CATALOGUE_SWAGGER_PETSTORE_POLICY_ID/'"$policies_swagger_petstore_id"'/' | \
-  sed 's/CATALOGUE_SWAGGER_PETSTORE_DOCUMENTATION_ID/'"$documentation_swagger_petstore_id"'/')
-log_json_result "$(curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
-  -H "Authorization: $dashboard_user_api_credentials" \
-  -d "$(echo $catalogue_data)" 2>> bootstrap.log)"
-bootstrap_progress
-
-log_message "Creating Portal for organisation $organisation_2_name"
-
-log_message "  Creating Portal default settings"
-log_json_result "$(curl $dashboard_base_url/api/portal/configuration -s \
-  -H "Authorization: $dashboard_user_organisation_2_api_credentials" \
-  -d "{}" 2>> bootstrap.log)"
-bootstrap_progress
-
-log_message "  Initialising Catalogue"
-result=$(curl $dashboard_base_url/api/portal/catalogue -s \
-  -H "Authorization: $dashboard_user_organisation_2_api_credentials" \
-  -d '{"org_id": "'$organisation_2_id'"}' 2>> bootstrap.log)
-catalogue_id=$(echo "$result" | jq -r '.Message')
-log_json_result "$result"
-bootstrap_progress
-
-log_message "  Creating Portal home page"
-log_json_result "$(curl $dashboard_base_url/api/portal/pages -s \
-  -H "Authorization: $dashboard_user_organisation_2_api_credentials" \
-  -d @deployments/tyk/data/tyk-dashboard/portal-home-page.json 2>> bootstrap.log)"
-bootstrap_progress
-
-log_message "  Creating Portal user"
-portal_user_email=$(jq -r '.email' deployments/tyk/data/tyk-dashboard/portal-user.json)
-portal_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/portal-user.json)
-log_json_result "$(curl $dashboard_base_url/api/portal/developers -s \
-  -H "Authorization: $dashboard_user_organisation_2_api_credentials" \
-  -d '{
-      "email": "'$portal_user_email'",
-      "password": "'$portal_user_password'",
-      "org_id": "'$organisation_2_id'"
-    }' 2>> bootstrap.log)"
-bootstrap_progress
 
 # APIs & Policies
 

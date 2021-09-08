@@ -225,6 +225,8 @@ build_go_plugin() {
 create_organisation() {
   local organistaion_data_path="$1"
   local api_key="$2"
+  local data_group="$3"
+  local index="$4"
   local organisation_id=$(jq -r '.id' $organistaion_data_path)
   local organisation_name=$(jq -r '.owner_name' $organistaion_data_path)
 
@@ -253,6 +255,8 @@ create_organisation() {
 create_dashboard_user() {
   local dashboard_user_data_path="$1"
   local api_key="$2"
+  local data_group="$3"
+  local index="$4"
   local dashboard_user_password=$(jq -r '.password' $dashboard_user_data_path)
   
   # create user in Tyk Dashboard database
@@ -303,6 +307,8 @@ create_dashboard_user() {
 create_user_group() {
   local user_group_data_path="$1"
   local api_key="$2"
+  local data_group="$3"
+  local index="$4"
   local user_group_name=$(jq -r '.name' $user_group_data_path)
 
   # create user group in Tyk Dashboard database
@@ -355,7 +361,7 @@ initialise_portal() {
 
   log_message "  Initialising Catalogue"
   api_response=$(curl $dashboard_base_url/api/portal/catalogue -s \
-     -H "Authorization: $api_key" \
+    -H "Authorization: $api_key" \
     -d '{"org_id": "'$organisation_id'"}' 2>> bootstrap.log)
   log_json_result "$api_response"
   
@@ -370,10 +376,9 @@ create_portal_page(){
 
   log_message "  Creating Page: $page_title"
 
-  api_response=$(curl $dashboard_base_url/api/portal/pages -s \
+  log_json_result "$(curl $dashboard_base_url/api/portal/pages -s \
     -H "Authorization: $api_key" \
-    -d @$page_data_path 2>> bootstrap.log)
-  log_json_result "$api_response"
+    -d @$page_data_path 2>> bootstrap.log)"
 }
 
 create_portal_developer(){
@@ -383,7 +388,7 @@ create_portal_developer(){
   local developer_password=$(jq -r '.password' $developer_data_path)
   log_message "  Creating Developer: $developer_email"
 
-  api_response=$(curl $dashboard_base_url/api/portal/developers -s \
+  local api_response=$(curl $dashboard_base_url/api/portal/developers -s \
     -H "Authorization: $api_key" \
     -d @$developer_data_path 2>> bootstrap.log)
   log_json_result "$api_response"
@@ -391,51 +396,55 @@ create_portal_developer(){
   log_message "    Password: $developer_password"
 }
 
-create_portal() {
+create_portal_documentation(){
+  local documentation_data_path="$1"
+  local api_key="$2"
+  local documentation_title=$(jq -r '.info.title' $documentation_data_path)
+  log_message "  Creating Documentation: $documentation_title"
 
+  # replace with sed or jq?
+  echo -n '{
+            "api_id":"",
+            "doc_type":"swagger",
+            "documentation":"' >/tmp/swagger_encoded.out
+  cat $documentation_data_path | base64 >>/tmp/swagger_encoded.out
+  echo '"}' >>/tmp/swagger_encoded.out
 
-  # TODO: refactor this code
+  local api_response=$(curl $dashboard_base_url/api/portal/documentation -s \
+    -H "Authorization: $api_key" \
+    -d "@/tmp/swagger_encoded.out" \
+      2>> bootstrap.log)
 
+  log_json_result "$api_response"
 
+  rm /tmp/swagger_encoded.out
 
-  # log_message "  Creating documentation"
-  # policies=$(curl $dashboard_base_url/api/portal/policies?p=-1 -s \
-  #   -H "Authorization:$dashboard_user_api_credentials" 2>> bootstrap.log)
-  # echo -n '{
-  #           "api_id":"",
-  #           "doc_type":"swagger",
-  #           "documentation":"' >/tmp/swagger_encoded.out
-  # cat deployments/tyk/data/tyk-dashboard/documentation-swagger-petstore.json | base64 >>/tmp/swagger_encoded.out
-  # echo '"}' >>/tmp/swagger_encoded.out
-  # result=$(curl $dashboard_base_url/api/portal/documentation -s \
-  #   -H "Authorization: $dashboard_user_api_credentials" \
-  #   -d "@/tmp/swagger_encoded.out" \
-  #     2>> bootstrap.log)
-  # documentation_swagger_petstore_id=$(echo "$result" | jq -r '.Message')
-  # log_json_result "$result"
-  # rm /tmp/swagger_encoded.out
-  # bootstrap_progress
+  local documentation_id=$(echo "$api_response" | jq -r '.Message')
 
-  # log_message "  Updating catalogue"
-  # policy_data=$(cat deployments/tyk/data/tyk-dashboard/policies.json)
-  # policies_swagger_petstore_id=$(echo $policy_data | jq -r '.Data[] | select(.name=="Swagger Petstore Policy") | .id')
-  # catalogue_data=$(cat deployments/tyk/data/tyk-dashboard/catalogue.json | \
-  #   sed 's/CATALOGUE_ID/'"$catalogue_id"'/' | \
-  #   sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \
-  #   sed 's/CATALOGUE_SWAGGER_PETSTORE_POLICY_ID/'"$policies_swagger_petstore_id"'/' | \
-  #   sed 's/CATALOGUE_SWAGGER_PETSTORE_DOCUMENTATION_ID/'"$documentation_swagger_petstore_id"'/')
-  # log_json_result "$(curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
-  #   -H "Authorization: $dashboard_user_api_credentials" \
-  #   -d "$(echo $catalogue_data)" 2>> bootstrap.log)"
-  # bootstrap_progress
+  log_message "    Id: $documentation_id"
 
+  echo "$documentation_id"
+}
 
+create_portal_catalogue(){
+  local catalogue_data_path="$1"
+  local api_key="$2"
+  local documentation_id="$3"
+  local catalogue_name=$(jq -r '.name' $catalogue_data_path)
 
+  log_message "  Adding Catalogue Entry: $catalogue_name"
 
+  # get the existing catalogue
+  catalogue="$(curl $dashboard_base_url/api/portal/catalogue -s \
+    -H "Authorization: $api_key" 2>> bootstrap.log)"
 
+  # add documentation id to new catalogue
+  new_catalogue=$(jq --arg documentation_id "$documentation_id" '.documentation = $documentation_id' $catalogue_data_path)
 
+  # update the catalogue with the new catalogue entry
+  updated_catalogue=$(jq --argjson new_catalogue "[$new_catalogue]" '.apis += $new_catalogue' <<< "$catalogue")
 
-
-
-  return 0;
+  log_json_result "$(curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
+    -H "Authorization: $api_key" \
+    -d "$updated_catalogue" 2>> bootstrap.log)"
 }
