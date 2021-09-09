@@ -5,10 +5,11 @@
 # this array defines the hostnames that the bootstrap script will verify, and that the update-hosts script will use to modify /etc/hosts
 declare -a tyk_demo_hostnames=("tyk-dashboard.localhost" "tyk-portal.localhost" "tyk-gateway.localhost" "tyk-gateway-2.localhost" "tyk-custom-domain.com" "tyk-worker-gateway.localhost" "acme-portal.localhost" "go-bench-suite.localhost")
 
+spinner_chars="/-\|"
+spinner_count=1
+
 function bootstrap_progress {
-  dot_count=$((dot_count+1))
-  dots=$(printf "%-${dot_count}s" ".")
-  echo -ne "  Bootstrapping $deployment ${dots// /.} \r"
+  printf "  Bootstrapping $deployment ${spinner_chars:spinner_count++%${#spinner_chars}:1} \r"
 }
 
 function log_http_result {
