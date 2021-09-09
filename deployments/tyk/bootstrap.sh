@@ -8,9 +8,7 @@ log_start_deployment
 bootstrap_progress
 
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
-portal_base_url="http://tyk-portal.localhost:3000"
-portal_organisation_2_base_url="http://acme-portal.localhost:3000"
-gateway_base_url="http://tyk-gateway.localhost:8080"
+gateway_base_url="http://$(jq -r '.host_config.override_hostname' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
 gateway_base_url_tcp="tyk-gateway.localhost:8086"
 gateway2_base_url="https://tyk-gateway-2.localhost:8081"
 gateway_image_tag=$(docker ps --filter "name=tyk-demo_tyk-gateway_1" --format "{{.Image}}" | awk -F':' '{print $2}')
