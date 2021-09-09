@@ -64,7 +64,7 @@ bootstrap_progress
 
 # Go plugins
 
-# NOTE: commented out until go compiler issue is resolved
+# NOTE: Go plugins are commented out until go compiler issue is resolved
 # build_go_plugin "example-go-plugin.so" "example"
 # bootstrap_progress
 
@@ -73,6 +73,7 @@ bootstrap_progress
 
 # Dashboard Data
 
+# The order these are processed in is important
 log_message "Processing Dashboard Data"
 for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
   if [[ -d $data_group_path ]]; then
@@ -201,6 +202,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
 done
 
 # Gateway Data
+
 log_message "Processing Gateway Data"
 
 # Bearer Tokens
@@ -211,94 +213,6 @@ for file in deployments/tyk/data/tyk-gateway/keys/bearer-token/*; do
     bootstrap_progress
   fi
 done
-
-
-# APIs & Policies
-
-# # Broken references occur because the ID of the data changes when it is created
-# # This means the references to this data must be 'reconnected' to the new IDs
-# # This is done before the APIs are imported, and after all the other data is imported, so we know the new IDs and can update the API data before importing it
-# log_message "Updating IDs"
-# api_data=$(cat deployments/tyk/data/tyk-dashboard/apis.json)
-# webhook_data=$(curl $dashboard_base_url/api/hooks?p=-1 -s \
-#   -H "Authorization: $dashboard_user_api_credentials" | \
-#   jq '.hooks[]')
-# # only process webhooks if any exist
-# if [ "$webhook_data" != "" ]
-# then
-#   log_message "  Webhooks"
-#   for webhook_id in $(echo $webhook_data | jq --raw-output '.id')
-#   do
-#     # Match old data using the webhook name, which is consistent
-#     webhook_name=$(echo "$webhook_data" | jq -r --arg webhook_id "$webhook_id" 'select ( .id == $webhook_id ) .name')
-#     log_message "    $webhook_name"
-#     # Hook references
-#     api_data=$(echo $api_data | jq --arg webhook_id "$webhook_id" --arg webhook_name "$webhook_name" '(.apis[].hook_references[] | select(.hook.name == $webhook_name) .hook.id) = $webhook_id')
-#     # AuthFailure event handlers
-#     api_data=$(echo $api_data | jq --arg webhook_id "$webhook_id" --arg webhook_name "$webhook_name" '(.apis[].api_definition.event_handlers.events.AuthFailure[]? | select(.handler_meta.name == $webhook_name) .handler_meta.id) = $webhook_id')
-#   done
-# fi
-# bootstrap_progress
-
-# log_message "Importing APIs for organisation: $organisation_name"
-# echo $api_data >/tmp/api_data.out
-# log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
-#   -H "admin-auth: $dashboard_admin_api_credentials" \
-#   -d "@/tmp/api_data.out")"
-# rm /tmp/api_data.out
-# bootstrap_progress
-
-# log_message "Importing APIs for organisation: $organisation_2_name"
-# log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
-#   -H "admin-auth: $dashboard_admin_api_credentials" \
-#   -d "@deployments/tyk/data/tyk-dashboard/apis-organisation-2.json")"
-# bootstrap_progress
-
-# log_message "Importing Policies for organisation: $organisation_name"
-# echo $policy_data >/tmp/policy_data.out
-# log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
-#   -H "admin-auth: $dashboard_admin_api_credentials" \
-#   -d "@/tmp/policy_data.out")"
-# rm /tmp/policy_data.out
-# bootstrap_progress
-
-# log_message "Importing Policies for organisation: $organisation_2_name"
-# log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
-#   -H "admin-auth: $dashboard_admin_api_credentials" \
-#   -d "@deployments/tyk/data/tyk-dashboard/policies-organisation-2.json")"
-# bootstrap_progress
-
-# log_message "Refreshing APIs"
-# # This helps correct some strange behaviour observed with imported data
-# cat deployments/tyk/data/tyk-dashboard/apis.json | jq --raw-output '.apis[].api_definition.id' | while read api_id
-# do
-#   # Get the API definition from the Dashboard
-#   api_definition=$(curl $dashboard_base_url/api/apis/$api_id -s \
-#     -H "Authorization: $dashboard_user_api_credentials")
-#   # Put the API definition into the Dashboard
-#   result=$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
-#     -H "Authorization: $dashboard_user_api_credentials" \
-#     --data "$api_definition" | jq -r '.Status')
-#   log_message "  $(echo $api_definition | jq -r '.api_definition.name'):$result"
-# done
-# bootstrap_progress
-
-# log_message "Refreshing Policies"
-# # Policies need to be 'refreshed' using the original policies.json data as the admin import endpoint does not correctly import all the data from the v3 policy schema
-# policies_data=$(cat deployments/tyk/data/tyk-dashboard/policies.json)
-# echo $policies_data | jq --raw-output '.Data[]._id' | while read policy_id
-# do
-#   policy_data=$(echo $policies_data | jq --arg pol_id "$policy_id" '.Data[] | select( ._id == $pol_id )')
-#   policy_name=$(echo $policy_data | jq -r '.name')
-#   policy_graphql_update_data=$(jq --arg pol_id "$policy_id" --argjson pol_data "$policy_data" '.variables.id = $pol_id | .variables.input = $pol_data' deployments/tyk/data/tyk-dashboard/update-policy-graphql-template.json)
-#   echo $policy_graphql_update_data >/tmp/policy_graphql_update_data.out  
-#   result=$(curl $dashboard_base_url/graphql -s \
-#     -H "Authorization: $dashboard_user_api_credentials" \
-#     -d "@/tmp/policy_graphql_update_data.out" | jq -r '.data.update_policy.status')
-#   log_message "  $policy_name:$result"
-#   rm /tmp/policy_graphql_update_data.out  
-# done
-# bootstrap_progress
 
 # System
 

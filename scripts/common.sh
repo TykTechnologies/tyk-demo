@@ -340,6 +340,8 @@ create_webhook() {
 
   # validate result
   log_json_result "$api_response"
+
+  # the /api/hooks endpoint doesn't return the webhook id, so we can't save any context data
 }
 
 initialise_portal() {
@@ -452,12 +454,11 @@ create_api() {
   local dashboard_api_key="$3"
   local api_name=$(jq -r '.api_definition.name' $api_data_path)
   local api_id=$(jq -r '.api_definition.id' $api_data_path)
+  local api_data="$(cat $api_data_path)"
 
   log_message "  Importing API: $api_name"
 
   import_request_payload=$(jq --slurpfile new_api "$api_data_path" '.apis += $new_api' deployments/tyk/data/tyk-dashboard/admin-api-apis-import-template.json)
-
-  # TODO: fix webhook id reference
 
   api_response="$(curl $dashboard_base_url/admin/apis/import -s \
     -H "admin-auth: $admin_api_key" \
@@ -465,11 +466,35 @@ create_api() {
 
   log_json_result "$api_response"
 
+  # Update any webhook references
+  webhook_reference_count=$(jq '.hook_references | length' $api_data_path)
+  if [ "$webhook_reference_count" -gt "0" ]; then
+    webhook_data=$(curl $dashboard_base_url/api/hooks?p=-1 -s \
+      -H "Authorization: $dashboard_api_key" | \
+      jq '.hooks[]')
+
+    # loop through each webhook referenced in the API
+    while read webhook_name; do
+      log_message "  Updating Webhook Reference: $webhook_name"
+
+      new_webhook_id=$(jq -r --arg webhook_name "$webhook_name" 'select ( .name == $webhook_name ) .id' <<< "$webhook_data")
+      
+      # update the hook reference id, matching by the webhook name
+      api_data=$(jq --arg webhook_id "$new_webhook_id" --arg webhook_name "$webhook_name" '(.hook_references[] | select(.hook.name == $webhook_name) .hook.id) = $webhook_id' <<< "$api_data")
+
+      # update the AuthFailure event handler, if it exists
+      # if more events are added then additional code will be needed to handle them
+      api_data=$(jq --arg webhook_id "$new_webhook_id" --arg webhook_name "$webhook_name" '(.api_definition.event_handlers.events.AuthFailure[]? | select(.handler_meta.name == $webhook_name) .handler_meta.id) = $webhook_id' <<< "$api_data")
+
+      log_message "    Id: $new_webhook_id"
+    done <<< "$(jq -c -r '.hook_references[].hook.name' $api_data_path)"
+  fi
+
   log_message "  Updating API: $api_name"
 
   api_response="$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
     -H "Authorization: $dashboard_api_key" \
-    -d @$api_data_path 2>> bootstrap.log)"
+    -d "$api_data" 2>> bootstrap.log)"
 
   log_json_result "$api_response"
 
@@ -493,7 +518,7 @@ create_policy() {
 
   log_json_result "$api_response"
 
-  log_message "  Updating Policy: $api_name"
+  log_message "  Updating Policy: $policy_name"
 
   policy_data=$(cat $policy_data_path)
 
