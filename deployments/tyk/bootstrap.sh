@@ -404,10 +404,10 @@ log_ok
 
 log_message "Sending API requests to generate analytics data"
 # global analytics off
-curl $gateway_base_url/basic-open-api/anything/[1-50] -s -o /dev/null 
+curl $gateway_base_url/basic-open-api/anything/[1-10] -s -o /dev/null 
 bootstrap_progress
 # global analytics on
-curl $gateway2_base_url/basic-open-api/get -s -k -o /dev/null
+curl $gateway2_base_url/basic-open-api/anything/[1-10] -s -k -o /dev/null
 bootstrap_progress
 # api analytics off
 curl $gateway_base_url/detailed-analytics-off/get -s -o /dev/null
