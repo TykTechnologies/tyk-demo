@@ -503,13 +503,76 @@ create_policy() {
     -H "Authorization: $dashboard_api_key" \
     -d "$update_request_payload" 2>> bootstrap.log)"
 
+  # currently custom approach to extracting the graphql response status
   response_status="$(jq -r '.data.update_policy.status' <<< "$api_response")"
   
-  # custom validation, as the log_json_result function doesn't handle GraphQL responses yet
-  if [[ "$response_status" != "OK" ]]; then
+  # custom validation
+  if [[ "$response_status" == "OK" ]]; then
+    log_ok
+    log_message "    Id: $policy_id"
+  else
     log_message "ERROR updating policy: $(jq -r '.data.update_policy.message' <<< "$api_response")"
     exit 1
   fi
+}
 
-  log_message "    Id: $policy_id"
+create_basic_key() {
+  local basic_key_data_path="$1"
+  local api_key="$2"
+  local file_name="$(basename $basic_key_data_path)"
+  # username is taken from the filename, using the 3rd hypenated segment and excluding the extension e.g. "basic-1-basic_auth_username.json" results in "basic_auth_username"
+  local username="$(echo "$file_name" | cut -d. -f1 | cut -d- -f3)"
+  local password="$(jq -r '.basic_auth_data.password' $basic_key_data_path)"
+
+  if [[ "$username" == "" ]]; then
+    log_message "ERROR: Could not extract username from filename $file_name"
+    exit 1
+  fi
+
+  log_message "  Adding Basic Key: $username"
+
+  api_response_status_code="$(curl $dashboard_base_url/api/apis/keys/basic/$username -s -w "%{http_code}" -o /dev/null \
+    -H "Authorization: $api_key" \
+    -d @$basic_key_data_path 2>> bootstrap.log)"
+
+  # custom validation
+  if [[ "$api_response_status_code" == "200" ]]; then
+    log_ok
+    log_message "    Password: $password"
+  else
+    log_message "ERROR: Could not create basic key. API response status code: $api_response_status_code."
+    exit 1
+  fi
+}
+
+create_bearer_token() {
+  local bearer_token_data_path="$1"
+  local api_key="$2"
+  local file_name="$(basename $bearer_token_data_path)"
+  # key name is taken from the filename, using the 4th hypenated segment and excluding the extension e.g. "basic-1-username.json" results in "username"
+  local key_name="$(echo "$file_name" | cut -d. -f1 | cut -d- -f4)"
+
+  if [[ "$key_name" == "" ]]; then
+    log_message "ERROR: Could not extract key name from filename $file_name"
+    exit 1
+  fi
+
+  log_message "  Adding Bearer Token: $key_name"
+
+  # currently hard-coded to target a single gateway "$gateway_base_url"
+  api_response=$(curl $gateway_base_url/tyk/keys/$key_name -s \
+    -H "x-tyk-authorization: $api_key" \
+    -d @$bearer_token_data_path 2>> bootstrap.log)
+
+  response_status="$(jq -r '.status' <<< "$api_response")"
+
+  # custom validation
+  if [[ "$response_status" == "ok" ]]; then
+    log_ok
+    log_message "    Key: $(jq -r '.key' <<< "$api_response")"
+    log_message "    Hash: $(jq -r '.key_hash' <<< "$api_response")"
+  else
+    log_message "ERROR: Could not create bearer token. API response returned $api_response."
+    exit 1
+  fi
 }

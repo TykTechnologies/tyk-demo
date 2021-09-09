@@ -64,25 +64,16 @@ bootstrap_progress
 
 # Go plugins
 
+# NOTE: commented out until go compiler issue is resolved
 # build_go_plugin "example-go-plugin.so" "example"
 # bootstrap_progress
 
 # build_go_plugin "jwt-go-plugin.so" "jwt"
 # bootstrap_progress
 
-# organisation_ids=()
-# organisation_names=()
-# dashboard_user_emails=()
-# dashboard_user_passwords=()
-# dashboard_user_api_keys=()
-# dashboard_user_group_ids=()
-# organisation_id=""
-# organisation_name=""
-# dashboard_user_email=""
-# dashboard_user_password=""
-# dashboard_user_api_key=""
-# dashboard_user_group_id=""
+# Dashboard Data
 
+log_message "Processing Dashboard Data"
 for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
   if [[ -d $data_group_path ]]; then
     log_message "Processing data in $data_group_path"
@@ -197,6 +188,27 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
         bootstrap_progress        
       fi
     done
+
+    # Keys - Basic
+    log_message "Creating Basic Auth Keys"
+    for file in $data_group_path/keys/basic/*; do
+      if [[ -f $file ]]; then
+        create_basic_key "$file" "$dashboard_user_api_key"
+        bootstrap_progress        
+      fi
+    done
+  fi
+done
+
+# Gateway Data
+log_message "Processing Gateway Data"
+
+# Bearer Tokens
+log_message "Creating Custom Bearer Tokens"
+for file in deployments/tyk/data/tyk-gateway/keys/bearer-token/*; do
+  if [[ -f $file ]]; then
+    create_bearer_token "$file" "$gateway_api_credentials"
+    bootstrap_progress
   fi
 done
 
@@ -306,8 +318,9 @@ do
     hot_reload "$gateway_base_url" "$gateway_api_credentials"
     sleep 2
   fi
+  bootstrap_progress
 done
-bootstrap_progress
+log_ok
 
 log_message "Checking Gateway - Python middleware"
 result=""
@@ -321,8 +334,9 @@ do
     hot_reload "$gateway_base_url" "$gateway_api_credentials"
     sleep 2
   fi
+  bootstrap_progress
 done
-bootstrap_progress
+log_ok
 
 log_message "Checking Gateway - Go plugin"
 result=""
@@ -336,8 +350,9 @@ do
     hot_reload "$gateway_base_url" "$gateway_api_credentials"
     sleep 2
   fi
+  bootstrap_progress
 done
-bootstrap_progress
+log_ok
 
 log_message "Checking Gateway 2 - Basic API access"
 result=""
@@ -351,55 +366,32 @@ do
     hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
     sleep 2
   fi
+  bootstrap_progress
 done
-bootstrap_progress
-
-log_message "Importing custom keys"
-result=$(curl $gateway_base_url/tyk/keys/auth_key -s \
-  -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @deployments/tyk/data/tyk-gateway/auth-key.json 2>> bootstrap.log | jq -r '.status')
-log_message "  Auth key:$result"
-result=$(curl $gateway_base_url/tyk/keys/auth_key_analytics_on -s \
-  -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @deployments/tyk/data/tyk-gateway/auth-key-analytics-on.json 2>> bootstrap.log | jq -r '.status')
-log_message "  Auth key (analytics on):$result"
-result=$(curl $gateway_base_url/tyk/keys/ratelimit_key -s \
-  -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @deployments/tyk/data/tyk-gateway/rate-limit-key.json 2>> bootstrap.log | jq -r '.status')
-log_message "  Rate limit key:$result"
-result=$(curl $gateway_base_url/tyk/keys/throttle_key -s \
-  -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @deployments/tyk/data/tyk-gateway/throttle-key.json 2>> bootstrap.log | jq -r '.status')
-log_message "  Throttle key:$result"
-result=$(curl $gateway_base_url/tyk/keys/quota_key -s \
-  -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @deployments/tyk/data/tyk-gateway/quota-key.json 2>> bootstrap.log | jq -r '.status')
-log_message "  Quota key:$result"
-result=$(curl $gateway_base_url/tyk/keys/go_plugin_key -s \
-  -H "x-tyk-authorization: $gateway_api_credentials" \
-  -d @deployments/tyk/data/tyk-gateway/go-plugin-key.json 2>> bootstrap.log | jq -r '.status')
-log_message "  Go Plugin key:$result"
-result=$(curl $dashboard_base_url/api/apis/keys/basic/basic-auth-username -s -w "%{http_code}" -o /dev/null \
-  -H "Authorization: $dashboard_user_api_credentials" \
-  -d @deployments/tyk/data/tyk-dashboard/key-basic-auth.json 2>> bootstrap.log)
-log_message "  Basic auth key:$result"
-bootstrap_progress
+log_ok
 
 log_message "Sending API requests to generate analytics data"
 # global analytics off
 curl $gateway_base_url/basic-open-api/get -s -o /dev/null 
+bootstrap_progress
 # global analytics on
 curl $gateway2_base_url/basic-open-api/get -s -k -o /dev/null
+bootstrap_progress
 # api analytics off
 curl $gateway_base_url/detailed-analytics-off/get -s -o /dev/null
+bootstrap_progress
 # api analytics on
 curl $gateway_base_url/detailed-analytics-on/get -s -o /dev/null 
+bootstrap_progress
 # key analytics off
-curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key" -o /dev/null 
+curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: standard_bearer_token" -o /dev/null 
+bootstrap_progress
 # key analytics on
-curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key_analytics_on" -o /dev/null 
+curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: analytics_on" -o /dev/null 
+bootstrap_progress
 # enforce timeout plugin
 curl $gateway_base_url/plugin-demo-api/delay/6 -s -o /dev/null 
+bootstrap_progress
 log_ok
 
 log_message "Restarting Dashboard container to ensure Portal URLs are loaded ok"
