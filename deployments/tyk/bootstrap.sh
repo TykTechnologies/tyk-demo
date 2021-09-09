@@ -306,11 +306,43 @@ log_message "Reloading Gateways"
 hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
 bootstrap_progress
 
-log_message "Checking Gateway - Basic API access"
+log_message "Checking Gateway - Anonymous API access"
 result=""
 while [ "$result" != "0" ]
 do
   wait_for_response "$gateway_base_url/basic-open-api/get" "200" "" 3
+  result="$?"
+  if [ "$result" != "0" ]
+  then
+    log_message "  Gateway not returning desired response, attempting hot reload"
+    hot_reload "$gateway_base_url" "$gateway_api_credentials"
+    sleep 2
+  fi
+  bootstrap_progress
+done
+log_ok
+
+log_message "Checking Gateway - Authenticated API access (bearer token)"
+result=""
+while [ "$result" != "0" ]
+do
+  wait_for_response "$gateway_base_url/basic-protected-api/get" "200" "Authorization:auth_key" 3
+  result="$?"
+  if [ "$result" != "0" ]
+  then
+    log_message "  Gateway not returning desired response, attempting hot reload"
+    hot_reload "$gateway_base_url" "$gateway_api_credentials"
+    sleep 2
+  fi
+  bootstrap_progress
+done
+log_ok
+
+log_message "Checking Gateway - Authenticated API access (basic)"
+result=""
+while [ "$result" != "0" ]
+do
+  wait_for_response "$gateway_base_url/basic-authentication-api/get" "200" "Authorization:Basic YmFzaWNfYXV0aF91c2VybmFtZTpiYXNpYy1hdXRoLXBhc3N3b3Jk" 3
   result="$?"
   if [ "$result" != "0" ]
   then
@@ -354,7 +386,7 @@ do
 done
 log_ok
 
-log_message "Checking Gateway 2 - Basic API access"
+log_message "Checking Gateway 2 - Anonymous API access"
 result=""
 while [ "$result" != "0" ]
 do
@@ -372,7 +404,7 @@ log_ok
 
 log_message "Sending API requests to generate analytics data"
 # global analytics off
-curl $gateway_base_url/basic-open-api/get -s -o /dev/null 
+curl $gateway_base_url/basic-open-api/anything/[1-50] -s -o /dev/null 
 bootstrap_progress
 # global analytics on
 curl $gateway2_base_url/basic-open-api/get -s -k -o /dev/null
@@ -384,7 +416,7 @@ bootstrap_progress
 curl $gateway_base_url/detailed-analytics-on/get -s -o /dev/null 
 bootstrap_progress
 # key analytics off
-curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: standard_bearer_token" -o /dev/null 
+curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key" -o /dev/null 
 bootstrap_progress
 # key analytics on
 curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: analytics_on" -o /dev/null 

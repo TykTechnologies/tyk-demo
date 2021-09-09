@@ -2064,7 +2064,7 @@
 												"header": [
 													{
 														"key": "Authorization",
-														"value": "Basic YmFzaWMtYXV0aC11c2VybmFtZTpiYXNpYy1hdXRoLXBhc3N3b3Jk",
+														"value": "Basic YmFzaWNfYXV0aF91c2VybmFtZTpiYXNpYy1hdXRoLXBhc3N3b3Jk",
 														"type": "text"
 													}
 												],
