@@ -92,7 +92,12 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
 
     # Organisation
     log_message "Creating Organisation"
-    create_organisation "$data_group_path/organisation.json" "$dashboard_admin_api_credentials" "$data_group" "1"
+    organisation_data_path="$data_group_path/organisation.json"
+    if [[ ! -f $organisation_data_path ]]; then
+          log_message "ERROR: organisation file missing: $organisation_data_path"
+          exit 1
+    fi
+    create_organisation "$organisation_data_path" "$dashboard_admin_api_credentials" "$data_group" "1"
     bootstrap_progress
     organisation_id=$(get_context_data "$data_group" "organisation" "1" "id")
 
@@ -139,11 +144,21 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
       fi
     done
 
-    # Portal
+    # Policies
+    log_message "Creating Policies"
+    for file in $data_group_path/policies/*; do
+      if [[ -f $file ]]; then
+        create_policy "$file" "$dashboard_admin_api_credentials"
+        bootstrap_progress
+      fi
+    done    
+
+    # Portal - Initialise
     log_message "Initialising Portal"
     initialise_portal "$organisation_id" "$dashboard_user_api_key"
     bootstrap_progress
     
+    # Portal - Pages
     log_message "Creating Portal Pages"
     for file in $data_group_path/portal/pages/*; do
       if [[ -f $file ]]; then
@@ -152,14 +167,18 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
       fi
     done
 
+    # Portal - Developers
     log_message "Creating Portal Developers"
+    index=1
     for file in $data_group_path/portal/developers/*; do
       if [[ -f $file ]]; then
-        create_portal_developer "$file" "$dashboard_user_api_key"
+        create_portal_developer "$file" "$dashboard_user_api_key" "$index"
+        index=$((index + 1))
         bootstrap_progress        
       fi
     done
 
+    # Portal - Catalogues
     log_message "Creating Portal Catalogues"
     for directory in $data_group_path/portal/catalogues/*; do
       if [[ -d $directory ]]; then
@@ -180,98 +199,96 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
         bootstrap_progress        
       fi
     done
-
-
   fi
 done
 
 
 # APIs & Policies
 
-# Broken references occur because the ID of the data changes when it is created
-# This means the references to this data must be 'reconnected' to the new IDs
-# This is done before the APIs are imported, and after all the other data is imported, so we know the new IDs and can update the API data before importing it
-log_message "Updating IDs"
-api_data=$(cat deployments/tyk/data/tyk-dashboard/apis.json)
-webhook_data=$(curl $dashboard_base_url/api/hooks?p=-1 -s \
-  -H "Authorization: $dashboard_user_api_credentials" | \
-  jq '.hooks[]')
-# only process webhooks if any exist
-if [ "$webhook_data" != "" ]
-then
-  log_message "  Webhooks"
-  for webhook_id in $(echo $webhook_data | jq --raw-output '.id')
-  do
-    # Match old data using the webhook name, which is consistent
-    webhook_name=$(echo "$webhook_data" | jq -r --arg webhook_id "$webhook_id" 'select ( .id == $webhook_id ) .name')
-    log_message "    $webhook_name"
-    # Hook references
-    api_data=$(echo $api_data | jq --arg webhook_id "$webhook_id" --arg webhook_name "$webhook_name" '(.apis[].hook_references[] | select(.hook.name == $webhook_name) .hook.id) = $webhook_id')
-    # AuthFailure event handlers
-    api_data=$(echo $api_data | jq --arg webhook_id "$webhook_id" --arg webhook_name "$webhook_name" '(.apis[].api_definition.event_handlers.events.AuthFailure[]? | select(.handler_meta.name == $webhook_name) .handler_meta.id) = $webhook_id')
-  done
-fi
-bootstrap_progress
+# # Broken references occur because the ID of the data changes when it is created
+# # This means the references to this data must be 'reconnected' to the new IDs
+# # This is done before the APIs are imported, and after all the other data is imported, so we know the new IDs and can update the API data before importing it
+# log_message "Updating IDs"
+# api_data=$(cat deployments/tyk/data/tyk-dashboard/apis.json)
+# webhook_data=$(curl $dashboard_base_url/api/hooks?p=-1 -s \
+#   -H "Authorization: $dashboard_user_api_credentials" | \
+#   jq '.hooks[]')
+# # only process webhooks if any exist
+# if [ "$webhook_data" != "" ]
+# then
+#   log_message "  Webhooks"
+#   for webhook_id in $(echo $webhook_data | jq --raw-output '.id')
+#   do
+#     # Match old data using the webhook name, which is consistent
+#     webhook_name=$(echo "$webhook_data" | jq -r --arg webhook_id "$webhook_id" 'select ( .id == $webhook_id ) .name')
+#     log_message "    $webhook_name"
+#     # Hook references
+#     api_data=$(echo $api_data | jq --arg webhook_id "$webhook_id" --arg webhook_name "$webhook_name" '(.apis[].hook_references[] | select(.hook.name == $webhook_name) .hook.id) = $webhook_id')
+#     # AuthFailure event handlers
+#     api_data=$(echo $api_data | jq --arg webhook_id "$webhook_id" --arg webhook_name "$webhook_name" '(.apis[].api_definition.event_handlers.events.AuthFailure[]? | select(.handler_meta.name == $webhook_name) .handler_meta.id) = $webhook_id')
+#   done
+# fi
+# bootstrap_progress
 
-log_message "Importing APIs for organisation: $organisation_name"
-echo $api_data >/tmp/api_data.out
-log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
-  -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "@/tmp/api_data.out")"
-rm /tmp/api_data.out
-bootstrap_progress
+# log_message "Importing APIs for organisation: $organisation_name"
+# echo $api_data >/tmp/api_data.out
+# log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
+#   -H "admin-auth: $dashboard_admin_api_credentials" \
+#   -d "@/tmp/api_data.out")"
+# rm /tmp/api_data.out
+# bootstrap_progress
 
-log_message "Importing APIs for organisation: $organisation_2_name"
-log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
-  -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "@deployments/tyk/data/tyk-dashboard/apis-organisation-2.json")"
-bootstrap_progress
+# log_message "Importing APIs for organisation: $organisation_2_name"
+# log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
+#   -H "admin-auth: $dashboard_admin_api_credentials" \
+#   -d "@deployments/tyk/data/tyk-dashboard/apis-organisation-2.json")"
+# bootstrap_progress
 
-log_message "Importing Policies for organisation: $organisation_name"
-echo $policy_data >/tmp/policy_data.out
-log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
-  -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "@/tmp/policy_data.out")"
-rm /tmp/policy_data.out
-bootstrap_progress
+# log_message "Importing Policies for organisation: $organisation_name"
+# echo $policy_data >/tmp/policy_data.out
+# log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
+#   -H "admin-auth: $dashboard_admin_api_credentials" \
+#   -d "@/tmp/policy_data.out")"
+# rm /tmp/policy_data.out
+# bootstrap_progress
 
-log_message "Importing Policies for organisation: $organisation_2_name"
-log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
-  -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "@deployments/tyk/data/tyk-dashboard/policies-organisation-2.json")"
-bootstrap_progress
+# log_message "Importing Policies for organisation: $organisation_2_name"
+# log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
+#   -H "admin-auth: $dashboard_admin_api_credentials" \
+#   -d "@deployments/tyk/data/tyk-dashboard/policies-organisation-2.json")"
+# bootstrap_progress
 
-log_message "Refreshing APIs"
-# This helps correct some strange behaviour observed with imported data
-cat deployments/tyk/data/tyk-dashboard/apis.json | jq --raw-output '.apis[].api_definition.id' | while read api_id
-do
-  # Get the API definition from the Dashboard
-  api_definition=$(curl $dashboard_base_url/api/apis/$api_id -s \
-    -H "Authorization: $dashboard_user_api_credentials")
-  # Put the API definition into the Dashboard
-  result=$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
-    -H "Authorization: $dashboard_user_api_credentials" \
-    --data "$api_definition" | jq -r '.Status')
-  log_message "  $(echo $api_definition | jq -r '.api_definition.name'):$result"
-done
-bootstrap_progress
+# log_message "Refreshing APIs"
+# # This helps correct some strange behaviour observed with imported data
+# cat deployments/tyk/data/tyk-dashboard/apis.json | jq --raw-output '.apis[].api_definition.id' | while read api_id
+# do
+#   # Get the API definition from the Dashboard
+#   api_definition=$(curl $dashboard_base_url/api/apis/$api_id -s \
+#     -H "Authorization: $dashboard_user_api_credentials")
+#   # Put the API definition into the Dashboard
+#   result=$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
+#     -H "Authorization: $dashboard_user_api_credentials" \
+#     --data "$api_definition" | jq -r '.Status')
+#   log_message "  $(echo $api_definition | jq -r '.api_definition.name'):$result"
+# done
+# bootstrap_progress
 
-log_message "Refreshing Policies"
-# Policies need to be 'refreshed' using the original policies.json data as the admin import endpoint does not correctly import all the data from the v3 policy schema
-policies_data=$(cat deployments/tyk/data/tyk-dashboard/policies.json)
-echo $policies_data | jq --raw-output '.Data[]._id' | while read policy_id
-do
-  policy_data=$(echo $policies_data | jq --arg pol_id "$policy_id" '.Data[] | select( ._id == $pol_id )')
-  policy_name=$(echo $policy_data | jq -r '.name')
-  policy_graphql_update_data=$(jq --arg pol_id "$policy_id" --argjson pol_data "$policy_data" '.variables.id = $pol_id | .variables.input = $pol_data' deployments/tyk/data/tyk-dashboard/update-policy-graphql-template.json)
-  echo $policy_graphql_update_data >/tmp/policy_graphql_update_data.out  
-  result=$(curl $dashboard_base_url/graphql -s \
-    -H "Authorization: $dashboard_user_api_credentials" \
-    -d "@/tmp/policy_graphql_update_data.out" | jq -r '.data.update_policy.status')
-  log_message "  $policy_name:$result"
-  rm /tmp/policy_graphql_update_data.out  
-done
-bootstrap_progress
+# log_message "Refreshing Policies"
+# # Policies need to be 'refreshed' using the original policies.json data as the admin import endpoint does not correctly import all the data from the v3 policy schema
+# policies_data=$(cat deployments/tyk/data/tyk-dashboard/policies.json)
+# echo $policies_data | jq --raw-output '.Data[]._id' | while read policy_id
+# do
+#   policy_data=$(echo $policies_data | jq --arg pol_id "$policy_id" '.Data[] | select( ._id == $pol_id )')
+#   policy_name=$(echo $policy_data | jq -r '.name')
+#   policy_graphql_update_data=$(jq --arg pol_id "$policy_id" --argjson pol_data "$policy_data" '.variables.id = $pol_id | .variables.input = $pol_data' deployments/tyk/data/tyk-dashboard/update-policy-graphql-template.json)
+#   echo $policy_graphql_update_data >/tmp/policy_graphql_update_data.out  
+#   result=$(curl $dashboard_base_url/graphql -s \
+#     -H "Authorization: $dashboard_user_api_credentials" \
+#     -d "@/tmp/policy_graphql_update_data.out" | jq -r '.data.update_policy.status')
+#   log_message "  $policy_name:$result"
+#   rm /tmp/policy_graphql_update_data.out  
+# done
+# bootstrap_progress
 
 # System
 
@@ -416,26 +433,26 @@ echo -e "\033[2K
                 Licence : $dashboard_licence_days_remaining days remaining
                     URL : $dashboard_base_url
        API AuthZ Header : Authorization
-    ▾ $organisation_name Organisation
-               Username : $dashboard_user_email
-               Password : $dashboard_user_password
-        API Credentials : $dashboard_user_api_credentials
-    ▾ $organisation_2_name Organisation
-               Username : $dashboard_user_organisation_2_email
-               Password : $dashboard_user_organisation_2_password
-        API Credentials : $dashboard_user_organisation_2_api_credentials
+    ▾ $(get_context_data "1" "organisation" "1" "name") Organisation
+               Username : $(get_context_data "1" "dashboard-user" "1" "email")
+               Password : $(get_context_data "1" "dashboard-user" "1" "password")
+        API Credentials : $(get_context_data "1" "dashboard-user" "1" "api-key")
+    ▾ $(get_context_data "2" "organisation" "1" "name") Organisation
+               Username : $(get_context_data "2" "dashboard-user" "1" "email")
+               Password : $(get_context_data "2" "dashboard-user" "1" "password")
+        API Credentials : $(get_context_data "2" "dashboard-user" "1" "api-key")
     ▾ Multi-Organisation User
-               Username : $dashboard_multi_organisation_user_email
-               Password : $dashboard_multi_organisation_user_password
+               Username : $(get_context_data "1" "dashboard-user" "2" "email")
+               Password : $(get_context_data "1" "dashboard-user" "2" "password")
   ▽ Portal ($dashboard_image_tag)
-    ▾ $organisation_name Organisation
-                    URL : $portal_base_url$portal_root_path
-               Username : $portal_user_email
-               Password : $portal_user_password  
-    ▾ $organisation_2_name Organisation
-                    URL : $portal_organisation_2_base_url$portal_root_path
-               Username : $portal_user_email
-               Password : $portal_user_password  
+    ▾ $(get_context_data "1" "organisation" "1" "name") Organisation
+                    URL : http://$(get_context_data "1" "portal" "1" "hostname")$portal_root_path
+               Username : $(get_context_data "1" "portal-developer" "1" "email")
+               Password : $(get_context_data "1" "portal-developer" "1" "password")
+    ▾ $(get_context_data "2" "organisation" "1" "name") Organisation
+                    URL : http://$(get_context_data "2" "portal" "1" "hostname")$portal_root_path
+               Username : $(get_context_data "2" "portal-developer" "1" "email")
+               Password : $(get_context_data "2" "portal-developer" "1" "password")
   ▽ Gateway ($gateway_image_tag)
                     URL : $gateway_base_url
                URL(TCP) : $gateway_base_url_tcp

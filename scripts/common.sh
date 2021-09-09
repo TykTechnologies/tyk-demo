@@ -223,33 +223,31 @@ build_go_plugin() {
 }
 
 create_organisation() {
-  local organistaion_data_path="$1"
+  local organisation_data_path="$1"
   local api_key="$2"
   local data_group="$3"
   local index="$4"
-  local organisation_id=$(jq -r '.id' $organistaion_data_path)
-  local organisation_name=$(jq -r '.owner_name' $organistaion_data_path)
+  local organisation_id=$(jq -r '.id' $organisation_data_path)
+  local organisation_name=$(jq -r '.owner_name' $organisation_data_path)
+  local portal_hostname=$(jq -r '.cname' $organisation_data_path)
 
   # create organisation in Tyk Dashboard database
   log_message "  Creating Organisation: $organisation_name"
   local api_response=$(curl $dashboard_base_url/admin/organisations/import -s \
     -H "admin-auth: $api_key" \
-    -d @$organistaion_data_path 2>> bootstrap.log)
+    -d @$organisation_data_path 2>> bootstrap.log)
 
   # validate result
   log_json_result "$api_response"
   
-  # add details to global variables and context data
-  # organisation_names+=("$organisation_name")
-  # organisation_ids+=("$organisation_id")
-  # local organisation_count=${#organisation_ids[@]}
-  # echo $organisation_id > ".context-data/organisation-$organisation_count-id"
-  # echo $organisation_name > ".context-data/organisation-$organisation_count-name"
+  # add details to context data
   set_context_data "$data_group" "organisation" "$index" "id" "$organisation_id"
   set_context_data "$data_group" "organisation" "$index" "name" "$organisation_name"
+  set_context_data "$data_group" "portal" "$index" "hostname" "$portal_hostname"
 
   log_message "    Name: $organisation_name"
   log_message "    Id: $organisation_id"
+  log_message "    Portal Hostname: $portal_hostname"
 }
 
 create_dashboard_user() {
@@ -323,15 +321,9 @@ create_user_group() {
   # extract data from response
   local user_group_id=$(echo "$api_response" | jq -r '.Meta')
 
-  # add details to global variables and context data
-  # dashboard_user_group_ids+=("$user_group_id")
-  # dashboard_user_group_count=${#dashboard_user_group_ids[@]}
-  # echo $user_group_id > ".context-data/dashboard-user-group-$dashboard_user_group_count-id"
   set_context_data "$data_group" "dashboard-user-group" "$index" "id" "$user_group_id"
 
   log_message "    Id: $user_group_id"
-
-  return 0;
 }
 
 create_webhook() {
@@ -348,6 +340,8 @@ create_webhook() {
   # validate result
   log_json_result "$api_response"
 }
+
+
 
 initialise_portal() {
   local organisation_id="$1"
@@ -384,6 +378,7 @@ create_portal_page() {
 create_portal_developer() {
   local developer_data_path="$1"
   local api_key="$2"
+  local index="$3"
   local developer_email=$(jq -r '.email' $developer_data_path)
   local developer_password=$(jq -r '.password' $developer_data_path)
   log_message "  Creating Developer: $developer_email"
@@ -392,6 +387,9 @@ create_portal_developer() {
     -H "Authorization: $api_key" \
     -d @$developer_data_path 2>> bootstrap.log)
   log_json_result "$api_response"
+
+  set_context_data "$data_group" "portal-developer" "$index" "email" "$developer_email"
+  set_context_data "$data_group" "portal-developer" "$index" "password" "$developer_password"
 
   log_message "    Password: $developer_password"
 }
@@ -456,11 +454,37 @@ create_api() {
 
   log_message "  Creating API: $api_name"
 
-  request_payload=$(jq --slurpfile new_api $api_data_path '.apis += $new_api' <<< "{ \"apis\": [] }")
+  request_payload=$(jq --slurpfile new_api "$api_data_path" '.apis += $new_api' deployments/tyk/data/tyk-dashboard/admin-api-apis-import-template.json)
+
+  # TODO: fix webhook id reference
 
   api_response="$(curl $dashboard_base_url/admin/apis/import -s \
     -H "admin-auth: $api_key" \
     -d "$request_payload" 2>> bootstrap.log)"
 
   log_json_result "$api_response"
+
+  api_id=$(echo $api_response | jq -r '.Meta | keys[]')
+
+  log_message "    Id: $api_id"
+}
+
+create_policy() {
+  local policy_data_path="$1"
+  local api_key="$2"
+  local policy_name=$(jq -r '.name' $policy_data_path)
+
+  log_message "  Creating Policy: $policy_name"
+
+  request_payload=$(jq --slurpfile new_policy "$policy_data_path" '.Data += $new_policy' deployments/tyk/data/tyk-dashboard/admin-api-policies-import-template.json)
+
+  api_response="$(curl $dashboard_base_url/admin/policies/import -s \
+    -H "admin-auth: $api_key" \
+    -d "$request_payload" 2>> bootstrap.log)"
+
+  log_json_result "$api_response"
+
+  policy_id=$(echo $api_response | jq -r '.Meta | keys[]')
+
+  log_message "    Id: $policy_id"
 }
