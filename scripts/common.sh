@@ -342,8 +342,6 @@ create_webhook() {
   log_json_result "$api_response"
 }
 
-
-
 initialise_portal() {
   local organisation_id="$1"
   local api_key="$2"
@@ -450,22 +448,30 @@ create_portal_catalogue() {
 
 create_api() {
   local api_data_path="$1"
-  local api_key="$2"
+  local admin_api_key="$2"
+  local dashboard_api_key="$3"
   local api_name=$(jq -r '.api_definition.name' $api_data_path)
+  local api_id=$(jq -r '.api_definition.id' $api_data_path)
 
-  log_message "  Creating API: $api_name"
+  log_message "  Importing API: $api_name"
 
-  request_payload=$(jq --slurpfile new_api "$api_data_path" '.apis += $new_api' deployments/tyk/data/tyk-dashboard/admin-api-apis-import-template.json)
+  import_request_payload=$(jq --slurpfile new_api "$api_data_path" '.apis += $new_api' deployments/tyk/data/tyk-dashboard/admin-api-apis-import-template.json)
 
   # TODO: fix webhook id reference
 
   api_response="$(curl $dashboard_base_url/admin/apis/import -s \
-    -H "admin-auth: $api_key" \
-    -d "$request_payload" 2>> bootstrap.log)"
+    -H "admin-auth: $admin_api_key" \
+    -d "$import_request_payload" 2>> bootstrap.log)"
 
   log_json_result "$api_response"
 
-  api_id=$(echo $api_response | jq -r '.Meta | keys[]')
+  log_message "  Updating API: $api_name"
+
+  api_response="$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
+    -H "Authorization: $dashboard_api_key" \
+    -d @$api_data_path 2>> bootstrap.log)"
+
+  log_json_result "$api_response"
 
   log_message "    Id: $api_id"
 }
@@ -473,19 +479,37 @@ create_api() {
 create_policy() {
   local policy_data_path="$1"
   local api_key="$2"
+  local dashboard_api_key="$3"
   local policy_name=$(jq -r '.name' $policy_data_path)
+  local policy_id=$(jq -r '._id' $policy_data_path)
 
-  log_message "  Creating Policy: $policy_name"
+  log_message "  Importing Policy: $policy_name"
 
-  request_payload=$(jq --slurpfile new_policy "$policy_data_path" '.Data += $new_policy' deployments/tyk/data/tyk-dashboard/admin-api-policies-import-template.json)
+  import_request_payload=$(jq --slurpfile new_policy "$policy_data_path" '.Data += $new_policy' deployments/tyk/data/tyk-dashboard/admin-api-policies-import-template.json)
 
   api_response="$(curl $dashboard_base_url/admin/policies/import -s \
     -H "admin-auth: $api_key" \
-    -d "$request_payload" 2>> bootstrap.log)"
+    -d "$import_request_payload" 2>> bootstrap.log)"
 
   log_json_result "$api_response"
 
-  policy_id=$(echo $api_response | jq -r '.Meta | keys[]')
+  log_message "  Updating Policy: $api_name"
+
+  policy_data=$(cat $policy_data_path)
+
+  update_request_payload=$(jq --argjson policy_data "$policy_data" --arg policy_id "$policy_id" '.variables.id = $policy_id | .variables.input = $policy_data' deployments/tyk/data/tyk-dashboard/dashboard-graphql-api-policy-update-template.json)
+
+  api_response="$(curl $dashboard_base_url/graphql -s \
+    -H "Authorization: $dashboard_api_key" \
+    -d "$update_request_payload" 2>> bootstrap.log)"
+
+  response_status="$(jq -r '.data.update_policy.status' <<< "$api_response")"
+  
+  # custom validation, as the log_json_result function doesn't handle GraphQL responses yet
+  if [[ "$response_status" != "OK" ]]; then
+    log_message "ERROR updating policy: $(jq -r '.data.update_policy.message' <<< "$api_response")"
+    exit 1
+  fi
 
   log_message "    Id: $policy_id"
 }
