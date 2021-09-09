@@ -430,15 +430,17 @@ echo -e "\033[2K
   ▽ Dashboard ($dashboard_image_tag)
                 Licence : $dashboard_licence_days_remaining days remaining
                     URL : $dashboard_base_url
-       API AuthZ Header : Authorization
+       Admin API Header : admin-auth
+          Admin API Key : $dashboard_admin_api_credentials 
+   Dashboard API Header : Authorization       
     ▾ $(get_context_data "1" "organisation" "1" "name") Organisation
                Username : $(get_context_data "1" "dashboard-user" "1" "email")
                Password : $(get_context_data "1" "dashboard-user" "1" "password")
-        API Credentials : $(get_context_data "1" "dashboard-user" "1" "api-key")
+      Dashboard API Key : $(get_context_data "1" "dashboard-user" "1" "api-key")
     ▾ $(get_context_data "2" "organisation" "1" "name") Organisation
                Username : $(get_context_data "2" "dashboard-user" "1" "email")
                Password : $(get_context_data "2" "dashboard-user" "1" "password")
-        API Credentials : $(get_context_data "2" "dashboard-user" "1" "api-key")
+      Dashboard API Key : $(get_context_data "2" "dashboard-user" "1" "api-key")
     ▾ Multi-Organisation User
                Username : $(get_context_data "1" "dashboard-user" "2" "email")
                Password : $(get_context_data "1" "dashboard-user" "2" "password")
@@ -454,9 +456,9 @@ echo -e "\033[2K
   ▽ Gateway ($gateway_image_tag)
                     URL : $gateway_base_url
                URL(TCP) : $gateway_base_url_tcp
-        API Credentials : $gateway_api_credentials
-       API AuthZ Header : x-tyk-authorization
+     Gateway API Header : x-tyk-authorization
+        Gateway API Key : $gateway_api_credentials
   ▽ Gateway 2 ($gateway2_image_tag)
                     URL : $gateway2_base_url  
-        API Credentials : $gateway2_api_credentials
-       API AuthZ Header : x-tyk-authorization"
+     Gateway API Header : x-tyk-authorization
+        Gateway API Key : $gateway2_api_credentials"
