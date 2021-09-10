@@ -99,7 +99,7 @@ For more examples, check the `bootstrap.sh` files in other deployments.
 
 ### Context data directory
 
-The `.context-data` directory is used to store data generated during bootstrap scripts so that other scripts can access and use that data. This is particularly important for dynamic data, such as the ids of data added via the Dashboard API.
+The `.context-data` directory is used to store data generated during bootstrap scripts so that other scripts can access and use that data. This is particularly important for dynamic data, such as the ids of data added via the Dashboard API. The `scripts/common.sh` script contains functions to read (`get_context_data`) and write (`set_context_data`) this data.
 
 For example, the base Tyk deployment bootstrap script (`deployments/tyk/bootstrap.sh`) writes the Dashboard API credentials to `.context-data/dashboard-user-api-credentials`, which can then be read by other scripts. When the SSO deployment is used, its bootstrap script (`deployments/sso/bootstrap.sh`) reads the content of the file so that it can access the Dashboard API.
 
@@ -132,8 +132,8 @@ These utility scripts are available in the `scripts` directory:
 * `add-gateway.sh`: Creates a new Tyk Gateway container, using the same configuration as the base Tyk deployment Gateway
 * `common.sh`: Contains functions useful for bootstrap scripts
 * `export.sh`: Uses the Dashboard API to export API and Policy definitions, overwriting data used to bootstrap the base Tyk deployment
-* `import.sh`: Uses the Dashboard Admin API to import API and Policy definitions, using data used to bootstrap the base Tyk deployment
 * `test.sh`: Uses a Newman container to run the Postman collection tests
+* `update-hosts.sh`: Adds the necessary hosts to the `/etc/hosts` file
 
 # Working with APIs, Policies and Postman data
 
@@ -154,27 +154,16 @@ If you have made changes to APIs or Policies, you can run the export script to u
 ./scripts/export.sh
 ```
 
-This will update the `apis.json` and `policies.json` files in the `deployments/tyk/data/tyk-dashboard` directory.
+This will update the `apis.json` and `policies.json` files in the `deployments/tyk/data/tyk-dashboard` path. Other types of data will need to be exported manually, or update the `export.sh` script to include your data. Please ensure that any necessary data is automatically added to the deployment when the `up.sh` script is run.
 
-When adding functionality to this repo, please also add requests to the Postman collection to demonstrate the functionality. Include a description and enough tests to validate the response. Export the collection and overwrite the `tyk_demo.postman_collection.json` file.
+When adding functionality to this repo, please also add requests to the Postman collection to demonstrate the functionality. Include a description and enough tests to validate the response. Tests are especially important to avoid regressions, so please add them. Export the collection and overwrite the `tyk_demo.postman_collection.json` file in the deployment directory.
 
 ## Scenario 2: Synchronising updates from remote
 
-The simplest and best-practice approach is to simply bring the environment down, pull the repo then bring it back up again. The `up.sh` script includes an API and Policy import step, so all latest data will be imported:
+The simplest and best-practice approach is to simply bring the environment down, pull the repo then bring it back up again. The `up.sh` script includes commands to import APIs, Policies and other data, so all latest data will be imported:
 
 ```
 ./down.sh
 git pull
 ./up.sh
 ```
-
-Alternatively, you can import data into an existing deployment by first pulling the repo, then using the import script:
-
-```
-git pull
-./scripts/import.sh
-```
-
-## Why not use Tyk Sync?
-
-The Tyk Sync binary is not always kept up-to-date with the latest changes in API and Policy object, which unfortunately means that the data it exports may be missing information. This also means that when this data is imported into the system, that the objects created will also be missing this data. This issue will be addressed in a future release of Tyk Sync. In the mean time, it is safer to manually handle data import and export directly with the Dashboard API.
