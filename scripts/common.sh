@@ -5,10 +5,11 @@
 # this array defines the hostnames that the bootstrap script will verify, and that the update-hosts script will use to modify /etc/hosts
 declare -a tyk_demo_hostnames=("tyk-dashboard.localhost" "tyk-portal.localhost" "tyk-gateway.localhost" "tyk-gateway-2.localhost" "tyk-custom-domain.com" "tyk-worker-gateway.localhost" "acme-portal.localhost" "go-bench-suite.localhost")
 
+spinner_chars="/-\|"
+spinner_count=1
+
 function bootstrap_progress {
-  dot_count=$((dot_count+1))
-  dots=$(printf "%-${dot_count}s" ".")
-  echo -ne "  Bootstrapping $deployment ${dots// /.} \r"
+  printf "  Bootstrapping $deployment ${spinner_chars:spinner_count++%${#spinner_chars}:1} \r"
 }
 
 function log_http_result {
@@ -149,6 +150,14 @@ function hot_reload {
   fi
 }
 
+set_context_data() {
+  echo $5 > .context-data/$1-$2-$3-$4
+}
+
+get_context_data() {
+  echo $(cat .context-data/$1-$2-$3-$4)
+}
+
 check_licence_expiry() {
   # read licence line from .env file
   licence_line=$(grep "$1=" .env)
@@ -211,5 +220,384 @@ build_go_plugin() {
   else
     # if you want to force a recompile of the plugin .so file, delete the .bootstrap/go-plugin-build-version file, or run the docker command manually
     log_message "  $go_plugin_filename has already built for $gateway_image_tag, skipping"
+  fi
+}
+
+create_organisation() {
+  local organisation_data_path="$1"
+  local api_key="$2"
+  local data_group="$3"
+  local index="$4"
+  local organisation_id=$(jq -r '.id' $organisation_data_path)
+  local organisation_name=$(jq -r '.owner_name' $organisation_data_path)
+  local portal_hostname=$(jq -r '.cname' $organisation_data_path)
+
+  # create organisation in Tyk Dashboard database
+  log_message "  Creating Organisation: $organisation_name"
+  local api_response=$(curl $dashboard_base_url/admin/organisations/import -s \
+    -H "admin-auth: $api_key" \
+    -d @$organisation_data_path 2>> bootstrap.log)
+
+  # validate result
+  log_json_result "$api_response"
+  
+  # add details to context data
+  set_context_data "$data_group" "organisation" "$index" "id" "$organisation_id"
+  set_context_data "$data_group" "organisation" "$index" "name" "$organisation_name"
+  set_context_data "$data_group" "portal" "$index" "hostname" "$portal_hostname"
+
+  log_message "    Name: $organisation_name"
+  log_message "    Id: $organisation_id"
+  log_message "    Portal Hostname: $portal_hostname"
+}
+
+create_dashboard_user() {
+  local dashboard_user_data_path="$1"
+  local api_key="$2"
+  local data_group="$3"
+  local index="$4"
+  local dashboard_user_password=$(jq -r '.password' $dashboard_user_data_path)
+  
+  # create user in Tyk Dashboard database
+  log_message "  Creating Dashboard User: $(jq -r '.email_address' $dashboard_user_data_path)"
+  local api_response=$(curl $dashboard_base_url/admin/users -s \
+    -H "admin-auth: $api_key" \
+    -d @$dashboard_user_data_path 2>> bootstrap.log)
+
+  # validate result
+  log_json_result "$api_response"
+
+  # extract user data from response
+  local dashboard_user_id=$(echo $api_response | jq -r '.Meta.id')
+  local dashboard_user_email=$(echo $api_response | jq -r '.Meta.email_address')
+  local dashboard_user_api_key=$(echo $api_response | jq -r '.Meta.access_key')
+  local dashboard_user_organisation_id=$(echo $api_response | jq -r '.Meta.org_id')
+
+  # log user data
+  log_message "    Id: $dashboard_user_id"
+  log_message "    Email: $dashboard_user_email"
+  log_message "    API Key: $dashboard_user_api_key"
+  log_message "    Organisation Id: $dashboard_user_organisation_id"
+
+  # add data to global variables and context data
+  # dashboard_user_emails+=("$dashboard_user_email")
+  # dashboard_user_passwords+=("$dashboard_user_password")
+  # dashboard_user_api_keys+=("$dashboard_user_api_key")
+  # local dashboard_user_count=${#dashboard_user_emails[@]}
+  set_context_data "$data_group" "dashboard-user" "$index" "email" "$dashboard_user_email"
+  set_context_data "$data_group" "dashboard-user" "$index" "password" "$dashboard_user_password"
+  set_context_data "$data_group" "dashboard-user" "$index" "api-key" "$dashboard_user_api_key"
+  # echo "$dashboard_user_api_key" > ".context-data/dashboard-user-$dashboard_user_count-api-key"
+
+  # reset the password
+  log_message "  Resetting password for $dashboard_user_email"
+  api_response=$(curl $dashboard_base_url/api/users/$dashboard_user_id/actions/reset -s \
+    -H "authorization: $dashboard_user_api_key" \
+    --data-raw '{
+        "new_password":"'$dashboard_user_password'",
+        "user_permissions": { "IsAdmin": "admin" }
+      }' 2>> bootstrap.log)
+
+  log_json_result "$api_response"
+
+  log_message "    Password: $dashboard_user_password"
+}
+
+create_user_group() {
+  local user_group_data_path="$1"
+  local api_key="$2"
+  local data_group="$3"
+  local index="$4"
+  local user_group_name=$(jq -r '.name' $user_group_data_path)
+
+  # create user group in Tyk Dashboard database
+  log_message "  Creating User Group: $user_group_name"
+  local api_response=$(curl $dashboard_base_url/api/usergroups -s \
+    -H "Authorization: $api_key" \
+    -d @$user_group_data_path 2>> bootstrap.log)
+
+  # validate result
+  log_json_result "$api_response"
+  
+  # extract data from response
+  local user_group_id=$(echo "$api_response" | jq -r '.Meta')
+
+  set_context_data "$data_group" "dashboard-user-group" "$index" "id" "$user_group_id"
+
+  log_message "    Id: $user_group_id"
+}
+
+create_webhook() {
+  local webhook_data_path="$1"
+  local api_key="$2"
+  local webhook_name=$(jq -r '.name' $webhook_data_path)
+
+  # create webhook in Tyk Dashboard database
+  log_message "  Creating Webhook: $webhook_name"
+  local api_response=$(curl $dashboard_base_url/api/hooks -s \
+    -H "Authorization: $api_key" \
+    -d @$webhook_data_path 2>> bootstrap.log)
+
+  # validate result
+  log_json_result "$api_response"
+
+  # the /api/hooks endpoint doesn't return the webhook id, so we can't save any context data
+}
+
+initialise_portal() {
+  local organisation_id="$1"
+  local api_key="$2"
+
+  log_message "  Creating default settings"
+  local api_response=$(curl $dashboard_base_url/api/portal/configuration -s \
+    -H "Authorization: $api_key" \
+    -d "{}" 2>> bootstrap.log)
+  log_json_result "$api_response"
+
+  log_message "  Initialising Catalogue"
+  api_response=$(curl $dashboard_base_url/api/portal/catalogue -s \
+    -H "Authorization: $api_key" \
+    -d '{"org_id": "'$organisation_id'"}' 2>> bootstrap.log)
+  log_json_result "$api_response"
+  
+  catalogue_id=$(echo "$api_response" | jq -r '.Message')
+  log_message "    Id: $catalogue_id"
+}
+
+create_portal_page() {
+  local page_data_path="$1"
+  local api_key="$2"
+  local page_title=$(jq -r '.title' $page_data_path)
+
+  log_message "  Creating Page: $page_title"
+
+  log_json_result "$(curl $dashboard_base_url/api/portal/pages -s \
+    -H "Authorization: $api_key" \
+    -d @$page_data_path 2>> bootstrap.log)"
+}
+
+create_portal_developer() {
+  local developer_data_path="$1"
+  local api_key="$2"
+  local index="$3"
+  local developer_email=$(jq -r '.email' $developer_data_path)
+  local developer_password=$(jq -r '.password' $developer_data_path)
+  log_message "  Creating Developer: $developer_email"
+
+  local api_response=$(curl $dashboard_base_url/api/portal/developers -s \
+    -H "Authorization: $api_key" \
+    -d @$developer_data_path 2>> bootstrap.log)
+  log_json_result "$api_response"
+
+  set_context_data "$data_group" "portal-developer" "$index" "email" "$developer_email"
+  set_context_data "$data_group" "portal-developer" "$index" "password" "$developer_password"
+
+  log_message "    Password: $developer_password"
+}
+
+create_portal_documentation() {
+  local documentation_data_path="$1"
+  local api_key="$2"
+  local documentation_title=$(jq -r '.info.title' $documentation_data_path)
+  log_message "  Creating Documentation: $documentation_title"
+
+  # replace with sed or jq?
+  echo -n '{
+            "api_id":"",
+            "doc_type":"swagger",
+            "documentation":"' >/tmp/swagger_encoded.out
+  cat $documentation_data_path | base64 >>/tmp/swagger_encoded.out
+  echo '"}' >>/tmp/swagger_encoded.out
+
+  local api_response=$(curl $dashboard_base_url/api/portal/documentation -s \
+    -H "Authorization: $api_key" \
+    -d "@/tmp/swagger_encoded.out" \
+      2>> bootstrap.log)
+
+  log_json_result "$api_response"
+
+  rm /tmp/swagger_encoded.out
+
+  local documentation_id=$(echo "$api_response" | jq -r '.Message')
+
+  log_message "    Id: $documentation_id"
+
+  echo "$documentation_id"
+}
+
+create_portal_catalogue() {
+  local catalogue_data_path="$1"
+  local api_key="$2"
+  local documentation_id="$3"
+  local catalogue_name=$(jq -r '.name' $catalogue_data_path)
+
+  log_message "  Adding Catalogue Entry: $catalogue_name"
+
+  # get the existing catalogue
+  catalogue="$(curl $dashboard_base_url/api/portal/catalogue -s \
+    -H "Authorization: $api_key" 2>> bootstrap.log)"
+
+  # add documentation id to new catalogue
+  new_catalogue=$(jq --arg documentation_id "$documentation_id" '.documentation = $documentation_id' $catalogue_data_path)
+
+  # update the catalogue with the new catalogue entry
+  updated_catalogue=$(jq --argjson new_catalogue "[$new_catalogue]" '.apis += $new_catalogue' <<< "$catalogue")
+
+  log_json_result "$(curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
+    -H "Authorization: $api_key" \
+    -d "$updated_catalogue" 2>> bootstrap.log)"
+}
+
+create_api() {
+  local api_data_path="$1"
+  local admin_api_key="$2"
+  local dashboard_api_key="$3"
+  local api_name=$(jq -r '.api_definition.name' $api_data_path)
+  local api_id=$(jq -r '.api_definition.id' $api_data_path)
+  local api_data="$(cat $api_data_path)"
+
+  log_message "  Importing API: $api_name"
+
+  import_request_payload=$(jq --slurpfile new_api "$api_data_path" '.apis += $new_api' deployments/tyk/data/tyk-dashboard/admin-api-apis-import-template.json)
+
+  api_response="$(curl $dashboard_base_url/admin/apis/import -s \
+    -H "admin-auth: $admin_api_key" \
+    -d "$import_request_payload" 2>> bootstrap.log)"
+
+  log_json_result "$api_response"
+
+  # Update any webhook references
+  webhook_reference_count=$(jq '.hook_references | length' $api_data_path)
+  if [ "$webhook_reference_count" -gt "0" ]; then
+    webhook_data=$(curl $dashboard_base_url/api/hooks?p=-1 -s \
+      -H "Authorization: $dashboard_api_key" | \
+      jq '.hooks[]')
+
+    # loop through each webhook referenced in the API
+    while read webhook_name; do
+      log_message "  Updating Webhook Reference: $webhook_name"
+
+      new_webhook_id=$(jq -r --arg webhook_name "$webhook_name" 'select ( .name == $webhook_name ) .id' <<< "$webhook_data")
+      
+      # update the hook reference id, matching by the webhook name
+      api_data=$(jq --arg webhook_id "$new_webhook_id" --arg webhook_name "$webhook_name" '(.hook_references[] | select(.hook.name == $webhook_name) .hook.id) = $webhook_id' <<< "$api_data")
+
+      # update the AuthFailure event handler, if it exists
+      # if more events are added then additional code will be needed to handle them
+      api_data=$(jq --arg webhook_id "$new_webhook_id" --arg webhook_name "$webhook_name" '(.api_definition.event_handlers.events.AuthFailure[]? | select(.handler_meta.name == $webhook_name) .handler_meta.id) = $webhook_id' <<< "$api_data")
+
+      log_message "    Id: $new_webhook_id"
+    done <<< "$(jq -c -r '.hook_references[].hook.name' $api_data_path)"
+  fi
+
+  log_message "  Updating API: $api_name"
+
+  api_response="$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
+    -H "Authorization: $dashboard_api_key" \
+    -d "$api_data" 2>> bootstrap.log)"
+
+  log_json_result "$api_response"
+
+  log_message "    Id: $api_id"
+}
+
+create_policy() {
+  local policy_data_path="$1"
+  local api_key="$2"
+  local dashboard_api_key="$3"
+  local policy_name=$(jq -r '.name' $policy_data_path)
+  local policy_id=$(jq -r '._id' $policy_data_path)
+
+  log_message "  Importing Policy: $policy_name"
+
+  import_request_payload=$(jq --slurpfile new_policy "$policy_data_path" '.Data += $new_policy' deployments/tyk/data/tyk-dashboard/admin-api-policies-import-template.json)
+
+  api_response="$(curl $dashboard_base_url/admin/policies/import -s \
+    -H "admin-auth: $api_key" \
+    -d "$import_request_payload" 2>> bootstrap.log)"
+
+  log_json_result "$api_response"
+
+  log_message "  Updating Policy: $policy_name"
+
+  policy_data=$(cat $policy_data_path)
+
+  update_request_payload=$(jq --argjson policy_data "$policy_data" --arg policy_id "$policy_id" '.variables.id = $policy_id | .variables.input = $policy_data' deployments/tyk/data/tyk-dashboard/dashboard-graphql-api-policy-update-template.json)
+
+  api_response="$(curl $dashboard_base_url/graphql -s \
+    -H "Authorization: $dashboard_api_key" \
+    -d "$update_request_payload" 2>> bootstrap.log)"
+
+  # currently custom approach to extracting the graphql response status
+  response_status="$(jq -r '.data.update_policy.status' <<< "$api_response")"
+  
+  # custom validation
+  if [[ "$response_status" == "OK" ]]; then
+    log_ok
+    log_message "    Id: $policy_id"
+  else
+    log_message "ERROR updating policy: $(jq -r '.data.update_policy.message' <<< "$api_response")"
+    exit 1
+  fi
+}
+
+create_basic_key() {
+  local basic_key_data_path="$1"
+  local api_key="$2"
+  local file_name="$(basename $basic_key_data_path)"
+  # username is taken from the filename, using the 3rd hypenated segment and excluding the extension e.g. "basic-1-basic_auth_username.json" results in "basic_auth_username"
+  local username="$(echo "$file_name" | cut -d. -f1 | cut -d- -f3)"
+  local password="$(jq -r '.basic_auth_data.password' $basic_key_data_path)"
+
+  if [[ "$username" == "" ]]; then
+    log_message "ERROR: Could not extract username from filename $file_name"
+    exit 1
+  fi
+
+  log_message "  Adding Basic Key: $username"
+
+  api_response_status_code="$(curl $dashboard_base_url/api/apis/keys/basic/$username -s -w "%{http_code}" -o /dev/null \
+    -H "Authorization: $api_key" \
+    -d @$basic_key_data_path 2>> bootstrap.log)"
+
+  # custom validation
+  if [[ "$api_response_status_code" == "200" ]]; then
+    log_ok
+    log_message "    Password: $password"
+  else
+    log_message "ERROR: Could not create basic key. API response status code: $api_response_status_code."
+    exit 1
+  fi
+}
+
+create_bearer_token() {
+  local bearer_token_data_path="$1"
+  local api_key="$2"
+  local file_name="$(basename $bearer_token_data_path)"
+  # key name is taken from the filename, using the 4th hypenated segment and excluding the extension e.g. "basic-1-username.json" results in "username"
+  local key_name="$(echo "$file_name" | cut -d. -f1 | cut -d- -f4)"
+
+  if [[ "$key_name" == "" ]]; then
+    log_message "ERROR: Could not extract key name from filename $file_name"
+    exit 1
+  fi
+
+  log_message "  Adding Bearer Token: $key_name"
+
+  # currently hard-coded to target a single gateway "$gateway_base_url"
+  api_response=$(curl $gateway_base_url/tyk/keys/$key_name -s \
+    -H "x-tyk-authorization: $api_key" \
+    -d @$bearer_token_data_path 2>> bootstrap.log)
+
+  response_status="$(jq -r '.status' <<< "$api_response")"
+
+  # custom validation
+  if [[ "$response_status" == "ok" ]]; then
+    log_ok
+    log_message "    Key: $(jq -r '.key' <<< "$api_response")"
+    log_message "    Hash: $(jq -r '.key_hash' <<< "$api_response")"
+  else
+    log_message "ERROR: Could not create bearer token. API response returned $api_response."
+    exit 1
   fi
 }

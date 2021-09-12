@@ -4,48 +4,38 @@
 
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 
-organisation_1_name=$(cat .context-data/organisation-name)
-dashboard_user_api_credentials=$(cat .context-data/dashboard-user-api-credentials)
+declare -a data_groups=("1" "2")
+declare -a organisation_names=("$(cat .context-data/1-organisation-1-name)" "$(cat .context-data/2-organisation-1-name)")
+declare -a dashboard_keys=("$(cat .context-data/1-dashboard-user-1-api-key)" "$(cat .context-data/2-dashboard-user-1-api-key)")
 
-organisation_2_name=$(cat .context-data/organisation-2-name)
-dashboard_user_organisation_2_api_credentials=$(cat .context-data/dashboard-user-organisations-2-api-credentials)
+index=0
+for data_group in "${data_groups[@]}"; do\
+  echo "Exporting APIs for organisation: ${organisation_names[$index]}"
+  apis=$(curl $dashboard_base_url/api/apis?p=-1 -s \
+    -H "Authorization:${dashboard_keys[$index]}" \
+    | jq -c '.apis[]')
+  file_count=1
+  while read -r api; do
+    if [[ "$api" != "" ]]; then
+      echo "  $(jq -r '.api_definition.name' <<< $api)"
+      echo "$api" | jq '.' > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/apis/api-$file_count.json"
+      file_count=$((file_count+1))
+    fi 
+  done <<< "$apis"
 
-echo "Exporting APIs for organisation: $organisation_1_name"
-curl $dashboard_base_url/api/apis?p=-1 -s \
-  -H "Authorization:$dashboard_user_api_credentials" \
-  | jq '.' \
-  > deployments/tyk/data/tyk-dashboard/apis.json
-cat deployments/tyk/data/tyk-dashboard/apis.json | jq --raw-output '.apis[].api_definition.name' | while read api_name
-do
-  echo "  $api_name"
-done
-
-echo "Exporting Policies for organisation: $organisation_1_name"
-curl $dashboard_base_url/api/portal/policies?p=-1 -s \
-  -H "Authorization:$dashboard_user_api_credentials" \
-  | jq '.' \
-  > deployments/tyk/data/tyk-dashboard/policies.json
-cat deployments/tyk/data/tyk-dashboard/policies.json | jq --raw-output '.Data[].name' | while read policy_name
-do
-  echo "  $policy_name"
-done
-
-echo "Exporting APIs for organisation: $organisation_2_name"
-curl $dashboard_base_url/api/apis?p=-1 -s \
-  -H "Authorization:$dashboard_user_organisation_2_api_credentials" \
-  | jq '.' \
-  > deployments/tyk/data/tyk-dashboard/apis-organisation-2.json
-cat deployments/tyk/data/tyk-dashboard/apis-organisation-2.json | jq --raw-output '.apis[].api_definition.name' | while read api_name
-do
-  echo "  $api_name"
-done
-
-echo "Exporting Policies for organisation: $organisation_2_name"
-curl $dashboard_base_url/api/portal/policies?p=-1 -s \
-  -H "Authorization:$dashboard_user_organisation_2_api_credentials" \
-  | jq '.' \
-  > deployments/tyk/data/tyk-dashboard/policies-organisation-2.json
-cat deployments/tyk/data/tyk-dashboard/policies-organisation-2.json | jq --raw-output '.Data[].name' | while read policy_name
-do
-  echo "  $policy_name"
+  echo "Exporting Policies for organisation: ${organisation_names[$index]}"
+  policies=$(curl $dashboard_base_url/api/portal/policies?p=-1 -s \
+    -H "Authorization:${dashboard_keys[$index]}" \
+    | jq -c '.Data[]')
+  echo "$policies" > "test-$index.json"
+  file_count=1
+  while read -r policy; do
+    if [[ "$policy" != "" ]]; then
+      echo "  $(jq -r '.name' <<< $policy)"
+      echo "$policy" | jq '.' > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/policies/policy-$file_count.json"
+      file_count=$((file_count+1))
+    fi
+  done <<< "$policies"
+  
+  index=$((index+1))
 done
