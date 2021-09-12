@@ -30,6 +30,11 @@ Both the `volumes` and `data` directories should contain sub-directories named a
 
 For example, in the `tyk` deployment, the Tyk Gateway's (`tyk-gateway`) configuration file (`tyk.conf`) is mapped as a volume, so has the path `volumes/tyk-gateway/tyk.conf`.
 
+### Data Groups
+
+Numbered directories within the `/data/tyk-dashboard` directory allow the data files to be grouped and processed in a segmented manner. This approach simplifies bootstrapping of separate organisations and recording resulting data.
+
+The bootstrap and export scripts are written to iterate through these directories, processing them in numerical order.
 ## Docker Compose
 
 The deployment's Docker Compose file must be named `docker-compose.yml`, and contain the services required by the deployment.
