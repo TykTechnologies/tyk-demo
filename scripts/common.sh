@@ -396,22 +396,15 @@ create_portal_documentation() {
   local documentation_title=$(jq -r '.info.title' $documentation_data_path)
   log_message "  Creating Documentation: $documentation_title"
 
-  # replace with sed or jq?
-  echo -n '{
-            "api_id":"",
-            "doc_type":"swagger",
-            "documentation":"' >/tmp/swagger_encoded.out
-  cat $documentation_data_path | base64 >>/tmp/swagger_encoded.out
-  echo '"}' >>/tmp/swagger_encoded.out
+  encoded_documentation=$(cat $documentation_data_path | base64)
+  documentation_payload=$(jq --arg documentation "$encoded_documentation" '.documentation = $documentation' deployments/tyk/data/tyk-dashboard/dashboard-api-portal-documentation-create-template.json)
 
   local api_response=$(curl $dashboard_base_url/api/portal/documentation -s \
     -H "Authorization: $api_key" \
-    -d "@/tmp/swagger_encoded.out" \
+    -d "$documentation_payload" \
       2>> bootstrap.log)
 
   log_json_result "$api_response"
-
-  rm /tmp/swagger_encoded.out
 
   local documentation_id=$(echo "$api_response" | jq -r '.Message')
 
