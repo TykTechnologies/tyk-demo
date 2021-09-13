@@ -3676,6 +3676,33 @@
 											"pm.test(\"Response contains keys object\", function () {",
 											"    var jsonData = pm.response.json();",
 											"    pm.expect(jsonData.keys).to.not.be.null;",
+											"});",
+											"",
+											"pm.test(\"Keys array is not empty\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.keys.length).to.be.gt(0);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// create a key so that at least one key exists",
+											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
+											"var tykGatewayApiKey = pm.variables.get(\"tyk-gateway.api-key\");",
+											"",
+											"var makeKeyRequest = {",
+											"    url: 'http://' + tykGatewayHost + '/tyk/keys/get-all-keys-test',",
+											"    method: 'POST',",
+											"    header: 'x-tyk-authorization: ' + tykGatewayApiKey,",
+											"    body: '{ \"last_check\": 0, \"allowance\": 1000, \"rate\": 1000, \"per\": 60, \"throttle_interval\": -1, \"throttle_retry_limit\": -1, \"expires\": 0, \"quota_max\": -1, \"quota_renews\": 1587524070, \"quota_remaining\": -1, \"quota_renewal_rate\": -1, \"access_rights\": { \"accbdd1b89e84ec97f4f16d4e3197d5c\": { \"api_name\": \"Basic Protected API\", \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\": [\"Default\"], \"allowed_urls\": [], \"limit\": null, \"allowance_scope\": \"\" } }, \"org_id\": \"5e9d9544a1dcd60001d0ed20\" }'",
+											"};",
+											"",
+											"pm.sendRequest(makeKeyRequest, function (err, response) { ",
+											"    pm.expect(response.code).to.eql(200);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -3726,14 +3753,30 @@
 											"    pm.expect(jsonData.action).to.eql(\"added\");",
 											"});",
 											"",
-											"pm.test(\"Key value returned\", function () {",
+											"pm.test(\"Encoded key value returned\", function () {",
 											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.key).length.to.be.gt(0)",
+											"    pm.expect(jsonData.key).to.not.be.empty",
 											"});",
 											"",
 											"pm.test(\"Key hash value returned\", function () {",
 											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.key_hash).length.to.be.gt(0)",
+											"    pm.expect(jsonData.key_hash).to.not.be.empty",
+											"});",
+											"",
+											"pm.test(\"Key is created\", function () {",
+											"    var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
+											"    var tykGatewayApiKey = pm.variables.get(\"tyk-gateway.api-key\");",
+											"    var key = pm.response.json().key;",
+											"",
+											"    var makeKeyRequest = {",
+											"        url: 'http://' + tykGatewayHost + '/tyk/keys/' + key,",
+											"        method: 'GET',",
+											"        header: 'x-tyk-authorization: ' + tykGatewayApiKey",
+											"    };",
+											"",
+											"    pm.sendRequest(makeKeyRequest, function (err, response) { ",
+											"        pm.expect(response.code).to.eql(200);",
+											"    });",
 											"});"
 										],
 										"type": "text/javascript"
@@ -3773,6 +3816,89 @@
 							"response": []
 						},
 						{
+							"name": "Create a custom key",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is ok\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.status).to.eql(\"ok\");",
+											"});",
+											"",
+											"pm.test(\"Action is added\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.action).to.eql(\"added\");",
+											"});",
+											"",
+											"pm.test(\"Key value returned\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.key).length.to.be.gt(0)",
+											"});",
+											"",
+											"pm.test(\"Key hash value returned\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.key_hash).length.to.be.gt(0)",
+											"});",
+											"",
+											"pm.test(\"Key is created\", function () {",
+											"    var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
+											"    var tykGatewayApiKey = pm.variables.get(\"tyk-gateway.api-key\");",
+											"",
+											"    var makeKeyRequest = {",
+											"        url: 'http://' + tykGatewayHost + '/tyk/keys/eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImN1c3RvbS1rZXktdGVzdCIsImgiOiJtdXJtdXI2NCJ9',",
+											"        method: 'GET',",
+											"        header: 'x-tyk-authorization: ' + tykGatewayApiKey",
+											"    };",
+											"",
+											"    pm.sendRequest(makeKeyRequest, function (err, response) { ",
+											"        pm.expect(response.code).to.eql(200);",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-tyk-authorization",
+										"value": "{{tyk-gateway.api-key}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"last_check\": 0,\n\t\"allowance\": 1000,\n\t\"rate\": 1000,\n\t\"per\": 60,\n\t\"throttle_interval\": -1,\n\t\"throttle_retry_limit\": -1,\n\t\"expires\": 0,\n\t\"quota_max\": -1,\n\t\"quota_renews\": 1587524070,\n\t\"quota_remaining\": -1,\n\t\"quota_renewal_rate\": -1,\n\t\"access_rights\": {\n\t\t\"accbdd1b89e84ec97f4f16d4e3197d5c\": {\n\t\t\t\"api_name\": \"Basic Protected API\",\n\t\t\t\"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\n\t\t\t\"versions\": [\"Default\"],\n\t\t\t\"allowed_urls\": [],\n\t\t\t\"limit\": null,\n\t\t\t\"allowance_scope\": \"\"\n\t\t}\n\t},\n\t\"org_id\": \"5e9d9544a1dcd60001d0ed20\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/tyk/keys/custom-key-test",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"tyk",
+										"keys",
+										"custom-key-test"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Get a key",
 							"event": [
 								{
@@ -3786,36 +3912,30 @@
 											"pm.test(\"Response contains key data\", function () {",
 											"    var jsonData = pm.response.json();",
 											"    pm.expect(jsonData.date_created).to.not.be.empty;",
-											"});",
-											"",
-											"// validate by creating a new key and trying to retrieve it",
+											"    pm.expect(jsonData.org_id).to.equal(\"5e9d9544a1dcd60001d0ed20\")",
+											"    pm.expect(jsonData.access_rights.accbdd1b89e84ec97f4f16d4e3197d5c.api_id).to.equal(\"accbdd1b89e84ec97f4f16d4e3197d5c\")",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// create a custom key so that the request can retrieve it",
 											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 											"var tykGatewayApiKey = pm.variables.get(\"tyk-gateway.api-key\");",
 											"",
 											"var makeKeyRequest = {",
-											"    url: 'http://' + tykGatewayHost + '/tyk/keys',",
+											"    url: 'http://' + tykGatewayHost + '/tyk/keys/get-key-test',",
 											"    method: 'POST',",
 											"    header: 'x-tyk-authorization: ' + tykGatewayApiKey,",
 											"    body: '{ \"last_check\": 0, \"allowance\": 1000, \"rate\": 1000, \"per\": 60, \"throttle_interval\": -1, \"throttle_retry_limit\": -1, \"expires\": 0, \"quota_max\": -1, \"quota_renews\": 1587524070, \"quota_remaining\": -1, \"quota_renewal_rate\": -1, \"access_rights\": { \"accbdd1b89e84ec97f4f16d4e3197d5c\": { \"api_name\": \"Basic Protected API\", \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\": [\"Default\"], \"allowed_urls\": [], \"limit\": null, \"allowance_scope\": \"\" } }, \"org_id\": \"5e9d9544a1dcd60001d0ed20\" }'",
 											"};",
 											"",
-											"// Test that new key can be retrieved",
-											"pm.test(\"API key can be retrieved\", function () {",
-											"    // Create new key",
-											"    pm.sendRequest(makeKeyRequest, function (err, response) { ",
-											"        pm.expect(response.code).to.eql(200);",
-											"        var responseJson = response.json();",
-											"        pm.expect(responseJson.key).to.be.not.empty;",
-											"        var key = responseJson.key;",
-											"        var getKeyRequest = {",
-											"            url: 'http://' + tykGatewayHost + '/tyk/keys/' + key,",
-											"            method: 'GET',",
-											"            header: 'x-tyk-authorization: ' + tykGatewayApiKey,",
-											"        };  ",
-											"        pm.sendRequest(getKeyRequest, function (err, response) { ",
-											"            pm.expect(response.code).to.eql(200);",
-											"        });",
-											"    });",
+											"pm.sendRequest(makeKeyRequest, function (err, response) { ",
+											"    pm.expect(response.code).to.eql(200);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -3832,7 +3952,7 @@
 									}
 								],
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/tyk/keys/eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImF1dGhfa2V5IiwiaCI6Im11cm11cjY0In0=",
+									"raw": "http://{{tyk-gateway.host}}/tyk/keys/eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImdldC1rZXktdGVzdCIsImgiOiJtdXJtdXI2NCJ9",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
@@ -3840,10 +3960,193 @@
 									"path": [
 										"tyk",
 										"keys",
-										"eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImF1dGhfa2V5IiwiaCI6Im11cm11cjY0In0="
+										"eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImdldC1rZXktdGVzdCIsImgiOiJtdXJtdXI2NCJ9"
 									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update a key",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is ok\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.status).to.eql(\"ok\");",
+											"});",
+											"",
+											"pm.test(\"Action is modified\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.action).to.eql(\"modified\");",
+											"});",
+											"",
+											"pm.test(\"Key rate is updated to 999\", function () {",
+											"    // create a custom key so that the request can update it",
+											"    var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
+											"    var tykGatewayApiKey = pm.variables.get(\"tyk-gateway.api-key\");",
+											"",
+											"    var makeKeyRequest = {",
+											"        url: 'http://' + tykGatewayHost + '/tyk/keys/eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6InVwZGF0ZS1rZXktdGVzdCIsImgiOiJtdXJtdXI2NCJ9',",
+											"        method: 'GET',",
+											"        header: 'x-tyk-authorization: ' + tykGatewayApiKey",
+											"    };",
+											"",
+											"    pm.sendRequest(makeKeyRequest, function (err, response) { ",
+											"        var jsonData = response.json();",
+											"        pm.expect(jsonData.rate).to.eql(999);",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
 								},
-								"description": "Gets the custom key `auth_key` created by the bootstrap."
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// create a custom key so that the request can update it",
+											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
+											"var tykGatewayApiKey = pm.variables.get(\"tyk-gateway.api-key\");",
+											"",
+											"var makeKeyRequest = {",
+											"    url: 'http://' + tykGatewayHost + '/tyk/keys/update-key-test',",
+											"    method: 'POST',",
+											"    header: 'x-tyk-authorization: ' + tykGatewayApiKey,",
+											"    body: '{ \"last_check\": 0, \"allowance\": 1000, \"rate\": 1000, \"per\": 60, \"throttle_interval\": -1, \"throttle_retry_limit\": -1, \"expires\": 0, \"quota_max\": -1, \"quota_renews\": 1587524070, \"quota_remaining\": -1, \"quota_renewal_rate\": -1, \"access_rights\": { \"accbdd1b89e84ec97f4f16d4e3197d5c\": { \"api_name\": \"Basic Protected API\", \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\": [\"Default\"], \"allowed_urls\": [], \"limit\": null, \"allowance_scope\": \"\" } }, \"org_id\": \"5e9d9544a1dcd60001d0ed20\" }'",
+											"};",
+											"",
+											"pm.sendRequest(makeKeyRequest, function (err, response) { ",
+											"    pm.expect(response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-tyk-authorization",
+										"value": "{{tyk-gateway.api-key}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"last_check\": 0,\n    \"allowance\": 1000,\n    \"rate\": 999,\n    \"per\": 60,\n    \"throttle_interval\": -1,\n    \"throttle_retry_limit\": -1,\n    \"expires\": 0,\n    \"quota_max\": -1,\n    \"quota_renews\": 1587524070,\n    \"quota_remaining\": -1,\n    \"quota_renewal_rate\": -1,\n    \"access_rights\": {\n        \"accbdd1b89e84ec97f4f16d4e3197d5c\": {\n            \"api_name\": \"Basic Protected API\",\n            \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\n            \"versions\": [\n                \"Default\"\n            ],\n            \"allowed_urls\": [],\n            \"limit\": null,\n            \"allowance_scope\": \"\"\n        }\n    },\n    \"org_id\": \"5e9d9544a1dcd60001d0ed20\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/tyk/keys/eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6InVwZGF0ZS1rZXktdGVzdCIsImgiOiJtdXJtdXI2NCJ9",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"tyk",
+										"keys",
+										"eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6InVwZGF0ZS1rZXktdGVzdCIsImgiOiJtdXJtdXI2NCJ9"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a key",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is ok\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.status).to.eql(\"ok\");",
+											"});",
+											"",
+											"pm.test(\"Action is deleted\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.action).to.eql(\"deleted\");",
+											"});",
+											"",
+											"pm.test(\"Key is deleted\", function () {",
+											"    // create a custom key so that the request can update it",
+											"    var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
+											"    var tykGatewayApiKey = pm.variables.get(\"tyk-gateway.api-key\");",
+											"",
+											"    var makeKeyRequest = {",
+											"        url: 'http://' + tykGatewayHost + '/tyk/keys/eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImRlbGV0ZS1rZXktdGVzdCIsImgiOiJtdXJtdXI2NCJ9',",
+											"        method: 'GET',",
+											"        header: 'x-tyk-authorization: ' + tykGatewayApiKey",
+											"    };",
+											"",
+											"    pm.sendRequest(makeKeyRequest, function (err, response) { ",
+											"        pm.expect(response.code).to.eql(404);",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// create a custom key so that the request can delete it",
+											"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
+											"var tykGatewayApiKey = pm.variables.get(\"tyk-gateway.api-key\");",
+											"",
+											"var makeKeyRequest = {",
+											"    url: 'http://' + tykGatewayHost + '/tyk/keys/delete-key-test',",
+											"    method: 'POST',",
+											"    header: 'x-tyk-authorization: ' + tykGatewayApiKey,",
+											"    body: '{ \"last_check\": 0, \"allowance\": 1000, \"rate\": 1000, \"per\": 60, \"throttle_interval\": -1, \"throttle_retry_limit\": -1, \"expires\": 0, \"quota_max\": -1, \"quota_renews\": 1587524070, \"quota_remaining\": -1, \"quota_renewal_rate\": -1, \"access_rights\": { \"accbdd1b89e84ec97f4f16d4e3197d5c\": { \"api_name\": \"Basic Protected API\", \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\": [\"Default\"], \"allowed_urls\": [], \"limit\": null, \"allowance_scope\": \"\" } }, \"org_id\": \"5e9d9544a1dcd60001d0ed20\" }'",
+											"};",
+											"",
+											"pm.sendRequest(makeKeyRequest, function (err, response) { ",
+											"    pm.expect(response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-tyk-authorization",
+										"value": "{{tyk-gateway.api-key}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/tyk/keys/eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImRlbGV0ZS1rZXktdGVzdCIsImgiOiJtdXJtdXI2NCJ9",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"tyk",
+										"keys",
+										"eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImRlbGV0ZS1rZXktdGVzdCIsImgiOiJtdXJtdXI2NCJ9"
+									]
+								}
 							},
 							"response": []
 						}
