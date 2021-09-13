@@ -94,16 +94,27 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     # Dashboard Users
     log_message "Creating Dashboard Users"
     index=1
+    admin_user_index=-1
     for file in $data_group_path/users/*; do
       if [[ -f $file ]]; then
         create_dashboard_user "$file" "$dashboard_admin_api_credentials" "$data_group" "$index"
+        is_admin="$(jq -r '.user_permissions.IsAdmin' $file)"
+        if [[ "$is_admin" == "admin" ]]; then
+          admin_user_index=$index
+        fi
         index=$((index + 1))
         bootstrap_progress
       fi
-    done
 
-    # first user added should be an admin, so that it's key can be used for Dashboard API calls
-    dashboard_user_api_key=$(get_context_data "$data_group" "dashboard-user" "1" "api-key")
+      if [ "$admin_user_index" -eq "-1" ]; then
+        log_message "ERROR: No Dashboard admin user found in data group $data_group_path"
+        exit 1
+      fi
+    done
+    log_message "  Dashboard admin user index: $admin_user_index"
+
+    # get admin user dashboard API key for Dashboard API calls
+    dashboard_user_api_key=$(get_context_data "$data_group" "dashboard-user" "$admin_user_index" "api-key")
 
     # User Groups
     log_message "Creating Dashboard User Groups"
