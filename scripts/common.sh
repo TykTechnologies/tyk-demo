@@ -280,14 +280,9 @@ create_dashboard_user() {
   log_message "    Organisation Id: $dashboard_user_organisation_id"
 
   # add data to global variables and context data
-  # dashboard_user_emails+=("$dashboard_user_email")
-  # dashboard_user_passwords+=("$dashboard_user_password")
-  # dashboard_user_api_keys+=("$dashboard_user_api_key")
-  # local dashboard_user_count=${#dashboard_user_emails[@]}
   set_context_data "$data_group" "dashboard-user" "$index" "email" "$dashboard_user_email"
   set_context_data "$data_group" "dashboard-user" "$index" "password" "$dashboard_user_password"
   set_context_data "$data_group" "dashboard-user" "$index" "api-key" "$dashboard_user_api_key"
-  # echo "$dashboard_user_api_key" > ".context-data/dashboard-user-$dashboard_user_count-api-key"
 
   # reset the password
   log_message "  Resetting password for $dashboard_user_email"
