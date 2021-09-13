@@ -3663,7 +3663,7 @@
 					"name": "Gateway API",
 					"item": [
 						{
-							"name": "Get all keys",
+							"name": "Get all Keys",
 							"event": [
 								{
 									"listen": "test",
@@ -3675,7 +3675,7 @@
 											"",
 											"pm.test(\"Response contains keys object\", function () {",
 											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.keys).to.not.be.null;",
+											"    pm.expect(jsonData.keys).to.not.be.undefined;",
 											"});",
 											"",
 											"pm.test(\"Keys array is not empty\", function () {",
@@ -3733,7 +3733,7 @@
 							"response": []
 						},
 						{
-							"name": "Create a key",
+							"name": "Create a Key",
 							"event": [
 								{
 									"listen": "test",
@@ -3816,7 +3816,7 @@
 							"response": []
 						},
 						{
-							"name": "Create a custom key",
+							"name": "Create a custom Key",
 							"event": [
 								{
 									"listen": "test",
@@ -3899,7 +3899,7 @@
 							"response": []
 						},
 						{
-							"name": "Get a key",
+							"name": "Get a Key",
 							"event": [
 								{
 									"listen": "test",
@@ -3967,7 +3967,7 @@
 							"response": []
 						},
 						{
-							"name": "Update a key",
+							"name": "Update a Key",
 							"event": [
 								{
 									"listen": "test",
@@ -4064,7 +4064,7 @@
 							"response": []
 						},
 						{
-							"name": "Delete a key",
+							"name": "Delete a Key",
 							"event": [
 								{
 									"listen": "test",
@@ -4151,6 +4151,444 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "Dashboard Admin API",
+					"item": [
+						{
+							"name": "Get all Organisations",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response contains organisations object\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.organisations).to.not.be.undefined;",
+											"});",
+											"",
+											"pm.test(\"Organisations array is not empty\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.organisations.length).to.be.gt(0);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// create an organisation so that at least one organisation exists",
+											"var tykDashboardHost = pm.variables.get(\"tyk-dashboard.host\");",
+											"var tykDashboardAdminApiKey = pm.variables.get(\"tyk-dashboard.admin-api-key\");",
+											"",
+											"var makeOrganisationRequest = {",
+											"    url: 'http://' + tykDashboardHost + '/admin/organisations',",
+											"    method: 'POST',",
+											"    header: 'admin-auth: ' + tykDashboardAdminApiKey,",
+											"    body: '{ \"owner_name\": \"Get All Organisations Test\" }'",
+											"};",
+											"",
+											"pm.sendRequest(makeOrganisationRequest, function (err, response) { ",
+											"    pm.expect(response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "admin-auth",
+										"value": "{{tyk-dashboard.admin-api-key}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-dashboard.host}}/admin/organisations",
+									"protocol": "http",
+									"host": [
+										"{{tyk-dashboard.host}}"
+									],
+									"path": [
+										"admin",
+										"organisations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get an Organisation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response contains correct Organisation name\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.owner_name).to.equal(\"Get an Organisation Test\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// create an organisation so that it can be retrieved",
+											"var tykDashboardHost = pm.variables.get(\"tyk-dashboard.host\");",
+											"var tykDashboardAdminApiKey = pm.variables.get(\"tyk-dashboard.admin-api-key\");",
+											"",
+											"var makeOrganisationRequest = {",
+											"    url: 'http://' + tykDashboardHost + '/admin/organisations',",
+											"    method: 'POST',",
+											"    header: 'admin-auth: ' + tykDashboardAdminApiKey,",
+											"    body: '{ \"owner_name\": \"Get an Organisation Test\" }'",
+											"};",
+											"",
+											"pm.sendRequest(makeOrganisationRequest, function (err, response) { ",
+											"    pm.expect(response.code).to.eql(200);",
+											"    pm.variables.set(\"organisation-id\", response.json().Meta)",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "admin-auth",
+										"value": "{{tyk-dashboard.admin-api-key}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-dashboard.host}}/admin/organisations/{{organisation-id}}",
+									"protocol": "http",
+									"host": [
+										"{{tyk-dashboard.host}}"
+									],
+									"path": [
+										"admin",
+										"organisations",
+										"{{organisation-id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create an Organisation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Message is \\\"Org created\\\"\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.Message).to.equal(\"Org created\");",
+											"});",
+											"",
+											"pm.test(\"Organisation is created\", function () {",
+											"    var tykDashboardHost = pm.variables.get(\"tyk-dashboard.host\");",
+											"    var tykDashboardAdminApiKey = pm.variables.get(\"tyk-dashboard.admin-api-key\");",
+											"    var organisationId = pm.response.json().Meta;",
+											"",
+											"    var getOrganisationRequest = {",
+											"        url: 'http://' + tykDashboardHost + '/admin/organisations/' + organisationId,",
+											"        method: 'GET',",
+											"        header: 'admin-auth: ' + tykDashboardAdminApiKey",
+											"    };",
+											"",
+											"    pm.sendRequest(getOrganisationRequest, function (err, response) { ",
+											"        pm.expect(response.code).to.eql(200);",
+											"        pm.expect(response.json().owner_name).to.eql(\"Create an Organisation Test\");",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "admin-auth",
+										"value": "{{tyk-dashboard.admin-api-key}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"owner_name\": \"Create an Organisation Test\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-dashboard.host}}/admin/organisations",
+									"protocol": "http",
+									"host": [
+										"{{tyk-dashboard.host}}"
+									],
+									"path": [
+										"admin",
+										"organisations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update an Organisation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Message is \\\"Org updated\\\"\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.Message).to.equal(\"Org updated\");",
+											"});",
+											"",
+											"pm.test(\"Status is \\\"OK\\\"\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.Status).to.equal(\"OK\");",
+											"});",
+											"",
+											"pm.test(\"Organisation is updated\", function () {",
+											"    var tykDashboardHost = pm.variables.get(\"tyk-dashboard.host\");",
+											"    var tykDashboardAdminApiKey = pm.variables.get(\"tyk-dashboard.admin-api-key\");",
+											"    var organisationId = pm.variables.get(\"organisation-id\")",
+											"",
+											"    var getOrganisationRequest = {",
+											"        url: 'http://' + tykDashboardHost + '/admin/organisations/' + organisationId,",
+											"        method: 'GET',",
+											"        header: 'admin-auth: ' + tykDashboardAdminApiKey",
+											"    };",
+											"",
+											"    pm.sendRequest(getOrganisationRequest, function (err, response) { ",
+											"        pm.expect(response.code).to.eql(200);",
+											"        pm.expect(response.json().owner_name).to.eql(\"Create an Organisation Test Updated\");",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// create an organisation so that it can be updated",
+											"var tykDashboardHost = pm.variables.get(\"tyk-dashboard.host\");",
+											"var tykDashboardAdminApiKey = pm.variables.get(\"tyk-dashboard.admin-api-key\");",
+											"",
+											"var makeOrganisationRequest = {",
+											"    url: 'http://' + tykDashboardHost + '/admin/organisations',",
+											"    method: 'POST',",
+											"    header: 'admin-auth: ' + tykDashboardAdminApiKey,",
+											"    body: '{ \"owner_name\": \"Update an Organisation Test\" }'",
+											"};",
+											"",
+											"pm.sendRequest(makeOrganisationRequest, function (err, response) { ",
+											"    pm.expect(response.code).to.eql(200);",
+											"    pm.variables.set(\"organisation-id\", response.json().Meta)",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "admin-auth",
+										"value": "{{tyk-dashboard.admin-api-key}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"owner_name\": \"Create an Organisation Test Updated\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-dashboard.host}}/admin/organisations/{{organisation-id}}",
+									"protocol": "http",
+									"host": [
+										"{{tyk-dashboard.host}}"
+									],
+									"path": [
+										"admin",
+										"organisations",
+										"{{organisation-id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete an Organisation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Message is \\\"Org updated\\\"\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.Message).to.equal(\"Org deleted\");",
+											"});",
+											"",
+											"pm.test(\"Status is \\\"OK\\\"\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.Status).to.equal(\"OK\");",
+											"});",
+											"",
+											"pm.test(\"Organisation is deleted\", function () {",
+											"    var tykDashboardHost = pm.variables.get(\"tyk-dashboard.host\");",
+											"    var tykDashboardAdminApiKey = pm.variables.get(\"tyk-dashboard.admin-api-key\");",
+											"    var organisationId = pm.variables.get(\"organisation-id\")",
+											"",
+											"    var getOrganisationRequest = {",
+											"        url: 'http://' + tykDashboardHost + '/admin/organisations/' + organisationId,",
+											"        method: 'GET',",
+											"        header: 'admin-auth: ' + tykDashboardAdminApiKey",
+											"    };",
+											"",
+											"    pm.sendRequest(getOrganisationRequest, function (err, response) { ",
+											"        pm.expect(response.code).to.eql(404);",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// create an organisation so that it can be deleted",
+											"var tykDashboardHost = pm.variables.get(\"tyk-dashboard.host\");",
+											"var tykDashboardAdminApiKey = pm.variables.get(\"tyk-dashboard.admin-api-key\");",
+											"",
+											"var makeOrganisationRequest = {",
+											"    url: 'http://' + tykDashboardHost + '/admin/organisations',",
+											"    method: 'POST',",
+											"    header: 'admin-auth: ' + tykDashboardAdminApiKey,",
+											"    body: '{ \"owner_name\": \"Delete an Organisation Test\" }'",
+											"};",
+											"",
+											"pm.sendRequest(makeOrganisationRequest, function (err, response) { ",
+											"    pm.expect(response.code).to.eql(200);",
+											"    pm.variables.set(\"organisation-id\", response.json().Meta)",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "admin-auth",
+										"value": "{{tyk-dashboard.admin-api-key}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-dashboard.host}}/admin/organisations/{{organisation-id}}",
+									"protocol": "http",
+									"host": [
+										"{{tyk-dashboard.host}}"
+									],
+									"path": [
+										"admin",
+										"organisations",
+										"{{organisation-id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		},
@@ -4228,6 +4666,10 @@
 		{
 			"key": "tyk-gateway.api-key",
 			"value": "28d220fd77974a4facfb07dc1e49c2aa"
+		},
+		{
+			"key": "tyk-dashboard.admin-api-key",
+			"value": "ff8289874f5d45de945a2ea5c02580fe"
 		}
 	]
 }
