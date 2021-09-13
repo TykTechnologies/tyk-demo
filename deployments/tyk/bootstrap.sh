@@ -346,9 +346,6 @@ bootstrap_progress
 # key analytics on
 curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: analytics_on" -o /dev/null 
 bootstrap_progress
-# enforce timeout plugin
-curl $gateway_base_url/plugin-demo-api/delay/6 -s -o /dev/null 
-bootstrap_progress
 log_ok
 
 log_message "Restarting Dashboard container to ensure Portal URLs are loaded ok"
