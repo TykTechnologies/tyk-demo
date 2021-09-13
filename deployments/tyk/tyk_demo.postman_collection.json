@@ -4166,7 +4166,7 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"",
-											"pm.test(\"Response contains organisations object\", function () {",
+											"pm.test(\"Response contains organisations array\", function () {",
 											"    var jsonData = pm.response.json();",
 											"    pm.expect(jsonData.organisations).to.not.be.undefined;",
 											"});",
@@ -4212,7 +4212,7 @@
 									}
 								],
 								"url": {
-									"raw": "http://{{tyk-dashboard.host}}/admin/organisations",
+									"raw": "http://{{tyk-dashboard.host}}/admin/organisations?p=-1",
 									"protocol": "http",
 									"host": [
 										"{{tyk-dashboard.host}}"
@@ -4220,6 +4220,12 @@
 									"path": [
 										"admin",
 										"organisations"
+									],
+									"query": [
+										{
+											"key": "p",
+											"value": "-1"
+										}
 									]
 								}
 							},
@@ -4481,7 +4487,7 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"",
-											"pm.test(\"Message is \\\"Org updated\\\"\", function () {",
+											"pm.test(\"Message is \\\"Org deleted\\\"\", function () {",
 											"    var jsonData = pm.response.json();",
 											"    pm.expect(jsonData.Message).to.equal(\"Org deleted\");",
 											"});",
