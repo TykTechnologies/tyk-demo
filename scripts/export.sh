@@ -14,7 +14,6 @@ for data_group in "${data_groups[@]}"; do\
   apis=$(curl $dashboard_base_url/api/apis?p=-1 -s \
     -H "Authorization:${dashboard_keys[$index]}" \
     | jq -c '.apis[]')
-
   while read -r api; do
     if [[ "$api" != "" ]]; then
       api_id=$(jq -r '.api_definition.id' <<< $api) 
