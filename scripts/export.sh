@@ -14,26 +14,24 @@ for data_group in "${data_groups[@]}"; do\
   apis=$(curl $dashboard_base_url/api/apis?p=-1 -s \
     -H "Authorization:${dashboard_keys[$index]}" \
     | jq -c '.apis[]')
-  file_count=1
+
   while read -r api; do
     if [[ "$api" != "" ]]; then
+      api_id=$(jq -r '.api_definition.id' <<< $api) 
       echo "  $(jq -r '.api_definition.name' <<< $api)"
-      echo "$api" | jq '.' > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/apis/api-$file_count.json"
-      file_count=$((file_count+1))
+      echo "$api" | jq '.' > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/apis/api-$api_id.json"
     fi 
   done <<< "$apis"
 
   echo "Exporting Policies for organisation: ${organisation_names[$index]}"
   policies=$(curl $dashboard_base_url/api/portal/policies?p=-1 -s \
     -H "Authorization:${dashboard_keys[$index]}" \
-    | jq -c '.Data[]')
-  echo "$policies" > "test-$index.json"
-  file_count=1
+    | jq -c '.Data | reverse | .[]')
   while read -r policy; do
     if [[ "$policy" != "" ]]; then
+      policy_id=$(jq -r '._id' <<< $policy)
       echo "  $(jq -r '.name' <<< $policy)"
-      echo "$policy" | jq '.' > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/policies/policy-$file_count.json"
-      file_count=$((file_count+1))
+      echo "$policy" | jq '.' > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/policies/policy-$policy_id.json"
     fi
   done <<< "$policies"
   
