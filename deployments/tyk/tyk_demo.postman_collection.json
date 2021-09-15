@@ -3908,8 +3908,8 @@
 													"pm.test(\"Response contains key data\", function () {",
 													"    var jsonData = pm.response.json();",
 													"    pm.expect(jsonData.date_created).to.not.be.empty;",
-													"    pm.expect(jsonData.org_id).to.equal(\"5e9d9544a1dcd60001d0ed20\")",
-													"    pm.expect(jsonData.access_rights.accbdd1b89e84ec97f4f16d4e3197d5c.api_id).to.equal(\"accbdd1b89e84ec97f4f16d4e3197d5c\")",
+													"    pm.expect(jsonData.org_id).to.equal(\"5e9d9544a1dcd60001d0ed20\");",
+													"    pm.expect(jsonData.access_rights.accbdd1b89e84ec97f4f16d4e3197d5c.api_id).to.equal(\"accbdd1b89e84ec97f4f16d4e3197d5c\");",
 													"});",
 													"",
 													"// delete temporary key",
@@ -4337,7 +4337,9 @@
 												"exec": [
 													"var organisationName = pm.variables.replaceIn(\"{{$randomCompanyName}}\");",
 													"tyk.dashboardAdminApi.organisations.create(",
-													"    JSON.stringify({ owner_name: organisationName }),",
+													"    JSON.stringify({ ",
+													"        owner_name: organisationName ",
+													"    }),",
 													"    (error, response) => {",
 													"        pm.expect(response.code).to.eql(200);",
 													"        // save org info so we can use it in the request and tests",
@@ -4557,6 +4559,134 @@
 							"item": [
 								{
 									"name": "Create a User",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Status is \\\"OK\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.Status).to.eql(\"OK\");",
+													"});",
+													"",
+													"pm.test(\"Message is not empty\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.Message).to.not.be.empty;",
+													"});",
+													"",
+													"pm.test(\"User is created\", function () {",
+													"    tyk.dashboardAdminApi.users.get(",
+													"        pm.response.json().Meta.id,",
+													"        (error, response) => { ",
+													"            pm.expect(response.code).to.eql(200);",
+													"        },",
+													"        pm",
+													"    );",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "admin-auth",
+												"value": "{{tyk-dashboard.admin-api-key}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"first_name\": \"{{$randomFirstName}}\",\n\t\"last_name\": \"{{$randomLastName}}\",\n\t\"email_address\": \"{{$randomExampleEmail}}\",\n\t\"org_id\": \"5e9d9544a1dcd60001d0ed20\",\n\t\"active\": true,\n\t\"password\": \"3LEsHO1jv1dt9Xgf\",\n\t\"user_permissions\": {\n\t\t\"IsAdmin\": \"admin\",\n\t\t\"ResetPassword\": \"admin\"\n\t}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{tyk-dashboard.host}}/admin/users",
+											"protocol": "http",
+											"host": [
+												"{{tyk-dashboard.host}}"
+											],
+											"path": [
+												"admin",
+												"users"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get a User",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"// create a temporary user so that at we can request it",
+													"tyk.dashboardAdminApi.users.create(",
+													"    JSON.stringify({",
+													"        first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
+													"        last_name: pm.variables.replaceIn(\"{{$randomLastName}}\"),",
+													"        email_address: pm.variables.replaceIn(\"{{$randomExampleEmail}}\"),",
+													"        org_id: \"5e9d9544a1dcd60001d0ed20\",",
+													"        active: true,",
+													"        password: \"3LEsHO1jv1dt9Xgf\",",
+													"        user_permissions: {",
+													"            IsAdmin: \"admin\",",
+													"            ResetPassword: \"admin\"",
+													"        }",
+													"    }),",
+													"    (error, response) => { ",
+													"        pm.expect(response.code).to.eql(200);",
+													"        // user id needed for request, and to delete after tests",
+													"        pm.variables.set(\"user-id\", response.json().Meta.id);",
+													"        pm.variables.set(\"user-api-key\", response.json().Meta.access_key);",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Response contains user data\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.created_at).to.not.be.empty;",
+													"    pm.expect(jsonData.org_id).to.equal(\"5e9d9544a1dcd60001d0ed20\");",
+													"    pm.expect(jsonData.user_permissions.IsAdmin).to.equal(\"admin\");",
+													"});",
+													"",
+													"// delete temporary user",
+													"// users Dashboard API, as Dashboard Admin API does not have a delete endpoint for users",
+													"tyk.dashboardApi.users.delete(",
+													"    pm.variables.get(\"user-id\"),",
+													"    pm.variables.get(\"user-api-key\"),",
+													"    (error, response) => {",
+													"        pm.expect(response.code).to.eq(200);",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
 										"method": "GET",
 										"header": [
@@ -4567,14 +4697,15 @@
 											}
 										],
 										"url": {
-											"raw": "http://{{tyk-dashboard.host}}/admin/users",
+											"raw": "http://{{tyk-dashboard.host}}/admin/users/{{user-id}}",
 											"protocol": "http",
 											"host": [
 												"{{tyk-dashboard.host}}"
 											],
 											"path": [
 												"admin",
-												"users"
+												"users",
+												"{{user-id}}"
 											]
 										}
 									},
@@ -4592,10 +4723,193 @@
 							"item": [
 								{
 									"name": "Create an API Definition",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.variables.set(\"api-path\", pm.variables.replaceIn(\"{{$randomLoremSlug}}\"));",
+													"",
+													"// create a user so that at we can delete it",
+													"tyk.dashboardAdminApi.users.create(",
+													"    JSON.stringify({",
+													"        first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
+													"        last_name: pm.variables.replaceIn(\"{{$randomLastName}}\"),",
+													"        email_address: pm.variables.replaceIn(\"{{$randomExampleEmail}}\"),",
+													"        org_id: \"5e9d9544a1dcd60001d0ed20\",",
+													"        active: true,",
+													"        password: \"3LEsHO1jv1dt9Xgf\",",
+													"        user_permissions: {",
+													"            IsAdmin: \"admin\",",
+													"            ResetPassword: \"admin\"",
+													"        }",
+													"    }),",
+													"    (error, response) => { ",
+													"        pm.expect(response.code).to.eql(200);",
+													"        pm.variables.set(\"user-id\", response.json().Meta.id);",
+													"        pm.variables.set(\"user-api-key\", response.json().Meta.access_key);",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Status is \\\"OK\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.Status).to.equal(\"OK\");",
+													"});",
+													"",
+													"pm.test(\"Message is \\\"API created\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.Message).to.equal(\"API created\");",
+													"});",
+													"",
+													"pm.test(\"API is created\", function () {",
+													"    tyk.dashboardApi.apis.get(",
+													"        pm.response.json().Meta,",
+													"        pm.variables.get(\"user-api-key\"),",
+													"        (error, response) => { ",
+													"            pm.expect(response.code).to.eql(200);",
+													"        },",
+													"        pm",
+													"    );",
+													"});",
+													"",
+													"// delete temporary user",
+													"tyk.dashboardApi.users.delete(",
+													"    pm.variables.get(\"user-id\"),",
+													"    pm.variables.get(\"user-api-key\"),",
+													"    (error, response) => {",
+													"        pm.expect(response.code).to.eq(200);",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
 									"request": {
-										"method": "GET",
-										"header": [],
-										"url": null
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "{{user-api-key}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"api_definition\": {\n        \"name\": \"{{$randomProductAdjective}} API\",\n        \"slug\": \"{{api-path}}\",\n        \"org_id\": \"5e9d9544a1dcd60001d0ed20\",\n        \"use_keyless\": true,\n        \"definition\": {\n            \"location\": \"header\",\n            \"key\": \"x-api-version\",\n            \"strip_path\": false\n        },\n        \"version_data\": {\n            \"not_versioned\": true,\n            \"versions\": {\n                \"Default\": {\n                    \"name\": \"Default\"\n                }\n            }\n        },\n        \"proxy\": {\n            \"listen_path\": \"/{{api-path}}/\",\n            \"target_url\": \"http://httpbin/\",\n            \"strip_listen_path\": true\n        },\n        \"active\": true\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{tyk-dashboard.host}}/api/apis",
+											"protocol": "http",
+											"host": [
+												"{{tyk-dashboard.host}}"
+											],
+											"path": [
+												"api",
+												"apis"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Users",
+							"item": [
+								{
+									"name": "Delete a User",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"// create a user so that at we can delete it",
+													"tyk.dashboardAdminApi.users.create(",
+													"    JSON.stringify({",
+													"        first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
+													"        last_name: pm.variables.replaceIn(\"{{$randomLastName}}\"),",
+													"        email_address: pm.variables.replaceIn(\"{{$randomExampleEmail}}\"),",
+													"        org_id: \"5e9d9544a1dcd60001d0ed20\",",
+													"        active: true,",
+													"        password: \"3LEsHO1jv1dt9Xgf\",",
+													"        user_permissions: {",
+													"            IsAdmin: \"admin\",",
+													"            ResetPassword: \"admin\"",
+													"        }",
+													"    }),",
+													"    (error, response) => { ",
+													"        pm.expect(response.code).to.eql(200);",
+													"        pm.variables.set(\"user-id\", response.json().Meta.id);",
+													"        pm.variables.set(\"user-api-key\", response.json().Meta.access_key);",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Message is \\\"User deleted\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.Message).to.equal(\"User deleted\");",
+													"});",
+													"",
+													"pm.test(\"Status is \\\"OK\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.Status).to.equal(\"OK\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "{{user-api-key}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://{{tyk-dashboard.host}}/api/users/{{user-id}}",
+											"protocol": "http",
+											"host": [
+												"{{tyk-dashboard.host}}"
+											],
+											"path": [
+												"api",
+												"users",
+												"{{user-id}}"
+											]
+										}
 									},
 									"response": []
 								}
@@ -4720,10 +5034,78 @@
 					"                    callback",
 					"                );   ",
 					"            }",
+					"        },",
+					"        users: {",
+					"            create: function (user, callback, pm) {",
+					"                pm.sendRequest(",
+					"                    {",
+					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/admin/users\",",
+					"                        method: \"POST\",",
+					"                        header: \"admin-auth: \" + pm.variables.get(\"tyk-dashboard.admin-api-key\"),",
+					"                        body: user",
+					"                    }, ",
+					"                    callback",
+					"                );   ",
+					"            },",
+					"            get: function (userId, callback, pm) {",
+					"                pm.sendRequest(",
+					"                    {",
+					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/admin/users/\" + userId,",
+					"                        method: \"GET\",",
+					"                        header: \"admin-auth: \" + pm.variables.get(\"tyk-dashboard.admin-api-key\")",
+					"                    }, ",
+					"                    callback",
+					"                );   ",
+					"            },",
+					"            update: function (userId, user, callback, pm) {",
+					"                pm.sendRequest(",
+					"                    {",
+					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/admin/users/\" + userId,",
+					"                        method: \"PUT\",",
+					"                        header: \"admin-auth: \" + pm.variables.get(\"tyk-dashboard.admin-api-key\"),",
+					"                        body: user",
+					"                    }, ",
+					"                    callback",
+					"                );   ",
+					"            }",
+					"            // Dashboard Admin API does not have a user delete endpoint, use dashboardApi.delete() function instead",
 					"        }",
 					"    },",
 					"    dashboardApi: {",
-					"",
+					"        apis: {",
+					"            get: function (apiId, apiKey, callback, pm) {",
+					"                pm.sendRequest(",
+					"                    {",
+					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/api/apis/\" + apiId,",
+					"                        method: \"GET\",",
+					"                        header: \"authorization: \" + apiKey",
+					"                    }, ",
+					"                    callback",
+					"                );",
+					"            }",
+					"        },",
+					"        users: {",
+					"            get: function (userId, apiKey, callback, pm) {",
+					"                pm.sendRequest(",
+					"                    {",
+					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/api/users/\" + userId,",
+					"                        method: \"GET\",",
+					"                        header: \"authorization: \" + apiKey",
+					"                    }, ",
+					"                    callback",
+					"                );   ",
+					"            },",
+					"            delete: function (userId, apiKey, callback, pm) {",
+					"                pm.sendRequest(",
+					"                    {",
+					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/api/users/\" + userId,",
+					"                        method: \"DELETE\",",
+					"                        header: \"authorization: \" + apiKey",
+					"                    }, ",
+					"                    callback",
+					"                );   ",
+					"            }",
+					"        }",
 					"    },",
 					"    gatewayApi: {",
 					"        keys: {",
