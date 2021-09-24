@@ -4842,7 +4842,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"// create a user so that at we can its api key to authorize the request",
+													"// create a user so that at we can use its api key to authorize the request",
 													"tyk.dashboardAdminApi.users.create(",
 													"    JSON.stringify({",
 													"        first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
@@ -4999,7 +4999,6 @@
 													"});",
 													"",
 													"// delete temporary user",
-													"// users Dashboard API, as Dashboard Admin API does not have a delete endpoint for users",
 													"tyk.dashboardApi.users.delete(",
 													"    pm.variables.get(\"user-id\"),",
 													"    pm.variables.get(\"user-api-key\"),",
@@ -5110,7 +5109,6 @@
 													"});",
 													"",
 													"// delete temporary user",
-													"// users Dashboard API, as Dashboard Admin API does not have a delete endpoint for users",
 													"tyk.dashboardApi.users.delete(",
 													"    pm.variables.get(\"user-id\"),",
 													"    pm.variables.get(\"user-api-key\"),",
@@ -5233,6 +5231,218 @@
 												"api",
 												"users",
 												"{{user-id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reset Password 1",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"// create a user so that at we can delete it",
+													"tyk.dashboardAdminApi.users.create(",
+													"    JSON.stringify({",
+													"        first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
+													"        last_name: pm.variables.replaceIn(\"{{$randomLastName}}\"),",
+													"        email_address: pm.variables.replaceIn(\"{{$randomExampleEmail}}\"),",
+													"        org_id: \"5e9d9544a1dcd60001d0ed20\",",
+													"        active: true,",
+													"        user_permissions: {",
+													"            IsAdmin: \"admin\",",
+													"            ResetPassword: \"admin\"",
+													"        }",
+													"    }),",
+													"    (error, response) => { ",
+													"        pm.expect(response.code).to.eql(200);",
+													"        pm.variables.set(\"user-id\", response.json().Meta.id);",
+													"        pm.variables.set(\"user-api-key\", response.json().Meta.access_key);",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Message is \\\"User password updated\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.Message).to.equal(\"User password updated\");",
+													"});",
+													"",
+													"pm.test(\"Status is \\\"OK\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.Status).to.equal(\"OK\");",
+													"});",
+													"",
+													"// delete temporary user",
+													"tyk.dashboardApi.users.delete(",
+													"    pm.variables.get(\"user-id\"),",
+													"    pm.variables.get(\"user-api-key\"),",
+													"    (error, response) => {",
+													"        pm.expect(response.code).to.eq(200);",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "{{user-api-key}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"new_password\": \"password1\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{tyk-dashboard.host}}/api/users/{{user-id}}/actions/reset",
+											"protocol": "http",
+											"host": [
+												"{{tyk-dashboard.host}}"
+											],
+											"path": [
+												"api",
+												"users",
+												"{{user-id}}",
+												"actions",
+												"reset"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reset Password 2",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"// create a user so that at we can delete it",
+													"tyk.dashboardAdminApi.users.create(",
+													"    JSON.stringify({",
+													"        first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
+													"        last_name: pm.variables.replaceIn(\"{{$randomLastName}}\"),",
+													"        email_address: pm.variables.replaceIn(\"{{$randomExampleEmail}}\"),",
+													"        org_id: \"5e9d9544a1dcd60001d0ed20\",",
+													"        active: true,",
+													"        user_permissions: {",
+													"            IsAdmin: \"admin\",",
+													"            ResetPassword: \"admin\"",
+													"        }",
+													"    }),",
+													"    (error, response) => { ",
+													"        var userId = response.json().Meta.id;",
+													"        var userApiKey = response.json().Meta.access_key;",
+													"",
+													"        pm.expect(response.code).to.eql(200);",
+													"        pm.variables.set(\"user-id\", userId);",
+													"        pm.variables.set(\"user-api-key\", userApiKey);",
+													"",
+													"        // set the first password to be \"password1\"",
+													"        tyk.dashboardApi.users.resetPassword(",
+													"            userId,",
+													"            JSON.stringify({",
+													"                new_password: \"password1\"",
+													"            }),",
+													"            userApiKey,",
+													"            (error, response) => { ",
+													"                pm.expect(response.code).to.eql(200);",
+													"            },",
+													"            pm",
+													"        );",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Message is \\\"User password updated\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.Message).to.equal(\"User password updated\");",
+													"});",
+													"",
+													"pm.test(\"Status is \\\"OK\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.Status).to.equal(\"OK\");",
+													"});",
+													"",
+													"// delete temporary user",
+													"tyk.dashboardApi.users.delete(",
+													"    pm.variables.get(\"user-id\"),",
+													"    pm.variables.get(\"user-api-key\"),",
+													"    (error, response) => {",
+													"        pm.expect(response.code).to.eq(200);",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "{{user-api-key}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"current_password\": \"password1\",\n  \"new_password\": \"password2\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{tyk-dashboard.host}}/api/users/{{user-id}}/actions/reset",
+											"protocol": "http",
+											"host": [
+												"{{tyk-dashboard.host}}"
+											],
+											"path": [
+												"api",
+												"users",
+												"{{user-id}}",
+												"actions",
+												"reset"
 											]
 										}
 									},
@@ -5429,6 +5639,17 @@
 					"                    }, ",
 					"                    callback",
 					"                );   ",
+					"            },",
+					"            resetPassword: function (userId, passwordResetBody, apiKey, callback, pm) {",
+					"                pm.sendRequest(",
+					"                    {",
+					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/api/users/\" + userId + \"/actions/reset\",",
+					"                        method: 'POST',",
+					"                        header: 'authorization: ' + apiKey,",
+					"                        body: passwordResetBody",
+					"                    },",
+					"                    callback",
+					"                );",
 					"            }",
 					"        }",
 					"    },",
