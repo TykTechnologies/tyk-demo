@@ -4912,6 +4912,118 @@
 										}
 									},
 									"response": []
+								},
+								{
+									"name": "Create a User",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"// create a user so that at we can its api key to authorize the request",
+													"tyk.dashboardAdminApi.users.create(",
+													"    JSON.stringify({",
+													"        first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
+													"        last_name: pm.variables.replaceIn(\"{{$randomLastName}}\"),",
+													"        email_address: pm.variables.replaceIn(\"{{$randomExampleEmail}}\"),",
+													"        org_id: \"5e9d9544a1dcd60001d0ed20\",",
+													"        active: true,",
+													"        password: \"3LEsHO1jv1dt9Xgf\",",
+													"        user_permissions: {",
+													"            IsAdmin: \"admin\",",
+													"            ResetPassword: \"admin\"",
+													"        }",
+													"    }),",
+													"    (error, response) => { ",
+													"        pm.expect(response.code).to.eql(200);",
+													"        pm.variables.set(\"user-id\", response.json().Meta.id);",
+													"        pm.variables.set(\"user-api-key\", response.json().Meta.access_key);",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"\\\"Status\\\" is \\\"OK\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.Status).to.equal(\"OK\");",
+													"});",
+													"",
+													"pm.test(\"\\\"Message\\\" is \\\"User and session have been created\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.Message).to.equal(\"User and session have been created\");",
+													"});",
+													"",
+													"pm.test(\"Response contains user id \", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.Meta).to.not.be.empty;",
+													"});",
+													"",
+													"pm.test(\"User is created\", function () {",
+													"    tyk.dashboardApi.users.get(",
+													"        pm.response.json().Meta,",
+													"        pm.variables.get(\"user-api-key\"),",
+													"        (error, response) => { ",
+													"            pm.expect(response.code).to.eql(200);",
+													"        },",
+													"        pm",
+													"    );",
+													"});",
+													"",
+													"// remove temp user",
+													"tyk.dashboardApi.users.delete(",
+													"    pm.variables.get(\"user-id\"),",
+													"    pm.variables.get(\"user-api-key\"),",
+													"    (error, response) => { ",
+													"        pm.expect(response.code).to.eql(200);",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "{{user-api-key}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"first_name\": \"{{$randomFirstName}}\",\n  \"last_name\": \"{{$randomLastName}}\",\n  \"email_address\": \"{{$randomExampleEmail}}\",\n  \"active\": true,\n  \"password\": \"thisisatest\",\n  \"user_permissions\": { \"IsAdmin\": \"admin\" }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{tyk-dashboard.host}}/api/users",
+											"protocol": "http",
+											"host": [
+												"{{tyk-dashboard.host}}"
+											],
+											"path": [
+												"api",
+												"users"
+											]
+										}
+									},
+									"response": []
 								}
 							]
 						}
