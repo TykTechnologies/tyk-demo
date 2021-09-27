@@ -384,7 +384,7 @@
       "options_passthrough": false,
       "debug": false
     },
-    "domain": "dynamic-looping.localhost",
+    "domain": "tyk-dynamic-looping.com",
     "certificates": [],
     "do_not_track": false,
     "tags": [],

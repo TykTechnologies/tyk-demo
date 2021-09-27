@@ -5963,7 +5963,7 @@
 		},
 		{
 			"key": "tyk-custom-domain-2.host",
-			"value": "dynamic-looping.localhost:8080"
+			"value": "tyk-dynamic-looping.com:8080"
 		}
 	]
 }

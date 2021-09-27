@@ -30,6 +30,7 @@ services:
       tyk:
         aliases:
           - tyk-custom-domain.com
+          - tyk-dynamic-looping.com
     environment:
       - TYK_LOGLEVEL=${GATEWAY_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
