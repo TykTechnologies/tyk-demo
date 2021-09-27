@@ -1,16 +1,16 @@
 {
-  "created_at": "2020-05-02T13:09:51Z",
+  "created_at": "2021-09-27T07:42:38Z",
   "api_model": {},
   "api_definition": {
-    "id": "5ead711f5759610001818678",
-    "name": "Basic Protected API",
-    "slug": "basic-protected-api",
+    "id": "615175ee8852f00001522ed6",
+    "name": "Versioned Dynamic Looping",
+    "slug": "version-test",
     "listen_port": 0,
     "protocol": "",
     "enable_proxy_protocol": false,
-    "api_id": "accbdd1b89e84ec97f4f16d4e3197d5c",
+    "api_id": "e22945fc12d949886b91595bd378a640",
     "org_id": "5e9d9544a1dcd60001d0ed20",
-    "use_keyless": false,
+    "use_keyless": true,
     "use_oauth2": false,
     "use_openid": false,
     "openid_options": {
@@ -57,7 +57,92 @@
           "error_message": ""
         }
       },
+      "basic": {
+        "use_param": false,
+        "param_name": "",
+        "use_cookie": false,
+        "cookie_name": "",
+        "auth_header_name": "Authorization",
+        "use_certificate": false,
+        "validate_signature": false,
+        "signature": {
+          "algorithm": "",
+          "header": "",
+          "secret": "",
+          "allowed_clock_skew": 0,
+          "error_code": 0,
+          "error_message": ""
+        }
+      },
+      "coprocess": {
+        "use_param": false,
+        "param_name": "",
+        "use_cookie": false,
+        "cookie_name": "",
+        "auth_header_name": "Authorization",
+        "use_certificate": false,
+        "validate_signature": false,
+        "signature": {
+          "algorithm": "",
+          "header": "",
+          "secret": "",
+          "allowed_clock_skew": 0,
+          "error_code": 0,
+          "error_message": ""
+        }
+      },
+      "hmac": {
+        "use_param": false,
+        "param_name": "",
+        "use_cookie": false,
+        "cookie_name": "",
+        "auth_header_name": "Authorization",
+        "use_certificate": false,
+        "validate_signature": false,
+        "signature": {
+          "algorithm": "",
+          "header": "",
+          "secret": "",
+          "allowed_clock_skew": 0,
+          "error_code": 0,
+          "error_message": ""
+        }
+      },
       "jwt": {
+        "use_param": false,
+        "param_name": "",
+        "use_cookie": false,
+        "cookie_name": "",
+        "auth_header_name": "Authorization",
+        "use_certificate": false,
+        "validate_signature": false,
+        "signature": {
+          "algorithm": "",
+          "header": "",
+          "secret": "",
+          "allowed_clock_skew": 0,
+          "error_code": 0,
+          "error_message": ""
+        }
+      },
+      "oauth": {
+        "use_param": false,
+        "param_name": "",
+        "use_cookie": false,
+        "cookie_name": "",
+        "auth_header_name": "Authorization",
+        "use_certificate": false,
+        "validate_signature": false,
+        "signature": {
+          "algorithm": "",
+          "header": "",
+          "secret": "",
+          "allowed_clock_skew": 0,
+          "error_code": 0,
+          "error_message": ""
+        }
+      },
+      "oidc": {
         "use_param": false,
         "param_name": "",
         "use_cookie": false,
@@ -88,7 +173,7 @@
     "upstream_certificates": {},
     "pinned_public_keys": {},
     "enable_jwt": false,
-    "use_standard_auth": true,
+    "use_standard_auth": false,
     "use_go_plugin_auth": false,
     "enable_coprocess_auth": false,
     "jwt_signing_method": "",
@@ -121,16 +206,16 @@
     },
     "base_identity_provided_by": "",
     "definition": {
-      "location": "header",
+      "location": "url",
       "key": "x-api-version",
-      "strip_path": false
+      "strip_path": true
     },
     "version_data": {
       "not_versioned": true,
       "default_version": "",
       "versions": {
-        "Default": {
-          "name": "Default",
+        "v1": {
+          "name": "v1",
           "expires": "",
           "paths": {
             "ignored": [],
@@ -139,18 +224,27 @@
           },
           "use_extended_paths": true,
           "extended_paths": {
-            "ignored": [
+            "url_rewrites": [
               {
-                "path": "/anything/ignored",
-                "ignore_case": false,
-                "method_actions": {
-                  "GET": {
-                    "action": "no_action",
-                    "code": 200,
-                    "data": "",
-                    "headers": {}
-                  }
-                }
+                "path": "/{version}/{api}/{path1}/{path2}/{path3}",
+                "method": "GET",
+                "match_pattern": "/(.*)/(.*)/(.*)/(.*)/(.*)",
+                "rewrite_to": "tyk://$2/$1/$3/$4/$5",
+                "triggers": []
+              },
+              {
+                "path": "/{version}/{api}/{path1}/{path2}",
+                "method": "GET",
+                "match_pattern": "/(.*)/(.*)/(.*)/(.*)",
+                "rewrite_to": "tyk://$2/$1/$3/$4",
+                "triggers": []
+              },
+              {
+                "path": "/{version}/{api}/{path1}",
+                "method": "GET",
+                "match_pattern": "/(.*)/(.*)/(.*)",
+                "rewrite_to": "tyk://$2/$1/$3",
+                "triggers": []
               }
             ]
           },
@@ -185,9 +279,9 @@
     },
     "proxy": {
       "preserve_host_header": false,
-      "listen_path": "/basic-protected-api/",
-      "target_url": "http://httpbin/",
-      "disable_strip_slash": false,
+      "listen_path": "/",
+      "target_url": "http://httpbin",
+      "disable_strip_slash": true,
       "strip_listen_path": true,
       "enable_load_balancing": false,
       "target_list": [],
@@ -257,24 +351,7 @@
       "meta": {}
     },
     "event_handlers": {
-      "events": {
-        "AuthFailure": [
-          {
-            "handler_name": "eh_web_hook_handler",
-            "handler_meta": {
-              "api_model": {},
-              "event_timeout": 60,
-              "header_map": {},
-              "id": "6151727935f8d55b8cebe152",
-              "method": "POST",
-              "name": "Webhook Receiver Post",
-              "org_id": "5e9d9544a1dcd60001d0ed20",
-              "target_path": "http://localhost:8080/webhook-receiver/post",
-              "template_path": ""
-            }
-          }
-        ]
-      }
+      "events": {}
     },
     "enable_batch_request_support": false,
     "enable_ip_whitelisting": false,
@@ -286,16 +363,28 @@
     "response_processors": [],
     "CORS": {
       "enable": false,
-      "allowed_origins": [],
-      "allowed_methods": [],
-      "allowed_headers": [],
+      "allowed_origins": [
+        "*"
+      ],
+      "allowed_methods": [
+        "GET",
+        "POST",
+        "HEAD"
+      ],
+      "allowed_headers": [
+        "Origin",
+        "Accept",
+        "Content-Type",
+        "X-Requested-With",
+        "Authorization"
+      ],
       "exposed_headers": [],
       "allow_credentials": false,
       "max_age": 24,
       "options_passthrough": false,
       "debug": false
     },
-    "domain": "",
+    "domain": "dynamic-looping.localhost",
     "certificates": [],
     "do_not_track": false,
     "tags": [],
@@ -310,8 +399,8 @@
     "enable_detailed_recording": false,
     "graphql": {
       "enabled": false,
-      "execution_mode": "",
-      "version": "",
+      "execution_mode": "proxyOnly",
+      "version": "2",
       "schema": "",
       "type_field_configurations": [],
       "playground": {
@@ -327,23 +416,7 @@
       }
     }
   },
-  "hook_references": [
-    {
-      "event_name": "AuthFailure",
-      "event_timeout": 60,
-      "hook": {
-        "api_model": {},
-        "id": "6151727935f8d55b8cebe152",
-        "org_id": "5e9d9544a1dcd60001d0ed20",
-        "name": "Webhook Receiver Post",
-        "method": "POST",
-        "target_path": "http://localhost:8080/webhook-receiver/post",
-        "template_path": "",
-        "header_map": {},
-        "event_timeout": 0
-      }
-    }
-  ],
+  "hook_references": [],
   "is_site": false,
   "sort_by": 0,
   "user_group_owners": [],

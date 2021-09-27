@@ -729,6 +729,51 @@
 							"response": []
 						},
 						{
+							"name": "Plugin - URL Rewrite (part 6 - looping, again)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"URL rewritten to \\\"http://httpbin/get\\\"\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.url).to.equal(\"http://httpbin/get\");",
+											"});",
+											"",
+											"pm.test(\"\\\"Version\\\" header is \\\"v1\\\"\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers.Version).to.equal(\"v1\");",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-custom-domain-2.host}}/v1/ccc9acdb5b8646f66b2322c337d04f21/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-custom-domain-2.host}}"
+									],
+									"path": [
+										"v1",
+										"ccc9acdb5b8646f66b2322c337d04f21",
+										"get"
+									]
+								},
+								"description": "This example uses URL Rewrite rules and Looping to redirect the request.\n\nThe API Definition which initially services this request is configured to extract the path elements, using the first (`v1`) as the version, the second (`ccc9acdb5b8646f66b2322c337d04f21`) as the api id to loop to, then the remaining path elements (`get`) as the upstream path.\n\nThe rewrite matching pattern `/(.*)/(.*)/(.*)` is rewritten as `tyk://$2/$1/$3`."
+							},
+							"response": []
+						},
+						{
 							"name": "Plugin - Modify Headers",
 							"event": [
 								{
@@ -1561,6 +1606,45 @@
 									]
 								},
 								"description": "This request shows that version can be expired. In this case a version called `expired` was created with an expiry date in the past. This means that requests for this version are rejected by the Gateway, with a message provided in the response body which says the version has expired."
+							},
+							"response": []
+						},
+						{
+							"name": "Versioning (part 4) - Path-based versioning",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Version \\\"v2\\\" header returned\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers.Version).to.eql(\"v2\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/version-by-path/v2/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"version-by-path",
+										"v2",
+										"get"
+									]
+								},
+								"description": "This request shows versioning using the request path. In this situation, the API version is extracted from the first path element after the listen path.\n\nIn this example the listen path is `version-by-path`, so the version is the following element `v2`. This version of the API injects a `Version` header with the value `v2`, which can be seen in the body of the response returned from the server."
 							},
 							"response": []
 						}
@@ -5876,6 +5960,10 @@
 		{
 			"key": "tyk-dashboard.admin-api-key",
 			"value": "ff8289874f5d45de945a2ea5c02580fe"
+		},
+		{
+			"key": "tyk-custom-domain-2.host",
+			"value": "dynamic-looping.localhost:8080"
 		}
 	]
 }
