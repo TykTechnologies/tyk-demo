@@ -190,7 +190,7 @@ It is normal to see this message in the `bootstrap.log` file. It appears when th
 
 If the message repeats without moving on then the service being tested is experiencing a problem. In this situation you should:
 
-- check for error messages in the container logs of the service being tested
-- ensure Docker has sufficient resources to run the deployment (particularly when combining multiple deployments together)
+- Check for error messages in the container logs of the service being tested.
+- Ensure Docker has sufficient resources to run the deployment. The standard `tyk` deployment should be ok with just 1GB RAM, but it is recommended to make more RAM available (2GB+) when combining multiple deployments together.
 
 These steps will help you diagnose the source of the problem.
