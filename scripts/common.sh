@@ -562,7 +562,7 @@ create_bearer_token() {
   local bearer_token_data_path="$1"
   local api_key="$2"
   local file_name="$(basename $bearer_token_data_path)"
-  # key name is taken from the filename, using the 4th hypenated segment and excluding the extension e.g. "basic-1-username.json" results in "username"
+  # key name is taken from the filename, using the 4th hypenated segment and excluding the extension e.g. "bearer-token-1-mytoken.json" results in "mytoken"
   local key_name="$(echo "$file_name" | cut -d. -f1 | cut -d- -f4)"
 
   if [[ "$key_name" == "" ]]; then
@@ -586,6 +586,32 @@ create_bearer_token() {
     log_message "    Hash: $(jq -r '.key_hash' <<< "$api_response")"
   else
     log_message "ERROR: Could not create bearer token. API response returned $api_response."
+    exit 1
+  fi
+}
+
+create_oauth_client() {
+  local oauth_client_data_path="$1"
+  local api_key="$2"
+  local api_id=$(cat $oauth_client_data_path | jq -r '.api_id')
+  local client_id=$(cat $oauth_client_data_path | jq -r '.client_id')
+  local client_secret=$(cat $oauth_client_data_path | jq -r '.secret')
+
+  log_message "  Adding OAuth Client: $client_id"
+
+  local api_response=$(curl $dashboard_base_url/api/apis/oauth/$api_id -s \
+    -H "Authorization: $api_key" \
+    -d @$oauth_client_data_path 2>> bootstrap.log)
+
+  local response_client_id=$(jq -r '.client_id' <<< "$api_response")
+  local response_client_secret=$(jq -r '.secret' <<< "$api_response")
+
+  # custom validation
+  if [[ "$response_client_id" == "$client_id" ]] && [[ "$response_client_secret" == "$client_secret" ]]; then
+    log_ok
+    log_message "    Secret: $client_secret"
+  else
+    log_message "ERROR: API response does not contain expected OAuth client data."
     exit 1
   fi
 }

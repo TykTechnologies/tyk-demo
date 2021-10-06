@@ -209,6 +209,15 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
         bootstrap_progress        
       fi
     done
+
+    # OAuth - Clients
+    log_message "Creating OAuth Clients"
+    for file in $data_group_path/oauth/clients/*; do
+      if [[ -f $file ]]; then
+        create_oauth_client "$file" "$dashboard_user_api_key"
+        bootstrap_progress        
+      fi
+    done
   fi
 done
 

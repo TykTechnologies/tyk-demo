@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "2988132f-e906-47a5-b842-b39f48330a52",
+		"_postman_id": "bb03f702-fd7b-43af-86ee-53d74ca9f22d",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2252,6 +2252,151 @@
 													]
 												},
 												"description": "This request uses an invalid key, so fails with an HTTP 401 response."
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "OAuth",
+									"item": [
+										{
+											"name": "OAuth - Get OAuth Client",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"Client id is \\\"my-client-id\\\"\", function () {",
+															"    var jsonData = pm.response.json();",
+															"    pm.expect(jsonData.client_id).to.eql(\"my-client-id\");",
+															"});",
+															"",
+															"pm.test(\"Client secret is \\\"my-client-secret\\\"\", function () {",
+															"    var jsonData = pm.response.json();",
+															"    pm.expect(jsonData.secret).to.eql(\"my-client-secret\");",
+															"});",
+															"",
+															"pm.test(\"Policy id is \\\"615d2e528bf3980001c7c6c2\\\"\", function () {",
+															"    var jsonData = pm.response.json();",
+															"    pm.expect(jsonData.policy_id).to.eql(\"615d2e528bf3980001c7c6c2\");",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "x-tyk-authorization",
+														"value": "28d220fd77974a4facfb07dc1e49c2aa",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "http://{{tyk-gateway.host}}/tyk/oauth/clients/fa0b0268b4124faa70e151a879d3e92c/my-client-id",
+													"protocol": "http",
+													"host": [
+														"{{tyk-gateway.host}}"
+													],
+													"path": [
+														"tyk",
+														"oauth",
+														"clients",
+														"fa0b0268b4124faa70e151a879d3e92c",
+														"my-client-id"
+													]
+												},
+												"description": "This request retrieves an OAuth client. The client is added to the system as part of the bootstrap process, and is associated with the \"OAuth 2.0 API\" API Definition and its corresponding Policy \"OAuth 2.0 Policy\".\n\nThe client's id and secret can be used to generate an API token for the \"OAuth 2.0 API\"."
+											},
+											"response": []
+										},
+										{
+											"name": "OAuth - Generate API Token Using Client Credentials",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															"pm.test(\"Access token is generated\", function () {",
+															"    var jsonData = pm.response.json();",
+															"    pm.expect(jsonData.access_token).is.not.empty;",
+															"});",
+															"",
+															"pm.test(\"Token type is \\\"bearer\\\"\", function () {",
+															"    var jsonData = pm.response.json();",
+															"    pm.expect(jsonData.token_type).eq(\"bearer\");",
+															"});",
+															"",
+															"pm.test(\"Token can access OAuth 2.0 API\", function () {",
+															"    var oauth2Rrequest = {",
+															"        url: 'http://' + pm.variables.get(\"tyk-gateway.host\") + '/oauth-2.0-api/get',",
+															"        method: 'GET',",
+															"        header: {",
+															"            'Authorization': 'Bearer ' + pm.response.json().access_token",
+															"        }",
+															"    };",
+															"    pm.sendRequest(oauth2Rrequest, function (err, response) {",
+															"        pm.expect(response.code).eq(200);",
+															"    });",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Basic bXktY2xpZW50LWlkOm15LWNsaWVudC1zZWNyZXQ=",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "urlencoded",
+													"urlencoded": [
+														{
+															"key": "grant_type",
+															"value": "client_credentials",
+															"type": "text"
+														},
+														{
+															"key": "client_id",
+															"value": "my-client-id",
+															"type": "text"
+														},
+														{
+															"key": "client_secret",
+															"value": "my-client-secret",
+															"type": "text"
+														}
+													]
+												},
+												"url": {
+													"raw": "http://{{tyk-gateway.host}}/oauth-2.0-api/oauth/token",
+													"protocol": "http",
+													"host": [
+														"{{tyk-gateway.host}}"
+													],
+													"path": [
+														"oauth-2.0-api",
+														"oauth",
+														"token"
+													]
+												},
+												"description": "This request uses an OAuth client to generate a token which can be used to access an API protected with OAuth 2.0.\n\nThe request `authorization` header uses basic-style authentication credentials, using a base64 encoded string of the OAuth client id and secret.\n\nThe request body contains the grant type and the OAuth client id and secret.\n\nThe response body provides the bearer token, which can then be used to access the API. The token has a expiry, which defaults to 3600 seconds (1 hour), after which the token is no longer valid for authentication."
 											},
 											"response": []
 										}
