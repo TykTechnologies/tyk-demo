@@ -9,7 +9,7 @@ Demonstrates how analytics data can be pushed into 3rd party databases and repor
 Run the `up.sh` script with the `analytics` parameter:
 
 ```
-./up.sh analytics
+./up.sh analytics-kibana
 ```
 
 ### Postman Collection

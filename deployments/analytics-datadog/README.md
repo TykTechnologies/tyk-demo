@@ -31,6 +31,7 @@ The metrics Tyk sends to Datadog can be found under the `tyk` namespace.
 |---------------------------|:-------------:|------:|
 | DD_API_KEY | {your-datadog-api-key} | For the DD agent to connect the DD portal |
 | DD_ENV |    tyk-demo-env   |   To set environment name |
+| DD_SITE |    {your-datadog-site-url}   |   By default this should be `datadoghq.com` but if registered in EU use `datadoghq.eu` |
 | DD_DOGSTATSD_TAGS | "env:tyk-demo" |  Additional tags to append to all metrics, events, and service checks received by this DogStatsD server |
 | DD_LOGS_ENABLED | true | For the DD agent to enable logs collection |
 | DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL | true | To skip the DD logs |
@@ -43,7 +44,7 @@ The metrics Tyk sends to Datadog can be found under the `tyk` namespace.
 
 ```
    DD_API_KEY={your-datadog-api-key}
-   DD_SITE="datadoghq.com"
+   DD_SITE={your-datadog-site-url}
    DD_DOGSTATSD_TAGS="env:tyk-demo"
    DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
    DD_LOGS_ENABLED=true
