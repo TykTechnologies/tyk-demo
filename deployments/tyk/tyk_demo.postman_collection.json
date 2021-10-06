@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "bb03f702-fd7b-43af-86ee-53d74ca9f22d",
+		"_postman_id": "ba85e7d0-6e64-4845-9e47-8f5535c1f8f4",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -4957,29 +4957,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"pm.variables.set(\"api-path\", pm.variables.replaceIn(\"{{$randomLoremSlug}}\"));",
-													"",
-													"// create a user so that at we can delete it",
-													"tyk.dashboardAdminApi.users.create(",
-													"    JSON.stringify({",
-													"        first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
-													"        last_name: pm.variables.replaceIn(\"{{$randomLastName}}\"),",
-													"        email_address: pm.variables.replaceIn(\"{{$randomExampleEmail}}\"),",
-													"        org_id: \"5e9d9544a1dcd60001d0ed20\",",
-													"        active: true,",
-													"        password: \"3LEsHO1jv1dt9Xgf\",",
-													"        user_permissions: {",
-													"            IsAdmin: \"admin\",",
-													"            ResetPassword: \"admin\"",
-													"        }",
-													"    }),",
-													"    (error, response) => { ",
-													"        pm.expect(response.code).to.eql(200);",
-													"        pm.variables.set(\"user-id\", response.json().Meta.id);",
-													"        pm.variables.set(\"user-api-key\", response.json().Meta.access_key);",
-													"    },",
-													"    pm",
-													");"
+													"pm.variables.set(\"api-path\", pm.variables.replaceIn(\"{{$randomLoremSlug}}\"));"
 												],
 												"type": "text/javascript"
 											}
@@ -5005,23 +4983,14 @@
 													"pm.test(\"API is created\", function () {",
 													"    tyk.dashboardApi.apis.get(",
 													"        pm.response.json().Meta,",
-													"        pm.variables.get(\"user-api-key\"),",
+													"        pm.variables.get(\"tyk-dashboard.api-key\"),",
 													"        (error, response) => { ",
 													"            pm.expect(response.code).to.eql(200);",
+													"            tyk.dashboardApi.tools.apiKey.delete(pm);",
 													"        },",
 													"        pm",
 													"    );",
-													"});",
-													"",
-													"// delete temporary user",
-													"tyk.dashboardApi.users.delete(",
-													"    pm.variables.get(\"user-id\"),",
-													"    pm.variables.get(\"user-api-key\"),",
-													"    (error, response) => {",
-													"        pm.expect(response.code).to.eq(200);",
-													"    },",
-													"    pm",
-													");"
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -5032,7 +5001,7 @@
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "{{user-api-key}}",
+												"value": "{{tyk-dashboard.api-key}}",
 												"type": "text"
 											}
 										],
@@ -5071,27 +5040,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"// create a user so that at we can use its api key to authorize the request",
-													"tyk.dashboardAdminApi.users.create(",
-													"    JSON.stringify({",
-													"        first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
-													"        last_name: pm.variables.replaceIn(\"{{$randomLastName}}\"),",
-													"        email_address: pm.variables.replaceIn(\"{{$randomExampleEmail}}\"),",
-													"        org_id: \"5e9d9544a1dcd60001d0ed20\",",
-													"        active: true,",
-													"        password: \"3LEsHO1jv1dt9Xgf\",",
-													"        user_permissions: {",
-													"            IsAdmin: \"admin\",",
-													"            ResetPassword: \"admin\"",
-													"        }",
-													"    }),",
-													"    (error, response) => { ",
-													"        pm.expect(response.code).to.eql(200);",
-													"        pm.variables.set(\"user-id\", response.json().Meta.id);",
-													"        pm.variables.set(\"user-api-key\", response.json().Meta.access_key);",
-													"    },",
-													"    pm",
-													");"
+													""
 												],
 												"type": "text/javascript"
 											}
@@ -5122,23 +5071,23 @@
 													"pm.test(\"User is created\", function () {",
 													"    tyk.dashboardApi.users.get(",
 													"        pm.response.json().Meta,",
-													"        pm.variables.get(\"user-api-key\"),",
+													"        pm.variables.get(\"tyk-dashboard.api-key\"),",
 													"        (error, response) => { ",
 													"            pm.expect(response.code).to.eql(200);",
+													"            // now delete the user that was created",
+													"            tyk.dashboardApi.users.delete(",
+													"                pm.response.json().Meta,",
+													"                pm.variables.get(\"tyk-dashboard.api-key\"),",
+													"                (error, response) => { ",
+													"                    pm.expect(response.code).to.eql(200);",
+													"                    tyk.dashboardApi.tools.apiKey.delete(pm);",
+													"                },",
+													"                pm",
+													"            );",
 													"        },",
 													"        pm",
 													"    );",
-													"});",
-													"",
-													"// remove temp user",
-													"tyk.dashboardApi.users.delete(",
-													"    pm.variables.get(\"user-id\"),",
-													"    pm.variables.get(\"user-api-key\"),",
-													"    (error, response) => { ",
-													"        pm.expect(response.code).to.eql(200);",
-													"    },",
-													"    pm",
-													");"
+													"});"
 												],
 												"type": "text/javascript"
 											}
@@ -5149,7 +5098,7 @@
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "{{user-api-key}}",
+												"value": "{{tyk-dashboard.api-key}}",
 												"type": "text"
 											}
 										],
@@ -5183,28 +5132,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"// create a temporary user so that at we can request it",
-													"tyk.dashboardAdminApi.users.create(",
-													"    JSON.stringify({",
-													"        first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
-													"        last_name: pm.variables.replaceIn(\"{{$randomLastName}}\"),",
-													"        email_address: pm.variables.replaceIn(\"{{$randomExampleEmail}}\"),",
-													"        org_id: \"5e9d9544a1dcd60001d0ed20\",",
-													"        active: true,",
-													"        password: \"3LEsHO1jv1dt9Xgf\",",
-													"        user_permissions: {",
-													"            IsAdmin: \"admin\",",
-													"            ResetPassword: \"admin\"",
-													"        }",
-													"    }),",
-													"    (error, response) => { ",
-													"        pm.expect(response.code).to.eql(200);",
-													"        // user id needed for request, and to delete after tests",
-													"        pm.variables.set(\"user-id\", response.json().Meta.id);",
-													"        pm.variables.set(\"user-api-key\", response.json().Meta.access_key);",
-													"    },",
-													"    pm",
-													");"
+													""
 												],
 												"type": "text/javascript"
 											}
@@ -5227,15 +5155,7 @@
 													"    pm.expect(jsonData.users.length).to.be.gt(0);",
 													"});",
 													"",
-													"// delete temporary user",
-													"tyk.dashboardApi.users.delete(",
-													"    pm.variables.get(\"user-id\"),",
-													"    pm.variables.get(\"user-api-key\"),",
-													"    (error, response) => {",
-													"        pm.expect(response.code).to.eq(200);",
-													"    },",
-													"    pm",
-													");"
+													"tyk.dashboardApi.tools.apiKey.delete(pm);"
 												],
 												"type": "text/javascript"
 											}
@@ -5249,13 +5169,13 @@
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "{{user-api-key}}",
+												"value": "{{tyk-dashboard.api-key}}",
 												"type": "text"
 											}
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"first_name\": \"{{$randomFirstName}}\",\n  \"last_name\": \"{{$randomLastName}}\",\n  \"email_address\": \"{{$randomExampleEmail}}\",\n  \"active\": true,\n  \"password\": \"thisisatest\",\n  \"user_permissions\": { \"IsAdmin\": \"admin\" }\n}",
+											"raw": "",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -5293,7 +5213,7 @@
 													"pm.variables.set(\"user-last-name\", pm.variables.replaceIn(\"{{$randomLastName}}\"));",
 													"pm.variables.set(\"user-email-address\", pm.variables.replaceIn(\"{{$randomExampleEmail}}\"));",
 													"",
-													"// create a temporary user so that at we can request it",
+													"// create a temporary user so that at we can get it",
 													"tyk.dashboardAdminApi.users.create(",
 													"    JSON.stringify({",
 													"        first_name: pm.variables.get(\"user-first-name\"),",
@@ -5337,12 +5257,13 @@
 													"    pm.expect(jsonData.email_address).to.equal(pm.variables.get(\"user-email-address\"));",
 													"});",
 													"",
-													"// delete temporary user",
+													"// tidy up",
 													"tyk.dashboardApi.users.delete(",
-													"    pm.variables.get(\"user-id\"),",
-													"    pm.variables.get(\"user-api-key\"),",
+													"    pm.variables.get(\"user-id\"), ",
+													"    pm.variables.get(\"tyk-dashboard.api-key\"), ",
 													"    (error, response) => {",
 													"        pm.expect(response.code).to.eq(200);",
+													"        tyk.dashboardApi.tools.apiKey.delete(pm);",
 													"    },",
 													"    pm",
 													");"
@@ -5359,13 +5280,13 @@
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "{{user-api-key}}",
+												"value": "{{tyk-dashboard.api-key}}",
 												"type": "text"
 											}
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"first_name\": \"{{$randomFirstName}}\",\n  \"last_name\": \"{{$randomLastName}}\",\n  \"email_address\": \"{{$randomExampleEmail}}\",\n  \"active\": true,\n  \"password\": \"thisisatest\",\n  \"user_permissions\": { \"IsAdmin\": \"admin\" }\n}",
+											"raw": "",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -5394,7 +5315,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"// create a user so that at we can delete it",
+													"// create a user so that at we can update it",
 													"tyk.dashboardAdminApi.users.create(",
 													"    JSON.stringify({",
 													"        first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
@@ -5452,20 +5373,22 @@
 													"            var currentEmailAddress = response.json().email_address;",
 													"            var requestedEmailAddress = JSON.parse(pm.request.body.raw).email_address;",
 													"            pm.expect(requestedEmailAddress).to.eql(currentEmailAddress);",
+													"",
+													"            // delete temporary user",
+													"            tyk.dashboardApi.users.delete(",
+													"                pm.variables.get(\"user-id\"),",
+													"                pm.variables.get(\"tyk-dashboard.api-key\"),",
+													"                (error, response) => {",
+													"                    pm.expect(response.code).to.eq(200);",
+													"                    tyk.dashboardApi.tools.apiKey.delete(pm);",
+													"                },",
+													"                pm",
+													"            );",
 													"        },",
 													"        pm",
 													"    );    ",
 													"});",
-													"",
-													"// delete temporary user",
-													"tyk.dashboardApi.users.delete(",
-													"    pm.variables.get(\"user-id\"),",
-													"    pm.variables.get(\"user-api-key\"),",
-													"    (error, response) => {",
-													"        pm.expect(response.code).to.eq(200);",
-													"    },",
-													"    pm",
-													");"
+													""
 												],
 												"type": "text/javascript"
 											}
@@ -5476,7 +5399,7 @@
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "{{user-api-key}}",
+												"value": "{{tyk-dashboard.api-key}}",
 												"type": "text"
 											}
 										],
@@ -5552,7 +5475,9 @@
 													"pm.test(\"Status is \\\"OK\\\"\", function () {",
 													"    var jsonData = pm.response.json();",
 													"    pm.expect(jsonData.Status).to.equal(\"OK\");",
-													"});"
+													"});",
+													"",
+													"tyk.dashboardApi.tools.apiKey.delete(pm);"
 												],
 												"type": "text/javascript"
 											}
@@ -5563,7 +5488,7 @@
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "{{user-api-key}}",
+												"value": "{{tyk-dashboard.api-key}}",
 												"type": "text"
 											}
 										],
@@ -5589,7 +5514,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"// create a user so that at we can delete it",
+													"// create a user so that at we can reset the password",
 													"tyk.dashboardAdminApi.users.create(",
 													"    JSON.stringify({",
 													"        first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
@@ -5634,9 +5559,10 @@
 													"// delete temporary user",
 													"tyk.dashboardApi.users.delete(",
 													"    pm.variables.get(\"user-id\"),",
-													"    pm.variables.get(\"user-api-key\"),",
+													"    pm.variables.get(\"tyk-dashboard.api-key\"),",
 													"    (error, response) => {",
 													"        pm.expect(response.code).to.eq(200);",
+													"        tyk.dashboardApi.tools.apiKey.delete(pm);",
 													"    },",
 													"    pm",
 													");"
@@ -5650,7 +5576,7 @@
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "{{user-api-key}}",
+												"value": "{{tyk-dashboard.api-key}}",
 												"type": "text"
 											}
 										],
@@ -5687,7 +5613,7 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
-													"// create a user so that at we can delete it",
+													"// create a user so that at we can reset the password",
 													"tyk.dashboardAdminApi.users.create(",
 													"    JSON.stringify({",
 													"        first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
@@ -5748,9 +5674,10 @@
 													"// delete temporary user",
 													"tyk.dashboardApi.users.delete(",
 													"    pm.variables.get(\"user-id\"),",
-													"    pm.variables.get(\"user-api-key\"),",
+													"    pm.variables.get(\"tyk-dashboard.api-key\"),",
 													"    (error, response) => {",
 													"        pm.expect(response.code).to.eq(200);",
+													"        tyk.dashboardApi.tools.apiKey.delete(pm);",
 													"    },",
 													"    pm",
 													");"
@@ -5764,7 +5691,7 @@
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "{{user-api-key}}",
+												"value": "{{tyk-dashboard.api-key}}",
 												"type": "text"
 											}
 										],
@@ -5795,6 +5722,213 @@
 									"response": []
 								}
 							]
+						},
+						{
+							"name": "OAuth Clients",
+							"item": [
+								{
+									"name": "Get an OAuth Client",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.variables.set(\"oauth-client-id\", pm.variables.replaceIn(\"{{$guid}}\"))",
+													"pm.variables.set(\"oauth-client-secret\", pm.variables.replaceIn(\"{{$randomPassword}}\"))",
+													"pm.variables.set(\"oauth-redirect-uri\", pm.variables.replaceIn(\"{{$randomUrl}}\"))",
+													"// The API and Policy Ids are based on data added by the bootstrap. The test will fail if it is run before the boostrap script.",
+													"pm.variables.set(\"api-id\", \"fa0b0268b4124faa70e151a879d3e92c\")",
+													"pm.variables.set(\"policy-id\", \"615d2e528bf3980001c7c6c2\")",
+													"",
+													"tyk.dashboardApi.oauthClients.create(",
+													"    JSON.stringify({",
+													"        \"client_id\": pm.variables.get(\"oauth-client-id\"),",
+													"        \"api_id\": pm.variables.get(\"api-id\"),",
+													"        \"policy_id\": pm.variables.get(\"policy-id\"),",
+													"        \"secret\": pm.variables.get(\"oauth-client-secret\"),",
+													"        \"redirect_uri\": pm.variables.get(\"oauth-redirect-uri\")",
+													"    }),",
+													"    (error, response) => {",
+													"        pm.expect(response.code).to.eq(200);",
+													"    },",
+													"    pm",
+													")"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var requestOauthClientId = pm.variables.get(\"oauth-client-id\");",
+													"var requestOauthClientSecret = pm.variables.get(\"oauth-client-secret\");",
+													"var requestApiId = pm.variables.get(\"api-id\");",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Client Id is \\\"\" + requestOauthClientId + \"\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.client_id).to.equal(requestOauthClientId);",
+													"});",
+													"",
+													"pm.test(\"Client Secret is \\\"\" + requestOauthClientSecret + \"\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.secret).to.equal(requestOauthClientSecret);",
+													"});",
+													"",
+													"// tidy up",
+													"tyk.dashboardApi.oauthClients.delete(",
+													"    requestOauthClientId, ",
+													"    requestApiId, ",
+													"    (error, response) => { ",
+													"        pm.expect(response.code).to.eql(200);",
+													"        tyk.dashboardApi.tools.apiKey.delete(pm);",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "{{tyk-dashboard.api-key}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://{{tyk-dashboard.host}}/api/apis/oauth/fa0b0268b4124faa70e151a879d3e92c/{{oauth-client-id}}",
+											"protocol": "http",
+											"host": [
+												"{{tyk-dashboard.host}}"
+											],
+											"path": [
+												"api",
+												"apis",
+												"oauth",
+												"fa0b0268b4124faa70e151a879d3e92c",
+												"{{oauth-client-id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create an OAuth Client",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var requestBody = JSON.parse(request.data);",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Client Id is \\\"\" + requestBody.client_id + \"\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.client_id).to.eql(requestBody.client_id);",
+													"});",
+													"",
+													"pm.test(\"Secret is \\\"\" + requestBody.secret + \"\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.secret).to.eql(requestBody.secret);",
+													"});",
+													"",
+													"pm.test(\"Policy Id is \\\"\" + requestBody.policy_id + \"\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.policy_id).to.eql(requestBody.policy_id);",
+													"});",
+													"",
+													"// tidy up",
+													"tyk.dashboardApi.oauthClients.delete(",
+													"    requestBody.client_id,",
+													"    requestBody.api_id, ",
+													"    (error, response) => { ",
+													"        pm.expect(response.code).to.eql(200);",
+													"        tyk.dashboardApi.tools.apiKey.delete(pm);",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "{{tyk-dashboard.api-key}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"client_id\": \"test-client-id\",\n    \"api_id\": \"fa0b0268b4124faa70e151a879d3e92c\",\n    \"policy_id\": \"615d2e528bf3980001c7c6c2\",\n    \"secret\": \"test-client-secret\",\n    \"redirect_uri\": \"http://example.com\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{tyk-dashboard.host}}/api/apis/oauth/fa0b0268b4124faa70e151a879d3e92c",
+											"protocol": "http",
+											"host": [
+												"{{tyk-dashboard.host}}"
+											],
+											"path": [
+												"api",
+												"apis",
+												"oauth",
+												"fa0b0268b4124faa70e151a879d3e92c"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Creates a Dashboard API key that can be used for requests within this folder.",
+									"// Each request is expected to call `tyk.dashboardApi.tools.apiKey.delete(pm);` at the end of its test so that the key is removed.",
+									"tyk.dashboardApi.tools.apiKey.create(pm);"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
 						}
 					]
 				},
@@ -5960,6 +6094,39 @@
 					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/api/apis/\" + apiId,",
 					"                        method: \"GET\",",
 					"                        header: \"authorization: \" + apiKey",
+					"                    },",
+					"                    callback",
+					"                );",
+					"            }",
+					"        },",
+					"        oauthClients: {",
+					"            create: function (oauthClient, callback, pm) {",
+					"                pm.sendRequest(",
+					"                    {",
+					"                        url: 'http://' + pm.variables.get(\"tyk-dashboard.host\") + '/api/apis/oauth/' + JSON.parse(oauthClient).api_id,",
+					"                        method: 'POST',",
+					"                        header: 'authorization: ' + pm.variables.get(\"tyk-dashboard.api-key\"),",
+					"                        body: oauthClient",
+					"                    },",
+					"                    callback",
+					"                );",
+					"            },",
+					"            get: function (oauthClientId, apiId, callback, pm) {",
+					"                pm.sendRequest(",
+					"                    {",
+					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/api/apis/oauth/\" + apiId + \"/\" + oauthClientId,",
+					"                        method: \"GET\",",
+					"                        header: \"authorization: \" + pm.variables.get(\"tyk-dashboard.api-key\")",
+					"                    }, ",
+					"                    callback",
+					"                );",
+					"            },",
+					"            delete: function (oauthClientId, apiId, callback, pm) {",
+					"                pm.sendRequest(",
+					"                    {",
+					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/api/apis/oauth/\" + apiId + \"/\" + oauthClientId,",
+					"                        method: \"DELETE\",",
+					"                        header: \"authorization: \" + pm.variables.get(\"tyk-dashboard.api-key\")",
 					"                    }, ",
 					"                    callback",
 					"                );",
@@ -5986,7 +6153,7 @@
 					"                    callback",
 					"                );   ",
 					"            },",
-					"            updateUser: function (userId, user, apiKey, callback, pm) {",
+					"            update: function (userId, user, apiKey, callback, pm) {",
 					"                pm.sendRequest(",
 					"                    {",
 					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/api/users/\" + userId,",
@@ -6007,6 +6174,44 @@
 					"                    },",
 					"                    callback",
 					"                );",
+					"            }",
+					"        },",
+					"        tools: {",
+					"            apiKey: {",
+					"                create: function (pm) {",
+					"                    // create a user so that at we can use its API credentials",
+					"                    tyk.dashboardAdminApi.users.create(",
+					"                        JSON.stringify({",
+					"                            first_name: pm.variables.replaceIn(\"{{$randomFirstName}}\"),",
+					"                            last_name: pm.variables.replaceIn(\"{{$randomLastName}}\"),",
+					"                            email_address: pm.variables.replaceIn(\"{{$randomExampleEmail}}\"),",
+					"                            org_id: \"5e9d9544a1dcd60001d0ed20\",",
+					"                            active: true,",
+					"                            password: \"3LEsHO1jv1dt9Xgf\",",
+					"                            user_permissions: {",
+					"                                IsAdmin: \"admin\",",
+					"                                ResetPassword: \"admin\"",
+					"                            }",
+					"                        }),",
+					"                        (error, response) => { ",
+					"                            pm.expect(response.code).to.eql(200);",
+					"                            pm.variables.set(\"tyk-dashboard.api-user-id\", response.json().Meta.id);",
+					"                            pm.variables.set(\"tyk-dashboard.api-key\", response.json().Meta.access_key);",
+					"                        },",
+					"                        pm",
+					"                    );   ",
+					"                },",
+					"                delete: function (pm) {",
+					"                    // delete temporary user",
+					"                    tyk.dashboardApi.users.delete(",
+					"                        pm.variables.get(\"tyk-dashboard.api-user-id\"),",
+					"                        pm.variables.get(\"tyk-dashboard.api-key\"),",
+					"                        (error, response) => {",
+					"                            pm.expect(response.code).to.eq(200);",
+					"                        },",
+					"                        pm",
+					"                    );",
+					"                }",
 					"            }",
 					"        }",
 					"    },",
