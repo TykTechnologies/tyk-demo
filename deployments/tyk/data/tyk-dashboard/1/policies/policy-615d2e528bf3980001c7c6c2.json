@@ -1,0 +1,62 @@
+{
+  "auth_type": "oauth",
+  "auth_types": [
+    "oauth"
+  ],
+  "state": "active",
+  "access_rights_array": [
+    {
+      "api_name": "OAuth 2.0 API",
+      "api_id": "fa0b0268b4124faa70e151a879d3e92c",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "limit": null,
+      "field_access_rights": [],
+      "allowance_scope": ""
+    }
+  ],
+  "graphql_enabled": false,
+  "_id": "615d2e528bf3980001c7c6c2",
+  "id": "",
+  "name": "OAuth 2.0 Policy",
+  "org_id": "5e9d9544a1dcd60001d0ed20",
+  "rate": 1000,
+  "per": 60,
+  "quota_max": -1,
+  "quota_renewal_rate": -1,
+  "throttle_interval": -1,
+  "throttle_retry_limit": -1,
+  "max_query_depth": -1,
+  "access_rights": {
+    "fa0b0268b4124faa70e151a879d3e92c": {
+      "api_name": "OAuth 2.0 API",
+      "api_id": "fa0b0268b4124faa70e151a879d3e92c",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "limit": null,
+      "field_access_rights": [],
+      "allowance_scope": ""
+    }
+  },
+  "hmac_enabled": false,
+  "active": true,
+  "is_inactive": false,
+  "date_created": "2021-10-06T05:04:18.33Z",
+  "tags": [],
+  "key_expires_in": 0,
+  "partitions": {
+    "quota": true,
+    "rate_limit": true,
+    "complexity": false,
+    "acl": true,
+    "per_api": false
+  },
+  "last_updated": "1633496658",
+  "meta_data": {}
+}

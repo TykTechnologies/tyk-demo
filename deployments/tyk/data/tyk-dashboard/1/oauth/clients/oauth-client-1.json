@@ -1,0 +1,7 @@
+{
+    "client_id": "my-client-id",
+    "api_id": "fa0b0268b4124faa70e151a879d3e92c",
+    "policy_id": "615d2e528bf3980001c7c6c2",
+    "secret": "my-client-secret",
+    "redirect_uri": "http://example.com"
+}
