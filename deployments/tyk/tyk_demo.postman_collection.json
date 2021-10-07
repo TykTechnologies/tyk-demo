@@ -5776,6 +5776,102 @@
 							"name": "OAuth Clients",
 							"item": [
 								{
+									"name": "Create an OAuth Client",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var requestBody = JSON.parse(request.data);",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Client Id is \\\"\" + requestBody.client_id + \"\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.client_id).to.eql(requestBody.client_id);",
+													"});",
+													"",
+													"pm.test(\"Secret is \\\"\" + requestBody.secret + \"\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.secret).to.eql(requestBody.secret);",
+													"});",
+													"",
+													"pm.test(\"Policy Id is \\\"\" + requestBody.policy_id + \"\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.policy_id).to.eql(requestBody.policy_id);",
+													"});",
+													"",
+													"pm.test(\"Redirect URI is \\\"\" + requestBody.redirect_uri + \"\\\"\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.redirect_uri).to.eql(requestBody.redirect_uri);",
+													"});",
+													"",
+													"// tidy up",
+													"tyk.dashboardApi.oauthClients.delete(",
+													"    requestBody.client_id,",
+													"    requestBody.api_id, ",
+													"    (error, response) => { ",
+													"        pm.expect(response.code).to.eql(200);",
+													"        tyk.dashboardApi.tools.apiKey.delete(pm);",
+													"    },",
+													"    pm",
+													");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.variables.set(\"oauth-client-id\", pm.variables.replaceIn(\"{{$guid}}\"))",
+													"pm.variables.set(\"oauth-client-secret\", pm.variables.replaceIn(\"{{$randomPassword}}\"))",
+													"pm.variables.set(\"oauth-redirect-uri\", pm.variables.replaceIn(\"{{$randomUrl}}\"))",
+													"// The API and Policy Ids are based on data added by the bootstrap. The test will fail if it is run before the bootstrap script.",
+													"pm.variables.set(\"api-id\", \"fa0b0268b4124faa70e151a879d3e92c\")",
+													"pm.variables.set(\"policy-id\", \"615d2e528bf3980001c7c6c2\")"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "{{tyk-dashboard.api-key}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"client_id\": \"{{oauth-client-id}}\",\n    \"api_id\": \"{{api-id}}\",\n    \"policy_id\": \"{{policy-id}}\",\n    \"secret\": \"{{oauth-client-secret}}\",\n    \"redirect_uri\": \"{{oauth-redirect-uri}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{tyk-dashboard.host}}/api/apis/oauth/{{api-id}}",
+											"protocol": "http",
+											"host": [
+												"{{tyk-dashboard.host}}"
+											],
+											"path": [
+												"api",
+												"apis",
+												"oauth",
+												"{{api-id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "Get an OAuth Client",
 									"event": [
 										{
@@ -5785,7 +5881,7 @@
 													"pm.variables.set(\"oauth-client-id\", pm.variables.replaceIn(\"{{$guid}}\"))",
 													"pm.variables.set(\"oauth-client-secret\", pm.variables.replaceIn(\"{{$randomPassword}}\"))",
 													"pm.variables.set(\"oauth-redirect-uri\", pm.variables.replaceIn(\"{{$randomUrl}}\"))",
-													"// The API and Policy Ids are based on data added by the bootstrap. The test will fail if it is run before the boostrap script.",
+													"// The API and Policy Ids are based on data added by the bootstrap. The test will fail if it is run before the bootstrap script.",
 													"pm.variables.set(\"api-id\", \"fa0b0268b4124faa70e151a879d3e92c\")",
 													"pm.variables.set(\"policy-id\", \"615d2e528bf3980001c7c6c2\")",
 													"",
@@ -5853,7 +5949,7 @@
 											}
 										],
 										"url": {
-											"raw": "http://{{tyk-dashboard.host}}/api/apis/oauth/fa0b0268b4124faa70e151a879d3e92c/{{oauth-client-id}}",
+											"raw": "http://{{tyk-dashboard.host}}/api/apis/oauth/{{api-id}}/{{oauth-client-id}}",
 											"protocol": "http",
 											"host": [
 												"{{tyk-dashboard.host}}"
@@ -5862,7 +5958,7 @@
 												"api",
 												"apis",
 												"oauth",
-												"fa0b0268b4124faa70e151a879d3e92c",
+												"{{api-id}}",
 												"{{oauth-client-id}}"
 											]
 										}
@@ -5870,37 +5966,63 @@
 									"response": []
 								},
 								{
-									"name": "Create an OAuth Client",
+									"name": "Get all OAuth Clients for an API",
 									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.variables.set(\"oauth-client-id\", pm.variables.replaceIn(\"{{$guid}}\"))",
+													"pm.variables.set(\"oauth-client-secret\", pm.variables.replaceIn(\"{{$randomPassword}}\"))",
+													"pm.variables.set(\"oauth-redirect-uri\", pm.variables.replaceIn(\"{{$randomUrl}}\"))",
+													"// The API and Policy Ids are based on data added by the bootstrap. The test will fail if it is run before the bootstrap script.",
+													"pm.variables.set(\"api-id\", \"fa0b0268b4124faa70e151a879d3e92c\")",
+													"pm.variables.set(\"policy-id\", \"615d2e528bf3980001c7c6c2\")",
+													"",
+													"tyk.dashboardApi.oauthClients.create(",
+													"    JSON.stringify({",
+													"        \"client_id\": pm.variables.get(\"oauth-client-id\"),",
+													"        \"api_id\": pm.variables.get(\"api-id\"),",
+													"        \"policy_id\": pm.variables.get(\"policy-id\"),",
+													"        \"secret\": pm.variables.get(\"oauth-client-secret\"),",
+													"        \"redirect_uri\": pm.variables.get(\"oauth-redirect-uri\")",
+													"    }),",
+													"    (error, response) => {",
+													"        pm.expect(response.code).to.eq(200);",
+													"    },",
+													"    pm",
+													")"
+												],
+												"type": "text/javascript"
+											}
+										},
 										{
 											"listen": "test",
 											"script": {
 												"exec": [
-													"var requestBody = JSON.parse(request.data);",
+													"var requestOauthClientId = pm.variables.get(\"oauth-client-id\");",
+													"var requestOauthClientSecret = pm.variables.get(\"oauth-client-secret\");",
+													"var requestApiId = pm.variables.get(\"api-id\");",
 													"",
 													"pm.test(\"Status code is 200\", function () {",
 													"    pm.response.to.have.status(200);",
 													"});",
 													"",
-													"pm.test(\"Client Id is \\\"\" + requestBody.client_id + \"\\\"\", function () {",
+													"pm.test(\"App data is returned\", function () {",
 													"    var jsonData = pm.response.json();",
-													"    pm.expect(jsonData.client_id).to.eql(requestBody.client_id);",
+													"    pm.expect(jsonData.apps).is.not.empty;",
 													"});",
 													"",
-													"pm.test(\"Secret is \\\"\" + requestBody.secret + \"\\\"\", function () {",
+													"pm.test(\"App data is correct\", function () {",
 													"    var jsonData = pm.response.json();",
-													"    pm.expect(jsonData.secret).to.eql(requestBody.secret);",
-													"});",
-													"",
-													"pm.test(\"Policy Id is \\\"\" + requestBody.policy_id + \"\\\"\", function () {",
-													"    var jsonData = pm.response.json();",
-													"    pm.expect(jsonData.policy_id).to.eql(requestBody.policy_id);",
+													"    var app = jsonData.apps.find(app => app.client_id === requestOauthClientId);",
+													"    pm.expect(app.secret).to.eq(requestOauthClientSecret);",
 													"});",
 													"",
 													"// tidy up",
 													"tyk.dashboardApi.oauthClients.delete(",
-													"    requestBody.client_id,",
-													"    requestBody.api_id, ",
+													"    requestOauthClientId, ",
+													"    requestApiId, ",
 													"    (error, response) => { ",
 													"        pm.expect(response.code).to.eql(200);",
 													"        tyk.dashboardApi.tools.apiKey.delete(pm);",
@@ -5910,19 +6032,10 @@
 												],
 												"type": "text/javascript"
 											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
 										}
 									],
 									"request": {
-										"method": "POST",
+										"method": "GET",
 										"header": [
 											{
 												"key": "Authorization",
@@ -5930,17 +6043,8 @@
 												"type": "text"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"client_id\": \"test-client-id\",\n    \"api_id\": \"fa0b0268b4124faa70e151a879d3e92c\",\n    \"policy_id\": \"615d2e528bf3980001c7c6c2\",\n    \"secret\": \"test-client-secret\",\n    \"redirect_uri\": \"http://example.com\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "http://{{tyk-dashboard.host}}/api/apis/oauth/fa0b0268b4124faa70e151a879d3e92c",
+											"raw": "http://{{tyk-dashboard.host}}/api/apis/oauth/{{api-id}}",
 											"protocol": "http",
 											"host": [
 												"{{tyk-dashboard.host}}"
@@ -5949,7 +6053,92 @@
 												"api",
 												"apis",
 												"oauth",
-												"fa0b0268b4124faa70e151a879d3e92c"
+												"{{api-id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete an OAuth Client",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.variables.set(\"oauth-client-id\", pm.variables.replaceIn(\"{{$guid}}\"))",
+													"pm.variables.set(\"oauth-client-secret\", pm.variables.replaceIn(\"{{$randomPassword}}\"))",
+													"pm.variables.set(\"oauth-redirect-uri\", pm.variables.replaceIn(\"{{$randomUrl}}\"))",
+													"// The API and Policy Ids are based on data added by the bootstrap. The test will fail if it is run before the bootstrap script.",
+													"pm.variables.set(\"api-id\", \"fa0b0268b4124faa70e151a879d3e92c\")",
+													"pm.variables.set(\"policy-id\", \"615d2e528bf3980001c7c6c2\")",
+													"",
+													"tyk.dashboardApi.oauthClients.create(",
+													"    JSON.stringify({",
+													"        \"client_id\": pm.variables.get(\"oauth-client-id\"),",
+													"        \"api_id\": pm.variables.get(\"api-id\"),",
+													"        \"policy_id\": pm.variables.get(\"policy-id\"),",
+													"        \"secret\": pm.variables.get(\"oauth-client-secret\"),",
+													"        \"redirect_uri\": pm.variables.get(\"oauth-redirect-uri\")",
+													"    }),",
+													"    (error, response) => {",
+													"        pm.expect(response.code).to.eq(200);",
+													"    },",
+													"    pm",
+													")"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var requestOauthClientId = pm.variables.get(\"oauth-client-id\");",
+													"var requestOauthClientSecret = pm.variables.get(\"oauth-client-secret\");",
+													"var requestApiId = pm.variables.get(\"api-id\");",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"OAuth Client is deleted\", function () {",
+													"    tyk.dashboardApi.oauthClients.get(",
+													"        requestOauthClientId,",
+													"        requestApiId,",
+													"        (error, response) => { ",
+													"            pm.expect(response.code).to.eql(404);",
+													"            tyk.dashboardApi.tools.apiKey.delete(pm);",
+													"        },",
+													"        pm",
+													"    );",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "{{tyk-dashboard.api-key}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://{{tyk-dashboard.host}}/api/apis/oauth/{{api-id}}/{{oauth-client-id}}",
+											"protocol": "http",
+											"host": [
+												"{{tyk-dashboard.host}}"
+											],
+											"path": [
+												"api",
+												"apis",
+												"oauth",
+												"{{api-id}}",
+												"{{oauth-client-id}}"
 											]
 										}
 									},
