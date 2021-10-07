@@ -3,7 +3,7 @@
 # Contains functions useful for bootstrap scripts
 
 # this array defines the hostnames that the bootstrap script will verify, and that the update-hosts script will use to modify /etc/hosts
-declare -a tyk_demo_hostnames=("tyk-dashboard.localhost" "tyk-portal.localhost" "tyk-gateway.localhost" "tyk-gateway-2.localhost" "tyk-custom-domain.com" "tyk-worker-gateway.localhost" "acme-portal.localhost" "go-bench-suite.localhost")
+declare -a tyk_demo_hostnames=("tyk-dashboard.localhost" "tyk-portal.localhost" "tyk-gateway.localhost" "tyk-gateway-2.localhost" "tyk-custom-domain.com" "tyk-worker-gateway.localhost" "acme-portal.localhost" "go-bench-suite.localhost" "tyk-dynamic-looping.com")
 
 spinner_chars="/-\|"
 spinner_count=1
@@ -280,14 +280,9 @@ create_dashboard_user() {
   log_message "    Organisation Id: $dashboard_user_organisation_id"
 
   # add data to global variables and context data
-  # dashboard_user_emails+=("$dashboard_user_email")
-  # dashboard_user_passwords+=("$dashboard_user_password")
-  # dashboard_user_api_keys+=("$dashboard_user_api_key")
-  # local dashboard_user_count=${#dashboard_user_emails[@]}
   set_context_data "$data_group" "dashboard-user" "$index" "email" "$dashboard_user_email"
   set_context_data "$data_group" "dashboard-user" "$index" "password" "$dashboard_user_password"
   set_context_data "$data_group" "dashboard-user" "$index" "api-key" "$dashboard_user_api_key"
-  # echo "$dashboard_user_api_key" > ".context-data/dashboard-user-$dashboard_user_count-api-key"
 
   # reset the password
   log_message "  Resetting password for $dashboard_user_email"
@@ -401,22 +396,15 @@ create_portal_documentation() {
   local documentation_title=$(jq -r '.info.title' $documentation_data_path)
   log_message "  Creating Documentation: $documentation_title"
 
-  # replace with sed or jq?
-  echo -n '{
-            "api_id":"",
-            "doc_type":"swagger",
-            "documentation":"' >/tmp/swagger_encoded.out
-  cat $documentation_data_path | base64 >>/tmp/swagger_encoded.out
-  echo '"}' >>/tmp/swagger_encoded.out
+  encoded_documentation=$(cat $documentation_data_path | base64)
+  documentation_payload=$(jq --arg documentation "$encoded_documentation" '.documentation = $documentation' deployments/tyk/data/tyk-dashboard/dashboard-api-portal-documentation-create-template.json)
 
   local api_response=$(curl $dashboard_base_url/api/portal/documentation -s \
     -H "Authorization: $api_key" \
-    -d "@/tmp/swagger_encoded.out" \
+    -d "$documentation_payload" \
       2>> bootstrap.log)
 
   log_json_result "$api_response"
-
-  rm /tmp/swagger_encoded.out
 
   local documentation_id=$(echo "$api_response" | jq -r '.Message')
 
