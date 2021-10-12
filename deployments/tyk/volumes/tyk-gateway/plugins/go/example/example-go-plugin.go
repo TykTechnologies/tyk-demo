@@ -98,7 +98,7 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set session state using session object
-	ctx.SetSession(r, sessionObject, lookupKey, false)
+	ctx.SetSession(r, sessionObject, false)
 	logger.Info("Session created for request")
 }
 
