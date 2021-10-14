@@ -94,18 +94,18 @@ During the bootstrap script, the Go source in `deployments/tyk/volumes/tyk-gatew
 
 ### WebSockets
 
-WebSocket proxying is demonstrated using the *WebSocket* API Definition. It's configured to proxy to the `ws://echo.websocket.org` server (note: internet access is required for this example), which will echo back any message it receives.
+WebSocket proxying is demonstrated using the *WebSocket* API Definition. It's configured to proxy to `ws://echo-server:8080`, which will echo back any message it receives.
 
-To see a live demonstration, open the [WebSocket Test page](http://localhost:8888/websocket-test.html), which is included in this deployment, in a browser. When this page loads, it automatically opens a WebSocket connection with the API Gateway and uses JavaScript to send a message. The Gateway proxies the message to the upstream server and returns the response to the web page, which is displayed in on the page. If all goes well, it will look something like this:
+To see a live demonstration, open the [WebSocket Test page](http://websocket.localhost:8080/.ws) in a browser. When this page loads, it automatically opens a WebSocket connection with the API Gateway and uses JavaScript to send a message. The Gateway proxies the message to the upstream server and returns the response to the web page, which is displayed on the page. If all goes well, it will look something like this:
 
 ```
-CONNECTED to ws://tyk-gateway.localhost:8080/websocket/
-
-SENT: Hello, world!
-
-RESPONSE: Hello, world!
-
-DISCONNECTED
+[info]  attempting to connect
+[info]  connected
+[recv]  Request served by 44a2695777f7
+[send]  0 = 0x0
+[recv]  0 = 0x0
+[send]  1 = 0x1
+[recv]  1 = 0x1
 ```
 
-The source code for the WebSocket Test page can be found in `deployments/tyk/volumes/http-server/websocket-test.html`.
+Check the browser's developer tool network information to see the `MessageEvent` objects.
