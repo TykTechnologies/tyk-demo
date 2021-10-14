@@ -64,7 +64,6 @@ bootstrap_progress
 
 # Go plugins
 
-# NOTE: Go plugins are commented out until go compiler issue is resolved
 build_go_plugin "example-go-plugin.so" "example"
 bootstrap_progress
 
