@@ -218,7 +218,7 @@ build_go_plugin() {
     echo $gateway_image_tag > $go_plugin_build_version_filename
     log_ok
   else
-    # if you want to force a recompile of the plugin .so file, delete the .bootstrap/go-plugin-build-version file, or run the docker command manually
+    # if you want to force a recompile of the plugin .so file, delete the .bootstrap/go-plugin-build-version-<go_plugin_filename> file, or run the docker command manually
     log_message "  $go_plugin_filename has already built for $gateway_image_tag, skipping"
   fi
 }
