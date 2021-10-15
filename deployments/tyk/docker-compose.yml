@@ -121,6 +121,10 @@ services:
       - ./deployments/tyk/volumes/http-server:/usr/local/apache2/htdocs
     ports:
       - "8888:80"
+  echo-server:
+    image: jmalloc/echo-server:0.3.1
+    networks:
+      - tyk
 
 volumes:
   tyk-redis-data:

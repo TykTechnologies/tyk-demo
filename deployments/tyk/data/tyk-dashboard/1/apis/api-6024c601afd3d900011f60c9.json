@@ -3,8 +3,8 @@
   "api_model": {},
   "api_definition": {
     "id": "6024c601afd3d900011f60c9",
-    "name": "WebSocket",
-    "slug": "websocket",
+    "name": "Echo Server",
+    "slug": "echo-server",
     "listen_port": 0,
     "protocol": "",
     "enable_proxy_protocol": false,
@@ -255,8 +255,8 @@
     },
     "proxy": {
       "preserve_host_header": false,
-      "listen_path": "/websocket/",
-      "target_url": "ws://echo.websocket.org",
+      "listen_path": "/",
+      "target_url": "ws://echo-server:8080",
       "disable_strip_slash": false,
       "strip_listen_path": true,
       "enable_load_balancing": false,
@@ -360,7 +360,7 @@
       "options_passthrough": false,
       "debug": false
     },
-    "domain": "",
+    "domain": "echo-server.localhost",
     "certificates": [],
     "do_not_track": false,
     "tags": [],

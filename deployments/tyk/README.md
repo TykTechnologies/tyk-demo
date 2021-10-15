@@ -92,20 +92,48 @@ A [Go Plugin](https://tyk.io/docs/plugins/supported-languages/golang/) is implem
 
 During the bootstrap script, the Go source in `deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.go` is complied into a shared object library file (`deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.so`), which is referenced by the *Go Plugin API*. A special container is used to build the library file, using the same Go version used to build the Gateway.
 
-### WebSockets
+### WebSockets and Server-Sent Events
 
-WebSocket proxying is demonstrated using the *WebSocket* API Definition. It's configured to proxy to the `ws://echo.websocket.org` server (note: internet access is required for this example), which will echo back any message it receives.
+These examples use the *Echo Server* API Definition, which is configured to proxy to `echo-server:8080`, a simple echo server container. The echo server echoes back any message it receives, and has special endpoints which enable demonstration of WebSockets and Server-Sent Events.
 
-To see a live demonstration, open the [WebSocket Test page](http://localhost:8888/websocket-test.html), which is included in this deployment, in a browser. When this page loads, it automatically opens a WebSocket connection with the API Gateway and uses JavaScript to send a message. The Gateway proxies the message to the upstream server and returns the response to the web page, which is displayed in on the page. If all goes well, it will look something like this:
+#### WebSockets
+
+To see a live demonstration, open the [WebSocket Test Page](http://echo-server.localhost:8080/.ws) in a browser. When this page loads, it automatically opens a WebSocket connection with the API Gateway and uses JavaScript to exchange messages. The Gateway proxies the message to the upstream server and returns the response to the web page. One message is sent every second. If all goes well, it will look something like this:
 
 ```
-CONNECTED to ws://tyk-gateway.localhost:8080/websocket/
-
-SENT: Hello, world!
-
-RESPONSE: Hello, world!
-
-DISCONNECTED
+[info]  attempting to connect
+[info]  connected
+[recv]  Request served by 44a2695777f7
+[send]  0 = 0x0
+[recv]  0 = 0x0
+[send]  1 = 0x1
+[recv]  1 = 0x1
 ```
 
-The source code for the WebSocket Test page can be found in `deployments/tyk/volumes/http-server/websocket-test.html`.
+Check the browser's developer tool network information to see the `MessageEvent` objects.
+
+#### Server-Sent Events
+
+To see a live demonstration, open the [SSE Test Page](http://echo-server.localhost:8080/.sse) in a browser (**Note**: If you are using Firefox, the browser will display a download dialog, rather than write the data to the page). When this page loads, it automatically opens a connection with the API Gateway and awaits messages sent via the open connection. The server sends timestamp data every second, which is then displayed on the page. The output should look something like this:
+
+```
+event: server
+data: 42ca818c2f16
+id: 1
+
+event: request
+data: HTTP/1.1 GET /.sse
+data: 
+data: Host: echo-server:8080
+... more request headers ...
+data: 
+id: 2
+
+event: time
+data: 2021-10-15T03:32:35Z
+id: 3
+
+event: time
+data: 2021-10-15T03:32:36Z
+id: 4
+```
