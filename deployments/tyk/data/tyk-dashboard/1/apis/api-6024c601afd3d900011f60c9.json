@@ -3,8 +3,8 @@
   "api_model": {},
   "api_definition": {
     "id": "6024c601afd3d900011f60c9",
-    "name": "WebSocket",
-    "slug": "websocket",
+    "name": "Echo Server",
+    "slug": "echo-server",
     "listen_port": 0,
     "protocol": "",
     "enable_proxy_protocol": false,
@@ -360,7 +360,7 @@
       "options_passthrough": false,
       "debug": false
     },
-    "domain": "websocket.localhost",
+    "domain": "echo-server.localhost",
     "certificates": [],
     "do_not_track": false,
     "tags": [],

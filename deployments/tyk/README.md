@@ -92,11 +92,13 @@ A [Go Plugin](https://tyk.io/docs/plugins/supported-languages/golang/) is implem
 
 During the bootstrap script, the Go source in `deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.go` is complied into a shared object library file (`deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.so`), which is referenced by the *Go Plugin API*. A special container is used to build the library file, using the same Go version used to build the Gateway.
 
-### WebSockets
+### WebSockets and Server-Sent Events
 
-WebSocket proxying is demonstrated using the *WebSocket* API Definition. It's configured to proxy to `ws://echo-server:8080`, which will echo back any message it receives.
+These examples use the *Echo Server* API Definition, which is configured to proxy to `echo-server:8080`, a simple echo server container. The echo server echoes back any message it receives, and has special endpoints which enable demonstration of WebSockets and Server-Sent Events.
 
-To see a live demonstration, open the [WebSocket Test page](http://websocket.localhost:8080/.ws) in a browser. When this page loads, it automatically opens a WebSocket connection with the API Gateway and uses JavaScript to send a message. The Gateway proxies the message to the upstream server and returns the response to the web page, which is displayed on the page. If all goes well, it will look something like this:
+#### WebSockets
+
+To see a live demonstration, open the [WebSocket Test Page](http://echo-server.localhost:8080/.ws) in a browser. When this page loads, it automatically opens a WebSocket connection with the API Gateway and uses JavaScript to exchange messages. The Gateway proxies the message to the upstream server and returns the response to the web page. One message is sent every second. If all goes well, it will look something like this:
 
 ```
 [info]  attempting to connect
@@ -109,3 +111,29 @@ To see a live demonstration, open the [WebSocket Test page](http://websocket.loc
 ```
 
 Check the browser's developer tool network information to see the `MessageEvent` objects.
+
+#### Server-Sent Events
+
+To see a live demonstration, open the [SSE Test Page](http://echo-server.localhost:8080/.sse) in a browser (**Note**: If you are using Firefox, the browser will display a download dialog, rather than write the data to the page). When this page loads, it automatically opens a connection with the API Gateway and awaits messages sent via the open connection. The server sends timestamp data every second, which is then displayed on the page. The output should look something like this:
+
+```
+event: server
+data: 42ca818c2f16
+id: 1
+
+event: request
+data: HTTP/1.1 GET /.sse
+data: 
+data: Host: echo-server:8080
+... more request headers ...
+data: 
+id: 2
+
+event: time
+data: 2021-10-15T03:32:35Z
+id: 3
+
+event: time
+data: 2021-10-15T03:32:36Z
+id: 4
+```
