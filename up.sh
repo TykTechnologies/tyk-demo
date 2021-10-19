@@ -33,6 +33,7 @@ mkdir -p .bootstrap 1> /dev/null
 echo -n > .bootstrap/bootstrapped_deployments
 
 # ensure Docker environment variables are correctly set before creating containers
+# these allow for tracing and instrumentation deployments to be easily used, without having to manually set the environment variables
 if [[ "$*" == *tracing* ]]
 then
   set_docker_environment_value "TRACING_ENABLED" "true"

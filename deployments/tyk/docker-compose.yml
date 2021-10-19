@@ -76,8 +76,8 @@ services:
     volumes:
       - ./deployments/tyk/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
     environment:
-      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:?0}
-      - TYK_LOGLEVEL=${PUMP_TYK_LOGLEVEL:-info}
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
+      - TYK_LOGLEVEL=${PUMP_LOGLEVEL:-info}
     env_file:
     - .env
     depends_on:
