@@ -18,7 +18,12 @@ dashboard_image_tag=$(docker ps --filter "name=tyk-demo_tyk-dashboard_1" --forma
 log_message "Checking Dashboard licence exists"
 if ! grep -q "DASHBOARD_LICENCE=" .env
 then
-  echo "ERROR: Dashboard licence missing from Docker environment file. Add a licence to the DASHBOARD_LICENCE variable in the .env file."
+  log_message "ERROR: Dashboard licence missing from Docker environment file (.env). Add a licence to the DASHBOARD_LICENCE environment variable."
+  exit 1
+fi
+if grep -q "DASHBOARD_LICENCE=add_your_dashboard_licence_here" .env
+then
+  log_message "ERROR: Placeholder Dashboard licence found in Docker environment file (.env). Replace \"add_your_dashboard_licence_here\" with your Tyk licence."
   exit 1
 fi
 log_ok
@@ -28,7 +33,7 @@ log_message "Checking Dashboard licence expiry"
 licence_days_remaining=0
 check_licence_expiry "DASHBOARD_LICENCE"
 if [[ "$?" -eq "1" ]]; then
-  echo "ERROR: Tyk Dashboard licence has expired. Update DASHBOARD_LICENCE variable in .env file with a new licence."
+  log_message "ERROR: Tyk Dashboard licence has expired. Update DASHBOARD_LICENCE variable in .env file with a new licence."
   exit 1
 fi
 dashboard_licence_days_remaining=$licence_days_remaining
