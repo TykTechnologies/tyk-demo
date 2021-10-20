@@ -72,7 +72,7 @@ then
   exit 1
 fi
 
-# alway run the tyk bootstrap first
+# always run the tyk bootstrap first
 deployments/tyk/bootstrap.sh 2>> bootstrap.log
 if [ "$?" != 0 ]
 then
