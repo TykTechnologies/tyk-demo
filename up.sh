@@ -49,7 +49,7 @@ else
 fi
 
 # create and run the docker compose command
-command_docker_compose="docker-compose -f deployments/tyk/docker-compose.yml"
+command_docker_compose="docker compose --env-file .env -f deployments/tyk/docker-compose.yml"
 for var in "$@"
 do
   #   the `tyk` deployment is already included, so don't duplicate it
@@ -63,7 +63,7 @@ echo "$command_docker_compose -p tyk-demo --project-directory $(pwd)" > .bootstr
 echo "my .bootstrap/docker-compose-prefix-command: "
 cat .bootstrap/docker-compose-prefix-command
 echo -n "----"
-command_docker_compose="$command_docker_compose -p tyk-demo --project-directory $(pwd) up --remove-orphans -d"
+command_docker_compose="$command_docker_compose -p tyk-demo --project-directory `pwd` up --remove-orphans -d"
 echo "Starting containers: $command_docker_compose"
 eval $command_docker_compose
 if [ "$?" != 0 ]
