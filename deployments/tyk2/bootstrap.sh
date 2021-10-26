@@ -49,11 +49,14 @@ log_end_deployment
 echo -e "\033[2K
 ▼ Tyk Environment 2
   ▽ Dashboard
-    ▾ Organisation 1
                     URL : $dashboard2_base_url
+       Admin API Header : admin-auth
+          Admin API Key : $dashboard_admin_api_credentials
+   Dashboard API Header : Authorization       
+    ▾ $(get_context_data "1" "organisation" "1" "name") Organisation
                Username : $dashboard_user_email
                Password : $dashboard_user_password
-        API Credentials : $dashboard2_user_api_credentials
-   Authorization header : x-tyk-authorization
+      Dashboard API Key : $dashboard2_user_api_credentials
   ▽ Gateway
-                    URL : $gateway2_base_url"
+                    URL : $gateway2_base_url
+     Gateway API Header : x-tyk-authorization"
