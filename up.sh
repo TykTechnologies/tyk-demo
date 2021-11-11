@@ -28,6 +28,7 @@ command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: JQ is required, but it's not
 is_docker_compose_v1=0
 regex_docker_compose_version_1='^docker-compose version 1\.'
 if [[ $(docker-compose --version) =~ $regex_docker_compose_version_1 ]]; then
+  echo "Detected Docker Compose v1"
   is_docker_compose_v1=1
 fi
 
@@ -54,17 +55,29 @@ else
 fi
 
 # create and run the docker compose command
-command_docker_compose="docker compose --env-file .env -f deployments/tyk/docker-compose.yml"
+command_docker_compose=""
+# use "docker-compose" if version is 1, otherwise use "docker compose"
+if [ "$is_docker_compose_v1" == 1 ]; then
+  command_docker_compose="docker-compose"
+else
+  command_docker_compose="docker compose"
+fi
+# always add the 'tyk' deployment
+command_docker_compose="$command_docker_compose -f deployments/tyk/docker-compose.yml"
+# then add each of the deployments specified in the command arguments, excluding "tyk" it has been already been added
 for var in "$@"; do
-  #   the `tyk` deployment is already included, so don't duplicate it
   if [ "$var" != "tyk" ]; then
     command_docker_compose="$command_docker_compose -f deployments/$var/docker-compose.yml"
   fi
 done
+# add the location of the env file if not using v1
+if [ "$is_docker_compose_v1" != 1 ]; then
+  command_docker_compose="$command_docker_compose --env-file .env"
+fi
 
 echo "$command_docker_compose -p tyk-demo --project-directory $(pwd)" > .bootstrap/docker-compose-prefix-command
-echo "my .bootstrap/docker-compose-prefix-command: "
-cat .bootstrap/docker-compose-prefix-command
+# echo "my .bootstrap/docker-compose-prefix-command: "
+# cat .bootstrap/docker-compose-prefix-command
 echo -n "----"
 command_docker_compose="$command_docker_compose -p tyk-demo --project-directory `pwd` up --remove-orphans -d"
 echo "Starting containers: $command_docker_compose"
