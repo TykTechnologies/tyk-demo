@@ -6,8 +6,20 @@ deployment="MDCB"
 log_start_deployment
 bootstrap_progress
 
+log_message "Storing container names"
+if [ -f .bootstrap/is_docker_compose_v1 ]; then
+  set_context_data "container" "mdcb" "1" "name" "tyk-demo_tyk-mdcb_1"
+else
+  set_context_data "container" "mdcb" "1" "name" "tyk-demo-tyk-mdcb-1"
+fi
+log_ok
+bootstrap_progress
+
+log_message "Setting global variables"
 worker_gateway_base_url="http://tyk-worker-gateway.localhost:8084"
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
+log_ok
+bootstrap_progress
 
 # check MDCB licence exists
 log_message "Checking MDCB licence exists"
@@ -63,7 +75,7 @@ bootstrap_progress
 
 # verify MDCB container is running
 log_message "Checking status of MDCB container"
-mdcb_status=$(docker ps -a --filter "name=tyk-demo_tyk-mdcb_1" --format "{{.Status}}")
+mdcb_status=$(docker ps -a --filter "name=$(get_context_data "container" "mdcb" "1" "name")" --format "{{.Status}}")
 log_message "  MDCB container status is: $mdcb_status"
 if [[ $mdcb_status != Up* ]]
 then

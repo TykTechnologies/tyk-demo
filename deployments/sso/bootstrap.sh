@@ -5,9 +5,21 @@ deployment="SSO"
 log_start_deployment
 bootstrap_progress
 
+log_message "Storing container names"
+if [ -f .bootstrap/is_docker_compose_v1 ]; then
+  set_context_data "container" "identity-broker" "1" "name" "tyk-demo_tyk-identity-broker_1"
+else
+  set_context_data "container" "identity-broker" "1" "name" "tyk-demo-tyk-identity-broker-1"
+fi
+log_ok
+bootstrap_progress
+
+log_message "Setting global variables"
 dashboard_sso_base_url="http://localhost:3001"
 dashboard_base_url_escaped="http:\/\/localhost:3000"
 identity_broker_base_url="http://localhost:3010"
+log_ok
+bootstrap_progress
 
 log_message "Getting config data"
 identity_broker_api_credentials=$(cat deployments/sso/volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
