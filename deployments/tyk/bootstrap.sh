@@ -7,13 +7,29 @@ deployment="Tyk"
 log_start_deployment
 bootstrap_progress
 
+log_message "Storing container names"
+if [ -f .bootstrap/is_docker_compose_v1 ]; then
+  set_context_data "container" "gateway" "1" "name" "tyk-demo_tyk-gateway_1"
+  set_context_data "container" "gateway" "2" "name" "tyk-demo_tyk-gateway-2_1"
+  set_context_data "container" "dashboard" "1" "name" "tyk-demo_tyk-dashboard_1"
+else
+  set_context_data "container" "gateway" "1" "name" "tyk-demo-tyk-gateway-1"
+  set_context_data "container" "gateway" "2" "name" "tyk-demo-tyk-gateway-2-1"
+  set_context_data "container" "dashboard" "1" "name" "tyk-demo-tyk-dashboard-1"
+fi
+log_ok
+bootstrap_progress
+
+log_message "Setting global variables"
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 gateway_base_url="http://$(jq -r '.host_config.override_hostname' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
 gateway_base_url_tcp="tyk-gateway.localhost:8086"
 gateway2_base_url="https://tyk-gateway-2.localhost:8081"
-gateway_image_tag=$(docker ps --filter "name=tyk-demo_tyk-gateway_1" --format "{{.Image}}" | awk -F':' '{print $2}')
-gateway2_image_tag=$(docker ps --filter "name=tyk-demo_tyk-gateway-2_1" --format "{{.Image}}" | awk -F':' '{print $2}')
-dashboard_image_tag=$(docker ps --filter "name=tyk-demo_tyk-dashboard_1" --format "{{.Image}}" | awk -F':' '{print $2}')
+gateway_image_tag=$(docker ps --filter "name=$(get_context_data "container" "gateway" "1" "name")" --format "{{.Image}}" | awk -F':' '{print $2}')
+gateway2_image_tag=$(docker ps --filter "name=$(get_context_data "container" "gateway" "2" "name")" --format "{{.Image}}" | awk -F':' '{print $2}')
+dashboard_image_tag=$(docker ps --filter "name=$(get_context_data "container" "dashboard" "1" "name")" --format "{{.Image}}" | awk -F':' '{print $2}')
+log_ok
+bootstrap_progress
 
 log_message "Checking Dashboard licence exists"
 if ! grep -q "DASHBOARD_LICENCE=" .env
@@ -53,12 +69,12 @@ wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $
 # Python plugin
 
 log_message "Building Python plugin bundle"
-docker exec tyk-demo_tyk-gateway_1 sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1>> /dev/null 2>> bootstrap.log
+docker exec $(get_context_data "container" "gateway" "1" "name") sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1>> /dev/null 2>> bootstrap.log
 log_ok
 bootstrap_progress
 
 log_message "Copying Python bundle to http-server"
-docker cp tyk-demo_tyk-gateway_1:/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip
+docker cp $(get_context_data "container" "gateway" "1" "name"):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip
 log_ok
 bootstrap_progress
 
@@ -363,7 +379,11 @@ bootstrap_progress
 log_ok
 
 log_message "Restarting Dashboard container to ensure Portal URLs are loaded ok"
-docker restart tyk-demo_tyk-dashboard_1
+docker restart $(get_context_data "container" "dashboard" "1" "name") 1> /dev/null
+if [ "$?" != 0 ]; then
+  echo "Error occurred when restarting Dashboard container"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
