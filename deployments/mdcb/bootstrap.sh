@@ -62,14 +62,28 @@ set_docker_environment_value "MDCB_USER_API_CREDENTIALS" "$dashboard_mdcb_user_a
 log_ok
 bootstrap_progress
 
-# restart containers to use updated MDCB credentials
-log_message "Restarting MDCB deployment containers to use updated MDCB user API credentials"
-docker-compose \
-    -f deployments/tyk/docker-compose.yml \
-    -f deployments/mdcb/docker-compose.yml \
-    -p tyk-demo \
-    --project-directory $(pwd) \
-    up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway 2> /dev/null
+# recreate containers to use updated MDCB credentials
+log_message "Recreating MDCB deployment containers to use updated MDCB user API credentials"
+if [ -f .bootstrap/is_docker_compose_v1 ]; then
+  docker-compose \
+      -f deployments/tyk/docker-compose.yml \
+      -f deployments/mdcb/docker-compose.yml \
+      -p tyk-demo \
+      --project-directory $(pwd) \
+      up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway 2> /dev/null
+else
+  docker compose \
+      -f deployments/tyk/docker-compose.yml \
+      -f deployments/mdcb/docker-compose.yml \
+      -p tyk-demo \
+      --project-directory $(pwd) \
+      --env-file $(pwd)/.env \
+      up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway 2> /dev/null
+fi
+if [ "$?" != 0 ]; then
+  echo "Error occurred when recreating MDCB deployment containers"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
