@@ -25,7 +25,7 @@ else
 fi
 while read deployment; do
   command_docker_compose="$command_docker_compose -f deployments/$deployment/docker-compose.yml"
-done <.bootstrap/bootstrapped_deployments
+done < .bootstrap/bootstrapped_deployments
 command_docker_compose="$command_docker_compose -p tyk-demo --project-directory `pwd` down -v --remove-orphans"
 
 # execute docker compose command
