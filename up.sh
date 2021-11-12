@@ -66,7 +66,7 @@ command_docker_compose="$(generate_docker_compose_command) up --remove-orphans -
 echo "Running docker compose command: $command_docker_compose"
 eval $command_docker_compose
 if [ "$?" != 0 ]; then
-  echo "Error occurred when using docker-compose to bring containers up"
+  echo "Error occurred when using Docker Compose to bring containers up"
   exit 1
 fi
 
