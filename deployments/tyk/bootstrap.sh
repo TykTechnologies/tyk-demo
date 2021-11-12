@@ -12,10 +12,12 @@ if [ -f .bootstrap/is_docker_compose_v1 ]; then
   set_context_data "container" "gateway" "1" "name" "tyk-demo_tyk-gateway_1"
   set_context_data "container" "gateway" "2" "name" "tyk-demo_tyk-gateway-2_1"
   set_context_data "container" "dashboard" "1" "name" "tyk-demo_tyk-dashboard_1"
+  set_context_data "container" "pump" "1" "name" "tyk-demo_tyk-pump_1"
 else
   set_context_data "container" "gateway" "1" "name" "tyk-demo-tyk-gateway-1"
   set_context_data "container" "gateway" "2" "name" "tyk-demo-tyk-gateway-2-1"
   set_context_data "container" "dashboard" "1" "name" "tyk-demo-tyk-dashboard-1"
+  set_context_data "container" "pump" "1" "name" "tyk-demo-tyk-pump-1"
 fi
 log_ok
 bootstrap_progress
