@@ -167,7 +167,6 @@ check_docker_compose_version () {
   fi
 }
 
-# call check_docker_compose_version prior to calling this function
 generate_docker_compose_command () {
   # create the docker compose command
   command_docker_compose=""
@@ -175,7 +174,7 @@ generate_docker_compose_command () {
   if [ -f .bootstrap/is_docker_compose_v1 ]; then
     command_docker_compose="docker-compose"
   else
-    command_docker_compose="docker compose"
+    command_docker_compose="docker compose --env-file `pwd`/.env"
   fi
   while read deployment; do
     command_docker_compose="$command_docker_compose -f deployments/$deployment/docker-compose.yml"

@@ -64,22 +64,8 @@ bootstrap_progress
 
 # recreate containers to use updated MDCB credentials
 log_message "Recreating MDCB deployment containers to use updated MDCB user API credentials"
-if [ -f .bootstrap/is_docker_compose_v1 ]; then
-  docker-compose \
-      -f deployments/tyk/docker-compose.yml \
-      -f deployments/mdcb/docker-compose.yml \
-      -p tyk-demo \
-      --project-directory $(pwd) \
-      up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway 2> /dev/null
-else
-  docker compose \
-      -f deployments/tyk/docker-compose.yml \
-      -f deployments/mdcb/docker-compose.yml \
-      -p tyk-demo \
-      --project-directory $(pwd) \
-      --env-file $(pwd)/.env \
-      up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway 2> /dev/null
-fi
+command_docker_compose="$(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway 2> /dev/null" 
+eval $command_docker_compose
 if [ "$?" != 0 ]; then
   echo "Error occurred when recreating MDCB deployment containers"
   exit 1
@@ -122,8 +108,8 @@ echo -e "\033[2K
 ▼ MDCB
   ▽ Multi Data Centre Bridge
                 Licence : $mdcb_licence_days_remaining days remaining
-   Dash API Credentials : $dashboard_mdcb_user_api_credentials
+     Dashboard Auth Key : $dashboard_mdcb_user_api_credentials
   ▽ Worker Gateway
                     URL : $worker_gateway_base_url
-        API Credentials : $worker_gateway_api_credentials
-       API AuthZ Header : x-tyk-authorization"
+        Gateway API Key : $worker_gateway_api_credentials
+     Gateway API Header : x-tyk-authorization"

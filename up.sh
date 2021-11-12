@@ -62,7 +62,7 @@ for deployment in "$@"; do
 done
 
 # bring the containers up
-command_docker_compose="$(generate_docker_compose_command) --env-file `pwd`/.env up --remove-orphans -d"
+command_docker_compose="$(generate_docker_compose_command) up --remove-orphans -d"
 echo "Running docker compose command: $command_docker_compose"
 eval $command_docker_compose
 if [ "$?" != 0 ]; then
