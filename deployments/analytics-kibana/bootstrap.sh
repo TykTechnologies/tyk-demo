@@ -24,9 +24,26 @@ log_http_result "$(curl $kibana_base_url/api/saved_objects/visualization/407e91c
   -d @deployments/analytics-kibana/data/kibana/visualizations/request-count-by-time.json 2>> bootstrap.log)"
 bootstrap_progress
 
-log_message "Stopping the pump instance deployed by the base deployment"
-# so it is replaced by the instance from this deployment
-docker-compose -f deployments/tyk/docker-compose.yml -p tyk-demo --project-directory $(pwd) stop tyk-pump 2> /dev/null
+log_message "Stopping the Pump container deployed by the base deployment"
+# the tyk-pump container (from the tyk deployment) is stopped as it is replaced by the container from this deployment
+command_docker_compose="$(generate_docker_compose_command) stop tyk-pump 2> /dev/null" 
+eval $command_docker_compose
+if [ "$?" != 0 ]; then
+  echo "Error stopping Pump container"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+# verify tyk-pump container is stopped
+log_message "Checking status of Pump container"
+container_status=$(docker ps -a --filter "name=$(get_context_data "container" "pump" "1" "name")" --format "{{.Status}}")
+log_message "  Pump container status is: $container_status"
+if [[ $container_status != Exited* ]]
+then
+  log_message "  ERROR: tyk-pump container is not stopped. Exiting."
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
