@@ -317,7 +317,7 @@
     },
     "session_lifetime": 0,
     "active": true,
-    "internal": false,
+    "internal": true,
     "auth_provider": {
       "name": "",
       "storage_engine": "",
