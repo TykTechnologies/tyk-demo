@@ -21,15 +21,15 @@ identity_broker_base_url="http://localhost:3010"
 log_ok
 bootstrap_progress
 
-log_message "Getting config data"
+log_message "Getting config data from Identity Broker config file"
 identity_broker_api_credentials=$(cat deployments/sso/volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
 log_message "  TIB base URL: $identity_broker_base_url"
 log_message "  TIB API Credentials: $identity_broker_api_credentials"
 log_ok
 bootstrap_progress
 
-log_message "Creating empty profiles.json"
-docker exec tyk-demo_tyk-identity-broker_1 sh -c "touch /opt/tyk-identity-broker/profiles.json"
+log_message "Ensuring that profiles.json file is present in Identity Broker container ($(get_context_data "container" "identity-broker" "1" "name"))"
+docker exec $(get_context_data "container" "identity-broker" "1" "name") sh -c "touch /opt/tyk-identity-broker/profiles.json"
 log_ok
 bootstrap_progress
 
