@@ -25,8 +25,7 @@ log_http_result "$(curl $kibana_base_url/api/saved_objects/visualization/407e91c
 bootstrap_progress
 
 log_message "Stopping the tyk-pump service (from Tyk deployment), preventing it from consuming the analytics records which we want to be processed by the Pump from this deployment."
-command_docker_compose="$(generate_docker_compose_command) stop tyk-pump 2> /dev/null" 
-eval $command_docker_compose
+eval $(generate_docker_compose_command) stop tyk-pump 2> /dev/null
 if [ "$?" != 0 ]; then
   echo "Error stopping tyk-pump service"
   exit 1
@@ -35,8 +34,7 @@ log_ok
 bootstrap_progress
 
 log_message "Verifying that tyk-pump service has stopped"
-command_docker_compose="$(generate_docker_compose_command) top tyk-pump"
-service_process=$(eval $command_docker_compose)
+service_process=$(eval $(generate_docker_compose_command) top tyk-pump)
 if [ "$service_process" != "" ]; then
   log_message "  ERROR: tyk-pump process has not stopped. Exiting."
   exit 1
