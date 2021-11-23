@@ -6,24 +6,20 @@ log_start_deployment
 bootstrap_progress
 
 datadog_dashboard="https://app.datadoghq.com/dashboard/lists"
-pump_container_name="$(get_context_data "container" "pump" "1" "name")"
 
-log_message "Stopping the Pump container ($pump_container_name) deployed by the Tyk deployment. This prevents the Tyk deployment Pump from consuming the analytics records which we want to be processed by the Pump from this deployment."
-command_docker_compose="$(generate_docker_compose_command) stop tyk-pump 2> /dev/null" 
-eval $command_docker_compose
+log_message "Stopping the tyk-pump service (from Tyk deployment), preventing it from consuming the analytics records which we want to be processed by the Pump from this deployment."
+eval $(generate_docker_compose_command) stop tyk-pump 2> /dev/null
 if [ "$?" != 0 ]; then
-  echo "Error stopping Pump container $pump_container_name"
+  echo "Error stopping Pump container tyk-pump"
   exit 1
 fi
 log_ok
 bootstrap_progress
 
-log_message "Verifying that $pump_container_name container is stopped"
-container_status=$(docker ps -a --filter "name=$pump_container_name" --format "{{.Status}}")
-log_message "  $pump_container_name container status is: $container_status"
-if [[ $container_status != Exited* ]]
-then
-  log_message "  ERROR: $pump_container_name container is not stopped. Exiting."
+log_message "Verifying that tyk-pump process has stopped"
+service_process=$(eval $(generate_docker_compose_command) top tyk-pump)
+if [ "$service_process" != "" ]; then
+  log_message "  ERROR: tyk-pump process has not stopped. Exiting."
   exit 1
 fi
 log_ok
