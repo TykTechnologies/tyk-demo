@@ -7,6 +7,7 @@ bootstrap_progress
 
 splunk_base_url="http://localhost:8000"
 splunk_base_mgmt_url="https://localhost:8089"
+pump_container_name="$(get_context_data "container" "pump" "1" "name")"
 
 log_message "Waiting for splunk to return desired response"
 wait_for_response "$splunk_base_url/en-GB/account/login" "200"
@@ -25,24 +26,20 @@ set_docker_environment_value "PMP_SPLUNK_META_COLLECTORTOKEN" "$splunk_token"
 log_ok
 bootstrap_progress
 
-log_message "Stopping the Pump container deployed by the base deployment"
-# the tyk-pump container (from the tyk deployment) is stopped as it is replaced by the container from this deployment
-command_docker_compose="$(generate_docker_compose_command) stop tyk-pump 2> /dev/null" 
-eval $command_docker_compose
+log_message "Stopping the tyk-pump service (from Tyk deployment), to prevent it consuming analytics data intended for this deployment's Pump"
+eval $(generate_docker_compose_command) stop tyk-pump 2> /dev/null
 if [ "$?" != 0 ]; then
-  echo "Error stopping Pump container"
+  echo "Error stopping Pump container $pump_container_name"
   exit 1
 fi
 log_ok
 bootstrap_progress
 
-# verify tyk-pump container is stopped
-log_message "Checking status of Pump container"
-container_status=$(docker ps -a --filter "name=$(get_context_data "container" "pump" "1" "name")" --format "{{.Status}}")
-log_message "  Pump container status is: $container_status"
-if [[ $container_status != Exited* ]]
-then
-  log_message "  ERROR: tyk-pump container is not stopped. Exiting."
+# verify tyk-pump service is stopped
+log_message "Checking that of tyk-pump service is stopped"
+service_process=$(eval $(generate_docker_compose_command) top tyk-pump)
+if [ "$service_process" != "" ]; then
+  log_message "  ERROR: tyk-pump process has not stopped. Exiting."
   exit 1
 fi
 log_ok
