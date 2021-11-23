@@ -158,6 +158,13 @@ get_context_data () {
   echo $(cat .context-data/$1-$2-$3-$4)
 }
 
+get_service_container_data () {
+  # use 1st function argument to get container id for service
+  container_id=$(eval $(generate_docker_compose_command) ps -q $1)
+  # use 2nd function argument to format container data
+  echo $(docker inspect $container_id --format "$2")
+}
+
 check_docker_compose_version () {
   rm .bootstrap/is_docker_compose_v1 2> /dev/null
   regex_docker_compose_version_1='^docker-compose version 1\.'
