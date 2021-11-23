@@ -82,5 +82,7 @@ echo -e "\033[2K
                Password : Abcd1234
   ▽ Identity Broker ($(get_service_image_tag "tyk-identity-broker"))
     ▾ SSO Endpoints
-       OIDC / Dashboard : $identity_broker_base_url/auth/tyk-dashboard/openid-connect
-           LDAP / Token : $identity_broker_base_url/auth/ldap-token/1"
+      ▿ OIDC / Dashboard
+                    URL : $identity_broker_base_url/auth/tyk-dashboard/openid-connect
+      ▿ LDAP / Token
+                    URL : $identity_broker_base_url/auth/ldap-token/1"
