@@ -74,7 +74,7 @@ log_ok
 bootstrap_progress
 
 # check status of worker gateway
-log_message "Checking that worker Gateway (tyk-worker-gateway) is accessible"
+log_message "Checking that worker Gateway is accessible (tyk-worker-gateway)"
 worker_gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
 result=""
 while [ "$result" != "0" ]; do
@@ -91,10 +91,10 @@ log_end_deployment
 
 echo -e "\033[2K 
 ▼ MDCB
-  ▽ Multi Data Centre Bridge
+  ▽ Multi Data Centre Bridge (v$(get_service_container_data "tyk-mdcb" "{{ .Config.Labels.Version }}"))
                 Licence : $mdcb_licence_days_remaining days remaining
      Dashboard Auth Key : $dashboard_mdcb_user_api_credentials
-  ▽ Worker Gateway
+  ▽ Worker Gateway (v$(get_service_container_data "tyk-worker-gateway" "{{ index .Config.Labels \"org.opencontainers.image.version\" }}"))
                     URL : $worker_gateway_base_url
         Gateway API Key : $worker_gateway_api_credentials
      Gateway API Header : x-tyk-authorization"
