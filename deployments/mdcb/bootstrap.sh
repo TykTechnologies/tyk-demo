@@ -6,15 +6,6 @@ deployment="MDCB"
 log_start_deployment
 bootstrap_progress
 
-log_message "Storing container names"
-if [ -f .bootstrap/is_docker_compose_v1 ]; then
-  set_context_data "container" "mdcb" "1" "name" "tyk-demo_tyk-mdcb_1"
-else
-  set_context_data "container" "mdcb" "1" "name" "tyk-demo-tyk-mdcb-1"
-fi
-log_ok
-bootstrap_progress
-
 log_message "Setting global variables"
 worker_gateway_base_url="http://tyk-worker-gateway.localhost:8084"
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
@@ -23,8 +14,7 @@ bootstrap_progress
 
 # check MDCB licence exists
 log_message "Checking MDCB licence exists"
-if ! grep -q "MDCB_LICENCE=" .env
-then
+if ! grep -q "MDCB_LICENCE=" .env; then
   echo "ERROR: MDCB licence missing from Docker environment file. Add a licence to the MDCB_LICENCE variable in the .env file."
   exit 1
 fi
@@ -43,7 +33,7 @@ mdcb_licence_days_remaining=$licence_days_remaining
 bootstrap_progress
 
 # set up MDCB user in Dashboard
-log_message "Creating Dashboard MDCB user"
+log_message "Creating Dashboard MDCB user, to obtain Dashboard API credentials"
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret 2>> bootstrap.log)
 dashboard_mdcb_user_email=$(jq -r '.email_address' deployments/mdcb/data/tyk-dashboard/dashboard-mdcb-user.json)
 dashboard_mdcb_user_password=$(jq -r '.password' deployments/mdcb/data/tyk-dashboard/dashboard-mdcb-user.json)
@@ -57,15 +47,14 @@ log_ok
 bootstrap_progress
 
 # set MDCB credentials and recreate the MDCB container
-log_message "Setting MDCB user API crednetials"
+log_message "Setting Docker environment variable for MDCB user API credentials"
 set_docker_environment_value "MDCB_USER_API_CREDENTIALS" "$dashboard_mdcb_user_api_credentials"
 log_ok
 bootstrap_progress
 
 # recreate containers to use updated MDCB credentials
-log_message "Recreating MDCB deployment containers to use updated MDCB user API credentials"
-command_docker_compose="$(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway 2> /dev/null" 
-eval $command_docker_compose
+log_message "Recreating MDCB deployment containers, so that they use updated MDCB user API credentials (tyk-mdcb, tyk-worker-gateway)"
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway 2> /dev/null
 if [ "$?" != 0 ]; then
   echo "Error occurred when recreating MDCB deployment containers"
   exit 1
@@ -74,28 +63,24 @@ log_ok
 bootstrap_progress
 
 # verify MDCB container is running
-log_message "Checking status of MDCB container"
-mdcb_status=$(docker ps -a --filter "name=$(get_context_data "container" "mdcb" "1" "name")" --format "{{.Status}}")
-log_message "  MDCB container status is: $mdcb_status"
-if [[ $mdcb_status != Up* ]]
-then
-  log_message "  ERROR: MDCB container not in desired status. Exiting."
+log_message "Verifying that MDCB service container is running (tyk-mdcb)"
+mdcb_running=$(eval $(generate_docker_compose_command) ps --status running -q tyk-mdcb)
+if [ "$mdcb_running" == "" ]; then
+  log_message "  ERROR: No running container for tyk-mdcb service. Exiting."
   log_message "  Suggest checking MDCB container log for more information. Perhaps the MDCB licence has expired?"
   exit 1
 fi
 log_ok
 bootstrap_progress
 
-# check status of worker Gateway
-log_message "Checking status of Worker Gateway"
+# check status of worker gateway
+log_message "Checking that worker Gateway (tyk-worker-gateway) is accessible"
 worker_gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
 result=""
-while [ "$result" != "0" ]
-do
+while [ "$result" != "0" ]; do
   wait_for_response "$worker_gateway_base_url/basic-open-api/get" "200" "" 3
   result="$?"
-  if [ "$result" != "0" ]
-  then
+  if [ "$result" != "0" ]; then
     log_message "  Gateway not returning desired response, attempting hot reload"
     hot_reload "$worker_gateway_base_url" "$worker_gateway_api_credentials" 
     sleep 2
