@@ -47,14 +47,12 @@ log_ok
 bootstrap_progress
 
 log_message "Regenerating Gitea hooks"
-command_docker_compose="$(generate_docker_compose_command) exec -T -u git gitea sh -c \"gitea admin regenerate hooks;\" 1>> /dev/null 2>> bootstrap.log" 
-eval $command_docker_compose
+eval $(generate_docker_compose_command) exec -T -u git gitea sh -c "gitea admin regenerate hooks;" 1>> /dev/null 2>> bootstrap.log
 log_ok
 bootstrap_progress
 
 log_message "Restarting Gitea service (gitea)"
-command_docker_compose="$(generate_docker_compose_command) restart gitea 2> /dev/null" 
-eval $command_docker_compose
+eval $(generate_docker_compose_command) restart gitea 2> /dev/null
 log_ok
 bootstrap_progress
 
@@ -112,8 +110,7 @@ log_ok
 bootstrap_progress
 
 log_message "Restarting Jenkins container to allow new config and plugins to be used"
-command_docker_compose="$(generate_docker_compose_command) restart jenkins 2> /dev/null"
-eval $command_docker_compose
+eval $(generate_docker_compose_command) restart jenkins 2> /dev/null
 log_ok
 bootstrap_progress
 
