@@ -15,10 +15,12 @@ log_message "Importing MQTT APIs"
 log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d "$(cat deployments/mqtt/data/tyk-dashboard/apis.json)")"
+log_ok
 bootstrap_progress
 
 log_message "Hot reloading Gateways"
 hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
+log_ok
 bootstrap_progress
 
 log_end_deployment
