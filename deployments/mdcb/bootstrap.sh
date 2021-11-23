@@ -91,10 +91,10 @@ log_end_deployment
 
 echo -e "\033[2K 
 ▼ MDCB
-  ▽ Multi Data Centre Bridge (v$(get_service_container_data "tyk-mdcb" "{{ .Config.Labels.Version }}"))
+  ▽ Multi Data Centre Bridge ($(get_service_image_tag "tyk-mdcb"))
                 Licence : $mdcb_licence_days_remaining days remaining
      Dashboard Auth Key : $dashboard_mdcb_user_api_credentials
-  ▽ Worker Gateway (v$(get_service_container_data "tyk-worker-gateway" "{{ index .Config.Labels \"org.opencontainers.image.version\" }}"))
+  ▽ Worker Gateway ($(get_service_image_tag "tyk-worker-gateway"))
                     URL : $worker_gateway_base_url
         Gateway API Key : $worker_gateway_api_credentials
      Gateway API Header : x-tyk-authorization"
