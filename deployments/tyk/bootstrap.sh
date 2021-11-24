@@ -7,29 +7,26 @@ deployment="Tyk"
 log_start_deployment
 bootstrap_progress
 
-log_message "Storing container names"
-if [ -f .bootstrap/is_docker_compose_v1 ]; then
-  set_context_data "container" "gateway" "1" "name" "tyk-demo_tyk-gateway_1"
-  set_context_data "container" "gateway" "2" "name" "tyk-demo_tyk-gateway-2_1"
-  set_context_data "container" "dashboard" "1" "name" "tyk-demo_tyk-dashboard_1"
-  set_context_data "container" "pump" "1" "name" "tyk-demo_tyk-pump_1"
-else
-  set_context_data "container" "gateway" "1" "name" "tyk-demo-tyk-gateway-1"
-  set_context_data "container" "gateway" "2" "name" "tyk-demo-tyk-gateway-2-1"
-  set_context_data "container" "dashboard" "1" "name" "tyk-demo-tyk-dashboard-1"
-  set_context_data "container" "pump" "1" "name" "tyk-demo-tyk-pump-1"
-fi
-log_ok
-bootstrap_progress
+# log_message "Storing container names"
+# if [ -f .bootstrap/is_docker_compose_v1 ]; then
+#   set_context_data "container" "gateway" "1" "name" "tyk-demo_tyk-gateway_1"
+#   set_context_data "container" "gateway" "2" "name" "tyk-demo_tyk-gateway-2_1"
+#   set_context_data "container" "dashboard" "1" "name" "tyk-demo_tyk-dashboard_1"
+#   set_context_data "container" "pump" "1" "name" "tyk-demo_tyk-pump_1"
+# else
+#   set_context_data "container" "gateway" "1" "name" "tyk-demo-tyk-gateway-1"
+#   set_context_data "container" "gateway" "2" "name" "tyk-demo-tyk-gateway-2-1"
+#   set_context_data "container" "dashboard" "1" "name" "tyk-demo-tyk-dashboard-1"
+#   set_context_data "container" "pump" "1" "name" "tyk-demo-tyk-pump-1"
+# fi
+# log_ok
+# bootstrap_progress
 
 log_message "Setting global variables"
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 gateway_base_url="http://$(jq -r '.host_config.override_hostname' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
 gateway_base_url_tcp="tyk-gateway.localhost:8086"
 gateway2_base_url="https://tyk-gateway-2.localhost:8081"
-gateway_image_tag=$(docker ps --filter "name=$(get_context_data "container" "gateway" "1" "name")" --format "{{.Image}}" | awk -F':' '{print $2}')
-gateway2_image_tag=$(docker ps --filter "name=$(get_context_data "container" "gateway" "2" "name")" --format "{{.Image}}" | awk -F':' '{print $2}')
-dashboard_image_tag=$(docker ps --filter "name=$(get_context_data "container" "dashboard" "1" "name")" --format "{{.Image}}" | awk -F':' '{print $2}')
 log_ok
 bootstrap_progress
 
@@ -71,17 +68,29 @@ wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $
 # Python plugin
 
 log_message "Building Python plugin bundle"
-docker exec $(get_context_data "container" "gateway" "1" "name") sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1>> /dev/null 2>> bootstrap.log
+eval "$(generate_docker_compose_command) exec -T tyk-gateway sh -c \"cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem\"" 1> /dev/null 2>> bootstrap.log
+if [ "$?" != 0 ]; then
+  echo "Error occurred when building Python plugin bundle"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
 log_message "Copying Python bundle to http-server"
-docker cp $(get_context_data "container" "gateway" "1" "name"):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip
+docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip
+if [ "$?" != 0 ]; then
+  echo "Error occurred when copying Python bundle to http-server"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
 log_message "Removing Python bundle intermediate assets"
 rm -r deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
+if [ "$?" != 0 ]; then
+  echo "Error occurred when removing Python bundle intermediate assets"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
@@ -96,7 +105,7 @@ bootstrap_progress
 
 # Dashboard Data
 
-# The order these are processed in is important
+# The order these are processed in is important, due to dependencies between objects
 log_message "Processing Dashboard Data"
 for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
   if [[ -d $data_group_path ]]; then
@@ -381,7 +390,7 @@ bootstrap_progress
 log_ok
 
 log_message "Restarting Dashboard container to ensure Portal URLs are loaded ok"
-docker restart $(get_context_data "container" "dashboard" "1" "name") 1> /dev/null
+eval $(generate_docker_compose_command) restart tyk-dashboard 1> /dev/null 2>> bootstrap.log
 if [ "$?" != 0 ]; then
   echo "Error occurred when restarting Dashboard container"
   exit 1
@@ -409,7 +418,7 @@ echo -e "\033[2K
                                ##########/                            
 
 ▼ Tyk
-  ▽ Dashboard ($dashboard_image_tag)
+  ▽ Dashboard ($(get_service_image_tag "tyk-dashboard"))
                 Licence : $dashboard_licence_days_remaining days remaining
                     URL : $dashboard_base_url
        Admin API Header : admin-auth
@@ -426,7 +435,7 @@ echo -e "\033[2K
     ▾ Multi-Organisation User
                Username : $(get_context_data "1" "dashboard-user" "2" "email")
                Password : $(get_context_data "1" "dashboard-user" "2" "password")
-  ▽ Portal ($dashboard_image_tag)
+  ▽ Portal ($(get_service_image_tag "tyk-dashboard"))
     ▾ $(get_context_data "1" "organisation" "1" "name") Organisation
                     URL : http://$(get_context_data "1" "portal" "1" "hostname")$portal_root_path
                Username : $(get_context_data "1" "portal-developer" "1" "email")
@@ -435,12 +444,12 @@ echo -e "\033[2K
                     URL : http://$(get_context_data "2" "portal" "1" "hostname")$portal_root_path
                Username : $(get_context_data "2" "portal-developer" "1" "email")
                Password : $(get_context_data "2" "portal-developer" "1" "password")
-  ▽ Gateway ($gateway_image_tag)
+  ▽ Gateway ($(get_service_image_tag "tyk-gateway"))
                     URL : $gateway_base_url
                URL(TCP) : $gateway_base_url_tcp
      Gateway API Header : x-tyk-authorization
         Gateway API Key : $gateway_api_credentials
-  ▽ Gateway 2 ($gateway2_image_tag)
+  ▽ Gateway 2 ($(get_service_image_tag "tyk-gateway-2"))
                     URL : $gateway2_base_url  
      Gateway API Header : x-tyk-authorization
         Gateway API Key : $gateway2_api_credentials"
