@@ -20,7 +20,7 @@ log_ok
 bootstrap_progress
 
 log_message "Ensuring that profiles.json file is present in Identity Broker container"
-eval "$(generate_docker_compose_command) exec -T tyk-identity-broker sh -c \"touch /opt/tyk-identity-broker/profiles.json\""
+eval "$(generate_docker_compose_command) exec -d tyk-identity-broker sh -c \"touch /opt/tyk-identity-broker/profiles.json\""
 if [ "$?" != 0 ]; then
   echo "Error occurred when touching profiles.json"
   exit 1
