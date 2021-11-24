@@ -158,11 +158,15 @@ get_context_data () {
   echo $(cat .context-data/$1-$2-$3-$4)
 }
 
+get_service_container_id () {
+  # use function argument to get container id for service
+  echo $(eval $(generate_docker_compose_command) ps -q $1)
+}
+
 get_service_container_data () {
-  # use 1st function argument to get container id for service
-  container_id=$(eval $(generate_docker_compose_command) ps -q $1)
-  # use 2nd function argument to format container data
-  echo $(docker inspect $container_id --format "$2")
+  # 1st function argument get container id
+  # 2nd function argument formats container data
+  echo $(docker inspect $(get_service_container_id $1) --format "$2")
 }
 
 get_service_image_tag () {

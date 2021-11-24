@@ -7,10 +7,6 @@ source scripts/common.sh
 
 check_docker_compose_version
 
-command_docker_compose="$(generate_docker_compose_command) exec -T -u git gitea sh -c \"cd /data/gitea; rm gitea-dump.zip; gitea dump -c /data/gitea/conf/app.ini --f gitea-dump.zip\""
-eval $command_docker_compose
+eval "$(generate_docker_compose_command) exec -T -u git gitea sh -c \"cd /data/gitea; rm gitea-dump.zip; gitea dump -c /data/gitea/conf/app.ini --f gitea-dump.zip\""
 
-command_docker_compose="$(generate_docker_compose_command) ps -q gitea"
-gitea_container_id=$(eval $command_docker_compose)
-
-docker cp $gitea_container_id:/data/gitea/gitea-dump.zip deployments/cicd/volumes/gitea/gitea-dump.zip
+docker cp $(get_service_container_id gitea):/data/gitea/gitea-dump.zip deployments/cicd/volumes/gitea/gitea-dump.zip
