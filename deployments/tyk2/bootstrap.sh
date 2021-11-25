@@ -48,7 +48,7 @@ log_end_deployment
 
 echo -e "\033[2K
 ▼ Tyk Environment 2
-  ▽ Dashboard
+  ▽ Dashboard ($(get_service_image_tag "tyk2-dashboard"))
                     URL : $dashboard2_base_url
        Admin API Header : admin-auth
           Admin API Key : $dashboard_admin_api_credentials
@@ -57,6 +57,6 @@ echo -e "\033[2K
                Username : $dashboard_user_email
                Password : $dashboard_user_password
       Dashboard API Key : $dashboard2_user_api_credentials
-  ▽ Gateway
+  ▽ Gateway ($(get_service_image_tag "tyk2-gateway"))
                     URL : $gateway2_base_url
      Gateway API Header : x-tyk-authorization"
