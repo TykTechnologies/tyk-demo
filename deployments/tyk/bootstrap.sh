@@ -47,6 +47,58 @@ gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq 
 gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
 bootstrap_progress
 
+# Certificates
+
+log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
+openssl req -x509 -newkey rsa:4096 -subj "/CN=tyk-gateway-2.localhost" -keyout deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.pem -out deployments/tyk/volumes/tyk-gateway/certs/tls-certificate.pem -days 365 -nodes >/dev/null 2>>bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not generate self-signed certificate"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Generating private key for secure messaging and signing"
+openssl genrsa -out deployments/tyk/volumes/tyk-gateway/certs/private-key.pem 2048 >/dev/null 2>>bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not generate private key"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Copying private key to the Dashboard"
+cp deployments/tyk/volumes/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/private-key.pem
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not copy private key"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Generating public key for secure messaging and signing"
+openssl rsa -in deployments/tyk/volumes/tyk-gateway/certs/private-key.pem -pubout -out deployments/tyk/volumes/tyk-gateway/certs/public-key.pem >/dev/null 2>>bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not generate public key"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Recreating containers to ensure new certificates are loaded (tyk-gateway, tyk-gateway-2, tyk-dashboard)"
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway tyk-gateway-2 tyk-dashboard
+# if there are gateways from other deployments connecting to this deployment 
+# (such as MDCB), then they must be recreated to. The MDCB deployment already 
+# handles recreation.
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not recreate containers"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+# Wait for Dashboard API
+
 log_message "Waiting for Dashboard API to be ready"
 wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
 
@@ -63,7 +115,7 @@ bootstrap_progress
 
 log_message "Copying Python bundle to http-server"
 # we don't use a 'docker compose' command here as docker compose version 1 does not support 'cp'
-docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip
+docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip 2>>bootstrap.log
 if [ "$?" != 0 ]; then
   echo "Error occurred when copying Python bundle to http-server"
   exit 1
@@ -88,26 +140,6 @@ bootstrap_progress
 
 # build_go_plugin "jwt-go-plugin.so" "jwt"
 # bootstrap_progress
-
-# TLS Certificate
-
-log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
-openssl req -x509 -newkey rsa:4096 -subj "/CN=tyk-gateway-2.localhost" -keyout deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.pem -out deployments/tyk/volumes/tyk-gateway/certs/tls-certificate.pem -days 365 -nodes >/dev/null 2>>bootstrap.log
-if [ "$?" != "0" ]; then
-  echo "ERROR: Could not generate self-signed certificate"
-  exit 1
-fi
-log_ok
-bootstrap_progress
-
-log_message "Recreating Gateway 2 container to ensure new certificate is loaded"
-eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway-2 2> /dev/null
-if [ "$?" != "0" ]; then
-  echo "ERROR: Could not recreate tyk-gateway-2 container"
-  exit 1
-fi
-log_ok
-bootstrap_progress
 
 # Dashboard Data
 
