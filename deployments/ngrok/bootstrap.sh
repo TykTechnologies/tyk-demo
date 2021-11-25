@@ -10,15 +10,13 @@ log_message "Getting the ngrok allocated IP for tyk-gateway:8080"
 
 access_ip=$(curl --fail --silent --show-error ${ngrok_ip_api_endpoint} | jq ".tunnels[0].public_url" --raw-output)
 
-if [ "$?" != 0 ]
-then
+if [ "$?" != 0 ]; then
   echo "Error occurred with ngrok."
   echo "access_ip=" $access_ip
   exit 1
 fi
 
-if [ "$$access_ip" = "" ]
-then
+if [ "$$access_ip" = "" ]; then
   echo "Error occurred with ngrok."
   echo "access_ip=" $access_ip
   exit 1

@@ -7,6 +7,8 @@ bootstrap_progress
 
 log_message "Sending API call to generate Instrumentation data"
 wait_for_response "http://localhost:8080/basic-open-api/get" "200"
+log_ok
+bootstrap_progress
 
 log_end_deployment
 

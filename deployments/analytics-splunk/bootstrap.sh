@@ -7,6 +7,7 @@ bootstrap_progress
 
 splunk_base_url="http://localhost:8000"
 splunk_base_mgmt_url="https://localhost:8089"
+pump_container_name="$(get_context_data "container" "pump" "1" "name")"
 
 log_message "Waiting for splunk to return desired response"
 wait_for_response "$splunk_base_url/en-GB/account/login" "200"
@@ -25,20 +26,22 @@ set_docker_environment_value "PMP_SPLUNK_META_COLLECTORTOKEN" "$splunk_token"
 log_ok
 bootstrap_progress
 
-# restart Pump container to use updated Splunk token
-#log_message "Restarting Pump deployment container to use token returned from Splunk"
-#docker-compose \
-#    -f deployments/tyk/docker-compose.yml \
-#    -f deployments/analytics-splunk/docker-compose.yml \
-#    -p tyk-demo \
-#    --project-directory $(pwd) \
-#    up -d --no-deps --force-recreate tyk-splunk-pump 2> /dev/null
-#log_ok
-#bootstrap_progress
+log_message "Stopping the tyk-pump service (from Tyk deployment), to prevent it consuming analytics data intended for this deployment's Pump"
+eval $(generate_docker_compose_command) stop tyk-pump 2> /dev/null
+if [ "$?" != 0 ]; then
+  echo "Error stopping Pump container $pump_container_name"
+  exit 1
+fi
+log_ok
+bootstrap_progress
 
-log_message "Stopping the pump instance deployed by the base deployment"
-# so it is replaced by the instance from this deployment
-docker-compose -f deployments/tyk/docker-compose.yml -p tyk-demo --project-directory $(pwd) stop tyk-pump 2> /dev/null
+# verify tyk-pump service is stopped
+log_message "Checking that of tyk-pump service is stopped"
+service_process=$(eval $(generate_docker_compose_command) top tyk-pump)
+if [ "$service_process" != "" ]; then
+  log_message "  ERROR: tyk-pump process has not stopped. Exiting."
+  exit 1
+fi
 log_ok
 bootstrap_progress
 

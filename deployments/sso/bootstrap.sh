@@ -5,30 +5,44 @@ deployment="SSO"
 log_start_deployment
 bootstrap_progress
 
+log_message "Setting global variables"
 dashboard_sso_base_url="http://localhost:3001"
 dashboard_base_url_escaped="http:\/\/localhost:3000"
 identity_broker_base_url="http://localhost:3010"
+log_ok
+bootstrap_progress
 
-log_message "Getting config data"
+log_message "Getting config data from Identity Broker config file"
 identity_broker_api_credentials=$(cat deployments/sso/volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
 log_message "  TIB base URL: $identity_broker_base_url"
 log_message "  TIB API Credentials: $identity_broker_api_credentials"
 log_ok
 bootstrap_progress
 
-log_message "Creating empty profiles.json"
-docker exec tyk-demo_tyk-identity-broker_1 sh -c "touch /opt/tyk-identity-broker/profiles.json"
+log_message "Ensuring that profiles.json file is present in Identity Broker container"
+eval "$(generate_docker_compose_command) exec -d tyk-identity-broker sh -c \"touch /opt/tyk-identity-broker/profiles.json\""
+if [ "$?" != 0 ]; then
+  echo "Error occurred when touching profiles.json"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Reading context data to be used to create SSO profiles"
+organisation_id=$(get_context_data "1" "organisation" "1" "id")
+dashboard_user_api_credentials=$(get_context_data "1" "dashboard-user" "1" "api-key")
+user_group_readonly_id=$(get_context_data "1" "dashboard-user-group" "1" "id")
+user_group_default_id=$(get_context_data "1" "dashboard-user-group" "2" "id")
+user_group_admin_id=$(get_context_data "1" "dashboard-user-group" "3" "id")
+log_message "  Organisation Id: $organisation_id"
+log_message "  Dashboard User API Credentials: $dashboard_user_api_credentials"
+log_message "  Dashboard \"Readonly\" User Group Id: $user_group_readonly_id"
+log_message "  Dashboard \"Default\" User Group Id: $user_group_default_id"
+log_message "  Dashboard \"Admin\" User Group Id: $user_group_admin_id"
 log_ok
 bootstrap_progress
 
 log_message "Creating profile for OICD / Dashboard"
-organisation_id=$(cat .context-data/organisation-id)
-dashboard_user_api_credentials=$(cat .context-data/dashboard-user-api-credentials)
-log_message "  Organisation id: $organisation_id"
-log_message "  Dashboard User API Credentials: $dashboard_user_api_credentials"
-user_group_readonly_id=$(cat .context-data/dashboard-user-group-1-id)
-user_group_default_id=$(cat .context-data/dashboard-user-group-2-id)
-user_group_admin_id=$(cat .context-data/dashboard-user-group-3-id)
 identity_broker_profile_tyk_dashboard_data=$(cat deployments/sso/data/tyk-identity-broker/profile-tyk-dashboard.json | \
   sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \
   sed 's/DASHBOARD_USER_API_CREDENTIALS/'"$dashboard_user_api_credentials"'/' | \
@@ -54,7 +68,7 @@ log_end_deployment
 
 echo -e "\033[2K
 ▼ SSO
-  ▽ Dashboard
+  ▽ Dashboard ($(get_service_image_tag "tyk-dashboard-sso"))
     ▾ Organisation 1
                     URL : $dashboard_sso_base_url
       ▿ Admin user
@@ -66,6 +80,9 @@ echo -e "\033[2K
       ▿ Default user
                Username : dashboard.default@example.org
                Password : Abcd1234
-  ▽ Identity Broker Profiles
-       OIDC / Dashboard : $identity_broker_base_url/auth/tyk-dashboard/openid-connect
-           LDAP / Token : $identity_broker_base_url/auth/ldap-token/1"
+  ▽ Identity Broker ($(get_service_image_tag "tyk-identity-broker"))
+    ▾ SSO Endpoints
+      ▿ OIDC / Dashboard
+                    URL : $identity_broker_base_url/auth/tyk-dashboard/openid-connect
+      ▿ LDAP / Token
+                    URL : $identity_broker_base_url/auth/ldap-token/1"

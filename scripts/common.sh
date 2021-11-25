@@ -8,11 +8,11 @@ declare -a tyk_demo_hostnames=("tyk-dashboard.localhost" "tyk-portal.localhost" 
 spinner_chars="/-\|"
 spinner_count=1
 
-function bootstrap_progress {
+bootstrap_progress () {
   printf "  Bootstrapping $deployment ${spinner_chars:spinner_count++%${#spinner_chars}:1} \r"
 }
 
-function log_http_result {
+log_http_result () {
   if [ "$1" = "200" ] || [ "$1" = "201" ]
   then 
     log_ok
@@ -22,7 +22,7 @@ function log_http_result {
   fi
 }
 
-function log_json_result {
+log_json_result () {
   status=$(echo $1 | jq -r '.Status')
   if [ "$status" = "OK" ] || [ "$status" = "Ok" ]
   then
@@ -33,23 +33,23 @@ function log_json_result {
   fi
 }
 
-function log_ok {
+log_ok () {
   log_message "  Ok"
 }
 
-function log_message {
+log_message () {
   echo "$(date -u) $1" >> bootstrap.log
 }
 
-function log_start_deployment {
+log_start_deployment () {
   log_message "START ▶ $deployment deployment bootstrap"
 }
 
-function log_end_deployment {
+log_end_deployment () {
   log_message "END ▶ $deployment deployment bootstrap"
 }
 
-function set_docker_environment_value {
+set_docker_environment_value () {
   setting_current_value=$(grep "$1" .env)
   setting_desired_value="$1=$2"
   if [ "$setting_current_value" == "" ]
@@ -71,7 +71,7 @@ function set_docker_environment_value {
   fi
 }
 
-function wait_for_response {
+wait_for_response () {
   url="$1"
   status=""
   desired_status="$2"
@@ -123,7 +123,7 @@ function wait_for_response {
   done
 }
 
-function hot_reload {
+hot_reload () {
   gateway_host="$1"
   gateway_secret="$2"
   group="$3"
@@ -150,15 +150,56 @@ function hot_reload {
   fi
 }
 
-set_context_data() {
+set_context_data () {
   echo $5 > .context-data/$1-$2-$3-$4
 }
 
-get_context_data() {
+get_context_data () {
   echo $(cat .context-data/$1-$2-$3-$4)
 }
 
-check_licence_expiry() {
+get_service_container_id () {
+  # use function argument to get container id for service
+  echo $(eval $(generate_docker_compose_command) ps -q $1)
+}
+
+get_service_container_data () {
+  # 1st function argument get container id
+  # 2nd function argument formats container data
+  echo $(docker inspect $(get_service_container_id $1) --format "$2")
+}
+
+get_service_image_tag () {
+  echo $(get_service_container_data $1 "{{ .Config.Image }}" | awk -F':' '{print $2}')
+}
+
+check_docker_compose_version () {
+  rm .bootstrap/is_docker_compose_v1 2> /dev/null
+  regex_docker_compose_version_1='^docker-compose version 1\.'
+  if [[ $(docker-compose --version) =~ $regex_docker_compose_version_1 ]]; then
+    echo "Detected Docker Compose v1"
+    touch .bootstrap/is_docker_compose_v1
+  fi
+}
+
+generate_docker_compose_command () {
+  # create the docker compose command
+  command_docker_compose=""
+  # use "docker-compose" if version is 1, otherwise use "docker compose"
+  if [ -f .bootstrap/is_docker_compose_v1 ]; then
+    command_docker_compose="docker-compose"
+  else
+    command_docker_compose="docker compose --env-file `pwd`/.env"
+  fi
+  while read deployment; do
+    command_docker_compose="$command_docker_compose -f deployments/$deployment/docker-compose.yml"
+  done < .bootstrap/bootstrapped_deployments
+  command_docker_compose="$command_docker_compose -p tyk-demo --project-directory `pwd`"
+
+  echo "$command_docker_compose"
+}
+
+check_licence_expiry () {
   # read licence line from .env file
   licence_line=$(grep "$1=" .env)
   # extract licence JWT
@@ -188,7 +229,7 @@ check_licence_expiry() {
   fi
 }
 
-_decode_base64_url() {
+_decode_base64_url () {
   local len=$((${#1} % 4))
   local result="$1"
   if [ $len -eq 2 ]; then result="$1"'=='
@@ -197,9 +238,9 @@ _decode_base64_url() {
   echo "$result" | tr '_-' '/+' | base64 -d
 }
 
-decode_jwt() { _decode_base64_url $(echo -n $1 | cut -d "." -f ${2:-2}) | jq .; }
+decode_jwt () { _decode_base64_url $(echo -n $1 | cut -d "." -f ${2:-2}) | jq .; }
 
-build_go_plugin() {
+build_go_plugin () {
   go_plugin_filename=$1
   # each plugin must be in its own directory
   go_plugin_directory="$PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/$2"
@@ -223,7 +264,7 @@ build_go_plugin() {
   fi
 }
 
-create_organisation() {
+create_organisation () {
   local organisation_data_path="$1"
   local api_key="$2"
   local data_group="$3"
@@ -251,7 +292,7 @@ create_organisation() {
   log_message "    Portal Hostname: $portal_hostname"
 }
 
-create_dashboard_user() {
+create_dashboard_user () {
   local dashboard_user_data_path="$1"
   local api_key="$2"
   local data_group="$3"
@@ -298,7 +339,7 @@ create_dashboard_user() {
   log_message "    Password: $dashboard_user_password"
 }
 
-create_user_group() {
+create_user_group () {
   local user_group_data_path="$1"
   local api_key="$2"
   local data_group="$3"
@@ -322,7 +363,7 @@ create_user_group() {
   log_message "    Id: $user_group_id"
 }
 
-create_webhook() {
+create_webhook () {
   local webhook_data_path="$1"
   local api_key="$2"
   local webhook_name=$(jq -r '.name' $webhook_data_path)
@@ -339,7 +380,7 @@ create_webhook() {
   # the /api/hooks endpoint doesn't return the webhook id, so we can't save any context data
 }
 
-initialise_portal() {
+initialise_portal () {
   local organisation_id="$1"
   local api_key="$2"
 
@@ -359,7 +400,7 @@ initialise_portal() {
   log_message "    Id: $catalogue_id"
 }
 
-create_portal_page() {
+create_portal_page () {
   local page_data_path="$1"
   local api_key="$2"
   local page_title=$(jq -r '.title' $page_data_path)
@@ -371,7 +412,7 @@ create_portal_page() {
     -d @$page_data_path 2>> bootstrap.log)"
 }
 
-create_portal_developer() {
+create_portal_developer () {
   local developer_data_path="$1"
   local api_key="$2"
   local index="$3"
@@ -390,7 +431,7 @@ create_portal_developer() {
   log_message "    Password: $developer_password"
 }
 
-create_portal_documentation() {
+create_portal_documentation () {
   local documentation_data_path="$1"
   local api_key="$2"
   local documentation_title=$(jq -r '.info.title' $documentation_data_path)
@@ -413,7 +454,7 @@ create_portal_documentation() {
   echo "$documentation_id"
 }
 
-create_portal_catalogue() {
+create_portal_catalogue () {
   local catalogue_data_path="$1"
   local api_key="$2"
   local documentation_id="$3"
@@ -436,7 +477,7 @@ create_portal_catalogue() {
     -d "$updated_catalogue" 2>> bootstrap.log)"
 }
 
-create_api() {
+create_api () {
   local api_data_path="$1"
   local admin_api_key="$2"
   local dashboard_api_key="$3"
@@ -489,7 +530,7 @@ create_api() {
   log_message "    Id: $api_id"
 }
 
-create_policy() {
+create_policy () {
   local policy_data_path="$1"
   local api_key="$2"
   local dashboard_api_key="$3"
@@ -529,7 +570,7 @@ create_policy() {
   fi
 }
 
-create_basic_key() {
+create_basic_key () {
   local basic_key_data_path="$1"
   local api_key="$2"
   local file_name="$(basename $basic_key_data_path)"
@@ -558,7 +599,7 @@ create_basic_key() {
   fi
 }
 
-create_bearer_token() {
+create_bearer_token () {
   local bearer_token_data_path="$1"
   local api_key="$2"
   local file_name="$(basename $bearer_token_data_path)"
@@ -590,7 +631,7 @@ create_bearer_token() {
   fi
 }
 
-create_oauth_client() {
+create_oauth_client () {
   local oauth_client_data_path="$1"
   local api_key="$2"
   local api_id=$(cat $oauth_client_data_path | jq -r '.api_id')
