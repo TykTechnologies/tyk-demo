@@ -8,7 +8,7 @@ log_start_deployment
 bootstrap_progress
 
 log_message "Setting global variables"
-dashboard_base_url="http://tyk-dashboard.localhost:3000"
+dashboard_base_url="http://tyk-dashboard.localhost:$(jq -r '.listen_port' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
 gateway_base_url="http://$(jq -r '.host_config.override_hostname' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
 gateway_base_url_tcp="tyk-gateway.localhost:8086"
 gateway2_base_url="https://tyk-gateway-2.localhost:8081"
@@ -62,6 +62,7 @@ log_ok
 bootstrap_progress
 
 log_message "Copying Python bundle to http-server"
+# we don't use a 'docker compose' command here as docker compose version 1 does not support 'cp'
 docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip
 if [ "$?" != 0 ]; then
   echo "Error occurred when copying Python bundle to http-server"
