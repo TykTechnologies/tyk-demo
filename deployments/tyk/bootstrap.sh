@@ -89,6 +89,26 @@ bootstrap_progress
 # build_go_plugin "jwt-go-plugin.so" "jwt"
 # bootstrap_progress
 
+# TLS Certificate
+
+log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
+openssl req -x509 -newkey rsa:4096 -subj "/CN=tyk-gateway-2.localhost" -keyout deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.pem -out deployments/tyk/volumes/tyk-gateway/certs/tls-certificate.pem -days 365 -nodes 1>/dev/null 2>>bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not generate self-signed certificate"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Recreating Gateway 2 container to ensure new certificate is loaded"
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway-2 2> /dev/null
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not recreate tyk-gateway-2 container"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
 # Dashboard Data
 
 # The order these are processed in is important, due to dependencies between objects
