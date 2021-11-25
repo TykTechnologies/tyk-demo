@@ -69,7 +69,7 @@ bootstrap_progress
 
 log_message "Copying private key to the Dashboard"
 # We delete the 'file' first, because it is missing at the start it gets created 
-# as a directory
+# as a directory and needs to be removed before the file can be copied
 rmdir deployments/tyk/volumes/tyk-dashboard/private-key.pem
 cp deployments/tyk/volumes/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard
 if [ "$?" != "0" ]; then
