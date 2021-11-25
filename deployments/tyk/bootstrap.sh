@@ -68,7 +68,10 @@ log_ok
 bootstrap_progress
 
 log_message "Copying private key to the Dashboard"
-cp deployments/tyk/volumes/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/private-key.pem
+# We delete the 'file' first, because it is missing at the start it gets created 
+# as a directory
+rmdir deployments/tyk/volumes/tyk-dashboard/private-key.pem
+cp deployments/tyk/volumes/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not copy private key"
   exit 1
