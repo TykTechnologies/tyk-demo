@@ -8,7 +8,7 @@ services:
       - tyk
     volumes:
       - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
-      - ./deployments/tyk/volumes/tyk-dashboard/private-key.pem:/opt/tyk-dashboard/private-key.pem
+      - ./deployments/tyk/volumes/tyk-dashboard/certs:/opt/tyk-dashboard/certs
       - ./deployments/tyk/volumes/tyk-dashboard/catalogue.html:/opt/tyk-dashboard/portal/templates/catalogue.html
       - ./deployments/tyk/volumes/tyk-dashboard/navigation.html:/opt/tyk-dashboard/portal/templates/navigation.html
       - ./deployments/tyk/volumes/tyk-dashboard/audit.log:/opt/tyk-dashboard/audit.log

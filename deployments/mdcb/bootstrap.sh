@@ -55,7 +55,7 @@ bootstrap_progress
 # recreate containers to use updated MDCB credentials
 log_message "Recreating MDCB deployment containers, so that they use updated MDCB user API credentials (tyk-mdcb, tyk-worker-gateway)"
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway 2> /dev/null
-if [ "$?" != 0 ]; then
+if [ "$?" != "0" ]; then
   echo "Error occurred when recreating MDCB deployment containers"
   exit 1
 fi
@@ -64,8 +64,8 @@ bootstrap_progress
 
 # verify MDCB container is running
 log_message "Verifying that MDCB service container is running (tyk-mdcb)"
-mdcb_running=$(eval $(generate_docker_compose_command) ps --status running -q tyk-mdcb)
-if [ "$mdcb_running" == "" ]; then
+mdcb_running=$(get_service_container_data tyk-mdcb "{{ .State.Running }}")
+if [ "$mdcb_running" != "true" ]; then
   log_message "  ERROR: No running container for tyk-mdcb service. Exiting."
   log_message "  Suggest checking MDCB container log for more information. Perhaps the MDCB licence has expired?"
   exit 1
@@ -86,6 +86,8 @@ while [ "$result" != "0" ]; do
     sleep 2
   fi
 done
+log_ok
+bootstrap_progress
 
 log_end_deployment
 
