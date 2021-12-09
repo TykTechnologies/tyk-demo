@@ -177,17 +177,12 @@ git pull
 
 # Postman Scripts
 
-The Postman collections contain scripts for two purposes:
-
-1. Providing a library of Tyk API functions
-3. Performing testing of the response
-
-## 1. Tyk Postman Library
+## Tyk Postman Library
 
 The Tyk Postman Library provides functions for simplified access to the Tyk Gateway, Dashboard and Dashboard Admin APIs.
 
-The functions simplify access by wrapping the Postman HTTP request method (`pm.sendRequest`) and automatically setting the necessary host, method, path, headers and body. All that remains is to provide any parameter values, as well as a callback function (if needed) and Postman context:
-- The parameters could things such as an id of an object to retrieve, or some body data. Basically, the data specific to that request.
+The library simplifies Tyk API access by wrapping the Postman HTTP request method (`pm.sendRequest`) and automatically setting the necessary host, method, path, headers and body. All the developer must do is provide the necessary parameter values, callback function (if needed) and Postman context:
+- The parameters vary depending on the function e.g. the id of an object to retrieve, or the body data to create an object.
 - The callback function can be used to perform further operations once the request is completed. The function is passed straight to Postman's `pm.sendRequest` function.
 - The Postman context is needed, as it is not accessible by the script directly, so must be passed into the function at runtime.
 
@@ -217,13 +212,97 @@ tyk = {
 
 Postman variables are used to retrieve some data, where it's possible and appropriate to do so, such as hostnames and API keys.
 
-Data is sometimes generated dynamically, using either the Postman dynamic variables to create random values or calls to the Tyk APIs to create temporary data and API keys.
+### Use in Postman Scripts
 
-## 2. Performing Testing
+Some requests benefit from or require access to Tyk data. The Tyk Postman Library can be used to perform the necessary interactions with the Tyk API.
 
-Testing the response is a vital, as it validates that the example request produced the desired result.
+#### Creating Data
 
-There are many ways in which the response can be validated.
+The *Tyk Demo > General Tests > Dashboard API > Users > Get a User* request creates a temporary user in the *Pre-request Script* so that the request can retrieve it:
+
+```javascript
+tyk.dashboardAdminApi.users.create(
+    JSON.stringify({
+        first_name: pm.variables.get("user-first-name"),
+        last_name: pm.variables.get("user-last-name"),
+        email_address: pm.variables.get("user-email-address"),
+        org_id: "5e9d9544a1dcd60001d0ed20",
+        active: true,
+        password: "3LEsHO1jv1dt9Xgf",
+        user_permissions: {
+            IsAdmin: "admin",
+            ResetPassword: "admin"
+        }
+    }),
+    (error, response) => { 
+        pm.expect(response.code).to.eql(200);
+        // user id needed for request, and to delete after tests
+        pm.variables.set("user-id", response.json().Meta.id);
+        pm.variables.set("user-api-key", response.json().Meta.access_key);
+    },
+    pm
+);
+```
+
+Notice that the Postman variables `user-id` and `user-api-key` are used to temporarily store the data. This is so it can be used later on, in the request and tests.
+
+#### Deleting Data
+
+Any temporary data created should be deleted once it's no longer required. This prevents the Tyk deployment from filling up with temporary data when running requests in the Postman collection. Use the Tyk Postman Library's `delete` functions to do this. In this example, the user is deleted at the end of the *Tests* script:
+
+```javascript
+tyk.dashboardApi.users.delete(
+    pm.variables.get("user-id"), 
+    (error, response) => {
+        pm.expect(response.code).to.eq(200);
+        tyk.dashboardApi.tools.apiKey.delete(pm);
+    },
+    pm
+);
+```
+
+#### Reading Data
+
+The *Tyk Demo > General Tests > Dashboard Admin API > Organisations > Create an Organisation* request uses the `Meta` JSON value returned in the response to retreive the organisation and then validate the value of its `owner_name` property:
+
+```javascript
+pm.test("Organisation is created", function () {
+    tyk.dashboardAdminApi.organisations.get(
+        pm.response.json().Meta,
+        (error, response) => { 
+            pm.expect(response.code).to.eql(200);
+            pm.expect(response.json().owner_name).to.eql("Create an Organisation Test");
+        },
+        pm
+    );
+});
+```
+
+#### Dashboard API Keys
+
+The Dashboard API requires authentication using a Dashboard User API key. These keys are randomly generated when a user is created, so cannot be defined in advance like the Dashboard Admin API key. 
+
+To provide the Dashboard API requests with a key, there are two functions which will generate and delete a key (and the related user). When the key is generated it is automatically stored in the `tyk-dashboard.api-key` Postman variable so that it can be used in the requests.
+
+To facilitate the generation of Dashboard API Keys for all Dashboard API requests, the *Tyk Demo > General Tests > Dashboard API* tree element has a pre-request script which generates a Dashboard API key:
+
+```javascript
+tyk.dashboardApi.tools.apiKey.create(pm);
+```
+
+This key can then be used by all the scripts within the *Dashboard API* branch, such as *Users > Get a User*, by referencing the Postman variable `{{tyk-dashboard.api-key}}` for the value of the `Authorization` header. 
+
+Once the tests are finished, the `delete` function can be called to remove the key from the database:
+
+```javascript
+tyk.dashboardApi.tools.apiKey.delete(pm);
+```
+
+## Testing Responses
+
+The Tyk Demo Postman collection contains many requests, each of which demonstrate a particular piece of functionality. Testing the responses generated by these requests provides validation that the desired result was achieved.
+
+There are many ways in which the response can be validated, here are some examples.
 
 ### HTTP Response Status Code
 
@@ -279,7 +358,7 @@ pm.test("Status code is 429", function () {
     });
 });
 ```
-### Dynamic Variables
+## Dynamic Variables
 
 Postman's dynamic variables produces random values such as names e.g. `"{{$randomFirstName}}"`. More information can be found on the [Postman dynamic variables documentation](https://learning.postman.com/docs/writing-scripts/script-references/variables-list/).
 
@@ -298,88 +377,4 @@ tyk.dashboardAdminApi.organisations.create(
     }, 
     pm
 );
-```
-
-### Interacting with Tyk APIs
-
-Some tests benefit from or require access to Tyk data. The Tyk Postman Library can be used to perform the necessary interactions with the Tyk API.
-
-#### Creating Data
-
-The *Tyk Demo > General Tests > Dashboard API > Users > Get a User* request creates a temporary user in the *Pre-request Script* so that the request can retrieve it:
-
-```javascript
-tyk.dashboardAdminApi.users.create(
-    JSON.stringify({
-        first_name: pm.variables.get("user-first-name"),
-        last_name: pm.variables.get("user-last-name"),
-        email_address: pm.variables.get("user-email-address"),
-        org_id: "5e9d9544a1dcd60001d0ed20",
-        active: true,
-        password: "3LEsHO1jv1dt9Xgf",
-        user_permissions: {
-            IsAdmin: "admin",
-            ResetPassword: "admin"
-        }
-    }),
-    (error, response) => { 
-        pm.expect(response.code).to.eql(200);
-        // user id needed for request, and to delete after tests
-        pm.variables.set("user-id", response.json().Meta.id);
-        pm.variables.set("user-api-key", response.json().Meta.access_key);
-    },
-    pm
-);
-```
-
-Notice that the Postman variables `user-id` and `user-api-key` are used to temporarily store the data. This is so it can be used later on, in the request and tests.
-
-Any temporary data created should be deleted once it's no longer required. This prevents the Tyk deployment from filling up with temporary data when running requests in the Postman collection. Use the Tyk Postman Library's `delete` functions to do this. In this example, the user is deleted at the end of the *Tests* script:
-
-```javascript
-tyk.dashboardApi.users.delete(
-    pm.variables.get("user-id"), 
-    (error, response) => {
-        pm.expect(response.code).to.eq(200);
-        tyk.dashboardApi.tools.apiKey.delete(pm);
-    },
-    pm
-);
-```
-
-#### Reading Data
-
-The *Tyk Demo > General Tests > Dashboard Admin API > Organisations > Create an Organisation* request uses the `Meta` value returned in the response to retreive the organisation and validate the `owner_name` value:
-
-```javascript
-pm.test("Organisation is created", function () {
-    tyk.dashboardAdminApi.organisations.get(
-        pm.response.json().Meta,
-        (error, response) => { 
-            pm.expect(response.code).to.eql(200);
-            pm.expect(response.json().owner_name).to.eql("Create an Organisation Test");
-        },
-        pm
-    );
-});
-```
-
-#### Dashboard API Keys
-
-The Dashboard API requires authentication using a Dashboard User API key. These keys are randomly generated when a user is created, so cannot be defined in advance like the Dashboard Admin API key. 
-
-To provide the Dashboard API requests with a key, there are two functions which will generate and delete a key (and the related user). When the key is generated it is automatically stored in the `tyk-dashboard.api-key` Postman variable so that it can be used in the requests.
-
-To facilitate the generation of Dashboard API Keys for all Dashboard API requests, the *Tyk Demo > General Tests > Dashboard API* tree element has a pre-request script which generates a Dashboard API key:
-
-```javascript
-tyk.dashboardApi.tools.apiKey.create(pm);
-```
-
-This key can then be used by all the scripts within the *Dashboard API* branch, such as *Users > Get a User*, by referencing the Postman variable `{{tyk-dashboard.api-key}}` for the value of the `Authorization` header. 
-
-Once the tests are finished, the `delete` function can be called to remove the key from the database:
-
-```javascript
-tyk.dashboardApi.tools.apiKey.delete(pm);
 ```
