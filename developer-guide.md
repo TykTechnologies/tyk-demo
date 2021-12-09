@@ -41,7 +41,7 @@ The deployment's Docker Compose file must be named `docker-compose.yml`, and con
 
 This file will be used as a parameter, alongside the base deployment's `deployments/tyk/docker-compose.yml`. This means that it only needs to contain services beyond those in the base deployment i.e. you do not need to specify a Dashboard, Gateway pump etc, as these are already in the base deployment.
 
-## Docker environment variables
+## Docker Environment Variables
 
 If the deployment makes use of Docker environment variables which would have adverse effects on the system if set incorrectly, use the `up.sh` script to verify the values and correct them as needed.
 
@@ -64,12 +64,12 @@ When creating the bootstrap for a deployment, follow these conventions:
   * Call the `bootstrap_progress` function to provide progress feedback during long-running steps
 * At the end of each step:
   * Call the `bootstrap_progress` function to provide progress feedback
-  * Call either the `log_ok`, `log_json_result` or `log_http_result` function, as appropriate,to log the end of the step
+  * Call either the `log_ok`, `log_json_result` or `log_http_result` function, as appropriate, to log the end of the step
 * At the end of the bootstrap script:
   * Call the `log_end_deployment` function, to log the end of the deployment
-  * Echo relevant information about the deployment
+  * Echo relevant information about the deployment (see Displaying Information, below)
 
-### Displaying information
+### Displaying Information
 
 At the end of the bootstrap process, display relevant information about the deployment that the user will find useful. This may be URLs of services, usernames, passwords etc.
 
@@ -102,7 +102,7 @@ Following these rules will allow the displayed data to be aligned uniformly with
 
 For more examples, check the `bootstrap.sh` files in other deployments.
 
-### Context data directory
+### Context Data Directory
 
 The `.context-data` directory is used to store data generated during bootstrap scripts so that other scripts can access and use that data. This is particularly important for dynamic data, such as the ids of data added via the Dashboard API. The `scripts/common.sh` script contains functions to read (`get_context_data`) and write (`set_context_data`) this data.
 
@@ -140,14 +140,16 @@ These utility scripts are available in the `scripts` directory:
 * `test.sh`: Uses a Newman container to run the Postman collection tests
 * `update-hosts.sh`: Adds the necessary hosts to the `/etc/hosts` file
 
-# Working with APIs, Policies and Postman data
+Note that there is no *import* script, as the `up.sh` script essentially imports the data when bootstrapping the deployment.
+
+# Working with APIs, Policies and Postman Data
 
 There are two scenarios for working with this data:
 
 1. You have made changes and want to commit them so that others can get them
 2. You want to get the changes other people have made
 
-## Scenario 1: Committing changes to remote
+## Scenario 1: Committing Changes to Remote
 
 In this scenario you have made updates to the repo which you want to commit back to master.
 
@@ -163,7 +165,7 @@ This will update the `apis.json` and `policies.json` files in the `deployments/t
 
 When adding functionality to this repo, please also add requests to the Postman collection to demonstrate the functionality. Include a description and enough tests to validate the response. Tests are especially important to avoid regressions, so please add them. Export the collection and overwrite the `tyk_demo.postman_collection.json` file in the deployment directory.
 
-## Scenario 2: Synchronising updates from remote
+## Scenario 2: Synchronising Updates from Remote
 
 The simplest and best-practice approach is to simply bring the environment down, pull the repo then bring it back up again. The `up.sh` script includes commands to import APIs, Policies and other data, so all latest data will be imported:
 
@@ -171,4 +173,213 @@ The simplest and best-practice approach is to simply bring the environment down,
 ./down.sh
 git pull
 ./up.sh
+```
+
+# Postman Scripts
+
+The Postman collections contain scripts for two purposes:
+
+1. Providing a library of Tyk API functions
+3. Performing testing of the response
+
+## 1. Tyk Postman Library
+
+The Tyk Postman Library provides functions for simplified access to the Tyk Gateway, Dashboard and Dashboard Admin APIs.
+
+The functions simplify access by wrapping the Postman HTTP request method (`pm.sendRequest`) and automatically setting the necessary host, method, path, headers and body. All that remains is to provide any parameter values, as well as a callback function (if needed) and Postman context:
+- The parameters could things such as an id of an object to retrieve, or some body data. Basically, the data specific to that request.
+- The callback function can be used to perform further operations once the request is completed. The function is passed straight to Postman's `pm.sendRequest` function.
+- The Postman context is needed, as it is not accessible by the script directly, so must be passed into the function at runtime.
+
+The library is stored in the root of the Postman collection as a pre-request script. To view it, click the *Tyk Demo* tree root element, then click on *Pre-request Script*. Storing the script here makes it available to all requests within the collection.
+
+Functions are namespaced, by API and object e.g. `tyk.dashboardAdminApi.organisations`. Within the namespaces are the functions which represent the different endpoints for that API and object. For example, the `create` function within `tyk.dashboardAdminApi.organisations` represents a `POST` request to the `/admin/organisations` endpoint:
+
+```javascript
+tyk = {
+    dashboardAdminApi: {
+        organisations: {
+            create: function (organisation, callback, pm) {
+                pm.sendRequest(
+                    {
+                        url: "http://" + pm.variables.get("tyk-dashboard.host") + "/admin/organisations",
+                        method: "POST",
+                        header: "admin-auth: " + pm.variables.get("tyk-dashboard.admin-api-key"),
+                        body: organisation
+                    }, 
+                    callback
+                );   
+            }
+        }
+    }
+}
+```
+
+Postman variables are used to retrieve some data, where it's possible and appropriate to do so, such as hostnames and API keys.
+
+Data is sometimes generated dynamically, using either the Postman dynamic variables to create random values or calls to the Tyk APIs to create temporary data and API keys.
+
+## 2. Performing Testing
+
+Testing the response is a vital, as it validates that the example request produced the desired result.
+
+There are many ways in which the response can be validated.
+
+### HTTP Response Status Code
+
+The HTTP Status Code returned by the response e.g. 200:
+
+```javascript
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+```
+
+### Response Body Data
+
+The body data returned by the response, depending if it's relevant e.g. "status" is "ok":
+
+```javascript
+pm.test("Status is ok", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.status).to.eql("ok");
+});
+```
+
+### Response Header Data
+
+The header data returned by the response, depending if it's relevant e.g. "New-Header" is present:
+
+```javascript
+pm.test("'New-Header' header is present", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.headers['New-Header']).to.eql("new-header-value");
+});
+```
+
+### Additional Requests
+
+Making additional requests can help validate a feature e.g. rate limiting:
+
+```javascript
+pm.test("Status code is 429", function () {
+    var rateLimitRequest = {
+        url: 'http://' + tykGatewayHost + '/basic-protected-api/get',
+        method: 'GET',
+        header: 'Authorization:' + keyId
+    };
+    pm.sendRequest(rateLimitRequest, function (err, response) {
+        pm.expect(response.code).to.eql(200);
+        pm.sendRequest(rateLimitRequest, function (err, response) {
+            pm.expect(response.code).to.eql(200);
+            pm.sendRequest(rateLimitRequest, function (err, response) {
+                pm.expect(response.code).to.eql(429);
+            });
+        });
+    });
+});
+```
+### Dynamic Variables
+
+Postman's dynamic variables produces random values such as names e.g. `"{{$randomFirstName}}"`. More information can be found on the [Postman dynamic variables documentation](https://learning.postman.com/docs/writing-scripts/script-references/variables-list/).
+
+These can be found throughout the collection, where general random values are helpful. For example, the *Tyk Demo > General Tests > Dashboard Admin API > Organisations > Get an Organisation* request uses `{{$randomCompanyName}}` to generate a random company name:
+
+```javascript
+var organisationName = pm.variables.replaceIn("{{$randomCompanyName}}");
+tyk.dashboardAdminApi.organisations.create(
+    JSON.stringify({ 
+        owner_name: organisationName 
+    }),
+    (error, response) => {
+        pm.expect(response.code).to.eql(200);
+        pm.variables.set("organisation-id", response.json().Meta);
+        pm.variables.set("organisation-name", organisationName);
+    }, 
+    pm
+);
+```
+
+### Interacting with Tyk APIs
+
+Some tests benefit from or require access to Tyk data. The Tyk Postman Library can be used to perform the necessary interactions with the Tyk API.
+
+#### Creating Data
+
+The *Tyk Demo > General Tests > Dashboard API > Users > Get a User* request creates a temporary user in the *Pre-request Script* so that the request can retrieve it:
+
+```javascript
+tyk.dashboardAdminApi.users.create(
+    JSON.stringify({
+        first_name: pm.variables.get("user-first-name"),
+        last_name: pm.variables.get("user-last-name"),
+        email_address: pm.variables.get("user-email-address"),
+        org_id: "5e9d9544a1dcd60001d0ed20",
+        active: true,
+        password: "3LEsHO1jv1dt9Xgf",
+        user_permissions: {
+            IsAdmin: "admin",
+            ResetPassword: "admin"
+        }
+    }),
+    (error, response) => { 
+        pm.expect(response.code).to.eql(200);
+        // user id needed for request, and to delete after tests
+        pm.variables.set("user-id", response.json().Meta.id);
+        pm.variables.set("user-api-key", response.json().Meta.access_key);
+    },
+    pm
+);
+```
+
+Notice that the Postman variables `user-id` and `user-api-key` are used to temporarily store the data. This is so it can be used later on, in the request and tests.
+
+Any temporary data created should be deleted once it's no longer required. This prevents the Tyk deployment from filling up with temporary data when running requests in the Postman collection. Use the Tyk Postman Library's `delete` functions to do this. In this example, the user is deleted at the end of the *Tests* script:
+
+```javascript
+tyk.dashboardApi.users.delete(
+    pm.variables.get("user-id"), 
+    (error, response) => {
+        pm.expect(response.code).to.eq(200);
+        tyk.dashboardApi.tools.apiKey.delete(pm);
+    },
+    pm
+);
+```
+
+#### Reading Data
+
+The *Tyk Demo > General Tests > Dashboard Admin API > Organisations > Create an Organisation* request uses the `Meta` value returned in the response to retreive the organisation and validate the `owner_name` value:
+
+```javascript
+pm.test("Organisation is created", function () {
+    tyk.dashboardAdminApi.organisations.get(
+        pm.response.json().Meta,
+        (error, response) => { 
+            pm.expect(response.code).to.eql(200);
+            pm.expect(response.json().owner_name).to.eql("Create an Organisation Test");
+        },
+        pm
+    );
+});
+```
+
+#### Dashboard API Keys
+
+The Dashboard API requires authentication using a Dashboard User API key. These keys are randomly generated when a user is created, so cannot be defined in advance like the Dashboard Admin API key. 
+
+To provide the Dashboard API requests with a key, there are two functions which will generate and delete a key (and the related user). When the key is generated it is automatically stored in the `tyk-dashboard.api-key` Postman variable so that it can be used in the requests.
+
+To facilitate the generation of Dashboard API Keys for all Dashboard API requests, the *Tyk Demo > General Tests > Dashboard API* tree element has a pre-request script which generates a Dashboard API key:
+
+```javascript
+tyk.dashboardApi.tools.apiKey.create(pm);
+```
+
+This key can then be used by all the scripts within the *Dashboard API* branch, such as *Users > Get a User*, by referencing the Postman variable `{{tyk-dashboard.api-key}}` for the value of the `Authorization` header. 
+
+Once the tests are finished, the `delete` function can be called to remove the key from the database:
+
+```javascript
+tyk.dashboardApi.tools.apiKey.delete(pm);
 ```
