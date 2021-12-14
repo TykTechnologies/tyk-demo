@@ -15,15 +15,15 @@ wait_for_response "$dashboard2_base_url/admin/organisations" "200" "admin-auth: 
 log_message "Importing organisation"
 log_json_result "$(curl $dashboard2_base_url/admin/organisations/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @deployments/tyk/data/tyk-dashboard/organisation.json)"
+  -d @deployments/tyk/data/tyk-dashboard/1/organisation.json)"
 bootstrap_progress
 
 log_message "Creating Dashboard user"
-dashboard_user_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/dashboard-user.json)
-dashboard_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/dashboard-user.json)
+dashboard_user_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/1/users/user-1.json)
+dashboard_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/1/users/user-1.json)
 dashboard2_user_api_response=$(curl $dashboard2_base_url/admin/users -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @deployments/tyk/data/tyk-dashboard/dashboard-user.json 2>> bootstrap.log \
+  -d @deployments/tyk/data/tyk-dashboard/1/users/user-1.json 2>> bootstrap.log \
   | jq -r '. | {api_key:.Message, id:.Meta.id}')
 dashboard2_user_id=$(echo $dashboard2_user_api_response | jq -r '.id')
 dashboard2_user_api_credentials=$(echo $dashboard2_user_api_response | jq -r '.api_key')
@@ -46,14 +46,17 @@ bootstrap_progress
 
 log_end_deployment
 
-echo -e "\033[2K 
+echo -e "\033[2K
 ▼ Tyk Environment 2
-  ▽ Dashboard 
-    ▾ Organisation 1
+  ▽ Dashboard ($(get_service_image_tag "tyk2-dashboard"))
                     URL : $dashboard2_base_url
+       Admin API Header : admin-auth
+          Admin API Key : $dashboard_admin_api_credentials
+   Dashboard API Header : Authorization       
+    ▾ $(get_context_data "1" "organisation" "1" "name") Organisation
                Username : $dashboard_user_email
                Password : $dashboard_user_password
-        API Credentials : $dashboard2_user_api_credentials
-   Authorization header : x-tyk-authorization
-  ▽ Gateway 
-                    URL : $gateway2_base_url"
+      Dashboard API Key : $dashboard2_user_api_credentials
+  ▽ Gateway ($(get_service_image_tag "tyk2-gateway"))
+                    URL : $gateway2_base_url
+     Gateway API Header : x-tyk-authorization"

@@ -42,15 +42,32 @@ The deployment directories (`deployments/*`) contain the various deployments whi
 
 All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.md` files specific to the deployment. They may also contain directories called `data` or `volumes`, which hold the data necessary during bootstrapping or providing as mapped volumes into the container.
 
-## Environment variable
+## Environment variables
 
-The `docker-compose.yml` files in this repo use a Docker environment variable to set environment variable in tyk-dashboard, tyk-gateway and tyk-pump. 
-To set them, create a file called `.env` in the root directory of the repo. 
-You can use `.env.example` as a starting point for your `.env` file. 
-Just remember to add the licenses for the Dashboard as the `DASHBOARD_LICENCE` variable, and if you are testing Tyk's multi data centre capabilities (AKA MDCB) also set `MDCB_LICENCE` license variable.
+The `docker-compose.yml` files in this repo use Docker environment variables to set OS environment variables for the Dashboard, Gateway and Pump containers. The allows aspects of the Tyk and Docker configration to be overridden without having to make changes to the source configuration files.
 
-If you want to change configs in tyk component but avoid diffs in the git repo, just add environment variables to `.env` (No need to update `docker-compose.yaml` any more).
+As per standard Docker convention, the Docker environment variables are stored in a file called `.env`, which is in the repository root directory.
 
+Notable environment variables are:
+
+| Variable | Description | Required | Default |
+| -------- | ----------- | -------- | ------- | 
+| DASHBOARD_LICENCE | Sets the licence used by the Tyk Dashboard | Yes | None - **Must** be manually set |
+| INSTRUMENTATION_ENABLED | Controls whether the instrumentation feature is enabled (`1`) or disabled (`0`) | No | `0` - Set automatically by the `up.sh` script |
+| TRACING_ENABLED | Controls whether the tracing feature is enabled (`true`) or disabled (`false`) | No | `false` - Set automatically by the `up.sh` script |
+| GATEWAY_VERSION | Sets the Tyk Gateway container image tag e.g. `v3.2.2` | No | Based on the latest release |
+| GATEWAY_LOGLEVEL | Sets the log level for the Tyk Gateway application e.g. `debug`  | No | `info` |
+| MDCB_LICENCE | Sets the licence used by the Tyk MDCB | Yes, if using the `mdcb` deployment, otherwise no | None - **Must** be manually set |
+| MDCB_USER_API_CREDENTIALS | Sets the credentials used by the Tyk MDCB to authenticate with the Dashboard | Yes, if using the `mdcb` deployment, otherwise no | None - Set automatically by the `bootstrap.sh` script |
+| PMP_SPLUNK_META_COLLECTORTOKEN | Sets the credentials used by the Tyk Pump to authenticate with the Splunk collector | Yes, if using the `analytics-splunk` deployment, otherwise no | None - Set automatically by the `bootstrap.sh` script |
+
+There are various other environment variables used, but it's not normally necessary to set them. See the [Tyk environment variables documentation](https://tyk.io/docs/tyk-environment-variables/) for more information. The exception being the variables used for the DataDog Analytics deployment (`analytics-datadog`), which has its own set of variables for configuring the DataDog integration - see the [Setup section of that deployment's readme](https://github.com/TykTechnologies/tyk-demo/blob/master/deployments/analytics-datadog/README.md#setup) for more information.
+
+Unless you have a specific reason to do so, it's not recommended to set the `*_VERSION` environment variables e.g. `GATEWAY_VERSION`. Doing so will effectively pin the image tag of the container, which could cause the `bootstrap.sh` scripts to fail, as they are written to operate against the image tags specified in the `docker-compose.yml` files.
+
+Many of the containers are configured to use `.env` as an environment file. This means that any standard Tyk environment variables added to `.env` will be available in the container e.g. setting `DB_AUDIT_ENABLED=true` enables auditing in the Dashboard.
+
+You can use `.env.example` as a starting point for your `.env` file. You must obtain a valid Tyk Dashboard licence and use it to set the `DASHBOARD_LICENCE` variable. If you are using the MDCB (`mdcb`) deployment, then you need to do the same for the `MDCB_LICENCE` variable.
 
 # Getting Started
 

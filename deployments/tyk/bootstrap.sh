@@ -7,18 +7,23 @@ deployment="Tyk"
 log_start_deployment
 bootstrap_progress
 
-dashboard_base_url="http://tyk-dashboard.localhost:3000"
+log_message "Setting global variables"
+dashboard_base_url="http://tyk-dashboard.localhost:$(jq -r '.listen_port' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
 gateway_base_url="http://$(jq -r '.host_config.override_hostname' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
 gateway_base_url_tcp="tyk-gateway.localhost:8086"
 gateway2_base_url="https://tyk-gateway-2.localhost:8081"
-gateway_image_tag=$(docker ps --filter "name=tyk-demo_tyk-gateway_1" --format "{{.Image}}" | awk -F':' '{print $2}')
-gateway2_image_tag=$(docker ps --filter "name=tyk-demo_tyk-gateway-2_1" --format "{{.Image}}" | awk -F':' '{print $2}')
-dashboard_image_tag=$(docker ps --filter "name=tyk-demo_tyk-dashboard_1" --format "{{.Image}}" | awk -F':' '{print $2}')
+log_ok
+bootstrap_progress
 
 log_message "Checking Dashboard licence exists"
 if ! grep -q "DASHBOARD_LICENCE=" .env
 then
-  echo "ERROR: Dashboard licence missing from Docker environment file. Add a licence to the DASHBOARD_LICENCE variable in the .env file."
+  log_message "ERROR: Dashboard licence missing from Docker environment file (.env). Add a licence to the DASHBOARD_LICENCE environment variable."
+  exit 1
+fi
+if grep -q "DASHBOARD_LICENCE=add_your_dashboard_licence_here" .env
+then
+  log_message "ERROR: Placeholder Dashboard licence found in Docker environment file (.env). Replace \"add_your_dashboard_licence_here\" with your Tyk licence."
   exit 1
 fi
 log_ok
@@ -28,7 +33,7 @@ log_message "Checking Dashboard licence expiry"
 licence_days_remaining=0
 check_licence_expiry "DASHBOARD_LICENCE"
 if [[ "$?" -eq "1" ]]; then
-  echo "ERROR: Tyk Dashboard licence has expired. Update DASHBOARD_LICENCE variable in .env file with a new licence."
+  log_message "ERROR: Tyk Dashboard licence has expired. Update DASHBOARD_LICENCE variable in .env file with a new licence."
   exit 1
 fi
 dashboard_licence_days_remaining=$licence_days_remaining
@@ -42,23 +47,88 @@ gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq 
 gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
 bootstrap_progress
 
+# Certificates
+
+log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
+openssl req -x509 -newkey rsa:4096 -subj "/CN=tyk-gateway-2.localhost" -keyout deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.pem -out deployments/tyk/volumes/tyk-gateway/certs/tls-certificate.pem -days 365 -nodes >/dev/null 2>>bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not generate self-signed certificate"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Generating private key for secure messaging and signing"
+openssl genrsa -out deployments/tyk/volumes/tyk-gateway/certs/private-key.pem 2048 >/dev/null 2>>bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not generate private key"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Copying private key to the Dashboard"
+cp deployments/tyk/volumes/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not copy private key"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Generating public key for secure messaging and signing"
+openssl rsa -in deployments/tyk/volumes/tyk-gateway/certs/private-key.pem -pubout -out deployments/tyk/volumes/tyk-gateway/certs/public-key.pem >/dev/null 2>>bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not generate public key"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Recreating containers to ensure new certificates are loaded (tyk-gateway, tyk-gateway-2, tyk-dashboard)"
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway tyk-gateway-2 tyk-dashboard
+# if there are gateways from other deployments connecting to this deployment 
+# (such as MDCB), then they must be recreated to. The MDCB deployment already 
+# handles recreation.
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not recreate containers"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+# Wait for Dashboard API
+
 log_message "Waiting for Dashboard API to be ready"
 wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
 
 # Python plugin
 
 log_message "Building Python plugin bundle"
-docker exec tyk-demo_tyk-gateway_1 sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1>> /dev/null 2>> bootstrap.log
+eval "$(generate_docker_compose_command) exec -d tyk-gateway sh -c \"cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem\"" 1> /dev/null 2>> bootstrap.log
+if [ "$?" != 0 ]; then
+  echo "Error occurred when building Python plugin bundle"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
 log_message "Copying Python bundle to http-server"
-docker cp tyk-demo_tyk-gateway_1:/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip
+# we don't use a 'docker compose' command here as docker compose version 1 does not support 'cp'
+docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip 2>>bootstrap.log
+if [ "$?" != 0 ]; then
+  echo "Error occurred when copying Python bundle to http-server"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
 log_message "Removing Python bundle intermediate assets"
 rm -r deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
+if [ "$?" != 0 ]; then
+  echo "Error occurred when removing Python bundle intermediate assets"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
@@ -72,7 +142,7 @@ bootstrap_progress
 
 # Dashboard Data
 
-# The order these are processed in is important
+# The order these are processed in is important, due to dependencies between objects
 log_message "Processing Dashboard Data"
 for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
   if [[ -d $data_group_path ]]; then
@@ -357,7 +427,11 @@ bootstrap_progress
 log_ok
 
 log_message "Restarting Dashboard container to ensure Portal URLs are loaded ok"
-docker restart tyk-demo_tyk-dashboard_1
+eval $(generate_docker_compose_command) restart tyk-dashboard 1> /dev/null 2>> bootstrap.log
+if [ "$?" != 0 ]; then
+  echo "Error occurred when restarting Dashboard container"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
@@ -381,7 +455,7 @@ echo -e "\033[2K
                                ##########/                            
 
 ▼ Tyk
-  ▽ Dashboard ($dashboard_image_tag)
+  ▽ Dashboard ($(get_service_image_tag "tyk-dashboard"))
                 Licence : $dashboard_licence_days_remaining days remaining
                     URL : $dashboard_base_url
        Admin API Header : admin-auth
@@ -398,7 +472,7 @@ echo -e "\033[2K
     ▾ Multi-Organisation User
                Username : $(get_context_data "1" "dashboard-user" "2" "email")
                Password : $(get_context_data "1" "dashboard-user" "2" "password")
-  ▽ Portal ($dashboard_image_tag)
+  ▽ Portal ($(get_service_image_tag "tyk-dashboard"))
     ▾ $(get_context_data "1" "organisation" "1" "name") Organisation
                     URL : http://$(get_context_data "1" "portal" "1" "hostname")$portal_root_path
                Username : $(get_context_data "1" "portal-developer" "1" "email")
@@ -407,12 +481,12 @@ echo -e "\033[2K
                     URL : http://$(get_context_data "2" "portal" "1" "hostname")$portal_root_path
                Username : $(get_context_data "2" "portal-developer" "1" "email")
                Password : $(get_context_data "2" "portal-developer" "1" "password")
-  ▽ Gateway ($gateway_image_tag)
+  ▽ Gateway ($(get_service_image_tag "tyk-gateway"))
                     URL : $gateway_base_url
                URL(TCP) : $gateway_base_url_tcp
      Gateway API Header : x-tyk-authorization
         Gateway API Key : $gateway_api_credentials
-  ▽ Gateway 2 ($gateway2_image_tag)
+  ▽ Gateway 2 ($(get_service_image_tag "tyk-gateway-2"))
                     URL : $gateway2_base_url  
      Gateway API Header : x-tyk-authorization
         Gateway API Key : $gateway2_api_credentials"

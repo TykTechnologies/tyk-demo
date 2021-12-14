@@ -9,7 +9,7 @@ bench_suite_base_url="http://go-bench-suite.localhost:8889"
 echo "bench_suite_base_url: " $bench_suite_base_url
 bench_suite_url=$bench_suite_base_url"/size/1KB"
 echo "bench_suite_url: " $bench_suite_url
-log_message "Waiting for the bench suite service to be ready"
+log_message "Waiting for the bench suite service to be ready on URL $bench_suite_url"
 wait_for_response $bench_suite_url "200" "" "" "GET"
 
 log_end_deployment
