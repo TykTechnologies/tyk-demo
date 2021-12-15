@@ -16,14 +16,14 @@ import (
 var logger = log.Get()
 
 func Authenticate(rw http.ResponseWriter, r *http.Request) {
-	if !storage.Connected() {
-		logger.Error("Storage not connected")
+	// Connect to Redis using the prefix "apikey-"
+	store := &storage.RedisCluster{KeyPrefix: "apikey-", HashKeys: config.Global().HashKeys}
+
+	if !store.Connect() {
+		logger.Error("Could not connect to storage")
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	// Connect to Redis using the prefix "apikey-"
-	store := storage.RedisCluster{KeyPrefix: "apikey-", HashKeys: config.Global().HashKeys}
 
 	if config.Global().HashKeys {
 		logger.Info("Key hashing is enabled using ", config.Global().HashKeyFunction)
@@ -36,6 +36,11 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	logger.Info("Authorization header: ", authHeader)
 
 	requestedAPI := ctx.GetDefinition(r)
+	if requestedAPI == nil {
+		logger.Error("Could not get API Definition")
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	// Calculate the key lookup value
 	lookupKey := authHeader
