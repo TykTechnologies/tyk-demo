@@ -241,7 +241,7 @@ _decode_base64_url () {
 decode_jwt () { _decode_base64_url $(echo -n $1 | cut -d "." -f ${2:-2}) | jq .; }
 
 build_go_plugin () {
-  gateway_image_tag=v4.0.0-rc11
+  gateway_image_tag=$(get_service_image_tag "tyk-gateway")
   go_plugin_filename=$1
   # each plugin must be in its own directory
   go_plugin_directory="$PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/$2"
