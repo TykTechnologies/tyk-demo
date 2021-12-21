@@ -4,16 +4,88 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/TykTechnologies/tyk/config"
 	"github.com/TykTechnologies/tyk/ctx"
 	"github.com/TykTechnologies/tyk/log"
+	"github.com/TykTechnologies/tyk/request"
 	"github.com/TykTechnologies/tyk/storage"
 	"github.com/TykTechnologies/tyk/user"
 )
 
 var logger = log.Get()
+
+func RequestLogger(rw http.ResponseWriter, r *http.Request) {
+	// call ParseForm to populate some of the form-related fields
+	r.ParseForm()
+
+	logger.Info("Request logger plugin will now log request data...")
+	logger.Info("  Method: ", r.Method)
+	logger.Info("  Proto: ", r.Proto)
+	logger.Info("  ProtoMajor: ", r.ProtoMajor)
+	logger.Info("  ProtoMinor: ", r.ProtoMinor)
+	logger.Info("  URL.Host: ", r.URL.Host)
+	logger.Info("  URL.Path: ", r.URL.Path)
+	logger.Info("  URL.Scheme: ", r.URL.Scheme)
+	logger.Info("  URL.Fragment: ", r.URL.Fragment)
+	logger.Info("  URL.RawQuery: ", r.URL.RawQuery)
+	logger.Info("  URL.Opaque: ", r.URL.Opaque)
+	for name, _ := range r.Header {
+		logger.Info("  Header.Get(\"", name, "\"): ", r.Header.Get(name))
+	}
+	logger.Info("  ContentLength: ", r.ContentLength)
+	logger.Info("  Host: ", r.Host)
+	logger.Info("  RemoteAddr: ", r.RemoteAddr)
+	logger.Info("  RequestURI: ", r.RequestURI)
+	for name, _ := range r.Form {
+		logger.Info("  Form.Get(\"", name, "\"): ", r.Form.Get(name))
+	}
+	for name, _ := range r.PostForm {
+		logger.Info("  PostForm.Get(\"", name, "\"): ", r.PostForm.Get(name))
+	}
+	body, err := ioutil.ReadAll(r.Body)
+	if err == nil {
+		sb := string(body)
+		logger.Info("  Body - read by ioutil.ReadAll(): ", sb)
+	}
+}
+
+func RateLimitIP(rw http.ResponseWriter, r *http.Request) {
+	// pull data from URL to make configuration more flexible during debugging
+	orgId := r.Form.Get("orgId")
+	apiId := r.Form.Get("apiId")
+	rate, _ := strconv.ParseFloat(r.Form.Get("rate"), 64)
+	per, _ := strconv.ParseFloat(r.Form.Get("per"), 64)
+
+	// get the client IP
+	remoteIP := request.RealIP(r)
+
+	logger.Info("Setting Authorization header using remote IP: ", remoteIP)
+	r.Header.Set("Authorization", remoteIP)
+
+	logger.Info("Setting session using this data...")
+	logger.Info("  orgId: ", orgId)
+	logger.Info("  apiId: ", apiId)
+	logger.Info("  rate: ", rate)
+	logger.Info("  per: ", per)
+	ipSession := &user.SessionState{
+		OrgID: orgId,
+		Alias: "ip-session-" + remoteIP,
+		Rate:  rate,
+		Per:   per,
+		AccessRights: map[string]user.AccessDefinition{
+			apiId: {
+				APIID: apiId,
+			},
+		},
+	}
+
+	logger.Info("Updating context with session")
+	ctx.SetSession(r, ipSession, remoteIP, true)
+}
 
 func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	// Connect to Redis using the prefix "apikey-"
