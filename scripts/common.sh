@@ -653,7 +653,7 @@ create_oauth_client () {
     log_ok
     log_message "    Secret: $client_secret"
   else
-    log_message "ERROR: API response does not contain expected OAuth client data."
+    log_message "ERROR: API response does not contain expected OAuth client data. API response returned $api_response."
     exit 1
   fi
 }
