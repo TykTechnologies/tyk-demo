@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/TykTechnologies/tyk/config"
@@ -14,6 +15,42 @@ import (
 )
 
 var logger = log.Get()
+
+// Writes data in the http.Request object to the Gateway log
+func RequestLogger(rw http.ResponseWriter, r *http.Request) {
+	// call ParseForm to populate some of the form-related fields
+	r.ParseForm()
+
+	logger.Info("Request logger plugin will now log request data...")
+	logger.Info("  Method: ", r.Method)
+	logger.Info("  Proto: ", r.Proto)
+	logger.Info("  ProtoMajor: ", r.ProtoMajor)
+	logger.Info("  ProtoMinor: ", r.ProtoMinor)
+	logger.Info("  URL.Host: ", r.URL.Host)
+	logger.Info("  URL.Path: ", r.URL.Path)
+	logger.Info("  URL.Scheme: ", r.URL.Scheme)
+	logger.Info("  URL.Fragment: ", r.URL.Fragment)
+	logger.Info("  URL.RawQuery: ", r.URL.RawQuery)
+	logger.Info("  URL.Opaque: ", r.URL.Opaque)
+	for name, _ := range r.Header {
+		logger.Info("  Header.Get(\"", name, "\"): ", r.Header.Get(name))
+	}
+	logger.Info("  ContentLength: ", r.ContentLength)
+	logger.Info("  Host: ", r.Host)
+	logger.Info("  RemoteAddr: ", r.RemoteAddr)
+	logger.Info("  RequestURI: ", r.RequestURI)
+	for name, _ := range r.Form {
+		logger.Info("  Form.Get(\"", name, "\"): ", r.Form.Get(name))
+	}
+	for name, _ := range r.PostForm {
+		logger.Info("  PostForm.Get(\"", name, "\"): ", r.PostForm.Get(name))
+	}
+	body, err := ioutil.ReadAll(r.Body)
+	if err == nil {
+		sb := string(body)
+		logger.Info("  Body - read by ioutil.ReadAll(): ", sb)
+	}
+}
 
 func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	// Connect to Redis using the prefix "apikey-"

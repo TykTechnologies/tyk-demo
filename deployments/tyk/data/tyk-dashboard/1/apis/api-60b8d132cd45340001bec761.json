@@ -286,7 +286,14 @@
     "disable_rate_limit": false,
     "disable_quota": false,
     "custom_middleware": {
-      "pre": [],
+      "pre": [
+        {
+          "name": "RequestLogger",
+          "path": "plugins/go/example/example-go-plugin.so",
+          "require_session": false,
+          "raw_body_only": false
+        }
+      ],
       "post": [
         {
           "name": "AddHelloWorldHeader",
@@ -396,6 +403,14 @@
       },
       "proxy": {
         "auth_headers": {}
+      },
+      "subgraph": {
+        "sdl": ""
+      },
+      "supergraph": {
+        "subgraphs": [],
+        "merged_sdl": "",
+        "global_headers": {}
       }
     }
   },
