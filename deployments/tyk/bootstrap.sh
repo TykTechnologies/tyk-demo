@@ -140,6 +140,9 @@ bootstrap_progress
 build_go_plugin "jwt-go-plugin.so" "jwt"
 bootstrap_progress
 
+build_go_plugin "ip-rate-limit.so" "ipratelimit"
+bootstrap_progress
+
 # Dashboard Data
 
 # The order these are processed in is important, due to dependencies between objects
