@@ -3282,11 +3282,15 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"",
-											"pm.test(\"Combined data is returned\", function () {",
+											"pm.test(\"Data is returned from GraphQL data source\", function () {",
 											"    var jsonData = pm.response.json();",
 											"    pm.expect(jsonData.data.country.code).to.eql(\"GB\");",
 											"    pm.expect(jsonData.data.country.name).to.eql(\"United Kingdom\");",
-											"    pm.expect(jsonData.data.country.pop).to.eql(65110000);",
+											"});",
+											"",
+											"pm.test(\"Data is returned from REST data source\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.country.pop).to.be.above(0);",
 											"});"
 										],
 										"type": "text/javascript"
