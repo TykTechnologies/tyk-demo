@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "aa823c06-af11-49fe-bd03-8a863a3da282",
+		"_postman_id": "0b656f0e-b0f9-4f12-9dea-5da44e334638",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2449,10 +2449,10 @@
 															]
 														}
 													},
-													"_postman_previewlanguage": null,
-													"header": null,
+													"_postman_previewlanguage": "Text",
+													"header": [],
 													"cookie": [],
-													"body": null
+													"body": ""
 												}
 											]
 										},
@@ -2511,10 +2511,10 @@
 															]
 														}
 													},
-													"_postman_previewlanguage": null,
-													"header": null,
+													"_postman_previewlanguage": "Text",
+													"header": [],
 													"cookie": [],
-													"body": null
+													"body": ""
 												}
 											]
 										},
@@ -2574,10 +2574,10 @@
 															]
 														}
 													},
-													"_postman_previewlanguage": null,
-													"header": null,
+													"_postman_previewlanguage": "Text",
+													"header": [],
 													"cookie": [],
-													"body": null
+													"body": ""
 												}
 											]
 										}
@@ -5369,7 +5369,14 @@
 													"        pm.response.json().Meta,",
 													"        (error, response) => { ",
 													"            pm.expect(response.code).to.eql(200);",
-													"            tyk.dashboardApi.tools.apiKey.delete(pm);",
+													"            // remove the created API to leave the database in the same state",
+													"            tyk.dashboardApi.apis.delete(",
+													"                pm.response.json().Meta,",
+													"                (error, response) => { ",
+													"                    pm.expect(response.code).to.eql(200);",
+													"                    tyk.dashboardApi.tools.apiKey.delete(pm);",
+													"                },",
+													"                pm);",
 													"        },",
 													"        pm",
 													"    );",
@@ -6657,6 +6664,16 @@
 					"                    {",
 					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/api/apis/\" + apiId,",
 					"                        method: \"GET\",",
+					"                        header: \"authorization: \" + pm.variables.get(\"tyk-dashboard.api-key\")",
+					"                    },",
+					"                    callback",
+					"                );",
+					"            },",
+					"            delete: function (apiId, callback, pm) {",
+					"                pm.sendRequest(",
+					"                    {",
+					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/api/apis/\" + apiId,",
+					"                        method: \"DELETE\",",
 					"                        header: \"authorization: \" + pm.variables.get(\"tyk-dashboard.api-key\")",
 					"                    },",
 					"                    callback",
