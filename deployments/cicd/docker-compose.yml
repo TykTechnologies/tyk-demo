@@ -7,8 +7,8 @@ services:
     networks:
       - tyk
     volumes:
-      - ./deployments/cicd/volumes/jenkins/jenkins-cli.jar:/var/jenkins_home/jenkins-cli.jar
-      - ./deployments/cicd/volumes/jenkins/bootstrap-import:/var/jenkins_home/bootstrap-import
+      - ./deployments/cicd/volumes/jenkins/jenkins-cli.jar:/tmp/jenkins-cli.jar
+      - ./deployments/cicd/volumes/jenkins/bootstrap-import:/tmp/bootstrap-import
   gitea:
     image: gitea/gitea:1.11.5
     environment:
