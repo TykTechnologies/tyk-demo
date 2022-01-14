@@ -2,6 +2,7 @@
 .context-data
 .bootstrap
 bootstrap.log
+deployments/cicd/volumes/jenkins/bootstrap-import/plugins/*.jpi
 deployments/cicd/volumes/jenkins/bootstrap-import/credentials-global.xml
 deployments/cicd/volumes/jenkins/bootstrap-import/jenkins-plugins.tar.gz
 deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
