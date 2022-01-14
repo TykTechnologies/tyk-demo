@@ -82,15 +82,6 @@ git -C $gitea_tyk_data_repo_path push "http://$gitea_username:$gitea_password@lo
 log_ok
 bootstrap_progress
 
-log_message "Checking Jenkins plugin archive exists"
-jenkins_plugin_path="deployments/cicd/volumes/jenkins/bootstrap-import/jenkins-plugins.tar.gz"
-if [ ! -f $jenkins_plugin_path ]; then
-  log_message "  Archive missing, downloading..."
-  curl "https://www.dropbox.com/s/d561fgowioqbceb/jenkins-plugins.tar.gz?dl=0" -L -s -o $jenkins_plugin_path 2>> bootstrap.log
-fi
-log_ok
-bootstrap_progress
-
 log_message "Waiting for Jenkins to respond ok"
 # 403 indicates that at least Jenkins was able to recognise that the request was unauthorised, so we should be ok to proceed
 wait_for_response "$jenkins_base_url" "403"
@@ -99,78 +90,94 @@ log_message "Getting Jenkins admin password"
 jenkins_admin_password=$(eval "$(generate_docker_compose_command) exec -T jenkins sh -c \"cat /var/jenkins_home/secrets/initialAdminPassword | head -c32\" 2>> bootstrap.log")
 log_message "  Jenkins admin password = $jenkins_admin_password"
 if [ "$jenkins_admin_password" == "" ]; then
-  echo "ERROR: Jenkins admin password could not be extracted"
+  log_message "ERROR: Jenkins admin password could not be extracted"
   exit 1
 fi
 log_ok
 bootstrap_progress
 
-log_message "Extracting Jenkins plugins and other configuration"
-eval $(generate_docker_compose_command) exec -d jenkins tar -xzvf /tmp/bootstrap-import/jenkins-plugins.tar.gz -C /var/jenkins_home 1> /dev/null 2>> bootstrap.log
+log_message "Downloading Jenkins plugins (this could take a while on first run)"
+jenkins_plugin_path="deployments/cicd/volumes/jenkins/plugins"
+$(generate_docker_compose_command) exec jenkins jenkins-plugin-cli -f /usr/share/jenkins/plugins.txt
 log_ok
 bootstrap_progress
 
-log_message "Restarting Jenkins container to allow new config and plugins to be used"
+log_message "Copying plugins into Jenkins home directory"
+$(generate_docker_compose_command) exec jenkins sh -c "cp /usr/share/jenkins/ref/plugins/*.jpi /var/jenkins_home/plugins"
+log_ok
+bootstrap_progress
+
+log_message "Restarting Jenkins container to install plugins"
 eval $(generate_docker_compose_command) restart jenkins 2> /dev/null
 log_ok
 bootstrap_progress
 
-log_message "Checking Tyk Environment 2 Dashboard API is accessible"
-dashboard2_user_api_credentials=$(cat .context-data/dashboard2-user-api-credentials)
-result=""
-while [ "$result" != "200" ]; do
-  result=$(curl $dashboard2_base_url/api/apis -s -o /dev/null -w "%{http_code}" -H "authorization: $dashboard2_user_api_credentials" 2>> bootstrap.log)
-  if [ "$result" == "401" ]; then
-    log_message "  ERROR: Unable to make API calls to Tyk Environment 2 Dashboard."
-    log_message "         CI/CD feature will not work as intended."
-    log_message "         Review container logs for the tyk2_dashboard service for errors."
-    exit 1
-    break
-  else
-    log_message "  Request unsuccessful, retrying..."
-    sleep 2
-  fi
-done
-log_ok
-bootstrap_progress
+  # log_message "Extracting Jenkins plugins and other configuration"
+  # eval $(generate_docker_compose_command) exec -d jenkins tar -xzvf /tmp/bootstrap-import/jenkins-plugins.tar.gz -C /var/jenkins_home 1> /dev/null 2>> bootstrap.log
+  # log_ok
+  # bootstrap_progress
 
-log_message "Writing Jenkins credentials import file, using Tyk Dashboard credentials generated during bootstrap."
-sed "s/TYK2_DASHBOARD_CREDENTIALS/$dashboard2_user_api_credentials/g" deployments/cicd/data/jenkins/credentials-global-template.xml > \
-  deployments/cicd/volumes/jenkins/bootstrap-import/credentials-global.xml
-log_ok
+  # log_message "Restarting Jenkins container to allow new config and plugins to be used"
+  # eval $(generate_docker_compose_command) restart jenkins 2> /dev/null
+  # log_ok
+  # bootstrap_progress
 
-log_message "Waiting for Jenkins CLI to be ready, before running CLI commands"
-# After the container restart, Jenkins functionality will not work for a little while, so we have to test if it's ready by checking the exit code of a CLI call
-jenkins_response=""
-while [ "$jenkins_response" != "0" ]; do
-  docker_compose_command="$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket who-am-i >/dev/null 2>&1\"; echo \$?"
-  jenkins_response=$(eval $docker_compose_command)
-  if [ "$jenkins_response" != "0" ]; then
-    log_message "  Jenkins CLI is not ready, retrying..."
-    sleep 2
-  else
-    log_ok
-  fi
-  bootstrap_progress
-done
+  # log_message "Checking Tyk Environment 2 Dashboard API is accessible"
+  # dashboard2_user_api_credentials=$(cat .context-data/dashboard2-user-api-credentials)
+  # result=""
+  # while [ "$result" != "200" ]; do
+  #   result=$(curl $dashboard2_base_url/api/apis -s -o /dev/null -w "%{http_code}" -H "authorization: $dashboard2_user_api_credentials" 2>> bootstrap.log)
+  #   if [ "$result" == "401" ]; then
+  #     log_message "  ERROR: Unable to make API calls to Tyk Environment 2 Dashboard."
+  #     log_message "         CI/CD feature will not work as intended."
+  #     log_message "         Review container logs for the tyk2_dashboard service for errors."
+  #     exit 1
+  #     break
+  #   else
+  #     log_message "  Request unsuccessful, retrying..."
+  #     sleep 2
+  #   fi
+  # done
+  # log_ok
+  # bootstrap_progress
 
-log_message "Importing 'global' credentials into Jenkins, for authenticating with Tyk Dashboard during pipeline script."
-jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket import-credentials-as-xml system::system::jenkins < /tmp/bootstrap-import/credentials-global.xml\"; echo \$?" 2>bootstrap.log)
-if [ "$jenkins_response" != "0" ]; then
-  echo "ERROR: Failed to import Jenkins credentials"
-  exit 1
-fi
-log_ok
-bootstrap_progress
+  # log_message "Writing Jenkins credentials import file, using Tyk Dashboard credentials generated during bootstrap."
+  # sed "s/TYK2_DASHBOARD_CREDENTIALS/$dashboard2_user_api_credentials/g" deployments/cicd/data/jenkins/credentials-global-template.xml > \
+  #   deployments/cicd/volumes/jenkins/bootstrap-import/credentials-global.xml
+  # log_ok
 
-log_message "Creating 'APIs and Policies' job in Jenkins, to execute deployment scripts when source code changes are detected."
-jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket create-job 'apis-and-policies' < /tmp/bootstrap-import/job-apis-and-policies.xml\"; echo \$?" 2>bootstrap.log)
-if [ "$jenkins_response" != "0" ]; then
-  echo "ERROR: Failed to create Jenkins job"
-  exit 1
-fi
-log_ok
-bootstrap_progress
+  # log_message "Waiting for Jenkins CLI to be ready, before running CLI commands"
+  # # After the container restart, Jenkins functionality will not work for a little while, so we have to test if it's ready by checking the exit code of a CLI call
+  # jenkins_response=""
+  # while [ "$jenkins_response" != "0" ]; do
+  #   docker_compose_command="$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket who-am-i >/dev/null 2>&1\"; echo \$?"
+  #   jenkins_response=$(eval $docker_compose_command)
+  #   if [ "$jenkins_response" != "0" ]; then
+  #     log_message "  Jenkins CLI is not ready, retrying..."
+  #     sleep 2
+  #   else
+  #     log_ok
+  #   fi
+  #   bootstrap_progress
+  # done
+
+  # log_message "Importing 'global' credentials into Jenkins, for authenticating with Tyk Dashboard during pipeline script."
+  # jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket import-credentials-as-xml system::system::jenkins < /tmp/bootstrap-import/credentials-global.xml\"; echo \$?" 2>bootstrap.log)
+  # if [ "$jenkins_response" != "0" ]; then
+  #   echo "ERROR: Failed to import Jenkins credentials"
+  #   exit 1
+  # fi
+  # log_ok
+  # bootstrap_progress
+
+  # log_message "Creating 'APIs and Policies' job in Jenkins, to execute deployment scripts when source code changes are detected."
+  # jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket create-job 'apis-and-policies' < /tmp/bootstrap-import/job-apis-and-policies.xml\"; echo \$?" 2>bootstrap.log)
+  # if [ "$jenkins_response" != "0" ]; then
+  #   echo "ERROR: Failed to create Jenkins job"
+  #   exit 1
+  # fi
+  # log_ok
+  # bootstrap_progress
 
 log_end_deployment
 
