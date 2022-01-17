@@ -1,14 +1,16 @@
 version: '3.3'
 services:
   jenkins:
-    image: jenkins/jenkins:2.249.2-lts-alpine
+    image: jenkins/jenkins:2.319.2-lts-alpine
     ports:
       - 8070:8080
     networks:
       - tyk
     volumes:
-      - ./deployments/cicd/volumes/jenkins/jenkins-cli.jar:/var/jenkins_home/jenkins-cli.jar
-      - ./deployments/cicd/volumes/jenkins/bootstrap-import:/var/jenkins_home/bootstrap-import
+      - ./deployments/cicd/volumes/jenkins/plugins:/usr/share/jenkins/ref/plugins
+      - ./deployments/cicd/volumes/jenkins/bootstrap-import:/tmp/bootstrap-import
+    environment:
+      - JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
   gitea:
     image: gitea/gitea:1.11.5
     environment:

@@ -82,35 +82,27 @@ git -C $gitea_tyk_data_repo_path push "http://$gitea_username:$gitea_password@lo
 log_ok
 bootstrap_progress
 
-log_message "Checking Jenkins plugin archive exists"
-jenkins_plugin_path="deployments/cicd/volumes/jenkins/bootstrap-import/jenkins-plugins.tar.gz"
-if [ ! -f $jenkins_plugin_path ]; then
-  log_message "  Archive missing, downloading..."
-  curl "https://www.dropbox.com/s/d561fgowioqbceb/jenkins-plugins.tar.gz?dl=0" -L -s -o $jenkins_plugin_path 2>> bootstrap.log
+log_message "Checking for local Jenkins plugin cache"
+if ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1> /dev/null 2>&1; then
+  log_message "  Plugins found, will use local cache instead of downloading plugins"
+else
+  log_message "  Plugins not found, downloading plugins to local cache... (please be patient, this can take a long time)"
+  $(generate_docker_compose_command) exec jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins.txt --latest false 1>/dev/null 2>&1
 fi
+bootstrap_progress
+
+log_message "Copying local plugin cache to Jenkins"
+$(generate_docker_compose_command) exec jenkins sh -c "cp /usr/share/jenkins/ref/plugins/*.jpi /var/jenkins_home/plugins"
 log_ok
 bootstrap_progress
 
-log_message "Waiting for Jenkins to respond ok"
-# 403 indicates that at least Jenkins was able to recognise that the request was unauthorised, so we should be ok to proceed
-wait_for_response "$jenkins_base_url" "403"
-
-log_message "Getting Jenkins admin password"
-jenkins_admin_password=$(eval "$(generate_docker_compose_command) exec -T jenkins sh -c \"cat /var/jenkins_home/secrets/initialAdminPassword | head -c32\" 2>> bootstrap.log")
-log_message "  Jenkins admin password = $jenkins_admin_password"
-if [ "$jenkins_admin_password" == "" ]; then
-  echo "ERROR: Jenkins admin password could not be extracted"
-  exit 1
-fi
+log_message "Updating configuration file"
+# this approach is used to avoid "Device or resource busy" issue when using a volume mapping
+$(generate_docker_compose_command) exec jenkins cp /tmp/bootstrap-import/config.xml /var/jenkins_home/config.xml
 log_ok
 bootstrap_progress
 
-log_message "Extracting Jenkins plugins and other configuration"
-eval $(generate_docker_compose_command) exec -d jenkins tar -xzvf /var/jenkins_home/bootstrap-import/jenkins-plugins.tar.gz -C /var/jenkins_home 1> /dev/null 2>> bootstrap.log
-log_ok
-bootstrap_progress
-
-log_message "Restarting Jenkins container to allow new config and plugins to be used"
+log_message "Restarting Jenkins container to install plugins"
 eval $(generate_docker_compose_command) restart jenkins 2> /dev/null
 log_ok
 bootstrap_progress
@@ -143,7 +135,7 @@ log_message "Waiting for Jenkins CLI to be ready, before running CLI commands"
 # After the container restart, Jenkins functionality will not work for a little while, so we have to test if it's ready by checking the exit code of a CLI call
 jenkins_response=""
 while [ "$jenkins_response" != "0" ]; do
-  docker_compose_command="$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket who-am-i >/dev/null 2>&1\"; echo \$?"
+  docker_compose_command="$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket who-am-i >/dev/null 2>&1\"; echo \$?"
   jenkins_response=$(eval $docker_compose_command)
   if [ "$jenkins_response" != "0" ]; then
     log_message "  Jenkins CLI is not ready, retrying..."
@@ -155,7 +147,7 @@ while [ "$jenkins_response" != "0" ]; do
 done
 
 log_message "Importing 'global' credentials into Jenkins, for authenticating with Tyk Dashboard during pipeline script."
-jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket import-credentials-as-xml system::system::jenkins < /var/jenkins_home/bootstrap-import/credentials-global.xml\"; echo \$?" 2>bootstrap.log)
+jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket import-credentials-as-xml system::system::jenkins < /tmp/bootstrap-import/credentials-global.xml\"; echo \$?" 2>bootstrap.log)
 if [ "$jenkins_response" != "0" ]; then
   echo "ERROR: Failed to import Jenkins credentials"
   exit 1
@@ -164,7 +156,7 @@ log_ok
 bootstrap_progress
 
 log_message "Creating 'APIs and Policies' job in Jenkins, to execute deployment scripts when source code changes are detected."
-jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /var/jenkins_home/jenkins-cli.jar -s http://localhost:8080/ -auth admin:$jenkins_admin_password -webSocket create-job 'apis-and-policies' < /var/jenkins_home/bootstrap-import/job-apis-and-policies.xml\"; echo \$?" 2>bootstrap.log)
+jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'apis-and-policies' < /tmp/bootstrap-import/job-apis-and-policies.xml\"; echo \$?" 2>bootstrap.log)
 if [ "$jenkins_response" != "0" ]; then
   echo "ERROR: Failed to create Jenkins job"
   exit 1
@@ -178,8 +170,6 @@ echo -e "\033[2K
 ▼ CI/CD
   ▽ Jenkins
                     URL : $jenkins_base_url
-               Username : admin
-               Password : $jenkins_admin_password
   ▽ Gitea
                     URL : $gitea_base_url
                Username : $gitea_username
