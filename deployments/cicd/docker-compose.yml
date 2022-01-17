@@ -7,8 +7,10 @@ services:
     networks:
       - tyk
     volumes:
-      - ./deployments/cicd/volumes/jenkins/plugins.txt:/usr/share/jenkins/plugins.txt
       - ./deployments/cicd/volumes/jenkins/plugins:/usr/share/jenkins/ref/plugins
+      - ./deployments/cicd/volumes/jenkins/bootstrap-import:/tmp/bootstrap-import
+    environment:
+      - JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
   gitea:
     image: gitea/gitea:1.11.5
     environment:
