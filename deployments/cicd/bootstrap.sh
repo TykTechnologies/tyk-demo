@@ -102,7 +102,7 @@ $(generate_docker_compose_command) exec jenkins cp /tmp/bootstrap-import/config.
 log_ok
 bootstrap_progress
 
-log_message "Restarting Jenkins container to install plugins"
+log_message "Restarting Jenkins container to load new state"
 eval $(generate_docker_compose_command) restart jenkins 2> /dev/null
 log_ok
 bootstrap_progress
