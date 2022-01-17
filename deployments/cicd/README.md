@@ -15,7 +15,7 @@ This feature depends on the Tyk Environment 2 deployment, so the two must be dep
 
 The bootstrap process installs the necessary plugins, adds a job and imports environment credentials into Jenkins. It also installs Gitea and restores a 'tyk-data' repo which Jenkins will use to push deploy Tyk configuration across environments.
 
-It can take a while for the bootstrap process to complete. This is due to the Jenkins APIs being unavailable until Jenkins has fully started.
+> :warning: The CICD bootstrap process can take a long time to complete the first time it is run. This is due to the having the download the Jenkins plugins. These are then cached locally to speed up the process for subsequent deployments.
 
 ## Usage
 

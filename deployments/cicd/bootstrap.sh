@@ -76,9 +76,9 @@ bootstrap_progress
 log_message "Add, commit and push Jenkinsfile to repo"
 # commit Jenkinsfile to repo (left uncommitted until now so it can be easily edited)
 cp ./deployments/cicd/data/jenkins/Jenkinsfile $gitea_tyk_data_repo_path
-git -C $gitea_tyk_data_repo_path add . 1> /dev/null 2> /dev/null
-git -C $gitea_tyk_data_repo_path commit -m "Adding Jenkinsfile" 1> /dev/null 2> /dev/null
-git -C $gitea_tyk_data_repo_path push "http://$gitea_username:$gitea_password@localhost:13000/gitea-user/tyk-data.git/" 1> /dev/null 2> /dev/null
+git -C $gitea_tyk_data_repo_path add . 1>/dev/null 2>&1
+git -C $gitea_tyk_data_repo_path commit -m "Adding Jenkinsfile" 1>/dev/null 2>&1
+git -C $gitea_tyk_data_repo_path push "http://$gitea_username:$gitea_password@localhost:13000/gitea-user/tyk-data.git/" 1>/dev/null 2>&1
 log_ok
 bootstrap_progress
 
@@ -87,7 +87,7 @@ if ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1> /dev/null 2>&1; then
   log_message "  Plugins found, will use local cache instead of downloading plugins"
 else
   log_message "  Plugins not found, downloading plugins to local cache... (please be patient, this can take a long time)"
-  $(generate_docker_compose_command) exec jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins.txt --latest false 1>/dev/null 2>&1
+  $(generate_docker_compose_command) exec jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins/plugins.txt --latest false 1>/dev/null 2>&1
 fi
 bootstrap_progress
 
@@ -102,7 +102,7 @@ $(generate_docker_compose_command) exec jenkins cp /tmp/bootstrap-import/config.
 log_ok
 bootstrap_progress
 
-log_message "Restarting Jenkins container to install plugins"
+log_message "Restarting Jenkins container to load new state"
 eval $(generate_docker_compose_command) restart jenkins 2> /dev/null
 log_ok
 bootstrap_progress
