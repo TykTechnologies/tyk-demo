@@ -241,6 +241,7 @@ _decode_base64_url () {
 decode_jwt () { _decode_base64_url $(echo -n $1 | cut -d "." -f ${2:-2}) | jq .; }
 
 build_go_plugin () {
+  gateway_image_tag=$(get_service_image_tag "tyk-gateway")
   go_plugin_filename=$1
   # each plugin must be in its own directory
   go_plugin_directory="$PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/$2"
@@ -259,7 +260,7 @@ build_go_plugin () {
     echo $gateway_image_tag > $go_plugin_build_version_filename
     log_ok
   else
-    # if you want to force a recompile of the plugin .so file, delete the .bootstrap/go-plugin-build-version file, or run the docker command manually
+    # if you want to force a recompile of the plugin .so file, delete the .bootstrap/go-plugin-build-version-<go_plugin_filename> file, or run the docker command manually
     log_message "  $go_plugin_filename has already built for $gateway_image_tag, skipping"
   fi
 }
@@ -652,7 +653,7 @@ create_oauth_client () {
     log_ok
     log_message "    Secret: $client_secret"
   else
-    log_message "ERROR: API response does not contain expected OAuth client data."
+    log_message "ERROR: API response does not contain expected OAuth client data. API response returned $api_response."
     exit 1
   fi
 }

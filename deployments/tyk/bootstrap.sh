@@ -134,12 +134,14 @@ bootstrap_progress
 
 # Go plugins
 
-# NOTE: Go plugins are commented out until go compiler issue is resolved
-# build_go_plugin "example-go-plugin.so" "example"
-# bootstrap_progress
+build_go_plugin "example-go-plugin.so" "example"
+bootstrap_progress
 
-# build_go_plugin "jwt-go-plugin.so" "jwt"
-# bootstrap_progress
+build_go_plugin "jwt-go-plugin.so" "jwt"
+bootstrap_progress
+
+build_go_plugin "ip-rate-limit.so" "ipratelimit"
+bootstrap_progress
 
 # Dashboard Data
 

@@ -265,7 +265,7 @@
               "api_model": {},
               "event_timeout": 60,
               "header_map": {},
-              "id": "615d2d1f71dc2e23b0e9ff80",
+              "id": "61c3e93d8949360001da89a6",
               "method": "POST",
               "name": "Webhook Receiver Post",
               "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -324,6 +324,14 @@
       },
       "proxy": {
         "auth_headers": {}
+      },
+      "subgraph": {
+        "sdl": ""
+      },
+      "supergraph": {
+        "subgraphs": [],
+        "merged_sdl": "",
+        "global_headers": {}
       }
     }
   },
@@ -333,7 +341,7 @@
       "event_timeout": 60,
       "hook": {
         "api_model": {},
-        "id": "615d2d1f71dc2e23b0e9ff80",
+        "id": "61c3e93d8949360001da89a6",
         "org_id": "5e9d9544a1dcd60001d0ed20",
         "name": "Webhook Receiver Post",
         "method": "POST",
