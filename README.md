@@ -55,7 +55,7 @@ Notable environment variables are:
 | DASHBOARD_LICENCE | Sets the licence used by the Tyk Dashboard | Yes | None - **Must** be manually set |
 | INSTRUMENTATION_ENABLED | Controls whether the instrumentation feature is enabled (`1`) or disabled (`0`) | No | `0` - Set automatically by the `up.sh` script |
 | TRACING_ENABLED | Controls whether the tracing feature is enabled (`true`) or disabled (`false`) | No | `false` - Set automatically by the `up.sh` script |
-| GATEWAY_VERSION | Sets the Tyk Gateway container image tag e.g. `v3.2.2` | No | Based on the latest release |
+| GATEWAY_VERSION | Sets the Tyk Gateway container image tag e.g. `v4.0.0` | No | Based on the latest release |
 | GATEWAY_LOGLEVEL | Sets the log level for the Tyk Gateway application e.g. `debug`  | No | `info` |
 | MDCB_LICENCE | Sets the licence used by the Tyk MDCB | Yes, if using the `mdcb` deployment, otherwise no | None - **Must** be manually set |
 | MDCB_USER_API_CREDENTIALS | Sets the credentials used by the Tyk MDCB to authenticate with the Dashboard | Yes, if using the `mdcb` deployment, otherwise no | None - Set automatically by the `bootstrap.sh` script |
