@@ -83,7 +83,7 @@
     },
     "blacklisted_ips": [],
     "graphql": {
-      "schema": "type Comment {\n  id: Int\n  name: String\n  email: String\n  body: String\n}\n\ntype Post {\n  id: Int\n  title: String\n  body: String\n  comments: [Comment]\n}\n\ntype Query {\n  user(id: Int!): User\n}\n\ntype User {\n  id: String\n  name: String\n  email: String\n  posts: [Post]\n  transformedName: String\n}\n",
+      "schema": "type Comment {\n  id: Int\n  name: String\n  email: String\n  body: String\n}\n\ntype Post {\n  id: Int\n  title: String\n  body: String\n  comments: [Comment]\n}\n\ntype Query {\n  user(id: Int!): User\n}\n\ntype User {\n  id: Int\n  name: String\n  email: String\n  posts: [Post]\n  transformedName: String\n}\n",
       "enabled": true,
       "engine": {
         "field_configs": [
@@ -193,7 +193,7 @@
         "enabled": false,
         "path": ""
       },
-      "last_schema_update": "2022-02-17T17:27:16.985Z"
+      "last_schema_update": "2022-02-23T20:28:12.614Z"
     },
     "hmac_allowed_clock_skew": -1,
     "dont_set_quota_on_create": false,

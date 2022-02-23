@@ -230,7 +230,7 @@
                                     "input_type": "json",
                                     "template_mode": "blob",
                                     "enable_session": false,
-                                    "template_source": "ewogICAgIm5hbWUiOiAie3sgLm5hbWUgfX0iLAogICAgImlkIjogInt7IC5pZCB9fSIsCiAgICAiZW1haWwiOiAie3sgLmVtYWlsIH19IiwKICAgICJ0cmFuc2Zvcm1lZE5hbWUiOiAie3sgLm5hbWUgfX0iCiAgICAKfQ=="
+                                    "template_source": "ewogICAgIm5hbWUiOiAie3sgLm5hbWUgfX0iLAogICAgImlkIjoge3sgLmlkIH19LAogICAgImVtYWlsIjogInt7IC5lbWFpbCB9fSIsCiAgICAidHJhbnNmb3JtZWROYW1lIjogInt7IC5uYW1lIH19IgogICAgCn0="
                                 },
                                 "path": "",
                                 "method": "GET"
