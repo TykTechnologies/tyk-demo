@@ -109,5 +109,5 @@ log_end_deployment
 echo -e "\033[2K
 ▼ IdP
   ▽ Keycloak
-                    Browser URL : $keycloak_admin_url
-                    Login : admin/admin"
+            Browser URL : $keycloak_admin_url
+                  Login : admin/admin"
