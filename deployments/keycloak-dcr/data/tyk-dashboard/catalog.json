@@ -1,0 +1,73 @@
+{
+    "name": "Keycloak DCR",
+    "short_description": "A cool example showing Dynamic Client Registration with Keycloak ",
+    "long_description": "A cool example showing Dynamic Client Registration with Keycloak ",
+    "show": true,
+    "api_id": "",
+    "policy_id": "61f2b294753d7a00016f9faf",
+    "documentation": "",
+    "version": "v2",
+    "is_keyless": false,
+    "config": {
+        "id": "",
+        "org_id": "",
+        "signup_fields": [],
+        "key_request_fields": [],
+        "require_key_approval": false,
+        "secure_key_approval": false,
+        "redirect_on_key_request": false,
+        "redirect_to": "",
+        "enable_multi_selection": false,
+        "disable_login": false,
+        "disable_signup": false,
+        "disable_auto_login": false,
+        "catalogue_login_only": false,
+        "oauth_usage_limit": -1,
+        "email": "",
+        "mail_options": {
+            "mail_from_name": "",
+            "mail_from_email": "",
+            "email_copy": {
+                "welcome_email": {
+                    "enabled": false,
+                    "subject": "",
+                    "body": "",
+                    "sign_off": "",
+                    "hide_token_data": false
+                },
+                "key_email": {
+                    "enabled": false,
+                    "subject": "",
+                    "body": "",
+                    "sign_off": "",
+                    "hide_token_data": false
+                },
+                "reset_password_email": {
+                    "enabled": false,
+                    "subject": "",
+                    "body": "",
+                    "sign_off": "",
+                    "hide_token_data": false
+                }
+            }
+        },
+        "dcr_options": {
+            "idp_host": "http://keycloak:8180/",
+            "access_token": "ACCESS_TOKEN",
+            "registration_endpoint": "http://keycloak:8180/auth/realms/master/clients-registrations/openid-connect",
+            "provider": "keycloak",
+            "grant_types": [
+                "client_credentials"
+            ],
+            "response_types": [
+                "code"
+            ],
+            "token_endpoint_auth_method": "client_secret_post"
+        },
+        "enable_dcr": true,
+        "override": true,
+        "HashKeys": false
+    },
+    "fields": {},
+    "auth_type": "jwt"
+}        

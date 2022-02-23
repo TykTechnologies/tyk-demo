@@ -3,7 +3,7 @@
 # Contains functions useful for bootstrap scripts
 
 # this array defines the hostnames that the bootstrap script will verify, and that the update-hosts script will use to modify /etc/hosts
-declare -a tyk_demo_hostnames=("tyk-dashboard.localhost" "tyk-portal.localhost" "tyk-gateway.localhost" "tyk-gateway-2.localhost" "tyk-custom-domain.com" "tyk-worker-gateway.localhost" "acme-portal.localhost" "go-bench-suite.localhost" "tyk-dynamic-looping.com" "echo-server.localhost")
+declare -a tyk_demo_hostnames=("tyk-dashboard.localhost" "tyk-portal.localhost" "tyk-gateway.localhost" "tyk-gateway-2.localhost" "tyk-custom-domain.com" "tyk-worker-gateway.localhost" "acme-portal.localhost" "go-bench-suite.localhost" "tyk-dynamic-looping.com" "echo-server.localhost" "keycloak")
 
 spinner_chars="/-\|"
 spinner_count=1

@@ -1,0 +1,139 @@
+{
+	"info": {
+		"_postman_id": "df7409c7-f679-498b-ae02-5fa526a1fdd7",
+		"name": "Tyk Demo - Keycloak DCR",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Obtain access token from keycloak",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", jsonData.access_token);",
+							"postman.setEnvironmentVariable(\"refresh_token\", jsonData.refresh_token);",
+							"postman.setEnvironmentVariable(\"id_token\", jsonData.id_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "<client-id>",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "<client-secret>",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"{{keycloak_url}}"
+					],
+					"path": [
+						"realms",
+						"{{realm}}",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				},
+				"description": "Obtain SAT (service account token)"
+			},
+			"response": []
+		},
+		{
+			"name": "Call API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJwVGNPWFZRUHNMRzNSSVpzUFpHc2lET2JUTjZBNkluV0UtMi1COGUxR1pZIn0.eyJleHAiOjE2NDMzNjQxMDMsImlhdCI6MTY0MzM2NDA0MywianRpIjoiZWMyMTg5NWYtZjE3Zi00MzMzLWIwNjgtNjhhZWFmYjdkNTExIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MTgwL2F1dGgvcmVhbG1zL21hc3RlciIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJjZTczNjM5Yy04YjRiLTQzYzEtYWMyYi04ZTgyOWMwMjYzZWYiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiI5NDQwNzkyMS04N2Y2LTQzZWYtYmQyNi04Zjg3ZTFlYTJkNDYiLCJzZXNzaW9uX3N0YXRlIjoiY2MyMjI1OTctNTA2NC00MzJiLWIxNzctZjcwNTIwOTkwYjZlIiwiYWNyIjoiMSIsInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwiY2xpZW50SWQiOiI5NDQwNzkyMS04N2Y2LTQzZWYtYmQyNi04Zjg3ZTFlYTJkNDYiLCJjbGllbnRIb3N0IjoiMTkyLjE2OC4wLjEiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6InNlcnZpY2UtYWNjb3VudC05NDQwNzkyMS04N2Y2LTQzZWYtYmQyNi04Zjg3ZTFlYTJkNDYiLCJjbGllbnRBZGRyZXNzIjoiMTkyLjE2OC4wLjEifQ.c3QWZHTTeRiENTvZ9Yf2ncsK414MxyJgbpI3zAOQRoycAv_8UYXTSx_24PyHem-SIPA8gQo7FHA9uOmWQIpgBgS2Qudqv7tQuvuiYl-QCMYHSBGLb_kFZVCC8d7tt7jPx136YmoEhxAUodVZxw0rHPg5k4ljt67LCZjudwbpBXk87oxuL5cdem623DNamSqr7ecLuRgcksdpO-e1qEKVwN9TCCToyOP8t4Lu4rIW4ju30OnJlACvM8XN0I5jRf0YAVfODFkO5PKGivtuZcPbDnIBzn0fn3PAW17XnL12brtaIw726hsouNZdHWiDWcl4h057BJuqBfdnraT8F2p3Vg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{tyk-gateway.host}}/keycloak-dcr-api/get",
+					"protocol": "http",
+					"host": [
+						"{{tyk-gateway.host}}"
+					],
+					"path": [
+						"keycloak-dcr-api",
+						"get"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "tyk-gateway.host",
+			"value": "tyk-gateway.localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "keycloak_url",
+			"value": "localhost:8180/auth",
+			"type": "string"
+		},
+		{
+			"key": "realm",
+			"value": "master",
+			"type": "string"
+		}
+	]
+}
