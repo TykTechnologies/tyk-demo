@@ -466,95 +466,6 @@
 							"response": []
 						},
 						{
-							"name": "Plugin - Enforced Timeout (part 1)",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 504\", function () {",
-											"    pm.response.to.have.status(504);",
-											"});",
-											"",
-											"pm.test(\"Response time is more than 3 seconds\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.above(3000);",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 6 seconds\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(6000);",
-											"});",
-											"",
-											"pm.test(\"Error message is 'Upstream service reached hard timeout.'\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.error).to.eql(\"Upstream service reached hard timeout.\");",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/delay/6",
-									"protocol": "http",
-									"host": [
-										"{{tyk-gateway.host}}"
-									],
-									"path": [
-										"plugin-demo-api",
-										"delay",
-										"6"
-									]
-								},
-								"description": "The Enforced Timeout plugin will return an error response from the Gateway if the API server does not respond within a set time. \n\nThis request calls the `/delay/6` endpoint, which has a 6 second delay before responding. The endpoint uses the Enforced Timeout plugin, which is configured for 4 seconds, so will repsond with a `504 Gateway Timeout` before the API server can provide a response."
-							},
-							"response": []
-						},
-						{
-							"name": "Plugin - Enforced Timeout (part 2)",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Response time is more than 1 second\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.above(1000);",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 3 seconds\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(3000);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/delay/1",
-									"protocol": "http",
-									"host": [
-										"{{tyk-gateway.host}}"
-									],
-									"path": [
-										"plugin-demo-api",
-										"delay",
-										"1"
-									]
-								},
-								"description": "This endpoint has the same configuration at part 1, but because this endpoint only has a 1 second delay, it responds in time, so the API client receives the API server response and the Enforced Timeout is not activated."
-							},
-							"response": []
-						},
-						{
 							"name": "Plugin - URL Rewrite (part 1 - basic rewrite)",
 							"event": [
 								{
@@ -3252,13 +3163,13 @@
 									}
 								},
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/graphql-posts/",
+									"raw": "http://{{tyk-gateway.host}}/graphql-posts-v3/",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
 									],
 									"path": [
-										"graphql-posts",
+										"graphql-posts-v3",
 										""
 									]
 								},
@@ -3355,13 +3266,13 @@
 									}
 								},
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/graphql-posts-v2/",
+									"raw": "http://{{tyk-gateway.host}}/graphql-posts-v3/",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
 									],
 									"path": [
-										"graphql-posts-v2",
+										"graphql-posts-v3",
 										""
 									]
 								},
