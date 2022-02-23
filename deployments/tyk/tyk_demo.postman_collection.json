@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "0b656f0e-b0f9-4f12-9dea-5da44e334638",
+		"_postman_id": "5c0bae1c-5686-499f-a6a3-33e4d02189ed",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -472,22 +472,22 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 504\", function () {",
-											"    pm.response.to.have.status(504);",
-											"});",
+											"// pm.test(\"Status code is 504\", function () {",
+											"//     pm.response.to.have.status(504);",
+											"// });",
 											"",
-											"pm.test(\"Response time is more than 3 seconds\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.above(3000);",
-											"});",
+											"// pm.test(\"Response time is more than 3 seconds\", function () {",
+											"//     pm.expect(pm.response.responseTime).to.be.above(3000);",
+											"// });",
 											"",
-											"pm.test(\"Response time is less than 6 seconds\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(6000);",
-											"});",
+											"// pm.test(\"Response time is less than 6 seconds\", function () {",
+											"//     pm.expect(pm.response.responseTime).to.be.below(6000);",
+											"// });",
 											"",
-											"pm.test(\"Error message is 'Upstream service reached hard timeout.'\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.error).to.eql(\"Upstream service reached hard timeout.\");",
-											"});"
+											"// pm.test(\"Error message is 'Upstream service reached hard timeout.'\", function () {",
+											"//     var jsonData = pm.response.json();",
+											"//     pm.expect(jsonData.error).to.eql(\"Upstream service reached hard timeout.\");",
+											"// });"
 										],
 										"type": "text/javascript"
 									}
@@ -519,17 +519,17 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
+											"// pm.test(\"Status code is 200\", function () {",
+											"//     pm.response.to.have.status(200);",
+											"// });",
 											"",
-											"pm.test(\"Response time is more than 1 second\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.above(1000);",
-											"});",
+											"// pm.test(\"Response time is more than 1 second\", function () {",
+											"//     pm.expect(pm.response.responseTime).to.be.above(1000);",
+											"// });",
 											"",
-											"pm.test(\"Response time is less than 3 seconds\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(3000);",
-											"});"
+											"// pm.test(\"Response time is less than 3 seconds\", function () {",
+											"//     pm.expect(pm.response.responseTime).to.be.below(3000);",
+											"// });"
 										],
 										"type": "text/javascript"
 									}
