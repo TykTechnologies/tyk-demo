@@ -3,7 +3,7 @@
   "api_model": {},
   "api_definition": {
     "id": "61c406297333700001d15861",
-    "name": "Universal Data Graph Composed",
+    "name": "UDG Countries Enriched",
     "slug": "universal-data-graph-composed",
     "listen_port": 0,
     "protocol": "",
