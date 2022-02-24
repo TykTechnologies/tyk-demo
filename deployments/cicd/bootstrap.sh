@@ -87,18 +87,18 @@ if ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1> /dev/null 2>&1; then
   log_message "  Plugins found, will use local cache instead of downloading plugins"
 else
   log_message "  Plugins not found, downloading plugins to local cache... (please be patient, this can take a long time)"
-  $(generate_docker_compose_command) exec jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins/plugins.txt --latest false 1>/dev/null 2>&1
+  $(generate_docker_compose_command) exec -T jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins/plugins.txt --latest false 1>/dev/null 2>&1
 fi
 bootstrap_progress
 
 log_message "Copying local plugin cache to Jenkins"
-$(generate_docker_compose_command) exec jenkins sh -c "cp /usr/share/jenkins/ref/plugins/*.jpi /var/jenkins_home/plugins"
+$(generate_docker_compose_command) exec -T jenkins sh -c "cp /usr/share/jenkins/ref/plugins/*.jpi /var/jenkins_home/plugins"
 log_ok
 bootstrap_progress
 
 log_message "Updating configuration file"
 # this approach is used to avoid "Device or resource busy" issue when using a volume mapping
-$(generate_docker_compose_command) exec jenkins cp /tmp/bootstrap-import/config.xml /var/jenkins_home/config.xml
+$(generate_docker_compose_command) exec -T jenkins cp /tmp/bootstrap-import/config.xml /var/jenkins_home/config.xml
 log_ok
 bootstrap_progress
 
@@ -147,7 +147,7 @@ while [ "$jenkins_response" != "0" ]; do
 done
 
 log_message "Importing 'global' credentials into Jenkins, for authenticating with Tyk Dashboard during pipeline script."
-jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket import-credentials-as-xml system::system::jenkins < /tmp/bootstrap-import/credentials-global.xml\"; echo \$?" 2>bootstrap.log)
+jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket import-credentials-as-xml system::system::jenkins < /tmp/bootstrap-import/credentials-global.xml\"; echo \$?" 2>>bootstrap.log)
 if [ "$jenkins_response" != "0" ]; then
   echo "ERROR: Failed to import Jenkins credentials"
   exit 1
@@ -156,7 +156,7 @@ log_ok
 bootstrap_progress
 
 log_message "Creating 'APIs and Policies' job in Jenkins, to execute deployment scripts when source code changes are detected."
-jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'apis-and-policies' < /tmp/bootstrap-import/job-apis-and-policies.xml\"; echo \$?" 2>bootstrap.log)
+jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'apis-and-policies' < /tmp/bootstrap-import/job-apis-and-policies.xml\"; echo \$?" 2>>bootstrap.log)
 if [ "$jenkins_response" != "0" ]; then
   echo "ERROR: Failed to create Jenkins job"
   exit 1
