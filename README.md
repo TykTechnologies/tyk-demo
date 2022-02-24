@@ -77,7 +77,7 @@ You can use `.env.example` as a starting point for your `.env` file. You must ob
 
 Docker is required. Follow the [Docker installation guide](https://docs.docker.com/get-docker/) for your platform.
 
-Docker Compose is required. If you're installing on Mac or Windows, then Docker Compose is already included as part of the base Docker install, so you don't need to do anything else. For Linux, follow the [Docker Compose installation guide](https://docs.docker.com/compose/install/).
+Docker Compose is required (v2.x+ recommended). If you're installing on Mac or Windows, then Docker Compose is already included as part of the base Docker install, so you don't need to do anything else. For Linux, follow the [Docker Compose installation guide](https://docs.docker.com/compose/install/).
 
 ### JQ
 
