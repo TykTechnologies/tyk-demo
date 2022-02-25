@@ -35,11 +35,6 @@ echo -n > .bootstrap/bootstrapped_deployments
 # check if docker compose version is v1.x
 check_docker_compose_version
 
-if [ -f .bootstrap/is_docker_compose_v1 ]; then
-  echo "Docker Compose v1 is not supported. Please upgrade to Docker Compose v2."
-  exit 1
-fi
-
 # ensure Docker environment variables are correctly set before creating containers
 # these allow for tracing and instrumentation deployments to be easily used, without having to manually set the environment variables
 if [[ "$*" == *tracing* ]]; then
