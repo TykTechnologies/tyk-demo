@@ -189,7 +189,7 @@ generate_docker_compose_command () {
   if [ -f .bootstrap/is_docker_compose_v1 ]; then
     command_docker_compose="docker-compose"
   else
-    command_docker_compose="docker-compose --env-file `pwd`/.env"
+    command_docker_compose="docker compose --env-file `pwd`/.env"
   fi
   while read deployment; do
     command_docker_compose="$command_docker_compose -f deployments/$deployment/docker-compose.yml"
