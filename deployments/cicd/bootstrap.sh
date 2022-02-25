@@ -42,12 +42,16 @@ bootstrap_progress
 
 log_message "Restoring Gitea database"
 # this command generates many errors (redirected to /dev/null), but these errors are expected as some elements of the database already exist
-eval $(generate_docker_compose_command) exec -d gitea sh -c "./data/restore.sh" 2> /dev/null 1> /dev/null
+eval $(generate_docker_compose_command) exec -T -d gitea sh -c "./data/restore.sh" 1>/dev/null 2>&1
 log_ok
 bootstrap_progress
 
 log_message "Regenerating Gitea hooks"
-eval $(generate_docker_compose_command) exec -d -u git gitea sh -c "gitea admin regenerate hooks;" 1>> /dev/null 2>> bootstrap.log
+eval $(generate_docker_compose_command) exec -T -d -u git gitea sh -c "gitea admin regenerate hooks;" 1>>/dev/null 2>>bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Failed to regenerate Gitea hooks"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
@@ -69,7 +73,7 @@ bootstrap_progress
 
 log_message "Cloning repo from Gitea to repo path"
 # clone repo
-git clone -q http://localhost:13000/gitea-user/tyk-data.git $gitea_tyk_data_repo_path 1> /dev/null 2>> bootstrap.log
+git clone -q http://localhost:13000/gitea-user/tyk-data.git $gitea_tyk_data_repo_path 1>/dev/null 2>>bootstrap.log
 log_ok
 bootstrap_progress
 
