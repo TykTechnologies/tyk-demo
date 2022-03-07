@@ -1,4 +1,5 @@
 .env
+.DS_store
 .context-data
 .bootstrap
 bootstrap.log

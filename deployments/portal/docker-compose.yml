@@ -1,0 +1,18 @@
+version: '3.3'
+services:
+  tyk-portal:
+    image: tykio/portal:v0.0.1-rc11
+    networks:
+      - tyk
+    volumes:
+      - ./deployments/portal/volumes/tyk-portal/portal.conf:/opt/portal/portal.conf
+    ports:
+      - 3100:3001
+    entrypoint: /opt/portal/dev-portal
+    command:
+      - "--bootstrap"
+      - "--user=admin-user@example.org"
+      - "--pass=3LEsHO1jv1dt9Xgf"
+      - "--provider-name=\"TykPro@localhost\""
+      - "--provider-type=tyk-pro"
+      - "--provider-data={\"URL\": \"http://host.docker.internal:3000/\", \"Secret\": \"${TYK_DASHBOARD_API_ACCESS_CREDENTIALS}\", \"OrgID\": \"5e9d9544a1dcd60001d0ed20\"}"
