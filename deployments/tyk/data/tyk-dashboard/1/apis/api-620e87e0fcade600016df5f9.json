@@ -1,14 +1,14 @@
 {
-  "created_at": "2021-02-11T05:52:01Z",
+  "created_at": "2022-02-17T17:37:36Z",
   "api_model": {},
   "api_definition": {
-    "id": "6024c601afd3d900011f60c9",
-    "name": "Echo Server",
-    "slug": "echo-server",
+    "id": "620e87e0fcade600016df5f9",
+    "name": "Restified-Posts",
+    "slug": "restified-posts",
     "listen_port": 0,
     "protocol": "",
     "enable_proxy_protocol": false,
-    "api_id": "b5d8914fa2204b53627ae40cb0010b6f",
+    "api_id": "9ddb13d7462042f27042f4dcfa0645af",
     "org_id": "5e9d9544a1dcd60001d0ed20",
     "use_keyless": true,
     "use_oauth2": false,
@@ -223,7 +223,38 @@
             "black_list": []
           },
           "use_extended_paths": true,
-          "extended_paths": {},
+          "extended_paths": {
+            "transform": [
+              {
+                "template_data": {
+                  "input_type": "json",
+                  "template_mode": "blob",
+                  "enable_session": false,
+                  "template_source": "ewogICAicXVlcnkiOiJxdWVyeSgkdXNlcklkOiBJbnQhKSB7IHVzZXIoaWQ6JHVzZXJJZCl7aWQgbmFtZSBlbWFpbCB0cmFuc2Zvcm1lZE5hbWUgcG9zdHMgeyBpZCB0aXRsZSBjb21tZW50cyB7IGlkIG5hbWUgfSB9fX0iLAogICAidmFyaWFibGVzIjp7CiAgICAgICJ1c2VySWQiOiB7eyBpbmRleCAuX3R5a19jb250ZXh0LnBhdGhfcGFydHMgMyB9fQogICB9Cn0="
+                },
+                "path": "user/{id}",
+                "method": "GET"
+              }
+            ],
+            "transform_response_headers": [
+              {
+                "delete_headers": [],
+                "add_headers": {
+                  "Content-Type": "application/json"
+                },
+                "path": "user/{id}",
+                "method": "GET",
+                "act_on": false
+              }
+            ],
+            "method_transforms": [
+              {
+                "path": "user/{id}",
+                "method": "GET",
+                "to_method": "POST"
+              }
+            ]
+          },
           "global_headers": {},
           "global_headers_remove": [],
           "global_response_headers": {},
@@ -255,9 +286,9 @@
     },
     "proxy": {
       "preserve_host_header": false,
-      "listen_path": "/",
-      "target_url": "ws://echo-server:8080",
-      "disable_strip_slash": false,
+      "listen_path": "/restified-posts/",
+      "target_url": "http://localhost:8080/graphql-posts-v3/",
+      "disable_strip_slash": true,
       "strip_listen_path": true,
       "enable_load_balancing": false,
       "target_list": [],
@@ -336,7 +367,16 @@
     "blacklisted_ips": [],
     "dont_set_quota_on_create": false,
     "expire_analytics_after": 0,
-    "response_processors": [],
+    "response_processors": [
+      {
+        "name": "header_injector",
+        "options": {}
+      },
+      {
+        "name": "response_body_transform",
+        "options": {}
+      }
+    ],
     "CORS": {
       "enable": false,
       "allowed_origins": [
@@ -360,11 +400,11 @@
       "options_passthrough": false,
       "debug": false
     },
-    "domain": "echo-server.localhost",
+    "domain": "",
     "certificates": [],
     "do_not_track": false,
     "tags": [],
-    "enable_context_vars": false,
+    "enable_context_vars": true,
     "config_data": {},
     "tag_headers": [],
     "global_rate_limit": {
@@ -376,7 +416,7 @@
     "graphql": {
       "enabled": false,
       "execution_mode": "proxyOnly",
-      "version": "",
+      "version": "2",
       "schema": "",
       "type_field_configurations": [],
       "playground": {

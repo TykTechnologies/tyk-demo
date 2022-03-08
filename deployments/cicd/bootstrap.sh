@@ -42,17 +42,21 @@ bootstrap_progress
 
 log_message "Restoring Gitea database"
 # this command generates many errors (redirected to /dev/null), but these errors are expected as some elements of the database already exist
-eval $(generate_docker_compose_command) exec -d gitea sh -c "./data/restore.sh" 2> /dev/null 1> /dev/null
+$(generate_docker_compose_command) exec -T gitea ./data/restore.sh 1>/dev/null 2>&1
 log_ok
 bootstrap_progress
 
 log_message "Regenerating Gitea hooks"
-eval $(generate_docker_compose_command) exec -d -u git gitea sh -c "gitea admin regenerate hooks;" 1>> /dev/null 2>> bootstrap.log
+$(generate_docker_compose_command) exec -T -u git gitea gitea admin regenerate hooks 1>>/dev/null 2>>bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Failed to regenerate Gitea hooks"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
 log_message "Restarting Gitea service (gitea)"
-eval $(generate_docker_compose_command) restart gitea 2> /dev/null
+$(generate_docker_compose_command) restart gitea 2> /dev/null
 log_ok
 bootstrap_progress
 
@@ -64,12 +68,20 @@ gitea_tyk_data_repo_path="/tmp/tyk-demo/tyk-data"
 echo $gitea_tyk_data_repo_path > .context-data/gitea-tyk-data-repo-path
 # delete any repo data which may already exist
 rm -rf $gitea_tyk_data_repo_path > /dev/null
+if [ "$?" != "0" ]; then
+  echo "ERROR: Failed to clear Git repo path $gitea_tyk_data_repo_path"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
 log_message "Cloning repo from Gitea to repo path"
 # clone repo
-git clone -q http://localhost:13000/gitea-user/tyk-data.git $gitea_tyk_data_repo_path 1> /dev/null 2>> bootstrap.log
+git clone -q http://localhost:13000/gitea-user/tyk-data.git $gitea_tyk_data_repo_path 1>/dev/null 2>>bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Failed to clone repo from Gitea to repo path $gitea_tyk_data_repo_path"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
@@ -78,7 +90,11 @@ log_message "Add, commit and push Jenkinsfile to repo"
 cp ./deployments/cicd/data/jenkins/Jenkinsfile $gitea_tyk_data_repo_path
 git -C $gitea_tyk_data_repo_path add . 1>/dev/null 2>&1
 git -C $gitea_tyk_data_repo_path commit -m "Adding Jenkinsfile" 1>/dev/null 2>&1
-git -C $gitea_tyk_data_repo_path push "http://$gitea_username:$gitea_password@localhost:13000/gitea-user/tyk-data.git/" 1>/dev/null 2>&1
+git -C $gitea_tyk_data_repo_path push "http://$gitea_username:$gitea_password@localhost:13000/gitea-user/tyk-data.git/" 1>/dev/null 2>>bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Failed git operations"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
@@ -87,23 +103,46 @@ if ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1> /dev/null 2>&1; then
   log_message "  Plugins found, will use local cache instead of downloading plugins"
 else
   log_message "  Plugins not found, downloading plugins to local cache... (please be patient, this can take a long time)"
-  $(generate_docker_compose_command) exec jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins/plugins.txt --latest false 1>/dev/null 2>&1
+  attempt_count=0
+  until ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1>/dev/null 2>&1; do
+    attempt_count=$((attempt_count+1))
+    $(generate_docker_compose_command) exec -T jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins/plugins.txt --latest false --verbose 1>>bootstrap.log 2>&1
+    if [ "$?" != "0" ]; then
+      if [ "$attempt_count" = "5" ]; then
+        log_message "  Maximum retry count reached. Aborting."
+        echo "ERROR: Unable to download Jenkins plugins"
+        exit 1
+      else 
+        log_message "  Failed to download Jenkins plugins, retrying"
+        sleep 3
+      fi      
+    fi
+  done
+  log_ok
 fi
 bootstrap_progress
 
 log_message "Copying local plugin cache to Jenkins"
-$(generate_docker_compose_command) exec jenkins sh -c "cp /usr/share/jenkins/ref/plugins/*.jpi /var/jenkins_home/plugins"
+$(generate_docker_compose_command) exec -T jenkins sh -c "cp /usr/share/jenkins/ref/plugins/*.jpi /var/jenkins_home/plugins"
+if [ "$?" != "0" ]; then
+  echo "ERROR: Failed to copy local plugin cache to Jenkins"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
 log_message "Updating configuration file"
 # this approach is used to avoid "Device or resource busy" issue when using a volume mapping
-$(generate_docker_compose_command) exec jenkins cp /tmp/bootstrap-import/config.xml /var/jenkins_home/config.xml
+$(generate_docker_compose_command) exec -T jenkins cp /tmp/bootstrap-import/config.xml /var/jenkins_home/config.xml
+if [ "$?" != "0" ]; then
+  echo "ERROR: Failed to update Jenkins configuration file"
+  exit 1
+fi
 log_ok
 bootstrap_progress
 
 log_message "Restarting Jenkins container to load new state"
-eval $(generate_docker_compose_command) restart jenkins 2> /dev/null
+$(generate_docker_compose_command) restart jenkins 2> /dev/null
 log_ok
 bootstrap_progress
 
@@ -147,7 +186,7 @@ while [ "$jenkins_response" != "0" ]; do
 done
 
 log_message "Importing 'global' credentials into Jenkins, for authenticating with Tyk Dashboard during pipeline script."
-jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket import-credentials-as-xml system::system::jenkins < /tmp/bootstrap-import/credentials-global.xml\"; echo \$?" 2>bootstrap.log)
+jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket import-credentials-as-xml system::system::jenkins < /tmp/bootstrap-import/credentials-global.xml\"; echo \$?" 2>>bootstrap.log)
 if [ "$jenkins_response" != "0" ]; then
   echo "ERROR: Failed to import Jenkins credentials"
   exit 1
@@ -156,7 +195,7 @@ log_ok
 bootstrap_progress
 
 log_message "Creating 'APIs and Policies' job in Jenkins, to execute deployment scripts when source code changes are detected."
-jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'apis-and-policies' < /tmp/bootstrap-import/job-apis-and-policies.xml\"; echo \$?" 2>bootstrap.log)
+jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'apis-and-policies' < /tmp/bootstrap-import/job-apis-and-policies.xml\"; echo \$?" 2>>bootstrap.log)
 if [ "$jenkins_response" != "0" ]; then
   echo "ERROR: Failed to create Jenkins job"
   exit 1

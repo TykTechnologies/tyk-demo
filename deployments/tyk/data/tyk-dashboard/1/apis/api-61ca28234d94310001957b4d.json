@@ -1,16 +1,16 @@
 {
-  "created_at": "2020-08-12T07:02:53Z",
+  "created_at": "2021-12-27T20:54:59Z",
   "api_model": {},
   "api_definition": {
-    "id": "5f33941d522d9f00019d0045",
-    "name": "Universal Data Graph Composed",
-    "slug": "universal-data-graph-composed",
+    "id": "61ca28234d94310001957b4d",
+    "name": "Go Custom IP Rate Limiter",
+    "slug": "go-ip-rate-limit",
     "listen_port": 0,
     "protocol": "",
     "enable_proxy_protocol": false,
-    "api_id": "05e25e6df8134c786757abb034e37e4d",
+    "api_id": "20cbad000d654076457fd6745fc1c4fb",
     "org_id": "5e9d9544a1dcd60001d0ed20",
-    "use_keyless": true,
+    "use_keyless": false,
     "use_oauth2": false,
     "use_openid": false,
     "openid_options": {
@@ -173,7 +173,7 @@
     "upstream_certificates": {},
     "pinned_public_keys": {},
     "enable_jwt": false,
-    "use_standard_auth": false,
+    "use_standard_auth": true,
     "use_go_plugin_auth": false,
     "enable_coprocess_auth": false,
     "jwt_signing_method": "",
@@ -255,9 +255,9 @@
     },
     "proxy": {
       "preserve_host_header": false,
-      "listen_path": "/universal-data-graph-composed/",
-      "target_url": "",
-      "disable_strip_slash": false,
+      "listen_path": "/go-ip-rate-limit/",
+      "target_url": "http://httpbin.org/",
+      "disable_strip_slash": true,
       "strip_listen_path": true,
       "enable_load_balancing": false,
       "target_list": [],
@@ -286,7 +286,14 @@
     "disable_rate_limit": false,
     "disable_quota": false,
     "custom_middleware": {
-      "pre": [],
+      "pre": [
+        {
+          "name": "IPRateLimiter",
+          "path": "plugins/go/ipratelimit/ip-rate-limit.so",
+          "require_session": false,
+          "raw_body_only": false
+        }
+      ],
       "post": [],
       "post_key_auth": [],
       "auth_check": {
@@ -296,7 +303,7 @@
         "raw_body_only": false
       },
       "response": [],
-      "driver": "",
+      "driver": "goplugin",
       "id_extractor": {
         "extract_from": "",
         "extract_with": "",
@@ -339,9 +346,21 @@
     "response_processors": [],
     "CORS": {
       "enable": false,
-      "allowed_origins": [],
-      "allowed_methods": [],
-      "allowed_headers": [],
+      "allowed_origins": [
+        "*"
+      ],
+      "allowed_methods": [
+        "GET",
+        "POST",
+        "HEAD"
+      ],
+      "allowed_headers": [
+        "Origin",
+        "Accept",
+        "Content-Type",
+        "X-Requested-With",
+        "Authorization"
+      ],
       "exposed_headers": [],
       "allow_credentials": false,
       "max_age": 24,
@@ -362,51 +381,11 @@
     "strip_auth_data": false,
     "enable_detailed_recording": false,
     "graphql": {
-      "enabled": true,
-      "execution_mode": "executionEngine",
-      "version": "",
-      "schema": "type Country {\n code: ID\n name: String\n pop: Int\n}\n\ntype Query {\n country(code: ID!): Country\n}\n",
-      "type_field_configurations": [
-        {
-          "type_name": "Query",
-          "field_name": "country",
-          "mapping": {
-            "disabled": false,
-            "path": "country"
-          },
-          "data_source": {
-            "kind": "TykGraphQLDataSource",
-            "data_source_config": {
-              "url": "tyk://8ba9f26729e041a95f84f01dd0ce6d9b/",
-              "method": "POST"
-            }
-          }
-        },
-        {
-          "type_name": "Country",
-          "field_name": "pop",
-          "mapping": {
-            "disabled": false,
-            "path": "population"
-          },
-          "data_source": {
-            "kind": "HTTPJSONDataSource",
-            "data_source_config": {
-              "url": "https://restcountries.eu/rest/v2/alpha/{{.object.code}}",
-              "method": "GET",
-              "body": "",
-              "headers": [],
-              "default_type_name": "Int",
-              "status_code_type_name_mappings": [
-                {
-                  "status_code": 200,
-                  "type_name": ""
-                }
-              ]
-            }
-          }
-        }
-      ],
+      "enabled": false,
+      "execution_mode": "proxyOnly",
+      "version": "2",
+      "schema": "",
+      "type_field_configurations": [],
       "playground": {
         "enabled": false,
         "path": ""
@@ -417,6 +396,14 @@
       },
       "proxy": {
         "auth_headers": {}
+      },
+      "subgraph": {
+        "sdl": ""
+      },
+      "supergraph": {
+        "subgraphs": [],
+        "merged_sdl": "",
+        "global_headers": {}
       }
     }
   },

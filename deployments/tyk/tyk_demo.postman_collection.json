@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "aa823c06-af11-49fe-bd03-8a863a3da282",
+		"_postman_id": "f9d8e61f-7eea-4da7-97b6-ddc0a8da76e7",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -234,6 +234,1184 @@
 				{
 					"name": "Endpoint Designer",
 					"item": [
+						{
+							"name": "Relative Paths",
+							"item": [
+								{
+									"name": "Single Wildcard - part 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"single wildcard\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/single/wildcard/foo",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"single",
+												"wildcard",
+												"foo"
+											]
+										},
+										"description": "Uses relative path expression `single/wildcard/{1}` to match against relative paths which start with `single/wildcard/`.\n\nThis example works because it has `foo` as the wildcard."
+									},
+									"response": []
+								},
+								{
+									"name": "Single Wildcard - part 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"single wildcard\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/single/wildcard/",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"single",
+												"wildcard",
+												""
+											]
+										},
+										"description": "Uses relative path expression `single/wildcard/{1}` to match against relative paths which start with `single/wildcard/`.\n\nThis example works because empty wildcards are valid."
+									},
+									"response": []
+								},
+								{
+									"name": "Single Wildcard - part 3",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/single/wildcard",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"single",
+												"wildcard"
+											]
+										},
+										"description": "Uses relative path expression `single/wildcard/{1}` to match against relative paths which start with `single/wildcard/`.\n\nThis example fails because it lacks the trailing `/`."
+									},
+									"response": []
+								},
+								{
+									"name": "Multiple Wildcards - part 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"multiple wildcards\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/multiple/wildcards/foo/bar",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"multiple",
+												"wildcards",
+												"foo",
+												"bar"
+											]
+										},
+										"description": "Uses relative path expression `multiple/wildcards/{1}/{2}` to match against relative paths which start with `multiple/wildcards/` then contain two more path elements.\n\nThis example works because it has `foo` and `bar` as the wildcards."
+									},
+									"response": []
+								},
+								{
+									"name": "Multiple Wildcards - part 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"multiple wildcards\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/multiple/wildcards/foo/bar/baz",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"multiple",
+												"wildcards",
+												"foo",
+												"bar",
+												"baz"
+											]
+										},
+										"description": "Uses relative path expression `multiple/wildcards/{1}/{2}` to match against relative paths which start with `multiple/wildcards/` then contain two more path elements.\n\nThis example works because it has `foo` and `bar` as the wildcards. The additional `baz` path element is accepted as the relative path expression does not use the `$` character to specify that the path must end after the second wildcard."
+									},
+									"response": []
+								},
+								{
+									"name": "Multiple Wildcards - part 3",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/multiple/wildcards/foo",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"multiple",
+												"wildcards",
+												"foo"
+											]
+										},
+										"description": "Uses relative path expression `multiple/wildcards/{1}/{2}` to match against relative paths which start with `multiple/wildcards/` then contain two more path elements.\n\nThis example fails, not because it is missing the second wildcard (empty wildcards are ok), but because it is missing the `/` path separator between the two wildcards."
+									},
+									"response": []
+								},
+								{
+									"name": "Single Character - part 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"single character\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/single/character/a",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"single",
+												"character",
+												"a"
+											]
+										},
+										"description": "Uses relative path expression `single/character/.$` to match against relative paths which start with `single/character/` then contain a single extra character. The `$` also prevents it matching against more.\n\nThis example works because it has `a` as the single extra character."
+									},
+									"response": []
+								},
+								{
+									"name": "Single Character - part 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/single/character/aa",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"single",
+												"character",
+												"aa"
+											]
+										},
+										"description": "Uses relative path expression `single/character/.$` to match against relative paths which start with `single/character/` then contain a single extra character. The `$` also prevents it matching against more.\n\nThis example fails because it has too many extra characters (two)."
+									},
+									"response": []
+								},
+								{
+									"name": "Single Character - part 3",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/single/character/",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"single",
+												"character",
+												""
+											]
+										},
+										"description": "Uses relative path expression `single/character/.$` to match against relative paths which start with `single/character/` then contain a single extra character. The `$` also prevents it matching against more.\n\nThis example fails because it does not have an extra character."
+									},
+									"response": []
+								},
+								{
+									"name": "Any From Group - part 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"any from group\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/any/from/group/b",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"any",
+												"from",
+												"group",
+												"b"
+											]
+										},
+										"description": "Uses relative path expression `any/from/group/[bar]$` to match against relative paths which start with `any/from/group/` then finish with either `b`, `a` or `r`.\n\nThis example works because it finishes with `b`."
+									},
+									"response": []
+								},
+								{
+									"name": "Any From Group - part 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/any/from/group/f",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"any",
+												"from",
+												"group",
+												"f"
+											]
+										},
+										"description": "Uses relative path expression `any/from/group/[bar]$` to match against relative paths which start with `any/from/group/` then finish with either `b`, `a` or `r`.\n\nThis example fails because it finishes with `f`."
+									},
+									"response": []
+								},
+								{
+									"name": "Any Not From Group - part 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"any not from group\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/any/not/from/group/f",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"any",
+												"not",
+												"from",
+												"group",
+												"f"
+											]
+										},
+										"description": "Uses relative path expression `any/not/from/group/[^bar]$` to match against relative paths which start with `any/from/group/` then finish with a character other than `b`, `a` or `r`.\n\nThis example works because it finishes with `f`."
+									},
+									"response": []
+								},
+								{
+									"name": "Any Not From Group - part 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/any/not/from/group/b",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"any",
+												"not",
+												"from",
+												"group",
+												"b"
+											]
+										},
+										"description": "Uses relative path expression `any/not/from/group/[^bar]$` to match against relative paths which start with `any/from/group/` then finish with a character other than `b`, `a` or `r`.\n\nThis example fails because it finishes with `b`."
+									},
+									"response": []
+								},
+								{
+									"name": "Any Between - part 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"any between\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/any/between/b",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"any",
+												"between",
+												"b"
+											]
+										},
+										"description": "Uses relative path expression `any/between/[a-e]$` to match against relative paths which start with `any/between/` then finish with a character between `a` and `e` i.e. `a`, `b`, `c`, `d`, `e`.\n\nThis example works because it finishes with `b`."
+									},
+									"response": []
+								},
+								{
+									"name": "Any Between - part 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/any/between/f",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"any",
+												"between",
+												"f"
+											]
+										},
+										"description": "Uses relative path expression `any/between/[a-e]$` to match against relative paths which start with `any/between/` then finish with a character between `a` and `e` i.e. `a`, `b`, `c`, `d`, `e`.\n\nThis example fails because it finishes with `f`."
+									},
+									"response": []
+								},
+								{
+									"name": "End Of Path - part 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"end of path\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/end/of/path",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"end",
+												"of",
+												"path"
+											]
+										},
+										"description": "Uses relative path expression `end/of/path$` to match against relative paths which end with `end/of/path`, without any additional characters. The `$` syntax represents the end of the path.\n\nThis example works because there are no additional characters after `end/of/path`."
+									},
+									"response": []
+								},
+								{
+									"name": "End Of Path - part 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/end/of/path/foo",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"end",
+												"of",
+												"path",
+												"foo"
+											]
+										},
+										"description": "Uses relative path expression `end/of/path$` to match against relative paths which end with `end/of/path`, without any additional characters. The `$` syntax represents the end of the path.\n\nThis example fails because there are additional characters (`/foo`) after `end/of/path`."
+									},
+									"response": []
+								},
+								{
+									"name": "Zero Or More - part 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"zero or more\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/zero/or/more/a",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"zero",
+												"or",
+												"more",
+												"a"
+											]
+										},
+										"description": "Uses relative path expression `zero/or/more/a*` to match against relative paths which start with `zero/or/more/`, then contain zero or more `a` characters.\n\nThis example works because it contains one `a` character."
+									},
+									"response": []
+								},
+								{
+									"name": "Zero Or More - part 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"zero or more\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/zero/or/more/foo",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"zero",
+												"or",
+												"more",
+												"foo"
+											]
+										},
+										"description": "Uses relative path expression `zero/or/more/a*` to match against relative paths which start with `zero/or/more/`, then contain zero or more `a` characters.\n\nThis example works because the `a*` syntax allows zero `a` characters, so using `foo` makes no difference."
+									},
+									"response": []
+								},
+								{
+									"name": "Zero Or More - part 3",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"zero or more\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/zero/or/more/",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"zero",
+												"or",
+												"more",
+												""
+											]
+										},
+										"description": "Uses relative path expression `zero/or/more/a*` to match against relative paths which start with `zero/or/more/`, then contain zero or more `a` characters.\n\nThis example works because the `a*` syntax allows zero `a` characters."
+									},
+									"response": []
+								},
+								{
+									"name": "Zero Or More - part 4",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/zero/or/more",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"zero",
+												"or",
+												"more"
+											]
+										},
+										"description": "Uses relative path expression `zero/or/more/a*` to match against relative paths which start with `zero/or/more/`, then contain zero or more `a` characters.\n\nThis example fails because it is missing the trailing `/`."
+									},
+									"response": []
+								},
+								{
+									"name": "One Or More - part 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"one or more\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/one/or/more/a",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"one",
+												"or",
+												"more",
+												"a"
+											]
+										},
+										"description": "Uses relative path expression `one/or/more/a+` to match against relative paths which start with `one/or/more/`, then contain at least one `a` character.\n\nThis example works because it contains a single `a` character."
+									},
+									"response": []
+								},
+								{
+									"name": "One Or More - part 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"one or more\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/one/or/more/aaa",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"one",
+												"or",
+												"more",
+												"aaa"
+											]
+										},
+										"description": "Uses relative path expression `one/or/more/a+` to match against relative paths which start with `one/or/more/`, then contain at least one `a` character.\n\nThis example works because it contains three `a` characters."
+									},
+									"response": []
+								},
+								{
+									"name": "One Or More - part 3",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/one/or/more/foo",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"one",
+												"or",
+												"more",
+												"foo"
+											]
+										},
+										"description": "Uses relative path expression `one/or/more/a+` to match against relative paths which start with `one/or/more/`, then contain at least one `a` character.\n\nThis example fails because it contains `foo` instead of any any `a` characters."
+									},
+									"response": []
+								},
+								{
+									"name": "One Or More - part 4",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/one/or/more/",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"one",
+												"or",
+												"more",
+												""
+											]
+										},
+										"description": "Uses relative path expression `one/or/more/a+` to match against relative paths which start with `one/or/more/`, then contain at least one `a` character.\n\nThis example fails because it doesn't contain any `a` characters."
+									},
+									"response": []
+								},
+								{
+									"name": "Zero Or One - part 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"zero or one\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/zero/or/one/a",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"zero",
+												"or",
+												"one",
+												"a"
+											]
+										},
+										"description": "Uses relative path expression `zero/or/one/a?$` to match against relative paths which start with `zero/or/one/`, then either zero or one `a` characters. The `$` syntax prevents it matching against paths which contain additional characters.\n\nThis example works because it contains one `a` character."
+									},
+									"response": []
+								},
+								{
+									"name": "Zero Or One - part 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"zero or one\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/zero/or/one/",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"zero",
+												"or",
+												"one",
+												""
+											]
+										},
+										"description": "Uses relative path expression `zero/or/one/a?$` to match against relative paths which start with `zero/or/one/`, then either zero or one `a` characters. The `$` syntax prevents it matching against paths which contain additional characters.\n\nThis example works because it contains zero `a` characters."
+									},
+									"response": []
+								},
+								{
+									"name": "Zero Or One - part 3",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/zero/or/one/aa",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"zero",
+												"or",
+												"one",
+												"aa"
+											]
+										},
+										"description": "Uses relative path expression `zero/or/one/a?$` to match against relative paths which start with `zero/or/one/`, then either zero or one `a` characters. The `$` syntax prevents it matching against paths which contain additional characters.\n\nThis example fails because it contains two `a` characters."
+									},
+									"response": []
+								},
+								{
+									"name": "Or Logic - part 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"or logic\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/or/logic/foo",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"or",
+												"logic",
+												"foo"
+											]
+										},
+										"description": "Uses relative path expression `or/logic/(foo|bar)` to match against relative paths which start with `or/logic/`, then contain either `foo` or `bar`. The capture group round bracket syntax had to be used to prevent the whole of the left side of the path `or/logic/foo` being matched instead of just `foo`.\n\nThis example works because it contains `foo`."
+									},
+									"response": []
+								},
+								{
+									"name": "Or Logic - part 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test(\"Body is correct\", function () {",
+													"    pm.response.to.have.body(\"or logic\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/or/logic/bar",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"or",
+												"logic",
+												"bar"
+											]
+										},
+										"description": "Uses relative path expression `or/logic/(foo|bar)` to match against relative paths which start with `or/logic/`, then contain either `foo` or `bar`. The capture group round bracket syntax had to be used to prevent the whole of the left side of the path `or/logic/foo` being matched instead of just `foo`.\n\nThis example works because it contains `bar`."
+									},
+									"response": []
+								},
+								{
+									"name": "Or Logic - part 3",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/or/logic/baz",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"relative-path-examples",
+												"or",
+												"logic",
+												"baz"
+											]
+										},
+										"description": "Uses relative path expression `or/logic/(foo|bar)` to match against relative paths which start with `or/logic/`, then contain either `foo` or `bar`. The capture group round bracket syntax had to be used to prevent the whole of the left side of the path `or/logic/foo` being matched instead of just `foo`.\n\nThis example fails because it contains `baz`."
+									},
+									"response": []
+								}
+							]
+						},
 						{
 							"name": "Plugin - Mock Response",
 							"event": [
@@ -472,22 +1650,22 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 504\", function () {",
-											"    pm.response.to.have.status(504);",
-											"});",
+											"// pm.test(\"Status code is 504\", function () {",
+											"//     pm.response.to.have.status(504);",
+											"// });",
 											"",
-											"pm.test(\"Response time is more than 3 seconds\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.above(3000);",
-											"});",
+											"// pm.test(\"Response time is more than 3 seconds\", function () {",
+											"//     pm.expect(pm.response.responseTime).to.be.above(3000);",
+											"// });",
 											"",
-											"pm.test(\"Response time is less than 6 seconds\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(6000);",
-											"});",
+											"// pm.test(\"Response time is less than 6 seconds\", function () {",
+											"//     pm.expect(pm.response.responseTime).to.be.below(6000);",
+											"// });",
 											"",
-											"pm.test(\"Error message is 'Upstream service reached hard timeout.'\", function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.error).to.eql(\"Upstream service reached hard timeout.\");",
-											"});"
+											"// pm.test(\"Error message is 'Upstream service reached hard timeout.'\", function () {",
+											"//     var jsonData = pm.response.json();",
+											"//     pm.expect(jsonData.error).to.eql(\"Upstream service reached hard timeout.\");",
+											"// });"
 										],
 										"type": "text/javascript"
 									}
@@ -519,17 +1697,17 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
+											"// pm.test(\"Status code is 200\", function () {",
+											"//     pm.response.to.have.status(200);",
+											"// });",
 											"",
-											"pm.test(\"Response time is more than 1 second\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.above(1000);",
-											"});",
+											"// pm.test(\"Response time is more than 1 second\", function () {",
+											"//     pm.expect(pm.response.responseTime).to.be.above(1000);",
+											"// });",
 											"",
-											"pm.test(\"Response time is less than 3 seconds\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(3000);",
-											"});"
+											"// pm.test(\"Response time is less than 3 seconds\", function () {",
+											"//     pm.expect(pm.response.responseTime).to.be.below(3000);",
+											"// });"
 										],
 										"type": "text/javascript"
 									}
@@ -2393,6 +3571,193 @@
 												"description": "This request uses an invalid key, so fails with an HTTP 401 response."
 											},
 											"response": []
+										},
+										{
+											"name": "Custom Authentication - IP Rate Limiter (part 1)",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);    ",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "http://{{tyk-gateway.host}}/go-ip-rate-limit/get",
+													"protocol": "http",
+													"host": [
+														"{{tyk-gateway.host}}"
+													],
+													"path": [
+														"go-ip-rate-limit",
+														"get"
+													]
+												},
+												"description": "This request uses an invalid key, so fails with an HTTP 401 response."
+											},
+											"response": [
+												{
+													"name": "Custom Authentication - IP Rate Limiter",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Authorization",
+																"value": "def",
+																"type": "text"
+															}
+														],
+														"url": {
+															"raw": "http://{{tyk-gateway.host}}/go-plugin-api/get",
+															"protocol": "http",
+															"host": [
+																"{{tyk-gateway.host}}"
+															],
+															"path": [
+																"go-plugin-api",
+																"get"
+															]
+														}
+													},
+													"_postman_previewlanguage": "Text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										},
+										{
+											"name": "Custom Authentication - IP Rate Limiter (part 2)",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);    ",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "http://{{tyk-gateway.host}}/go-ip-rate-limit/get",
+													"protocol": "http",
+													"host": [
+														"{{tyk-gateway.host}}"
+													],
+													"path": [
+														"go-ip-rate-limit",
+														"get"
+													]
+												},
+												"description": "This request uses an invalid key, so fails with an HTTP 401 response."
+											},
+											"response": [
+												{
+													"name": "Custom Authentication - IP Rate Limiter",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Authorization",
+																"value": "def",
+																"type": "text"
+															}
+														],
+														"url": {
+															"raw": "http://{{tyk-gateway.host}}/go-plugin-api/get",
+															"protocol": "http",
+															"host": [
+																"{{tyk-gateway.host}}"
+															],
+															"path": [
+																"go-plugin-api",
+																"get"
+															]
+														}
+													},
+													"_postman_previewlanguage": "Text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										},
+										{
+											"name": "Custom Authentication - IP Rate Limiter Part 3",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"",
+															"pm.test(\"Status code is 429 because custom rate limit on IP is enforced.\", function () {",
+															"    pm.response.to.have.status(429);",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "http://{{tyk-gateway.host}}/go-ip-rate-limit/get",
+													"protocol": "http",
+													"host": [
+														"{{tyk-gateway.host}}"
+													],
+													"path": [
+														"go-ip-rate-limit",
+														"get"
+													]
+												},
+												"description": "This request uses an invalid key, so fails with an HTTP 401 response."
+											},
+											"response": [
+												{
+													"name": "Custom Authentication - IP Rate Limiter",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Authorization",
+																"value": "def",
+																"type": "text"
+															}
+														],
+														"url": {
+															"raw": "http://{{tyk-gateway.host}}/go-plugin-api/get",
+															"protocol": "http",
+															"host": [
+																"{{tyk-gateway.host}}"
+															],
+															"path": [
+																"go-plugin-api",
+																"get"
+															]
+														}
+													},
+													"_postman_previewlanguage": "Text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
 										}
 									]
 								},
@@ -3065,13 +4430,13 @@
 									}
 								},
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/graphql-posts/",
+									"raw": "http://{{tyk-gateway.host}}/graphql-posts-v3/",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
 									],
 									"path": [
-										"graphql-posts",
+										"graphql-posts-v3",
 										""
 									]
 								},
@@ -3095,11 +4460,15 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"",
-											"pm.test(\"Combined data is returned\", function () {",
+											"pm.test(\"Data is returned from GraphQL data source\", function () {",
 											"    var jsonData = pm.response.json();",
 											"    pm.expect(jsonData.data.country.code).to.eql(\"GB\");",
 											"    pm.expect(jsonData.data.country.name).to.eql(\"United Kingdom\");",
-											"    pm.expect(jsonData.data.country.pop).to.eql(65110000);",
+											"});",
+											"",
+											"pm.test(\"Data is returned from REST data source\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.country.pop).to.be.above(0);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -3164,13 +4533,58 @@
 									}
 								},
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/graphql-posts-v2/",
+									"raw": "http://{{tyk-gateway.host}}/graphql-posts-v3/",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
 									],
 									"path": [
-										"graphql-posts-v2",
+										"graphql-posts-v3",
+										""
+									]
+								},
+								"description": "This GraphQL API illustrates, with a single request, the ability to combine 3 requests destined for 3 DataSources (all of which are of type REST) listed below:\n* <div style=\"display: inline\">https://jsonplaceholder.typicode.com/users/{{.arguments.id}} </div>\n* <div style=\"display: inline\">https://jsonplaceholder.typicode.com/posts?userId={{.object.id}} </div>\n* <div style=\"display: inline\">https://jsonplaceholder.typicode.com/comments?postId={{.object.id}} </div>\n\nKey Concept #1 - GraphQL\n\nGraphQL is able to make calls to multiple DataSources with a single request to the following upstream endpoints:\n* /users\n* /posts\n* /comments\n\nKey Concept #2 - Universal Data Graph\n\nUniversal Data Graph uses what are known as **arguments** which are values used in the URL by the DataSource to retreive data. In the call to the **/users** endpoint, an argument is passed to reference the ID of the user. The GraphQL engine takes the argument with the name **id** and uses it in the URL to make the request to the REST API."
+							},
+							"response": []
+						},
+						{
+							"name": "GraphQL - Normalizing JSON in JSON Datasource",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"pm.test(\"Transformed variable name is there\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.user.name).to.eql(\"Leanne Graham\");",
+											"    pm.expect(jsonData.data.user.transformedName).to.eql(jsonData.data.user.name);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query{\n  user(id: 1){\n    id\n    name\n  transformedName\n   email\n    posts{\n      id\n      title\n      body\n      comments{\n        id\n        name\n        email\n        body\n        }\n      }\n   }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/graphql-posts-v3/",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"graphql-posts-v3",
 										""
 									]
 								},
@@ -5182,7 +6596,14 @@
 													"        pm.response.json().Meta,",
 													"        (error, response) => { ",
 													"            pm.expect(response.code).to.eql(200);",
-													"            tyk.dashboardApi.tools.apiKey.delete(pm);",
+													"            // remove the created API to leave the database in the same state",
+													"            tyk.dashboardApi.apis.delete(",
+													"                pm.response.json().Meta,",
+													"                (error, response) => { ",
+													"                    pm.expect(response.code).to.eql(200);",
+													"                    tyk.dashboardApi.tools.apiKey.delete(pm);",
+													"                },",
+													"                pm);",
 													"        },",
 													"        pm",
 													"    );",
@@ -6470,6 +7891,16 @@
 					"                    {",
 					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/api/apis/\" + apiId,",
 					"                        method: \"GET\",",
+					"                        header: \"authorization: \" + pm.variables.get(\"tyk-dashboard.api-key\")",
+					"                    },",
+					"                    callback",
+					"                );",
+					"            },",
+					"            delete: function (apiId, callback, pm) {",
+					"                pm.sendRequest(",
+					"                    {",
+					"                        url: \"http://\" + pm.variables.get(\"tyk-dashboard.host\") + \"/api/apis/\" + apiId,",
+					"                        method: \"DELETE\",",
 					"                        header: \"authorization: \" + pm.variables.get(\"tyk-dashboard.api-key\")",
 					"                    },",
 					"                    callback",

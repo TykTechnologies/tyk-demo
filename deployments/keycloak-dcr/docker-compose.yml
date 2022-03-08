@@ -1,0 +1,44 @@
+version: '3.3'
+services:
+  keycloak-db:
+    image: postgres:9.6
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    networks:
+      - tyk
+    ports:
+      - "25432:5432"
+    volumes:
+      - keycloak-data:/var/lib/postresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "keycloak"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    restart: on-failure
+    deploy:
+      restart_policy:
+        condition: on-failure
+  keycloak:
+    image: jboss/keycloak:11.0.2
+    depends_on:
+      - keycloak-db
+    command: ["-Djboss.http.port=8180"]
+    networks:
+      - tyk
+    ports:
+      - "8180:8180"
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: keycloak-db
+      DB_PORT: 5432
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: keycloak
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+
+volumes:
+  keycloak-data:

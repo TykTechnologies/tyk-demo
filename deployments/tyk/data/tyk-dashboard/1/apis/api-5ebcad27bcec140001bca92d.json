@@ -380,6 +380,14 @@
       },
       "proxy": {
         "auth_headers": {}
+      },
+      "subgraph": {
+        "sdl": ""
+      },
+      "supergraph": {
+        "subgraphs": [],
+        "merged_sdl": "",
+        "global_headers": {}
       }
     }
   },
