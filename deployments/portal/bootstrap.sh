@@ -7,10 +7,12 @@ log_start_deployment
 bootstrap_progress
 
 dashboard_user_api_credentials=$(cat .context-data/1-dashboard-user-1-api-key)
-dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
-
 
 set_docker_environment_value "TYK_DASHBOARD_API_ACCESS_CREDENTIALS" $dashboard_user_api_credentials
+
+#set_docker_environment_value "ADMIN_EMAIL" $(cat. some_admin_email)
+#set_docker_environment_value "ADMIN_PASSWORD" $(cat. some_admin_email)
+
 
 # Grab the Dashboard License line from ENV file
 licence_line=$(grep "DASHBOARD_LICENCE=" .env)
@@ -54,3 +56,13 @@ for file in deployments/portal/volumes/tyk-portal/products/*; do
 done
 
 log_ok
+
+portal_admin_user_email=$(cat .context-data/1-dashboard-user-1-email)
+portal_admin_user_password=$(cat .context-data/1-dashboard-user-1-password)
+
+echo -e "\033[2K 
+  ▽ Enterprise Portal ($(get_service_image_tag "tyk-portal"))
+               Hosted At: http://localhost:3100/
+               Admin Username : $portal_admin_user_email
+               Admin Password : $portal_admin_user_password
+"
