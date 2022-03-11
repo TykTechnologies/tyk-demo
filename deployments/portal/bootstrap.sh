@@ -11,8 +11,19 @@ dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_
 
 
 set_docker_environment_value "TYK_DASHBOARD_API_ACCESS_CREDENTIALS" $dashboard_user_api_credentials
-log_message "Restarting tyk-portal."
 
+# Grab the Dashboard License line from ENV file
+licence_line=$(grep "DASHBOARD_LICENCE=" .env)
+# Parse out the DASHBOARD_LICENSE= bit
+encoded_licence_jwt=$(echo $licence_line | sed -E 's/^[A-Z_]+=(.+)$/\1/')
+
+# Copy portal.conf.example to portal.conf for proper usage
+cp deployments/portal/volumes/tyk-portal/portal.conf.example deployments/portal/volumes/tyk-portal/portal.conf
+# Replace portal.conf license variable w/ proper license key
+find deployments/portal/volumes/tyk-portal/portal.conf -type f -exec sed -i '' "s/REPLACE_VALUE_HERE/$encoded_licence_jwt/g" {} \;
+
+
+log_message "Restarting tyk-portal."
 $(generate_docker_compose_command) stop tyk-portal 2> /dev/null
 $(generate_docker_compose_command) rm -f tyk-portal 2> /dev/null
 $(generate_docker_compose_command) up -d tyk-portal 2> /dev/null
