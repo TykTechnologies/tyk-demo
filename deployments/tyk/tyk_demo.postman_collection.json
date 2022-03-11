@@ -4443,6 +4443,49 @@
 								"description": "This GraphQL API illustrates, with a single request, the ability to combine 3 requests destined for 3 DataSources (all of which are of type REST) listed below:\n* <div style=\"display: inline\">https://jsonplaceholder.typicode.com/users/{{.arguments.id}} </div>\n* <div style=\"display: inline\">https://jsonplaceholder.typicode.com/posts?userId={{.object.id}} </div>\n* <div style=\"display: inline\">https://jsonplaceholder.typicode.com/comments?postId={{.object.id}} </div>\n\nKey Concept #1 - GraphQL\n\nGraphQL is able to make calls to multiple DataSources with a single request to the following upstream endpoints:\n* /users\n* /posts\n* /comments\n\nKey Concept #2 - Universal Data Graph\n\nUniversal Data Graph uses what are known as **arguments** which are values used in the URL by the DataSource to retreive data. In the call to the **/users** endpoint, an argument is passed to reference the ID of the user. The GraphQL engine takes the argument with the name **id** and uses it in the URL to make the request to the REST API."
 							},
 							"response": []
+						},
+						{
+							"name": "Federation - Users Posts",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Users & Posts Data returned from Federated Graph\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.data.user.name).to.eql(\"Leanne Graham\");",
+											"    pm.expect(jsonData.data.user.posts.length).to.eql(10);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"query\":\"query {\\n  user(id:1) {\\n    name\\n    posts {\\n      title\\n    }\\n  }\\n}\",\"variables\":null}"
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/social-media-apis-federated/",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"social-media-apis-federated",
+										""
+									]
+								},
+								"description": "This GraphQL API illustrates, with a single request, the ability to combine 2 subgraphs into a single Federated graphQL API using Tyk\n\n*   http://localhost:4001/query\n*   http://localhost:4002/query\n    \n\n``` graphql\nquery{\n  user(id: 1){\n    id\n    name\n    posts{\n      id\n      title\n    }\n}\n\n```"
+							},
+							"response": []
 						}
 					]
 				},
