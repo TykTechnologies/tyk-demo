@@ -118,8 +118,8 @@
       },
       "version": "2",
       "playground": {
-        "enabled": false,
-        "path": ""
+        "enabled": true,
+        "path": "/playground"
       },
       "last_schema_update": "2022-03-11T16:08:13.774Z"
     },
