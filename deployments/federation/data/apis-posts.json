@@ -169,7 +169,7 @@
       "events": {}
     },
     "proxy": {
-      "target_url": "http://host.docker.internal:4002/query",
+      "target_url": "http://posts:4002/query",
       "service_discovery": {
         "endpoint_returns_list": false,
         "cache_timeout": 0,
