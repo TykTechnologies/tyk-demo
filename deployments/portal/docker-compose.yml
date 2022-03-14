@@ -7,13 +7,16 @@ services:
     volumes:
       - ${PWD}/scripts/common.sh:/opt/common.sh
       - ${PWD}/.context-data/:/.context-data/
-      - ${PWD}/deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
-      - ${PWD}/deployments/tyk/data/tyk-dashboard/1/organisation.json:/opt/tyk-dashboard/organization.json
-      - ${PWD}/deployments/portal/volumes/tyk-portal/portal.conf:/opt/portal/portal.conf
-      - ${PWD}/deployments/portal/entrypoint.sh:/opt/portal/entrypoint.sh
+    env_file:
+      - .env
     ports:
       - 3100:3001
-#    command:
-#      - tail -f /dev/null
-    entrypoint:
-      - /opt/portal/entrypoint.sh
+    entrypoint: /opt/portal/dev-portal
+    command:
+      - "--bootstrap"
+      - "--user=${ADMIN_EMAIL}"
+      - "--pass=${ADMIN_PASSWORD}"
+      - "--provider-name=\"TykPro@localhost\""
+      - "--provider-type=tyk-pro"
+      - "--provider-data={\"URL\": \"http://host.docker.internal:3000/\", \"Secret\": \"${TYK_DASHBOARD_API_ACCESS_CREDENTIALS}\", \"OrgID\": \"${ADMIN_ORG_ID}\"}"
+
