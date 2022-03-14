@@ -10,10 +10,6 @@ dashboard_user_api_credentials=$(cat .context-data/1-dashboard-user-1-api-key)
 
 set_docker_environment_value "TYK_DASHBOARD_API_ACCESS_CREDENTIALS" $dashboard_user_api_credentials
 
-#set_docker_environment_value "ADMIN_EMAIL" $(cat. some_admin_email)
-#set_docker_environment_value "ADMIN_PASSWORD" $(cat. some_admin_email)
-
-
 # Grab the Dashboard License line from ENV file
 licence_line=$(grep "DASHBOARD_LICENCE=" .env)
 # Parse out the DASHBOARD_LICENSE= bit
