@@ -19,3 +19,4 @@ deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.pem
 deployments/tyk/volumes/tyk-gateway/certs/private-key.pem
 deployments/tyk/volumes/tyk-gateway/certs/public-key.pem
 deployments/tyk/volumes/tyk-dashboard/certs/private-key.pem
+deployments/portal/volumes/tyk-portal/portal.conf
