@@ -9,7 +9,7 @@ The portal can be accessed here:
 ## Setup
 
 ### License
-Portal currently shares the license with the dashboard. Ensure that you have set your license key in the `./volumes/tyk-portal/portal.conf` file.
+Portal currently shares the license with the dashboard. Ensure that you have set your license key your .env file. Additionally, portal specific env vars will be exported to your .env file. 
 
 The bootstrap process will fail if the licence is not present.
 
