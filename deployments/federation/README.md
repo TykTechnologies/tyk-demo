@@ -25,7 +25,7 @@ http://tyk-gateway.localhost:8080/social-media-apis-federated/playground
 
 3. Add the "comments" subgraph by adding a new Tyk API Subgraph:
 ```
-http://comments-subgraph:4003/query
+http://comments:4003/query
 ```
 
 4. Add the subgraph to the "Social Media Federated Subgraph"
