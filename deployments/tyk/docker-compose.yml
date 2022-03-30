@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   tyk-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v3.2.3-rc9}
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v3.2.3}
     ports:
       - 3000:3000
     networks:
