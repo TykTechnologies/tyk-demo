@@ -18,5 +18,5 @@ services:
       - "--pass=${ADMIN_PASSWORD}"
       - "--provider-name=\"TykPro@localhost\""
       - "--provider-type=tyk-pro"
-      - "--provider-data={\"URL\": \"http://host.docker.internal:3000/\", \"Secret\": \"${TYK_DASHBOARD_API_ACCESS_CREDENTIALS}\", \"OrgID\": \"${ADMIN_ORG_ID}\"}"
+      - "--provider-data={\"URL\": \"http://tyk-dashboard:3000/\", \"Secret\": \"${TYK_DASHBOARD_API_ACCESS_CREDENTIALS}\", \"OrgID\": \"${ADMIN_ORG_ID}\"}"
 
