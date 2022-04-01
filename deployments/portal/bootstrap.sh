@@ -66,7 +66,7 @@ portal_admin_user_password=$(cat .context-data/1-dashboard-user-1-password)
 
 echo -e "\033[2K 
   ▽ Enterprise Portal ($(get_service_image_tag "tyk-portal"))
-               Hosted At: http://tyk-portal.localhost:3100/
-               Admin Username : $portal_admin_user_email
-               Admin Password : $portal_admin_user_password
+                    URL : http://tyk-portal.localhost:3100/
+         Admin Username : $portal_admin_user_email
+         Admin Password : $portal_admin_user_password
 "
