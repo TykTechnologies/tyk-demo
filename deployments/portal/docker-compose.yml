@@ -4,9 +4,6 @@ services:
     image: tykio/portal:v0.0.1-rc11
     networks:
       - tyk
-    volumes:
-      - ${PWD}/scripts/common.sh:/opt/common.sh
-      - ${PWD}/.context-data/:/.context-data/
     env_file:
       - .env
     ports:

@@ -34,9 +34,11 @@ log_ok
 
 # Create Plans and Policies for NEW Developer Portal
 log_message "Creating Enterprise Portal Plans"
-for file in deployments/portal/volumes/tyk-portal/plans/*; do 
+for file in deployments/portal/data/tyk-portal/plans/*; do 
   if [[ -f $file ]]; then
   	policy=`cat $file`
+    plan_name=$(jq -r '.name' $file)
+    log_message "  Creating Plan: $plan_name"
     curl http://tyk-dashboard.localhost:3000/api/portal/policies -s \
       -o /dev/null \
       -H "authorization: $dashboard_user_api_credentials" \
@@ -47,9 +49,11 @@ done
 log_ok
 
 log_message "Creating Enterprise Portal Products ..."
-for file in deployments/portal/volumes/tyk-portal/products/*; do 
+for file in deployments/portal/data/tyk-portal/products/*; do 
   if [[ -f $file ]]; then
   	product=`cat $file`
+    product_name=$(jq -r '.name' $file)
+    log_message "  Creating Product: $product_name"
     curl http://tyk-dashboard.localhost:3000/api/portal/policies -s \
       -o /dev/null \
       -H "authorization: $dashboard_user_api_credentials" \
