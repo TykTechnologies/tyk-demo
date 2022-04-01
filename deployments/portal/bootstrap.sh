@@ -30,9 +30,8 @@ set_docker_environment_value "TYK_DASHBOARD_API_ACCESS_CREDENTIALS" $dashboard_u
 
 
 log_message "Restarting tyk-portal ... "
-$(generate_docker_compose_command) stop tyk-portal 2> /dev/null
-$(generate_docker_compose_command) rm -f tyk-portal 2> /dev/null
-$(generate_docker_compose_command) up -d tyk-portal 2> /dev/null
+$(generate_docker_compose_command) rm -f -s tyk-portal 1>/dev/null 2>&1
+$(generate_docker_compose_command) up -d tyk-portal 2>/dev/null
 
 log_ok
 
