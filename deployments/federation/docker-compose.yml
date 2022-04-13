@@ -30,3 +30,13 @@ services:
       - "4003:4003"
     networks:
       - tyk
+
+  notifications:
+    image: zalbiraw/go-api-test-service
+    entrypoint: ./notifications/server
+    environment:
+      - PORT=4004
+    ports:
+      - "4004:4004"
+    networks:
+      - tyk
