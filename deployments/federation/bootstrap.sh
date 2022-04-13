@@ -17,6 +17,9 @@ bootstrap_progress
 create_api "deployments/federation/data/apis-posts.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
 bootstrap_progress
 
+create_api "deployments/federation/data/apis-notifications.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+bootstrap_progress
+
 create_api "deployments/federation/data/apis-supergraph.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
 bootstrap_progress
 
@@ -28,14 +31,19 @@ echo -e "\033[2K
                     URL : $gateway_base_url/social-media-apis-federated/playground
   ▽ Users API
                     URL : localhost:4001
-                              /playground 
+                              / 
                               /query
   ▽ Posts API
                     URL : localhost:4002
-                              /playground 
+                              / 
                               /query
   
   ▽ Comments API
                     URL : localhost:4003
-                              /playground 
+                              / 
+                              /query
+  
+  ▽ Notificaitons API
+                    URL : localhost:4004
+                              / 
                               /query"

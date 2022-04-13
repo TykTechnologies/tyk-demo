@@ -1,8 +1,8 @@
 {
-  "created_at": "2022-04-13T15:51:36Z",
+  "created_at": "2022-04-13T15:32:26Z",
   "api_model": {},
   "api_definition": {
-    "api_id": "89f45d648de84bfa5de30e8f8c149f85",
+    "api_id": "f1bbb87fc7fe43525f2c6aa2892933f8",
     "jwt_issued_at_validation_skew": 0,
     "upstream_certificates": {},
     "use_keyless": true,
@@ -83,43 +83,30 @@
     },
     "blacklisted_ips": [],
     "graphql": {
-      "schema": "type Query {\n  user(id: ID!): User!\n  users: [User!]!\n  post(id: ID!): Post!\n  posts: [Post!]!\n}\n\ntype Subscription {\n  getUserNotifications(userId: ID!): User!\n}\n\ntype Notification {\n  id: ID!\n  userId: ID!\n  title: String!\n  body: String!\n}\n\ntype User {\n  id: ID!\n  name: String!\n  username: String!\n  email: String!\n  address: Address!\n  phone: String!\n  website: String!\n  company: Company!\n  notifications: [Notification!]!\n  posts: [Post!]!\n}\n\ntype Address {\n  street: String!\n  suite: String!\n  city: String!\n  zipcode: String!\n  geo: GeoLocation!\n}\n\ntype GeoLocation {\n  lat: String!\n  lng: String!\n}\n\ntype Company {\n  name: String!\n  catchPhrase: String!\n  bs: String!\n}\n\ntype Post {\n  id: ID!\n  userId: ID!\n  title: String!\n  body: String!\n}",
+      "schema": "directive @extends on OBJECT | INTERFACE\n\ndirective @external on FIELD_DEFINITION\n\ndirective @key(fields: _FieldSet!) on OBJECT | INTERFACE\n\ndirective @provides(fields: _FieldSet!) on FIELD_DEFINITION\n\ndirective @requires(fields: _FieldSet!) on FIELD_DEFINITION\n\n\"\"\"\nThe @specifiedBy built-in directive is used within the type system definition\nlanguage to provide a scalar specification URL for specifying the behavior of\ncustom scalar types.\n\"\"\"\ndirective @specifiedBy(url: String!) on SCALAR\n\nscalar _Any\n\nunion _Entity = Notification | User\n\nscalar _FieldSet\n\ntype _Service {\n  sdl: String\n}\n\ntype Entity {\n  findNotificationByID(id: ID!): Notification!\n  findUserByID(id: ID!): User!\n}\n\ntype Notification {\n  id: ID!\n  userId: ID!\n  title: String!\n  body: String!\n}\n\ntype Query {\n  _entities(representations: [_Any!]!): [_Entity]!\n  _service: _Service!\n}\n\ntype Subscription {\n  getUserNotifications(userId: ID!): User!\n}\n\ntype User {\n  id: ID!\n  notifications: [Notification!]!\n}\n",
       "enabled": true,
       "engine": {
         "field_configs": [],
         "data_sources": []
       },
       "type_field_configurations": [],
-      "execution_mode": "supergraph",
+      "execution_mode": "subgraph",
       "proxy": {
         "auth_headers": {}
       },
       "subgraph": {
-        "sdl": ""
+        "sdl": "extend type Subscription {\n    getUserNotifications(userId: ID!): User!\n}\n\ntype Notification @key(fields: \"id\") {\n    id: ID!\n    userId: ID!\n    title: String!\n    body: String!\n}\n\nextend type User @key(fields: \"id\") {\n    id: ID! @external\n    notifications: [Notification!]!\n}"
       },
       "supergraph": {
-        "updated_at": "2022-04-13T15:51:36.987Z",
         "subgraphs": [
           {
-            "api_id": "f1bbb87fc7fe43525f2c6aa2892933f8",
-            "name": "Notifications Subgraph",
-            "url": "tyk://Notifications-Subgraph",
-            "sdl": "extend type Subscription {\n    getUserNotifications(userId: ID!): User!\n}\n\ntype Notification @key(fields: \"id\") {\n    id: ID!\n    userId: ID!\n    title: String!\n    body: String!\n}\n\nextend type User @key(fields: \"id\") {\n    id: ID! @external\n    notifications: [Notification!]!\n}"
-          },
-          {
-            "api_id": "5a73b8e6cccd4cf042b0fa5f53c2d365",
-            "name": "Users subgraph",
-            "url": "tyk://Users-subgraph",
-            "sdl": "extend type Query {\n    user(id: ID!): User!\n    users: [User!]!\n}\n\ntype User @key(fields: \"id\") {\n    id: ID!\n    name: String!\n    username: String!\n    email: String!\n    address: Address!\n    phone: String!\n    website: String!\n    company: Company!\n}\n\ntype Address {\n    street: String!\n    suite: String!\n    city: String!\n    zipcode: String!\n    geo: GeoLocation!\n}\n\ntype GeoLocation {\n    lat: String!\n    lng: String!\n}\n\ntype Company {\n    name: String!\n    catchPhrase: String!\n    bs: String!\n}\n"
-          },
-          {
-            "api_id": "7c610da7e32f4ffa482c36acfe65fe9a",
-            "name": "Posts Subgraph",
-            "url": "tyk://Posts-Subgraph",
-            "sdl": "extend type Query {\n    post(id: ID!): Post!\n    posts: [Post!]!\n}\n\ntype Post @key(fields: \"id\") {\n    id: ID!\n    userId: ID!\n    title: String!\n    body: String!\n}\n\nextend type User @key(fields: \"id\") {\n    id: ID! @external\n    posts: [Post!]!\n}\n"
+            "api_id": "",
+            "name": "",
+            "url": "",
+            "sdl": ""
           }
         ],
-        "merged_sdl": "type Query {\n  user(id: ID!): User!\n  users: [User!]!\n  post(id: ID!): Post!\n  posts: [Post!]!\n}\n\ntype Subscription {\n  getUserNotifications(userId: ID!): User!\n}\n\ntype Notification {\n  id: ID!\n  userId: ID!\n  title: String!\n  body: String!\n}\n\ntype User {\n  id: ID!\n  name: String!\n  username: String!\n  email: String!\n  address: Address!\n  phone: String!\n  website: String!\n  company: Company!\n  notifications: [Notification!]!\n  posts: [Post!]!\n}\n\ntype Address {\n  street: String!\n  suite: String!\n  city: String!\n  zipcode: String!\n  geo: GeoLocation!\n}\n\ntype GeoLocation {\n  lat: String!\n  lng: String!\n}\n\ntype Company {\n  name: String!\n  catchPhrase: String!\n  bs: String!\n}\n\ntype Post {\n  id: ID!\n  userId: ID!\n  title: String!\n  body: String!\n}",
+        "merged_sdl": "",
         "global_headers": {}
       },
       "version": "2",
@@ -127,7 +114,7 @@
         "enabled": false,
         "path": ""
       },
-      "last_schema_update": "2022-04-13T15:51:36.987Z"
+      "last_schema_update": "2022-03-14T15:32:26.175Z"
     },
     "hmac_allowed_clock_skew": -1,
     "dont_set_quota_on_create": false,
@@ -148,8 +135,8 @@
     },
     "enable_jwt": false,
     "do_not_track": false,
-    "name": "Social Media Federated Graph",
-    "slug": "social-media-federated-graph",
+    "name": "Notifications Subgraph",
+    "slug": "notifications-subgraph",
     "oauth_meta": {
       "allowed_access_types": [],
       "allowed_authorize_types": [],
@@ -182,7 +169,7 @@
       "events": {}
     },
     "proxy": {
-      "target_url": "",
+      "target_url": "http://notifications:4004/query",
       "service_discovery": {
         "endpoint_returns_list": false,
         "cache_timeout": 0,
@@ -207,7 +194,7 @@
       "preserve_host_header": false,
       "strip_listen_path": true,
       "enable_load_balancing": false,
-      "listen_path": "/social-media-federated-graph/",
+      "listen_path": "/notifications-subgraph/",
       "disable_strip_slash": true
     },
     "client_certificates": [],
@@ -426,11 +413,11 @@
       }
     },
     "strip_auth_data": false,
-    "id": "6256f18800e7550001f1cbd3",
+    "id": "6256ed0aa589be0001ccf808",
     "certificates": [],
     "enable_signature_checking": false,
     "use_openid": false,
-    "internal": false,
+    "internal": true,
     "jwt_skip_kid": false,
     "enable_batch_request_support": false,
     "enable_detailed_recording": false,

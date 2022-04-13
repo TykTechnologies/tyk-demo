@@ -2,7 +2,7 @@ version: '3.9'
 services:
 
   users:
-    image: zalbiraw/go-api-test-service
+    image: zalbiraw/go-api-test-service:v1.0.0
     entrypoint: ./users/server
     environment:
       - PORT=4001
@@ -12,7 +12,7 @@ services:
     - tyk
 
   posts:
-    image: zalbiraw/go-api-test-service
+    image: zalbiraw/go-api-test-service:v1.0.0
     entrypoint: ./posts/server
     environment:
       - PORT=4002
@@ -22,11 +22,21 @@ services:
       - tyk
 
   comments:
-    image: zalbiraw/go-api-test-service
+    image: zalbiraw/go-api-test-service:v1.0.0
     entrypoint: ./comments/server
     environment:
       - PORT=4003
     ports:
       - "4003:4003"
+    networks:
+      - tyk
+
+  notifications:
+    image: zalbiraw/go-api-test-service:v1.0.0
+    entrypoint: ./notifications/server
+    environment:
+      - PORT=4004
+    ports:
+      - "4004:4004"
     networks:
       - tyk
