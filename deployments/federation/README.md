@@ -19,7 +19,7 @@ Run the `up.sh` script with the `federation` parameter:
 
 1. Once running, visit the Supergraph playground:
 
-http://tyk-gateway.localhost:8080/social-media-apis-federated/playground
+http://tyk-gateway.localhost:8080/social-media-federated-graph/playground
 
 2. The example includes Users and Posts subgraph.  
 
