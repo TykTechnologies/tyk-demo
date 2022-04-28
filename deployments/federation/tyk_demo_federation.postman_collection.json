@@ -34,13 +34,13 @@
 					"raw": "{\"query\":\"query {\\n  user(id:1) {\\n    name\\n    posts {\\n      title\\n    }\\n  }\\n}\",\"variables\":null}"
 				},
 				"url": {
-					"raw": "http://{{tyk-gateway.host}}/social-media-apis-federated/",
+					"raw": "http://{{tyk-gateway.host}}/social-media-federated-graph/",
 					"protocol": "http",
 					"host": [
 						"{{tyk-gateway.host}}"
 					],
 					"path": [
-						"social-media-apis-federated",
+						"social-media-federated-graph",
 						""
 					]
 				},

@@ -28,7 +28,7 @@ log_end_deployment
 echo -e "\033[2K
 ▼ Federation
   ▽ Supergraph Playground:
-                    URL : $gateway_base_url/social-media-apis-federated/playground
+                    URL : $gateway_base_url/social-media-federated-graph/playground
   ▽ Users API
                     URL : localhost:4001
                               / 
