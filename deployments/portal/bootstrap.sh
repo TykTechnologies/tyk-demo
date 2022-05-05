@@ -79,15 +79,17 @@ log_end_deployment
 portal_admin_user_email=$(cat .context-data/1-dashboard-user-1-email)
 portal_admin_user_password=$(cat .context-data/1-dashboard-user-1-password)
 
+
+# Echo credentials for Admin, Example Developer and Example Consumer
 echo -e "\033[2K 
 ▼ Portal
   ▽ Enterprise Portal ($(get_service_image_tag "tyk-portal"))
                     URL : http://tyk-portal.localhost:3100/
          Admin Username : $portal_admin_user_email
-         Admin Password : $portal_admin_user_password"
+         Admin Password : $portal_admin_user_password
 
-# Echo credentials for the developers & consumers
+      (Internal) Developer Username : api-developer@internal.org
+      (Interlal) Developer Password : password
 
-
-
-
+          (External) Consumer Email : api-consumer@external.org
+          (External) Consumer Email : password"
