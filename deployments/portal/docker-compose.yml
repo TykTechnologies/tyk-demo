@@ -11,3 +11,4 @@ services:
     entrypoint: /opt/portal/dev-portal
     volumes:
       - ./deployments/portal/data/tyk-portal/database/portal.db:/opt/portal/portal.db
+      - ./deployments/portal/data/tyk-portal/assets/:/opt/portal/public/system/products/
