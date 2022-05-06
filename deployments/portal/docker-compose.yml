@@ -10,5 +10,5 @@ services:
       - 3100:3001
     entrypoint: /opt/portal/dev-portal
     volumes:
-      - ./deployments/portal/data/tyk-portal/database/portal.db:/opt/portal/portal.db
-      - ./deployments/portal/data/tyk-portal/assets/:/opt/portal/public/system/products/
+      - ./deployments/portal/volumes/database/portal.db:/opt/portal/portal.db
+      - ./deployments/portal/volumes/assets/:/opt/portal/public/system/products/

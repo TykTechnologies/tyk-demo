@@ -4,7 +4,7 @@ source scripts/common.sh
 # Get Tyk Dashboard API Access Credentials
 dashboard_user_api_credentials=$(cat .context-data/1-dashboard-user-1-api-key)
 
-DB='deployments/portal/data/tyk-portal/database/portal.db'
+DB='deployments/portal/volumes/database/portal.db'
 
 # Read meta_data field from the SQLite table provider_configs
 CONFIG=`sqlite3 $DB "select meta_data from provider_configs;"`

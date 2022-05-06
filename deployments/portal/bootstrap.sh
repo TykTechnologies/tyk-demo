@@ -28,7 +28,7 @@ set_docker_environment_value "TYK_DASHBOARD_API_ACCESS_CREDENTIALS" $dashboard_u
 
 # Create Plans and Policies for NEW Developer Portal
 log_message "Creating Enterprise Portal Plans"
-for file in deployments/portal/data/tyk-portal/plans/*; do 
+for file in deployments/portal/data/plans/*; do 
   if [[ -f $file ]]; then
   	policy=`cat $file`
     plan_name=$(jq -r '.name' $file)
@@ -43,7 +43,7 @@ done
 log_ok
 
 log_message "Creating Enterprise Portal Products ..."
-for file in deployments/portal/data/tyk-portal/products/*; do 
+for file in deployments/portal/data/products/*; do 
   if [[ -f $file ]]; then
   	product=`cat $file`
     product_name=$(jq -r '.name' $file)
@@ -59,7 +59,7 @@ log_ok
 
 # Restoring a default "seed" of the database
 log_message "Copying portal.db.bak to portal.db ..."
-cp deployments/portal/data/tyk-portal/database/portal.db.bak deployments/portal/data/tyk-portal/database/portal.db
+cp deployments/portal/volumes/database/portal.db.bak deployments/volumes/database/portal.db
 log_ok
 
 # Update the portal database with the proper access credentials for loading a bootstrapped portal
