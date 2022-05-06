@@ -59,7 +59,7 @@ log_ok
 
 # Restoring a default "seed" of the database
 log_message "Copying portal.db.bak to portal.db ..."
-cp deployments/portal/volumes/database/portal.db.bak deployments/volumes/database/portal.db
+cp deployments/portal/volumes/database/portal.db.bak deployments/portal/volumes/database/portal.db
 log_ok
 
 # Update the portal database with the proper access credentials for loading a bootstrapped portal
