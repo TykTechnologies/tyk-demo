@@ -20,3 +20,6 @@ To use this deployment, run the `up.sh` script with the `portal` parameter:
 ```
 ./up.sh portal
 ```
+
+This install comes bootstrapped with an admin user, an external api consumer user and an internal api developer user.  
+The SQLite database file is located within deployments/portal/volumes/database/portal.db.
