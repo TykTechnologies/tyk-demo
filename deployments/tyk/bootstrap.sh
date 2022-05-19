@@ -143,8 +143,8 @@ bootstrap_progress
 build_go_plugin "ip-rate-limit.so" "ipratelimit"
 bootstrap_progress
 
-log_message "Taking an M1 Nap"
-sleep 15
+log_message "Liveness Health Check"
+wait_for_liveness
 
 # Dashboard Data
 
