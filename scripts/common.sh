@@ -657,3 +657,33 @@ create_oauth_client () {
     exit 1
   fi
 }
+
+wait_for_liveness () {
+
+  attempt_count=0
+  pass="pass"
+
+  log_message "Waiting for Gateway, Dashboard and Redis to be up and running"
+
+  while true
+  do
+    attempt_count=$((attempt_count+1))
+
+    #Check Gateway, Redis and Dashboard status
+    local hello=$(curl http://tyk-gateway.localhost:8080/hello -s)
+    local gw_status=$(echo "$hello" | jq -r '.status')
+    local dash_status=$(echo "$hello" | jq -r '.details.dashboard.status')
+    local redis_status=$(echo "$hello" | jq -r '.details.redis.status')
+
+    if [[ "$gw_status" = "pass" ]] && [[ "$dash_status" = "pass" ]] && [[ "$redis_status" = "pass" ]]
+    then
+      log_message "    Attempt $attempt_count succeeded: Gateway, Dashboard and Redis all running"
+      break
+    else
+      log_message "    Attempt $attempt_count unsuccessful: gw status = '$gw_status', dashboard status = '$dash_status', redis status = '$redis_status'"
+    fi
+
+    sleep 2
+
+  done
+}
