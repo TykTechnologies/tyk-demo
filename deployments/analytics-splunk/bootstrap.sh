@@ -39,7 +39,7 @@ bootstrap_progress
 log_message "Stopping the tyk-pump service (from Tyk deployment), to prevent it consuming analytics data intended for this deployment's Pump"
 eval $(generate_docker_compose_command) stop tyk-pump 2> /dev/null
 if [ "$?" != 0 ]; then
-  echo "Error stopping Pump contsainer $pump_container_name"
+  echo "Error stopping Pump container $pump_container_name"
   exit 1
 fi
 log_ok
