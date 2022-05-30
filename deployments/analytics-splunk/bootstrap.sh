@@ -7,7 +7,6 @@ bootstrap_progress
 
 splunk_base_url="http://localhost:8000"
 splunk_base_mgmt_url="https://localhost:8089"
-pump_container_name="$(get_context_data "container" "pump" "1" "name")"
 
 log_message "Waiting for splunk to return desired response"
 wait_for_response "$splunk_base_url/en-GB/account/login" "200"
@@ -26,10 +25,18 @@ set_docker_environment_value "PMP_SPLUNK_META_COLLECTORTOKEN" "$splunk_token"
 log_ok
 bootstrap_progress
 
+# Configure splunk token in splunk-pump.conf
+log_message "Adding updated splunk token in splunk-pump.conf"
+jq --arg a "$splunk_token" '.pumps.splunk.meta.collector_token = $a' ./deployments/analytics-splunk/volumes/tyk-pump/splunk-pump.conf > ./deployments/analytics-splunk/volumes/tyk-pump/splunk-pump.conf.tmp && mv ./deployments/analytics-splunk/volumes/tyk-pump/splunk-pump.conf.tmp ./deployments/analytics-splunk/volumes/tyk-pump/splunk-pump.conf
+log_message "Restarting tyk-splunk-pump"
+$(generate_docker_compose_command) restart tyk-splunk-pump 2>/dev/null
+log_ok
+bootstrap_progress
+
 log_message "Stopping the tyk-pump service (from Tyk deployment), to prevent it consuming analytics data intended for this deployment's Pump"
 eval $(generate_docker_compose_command) stop tyk-pump 2> /dev/null
 if [ "$?" != 0 ]; then
-  echo "Error stopping Pump container $pump_container_name"
+  echo "Error stopping Pump service tyk-pump"
   exit 1
 fi
 log_ok
