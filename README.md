@@ -6,7 +6,7 @@ This repo provides an example installation of Tyk. It uses Docker Compose to pro
 
 It has been built to enable the sharing of knowledge and combining of effort amongst client-facing technical Tyk folks.
 
-See the [Developer Guide](developer-guide.md) for information on how to contribute to and extend this repository.
+See the [Contributor Guide](CONTRIBUTING.md) for information on how to contribute to and extend this repository.
 
 > :warning: Please note that this repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system or approach. 
 
