@@ -22,15 +22,6 @@ fi
 log_ok
 bootstrap_progress
 
-# log_message "Stopping MongoDB (tyk-mongo)"
-# eval $(generate_docker_compose_command) stop tyk-mongo 1>>bootstrap.log 2>&1
-# if [ "$?" != 0 ]; then
-#   echo "Error occurred when stopping Mongo service (tyk-mongo)."
-#   exit 1
-# fi
-# log_ok
-# bootstrap_progress
-
 log_message "Removing Tyk Dashboard (tyk-dashboard)"
 eval $(generate_docker_compose_command) rm -s -f tyk-dashboard 1>>bootstrap.log 2>&1
 if [ "$?" != 0 ]; then
@@ -48,10 +39,6 @@ if [ "$?" != 0 ]; then
 fi
 log_ok
 bootstrap_progress
-
-# pump config?
-
-# other services which reference mongoDB?
 
 log_end_deployment
 
