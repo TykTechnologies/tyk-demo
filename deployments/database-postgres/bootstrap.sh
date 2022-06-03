@@ -40,14 +40,14 @@ fi
 log_ok
 bootstrap_progress
 
-# log_message "Recreating Dashboard to use new database configuration"
-# eval $(generate_docker_compose_command) run -d -e TYK_DB_MONGOURL='' --service-ports tyk-dashboard
-# if [ "$?" != 0 ]; then
-#   echo "Error occurred when recreating Dashboard to use new database configuration."
-#   exit 1
-# fi
-# log_ok
-# bootstrap_progress
+log_message "Recreating Dashboard to use new database configuration"
+eval $(generate_docker_compose_command) run -T -d -e TYK_DB_MONGOURL='' --service-ports --name tyk-dashboard tyk-dashboard
+if [ "$?" != 0 ]; then
+  echo "Error occurred when recreating Dashboard to use new database configuration."
+  exit 1
+fi
+log_ok
+bootstrap_progress
 
 # pump config?
 
