@@ -4,7 +4,7 @@ source scripts/common.sh
 deployment="Database PostgreSQL"
 log_start_deployment
 
-log_message "Creating Tyk Database (tyk_analytics) in PostgreSQL (tyk-postgres)"
+log_message "Creating Tyk Dashboard database (tyk_analytics) in PostgreSQL (tyk-postgres)"
 eval $(generate_docker_compose_command) exec -T -u postgres tyk-postgres sh -c \"psql -U postgres -c \'CREATE DATABASE tyk_analytics\'\" 1>>bootstrap.log 2>&1
 if [ "$?" != 0 ]; then
   echo "Error occurred when creating PostgreSQL database."
@@ -22,9 +22,32 @@ fi
 log_ok
 bootstrap_progress
 
-# stop mongo
+log_message "Stopping MongoDB (tyk-mongo)"
+eval $(generate_docker_compose_command) stop tyk-mongo 1>>bootstrap.log 2>&1
+if [ "$?" != 0 ]; then
+  echo "Error occurred when stopping Mongo service (tyk-mongo)."
+  exit 1
+fi
+log_ok
+bootstrap_progress
 
-# recreate dashboard using env to make mongo_url empty
+log_message "Removing Tyk Dashboard (tyk-dashboard)"
+eval $(generate_docker_compose_command) rm -s -f tyk-dashboard 1>>bootstrap.log 2>&1
+if [ "$?" != 0 ]; then
+  echo "Error occurred when stopping Tyk Dashboard service (tyk-dashboard)."
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+# log_message "Recreating Dashboard to use new database configuration"
+# eval $(generate_docker_compose_command) run -d -e TYK_DB_MONGOURL='' --service-ports tyk-dashboard
+# if [ "$?" != 0 ]; then
+#   echo "Error occurred when recreating Dashboard to use new database configuration."
+#   exit 1
+# fi
+# log_ok
+# bootstrap_progress
 
 # pump config?
 
