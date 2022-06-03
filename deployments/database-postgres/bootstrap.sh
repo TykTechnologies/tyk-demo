@@ -24,7 +24,11 @@ bootstrap_progress
 
 # stop mongo
 
-# restart dashboard
+# recreate dashboard using env to make mongo_url empty
+
+# pump config?
+
+# other services which reference mongoDB?
 
 log_end_deployment
 
