@@ -4,6 +4,8 @@ This deployment uses a PostgreSQL database instead of MongoDB for storing the Ty
 
 The MongoDB database is kept running, as it is still used by the Tyk Pump to store analytics data.
 
+When the `mongo_url` value in the Dashboard `tyk_analytics.conf` is set to a blank value, the Dashboard will use the configuration from the `storage` part of the configuration file instead. This contains the PostgreSQL connection string, which the Dashboard then uses to store its configuration data, such as API Definitions and Policies.
+
 See the Tyk Documentation for [more information about using SQL with Tyk](https://tyk.io/docs/planning-for-production/database-settings/sql/#introduction). 
 
 ## Setup
@@ -16,18 +18,20 @@ Run the `up.sh` script with the `database-postgres` parameter:
 
 ## Usage
 
-The effect of using PostgreSQL is not visible to end users. However, if you want to confirm that PostgreSQL is being used to store the Tyk Dashboard configuration data, you can do the following:
+The effect of using PostgreSQL is not visible to end users.
 
-1. Use the Dashboard to create a new API Definition called "SQL TEST" (use all caps)
-2. Use a terminal to run this script. It checks the PostgreSQL database for the newly created API:
+However, to confirm that PostgreSQL is being used to store the Tyk Dashboard configuration data, you can do the following:
+
+1. Use a terminal to run this script. It uses the Dashboard API to import an API Definition, then queries the PostgreSQL database for it:
 ```
-./deployments/database-postgres/check-sql-data.sh "SQL TEST"
+./deployments/database-postgres/check-sql-data.sh
 ```
-3. If successful, the script should produce the following output, showing a single result:
+2. If successful, the script should produce the following output, showing a single result:
 ```
-Querying PostgreSQL for an API called "SQL TEST"
-   name
-----------
- SQL TEST
+Importing an API Definition called "Hello PostgreSQL" into the Dashboard
+Querying PostgreSQL for an API called "Hello PostgreSQL" - expecting result to show 1 row
+       name
+------------------
+ Hello PostgreSQL
 (1 row)
 ```
