@@ -2,7 +2,7 @@
 
 This deployment uses a PostgreSQL database instead of MongoDB for storing the Tyk Dashboard configuration data. The base Tyk deployment still deploys the MongoDB and bootstraps the data into it, but this deployment then migrates that data into PostgreSQL and redeploys the Tyk Dashboard to use PostgreSQL instead.
 
-The MongoDB database is kept running, as it is still used by the Tyk Pump to store analytics data.
+The MongoDB database is kept running, as it's still used by the Tyk Pump and Dashboard to store and display analytics data.
 
 When the `mongo_url` value in the Dashboard `tyk_analytics.conf` is set to a blank value, the Dashboard will use the configuration from the `storage` part of the configuration file instead. This contains the PostgreSQL connection string, which the Dashboard then uses to store its configuration data, such as API Definitions and Policies.
 
