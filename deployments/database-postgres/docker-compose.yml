@@ -1,0 +1,8 @@
+version: '3.9'
+services:
+  tyk-postgres:
+    image: postgres:13.3-alpine
+    environment:
+      - POSTGRES_PASSWORD=qtpNQY8UKPH3YrDk
+    networks:
+    - tyk
