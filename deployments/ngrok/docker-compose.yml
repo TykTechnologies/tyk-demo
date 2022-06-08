@@ -10,4 +10,4 @@ services:
       - NGROK_PORT=tyk-gateway:8080
     deploy:
       restart_policy:
-        condition: any
+        condition: on-failure
