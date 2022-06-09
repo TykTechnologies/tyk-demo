@@ -3903,6 +3903,43 @@
 												"description": "This request uses an OAuth client to generate a token which can be used to access an API protected with OAuth 2.0.\n\nThe request `authorization` header uses basic-style authentication credentials, using a base64 encoded string of the OAuth client id and secret.\n\nThe request body contains the grant type and the OAuth client id and secret.\n\nThe response body provides the bearer token, which can then be used to access the API. The token has a expiry, which defaults to 3600 seconds (1 hour), after which the token is no longer valid for authentication."
 											},
 											"response": []
+										},
+										{
+											"name": "OAuth - Access API with Access Token",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <insert-access-token-here>",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "http://{{tyk-gateway.host}}/oauth-2.0-api/get",
+													"protocol": "http",
+													"host": [
+														"{{tyk-gateway.host}}"
+													],
+													"path": [
+														"oauth-2.0-api",
+														"get"
+													]
+												},
+												"description": "This request uses an OAuth client to generate a token which can be used to access an API protected with OAuth 2.0.\n\nThe request `authorization` header uses basic-style authentication credentials, using a base64 encoded string of the OAuth client id and secret.\n\nThe request body contains the grant type and the OAuth client id and secret.\n\nThe response body provides the bearer token, which can then be used to access the API. The token has a expiry, which defaults to 3600 seconds (1 hour), after which the token is no longer valid for authentication."
+											},
+											"response": []
 										}
 									]
 								}
