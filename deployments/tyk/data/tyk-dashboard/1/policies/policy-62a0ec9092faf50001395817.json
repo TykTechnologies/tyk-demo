@@ -1,0 +1,42 @@
+{
+  "_id": "62a0ec9092faf50001395817",
+  "id": "62a0ec9092faf50001395817",
+  "name": "JsonPlaceholder",
+  "org_id": "5e9d9544a1dcd60001d0ed20",
+  "rate": 1000,
+  "per": 60,
+  "quota_max": -1,
+  "quota_renewal_rate": -1,
+  "throttle_interval": -1,
+  "throttle_retry_limit": -1,
+  "max_query_depth": -1,
+  "access_rights": {
+    "546e885199c947147e7f39b7d6e8e984": {
+      "api_name": "JSON Placeholder",
+      "api_id": "546e885199c947147e7f39b7d6e8e984",
+      "versions": [
+        "1.0.0"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "limit": null,
+      "field_access_rights": [],
+      "allowance_scope": ""
+    }
+  },
+  "hmac_enabled": false,
+  "active": true,
+  "is_inactive": false,
+  "date_created": "2022-06-08T18:38:08.6Z",
+  "tags": [],
+  "key_expires_in": 0,
+  "partitions": {
+    "quota": true,
+    "rate_limit": true,
+    "complexity": false,
+    "acl": true,
+    "per_api": false
+  },
+  "last_updated": "1654713488",
+  "meta_data": {}
+}

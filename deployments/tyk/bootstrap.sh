@@ -272,6 +272,17 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
           log_message "ERROR: catalogue file missing: $catalogue_path"
           exit 1
         fi
+
+        documentation_id_graph=$(create_portal_graphql_documentation "$dashboard_user_api_key" "Social Media GQL")
+        bootstrap_progress  
+
+        catalogue_path_graph="$directory/catalogue_graph.json"
+        if [[ -f $catalogue_path_graph ]]; then
+          create_portal_catalogue "$catalogue_path_graph" "$dashboard_user_api_key" "$documentation_id_graph"
+        else
+          log_message "ERROR: catalogue file missing: $catalogue_path"
+          exit 1
+        fi
         bootstrap_progress        
       fi
     done

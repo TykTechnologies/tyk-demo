@@ -9,8 +9,8 @@
         "redirect_on_key_request": false,
         "override": false
     },
-    "policy_id": "62a0ec9092faf50001395817",
-    "name": "Social Media REST",
+    "policy_id": "62a0eac392faf50001395814",
+    "name": "Social Media Graph",
     "version": "v2",
     "short_description": "",
     "long_description": "",

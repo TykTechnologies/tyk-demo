@@ -432,6 +432,25 @@ create_portal_developer () {
   log_message "    Password: $developer_password"
 }
 
+create_portal_graphql_documentation () {
+  local api_key="$1"
+  local documentation_title="$2"
+  log_message "  Creating Documentation: $documentation_title"
+
+  local api_response=$(curl $dashboard_base_url/api/portal/documentation -s \
+    -H "Authorization: $api_key" \
+    -d '{"api_id":"","doc_type":"graphql","documentation":"graphql"}' \
+      2>> bootstrap.log)
+
+  log_json_result "$api_response"
+
+  local documentation_id=$(echo "$api_response" | jq -r '.Message')
+
+  log_message "    Id: $documentation_id"
+
+  echo "$documentation_id"
+}
+
 create_portal_documentation () {
   local documentation_data_path="$1"
   local api_key="$2"

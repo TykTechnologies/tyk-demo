@@ -1,0 +1,42 @@
+{
+  "_id": "62a0eac392faf50001395814",
+  "id": "62a0eac392faf50001395814",
+  "name": "GraphQL Posts V3",
+  "org_id": "5e9d9544a1dcd60001d0ed20",
+  "rate": 1000,
+  "per": 60,
+  "quota_max": -1,
+  "quota_renewal_rate": -1,
+  "throttle_interval": -1,
+  "throttle_retry_limit": -1,
+  "max_query_depth": -1,
+  "access_rights": {
+    "0b2038203a5d4f0c71984b6a290fb24a": {
+      "api_name": "GraphQL posts v3",
+      "api_id": "0b2038203a5d4f0c71984b6a290fb24a",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "limit": null,
+      "field_access_rights": [],
+      "allowance_scope": ""
+    }
+  },
+  "hmac_enabled": false,
+  "active": true,
+  "is_inactive": false,
+  "date_created": "2022-06-08T18:30:27.954Z",
+  "tags": [],
+  "key_expires_in": 0,
+  "partitions": {
+    "quota": true,
+    "rate_limit": true,
+    "complexity": true,
+    "acl": true,
+    "per_api": false
+  },
+  "last_updated": "1654713027",
+  "meta_data": {}
+}
