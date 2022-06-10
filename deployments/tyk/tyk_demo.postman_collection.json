@@ -5482,7 +5482,7 @@
 								"get"
 							]
 						},
-						"description": "This request goes via the public Ngrok URL, which enables the Tyk Gateway to geolocate the client.\n\nThe result of this appears in the *Activity By Location* report in the Tyk Dashboard.\n\nThe Gateway matches your IP address against the Maxmind database to find you location."
+						"description": "This request goes via the public Ngrok URL, which then gets routed through to the API Gateway.\n\nThe Gateway can geolocate this request, as it originates from outside of the local network. You can see the result of this in the *Activity By Location* report in the Tyk Dashboard.\n\nThe Gateway matches the IP address against the Maxmind database to find you location."
 					},
 					"response": []
 				}
