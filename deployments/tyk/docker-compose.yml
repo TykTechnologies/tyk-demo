@@ -38,6 +38,8 @@ services:
       - TYK_GW_HTTPSERVEROPTIONS_ENABLEHTTP2=true
       - TYK_GW_PROXYENABLEHTTP2=true
       - TYK_GW_HTTPSERVEROPTIONS_FLUSHINTERVAL=1
+      - TYK_GW_ANALYTICSCONFIG_ENABLEGEOIP=true
+      - TYK_GW_ANALYTICSCONFIG_GEOIPDBLOCATION=/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
     env_file:
     - .env
     volumes:
@@ -46,6 +48,7 @@ services:
       - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
       - ./deployments/tyk/volumes/tyk-gateway/plugins:/opt/tyk-gateway/plugins
       - ./deployments/tyk/volumes/tyk-gateway/templates/error_401.json:/opt/tyk-gateway/templates/error_401.json
+      - ./deployments/tyk/volumes/databases/GeoLite2-Country.mmdb:/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
     depends_on:
       - tyk-redis
   tyk-gateway-2:
@@ -125,6 +128,17 @@ services:
     image: jmalloc/echo-server:0.3.1
     networks:
       - tyk
+  www-ngrok:
+    image: ${NGROK_IMAGE:-wernight}/ngrok:latest
+    networks:
+      - tyk
+    ports:
+      - 4040:4040
+    environment:
+      - NGROK_PORT=tyk-gateway:8080
+    deploy:
+      restart_policy:
+        condition: on-failure
 
 volumes:
   tyk-redis-data:

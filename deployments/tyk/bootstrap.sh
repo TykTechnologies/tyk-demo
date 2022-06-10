@@ -441,6 +441,26 @@ fi
 log_ok
 bootstrap_progress
 
+log_message "Deploying ngrok for "
+ngrok_url="http://localhost:4040"
+ngrok_ip_api_endpoint="$ngrok_url/api/tunnels"
+
+log_message "Getting the ngrok allocated IP for tyk-gateway:8080"
+
+access_ip=$(curl --fail --silent --show-error ${ngrok_ip_api_endpoint} | jq ".tunnels[0].public_url" --raw-output)
+
+if [ "$?" != 0 ]; then
+  echo "Error occurred with ngrok."
+  echo "access_ip=" $access_ip
+  exit 1
+fi
+
+if [ "$$access_ip" = "" ]; then
+  echo "Error occurred with ngrok."
+  echo "access_ip=" $access_ip
+  exit 1
+fi
+
 log_end_deployment
 
 echo -e "\033[2K
@@ -495,4 +515,9 @@ echo -e "\033[2K
   ▽ Gateway 2 ($(get_service_image_tag "tyk-gateway-2"))
                     URL : $gateway2_base_url  
      Gateway API Header : x-tyk-authorization
-        Gateway API Key : $gateway2_api_credentials"
+        Gateway API Key : $gateway2_api_credentials
+  ▽ Ngrok
+    ▾ External ngrok URL:
+                    URL : $access_ip
+    ▾ Ngrok dashboard
+                    URL : $ngrok_url"
