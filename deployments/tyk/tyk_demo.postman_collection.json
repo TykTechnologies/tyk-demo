@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f9d8e61f-7eea-4da7-97b6-ddc0a8da76e7",
+		"_postman_id": "a47a7bed-5248-44ee-a7c7-bf57e19649bd",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -5435,6 +5435,56 @@
 						"description": "This request calls the **Secret API**, which has its *listen path* and *target URL* set using secret values taken from the Gateway's configuration file. It also injects a header called `Secret-Header` with the value `secret-header-value`.\n\nThe values are stored in a key/value array called `secrets` in the Gateway's configuration file `tyk.conf`:\n```\n  \"secrets\": {\n    \"target_url\": \"http://httpbin/\",\n    \"listen_path\": \"/secret-path/\"\n    \"header\": \"secret-header-value\"\n  }\n```\n\nThese values can be used as values in the API Definition.\n- When setting the *listen path* and *target URL*, the syntax is `secrets://value` where `value` is the key for the `secrets` array e.g. `secrets://target_url`. \n- When used in other contexts, such as setting a header value, the syntax is `$secret_conf.value` e.g. `$secret_conf.header`.\n\nThe Gateway can also pull key/value pairs from secret stores such as Vault and Consul. See https://tyk.io/docs/tyk-configuration-reference/kv-store/ for more information."
 					},
 					"response": []
+				},
+				{
+					"name": "Geolocation",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.sendRequest(\"http://\" + pm.variables.get(\"ngrok.host\") + \":\" + pm.variables.get(\"ngrok.port\") + \"/api/tunnels/command_line\", function (err, response) {",
+									"",
+									"    ngrokPublicUrl = response.json().public_url;",
+									"",
+									"    if (ngrokPublicUrl == \"\") {",
+									"        throw new Error('Could not get Ngrok public URL.')",
+									"    }",
+									"",
+									"    pm.variables.set(\"ngrok.public-url\", ngrokPublicUrl);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ngrok.public-url}}/basic-open-api/get",
+							"host": [
+								"{{ngrok.public-url}}"
+							],
+							"path": [
+								"basic-open-api",
+								"get"
+							]
+						},
+						"description": "This request goes via the public Ngrok URL, which enables the Tyk Gateway to geolocate the client.\n\nThe result of this appears in the *Activity By Location* report in the Tyk Dashboard.\n\nThe Gateway matches your IP address against the Maxmind database to find you location."
+					},
+					"response": []
 				}
 			]
 		},
@@ -8121,6 +8171,16 @@
 		{
 			"key": "tyk-custom-domain-2.host",
 			"value": "tyk-dynamic-looping.com:8080"
+		},
+		{
+			"key": "ngrok.host",
+			"value": "localhost",
+			"type": "default"
+		},
+		{
+			"key": "ngrok.port",
+			"value": "4040",
+			"type": "default"
 		}
 	]
 }
