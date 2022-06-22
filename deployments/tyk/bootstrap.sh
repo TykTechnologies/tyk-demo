@@ -258,6 +258,8 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     log_message "Creating Portal Catalogues"
     for directory in $data_group_path/portal/catalogues/*; do
       if [[ -d $directory ]]; then
+
+        # Swagger Petstore REST
         documentation_path="$directory/documentation.json"
         documentation_id=""
         if [[ -f $documentation_path ]]; then
@@ -272,11 +274,29 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
           log_message "ERROR: catalogue file missing: $catalogue_path"
           exit 1
         fi
+        bootstrap_progress        
 
+        # Social Media REST
+        documentation_path="$directory/documentation_socialmedia_rest.json"
+        documentation_id=""
+        if [[ -f $documentation_path ]]; then
+          documentation_id=$(create_portal_documentation "$documentation_path" "$dashboard_user_api_key")
+        fi
+        bootstrap_progress
+
+        catalogue_path="$directory/catalogue_socialmedia_rest.json"
+        if [[ -f $catalogue_path ]]; then
+          create_portal_catalogue "$catalogue_path" "$dashboard_user_api_key" "$documentation_id"
+        else
+          log_message "ERROR: catalogue file missing: $catalogue_path"
+          exit 1
+        fi
+
+        # Social Media GQL
         documentation_id_graph=$(create_portal_graphql_documentation "$dashboard_user_api_key" "Social Media GQL")
         bootstrap_progress  
 
-        catalogue_path_graph="$directory/catalogue_graph.json"
+        catalogue_path_graph="$directory/catalogue_socialmediagql.json"
         if [[ -f $catalogue_path_graph ]]; then
           create_portal_catalogue "$catalogue_path_graph" "$dashboard_user_api_key" "$documentation_id_graph"
         else

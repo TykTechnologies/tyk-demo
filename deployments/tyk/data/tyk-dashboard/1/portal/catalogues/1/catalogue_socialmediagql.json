@@ -9,8 +9,8 @@
         "redirect_on_key_request": false,
         "override": false
     },
-    "policy_id": "5ead7120575961000181867e",
-    "name": "Swagger Petstore",
+    "policy_id": "62a0eac392faf50001395814",
+    "name": "Social Media GQL",
     "version": "v2",
     "short_description": "",
     "long_description": "",
