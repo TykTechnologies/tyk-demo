@@ -1,4 +1,24 @@
 {
+  "auth_type": "keyless",
+  "auth_types": [
+    "keyless"
+  ],
+  "state": "active",
+  "access_rights_array": [
+    {
+      "api_name": "GraphQL posts v3",
+      "api_id": "0b2038203a5d4f0c71984b6a290fb24a",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "limit": null,
+      "field_access_rights": [],
+      "allowance_scope": ""
+    }
+  ],
+  "graphql_enabled": true,
   "_id": "62a0eac392faf50001395814",
   "id": "62a0eac392faf50001395814",
   "name": "GraphQL Posts V3",

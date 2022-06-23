@@ -1,4 +1,24 @@
 {
+  "auth_type": "authToken",
+  "auth_types": [
+    "authToken"
+  ],
+  "state": "active",
+  "access_rights_array": [
+    {
+      "api_name": "JSON Placeholder",
+      "api_id": "546e885199c947147e7f39b7d6e8e984",
+      "versions": [
+        "1.0.0"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "limit": null,
+      "field_access_rights": [],
+      "allowance_scope": ""
+    }
+  ],
+  "graphql_enabled": false,
   "_id": "62a0ec9092faf50001395817",
   "id": "62a0ec9092faf50001395817",
   "name": "JsonPlaceholder",
