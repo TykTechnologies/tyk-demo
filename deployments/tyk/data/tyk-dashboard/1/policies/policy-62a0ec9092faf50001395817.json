@@ -1,15 +1,15 @@
 {
-  "auth_type": "ba",
+  "auth_type": "authToken",
   "auth_types": [
-    "ba"
+    "authToken"
   ],
   "state": "active",
   "access_rights_array": [
     {
-      "api_name": "Basic Authentication API",
-      "api_id": "5963f8fdedee405143f5858ea17de422",
+      "api_name": "JSON Placeholder",
+      "api_id": "546e885199c947147e7f39b7d6e8e984",
       "versions": [
-        "Default"
+        "1.0.0"
       ],
       "allowed_urls": [],
       "restricted_types": [],
@@ -19,23 +19,23 @@
     }
   ],
   "graphql_enabled": false,
-  "_id": "5eb6349543f0440001373f5c",
-  "id": "",
-  "name": "Basic Authentication Policy",
+  "_id": "62a0ec9092faf50001395817",
+  "id": "62a0ec9092faf50001395817",
+  "name": "JsonPlaceholder",
   "org_id": "5e9d9544a1dcd60001d0ed20",
   "rate": 1000,
   "per": 60,
   "quota_max": -1,
-  "quota_renewal_rate": 3600,
+  "quota_renewal_rate": -1,
   "throttle_interval": -1,
   "throttle_retry_limit": -1,
-  "max_query_depth": 0,
+  "max_query_depth": -1,
   "access_rights": {
-    "5963f8fdedee405143f5858ea17de422": {
-      "api_name": "Basic Authentication API",
-      "api_id": "5963f8fdedee405143f5858ea17de422",
+    "546e885199c947147e7f39b7d6e8e984": {
+      "api_name": "JSON Placeholder",
+      "api_id": "546e885199c947147e7f39b7d6e8e984",
       "versions": [
-        "Default"
+        "1.0.0"
       ],
       "allowed_urls": [],
       "restricted_types": [],
@@ -47,7 +47,7 @@
   "hmac_enabled": false,
   "active": true,
   "is_inactive": false,
-  "date_created": "2020-05-09T04:41:57.292Z",
+  "date_created": "2022-06-08T18:38:08.6Z",
   "tags": [],
   "key_expires_in": 0,
   "partitions": {
@@ -57,6 +57,6 @@
     "acl": true,
     "per_api": false
   },
-  "last_updated": "1655966901",
+  "last_updated": "1654713488",
   "meta_data": {}
 }

@@ -1,13 +1,13 @@
 {
-  "auth_type": "ba",
+  "auth_type": "keyless",
   "auth_types": [
-    "ba"
+    "keyless"
   ],
   "state": "active",
   "access_rights_array": [
     {
-      "api_name": "Basic Authentication API",
-      "api_id": "5963f8fdedee405143f5858ea17de422",
+      "api_name": "GraphQL posts v3",
+      "api_id": "0b2038203a5d4f0c71984b6a290fb24a",
       "versions": [
         "Default"
       ],
@@ -18,22 +18,22 @@
       "allowance_scope": ""
     }
   ],
-  "graphql_enabled": false,
-  "_id": "5eb6349543f0440001373f5c",
-  "id": "",
-  "name": "Basic Authentication Policy",
+  "graphql_enabled": true,
+  "_id": "62a0eac392faf50001395814",
+  "id": "62a0eac392faf50001395814",
+  "name": "GraphQL Posts V3",
   "org_id": "5e9d9544a1dcd60001d0ed20",
   "rate": 1000,
   "per": 60,
   "quota_max": -1,
-  "quota_renewal_rate": 3600,
+  "quota_renewal_rate": -1,
   "throttle_interval": -1,
   "throttle_retry_limit": -1,
-  "max_query_depth": 0,
+  "max_query_depth": -1,
   "access_rights": {
-    "5963f8fdedee405143f5858ea17de422": {
-      "api_name": "Basic Authentication API",
-      "api_id": "5963f8fdedee405143f5858ea17de422",
+    "0b2038203a5d4f0c71984b6a290fb24a": {
+      "api_name": "GraphQL posts v3",
+      "api_id": "0b2038203a5d4f0c71984b6a290fb24a",
       "versions": [
         "Default"
       ],
@@ -47,16 +47,16 @@
   "hmac_enabled": false,
   "active": true,
   "is_inactive": false,
-  "date_created": "2020-05-09T04:41:57.292Z",
+  "date_created": "2022-06-08T18:30:27.954Z",
   "tags": [],
   "key_expires_in": 0,
   "partitions": {
     "quota": true,
     "rate_limit": true,
-    "complexity": false,
+    "complexity": true,
     "acl": true,
     "per_api": false
   },
-  "last_updated": "1655966901",
+  "last_updated": "1654713027",
   "meta_data": {}
 }

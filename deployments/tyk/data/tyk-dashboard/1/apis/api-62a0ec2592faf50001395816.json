@@ -1,16 +1,16 @@
 {
-  "created_at": "2022-01-07T19:35:25Z",
+  "created_at": "2022-06-08T18:36:21Z",
   "api_model": {},
   "api_definition": {
-    "id": "61d895fdfb3c3800017895ef",
-    "name": "GraphQL posts v3",
-    "slug": "graphql-posts-v3",
+    "id": "62a0ec2592faf50001395816",
+    "name": "JSON Placeholder",
+    "slug": "json-placeholder",
     "listen_port": 0,
     "protocol": "",
     "enable_proxy_protocol": false,
-    "api_id": "0b2038203a5d4f0c71984b6a290fb24a",
+    "api_id": "546e885199c947147e7f39b7d6e8e984",
     "org_id": "5e9d9544a1dcd60001d0ed20",
-    "use_keyless": true,
+    "use_keyless": false,
     "use_oauth2": false,
     "use_openid": false,
     "openid_options": {
@@ -27,7 +27,7 @@
       "param_name": "",
       "use_cookie": false,
       "cookie_name": "",
-      "auth_header_name": "Authorization",
+      "auth_header_name": "",
       "use_certificate": false,
       "validate_signature": false,
       "signature": {
@@ -45,58 +45,7 @@
         "param_name": "",
         "use_cookie": false,
         "cookie_name": "",
-        "auth_header_name": "Authorization",
-        "use_certificate": false,
-        "validate_signature": false,
-        "signature": {
-          "algorithm": "",
-          "header": "",
-          "secret": "",
-          "allowed_clock_skew": 0,
-          "error_code": 0,
-          "error_message": ""
-        }
-      },
-      "basic": {
-        "use_param": false,
-        "param_name": "",
-        "use_cookie": false,
-        "cookie_name": "",
-        "auth_header_name": "Authorization",
-        "use_certificate": false,
-        "validate_signature": false,
-        "signature": {
-          "algorithm": "",
-          "header": "",
-          "secret": "",
-          "allowed_clock_skew": 0,
-          "error_code": 0,
-          "error_message": ""
-        }
-      },
-      "coprocess": {
-        "use_param": false,
-        "param_name": "",
-        "use_cookie": false,
-        "cookie_name": "",
-        "auth_header_name": "Authorization",
-        "use_certificate": false,
-        "validate_signature": false,
-        "signature": {
-          "algorithm": "",
-          "header": "",
-          "secret": "",
-          "allowed_clock_skew": 0,
-          "error_code": 0,
-          "error_message": ""
-        }
-      },
-      "hmac": {
-        "use_param": false,
-        "param_name": "",
-        "use_cookie": false,
-        "cookie_name": "",
-        "auth_header_name": "Authorization",
+        "auth_header_name": "",
         "use_certificate": false,
         "validate_signature": false,
         "signature": {
@@ -113,41 +62,7 @@
         "param_name": "",
         "use_cookie": false,
         "cookie_name": "",
-        "auth_header_name": "Authorization",
-        "use_certificate": false,
-        "validate_signature": false,
-        "signature": {
-          "algorithm": "",
-          "header": "",
-          "secret": "",
-          "allowed_clock_skew": 0,
-          "error_code": 0,
-          "error_message": ""
-        }
-      },
-      "oauth": {
-        "use_param": false,
-        "param_name": "",
-        "use_cookie": false,
-        "cookie_name": "",
-        "auth_header_name": "Authorization",
-        "use_certificate": false,
-        "validate_signature": false,
-        "signature": {
-          "algorithm": "",
-          "header": "",
-          "secret": "",
-          "allowed_clock_skew": 0,
-          "error_code": 0,
-          "error_message": ""
-        }
-      },
-      "oidc": {
-        "use_param": false,
-        "param_name": "",
-        "use_cookie": false,
-        "cookie_name": "",
-        "auth_header_name": "Authorization",
+        "auth_header_name": "",
         "use_certificate": false,
         "validate_signature": false,
         "signature": {
@@ -173,7 +88,7 @@
     "upstream_certificates": {},
     "pinned_public_keys": {},
     "enable_jwt": false,
-    "use_standard_auth": false,
+    "use_standard_auth": true,
     "use_go_plugin_auth": false,
     "enable_coprocess_auth": false,
     "jwt_signing_method": "",
@@ -207,15 +122,15 @@
     "base_identity_provided_by": "",
     "definition": {
       "location": "header",
-      "key": "x-api-version",
+      "key": "version",
       "strip_path": false
     },
     "version_data": {
       "not_versioned": true,
       "default_version": "",
       "versions": {
-        "Default": {
-          "name": "Default",
+        "1.0.0": {
+          "name": "1.0.0",
           "expires": "",
           "paths": {
             "ignored": [],
@@ -223,7 +138,66 @@
             "black_list": []
           },
           "use_extended_paths": true,
-          "extended_paths": {},
+          "extended_paths": {
+            "track_endpoints": [
+              {
+                "path": "/posts/{id}/comments",
+                "method": "GET"
+              },
+              {
+                "path": "/albums/{id}/photos",
+                "method": "GET"
+              },
+              {
+                "path": "/comments/{id}",
+                "method": "GET"
+              },
+              {
+                "path": "/photos/{id}",
+                "method": "GET"
+              },
+              {
+                "path": "/albums/{id}",
+                "method": "GET"
+              },
+              {
+                "path": "/users/{id}",
+                "method": "GET"
+              },
+              {
+                "path": "/todos/{id}",
+                "method": "GET"
+              },
+              {
+                "path": "/posts/{id}",
+                "method": "GET"
+              },
+              {
+                "path": "/comments",
+                "method": "GET"
+              },
+              {
+                "path": "/photos",
+                "method": "GET"
+              },
+              {
+                "path": "/albums",
+                "method": "GET"
+              },
+              {
+                "path": "/users",
+                "method": "GET"
+              },
+              {
+                "path": "/todos",
+                "method": "GET"
+              },
+              {
+                "path": "/posts",
+                "method": "GET"
+              }
+            ]
+          },
           "global_headers": {},
           "global_headers_remove": [],
           "global_response_headers": {},
@@ -255,9 +229,9 @@
     },
     "proxy": {
       "preserve_host_header": false,
-      "listen_path": "/graphql-posts-v3/",
-      "target_url": "",
-      "disable_strip_slash": true,
+      "listen_path": "/jsonplaceholder",
+      "target_url": "https://jsonplaceholder.typicode.com/",
+      "disable_strip_slash": false,
       "strip_listen_path": true,
       "enable_load_balancing": false,
       "target_list": [],
@@ -305,8 +279,8 @@
     },
     "custom_middleware_bundle": "",
     "cache_options": {
-      "cache_timeout": 60,
-      "enable_cache": true,
+      "cache_timeout": 0,
+      "enable_cache": false,
       "cache_all_safe_requests": false,
       "cache_response_codes": [],
       "enable_upstream_cache_control": false,
@@ -336,32 +310,15 @@
     "blacklisted_ips": [],
     "dont_set_quota_on_create": false,
     "expire_analytics_after": 0,
-    "response_processors": [
-      {
-        "name": "response_body_transform",
-        "options": {}
-      }
-    ],
+    "response_processors": [],
     "CORS": {
-      "enable": true,
-      "allowed_origins": [
-        "*"
-      ],
-      "allowed_methods": [
-        "GET",
-        "POST",
-        "HEAD"
-      ],
-      "allowed_headers": [
-        "Origin",
-        "Accept",
-        "Content-Type",
-        "X-Requested-With",
-        "Authorization"
-      ],
+      "enable": false,
+      "allowed_origins": [],
+      "allowed_methods": [],
+      "allowed_headers": [],
       "exposed_headers": [],
       "allow_credentials": false,
-      "max_age": 24,
+      "max_age": 0,
       "options_passthrough": false,
       "debug": false
     },
@@ -379,105 +336,18 @@
     "strip_auth_data": false,
     "enable_detailed_recording": false,
     "graphql": {
-      "enabled": true,
-      "execution_mode": "executionEngine",
-      "version": "2",
-      "schema": "type Comment {\n  id: Int\n  name: String\n  email: String\n  body: String\n}\n\ntype Post {\n  id: Int\n  title: String\n  body: String\n  comments: [Comment]\n}\n\ntype Query {\n  user(id: Int!): User\n}\n\ntype User {\n  id: Int\n  name: String\n  email: String\n  posts: [Post]\n  transformedName: String\n}\n",
-      "last_schema_update": "2022-02-23T20:28:12.614Z",
+      "enabled": false,
+      "execution_mode": "",
+      "version": "",
+      "schema": "",
       "type_field_configurations": [],
       "playground": {
         "enabled": false,
         "path": ""
       },
       "engine": {
-        "field_configs": [
-          {
-            "type_name": "User",
-            "field_name": "posts",
-            "disable_default_mapping": true,
-            "path": [
-              ""
-            ]
-          },
-          {
-            "type_name": "Post",
-            "field_name": "comments",
-            "disable_default_mapping": true,
-            "path": [
-              ""
-            ]
-          },
-          {
-            "type_name": "Query",
-            "field_name": "user",
-            "disable_default_mapping": true,
-            "path": [
-              ""
-            ]
-          }
-        ],
-        "data_sources": [
-          {
-            "kind": "REST",
-            "name": "Posts",
-            "internal": false,
-            "root_fields": [
-              {
-                "type": "User",
-                "fields": [
-                  "posts"
-                ]
-              }
-            ],
-            "config": {
-              "url": "https://jsonplaceholder.typicode.com/posts?userId={{.object.id}}",
-              "method": "GET",
-              "body": "",
-              "headers": {},
-              "default_type_name": "Post"
-            }
-          },
-          {
-            "kind": "REST",
-            "name": "Comments",
-            "internal": false,
-            "root_fields": [
-              {
-                "type": "Post",
-                "fields": [
-                  "comments"
-                ]
-              }
-            ],
-            "config": {
-              "url": "https://jsonplaceholder.typicode.com/comments?postId={{.object.id}}",
-              "method": "GET",
-              "body": "",
-              "headers": {},
-              "default_type_name": "Comment"
-            }
-          },
-          {
-            "kind": "REST",
-            "name": "User",
-            "internal": true,
-            "root_fields": [
-              {
-                "type": "Query",
-                "fields": [
-                  "user"
-                ]
-              }
-            ],
-            "config": {
-              "url": "tyk://69a4e6fa47a645df70d2305f47da9561/{{.arguments.id}}",
-              "method": "GET",
-              "body": "",
-              "headers": {},
-              "default_type_name": "User"
-            }
-          }
-        ]
+        "field_configs": [],
+        "data_sources": []
       },
       "proxy": {
         "auth_headers": {}

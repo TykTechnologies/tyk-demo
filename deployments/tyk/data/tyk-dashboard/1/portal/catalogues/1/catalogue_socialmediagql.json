@@ -1,0 +1,20 @@
+{
+    "api_id": "",
+    "hasDocumentation": true,
+    "config": {
+        "email": "",
+        "key_request_fields": [],
+        "require_key_approval": false,
+        "oauth_usage_limit": -1,
+        "redirect_on_key_request": false,
+        "override": false
+    },
+    "policy_id": "62a0eac392faf50001395814",
+    "name": "Social Media GQL",
+    "version": "v2",
+    "short_description": "",
+    "long_description": "",
+    "fields": {},
+    "documentation": "DOCUMENTATION_ID",
+    "show": true
+}
