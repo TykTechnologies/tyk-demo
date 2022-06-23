@@ -1,8 +1,23 @@
 {
-  "auth_type": "other",
-  "auth_types": null,
+  "auth_type": "ba",
+  "auth_types": [
+    "ba"
+  ],
   "state": "active",
-  "access_rights_array": [],
+  "access_rights_array": [
+    {
+      "api_name": "Basic Authentication API",
+      "api_id": "5963f8fdedee405143f5858ea17de422",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "limit": null,
+      "field_access_rights": [],
+      "allowance_scope": ""
+    }
+  ],
   "graphql_enabled": false,
   "_id": "5eb6349543f0440001373f5c",
   "id": "",
@@ -15,7 +30,20 @@
   "throttle_interval": -1,
   "throttle_retry_limit": -1,
   "max_query_depth": 0,
-  "access_rights": {},
+  "access_rights": {
+    "5963f8fdedee405143f5858ea17de422": {
+      "api_name": "Basic Authentication API",
+      "api_id": "5963f8fdedee405143f5858ea17de422",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "limit": null,
+      "field_access_rights": [],
+      "allowance_scope": ""
+    }
+  },
   "hmac_enabled": false,
   "active": true,
   "is_inactive": false,
@@ -23,12 +51,12 @@
   "tags": [],
   "key_expires_in": 0,
   "partitions": {
-    "quota": false,
-    "rate_limit": false,
+    "quota": true,
+    "rate_limit": true,
     "complexity": false,
-    "acl": false,
+    "acl": true,
     "per_api": false
   },
-  "last_updated": "1588999317",
+  "last_updated": "1655966901",
   "meta_data": {}
 }
