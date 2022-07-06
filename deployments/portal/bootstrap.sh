@@ -62,8 +62,15 @@ log_message "Copying portal.db.bak to portal.db ..."
 cp deployments/portal/volumes/database/portal.db.bak deployments/portal/volumes/database/portal.db
 log_ok
 
+# Sanity check for SQLite install
+log_message "Checking if SQLite is installed ... "
+sqlite_installpath=`which sqlite3`
+if [ -z "${sqlite_installpath}" ]; then
+  echo "SQLite install path is empty, please ensure you have SQLite installed."
+fi
+
 # Update the portal database with the proper access credentials for loading a bootstrapped portal
-log_message "Updating Portal DB With new TYK_DASHBOARD_API_ACCESS_CREDENTIALS"
+log_message "Updating Portal SQLite DB With new TYK_DASHBOARD_API_ACCESS_CREDENTIALS"
 ./deployments/portal/update_database.sh
 log_ok
 
