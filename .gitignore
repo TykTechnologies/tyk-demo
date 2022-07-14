@@ -7,12 +7,12 @@ bootstrap.log
 deployments/cicd/volumes/jenkins/bootstrap-import/credentials-global.xml
 deployments/cicd/volumes/jenkins/plugins/*.jpi
 deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
-deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.so
-deployments/tyk/volumes/tyk-gateway/plugins/go/ipratelimit/ip-rate-limit.so
+deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin_*.so
+deployments/tyk/volumes/tyk-gateway/plugins/go/ipratelimit/ip-rate-limit_*.so
 deployments/tyk/volumes/tyk-gateway/plugins/go/example/vendor
 deployments/tyk/volumes/http-server/python-basic-example.zip
 deployments/tyk/volumes/tyk-gateway/middleware/bundles
-deployments/tyk/volumes/tyk-gateway/plugins/go/jwt/jwt-go-plugin.so
+deployments/tyk/volumes/tyk-gateway/plugins/go/jwt/jwt-go-plugin_*.so
 deployments/tyk/volumes/tyk-gateway/plugins/go/jwt/vendor
 audit.log
 deployments/tyk/volumes/tyk-gateway/certs/tls-certificate.pem
