@@ -28,9 +28,8 @@ command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: JQ is required, but it's not
 mkdir -p .context-data 1> /dev/null
 rm -f .context-data/*
 
-# clear the .bootstrap/bootstrapped_deployments from deployments
+# make the .bootstrap directory
 mkdir -p .bootstrap 1> /dev/null
-echo -n > .bootstrap/bootstrapped_deployments
 
 # check if docker compose version is v1.x
 check_docker_compose_version
@@ -47,6 +46,13 @@ if [[ "$*" == *instrumentation* ]]; then
   set_docker_environment_value "INSTRUMENTATION_ENABLED" "1"
 else
   set_docker_environment_value "INSTRUMENTATION_ENABLED" "0"
+fi
+
+if [[ -s .bootstrap/bootstrapped_deployments ]]; then
+  echo "Existing deployments found:"
+  cat .bootstrap/bootstrapped_deployments
+else
+  echo "No existing deployments found"
 fi
 
 # create a file which contains names of all the deployments

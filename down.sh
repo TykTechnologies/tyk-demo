@@ -18,9 +18,11 @@ command_docker_compose="$(generate_docker_compose_command) down -v --remove-orph
 echo "Running docker compose command: $command_docker_compose"
 eval $command_docker_compose
 
-if [ "$?" == 0 ]
-then
+if [ "$?" == 0 ]; then
   echo "All containers were stopped and removed"
+  
+  # clear the bootstraped deployments
+  echo -n > .bootstrap/bootstrapped_deployments
 else
   echo "Error occurred during the following the down command."
 fi 
