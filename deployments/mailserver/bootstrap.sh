@@ -7,5 +7,5 @@ log_end_deployment
 echo -e "\033[2K
 ▼ Mailserver
   ▽ MailSlurper
-                    Browser URL : http://localhost:8089
-                    SMTP URL : http://localhost:2500"
+            Browser URL : http://localhost:8089
+               SMTP URL : http://localhost:2500"

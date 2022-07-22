@@ -24,13 +24,11 @@ done
 # check that jq is available
 command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: JQ is required, but it's not installed. Review 'getting started' steps in README.md."; exit 1; }
 
-# make the context data directory and clear and data from an existing directory
+# make the context data directory
 mkdir -p .context-data 1> /dev/null
-rm -f .context-data/*
 
-# clear the .bootstrap/bootstrapped_deployments from deployments
+# make the .bootstrap directory
 mkdir -p .bootstrap 1> /dev/null
-echo -n > .bootstrap/bootstrapped_deployments
 
 # check if docker compose version is v1.x
 check_docker_compose_version
@@ -49,16 +47,46 @@ else
   set_docker_environment_value "INSTRUMENTATION_ENABLED" "0"
 fi
 
-# create a file which contains names of all the deployments
-# this determines the order in which the deployments are bootstrapped
-# the default "tyk" deployment is added first
-echo "tyk" >> .bootstrap/bootstrapped_deployments
-# add any deployments which were specified as arguments
+# list of deployments to bootstrap
+deployments_to_create=()
+
+if [[ -s .bootstrap/bootstrapped_deployments ]]; then
+  echo "Existing deployments found. Only newly specified deployments will be created."
+else
+  echo "No existing deployments found. All specified deployments will be created."
+  # create a file which contains names of all the deployments
+  # this determines the order in which the deployments are bootstrapped
+  # the default "tyk" deployment is added automatically as the first deployment
+  echo "tyk" >> .bootstrap/bootstrapped_deployments
+  deployments_to_create+=("tyk")
+fi
+
+# extract new deployments from arguments
 for deployment in "$@"; do
-  # avoid re-adding "tyk"
-  if [ "$deployment" != "tyk" ]; then
-    echo "$deployment" >> .bootstrap/bootstrapped_deployments
+  # skip "tyk" deployment, as it is handled automatically
+  [ "$deployment" == "tyk" ] && continue
+
+  # skip existing deployments, to avoid rebootstrapping
+  if [ ! -z $(grep "$deployment" ".bootstrap/bootstrapped_deployments") ]; then 
+    echo "Deployment \"$deployment\" already exists, skipping."
+    continue
   fi
+
+  echo "$deployment" >> .bootstrap/bootstrapped_deployments
+  deployments_to_create+=("$deployment")
+done
+
+# check if bootstrap is needed
+if [ ${#deployments_to_create[@]} -eq 0 ]; then
+  echo "Specified deployments already exist. Exiting."
+  echo "Tip: If you want to recreate the existing deployment, run the down.sh script first."
+  exit
+fi
+
+# display deployments to bootstrap
+echo "Deployments to create:"
+for deployment in "${deployments_to_create[@]}"; do
+  echo "  $deployment"
 done
 
 # bring the containers up
@@ -71,14 +99,14 @@ if [ "$?" != 0 ]; then
 fi
 
 # bootstrap the deployments
-while read deployment; do
+for deployment in "${deployments_to_create[@]}"; do
   eval "deployments/$deployment/bootstrap.sh"
   if [ "$?" != 0 ]; then
     echo "Error occurred during bootstrap of $deployment, when running deployments/$deployment/bootstrap.sh. Check bootstrap.log for details."
     exit 1
   fi
-done < .bootstrap/bootstrapped_deployments
+done
 
-# Confirm bootstrap is compelete
+# Confirm bootstrap is complete
 printf "\nTyk Demo bootstrap completed\n"
 printf "\n----------------------------\n\n"

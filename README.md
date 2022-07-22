@@ -130,24 +130,31 @@ To bootstrap the system we will run the `up.sh` script, which will run the neces
 ./up.sh
 ```
 
+The script displays a message, showing the deployments it will create:
+
+```
+Deployments to create:
+  tyk
+```
+
 This will bring up the standard Tyk deployment, after which you can log into the Dashboard and start using Tyk.
 
 ### Deploying a feature
 
-If you want to deploy features, run the `up.sh` command, passing a parameter of the directory name of the feature to deploy. For example, to deploy both the standard Tyk deployment and the `analytics` deployment:
+If you want to deploy features, run the `up.sh` command, passing a parameter of the directory name of the feature to deploy. For example, to deploy both the standard Tyk deployment and the `analytics-kibana` deployment:
 
 ```
-./up.sh analytics
+./up.sh analytics-kibana
 ```
 
 The feature names are the directory names from the `deployments` directory.
 
 ### Deploying multiple features at the same time
 
-Multiple features can be deployed at the same time by providing multiple feature parameters. For example, to deploy `analytics` and `instrumentation`:
+Multiple features can be deployed at the same time by providing multiple feature parameters. For example, to deploy `analytics-kibana` and `instrumentation`:
 
 ```
-./up.sh analytics instrumentation
+./up.sh analytics-kibana instrumentation
 ```
 
 ### Bootstrap logging
@@ -168,21 +175,48 @@ The collection for the base *Tyk* Deployment is called `tyk_demo.postman_collect
 
 # Resetting
 
-If you want to reset your environment then you need to remove the volumes associated with the container as well as the containers themselves. The `down.sh` script can do this for you.
-You do not need to declare which component to remove since the `up.sh` has already registered them in `.bootstrap/bootstrapped_deployments` so the `down.sh` will just read it and stop all those services.
+If you want to reset your environment, you need to remove the volumes associated with the container as well as the containers themselves. The `down.sh` script can do this for you.
+You don't need to declare which component to remove, since they have already been registered in `.bootstrap/bootstrapped_deployments` by the `up.sh` script. The `down.sh` script will simply remove the deployments listed in that file.
 
-To bring down the containers and delete associated volumes:
+To delete the containers and associated volumes:
 
 ```
 ./down.sh
 ```
 
+The script displays a message, showing the deployments it intends to remove. For example:
+
+```
+Deployments to remove:
+  tyk
+```
+
 # Redeploying
 
-The `up.sh` script is not intended to be run consecutively without running `down.sh` in between. The reason for this is that the `up.sh` script assumes that the system will not contain any data, so it attempts to bootstrap the system by creating data. This means that running the script consecutively will likely generate errors and duplicate data. For this reason, if you want to bring down the environment and recreate it, it is recommended to combine the `down.sh` and `up.sh` commands:
+To redeploy an existing deployment, run the `./down.sh` script followed by the `./up.sh` script:
 
 ```
 ./down.sh && ./up.sh
+```
+
+This deletes the containers and volumes associated with the existing deployment, then creates a new deployment based on the `up.sh` command. 
+
+# Appending to an existing deployment
+
+Feature deployments can be added to existing deployment by running the `up.sh` script consecutively. This avoids having to remove the existing deployment with the `down.sh` script.
+
+For example, if `./up.sh` has already been run, there will be a standard `tyk` deployment currently deployed. To add the `sso` deployment to the existing deployment, run:
+
+```
+./up.sh sso
+```
+
+Note that existing deployments do not need to be specified. The script detects existing deployments and skips them. A message is displayed to confirm the situation:
+
+```
+Existing deployments found. Only newly specified deployments will be created.
+Deployments to create:
+  sso
 ```
 
 # Check running containers, logs, restart
