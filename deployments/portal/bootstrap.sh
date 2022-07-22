@@ -87,9 +87,9 @@ echo -e "\033[2K
                     URL : http://tyk-portal.localhost:3100/
          Admin Username : $portal_admin_user_email
          Admin Password : $portal_admin_user_password
-
-      (Internal) Developer Username : api-developer@internal.org
-      (Interlal) Developer Password : password
-
-          (External) Consumer Email : api-consumer@external.org
-          (External) Consumer Email : password"
+    ▾ (Internal) Developer
+               Username : api-developer@internal.org
+               Password : password
+    ▾ (External) Consumer
+                  Email : api-consumer@external.org
+               Password : password"
