@@ -8,6 +8,3 @@ services:
       - "2500:2500"
       - "8089:8080"
       - "8085:8085"
-    deploy:
-      restart_policy:
-        condition: any
