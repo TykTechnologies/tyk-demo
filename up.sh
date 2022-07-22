@@ -76,6 +76,19 @@ for deployment in "$@"; do
   to_bootstrap+=("$deployment")
 done
 
+# check if bootstrap is needed
+if [ ${#to_bootstrap[@]} -eq 0 ]; then
+  echo "No bootstrap required. Exiting."
+  echo "Tip: If you want to recreate the existing deployment, run the down.sh script first."
+  exit
+fi
+
+# display deployments to bootstrap
+echo "Deployments to bootstrap:"
+for deployment in "${to_bootstrap[@]}"; do
+  echo "  $deployment"
+done
+
 # bring the containers up
 command_docker_compose="$(generate_docker_compose_command) up --remove-orphans -d"
 echo "Running docker compose command: $command_docker_compose"
@@ -83,18 +96,6 @@ eval $command_docker_compose
 if [ "$?" != 0 ]; then
   echo "Error occurred when using Docker Compose to bring containers up"
   exit 1
-fi
-
-# check if bootstrap is needed
-if [ ${#to_bootstrap[@]} -eq 0 ]; then
-  echo "No bootstrap required. Exiting."
-  echo "Tip: If you want to recreate the existing deployment, run the down.sh script first."
-  exit
-else
-  echo "Deployments to bootstrap:"
-  for deployment in "${to_bootstrap[@]}"; do
-    echo "  $deployment"
-  done
 fi
 
 # bootstrap the deployments
@@ -106,6 +107,6 @@ for deployment in "${to_bootstrap[@]}"; do
   fi
 done
 
-# Confirm bootstrap is compelete
+# Confirm bootstrap is complete
 printf "\nTyk Demo bootstrap completed\n"
 printf "\n----------------------------\n\n"
