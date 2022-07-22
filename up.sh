@@ -48,7 +48,7 @@ else
 fi
 
 # list of deployments to bootstrap
-to_bootstrap=()
+deployments_to_create=()
 
 if [[ -s .bootstrap/bootstrapped_deployments ]]; then
   echo "Existing deployments found. Only newly specified deployments will be created."
@@ -58,7 +58,7 @@ else
   # this determines the order in which the deployments are bootstrapped
   # the default "tyk" deployment is added automatically as the first deployment
   echo "tyk" >> .bootstrap/bootstrapped_deployments
-  to_bootstrap+=("tyk")
+  deployments_to_create+=("tyk")
 fi
 
 # extract new deployments from arguments
@@ -73,19 +73,19 @@ for deployment in "$@"; do
   fi
 
   echo "$deployment" >> .bootstrap/bootstrapped_deployments
-  to_bootstrap+=("$deployment")
+  deployments_to_create+=("$deployment")
 done
 
 # check if bootstrap is needed
-if [ ${#to_bootstrap[@]} -eq 0 ]; then
-  echo "No bootstrap required. Exiting."
+if [ ${#deployments_to_create[@]} -eq 0 ]; then
+  echo "Specified deployments already exist. Exiting."
   echo "Tip: If you want to recreate the existing deployment, run the down.sh script first."
   exit
 fi
 
 # display deployments to bootstrap
-echo "Deployments to bootstrap:"
-for deployment in "${to_bootstrap[@]}"; do
+echo "Deployments to create:"
+for deployment in "${deployments_to_create[@]}"; do
   echo "  $deployment"
 done
 
@@ -99,7 +99,7 @@ if [ "$?" != 0 ]; then
 fi
 
 # bootstrap the deployments
-for deployment in "${to_bootstrap[@]}"; do
+for deployment in "${deployments_to_create[@]}"; do
   eval "deployments/$deployment/bootstrap.sh"
   if [ "$?" != 0 ]; then
     echo "Error occurred during bootstrap of $deployment, when running deployments/$deployment/bootstrap.sh. Check bootstrap.log for details."
