@@ -169,7 +169,7 @@
       "events": {}
     },
     "proxy": {
-      "target_url": "http://notifications:4004/query",
+      "target_url": "http://notifications-subgraph:4204/query",
       "service_discovery": {
         "endpoint_returns_list": false,
         "cache_timeout": 0,

@@ -44,7 +44,7 @@
 						""
 					]
 				},
-				"description": "This GraphQL API illustrates, with a single request, the ability to combine 2 subgraphs into a single Federated graphQL API using Tyk\n\n**Subgraph URLs:**\n\n*   [http://localhost:4001/query](http://localhost:4001/query)\n*   [http://localhost:4002/query](http://localhost:4002/query)\n    \n\n**Query to send to supergraph:**\n\n``` graphql\nquery{\n  user(id: 1){\n    id\n    name\n    posts{\n      id\n      title\n    }\n}\n\n```\n\nCheckout the federation deployment README for steps to adding a 3rd subgraph"
+				"description": "This GraphQL API illustrates, with a single request, the ability to combine 2 subgraphs into a single Federated graphQL API using Tyk\n\n**Subgraph URLs:**\n\n*   [http://localhost:4201/query](http://localhost:4201/query)\n*   [http://localhost:4202/query](http://localhost:4202/query)\n    \n\n**Query to send to supergraph:**\n\n``` graphql\nquery{\n  user(id: 1){\n    id\n    name\n    posts{\n      id\n      title\n    }\n}\n\n```\n\nCheckout the federation deployment README for steps to adding a 3rd subgraph"
 			},
 			"response": []
 		}
