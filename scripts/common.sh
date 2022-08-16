@@ -258,10 +258,15 @@ build_go_plugin () {
       exit 1
     fi
     echo $gateway_image_tag > $go_plugin_build_version_filename
+    # the .so file created by the plugin build container includes the target release version and architecture e.g. example-go-plugin_v4.1.0_linux_amd64.so
+    # we need to remove these so that the file name matches what's in the API definition e.g. example-go-plugin.so
+    log_message "Building Go Plugin $go_plugin_path using tag $gateway_image_tag"
+    rm $go_plugin_directory/$go_plugin_filename
+    mv $go_plugin_directory/*.so $go_plugin_directory/$go_plugin_filename
     log_ok
   else
-    # if you want to force a recompile of the plugin .so file, delete the .bootstrap/go-plugin-build-version-<go_plugin_filename> file, or run the docker command manually
     log_message "  $go_plugin_filename has already built for $gateway_image_tag, skipping"
+    # note: if you want to force a recompile of the plugin .so file, delete the .bootstrap/go-plugin-build-version-<go_plugin_filename> file, or run the docker command manually
   fi
 }
 
