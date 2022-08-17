@@ -58,7 +58,7 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	conf := config.Global()
 	// Create a Redis Controller, which will handle the Redis connection for the storage
 	rc := storage.NewRedisController(r.Context())
-	// Create a storage object, which will handle the key operations
+	// Create a storage object, which will handle Redis operations using "apikey-" key prefix
 	store := storage.RedisCluster{KeyPrefix: "apikey-", HashKeys: conf.HashKeys, RedisController: rc}
 
 	go rc.ConnectToRedis(r.Context(), nil, &conf)
