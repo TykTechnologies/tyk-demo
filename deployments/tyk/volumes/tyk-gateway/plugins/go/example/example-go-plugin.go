@@ -122,14 +122,12 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	logger.Info("DAVE 2")
 
 	if !exists {
 		logger.Info("No session object for key")
 		rw.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	logger.Info("DAVE 3")
 
 	// Use key to get session from Redis storage
 	sessionJson, err := store.GetKey(lookupKey)
@@ -138,7 +136,6 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	logger.Info("DAVE 4")
 
 	// Convert to session object
 	sessionObject := &user.SessionState{}
