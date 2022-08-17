@@ -64,10 +64,10 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	go rc.ConnectToRedis(r.Context(), nil, &conf)
 	for i := 0; i < 5; i++ { // max 5 attempts - should only take 2
 		if rc.Connected() {
-			logger.Info("RC2 connected")
+			logger.Info("Redis Controller connected")
 			break
 		}
-		logger.Warn("RC2 not connected, sleeping")
+		logger.Warn("Redis Controller not connected, will retry")
 
 		time.Sleep(10 * time.Millisecond)
 	}
