@@ -116,13 +116,11 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 
 	// Check if key exists
 	exists, err := store.Exists(lookupKey)
-
 	if err != nil {
 		logger.Error("Couldn't check if key exists in Redis: ", err)
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 	if !exists {
 		logger.Info("No session object for key")
 		rw.WriteHeader(http.StatusUnauthorized)
