@@ -111,7 +111,7 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 		lookupKey = base64.StdEncoding.EncodeToString([]byte(jsonKey))
 	}
 
-	// This is the key will be looking for
+	// This is the key we will be looking for
 	logger.Info("Lookup key: ", lookupKey)
 
 	// Check if key exists
