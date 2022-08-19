@@ -16,9 +16,18 @@ for data_group in "${data_groups[@]}"; do\
     | jq -c '.apis[]')
   while read -r api; do
     if [[ "$api" != "" ]]; then
-      api_id=$(jq -r '.api_definition.id' <<< $api) 
-      echo "  $(jq -r '.api_definition.name' <<< $api)"
-      echo "$api" | jq '.' > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/apis/api-$api_id.json"
+      api_is_oas=$(jq -r '.api_definition.is_oas' <<< $api) 
+      api_name=$(jq -r '.api_definition.name' <<< $api)
+      api_id=$(jq -r '.api_definition.id' <<< $api)
+      api_file_name="api-$api_id.json"
+      echo "  $api_name"
+      # if API is OAS spec, then retrieve the OAS document and use a different file name
+      if [[ "$api_is_oas" == "true" ]]; then
+        api=$(curl $dashboard_base_url/api/apis/oas/$api_id -s \
+          -H "Authorization:${dashboard_keys[$index]}")
+        api_file_name="api-oas-$api_id.json"
+      fi
+      echo "$api" | jq '.' > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/apis/$api_file_name"
     fi 
   done <<< "$apis"
 

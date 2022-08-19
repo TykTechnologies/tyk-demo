@@ -505,21 +505,44 @@ create_api () {
   local api_data_path="$1"
   local admin_api_key="$2"
   local dashboard_api_key="$3"
-  local api_name=$(jq -r '.api_definition.name' $api_data_path)
-  local api_id=$(jq -r '.api_definition.id' $api_data_path)
   local api_data="$(cat $api_data_path)"
+  local api_name=""
+  local api_id=""
+  # API data format differs depending on type of API, which we can determine by the file name containing 'oas'
+  local api_is_oas=$([[ $api_data_path =~ api-oas-[a-z0-9]+\.json$ ]] && echo true || echo false)
 
+  # get the id and name of the API
+  if [ "$api_is_oas" == true ]; then
+    # OAS API
+    api_name=$(jq -r '.["x-tyk-api-gateway"].info.name' $api_data_path)
+    api_id=$(jq -r '.["x-tyk-api-gateway"].info.id' $api_data_path)    
+  else
+    # Tyk API 
+    api_name=$(jq -r '.api_definition.name' $api_data_path)
+    api_id=$(jq -r '.api_definition.id' $api_data_path)
+  fi
+
+  # importing the API enables us to keep the API's id rather than getting a new random id
+  # this means we can then reference the APIs by these known ids
   log_message "  Importing API: $api_name"
-
-  import_request_payload=$(jq --slurpfile new_api "$api_data_path" '.apis += $new_api' deployments/tyk/data/tyk-dashboard/admin-api-apis-import-template.json)
-
-  api_response="$(curl $dashboard_base_url/admin/apis/import -s \
-    -H "admin-auth: $admin_api_key" \
-    -d "$import_request_payload" 2>> bootstrap.log)"
-
+  api_response=""
+  if [ "$api_is_oas" == true ]; then
+    # OAS API
+    # we just create OAS APIs, rather than import them, as the import endpoint doesn't allow for the id to be maintained, so it makes no difference
+    api_response="$(curl $dashboard_base_url/api/apis/oas -s \
+      -H "authorization: $dashboard_api_key" \
+      -d "$api_data" 2>> bootstrap.log)"
+  else
+    # Tyk API
+    import_request_payload=$(jq --slurpfile new_api "$api_data_path" '.apis += $new_api' deployments/tyk/data/tyk-dashboard/admin-api-apis-import-template.json)
+    api_response="$(curl $dashboard_base_url/admin/apis/import -s \
+      -H "admin-auth: $admin_api_key" \
+      -d "$import_request_payload" 2>> bootstrap.log)"
+  fi
   log_json_result "$api_response"
 
-  # Update any webhook references
+  # Update any webhook references - these need updating because webhooks cannot be imported, so their ids change each time
+  # TODO: create OAS version for this, when needed
   webhook_reference_count=$(jq '.hook_references | length' $api_data_path)
   if [ "$webhook_reference_count" -gt "0" ]; then
     webhook_data=$(curl $dashboard_base_url/api/hooks?p=-1 -s \
@@ -543,12 +566,19 @@ create_api () {
     done <<< "$(jq -c -r '.hook_references[].hook.name' $api_data_path)"
   fi
 
+  # APIs must be updated once imported, to ensure that all fields from the API data are stored
   log_message "  Updating API: $api_name"
-
-  api_response="$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
-    -H "Authorization: $dashboard_api_key" \
-    -d "$api_data" 2>> bootstrap.log)"
-
+  if [ "$api_is_oas" == true ]; then
+    # OAS API
+    # nothing to do - API already created
+    # this might change in the future, if we are able to import an OAS API and maintain its id, we may need to update the API depending on how the import functionality works
+    log_message "    Skipping update for OAS API"
+  else
+    # Tyk API
+    api_response="$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
+      -H "Authorization: $dashboard_api_key" \
+      -d "$api_data" 2>> bootstrap.log)"
+  fi
   log_json_result "$api_response"
 
   log_message "    Id: $api_id"
