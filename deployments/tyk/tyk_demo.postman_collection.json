@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a47a7bed-5248-44ee-a7c7-bf57e19649bd",
+		"_postman_id": "a9113903-34dd-4848-9dc9-1294e77d5687",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -4763,6 +4763,104 @@
 									]
 								},
 								"description": "This request shows how [detailed analytics logging](https://tyk.io/docs/analytics-and-reporting/useful-debug-modes/#enabling-detailed-logging) can be configured at a **Key** level. Detailed analytics data will be recorded if it is enabled at any of the three levels - global, API and key.\n\nThe Key used by this request, `auth_key_analytics_on`, has it's configuration `enable_detailed_recording` set to `true`.\n\nThis example *does* record detailed analytics data because it:\n- goes to an API Gateway that does not have detailed analytics recording enabled (**global** level), and\n- calls an API Definition that does not have detailed analytics recording enabled (**API** level), but\n- uses an API key that has detailed analytics recording enabled (**key** level)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "OAS",
+					"item": [
+						{
+							"name": "OAS - JSON Validation part 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Contains posted data\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.json.firstName).to.eql(\"Dave\");",
+											"    pm.expect(jsonData.json.lastName).to.eql(\"Challinor\");",
+											"    pm.expect(jsonData.json.age).to.eql(46);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\":\"Dave\",\n    \"lastName\":\"Challinor\",\n    \"age\": 46\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request-body",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"validate-request-body"
+									]
+								},
+								"description": "Example of JSON schema validation using an OAS API definition.\n\nThis request succeeds as it contains the two required fields (firstName, lastName), and the age provided is an integer."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - JSON Validation part 2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 422\", function () {",
+											"    pm.response.to.have.status(422);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\":\"Dave\",\n    \"age\": 46\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request-body",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"validate-request-body"
+									]
+								},
+								"description": "Example of JSON schema validation using an OAS API definition.\n\nThe validation of this request fails, as it is missing the \"lastName\" field in the body data."
 							},
 							"response": []
 						}
