@@ -4,6 +4,7 @@
   "api_definition": {
     "id": "6225a1b137d93600015a1731",
     "name": "Relative Path Examples",
+    "expiration": "",
     "slug": "listen-path-examples",
     "listen_port": 0,
     "protocol": "",
@@ -23,16 +24,20 @@
       "auth_login_redirect": ""
     },
     "auth": {
+      "name": "",
       "use_param": false,
       "param_name": "",
       "use_cookie": false,
       "cookie_name": "",
+      "disable_header": false,
       "auth_header_name": "Authorization",
       "use_certificate": false,
       "validate_signature": false,
       "signature": {
         "algorithm": "",
         "header": "",
+        "use_param": false,
+        "param_name": "",
         "secret": "",
         "allowed_clock_skew": 0,
         "error_code": 0,
@@ -41,16 +46,20 @@
     },
     "auth_configs": {
       "authToken": {
+        "name": "",
         "use_param": false,
         "param_name": "",
         "use_cookie": false,
         "cookie_name": "",
+        "disable_header": false,
         "auth_header_name": "Authorization",
         "use_certificate": false,
         "validate_signature": false,
         "signature": {
           "algorithm": "",
           "header": "",
+          "use_param": false,
+          "param_name": "",
           "secret": "",
           "allowed_clock_skew": 0,
           "error_code": 0,
@@ -58,16 +67,20 @@
         }
       },
       "basic": {
+        "name": "",
         "use_param": false,
         "param_name": "",
         "use_cookie": false,
         "cookie_name": "",
+        "disable_header": false,
         "auth_header_name": "Authorization",
         "use_certificate": false,
         "validate_signature": false,
         "signature": {
           "algorithm": "",
           "header": "",
+          "use_param": false,
+          "param_name": "",
           "secret": "",
           "allowed_clock_skew": 0,
           "error_code": 0,
@@ -75,16 +88,20 @@
         }
       },
       "coprocess": {
+        "name": "",
         "use_param": false,
         "param_name": "",
         "use_cookie": false,
         "cookie_name": "",
+        "disable_header": false,
         "auth_header_name": "Authorization",
         "use_certificate": false,
         "validate_signature": false,
         "signature": {
           "algorithm": "",
           "header": "",
+          "use_param": false,
+          "param_name": "",
           "secret": "",
           "allowed_clock_skew": 0,
           "error_code": 0,
@@ -92,16 +109,20 @@
         }
       },
       "hmac": {
+        "name": "",
         "use_param": false,
         "param_name": "",
         "use_cookie": false,
         "cookie_name": "",
+        "disable_header": false,
         "auth_header_name": "Authorization",
         "use_certificate": false,
         "validate_signature": false,
         "signature": {
           "algorithm": "",
           "header": "",
+          "use_param": false,
+          "param_name": "",
           "secret": "",
           "allowed_clock_skew": 0,
           "error_code": 0,
@@ -109,16 +130,20 @@
         }
       },
       "jwt": {
+        "name": "",
         "use_param": false,
         "param_name": "",
         "use_cookie": false,
         "cookie_name": "",
+        "disable_header": false,
         "auth_header_name": "Authorization",
         "use_certificate": false,
         "validate_signature": false,
         "signature": {
           "algorithm": "",
           "header": "",
+          "use_param": false,
+          "param_name": "",
           "secret": "",
           "allowed_clock_skew": 0,
           "error_code": 0,
@@ -126,16 +151,20 @@
         }
       },
       "oauth": {
+        "name": "",
         "use_param": false,
         "param_name": "",
         "use_cookie": false,
         "cookie_name": "",
+        "disable_header": false,
         "auth_header_name": "Authorization",
         "use_certificate": false,
         "validate_signature": false,
         "signature": {
           "algorithm": "",
           "header": "",
+          "use_param": false,
+          "param_name": "",
           "secret": "",
           "allowed_clock_skew": 0,
           "error_code": 0,
@@ -143,16 +172,20 @@
         }
       },
       "oidc": {
+        "name": "",
         "use_param": false,
         "param_name": "",
         "use_cookie": false,
         "cookie_name": "",
+        "disable_header": false,
         "auth_header_name": "Authorization",
         "use_certificate": false,
         "validate_signature": false,
         "signature": {
           "algorithm": "",
           "header": "",
+          "use_param": false,
+          "param_name": "",
           "secret": "",
           "allowed_clock_skew": 0,
           "error_code": 0,
@@ -171,7 +204,9 @@
     "use_mutual_tls_auth": false,
     "client_certificates": [],
     "upstream_certificates": {},
+    "upstream_certificates_disabled": false,
     "pinned_public_keys": {},
+    "certificate_pinning_disabled": false,
     "enable_jwt": false,
     "use_standard_auth": false,
     "use_go_plugin_auth": false,
@@ -186,6 +221,16 @@
     "jwt_expires_at_validation_skew": 0,
     "jwt_not_before_validation_skew": 0,
     "jwt_skip_kid": false,
+    "scopes": {
+      "jwt": {
+        "scope_claim_name": "",
+        "scope_to_policy": {}
+      },
+      "oidc": {
+        "scope_claim_name": "",
+        "scope_to_policy": {}
+      }
+    },
     "jwt_scope_to_policy_mapping": {},
     "jwt_scope_claim_name": "",
     "notifications": {
@@ -206,9 +251,14 @@
     },
     "base_identity_provided_by": "",
     "definition": {
+      "enabled": false,
+      "name": "",
+      "default": "",
       "location": "header",
       "key": "x-api-version",
-      "strip_path": false
+      "strip_path": false,
+      "strip_versioning_data": false,
+      "versions": {}
     },
     "version_data": {
       "not_versioned": true,
@@ -226,7 +276,9 @@
           "extended_paths": {
             "white_list": [
               {
+                "disabled": false,
                 "path": "one/or/more/a+",
+                "method": "",
                 "ignore_case": false,
                 "method_actions": {
                   "GET": {
@@ -238,7 +290,9 @@
                 }
               },
               {
+                "disabled": false,
                 "path": "any/not/from/group/[^bar]$",
+                "method": "",
                 "ignore_case": false,
                 "method_actions": {
                   "GET": {
@@ -250,7 +304,9 @@
                 }
               },
               {
+                "disabled": false,
                 "path": "single/character/.$",
+                "method": "",
                 "ignore_case": false,
                 "method_actions": {
                   "GET": {
@@ -262,7 +318,9 @@
                 }
               },
               {
+                "disabled": false,
                 "path": "multiple/wildcards/{1}/{2}",
+                "method": "",
                 "ignore_case": false,
                 "method_actions": {
                   "GET": {
@@ -274,7 +332,9 @@
                 }
               },
               {
+                "disabled": false,
                 "path": "any/between/[a-e]$",
+                "method": "",
                 "ignore_case": false,
                 "method_actions": {
                   "GET": {
@@ -286,7 +346,9 @@
                 }
               },
               {
+                "disabled": false,
                 "path": "any/from/group/[bar]$",
+                "method": "",
                 "ignore_case": false,
                 "method_actions": {
                   "GET": {
@@ -298,7 +360,9 @@
                 }
               },
               {
+                "disabled": false,
                 "path": "or/logic/(foo|bar)",
+                "method": "",
                 "ignore_case": false,
                 "method_actions": {
                   "GET": {
@@ -310,7 +374,9 @@
                 }
               },
               {
+                "disabled": false,
                 "path": "zero/or/one/a?$",
+                "method": "",
                 "ignore_case": false,
                 "method_actions": {
                   "GET": {
@@ -322,7 +388,9 @@
                 }
               },
               {
+                "disabled": false,
                 "path": "single/wildcard/{1}",
+                "method": "",
                 "ignore_case": false,
                 "method_actions": {
                   "GET": {
@@ -334,7 +402,9 @@
                 }
               },
               {
+                "disabled": false,
                 "path": "end/of/path$",
+                "method": "",
                 "ignore_case": false,
                 "method_actions": {
                   "GET": {
@@ -346,7 +416,9 @@
                 }
               },
               {
+                "disabled": false,
                 "path": "zero/or/more/a*",
+                "method": "",
                 "ignore_case": false,
                 "method_actions": {
                   "GET": {
@@ -496,9 +568,9 @@
       "debug": false
     },
     "domain": "",
+    "domain_disabled": false,
     "certificates": [],
     "do_not_track": false,
-    "tags": [],
     "enable_context_vars": false,
     "config_data": {},
     "tag_headers": [],
@@ -531,9 +603,18 @@
       "supergraph": {
         "subgraphs": [],
         "merged_sdl": "",
-        "global_headers": {}
+        "global_headers": {},
+        "disable_query_batching": false
       }
-    }
+    },
+    "analytics_plugin": {
+      "enable": false,
+      "plugin_path": "",
+      "func_name": ""
+    },
+    "tags_disabled": false,
+    "tags": [],
+    "is_oas": false
   },
   "hook_references": [],
   "is_site": false,

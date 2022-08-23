@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/TykTechnologies/tyk/config"
 	"github.com/TykTechnologies/tyk/ctx"
@@ -53,17 +54,32 @@ func RequestLogger(rw http.ResponseWriter, r *http.Request) {
 }
 
 func Authenticate(rw http.ResponseWriter, r *http.Request) {
-	// Connect to Redis using the prefix "apikey-"
-	store := &storage.RedisCluster{KeyPrefix: "apikey-", HashKeys: config.Global().HashKeys}
+	// Get the global config - it's needed in various places
+	conf := config.Global()
+	// Create a Redis Controller, which will handle the Redis connection for the storage
+	rc := storage.NewRedisController(r.Context())
+	// Create a storage object, which will handle Redis operations using "apikey-" key prefix
+	store := storage.RedisCluster{KeyPrefix: "apikey-", HashKeys: conf.HashKeys, RedisController: rc}
 
-	if !store.Connect() {
+	go rc.ConnectToRedis(r.Context(), nil, &conf)
+	for i := 0; i < 5; i++ { // max 5 attempts - should only take 2
+		if rc.Connected() {
+			logger.Info("Redis Controller connected")
+			break
+		}
+		logger.Warn("Redis Controller not connected, will retry")
+
+		time.Sleep(10 * time.Millisecond)
+	}
+
+	if !rc.Connected() {
 		logger.Error("Could not connect to storage")
 		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if config.Global().HashKeys {
-		logger.Info("Key hashing is enabled using ", config.Global().HashKeyFunction)
+	if conf.HashKeys {
+		logger.Info("Key hashing is enabled using ", conf.HashKeyFunction)
 	} else {
 		logger.Info("Key hashing is disabled")
 	}
@@ -90,10 +106,12 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	} else {
 		// Custom keys need to be converted to a JSON key for lookup purposes
 		logger.Info("Key is a custom key")
-		jsonKey := fmt.Sprintf(`{"org":"%s","id":"%s","h":"%s"}`, requestedAPI.OrgID, authHeader, config.Global().HashKeyFunction)
+		jsonKey := fmt.Sprintf(`{"org":"%s","id":"%s","h":"%s"}`, requestedAPI.OrgID, authHeader, conf.HashKeyFunction)
 		logger.Info("Generated JSON for custom key: ", jsonKey)
 		lookupKey = base64.StdEncoding.EncodeToString([]byte(jsonKey))
 	}
+
+	// This is the key we will be looking for
 	logger.Info("Lookup key: ", lookupKey)
 
 	// Check if key exists
