@@ -169,7 +169,7 @@
       "events": {}
     },
     "proxy": {
-      "target_url": "http://users:4001/query",
+      "target_url": "http://users-subgraph:4201/query",
       "service_discovery": {
         "endpoint_returns_list": false,
         "cache_timeout": 0,

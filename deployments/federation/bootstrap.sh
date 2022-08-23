@@ -30,20 +30,20 @@ echo -e "\033[2K
   ▽ Supergraph Playground:
                     URL : $gateway_base_url/social-media-federated-graph/playground
   ▽ Users API
-                    URL : localhost:4001
+                    URL : localhost:4201
                               / 
                               /query
   ▽ Posts API
-                    URL : localhost:4002
+                    URL : localhost:4202
                               / 
                               /query
   
   ▽ Comments API
-                    URL : localhost:4003
+                    URL : localhost:4203
                               / 
                               /query
   
   ▽ Notificaitons API
-                    URL : localhost:4004
+                    URL : localhost:4204
                               / 
                               /query"
