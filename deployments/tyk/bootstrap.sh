@@ -472,25 +472,21 @@ fi
 log_ok
 bootstrap_progress
 
-log_message "Deploying ngrok for "
+log_message "Getting ngrok public URL for Tyk Gateway"
 ngrok_dashboard_url="http://localhost:4040"
 ngrok_ip_api_endpoint="$ngrok_dashboard_url/api/tunnels"
-
-log_message "Getting the ngrok allocated IP for tyk-gateway:8080"
-
+log_message "  Getting data from $ngrok_ip_api_endpoint"
 ngrok_public_url=$(curl --fail --silent --show-error ${ngrok_ip_api_endpoint} | jq ".tunnels[0].public_url" --raw-output)
-
 if [ "$?" != 0 ]; then
-  echo "Error occurred with ngrok."
-  echo "access_ip=" $ngrok_public_url
+  echo "Error getting ngrok configuration from $ngrok_ip_api_endpoint"
   exit 1
 fi
-
 if [ "$ngrok_public_url" = "" ]; then
-  echo "Error occurred with ngrok."
-  echo "access_ip=" $ngrok_public_url
+  echo "Error: ngrok public URL is empty"
   exit 1
 fi
+log_message "  Ngrok public URL: $ngrok_public_url"
+log_ok
 
 log_end_deployment
 
