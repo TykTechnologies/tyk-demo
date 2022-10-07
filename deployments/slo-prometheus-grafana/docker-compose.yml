@@ -1,0 +1,55 @@
+version: '3.3'
+services:
+  tyk-slo-pump:
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.7.0-rc1}
+    ports:
+    - 8091:8083
+    - 8092:8092
+    networks:
+      - tyk
+    volumes:
+      - ./deployments/slo-prometheus-grafana/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
+    environment:
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
+      - TYK_LOGLEVEL=${PUMP_LOGLEVEL:-info}
+    env_file:
+    - .env
+    depends_on:
+      - tyk-redis
+  
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./deployments/slo-prometheus-grafana/volumes/prometheus/:/etc/prometheus
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    networks:
+      - tyk
+
+  k6:
+    image: grafana/k6:latest
+    networks:
+      - tyk
+    ports:
+      - "6565:6565"
+    volumes:
+      - ./deployments/slo-prometheus-grafana/volumes/k6/:/scripts
+
+  grafana:
+    image: grafana/grafana-oss
+    ports:
+      - 3020:3000
+    volumes:
+      - ./deployments/slo-prometheus-grafana/volumes/grafana/datasources:/etc/grafana/provisioning/datasources/
+      - ./deployments/slo-prometheus-grafana/volumes/grafana/dashboards:/etc/grafana/provisioning/dashboards/
+      - grafana-data:/var/lib/grafana
+    networks:
+      - tyk
+      
+volumes:
+  grafana-data:
+  prometheus-data:
