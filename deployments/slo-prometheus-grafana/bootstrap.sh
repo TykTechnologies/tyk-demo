@@ -43,6 +43,8 @@ echo -e "\033[2K
 ▼ SLO Prometheus Grafana
   ▽ Grafana
                     URL : http://localhost:3020/
+               Username : admin
+               Password : admin
   ▽ Prometheus
                     URL : http://localhost:9090/
   ▽ Tyk Gateway
