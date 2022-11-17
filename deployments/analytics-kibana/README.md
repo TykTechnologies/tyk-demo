@@ -14,7 +14,7 @@ Run the `up.sh` script with the `analytics` parameter:
 
 ### Postman Collection
 
-You can import the deployment-specific Postman collection `tyk_demo_analytics.postman_collection.json`.
+You can import the deployment-specific Postman collection `tyk_demo_analytics_kibana.postman_collection.json`.
 
 ## Analytics data processing
 
