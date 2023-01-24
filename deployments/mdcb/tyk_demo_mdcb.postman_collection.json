@@ -25,10 +25,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{tyk-worker-gateway}}/basic-open-api/get",
+					"raw": "http://{{tyk-worker-gateway.host}}/basic-open-api/get",
 					"protocol": "http",
 					"host": [
-						"{{tyk-worker-gateway}}"
+						"{{tyk-worker-gateway.host}}"
 					],
 					"path": [
 						"basic-open-api",
@@ -43,7 +43,7 @@
 	"protocolProfileBehavior": {},
 	"variable": [
 		{
-			"key": "tyk-worker-gateway",
+			"key": "tyk-worker-gateway.host",
 			"value": "tyk-worker-gateway.localhost:8084"
 		}
 	]
