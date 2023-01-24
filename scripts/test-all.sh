@@ -29,7 +29,6 @@ do
 
     # If the deployment doesn't have a postman collection then there are no tests to perform, so the deployment can be skipped
     echo "  Checking for Postman collection ($postman_collection_file_name)"
-
     if [ -z "$(ls -A $postman_collection_path 2>/dev/null)" ]; then
         echo "    Collection not found. Skipping to next deployment..."
         continue
@@ -40,9 +39,7 @@ do
     echo "Creating deployment: $deployment_name"
     ./up.sh $deployment_name
 
-
     echo "Testing deployment: $deployment_name "
-
     # Provide the 'test' environment variables, so newman can target the correct hosts from within the docker network
     # --insecure option is used due to self-signed certificates
     docker run -t --rm \
@@ -55,11 +52,11 @@ do
         --insecure
 
     if [ "$?" != "0" ]; then
-        echo "Tests failed"
+        echo "Tests failed for $deployment_name deployment"
         # exit 1;
-        # TODO: record which tests failed
+        # TODO: record which deployments have failed tests
     else
-        echo "Tests passed"
+        echo "Tests passed for $deployment_name deployment"
     fi        
 
     echo "Removing deployment: $deployment_name"
@@ -71,18 +68,19 @@ done
 # TODO: 
 # - display test statuses for all deployments (pass/fail/none)
 # - exit with correct exit code
+# - fix collection env vars for SSO, MDCB, keycloak dcr, others?
 
 
-# Stop on first error
-set -e;
+# # Stop on first error
+# set -e;
 
-function onExit {
-    if [ "$?" != "0" ]; then
-        echo "Tests failed";
-        exit 1;
-    else
-        echo "Tests passed";
-    fi
-}
+# function onExit {
+#     if [ "$?" != "0" ]; then
+#         echo "Tests failed";
+#         exit 1;
+#     else
+#         echo "Tests passed";
+#     fi
+# }
 
-trap onExit EXIT;
+# trap onExit EXIT;
