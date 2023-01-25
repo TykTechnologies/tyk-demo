@@ -82,6 +82,9 @@ do
     ./down.sh
 done
 
+echo -e "\nTesting complete"
+
+echo -e "\nTest Results:"
 test_pass_count=0
 test_fail_count=0
 test_skip_count=0
@@ -90,37 +93,36 @@ do
   result_print=""
   case ${result_codes[$i]} in
     0)
-        echo "$(tput setaf 2)Pass$(tput sgr 0) ${result_names[$i]} - Ok"
-        test_pass_count++;;
+        echo "$(tput setaf 2)Pass$(tput sgr 0) ${result_names[$i]} - Tests passed"
+        test_pass_count=$((test_pass_count+1));;
     1) 
         echo "$(tput setaf 1)Fail$(tput sgr 0) ${result_names[$i]} - Tests failed"
-        test_fail_count++;;
+        test_fail_count=$((test_fail_count+1));;
     2) 
         echo "$(tput setaf 4)Skip$(tput sgr 0) ${result_names[$i]} - No collection"
-        test_skip_count++;;
+        test_skip_count=$((test_skip_count+1));;
     3) 
         echo "$(tput setaf 4)Skip$(tput sgr 0) ${result_names[$i]} - No tests"
-        test_skip_count++;;
+        test_skip_count=$((test_skip_count+1));;
     *) 
         echo "ERROR: Unexpected result code. Exiting."
         exit 1;;
     esac
 done
 
-echo -e "\nSummary:"
+echo -e "\nTest Result Totals:"
 echo "$(tput setaf 2)Pass$(tput sgr 0):$test_pass_count"
 echo "$(tput setaf 1)Fail$(tput sgr 0):$test_fail_count"
 echo "$(tput setaf 4)Skip$(tput sgr 0):$test_skip_count"
 
+echo -e "\nExit Status:"
 if [ $test_fail_count = 0 ]; then
-    echo "No failures detected, exiting with code 0"
+    echo -e "\nFailure count is 0, exiting with code 0"
     exit 0
 else
-    echo "Failures detected, exiting with code 1"
+    echo -e "\nFailure count is not 0, exiting with code 1"
     exit 1
 fi
 
 # TODO: 
-# - display test statuses for all deployments (pass/fail/none)
-# - exit with correct exit code
 # - fix collection env vars for SSO, MDCB, keycloak dcr, others?
