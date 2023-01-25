@@ -117,10 +117,10 @@ echo "$(tput setaf 4)Skip$(tput sgr 0):$test_skip_count"
 
 echo -e "\nExit Status:"
 if [ $test_fail_count = 0 ]; then
-    echo -e "\nFailure count is 0, exiting with code 0"
+    echo "Failure count is 0, exiting with code 0"
     exit 0
 else
-    echo -e "\nFailure count is not 0, exiting with code 1"
+    echo "Failure count is not 0, exiting with code 1"
     exit 1
 fi
 
