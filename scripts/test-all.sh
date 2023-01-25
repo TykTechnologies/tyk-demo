@@ -17,23 +17,42 @@ else
     ./down.sh
 fi
 
+declare -a result_names
+declare -a result_codes
+
 for dir in deployments/*/     
 do
     deployment_dir=${dir%*/}      # remove the trailing slash
     deployment_name=${deployment_dir##*/}
+    result_names[${#result_names[@]}]=$deployment_name
 
     echo "Processing deployment: $deployment_name"
 
+    # Script assumes postman file name is based on deployment name, but with underscores instead of hyphens
+    # e.g. for development directory "foo-bar", it assumes the postman collection will be "tyk_demo_foo_bar.postman_collection.json"
     postman_collection_file_name="tyk_demo_${deployment_name//-/_}.postman_collection.json"
     postman_collection_path="$deployment_dir/$postman_collection_file_name"
 
     # If the deployment doesn't have a postman collection then there are no tests to perform, so the deployment can be skipped
-    echo "  Checking for Postman collection ($postman_collection_file_name)"
+    echo "Validating deployment's Postman collection ($postman_collection_file_name)"
+
     if [ -z "$(ls -A $postman_collection_path 2>/dev/null)" ]; then
-        echo "    Collection not found. Skipping to next deployment..."
+        echo "  Collection not found. Skipping to next deployment."
+        result_codes[${#result_codes[@]}]=2
         continue
     else
-        echo "    Collection found. Proceeding..."
+        echo "  Collection found."
+    fi
+
+    # If the collection doesn't contain any tests then the deployment can be skipped
+    # The jq command finds "listen" fields which have the value "test", if none are returned then the collection doesn't contain any tests
+    postman_collection_tests=$(jq '..|.listen?|select(.=="test")' $postman_collection_path)
+    if [[ "$postman_collection_tests" == "" ]]; then
+        echo "  Collection does not contain any tests. Skipping to next deployment."
+        result_codes[${#result_codes[@]}]=3
+        continue
+    else
+        echo "  Collection contains tests."
     fi
 
     echo "Creating deployment: $deployment_name"
@@ -53,34 +72,55 @@ do
 
     if [ "$?" != "0" ]; then
         echo "Tests failed for $deployment_name deployment"
-        # exit 1;
-        # TODO: record which deployments have failed tests
+        result_codes[${#result_codes[@]}]=1
     else
         echo "Tests passed for $deployment_name deployment"
-    fi        
+        result_codes[${#result_codes[@]}]=0
+    fi
 
     echo "Removing deployment: $deployment_name"
     ./down.sh
 done
 
+test_pass_count=0
+test_fail_count=0
+test_skip_count=0
+for i in "${!result_codes[@]}"
+do 
+  result_print=""
+  case ${result_codes[$i]} in
+    0)
+        echo "$(tput setaf 2)Pass$(tput sgr 0) ${result_names[$i]} - Ok"
+        test_pass_count++;;
+    1) 
+        echo "$(tput setaf 1)Fail$(tput sgr 0) ${result_names[$i]} - Tests failed"
+        test_fail_count++;;
+    2) 
+        echo "$(tput setaf 4)Skip$(tput sgr 0) ${result_names[$i]} - No collection"
+        test_skip_count++;;
+    3) 
+        echo "$(tput setaf 4)Skip$(tput sgr 0) ${result_names[$i]} - No tests"
+        test_skip_count++;;
+    *) 
+        echo "ERROR: Unexpected result code. Exiting."
+        exit 1;;
+    esac
+done
 
+echo -e "\nSummary:"
+echo "$(tput setaf 2)Pass$(tput sgr 0):$test_pass_count"
+echo "$(tput setaf 1)Fail$(tput sgr 0):$test_fail_count"
+echo "$(tput setaf 4)Skip$(tput sgr 0):$test_skip_count"
+
+if [ $test_fail_count = 0 ]; then
+    echo "No failures detected, exiting with code 0"
+    exit 0
+else
+    echo "Failures detected, exiting with code 1"
+    exit 1
+fi
 
 # TODO: 
 # - display test statuses for all deployments (pass/fail/none)
 # - exit with correct exit code
 # - fix collection env vars for SSO, MDCB, keycloak dcr, others?
-
-
-# # Stop on first error
-# set -e;
-
-# function onExit {
-#     if [ "$?" != "0" ]; then
-#         echo "Tests failed";
-#         exit 1;
-#     else
-#         echo "Tests passed";
-#     fi
-# }
-
-# trap onExit EXIT;
