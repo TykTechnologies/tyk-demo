@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "df7409c7-f679-498b-ae02-5fa526a1fdd7",
+		"_postman_id": "536c8d57-c0d1-4ed3-b934-812b0e84809e",
 		"name": "Tyk Demo - Keycloak DCR",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -12,10 +12,13 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"postman.setEnvironmentVariable(\"token\", jsonData.access_token);",
-							"postman.setEnvironmentVariable(\"refresh_token\", jsonData.refresh_token);",
-							"postman.setEnvironmentVariable(\"id_token\", jsonData.id_token);"
+							"// this if statement helps prevent the code within from generating a failed test status, since this example requires manual human intervention to be successful it does not work in an automated environment",
+							"if (pm.response.code == 200) {",
+							"    var jsonData = JSON.parse(responseBody);",
+							"    postman.setEnvironmentVariable(\"token\", jsonData.access_token);",
+							"    postman.setEnvironmentVariable(\"refresh_token\", jsonData.refresh_token);",
+							"    postman.setEnvironmentVariable(\"id_token\", jsonData.id_token);",
+							"}"
 						],
 						"type": "text/javascript"
 					}
@@ -52,12 +55,13 @@
 					]
 				},
 				"url": {
-					"raw": "http://{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
+					"raw": "http://{{keycloak.host}}/auth/realms/{{realm}}/protocol/openid-connect/token",
 					"protocol": "http",
 					"host": [
-						"{{keycloak_url}}"
+						"{{keycloak.host}}"
 					],
 					"path": [
+						"auth",
 						"realms",
 						"{{realm}}",
 						"protocol",
@@ -126,8 +130,8 @@
 			"type": "string"
 		},
 		{
-			"key": "keycloak_url",
-			"value": "localhost:8180/auth",
+			"key": "keycloak.host",
+			"value": "localhost:8180",
 			"type": "string"
 		},
 		{
