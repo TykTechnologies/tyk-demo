@@ -1,9 +1,15 @@
 #!/bin/bash
 
-# This script will run tests across all deployments, if they are provided, rather than just for the tyk deployment
-# This requires that each deployment is sequentially created, tested and then removed
-# It may take a while to complete
-# Note: script must be run from the repoistory root i.e. ./scripts/test-all.sh
+# This script run tests from all Tyk Demo deployments
+# Deployments are processed consecutively in alphabetical order
+# Expect the script to take a while to complete, as each deployment has to be created, tested and removed
+# For a deployment to be tested, two criteria must be met:
+#   1. The deployment must contain a correctly-named Postman collection: e.g. for development directory "foo-bar", the postman collection should be called "tyk_demo_foo_bar.postman_collection.json"
+#   2. The Postman collection must contain at least one test
+# Deployments which don't meet the criteria are skipped
+# Tests are considered successful if no failures are detected i.e. the Newman command generates a 0 exit code
+# If no tests fail then this script exits with a 0, otherwise it will be a non-zero value
+# The script must be run from the repoistory root i.e. ./scripts/test-all.sh
 
 echo "Checking for active deployments"
 if [ ! -s .bootstrap/bootstrapped_deployments ]; then
@@ -29,7 +35,6 @@ do
     echo "Processing deployment: $deployment_name"
 
     # Script assumes postman file name is based on deployment name, but with underscores instead of hyphens
-    # e.g. for development directory "foo-bar", it assumes the postman collection will be "tyk_demo_foo_bar.postman_collection.json"
     postman_collection_file_name="tyk_demo_${deployment_name//-/_}.postman_collection.json"
     postman_collection_path="$deployment_dir/$postman_collection_file_name"
 
@@ -106,7 +111,7 @@ do
         test_skip_count=$((test_skip_count+1));;
     *) 
         echo "ERROR: Unexpected result code. Exiting."
-        exit 1;;
+        exit 2;;
     esac
 done
 
