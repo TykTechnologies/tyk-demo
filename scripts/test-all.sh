@@ -123,6 +123,3 @@ else
     echo "Failure count is not 0, exiting with code 1"
     exit 1
 fi
-
-# TODO: 
-# - fix collection env vars for SSO, MDCB, keycloak dcr, others?
