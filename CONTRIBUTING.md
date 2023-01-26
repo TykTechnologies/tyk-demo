@@ -137,7 +137,8 @@ These utility scripts are available in the `scripts` directory:
 * `add-gateway.sh`: Creates a new Tyk Gateway container, using the same configuration as the base Tyk deployment Gateway
 * `common.sh`: Contains functions useful for bootstrap scripts
 * `export.sh`: Uses the Dashboard API to export API and Policy definitions, overwriting data used to bootstrap the base Tyk deployment
-* `test.sh`: Uses a Newman container to run the Postman collection tests
+* `test.sh`: Uses a Newman container to run the Postman collection tests for only the **Tyk** deployment
+* `test-all.sh`: As `test.sh`, but runs for all deployments
 * `update-hosts.sh`: Adds the necessary hosts to the `/etc/hosts` file
 
 Note that there is no *import* script, as the `up.sh` script essentially imports the data when bootstrapping the deployment.
@@ -153,7 +154,7 @@ There are two scenarios for working with this data:
 
 In this scenario you have made updates to the repo which you want to commit back to master.
 
-Before making a pull request, please check that **all tests are working correctly**. Run the `./scripts/test.sh`, if any tests fail then please resolve.
+Before making a pull request, if your changes are to an existing deployment, please check that **all tests are working correctly** by running the `./scripts/test-all.sh` script. If any tests fail then please resolve.
 
 If you have made changes to APIs or Policies, you can run the export script to update the version controlled data files:
 
