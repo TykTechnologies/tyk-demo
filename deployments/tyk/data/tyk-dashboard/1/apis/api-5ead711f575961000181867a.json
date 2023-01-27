@@ -248,6 +248,18 @@
                 "path": "/anything/modify-headers",
                 "method": "GET",
                 "act_on": false
+              },
+              {
+                "add_headers": {
+                  "Context-Variable-Request-Data": "$tyk_context.request_data",
+                  "Context-Variable-Path-Parts": "$tyk_context.path_parts",
+                  "Context-Variable-Path": "$tyk_context.path",
+                  "Context-Variable-Header-Cat": "$tyk_context.headers_Cat",
+                  "Context-Variable-Remote-Address": "$tyk_context.remote_addr"
+                },
+                "path": "/anything/context-variables",
+                "method": "POST",
+                "act_on": false
               }
             ],
             "hard_timeouts": [
@@ -581,7 +593,7 @@
     "domain_disabled": false,
     "certificates": [],
     "do_not_track": false,
-    "enable_context_vars": false,
+    "enable_context_vars": true,
     "config_data": {},
     "tag_headers": [],
     "global_rate_limit": {
