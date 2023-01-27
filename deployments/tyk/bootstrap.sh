@@ -105,7 +105,8 @@ wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $
 # Python plugin
 
 log_message "Building Python plugin bundle"
-eval "$(generate_docker_compose_command) exec -T -d tyk-gateway sh -c \"cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem\"" 1> /dev/null 2>> bootstrap.log
+docker exec $(get_service_container_id tyk-gateway) sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1> /dev/null 2>> bootstrap.log
+# eval "$(generate_docker_compose_command) exec -T -d tyk-gateway sh -c \"cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem\"" 1> /dev/null 2>> bootstrap.log
 if [ "$?" != 0 ]; then
   echo "Error occurred when building Python plugin bundle"
   exit 1
@@ -114,8 +115,10 @@ log_ok
 bootstrap_progress
 
 log_message "Copying Python bundle to http-server"
+gateway_docker_pwd=$(docker exec $(get_service_container_id tyk-gateway) pwd)
+log_message "  Gateway container working directory path: $gateway_docker_pwd"
 # we don't use a 'docker compose' command here as docker compose version 1 does not support 'cp'
-docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip 2>>bootstrap.log
+docker cp $(get_service_container_id tyk-gateway):$gateway_docker_pwd/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip 2>>bootstrap.log
 if [ "$?" != 0 ]; then
   echo "Error occurred when copying Python bundle to http-server"
   exit 1
