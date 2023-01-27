@@ -49,8 +49,10 @@ bootstrap_progress
 
 # Certificates
 
+log_message "OpenSSL version used for generating certs: $(docker exec $(get_service_container_id tyk-gateway) sh -c "openssl version")"
+
 log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
-openssl req -x509 -newkey rsa:4096 -subj "/CN=tyk-gateway-2.localhost" -keyout deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.pem -out deployments/tyk/volumes/tyk-gateway/certs/tls-certificate.pem -days 365 -nodes >/dev/null 2>>bootstrap.log
+docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tyk-gateway-2.localhost\" -keyout certs/tls-private-key.pem -out certs/tls-certificate.pem -days 365 -nodes" >/dev/null 2>>bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not generate self-signed certificate"
   exit 1
@@ -59,8 +61,7 @@ log_ok
 bootstrap_progress
 
 log_message "Generating private key for secure messaging and signing"
-log_message "  OpenSSL version: $(docker exec $(get_service_container_id tyk-gateway) sh -c "openssl version")"
-docker exec $(get_service_container_id tyk-gateway) sh -c "openssl genrsa -out certs/private-key.pem 2048" >>bootstrap.log
+docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl genrsa -out certs/private-key.pem 2048" >/dev/null 2>>bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not generate private key"
   exit 1
@@ -69,9 +70,7 @@ log_ok
 bootstrap_progress
 
 log_message "Copying private key to the Dashboard"
-docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs # 2>>bootstrap.log
-
-# cp deployments/tyk/volumes/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs
+docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs 2>>bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not copy private key"
   exit 1
@@ -80,7 +79,7 @@ log_ok
 bootstrap_progress
 
 log_message "Generating public key for secure messaging and signing"
-openssl rsa -in deployments/tyk/volumes/tyk-gateway/certs/private-key.pem -pubout -out deployments/tyk/volumes/tyk-gateway/certs/public-key.pem >/dev/null 2>>bootstrap.log
+docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl rsa -in certs/private-key.pem -pubout -out certs/public-key.pem" >/dev/null 2>>bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not generate public key"
   exit 1
@@ -108,8 +107,7 @@ wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $
 # Python plugin
 
 log_message "Building Python plugin bundle"
-docker exec $(get_service_container_id tyk-gateway) sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1> /dev/null 2>> bootstrap.log
-# eval "$(generate_docker_compose_command) exec -T -d tyk-gateway sh -c \"cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem\"" 1> /dev/null 2>> bootstrap.log
+docker exec -d $(get_service_container_id tyk-gateway) sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1> /dev/null 2>> bootstrap.log
 if [ "$?" != 0 ]; then
   echo "Error occurred when building Python plugin bundle"
   exit 1
@@ -118,10 +116,8 @@ log_ok
 bootstrap_progress
 
 log_message "Copying Python bundle to http-server"
-gateway_docker_pwd=$(docker exec $(get_service_container_id tyk-gateway) pwd)
-log_message "  Gateway container working directory path: $gateway_docker_pwd"
 # we don't use a 'docker compose' command here as docker compose version 1 does not support 'cp'
-docker cp $(get_service_container_id tyk-gateway):$gateway_docker_pwd/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip 2>>bootstrap.log
+docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip 2>>bootstrap.log
 if [ "$?" != 0 ]; then
   echo "Error occurred when copying Python bundle to http-server"
   exit 1
