@@ -9,6 +9,7 @@
 #   3. The deployment must be successfully created
 # Deployments which don't meet the criteria are skipped
 # A test is considered successful if a deployment can be created, tested and removed without error
+# The scope of testing is limited to the tests defined within the Postman collection
 # If no tests fail then this script will exit with a 0, otherwise it will be a non-zero value
 # The script must be run from the repository root i.e. ./scripts/test-all.sh
 
