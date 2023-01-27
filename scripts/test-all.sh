@@ -3,13 +3,14 @@
 # This script run tests from all Tyk Demo deployments
 # Deployments are processed consecutively in alphabetical order
 # Expect the script to take a while to complete, as each deployment has to be created, tested and removed
-# For a deployment to be tested, two criteria must be met:
+# For a deployment to be tested, three criteria must be met:
 #   1. The deployment must contain a correctly-named Postman collection: e.g. for development directory "foo-bar", the postman collection should be called "tyk_demo_foo_bar.postman_collection.json"
 #   2. The Postman collection must contain at least one test
+#   3. The deployment must be successfully created
 # Deployments which don't meet the criteria are skipped
-# Tests are considered successful if no failures are detected i.e. the Newman command generates a 0 exit code
-# If no tests fail then this script exits with a 0, otherwise it will be a non-zero value
-# The script must be run from the repoistory root i.e. ./scripts/test-all.sh
+# A test is considered successful if a deployment can be created, tested and removed without error
+# If no tests fail then this script will exit with a 0, otherwise it will be a non-zero value
+# The script must be run from the repository root i.e. ./scripts/test-all.sh
 
 echo "Checking for active deployments"
 if [ ! -s .bootstrap/bootstrapped_deployments ]; then
@@ -62,6 +63,15 @@ do
 
     echo "Creating deployment: $deployment_name"
     ./up.sh $deployment_name
+    if [ "$?" != "0" ]; then
+        echo "  Failed to create $deployment_name deployment"
+        result_codes[${#result_codes[@]}]=4
+        echo "Removing deployment: $deployment_name"
+        ./down.sh
+        continue
+    else
+        echo "  Successfully created $deployment_name deployment"
+    fi
 
     echo "Testing deployment: $deployment_name "
     # Provide the 'test' environment variables, so newman can target the correct hosts from within the docker network
@@ -85,6 +95,15 @@ do
 
     echo "Removing deployment: $deployment_name"
     ./down.sh
+
+    if [ "$?" != "0" ]; then
+        echo "  Failed to remove $deployment_name deployment"
+        result_codes[${#result_codes[@]}]=5
+        # failing to remove a deployment may negatively affect subsequent deployments and tests
+        continue
+    else
+        echo "  Successfully removed $deployment_name deployment"
+    fi
 done
 
 echo -e "\nTesting complete"
@@ -109,6 +128,12 @@ do
     3) 
         echo "$(tput setaf 4)Skip$(tput sgr 0) ${result_names[$i]} - No tests"
         test_skip_count=$((test_skip_count+1));;
+    4) 
+        echo "$(tput setaf 1)Fail$(tput sgr 0) ${result_names[$i]} - Create failed"
+        test_skip_count=$((test_fail_count+1));;
+    5) 
+        echo "$(tput setaf 1)Fail$(tput sgr 0) ${result_names[$i]} - Remove failed"
+        test_skip_count=$((test_fail_count+1));;
     *) 
         echo "ERROR: Unexpected result code. Exiting."
         exit 2;;
