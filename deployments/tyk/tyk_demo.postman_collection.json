@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a9113903-34dd-4848-9dc9-1294e77d5687",
+		"_postman_id": "48438e95-9424-4ae6-b50a-627dd7cb53b6",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -3046,6 +3046,88 @@
 									]
 								},
 								"description": "Header `X-Req-Id` is injected by the Gateway, and can be seen in the response body. \n\nThe header value is a GUID representing the random id assigned to each request by the Gateway. It is configured using the Tyk context variable `$tyk_context.request_id`.\n\nThe value is accessible to various parts of the Tyk middleware chain, so can be used as a reference when processing requests."
+							},
+							"response": []
+						},
+						{
+							"name": "Context Variables",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"'Context-Variable-Request-Data' header contains posted form data\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    // order of data can change, so check for pairs separately",
+											"    pm.expect(jsonData.headers[\"Context-Variable-Request-Data\"]).to.include(\"foo:bar\").and.include(\"fizz:buzz\");",
+											"});",
+											"",
+											"pm.test(\"'Context-Variable-Remote-Address' header is not empty\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    // check value is not empty, rather than try to match IPv4/v6 address",
+											"    pm.expect(jsonData.headers[\"Context-Variable-Remote-Address\"]).to.not.equal(\"\");",
+											"});",
+											"",
+											"pm.test(\"'Context-Variable-Path-Parts' header contains requested path parts\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers[\"Context-Variable-Path-Parts\"]).to.equal(\"plugin-demo-api,anything,context-variables\");",
+											"});",
+											"",
+											"pm.test(\"'Context-Variable-Path' header contains requested path\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers[\"Context-Variable-Path\"]).to.equal(\"/plugin-demo-api/anything/context-variables\");",
+											"});",
+											"",
+											"pm.test(\"'Context-Variable-Header-Cat' header value of Cat HTTP header\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers[\"Context-Variable-Header-Cat\"]).to.equal(\"Ralph\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Cat",
+										"value": "Ralph",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "foo",
+											"value": "bar",
+											"type": "default"
+										},
+										{
+											"key": "fizz",
+											"value": "buzz",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/context-variables",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"context-variables"
+									]
+								},
+								"description": "This request has the Gateway inject several of Tyk's context variables into the request headers. Tyk can inject various contextual data into the request as it processes it - see https://tyk.io/docs/context-variables/.\n\nThe result can be seen in the response body, which shows the injected headers:\n\n- `\"Context-Variable-Header-Cat\": \"Ralph\"`: The value of the HTTP header `Cat`\n- `\"Context-Variable-Path\": \"/plugin-demo-api/anything/context-variable-request-data\"`: The full requested path\n- `\"Context-Variable-Path-Parts\": \"plugin-demo-api,anything,context-variable-request-data\"`: The path as comma-separated parts\n- `\"Context-Variable-Remote-Address\": \"172.26.0.1\"`: The request source IP address\n`\"Context-Variable-Request-Data\": \"foo:bar;fizz:buzz\"`: The URL encoded posted form data"
 							},
 							"response": []
 						},
