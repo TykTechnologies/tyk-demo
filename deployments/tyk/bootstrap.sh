@@ -59,19 +59,19 @@ log_ok
 bootstrap_progress
 
 log_message "Generating private key for secure messaging and signing"
-log_message "  OpenSSL version: $(openssl version)"
-openssl genrsa -out deployments/tyk/volumes/tyk-gateway/certs/private-key.pem 2048 >/dev/null 2>>bootstrap.log
+log_message "  OpenSSL version: $(docker exec $(get_service_container_id tyk-gateway) sh -c "openssl version")"
+docker exec $(get_service_container_id tyk-gateway) sh -c "openssl genrsa -out certs/private-key.pem 2048" >>bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not generate private key"
   exit 1
 fi
-log_message "Private key:"
-cat deployments/tyk/volumes/tyk-gateway/certs/private-key.pem >> bootstrap.log
 log_ok
 bootstrap_progress
 
 log_message "Copying private key to the Dashboard"
-cp deployments/tyk/volumes/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs
+docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs # 2>>bootstrap.log
+
+# cp deployments/tyk/volumes/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not copy private key"
   exit 1
