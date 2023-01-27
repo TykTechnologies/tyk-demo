@@ -25,9 +25,9 @@ jobs:
         with:
           name: bootstrap-log
           path: bootstrap.log
-      # - name: Show bootstrap log
-      #   if: success() || failure()
-      #   run: cat bootstrap.log
+      - name: Show bootstrap log
+        if: success() || failure()
+        run: cat bootstrap.log
       - name: Run Postman tests
         run: sudo ./scripts/test.sh
       - run: echo "🍏 This job's status is ${{ job.status }}."
