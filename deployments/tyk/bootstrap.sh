@@ -59,12 +59,13 @@ log_ok
 bootstrap_progress
 
 log_message "Generating private key for secure messaging and signing"
+log_message "  OpenSSL version: $(openssl version)"
 openssl genrsa -out deployments/tyk/volumes/tyk-gateway/certs/private-key.pem 2048 >/dev/null 2>>bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not generate private key"
   exit 1
 fi
-log_message "  Private key:"
+log_message "Private key:"
 cat deployments/tyk/volumes/tyk-gateway/certs/private-key.pem >> bootstrap.log
 log_ok
 bootstrap_progress
