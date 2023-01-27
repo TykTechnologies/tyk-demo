@@ -19,9 +19,15 @@ jobs:
         run: sudo ./scripts/update-hosts.sh
       - name: Bootstrap Tyk
         run: sudo ./up.sh
-      - name: Show bootstrap log
+      - name: Store bootstrap log
         if: success() || failure()
-        run: cat bootstrap.log
+        uses: actions/upload-artifact@v3
+        with:
+          name: bootstrap-log
+          path: bootstrap.log
+      # - name: Show bootstrap log
+      #   if: success() || failure()
+      #   run: cat bootstrap.log
       - name: Run Postman tests
         run: sudo ./scripts/test.sh
       - run: echo "🍏 This job's status is ${{ job.status }}."
