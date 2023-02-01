@@ -29,12 +29,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8500",
+					"raw": "http://{{waf.host}}",
 					"protocol": "http",
 					"host": [
-						"localhost"
-					],
-					"port": "8500"
+						"{{waf.host}}"
+					]
 				},
 				"description": "This request checks that the Web Application Firewall (WAF) is operational.\n\nIt should return a HTTP 200 response with the body text `hello world`."
 			},
@@ -60,11 +59,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8500/?param=\"<script>alert(1);</script>\"",
+					"raw": "{{waf.host}}/?param=\"<script>alert(1);</script>\"",
 					"host": [
-						"localhost"
+						"{{waf.host}}"
 					],
-					"port": "8500",
 					"path": [
 						""
 					],
@@ -99,11 +97,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/waf/ip",
+					"raw": "{{tyk-gateway.host}}/waf/ip",
 					"host": [
-						"localhost"
+						"{{tyk-gateway.host}}"
 					],
-					"port": "8080",
 					"path": [
 						"waf",
 						"ip"
@@ -138,11 +135,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/waf/ip?param=\"<script>alert(1);</script>\"",
+					"raw": "{{tyk-gateway.host}}/waf/ip?param=\"<script>alert(1);</script>\"",
 					"host": [
-						"localhost"
+						"{{tyk-gateway.host}}"
 					],
-					"port": "8080",
 					"path": [
 						"waf",
 						"ip"
@@ -159,5 +155,15 @@
 			"response": []
 		}
 	],
-	"protocolProfileBehavior": {}
+	"protocolProfileBehavior": {},
+	"variable": [
+		{
+			"key": "waf.host",
+			"value": "localhost:8500"
+		},
+		{
+			"key": "tyk-gateway.host",
+			"value": "tyk-gateway.localhost:8080"
+		}
+	]
 }

@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "490a96e6-baef-49e5-bca9-63a66f930713",
-		"name": "Tyk Demo - Analytics",
+		"name": "Tyk Demo - Analytics Kibana",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -29,13 +29,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://tyk-gateway.localhost:8080/httpbin-acme/get",
+					"raw": "http://{{tyk-gateway.localhost}}/httpbin-acme/get",
 					"protocol": "http",
 					"host": [
-						"tyk-gateway",
-						"localhost"
+						"{{tyk-gateway.host}}"
 					],
-					"port": "8080",
 					"path": [
 						"httpbin-acme",
 						"get"
@@ -46,5 +44,11 @@
 			"response": []
 		}
 	],
-	"protocolProfileBehavior": {}
+	"protocolProfileBehavior": {},
+	"variable": [
+		{
+			"key": "tyk-gateway.host",
+			"value": "tyk-gateway.localhost:8080"
+		}
+	]
 }
