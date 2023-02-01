@@ -255,7 +255,7 @@
         "raw_body_only": false
       },
       "response": [],
-      "driver": "",
+      "driver": "otto",
       "id_extractor": {
         "extract_from": "",
         "extract_with": "",
