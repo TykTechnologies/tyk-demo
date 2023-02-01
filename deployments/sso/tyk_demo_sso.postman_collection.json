@@ -1,12 +1,30 @@
 {
 	"info": {
-		"_postman_id": "3d3b169a-1ef8-42e3-b5b1-c4d6b1eb3a55",
+		"_postman_id": "4777a12d-ae25-42fe-9bf3-e49cad70ae70",
 		"name": "Tyk Demo - SSO",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "LDAP - Generate API key",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Key data is returned\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.key_id).to.be.length.gt(0)",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -46,7 +64,6 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "d07fac22-2de4-4a1c-a077-0247d253ccfc",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -56,7 +73,6 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "e66c6bce-384f-4a95-9266-8216a1d8a06e",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -66,15 +82,12 @@
 	],
 	"variable": [
 		{
-			"id": "64638bbd-2c10-4fe2-91ea-002faabd9eda",
 			"key": "tyk-identity-broker.host",
 			"value": "localhost:3010"
 		},
 		{
-			"id": "f4775614-6c19-4823-976b-4e99b6bbb977",
 			"key": "tyk-dashboard.host",
 			"value": "tyk-dashboard.localhost:3000"
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }

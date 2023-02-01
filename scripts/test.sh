@@ -18,7 +18,7 @@ trap onExit EXIT;
 # --insecure option is used due to self-signed certificates
 docker run -t --rm \
     --network tyk-demo_tyk \
-    -v $(pwd)/deployments/tyk/tyk_demo.postman_collection.json:/etc/postman/tyk_demo.postman_collection.json \
+    -v $(pwd)/deployments/tyk/tyk_demo_tyk.postman_collection.json:/etc/postman/tyk_demo.postman_collection.json \
     -v $(pwd)/test.postman_environment.json:/etc/postman/test.postman_environment.json \
     postman/newman:alpine \
     run "/etc/postman/tyk_demo.postman_collection.json" \

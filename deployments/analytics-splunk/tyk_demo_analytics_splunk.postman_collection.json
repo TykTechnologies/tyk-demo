@@ -29,13 +29,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://tyk-gateway.localhost:8080/httpbin-acme/get",
+					"raw": "http://{{tyk-gateway.host}}/httpbin-acme/get",
 					"protocol": "http",
 					"host": [
-						"tyk-gateway",
-						"localhost"
+						"{{tyk-gateway.host}}"
 					],
-					"port": "8080",
 					"path": [
 						"httpbin-acme",
 						"get"
@@ -46,5 +44,11 @@
 			"response": []
 		}
 	],
-	"protocolProfileBehavior": {}
+	"protocolProfileBehavior": {},
+	"variable": [
+		{
+			"key": "tyk-gateway.host",
+			"value": "tyk-gateway.localhost:8080"
+		}
+	]
 }
