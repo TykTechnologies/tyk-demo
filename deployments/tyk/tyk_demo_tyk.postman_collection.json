@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "48438e95-9424-4ae6-b50a-627dd7cb53b6",
+		"_postman_id": "83f72dbf-9430-4886-840c-5ffae29b8615",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -7136,7 +7136,8 @@
 													"    pm.expect(jsonData.user_permissions.IsAdmin).to.equal(\"admin\");",
 													"    pm.expect(jsonData.first_name).to.equal(pm.variables.get(\"user-first-name\"));",
 													"    pm.expect(jsonData.last_name).to.equal(pm.variables.get(\"user-last-name\"));",
-													"    pm.expect(jsonData.email_address).to.equal(pm.variables.get(\"user-email-address\"));",
+													"    // Tyk converts email addresses to lower case, so we validate against a lower case email address",
+													"    pm.expect(jsonData.email_address).to.equal(pm.variables.get(\"user-email-address\").toLowerCase());",
 													"});",
 													"",
 													"// tidy up",
