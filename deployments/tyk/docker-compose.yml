@@ -11,7 +11,7 @@ services:
       - ./deployments/tyk/volumes/tyk-dashboard/certs:/opt/tyk-dashboard/certs
       - ./deployments/tyk/volumes/tyk-dashboard/catalogue.html:/opt/tyk-dashboard/portal/templates/catalogue.html
       - ./deployments/tyk/volumes/tyk-dashboard/navigation.html:/opt/tyk-dashboard/portal/templates/navigation.html
-      - ./deployments/tyk/volumes/tyk-dashboard/audit.log:/opt/tyk-dashboard/audit.log
+      - ./deployments/tyk/volumes/tyk-dashboard/audit:/opt/tyk-dashboard/audit
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Dashboard licence missing from Docker environment file .env. Review The Getting Started steps in README.md.}
       - TYK_LOGLEVEL=${DASHBOARD_LOGLEVEL:-info}

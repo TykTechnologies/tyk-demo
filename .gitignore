@@ -12,7 +12,7 @@ deployments/tyk/volumes/tyk-gateway/plugins/go/example/vendor
 deployments/tyk/volumes/http-server/python-basic-example.zip
 deployments/tyk/volumes/tyk-gateway/middleware/bundles
 deployments/tyk/volumes/tyk-gateway/plugins/go/jwt/vendor
-audit.log
+deployments/tyk/volumes/tyk-dashboard/audit/audit.log
 deployments/tyk/volumes/tyk-gateway/certs/tls-certificate.pem
 deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.pem
 deployments/tyk/volumes/tyk-gateway/certs/private-key.pem
