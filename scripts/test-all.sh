@@ -131,10 +131,10 @@ do
         test_skip_count=$((test_skip_count+1));;
     4) 
         echo "$(tput setaf 1)Fail$(tput sgr 0) ${result_names[$i]} - Create failed"
-        test_skip_count=$((test_fail_count+1));;
+        test_fail_count=$((test_fail_count+1));;
     5) 
         echo "$(tput setaf 1)Fail$(tput sgr 0) ${result_names[$i]} - Remove failed"
-        test_skip_count=$((test_fail_count+1));;
+        test_fail_count=$((test_fail_count+1));;
     *) 
         echo "ERROR: Unexpected result code. Exiting."
         exit 2;;
