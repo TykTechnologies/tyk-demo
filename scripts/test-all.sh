@@ -13,6 +13,11 @@
 # If no tests fail then this script will exit with a 0, otherwise it will be a non-zero value
 # The script must be run from the repository root i.e. ./scripts/test-all.sh
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NOCOLOUR='\033[0m'
+
 echo "Checking for active deployments"
 if [ ! -s .bootstrap/bootstrapped_deployments ]; then
    echo "  No active deployments found - proceeding with tests"
@@ -118,22 +123,22 @@ do
   result_print=""
   case ${result_codes[$i]} in
     0)
-        echo "$(tput setaf 2)Pass$(tput sgr 0) ${result_names[$i]} - Tests passed"
+        echo "${GREEN}Pass${NOCOLOUR} ${result_names[$i]} - Tests passed"
         test_pass_count=$((test_pass_count+1));;
     1) 
-        echo "$(tput setaf 1)Fail$(tput sgr 0) ${result_names[$i]} - Tests failed"
+        echo "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Tests failed"
         test_fail_count=$((test_fail_count+1));;
     2) 
-        echo "$(tput setaf 4)Skip$(tput sgr 0) ${result_names[$i]} - No collection"
+        echo "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No collection"
         test_skip_count=$((test_skip_count+1));;
     3) 
-        echo "$(tput setaf 4)Skip$(tput sgr 0) ${result_names[$i]} - No tests"
+        echo "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No tests"
         test_skip_count=$((test_skip_count+1));;
     4) 
-        echo "$(tput setaf 1)Fail$(tput sgr 0) ${result_names[$i]} - Create failed"
+        echo "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Create failed"
         test_fail_count=$((test_fail_count+1));;
     5) 
-        echo "$(tput setaf 1)Fail$(tput sgr 0) ${result_names[$i]} - Remove failed"
+        echo "$(tput setaf 1)Fail${NOCOLOUR} ${result_names[$i]} - Remove failed"
         test_fail_count=$((test_fail_count+1));;
     *) 
         echo "ERROR: Unexpected result code. Exiting."
@@ -142,9 +147,9 @@ do
 done
 
 echo -e "\nTest Result Totals:"
-echo "$(tput setaf 2)Pass$(tput sgr 0):$test_pass_count"
-echo "$(tput setaf 1)Fail$(tput sgr 0):$test_fail_count"
-echo "$(tput setaf 4)Skip$(tput sgr 0):$test_skip_count"
+echo "${GREEN}Pass${NOCOLOUR}:$test_pass_count"
+echo "${RED}Fail${NOCOLOUR}:$test_fail_count"
+echo "${BLUE}Skip${NOCOLOUR}:$test_skip_count"
 
 echo -e "\nExit Status:"
 if [ $test_fail_count = 0 ]; then
