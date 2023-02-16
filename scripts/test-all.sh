@@ -49,7 +49,7 @@ do
     echo "Validating deployment's Postman collection ($postman_collection_file_name)"
 
     if [ -z "$(ls -A $postman_collection_path 2>/dev/null)" ]; then
-        echo "  Collection not found. Skipping to next deployment."
+        echo -e "  Collection not found. ${BLUE}Skipping${NOCOLOUR} to next deployment."
         result_codes[${#result_codes[@]}]=2
         continue
     else
@@ -60,7 +60,7 @@ do
     # The jq command finds "listen" fields which have the value "test", if none are returned then the collection doesn't contain any tests
     postman_collection_tests=$(jq '..|.listen?|select(.=="test")' $postman_collection_path)
     if [[ "$postman_collection_tests" == "" ]]; then
-        echo "  Collection does not contain any tests. Skipping to next deployment."
+        echo -e "  Collection does not contain any tests. ${BLUE}Skipping${NOCOLOUR} to next deployment."
         result_codes[${#result_codes[@]}]=3
         continue
     else
@@ -70,7 +70,7 @@ do
     echo "Creating deployment: $deployment_name"
     ./up.sh $deployment_name persist-log
     if [ "$?" != "0" ]; then
-        echo "  Failed to create $deployment_name deployment"
+        echo -e "  ${RED}Failed${NOCOLOUR} to create $deployment_name deployment"
         result_codes[${#result_codes[@]}]=4
         echo "Removing deployment: $deployment_name"
         ./down.sh
@@ -92,10 +92,10 @@ do
         --insecure
 
     if [ "$?" != "0" ]; then
-        echo "Tests failed for $deployment_name deployment"
+        echo -e "Tests ${RED}failed${NOCOLOUR} for $deployment_name deployment"
         result_codes[${#result_codes[@]}]=1
     else
-        echo "Tests passed for $deployment_name deployment"
+        echo -e "Tests ${GREEN}passed${NOCOLOUR} for $deployment_name deployment"
         result_codes[${#result_codes[@]}]=0
     fi
 
@@ -103,7 +103,7 @@ do
     ./down.sh
 
     if [ "$?" != "0" ]; then
-        echo "  Failed to remove $deployment_name deployment"
+        echo -e "  ${RED}Failed${NOCOLOUR} to remove $deployment_name deployment"
         result_codes[${#result_codes[@]}]=5
         # failing to remove a deployment may negatively affect subsequent deployments and tests
         continue
