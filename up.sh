@@ -2,10 +2,9 @@
 
 source scripts/common.sh
 
-echo "Bringing Tyk Demo deployment UP"
+persist_log=false
 
-# restart bootstrap log file
-echo -n > bootstrap.log
+echo "Bringing Tyk Demo deployment UP"
 
 # check .env file exists
 if [ ! -f .env ]; then
@@ -61,19 +60,41 @@ else
   deployments_to_create+=("tyk")
 fi
 
-# extract new deployments from arguments
-for deployment in "$@"; do
-  # skip "tyk" deployment, as it is handled automatically
-  [ "$deployment" == "tyk" ] && continue
+deployment_names=(deployments/*)
+# process arguments
+for argument in "$@"; do  
+  argument_is_deployment=false
+  # process arguments that refer to deployments
+  for deployment_name in "${deployment_names[@]}"
+  do
+    if [ "deployments/$argument" = "$deployment_name" ]; then
+      argument_is_deployment=true
 
-  # skip existing deployments, to avoid rebootstrapping
-  if [ ! -z $(grep "$deployment" ".bootstrap/bootstrapped_deployments") ]; then 
-    echo "Deployment \"$deployment\" already exists, skipping."
-    continue
-  fi
+      # "tyk" deployment is handled automatically, so skip
+      [ "$deployment_name" == "tyk" ] && continue
 
-  echo "$deployment" >> .bootstrap/bootstrapped_deployments
-  deployments_to_create+=("$deployment")
+      # skip existing deployments, to avoid rebootstrapping
+      if [ ! -z $(grep "$argument" ".bootstrap/bootstrapped_deployments") ]; then 
+        echo "Deployment \"$argument\" already exists, skipping."
+        continue
+      fi
+
+      echo "$argument" >> .bootstrap/bootstrapped_deployments
+      deployments_to_create+=("$argument")
+      break
+    fi
+  done  
+
+  # continue if argument was processed as a deployment
+  [ "$argument_is_deployment" = true ] && continue
+
+  # process arguments that are not deployments
+  case $argument in
+  "persist-log")
+    echo "Persisting bootstrap log"
+    persist_log=true;;
+  *) echo "Argument \"$argument\" is unknown, ignoring.";; 
+  esac
 done
 
 # check if bootstrap is needed
@@ -88,6 +109,11 @@ echo "Deployments to create:"
 for deployment in "${deployments_to_create[@]}"; do
   echo "  $deployment"
 done
+
+# clear log, if it is not persisted
+if [ "$persist_log" = false ]; then
+  echo -n > bootstrap.log
+fi
 
 # bring the containers up
 command_docker_compose="$(generate_docker_compose_command) up --remove-orphans -d"
