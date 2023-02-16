@@ -12,8 +12,8 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - name: Create Environment File
         run: |
-          echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> $GITHUB_ENV
-          echo "MDCB_LICENCE=${{ secrets.MDCB_LICENSE }}" >> $GITHUB_ENV
+          echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
+          echo "MDCB_LICENCE=${{ secrets.MDCB_LICENSE }}" >> .env
       - name: Update Hosts
         run: sudo ./scripts/update-hosts.sh
       - name: Bootstrap and Test All Eligible Deployments
