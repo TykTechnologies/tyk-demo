@@ -68,7 +68,7 @@ do
     fi
 
     echo "Creating deployment: $deployment_name"
-    ./up.sh $deployment_name
+    ./up.sh $deployment_name persist-log
     if [ "$?" != "0" ]; then
         echo "  Failed to create $deployment_name deployment"
         result_codes[${#result_codes[@]}]=4
@@ -123,22 +123,22 @@ do
   result_print=""
   case ${result_codes[$i]} in
     0)
-        echo "${GREEN}Pass${NOCOLOUR} ${result_names[$i]} - Tests passed"
+        echo -e "${GREEN}Pass${NOCOLOUR} ${result_names[$i]} - Tests passed"
         test_pass_count=$((test_pass_count+1));;
     1) 
-        echo "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Tests failed"
+        echo -e "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Tests failed"
         test_fail_count=$((test_fail_count+1));;
     2) 
-        echo "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No collection"
+        echo -e "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No collection"
         test_skip_count=$((test_skip_count+1));;
     3) 
-        echo "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No tests"
+        echo -e "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No tests"
         test_skip_count=$((test_skip_count+1));;
     4) 
-        echo "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Create failed"
+        echo -e "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Create failed"
         test_fail_count=$((test_fail_count+1));;
     5) 
-        echo "$(tput setaf 1)Fail${NOCOLOUR} ${result_names[$i]} - Remove failed"
+        echo -e "$(tput setaf 1)Fail${NOCOLOUR} ${result_names[$i]} - Remove failed"
         test_fail_count=$((test_fail_count+1));;
     *) 
         echo "ERROR: Unexpected result code. Exiting."
@@ -147,9 +147,9 @@ do
 done
 
 echo -e "\nTest Result Totals:"
-echo "${GREEN}Pass${NOCOLOUR}:$test_pass_count"
-echo "${RED}Fail${NOCOLOUR}:$test_fail_count"
-echo "${BLUE}Skip${NOCOLOUR}:$test_skip_count"
+echo -e "${GREEN}Pass${NOCOLOUR}:$test_pass_count"
+echo -e "${RED}Fail${NOCOLOUR}:$test_fail_count"
+echo -e "${BLUE}Skip${NOCOLOUR}:$test_skip_count"
 
 echo -e "\nExit Status:"
 if [ $test_fail_count = 0 ]; then
