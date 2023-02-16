@@ -15,7 +15,7 @@ services:
   tyk-worker-gateway:
     image: tykio/tyk-gateway:${GATEWAY_WORKER_VERSION:-v4.3.3-rc2}
     ports:
-      - 8084:8080
+      - 8090:8080
     networks:
       - tyk
     environment:
