@@ -11,6 +11,7 @@
 # A test is considered successful if a deployment can be created, tested and removed without error
 # The scope of testing is limited to the tests defined within the Postman collection
 # If no tests fail then this script will exit with a 0, otherwise it will be a non-zero value
+# Tests may fail due to environmental reasons, so if you experience a failure it's worth checking that it wasn't caused by an environmental error, such as lack of resources
 # The script must be run from the repository root i.e. ./scripts/test-all.sh
 
 RED='\033[0;31m'
