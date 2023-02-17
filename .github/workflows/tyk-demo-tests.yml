@@ -24,6 +24,12 @@ jobs:
         with:
           name: bootstrap-log
           path: bootstrap.log
+      - name: Store Test Results Log
+        if: success() || failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-log
+          path: test-results.log
       - name: Show Bootstrap Log
         if: success() || failure()
         run: cat bootstrap.log

@@ -30,6 +30,9 @@ else
     ./down.sh
 fi
 
+# clear test result log file
+echo -n > test-result.log
+
 declare -a result_names
 declare -a result_codes
 
@@ -89,7 +92,8 @@ do
         postman/newman:alpine \
         run "/etc/postman/tyk_demo.postman_collection.json" \
         --environment /etc/postman/test.postman_environment.json \
-        --insecure
+        --insecure \
+        | tee -a test-result.log
 
     if [ "$?" != "0" ]; then
         echo -e "Tests ${RED}failed${NOCOLOUR} for $deployment_name deployment"
