@@ -31,7 +31,7 @@ else
 fi
 
 # clear test result log file
-echo -n > test-result.log
+echo -n > test.log
 
 declare -a result_names
 declare -a result_codes
@@ -93,7 +93,9 @@ do
         run "/etc/postman/tyk_demo.postman_collection.json" \
         --environment /etc/postman/test.postman_environment.json \
         --insecure \
-        | tee -a test-result.log
+        | tee -a test.log
+    # output of above command is captured in test.log file
+    # file will contain control characters, so is advised to use command "less -r test.log", or similar, to view it
 
     if [ "$?" != "0" ]; then
         echo -e "Tests ${RED}failed${NOCOLOUR} for $deployment_name deployment"
