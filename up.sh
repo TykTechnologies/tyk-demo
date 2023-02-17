@@ -2,6 +2,8 @@
 
 source scripts/common.sh
 
+# persistence of bootstrap.log file is disabled by default, meaning the file is 
+# to enable persistence, use argument "persist-log" when running this script
 persist_log=false
 
 echo "Bringing Tyk Demo deployment UP"
@@ -64,19 +66,20 @@ deployment_names=(deployments/*)
 # process arguments
 for argument in "$@"; do  
   argument_is_deployment=false
+
+  # "tyk" deployment is handled automatically, so ignore and continue to next argument
+  [ "$deployment_name" == "tyk" ] && continue
+
   # process arguments that refer to deployments
   for deployment_name in "${deployment_names[@]}"
   do
     if [ "deployments/$argument" = "$deployment_name" ]; then
       argument_is_deployment=true
 
-      # "tyk" deployment is handled automatically, so skip
-      [ "$deployment_name" == "tyk" ] && continue
-
       # skip existing deployments, to avoid rebootstrapping
       if [ ! -z $(grep "$argument" ".bootstrap/bootstrapped_deployments") ]; then 
         echo "Deployment \"$argument\" already exists, skipping."
-        continue
+        break
       fi
 
       echo "$argument" >> .bootstrap/bootstrapped_deployments
@@ -85,7 +88,7 @@ for argument in "$@"; do
     fi
   done  
 
-  # continue if argument was processed as a deployment
+  # skip to next argument if this argument has already been processed as a deployment
   [ "$argument_is_deployment" = true ] && continue
 
   # process arguments that are not deployments
