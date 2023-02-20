@@ -31,8 +31,9 @@ else
     ./down.sh
 fi
 
-# clear test result log file
+# clear log files
 echo -n > test.log
+echo -n > bootstrap.log
 
 declare -a result_names
 declare -a result_codes
@@ -127,7 +128,6 @@ test_fail_count=0
 test_skip_count=0
 for i in "${!result_codes[@]}"
 do 
-  result_print=""
   case ${result_codes[$i]} in
     0)
         echo -e "${GREEN}Pass${NOCOLOUR} ${result_names[$i]} - Tests passed"
@@ -145,7 +145,7 @@ do
         echo -e "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Create failed"
         test_fail_count=$((test_fail_count+1));;
     5) 
-        echo -e "$(tput setaf 1)Fail${NOCOLOUR} ${result_names[$i]} - Remove failed"
+        echo -e "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Remove failed"
         test_fail_count=$((test_fail_count+1));;
     *) 
         echo "ERROR: Unexpected result code. Exiting."
@@ -160,9 +160,9 @@ echo -e "${BLUE}Skip${NOCOLOUR}:$test_skip_count"
 
 echo -e "\nExit Status:"
 if [ $test_fail_count = 0 ]; then
-    echo "Failure count is 0, exiting with code 0"
+    echo "No failures detected, exiting with code 0"
     exit 0
 else
-    echo "Failure count is not 0, exiting with code 1"
+    echo "Failures detected, exiting with code 1"
     exit 1
 fi
