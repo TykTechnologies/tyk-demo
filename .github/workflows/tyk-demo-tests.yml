@@ -33,4 +33,7 @@ jobs:
       - name: Show Bootstrap Log
         if: success() || failure()
         run: cat bootstrap.log
+      - name: Show Test Log
+        if: success() || failure()
+        run: cat test.log
       - run: echo "🍏 This job's status is ${{ job.status }}."
