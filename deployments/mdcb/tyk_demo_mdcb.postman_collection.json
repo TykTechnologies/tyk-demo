@@ -44,7 +44,7 @@
 	"variable": [
 		{
 			"key": "tyk-worker-gateway.host",
-			"value": "tyk-worker-gateway.localhost:8084"
+			"value": "tyk-worker-gateway.localhost:8090"
 		}
 	]
 }

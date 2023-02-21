@@ -11,7 +11,13 @@
 # A test is considered successful if a deployment can be created, tested and removed without error
 # The scope of testing is limited to the tests defined within the Postman collection
 # If no tests fail then this script will exit with a 0, otherwise it will be a non-zero value
+# Tests may fail due to environmental reasons, so if you experience a failure it's worth checking that it wasn't caused by an environmental error, such as lack of resources
 # The script must be run from the repository root i.e. ./scripts/test-all.sh
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NOCOLOUR='\033[0m'
 
 echo "Checking for active deployments"
 if [ ! -s .bootstrap/bootstrapped_deployments ]; then
@@ -24,6 +30,10 @@ else
     echo "Removing active deployments..."
     ./down.sh
 fi
+
+# clear log files
+echo -n > test.log
+echo -n > bootstrap.log
 
 declare -a result_names
 declare -a result_codes
@@ -44,7 +54,7 @@ do
     echo "Validating deployment's Postman collection ($postman_collection_file_name)"
 
     if [ -z "$(ls -A $postman_collection_path 2>/dev/null)" ]; then
-        echo "  Collection not found. Skipping to next deployment."
+        echo -e "  Collection not found. ${BLUE}Skipping${NOCOLOUR} to next deployment."
         result_codes[${#result_codes[@]}]=2
         continue
     else
@@ -55,7 +65,7 @@ do
     # The jq command finds "listen" fields which have the value "test", if none are returned then the collection doesn't contain any tests
     postman_collection_tests=$(jq '..|.listen?|select(.=="test")' $postman_collection_path)
     if [[ "$postman_collection_tests" == "" ]]; then
-        echo "  Collection does not contain any tests. Skipping to next deployment."
+        echo -e "  Collection does not contain any tests. ${BLUE}Skipping${NOCOLOUR} to next deployment."
         result_codes[${#result_codes[@]}]=3
         continue
     else
@@ -63,9 +73,9 @@ do
     fi
 
     echo "Creating deployment: $deployment_name"
-    ./up.sh $deployment_name
+    ./up.sh $deployment_name persist-log
     if [ "$?" != "0" ]; then
-        echo "  Failed to create $deployment_name deployment"
+        echo -e "  ${RED}Failed${NOCOLOUR} to create $deployment_name deployment"
         result_codes[${#result_codes[@]}]=4
         echo "Removing deployment: $deployment_name"
         ./down.sh
@@ -84,13 +94,16 @@ do
         postman/newman:alpine \
         run "/etc/postman/tyk_demo.postman_collection.json" \
         --environment /etc/postman/test.postman_environment.json \
-        --insecure
+        --insecure \
+        | tee -a test.log
+    # output of above command is captured in test.log file
+    # file will contain control characters, so is advised to use command "less -r test.log", or similar, to view it
 
     if [ "$?" != "0" ]; then
-        echo "Tests failed for $deployment_name deployment"
+        echo -e "Tests ${RED}failed${NOCOLOUR} for $deployment_name deployment"
         result_codes[${#result_codes[@]}]=1
     else
-        echo "Tests passed for $deployment_name deployment"
+        echo -e "Tests ${GREEN}passed${NOCOLOUR} for $deployment_name deployment"
         result_codes[${#result_codes[@]}]=0
     fi
 
@@ -98,7 +111,7 @@ do
     ./down.sh
 
     if [ "$?" != "0" ]; then
-        echo "  Failed to remove $deployment_name deployment"
+        echo -e "  ${RED}Failed${NOCOLOUR} to remove $deployment_name deployment"
         result_codes[${#result_codes[@]}]=5
         # failing to remove a deployment may negatively affect subsequent deployments and tests
         continue
@@ -115,26 +128,25 @@ test_fail_count=0
 test_skip_count=0
 for i in "${!result_codes[@]}"
 do 
-  result_print=""
   case ${result_codes[$i]} in
     0)
-        echo "$(tput setaf 2)Pass$(tput sgr 0) ${result_names[$i]} - Tests passed"
+        echo -e "${GREEN}Pass${NOCOLOUR} ${result_names[$i]} - Tests passed"
         test_pass_count=$((test_pass_count+1));;
     1) 
-        echo "$(tput setaf 1)Fail$(tput sgr 0) ${result_names[$i]} - Tests failed"
+        echo -e "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Tests failed"
         test_fail_count=$((test_fail_count+1));;
     2) 
-        echo "$(tput setaf 4)Skip$(tput sgr 0) ${result_names[$i]} - No collection"
+        echo -e "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No collection"
         test_skip_count=$((test_skip_count+1));;
     3) 
-        echo "$(tput setaf 4)Skip$(tput sgr 0) ${result_names[$i]} - No tests"
+        echo -e "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No tests"
         test_skip_count=$((test_skip_count+1));;
     4) 
-        echo "$(tput setaf 1)Fail$(tput sgr 0) ${result_names[$i]} - Create failed"
-        test_skip_count=$((test_fail_count+1));;
+        echo -e "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Create failed"
+        test_fail_count=$((test_fail_count+1));;
     5) 
-        echo "$(tput setaf 1)Fail$(tput sgr 0) ${result_names[$i]} - Remove failed"
-        test_skip_count=$((test_fail_count+1));;
+        echo -e "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Remove failed"
+        test_fail_count=$((test_fail_count+1));;
     *) 
         echo "ERROR: Unexpected result code. Exiting."
         exit 2;;
@@ -142,15 +154,15 @@ do
 done
 
 echo -e "\nTest Result Totals:"
-echo "$(tput setaf 2)Pass$(tput sgr 0):$test_pass_count"
-echo "$(tput setaf 1)Fail$(tput sgr 0):$test_fail_count"
-echo "$(tput setaf 4)Skip$(tput sgr 0):$test_skip_count"
+echo -e "${GREEN}Pass${NOCOLOUR}:$test_pass_count"
+echo -e "${RED}Fail${NOCOLOUR}:$test_fail_count"
+echo -e "${BLUE}Skip${NOCOLOUR}:$test_skip_count"
 
 echo -e "\nExit Status:"
 if [ $test_fail_count = 0 ]; then
-    echo "Failure count is 0, exiting with code 0"
+    echo "No failures detected, exiting with code 0"
     exit 0
 else
-    echo "Failure count is not 0, exiting with code 1"
+    echo "Failures detected, exiting with code 1"
     exit 1
 fi

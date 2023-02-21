@@ -12,7 +12,7 @@ MDCB architecture creates a Control Plane and a Data Plane:
 - MDCB is the link between the Planes
 
 The worker Gateway can be accessed here:
-- [Tyk Worker Gateway](http://tyk-worker-gateway.localhost:8084)
+- [Tyk Worker Gateway](http://tyk-worker-gateway.localhost:8090)
 
 ## Setup
 
@@ -79,7 +79,7 @@ These indicate that the Gateway has lost its connection to MDCB.
 You can then try accessing APIs via the Worker Gateway:
 
 ```
-curl http://tyk-worker-gateway.localhost:8084/basic-open-api/get
+curl http://tyk-worker-gateway.localhost:8090/basic-open-api/get
 ```
 
 You will receive a response, despite the Gateway being disconnected from MDCB. In a typical multi-data centre deployment, this would allow the Gateway to continue operating in the event of connectivity disuption between it and the primary data centre where MDCB is deployed.

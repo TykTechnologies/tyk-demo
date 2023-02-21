@@ -15,13 +15,13 @@ services:
   tyk-worker-gateway:
     image: tykio/tyk-gateway:${GATEWAY_WORKER_VERSION:-v4.3.3-rc2}
     ports:
-      - 8084:8080
+      - 8090:8080
     networks:
       - tyk
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-0}
-      - TYK_GW_SLAVEOPTIONS_APIKEY=${MDCB_USER_API_CREDENTIALS:?}
+      - TYK_GW_SLAVEOPTIONS_APIKEY=${MDCB_USER_API_CREDENTIALS:-placeholder}
     volumes:
       - ./deployments/mdcb/volumes/tyk-worker-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
