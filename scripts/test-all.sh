@@ -87,15 +87,19 @@ do
     echo "Testing deployment: $deployment_name "
     # Provide the 'test' environment variables, so newman can target the correct hosts from within the docker network
     # --insecure option is used due to self-signed certificates
-    docker run -t --rm \
-        --network tyk-demo_tyk \
-        -v $(pwd)/$postman_collection_path:/etc/postman/tyk_demo.postman_collection.json \
-        -v $(pwd)/test.postman_environment.json:/etc/postman/test.postman_environment.json \
-        postman/newman:alpine \
-        run "/etc/postman/tyk_demo.postman_collection.json" \
-        --environment /etc/postman/test.postman_environment.json \
-        --insecure \
-        | tee -a test.log
+    # pipefail option is set so that failure of docker command can be detected
+    (
+        set -o pipefail  
+        docker run -t --rm \
+            --network tyk-demo_tyk \
+            -v $(pwd)/$postman_collection_path:/etc/postman/tyk_demo.postman_collection.json \
+            -v $(pwd)/test.postman_environment.json:/etc/postman/test.postman_environment.json \
+            postman/newman:alpine \
+            run "/etc/postman/tyk_demo.postman_collection.json" \
+            --environment /etc/postman/test.postman_environment.json \
+            --insecure \
+            | tee -a test.log
+    )
     # output of above command is captured in test.log file
     # file will contain control characters, so is advised to use command "less -r test.log", or similar, to view it
 
