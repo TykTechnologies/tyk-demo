@@ -1,0 +1,121 @@
+{
+    "last_check": 0,
+    "allowance": 1000,
+    "rate": 1000,
+    "per": 60,
+    "throttle_interval": -1,
+    "throttle_retry_limit": -1,
+    "max_query_depth": -1,
+    "date_created": "2023-03-23T09:03:44.919426863Z",
+    "expires": 0,
+    "quota_max": -1,
+    "quota_renews": 1679562223,
+    "quota_remaining": 0,
+    "quota_renewal_rate": -1,
+    "access_rights": {
+        "c252af6eaf2e43ca5c89465af4f481c1": {
+            "api_name": "",
+            "api_id": "",
+            "versions": [
+                "Default"
+            ],
+            "allowed_urls": [],
+            "restricted_types": [],
+            "allowed_types": [],
+            "limit": {
+                "rate": 3,
+                "per": 6,
+                "throttle_interval": -1,
+                "throttle_retry_limit": -1,
+                "max_query_depth": -1,
+                "quota_max": -1,
+                "quota_renews": 0,
+                "quota_remaining": 0,
+                "quota_renewal_rate": -1
+            },
+            "field_access_rights": [],
+            "disable_introspection": false,
+            "allowance_scope": "c252af6eaf2e43ca5c89465af4f481c1"
+        },
+        "d1dfc6a927a046c54c0ed470f19757cc": {
+            "api_name": "",
+            "api_id": "",
+            "versions": [
+                "Default"
+            ],
+            "allowed_urls": [],
+            "restricted_types": [],
+            "allowed_types": [],
+            "limit": {
+                "rate": 1000,
+                "per": 60,
+                "throttle_interval": -1,
+                "throttle_retry_limit": -1,
+                "max_query_depth": -1,
+                "quota_max": -1,
+                "quota_renews": 0,
+                "quota_remaining": 0,
+                "quota_renewal_rate": -1
+            },
+            "field_access_rights": [],
+            "disable_introspection": false,
+            "allowance_scope": "641c15dd0fffb800010197bf"
+        },
+        "d371b83b249845a2497ab9a947fd6210": {
+            "api_name": "",
+            "api_id": "",
+            "versions": [
+                "Default"
+            ],
+            "allowed_urls": [],
+            "restricted_types": [],
+            "allowed_types": [],
+            "limit": {
+                "rate": 1,
+                "per": 5,
+                "throttle_interval": -1,
+                "throttle_retry_limit": -1,
+                "max_query_depth": -1,
+                "quota_max": -1,
+                "quota_renews": 0,
+                "quota_remaining": 0,
+                "quota_renewal_rate": -1
+            },
+            "field_access_rights": [],
+            "disable_introspection": false,
+            "allowance_scope": "d371b83b249845a2497ab9a947fd6210"
+        }
+    },
+    "org_id": "5e9d9544a1dcd60001d0ed20",
+    "oauth_client_id": "",
+    "oauth_keys": null,
+    "certificate": "",
+    "basic_auth_data": {
+        "password": "",
+        "hash_type": ""
+    },
+    "jwt_data": {
+        "secret": ""
+    },
+    "hmac_enabled": false,
+    "enable_http_signature_validation": false,
+    "hmac_string": "",
+    "rsa_certificate_id": "",
+    "is_inactive": false,
+    "apply_policy_id": "",
+    "apply_policies": [
+        "641c15dd0fffb800010197bf"
+    ],
+    "data_expires": 0,
+    "monitor": {
+        "trigger_limits": null
+    },
+    "enable_detail_recording": false,
+    "enable_detailed_recording": false,
+    "meta_data": {},
+    "tags": [],
+    "alias": "",
+    "last_updated": "1679562224",
+    "id_extractor_deadline": 0,
+    "session_lifetime": 0
+}

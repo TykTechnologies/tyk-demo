@@ -1,0 +1,166 @@
+{
+  "auth_type": "authToken",
+  "auth_types": [
+    "authToken"
+  ],
+  "state": "active",
+  "access_rights_array": [
+    {
+      "api_name": "Rate Limit Path API 2",
+      "api_id": "c252af6eaf2e43ca5c89465af4f481c1",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "allowed_types": [],
+      "disable_introspection": false,
+      "limit": {
+        "rate": 3,
+        "per": 6,
+        "throttle_interval": -1,
+        "throttle_retry_limit": -1,
+        "max_query_depth": -1,
+        "quota_max": -1,
+        "quota_renews": 0,
+        "quota_remaining": 0,
+        "quota_renewal_rate": -1,
+        "set_by_policy": false
+      },
+      "field_access_rights": [],
+      "allowance_scope": ""
+    },
+    {
+      "api_name": "Rate Limit Proxy API",
+      "api_id": "d1dfc6a927a046c54c0ed470f19757cc",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "allowed_types": [],
+      "disable_introspection": false,
+      "limit": null,
+      "field_access_rights": [],
+      "allowance_scope": ""
+    },
+    {
+      "api_name": "Rate Limit Path API 1",
+      "api_id": "d371b83b249845a2497ab9a947fd6210",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "allowed_types": [],
+      "disable_introspection": false,
+      "limit": {
+        "rate": 1,
+        "per": 5,
+        "throttle_interval": -1,
+        "throttle_retry_limit": -1,
+        "max_query_depth": -1,
+        "quota_max": -1,
+        "quota_renews": 0,
+        "quota_remaining": 0,
+        "quota_renewal_rate": -1,
+        "set_by_policy": false
+      },
+      "field_access_rights": [],
+      "allowance_scope": ""
+    }
+  ],
+  "graphql_enabled": false,
+  "_id": "641c15dd0fffb800010197bf",
+  "id": "",
+  "name": "Rate Limit Proxy",
+  "org_id": "5e9d9544a1dcd60001d0ed20",
+  "rate": 1000,
+  "per": 60,
+  "quota_max": -1,
+  "quota_renewal_rate": -1,
+  "throttle_interval": -1,
+  "throttle_retry_limit": -1,
+  "max_query_depth": -1,
+  "access_rights": {
+    "c252af6eaf2e43ca5c89465af4f481c1": {
+      "api_name": "Rate Limit Path API 2",
+      "api_id": "c252af6eaf2e43ca5c89465af4f481c1",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "allowed_types": [],
+      "disable_introspection": false,
+      "limit": {
+        "rate": 3,
+        "per": 6,
+        "throttle_interval": -1,
+        "throttle_retry_limit": -1,
+        "max_query_depth": -1,
+        "quota_max": -1,
+        "quota_renews": 0,
+        "quota_remaining": 0,
+        "quota_renewal_rate": -1,
+        "set_by_policy": false
+      },
+      "field_access_rights": [],
+      "allowance_scope": ""
+    },
+    "d1dfc6a927a046c54c0ed470f19757cc": {
+      "api_name": "Rate Limit Proxy API",
+      "api_id": "d1dfc6a927a046c54c0ed470f19757cc",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "allowed_types": [],
+      "disable_introspection": false,
+      "limit": null,
+      "field_access_rights": [],
+      "allowance_scope": ""
+    },
+    "d371b83b249845a2497ab9a947fd6210": {
+      "api_name": "Rate Limit Path API 1",
+      "api_id": "d371b83b249845a2497ab9a947fd6210",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "allowed_types": [],
+      "disable_introspection": false,
+      "limit": {
+        "rate": 1,
+        "per": 5,
+        "throttle_interval": -1,
+        "throttle_retry_limit": -1,
+        "max_query_depth": -1,
+        "quota_max": -1,
+        "quota_renews": 0,
+        "quota_remaining": 0,
+        "quota_renewal_rate": -1,
+        "set_by_policy": false
+      },
+      "field_access_rights": [],
+      "allowance_scope": ""
+    }
+  },
+  "hmac_enabled": false,
+  "active": true,
+  "is_inactive": false,
+  "date_created": "2023-03-23T09:03:25.553Z",
+  "tags": [],
+  "key_expires_in": 0,
+  "partitions": {
+    "quota": false,
+    "rate_limit": false,
+    "complexity": false,
+    "acl": false,
+    "per_api": true
+  },
+  "last_updated": "1679562215",
+  "meta_data": {}
+}

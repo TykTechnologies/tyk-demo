@@ -20,6 +20,8 @@
         }
       ],
       "restricted_types": [],
+      "allowed_types": [],
+      "disable_introspection": false,
       "limit": null,
       "field_access_rights": [],
       "allowance_scope": ""
@@ -53,6 +55,8 @@
         }
       ],
       "restricted_types": [],
+      "allowed_types": [],
+      "disable_introspection": false,
       "limit": null,
       "field_access_rights": [],
       "allowance_scope": ""
