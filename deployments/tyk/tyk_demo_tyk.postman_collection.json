@@ -4119,7 +4119,7 @@
 													"// create the test key",
 													"pm.sendRequest(rateLimitTestKeyCreateRequest, function (err, response) { ",
 													"    ",
-													"    // get the actual key",
+													"    // get the actual key id",
 													"    var jsonData = response.json();",
 													"    keyId=jsonData.key;",
 													"",
@@ -4179,13 +4179,11 @@
 											}
 										],
 										"url": {
-											"raw": "http://tyk-gateway.localhost:8080/rate-limit-proxy-api/anything/no-rate-limit",
+											"raw": "http://{{tyk-gateway.host}}/rate-limit-proxy-api/anything/no-rate-limit",
 											"protocol": "http",
 											"host": [
-												"tyk-gateway",
-												"localhost"
+												"{{tyk-gateway.host}}"
 											],
-											"port": "8080",
 											"path": [
 												"rate-limit-proxy-api",
 												"anything",
@@ -4284,7 +4282,7 @@
 													"",
 													"// create the test key",
 													"pm.sendRequest(rateLimitTestKeyCreateRequest, function (err, response) { ",
-													"    // get the actual key",
+													"    // get the actual key id",
 													"    var jsonData = response.json();",
 													"    keyId=jsonData.key;",
 													"",
@@ -4333,13 +4331,11 @@
 											}
 										],
 										"url": {
-											"raw": "http://tyk-gateway.localhost:8080/rate-limit-proxy-api/anything/rate-limit-1-per-5",
+											"raw": "http://{{tyk-gateway.host}}/rate-limit-proxy-api/anything/rate-limit-1-per-5",
 											"protocol": "http",
 											"host": [
-												"tyk-gateway",
-												"localhost"
+												"{{tyk-gateway.host}}"
 											],
-											"port": "8080",
 											"path": [
 												"rate-limit-proxy-api",
 												"anything",
@@ -4439,7 +4435,7 @@
 													"// create the test key",
 													"pm.sendRequest(rateLimitTestKeyCreateRequest, function (err, response) { ",
 													"    ",
-													"    // get the actual key",
+													"    // get the actual key id",
 													"    var jsonData = response.json();",
 													"    keyId=jsonData.key;",
 													"",
@@ -4495,13 +4491,11 @@
 											}
 										],
 										"url": {
-											"raw": "http://tyk-gateway.localhost:8080/rate-limit-proxy-api/anything/rate-limit-3-per-6",
+											"raw": "http://{{tyk-gateway.host}}/rate-limit-proxy-api/anything/rate-limit-3-per-6",
 											"protocol": "http",
 											"host": [
-												"tyk-gateway",
-												"localhost"
+												"{{tyk-gateway.host}}"
 											],
-											"port": "8080",
 											"path": [
 												"rate-limit-proxy-api",
 												"anything",
