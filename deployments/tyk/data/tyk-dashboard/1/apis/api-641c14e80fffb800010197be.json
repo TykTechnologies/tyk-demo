@@ -271,17 +271,17 @@
           "extended_paths": {
             "url_rewrites": [
               {
-                "path": "anything/rate-limit-2",
+                "path": "anything/rate-limit-3-per-6",
                 "method": "GET",
-                "match_pattern": "anything/rate-limit-2",
-                "rewrite_to": "http://localhost:8080/rate-limit-path-api-2/anything/rate-limit-2",
+                "match_pattern": "anything/rate-limit-3-per-6",
+                "rewrite_to": "http://localhost:8080/rate-limit-path-api-2/anything/rate-limit-3-per-6",
                 "triggers": []
               },
               {
-                "path": "anything/rate-limit-1",
+                "path": "anything/rate-limit-1-per-5",
                 "method": "GET",
-                "match_pattern": "anything/rate-limit-1",
-                "rewrite_to": "http://localhost:8080/rate-limit-path-api-1/anything/rate-limit-1",
+                "match_pattern": "anything/rate-limit-1-per-5",
+                "rewrite_to": "http://localhost:8080/rate-limit-path-api-1/anything/rate-limit-1-per-5",
                 "triggers": []
               }
             ],
