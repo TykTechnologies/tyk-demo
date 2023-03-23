@@ -4,7 +4,6 @@
   "api_definition": {
     "id": "5f339452522d9f00019d0046",
     "name": "GraphQL Countries",
-    "expiration": "",
     "slug": "graphql-countries",
     "listen_port": 0,
     "protocol": "",
@@ -13,6 +12,10 @@
     "org_id": "5e9d9544a1dcd60001d0ed20",
     "use_keyless": true,
     "use_oauth2": false,
+    "external_oauth": {
+      "enabled": false,
+      "providers": []
+    },
     "use_openid": false,
     "openid_options": {
       "providers": [],
@@ -204,9 +207,7 @@
     "use_mutual_tls_auth": false,
     "client_certificates": [],
     "upstream_certificates": {},
-    "upstream_certificates_disabled": false,
     "pinned_public_keys": {},
-    "certificate_pinning_disabled": false,
     "enable_jwt": false,
     "use_standard_auth": false,
     "use_go_plugin_auth": false,
@@ -222,14 +223,8 @@
     "jwt_not_before_validation_skew": 0,
     "jwt_skip_kid": false,
     "scopes": {
-      "jwt": {
-        "scope_claim_name": "",
-        "scope_to_policy": {}
-      },
-      "oidc": {
-        "scope_claim_name": "",
-        "scope_to_policy": {}
-      }
+      "jwt": {},
+      "oidc": {}
     },
     "jwt_scope_to_policy_mapping": {},
     "jwt_scope_claim_name": "",
@@ -273,7 +268,9 @@
             "black_list": []
           },
           "use_extended_paths": true,
-          "extended_paths": {},
+          "extended_paths": {
+            "persist_graphql": []
+          },
           "global_headers": {},
           "global_headers_remove": [],
           "global_response_headers": {},
@@ -399,7 +396,6 @@
       "debug": false
     },
     "domain": "",
-    "domain_disabled": false,
     "certificates": [],
     "do_not_track": false,
     "enable_context_vars": false,
@@ -438,14 +434,8 @@
         "disable_query_batching": false
       }
     },
-    "analytics_plugin": {
-      "enable": false,
-      "plugin_path": "",
-      "func_name": ""
-    },
-    "tags_disabled": false,
-    "tags": [],
-    "is_oas": false
+    "analytics_plugin": {},
+    "tags": []
   },
   "hook_references": [],
   "is_site": false,
