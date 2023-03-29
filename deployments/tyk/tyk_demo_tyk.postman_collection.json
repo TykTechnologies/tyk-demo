@@ -3655,139 +3655,41 @@
 											"response": []
 										},
 										{
-											"name": "Custom Authentication - IP Rate Limiter (part 1)",
+											"name": "Custom Authentication - IP Rate Limiter",
 											"event": [
 												{
 													"listen": "test",
 													"script": {
 														"exec": [
-															"pm.test(\"Status code is 200\", function () {",
-															"    pm.response.to.have.status(200);    ",
-															"});"
-														],
-														"type": "text/javascript"
-													}
-												}
-											],
-											"request": {
-												"method": "GET",
-												"header": [],
-												"url": {
-													"raw": "http://{{tyk-gateway.host}}/go-ip-rate-limit/get",
-													"protocol": "http",
-													"host": [
-														"{{tyk-gateway.host}}"
-													],
-													"path": [
-														"go-ip-rate-limit",
-														"get"
-													]
-												},
-												"description": "This request uses an invalid key, so fails with an HTTP 401 response."
-											},
-											"response": [
-												{
-													"name": "Custom Authentication - IP Rate Limiter",
-													"originalRequest": {
-														"method": "GET",
-														"header": [
-															{
-																"key": "Authorization",
-																"value": "def",
-																"type": "text"
-															}
-														],
-														"url": {
-															"raw": "http://{{tyk-gateway.host}}/go-plugin-api/get",
-															"protocol": "http",
-															"host": [
-																"{{tyk-gateway.host}}"
-															],
-															"path": [
-																"go-plugin-api",
-																"get"
-															]
-														}
-													},
-													"_postman_previewlanguage": "Text",
-													"header": [],
-													"cookie": [],
-													"body": ""
-												}
-											]
-										},
-										{
-											"name": "Custom Authentication - IP Rate Limiter (part 2)",
-											"event": [
-												{
-													"listen": "test",
-													"script": {
-														"exec": [
-															"pm.test(\"Status code is 200\", function () {",
-															"    pm.response.to.have.status(200);    ",
-															"});"
-														],
-														"type": "text/javascript"
-													}
-												}
-											],
-											"request": {
-												"method": "GET",
-												"header": [],
-												"url": {
-													"raw": "http://{{tyk-gateway.host}}/go-ip-rate-limit/get",
-													"protocol": "http",
-													"host": [
-														"{{tyk-gateway.host}}"
-													],
-													"path": [
-														"go-ip-rate-limit",
-														"get"
-													]
-												},
-												"description": "This request uses an invalid key, so fails with an HTTP 401 response."
-											},
-											"response": [
-												{
-													"name": "Custom Authentication - IP Rate Limiter",
-													"originalRequest": {
-														"method": "GET",
-														"header": [
-															{
-																"key": "Authorization",
-																"value": "def",
-																"type": "text"
-															}
-														],
-														"url": {
-															"raw": "http://{{tyk-gateway.host}}/go-plugin-api/get",
-															"protocol": "http",
-															"host": [
-																"{{tyk-gateway.host}}"
-															],
-															"path": [
-																"go-plugin-api",
-																"get"
-															]
-														}
-													},
-													"_postman_previewlanguage": "Text",
-													"header": [],
-													"cookie": [],
-													"body": ""
-												}
-											]
-										},
-										{
-											"name": "Custom Authentication - IP Rate Limiter Part 3",
-											"event": [
-												{
-													"listen": "test",
-													"script": {
-														"exec": [
+															"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 															"",
-															"pm.test(\"Status code is 429 because custom rate limit on IP is enforced.\", function () {",
-															"    pm.response.to.have.status(429);",
+															"// this unique test key is needed to ensure that the test will always operate as expected, and not interfere with the end-user request and visa versa.",
+															"testKeyId = pm.variables.replaceIn('{{$randomUUID}}');",
+															"",
+															"// rate limit request object, using test key",
+															"rateLimitRequest = {",
+															"    url: 'http://' + tykGatewayHost + '/go-ip-rate-limit/anything?test=' + testKeyId,",
+															"    method: 'GET'",
+															"};",
+															"",
+															"// make 3 requests in quick succession and test that the third is blocked by the rate limiter",
+															"pm.test(\"3rd request is rate limited\", function () {",
+															"",
+															"    pm.sendRequest(rateLimitRequest, function (err, response) {",
+															"        // first request is within rate limit",
+															"        pm.expect(response.code).to.eql(200);",
+															"",
+															"        pm.sendRequest(rateLimitRequest, function (err, response) {",
+															"            // second request is within rate limit",
+															"            pm.expect(response.code).to.eql(200);",
+															"",
+															"            pm.sendRequest(rateLimitRequest, function (err, response) {",
+															"                // third request exceeds rate limit and 429 status is returned",
+															"                pm.expect(response.code).to.eql(429);",
+															"",
+															"            });            ",
+															"        });",
+															"    });",
 															"});"
 														],
 														"type": "text/javascript"
@@ -3808,7 +3710,7 @@
 														"get"
 													]
 												},
-												"description": "This request uses an invalid key, so fails with an HTTP 401 response."
+												"description": "This request uses custom Go middleware to enforce a rate limit of 2 requests every 5 seconds. The reason for using custom middleware to implement this is that it uses the client IP address to aggregate the requests, rather than an client-supplied API key.\n\nTry running this request 3 times within 5 seconds to see the rate limiter take effect."
 											},
 											"response": [
 												{
