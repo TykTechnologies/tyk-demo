@@ -24,6 +24,9 @@ func IPRateLimiter(rw http.ResponseWriter, r *http.Request) {
 	rc := storage.NewRedisController(r.Context())
 	// Create a storage object, which will handle Redis operations using "apikey-" key prefix
 	store := storage.RedisCluster{KeyPrefix: "apikey-", HashKeys: conf.HashKeys, RedisController: rc}
+	// The "test" query param denotes that the request is part of a test
+	testKeyId := r.URL.Query().Get("test")
+	isTestRequest := testKeyId != ""
 
 	go rc.ConnectToRedis(r.Context(), nil, &conf)
 	for i := 0; i < 5; i++ { // max 5 attempts - should only take 2
@@ -54,13 +57,22 @@ func IPRateLimiter(rw http.ResponseWriter, r *http.Request) {
 	orgId := requestedAPI.OrgID
 	apiId := requestedAPI.APIID
 
+	// "sessionAlias" is the identifier for the API key
+	sessionAlias := "ip-session-" + realIp
+
+	// For the purpose of this demonstration, test requests have a unique id added to them so that they don't interfere with real requests
+	if isTestRequest {
+		sessionAlias += "-" + testKeyId
+	}
+
+	logger.Info("IP Rate Limit Session Alias: ", sessionAlias)
+
 	// Set auth header
-	r.Header.Add("Authorization", realIp)
-	logger.Debug("Setting Authorization to ", realIp)
+	r.Header.Add("Authorization", sessionAlias)
 
 	ipSession := &user.SessionState{
 		OrgID: orgId,
-		Alias: "ip-session-" + realIp,
+		Alias: sessionAlias,
 		Rate:  2,
 		Per:   5,
 		AccessRights: map[string]user.AccessDefinition{
@@ -70,7 +82,7 @@ func IPRateLimiter(rw http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	jsonKey := fmt.Sprintf(`{"org":"%s","id":"%s","h":"%s"}`, orgId, realIp, config.Global().HashKeyFunction)
+	jsonKey := fmt.Sprintf(`{"org":"%s","id":"%s","h":"%s"}`, orgId, sessionAlias, config.Global().HashKeyFunction)
 	lookupKey := base64.StdEncoding.EncodeToString([]byte(jsonKey))
 
 	j, err := json.Marshal(ipSession)
