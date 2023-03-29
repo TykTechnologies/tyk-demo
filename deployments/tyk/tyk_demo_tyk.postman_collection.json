@@ -3663,7 +3663,7 @@
 														"exec": [
 															"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 															"",
-															"// this unique test key is needed to ensure that the test will always operate as expected, and not interfere with the end-user test and visa versa.",
+															"// this unique test key is needed to ensure that the test will always operate as expected, and not interfere with the end-user request and visa versa.",
 															"testKeyId = pm.variables.replaceIn('{{$randomUUID}}');",
 															"",
 															"// rate limit request object, using test key",
