@@ -237,17 +237,6 @@
             ],
             "transform_headers": [
               {
-                "delete_headers": [
-                  "Delete-Header"
-                ],
-                "add_headers": {
-                  "new-header": "new-header-value"
-                },
-                "path": "/anything/modify-headers",
-                "method": "GET",
-                "act_on": false
-              },
-              {
                 "delete_headers": [],
                 "add_headers": {
                   "Context-Variable-Header-Cat": "$tyk_context.headers_Cat",
@@ -258,6 +247,17 @@
                 },
                 "path": "/anything/context-variables",
                 "method": "POST",
+                "act_on": false
+              },
+              {
+                "delete_headers": [
+                  "Delete-Header"
+                ],
+                "add_headers": {
+                  "new-header": "new-header-value"
+                },
+                "path": "/anything/modify-headers",
+                "method": "GET",
                 "act_on": false
               }
             ],
@@ -281,11 +281,27 @@
             ],
             "url_rewrites": [
               {
-                "path": "anything/looping",
-                "method": "GET",
-                "match_pattern": "anything/looping",
-                "rewrite_to": "tyk://727dad853a8a45f64ab981154d1ffdad/get",
-                "triggers": []
+                "path": "/anything/url-rewrite-trigger-payload",
+                "method": "POST",
+                "match_pattern": "/anything/url-rewrite-trigger-payload",
+                "rewrite_to": "/anything/url-rewrite-triggers/default-rewrite",
+                "triggers": [
+                  {
+                    "on": "all",
+                    "options": {
+                      "header_matches": {},
+                      "query_val_matches": {},
+                      "path_part_matches": {},
+                      "session_meta_matches": {},
+                      "request_context_matches": {},
+                      "payload_matches": {
+                        "match_rx": "\\b[a-z0-9\\.\\+\\-]+@[a-z0-9\\-]+(?:\\.[a-z0-9\\-]+)+\\b",
+                        "reverse": false
+                      }
+                    },
+                    "rewrite_to": "/anything/url-rewrite-trigger-payload?email=$tyk_context.trigger-0-payload-0"
+                  }
+                ]
               },
               {
                 "path": "/anything/url-rewrite",
@@ -340,6 +356,13 @@
                 "method": "GET",
                 "match_pattern": "/cache-slow-endpoint",
                 "rewrite_to": "/delay/3",
+                "triggers": []
+              },
+              {
+                "path": "anything/looping",
+                "method": "GET",
+                "match_pattern": "anything/looping",
+                "rewrite_to": "tyk://727dad853a8a45f64ab981154d1ffdad/get",
                 "triggers": []
               }
             ],

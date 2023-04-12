@@ -2091,6 +2091,54 @@
 							"response": []
 						},
 						{
+							"name": "Plugin - URL Rewrite (part 9 - request body)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"URL rewritten to contain email address from payload\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.args.email).to.eql(\"dave@example.com\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"email\":\"dave@example.com\",\n\t\"name\":\"Dave\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/plugin-demo-api/anything/url-rewrite-trigger-payload",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"url-rewrite-trigger-payload"
+									]
+								},
+								"description": "This request uses an advanced URL rewrite rule to extract data from the request body and add it to the upstream request as a URL query parameter.\n\nThe configuration uses a regular expression to  extract the email address from the request body, then uses the Tyk context variables to add the value as part of the rewritten URL."
+							},
+							"response": []
+						},
+						{
 							"name": "Plugin - Modify Headers",
 							"event": [
 								{
