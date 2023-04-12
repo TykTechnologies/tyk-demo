@@ -2123,11 +2123,11 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8080/plugin-demo-api/anything/url-rewrite-trigger-payload",
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/url-rewrite-trigger-payload",
+									"protocol": "http",
 									"host": [
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"plugin-demo-api",
 										"anything",
