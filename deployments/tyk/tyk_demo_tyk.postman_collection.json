@@ -2101,9 +2101,11 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"",
-											"pm.test(\"URL rewritten to contain email address from payload\", function () {",
+											"pm.test(\"URL rewritten to contain email addresses from payload\", function () {",
 											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.args.email).to.eql(\"dave@example.com\");",
+											"    pm.expect(jsonData.args[\"personal-email\"]).to.eql(\"personal@example.com\");",
+											"    pm.expect(jsonData.args[\"business-email\"]).to.eql(\"business@example.com\");",
+											"",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2115,7 +2117,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"email\":\"dave@example.com\",\n\t\"name\":\"Dave\"\n}",
+									"raw": "{\n\t\"personalEmail\":\"personal@example.com\",\n    \"businessEmail\":\"business@example.com\",\n\t\"name\":\"Dave\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2134,7 +2136,7 @@
 										"url-rewrite-trigger-payload"
 									]
 								},
-								"description": "This request uses an advanced URL rewrite rule to extract data from the request body and add it to the upstream request as a URL query parameter.\n\nThe configuration uses a regular expression to  extract the email address from the request body, then uses the Tyk context variables to add the value as part of the rewritten URL."
+								"description": "This request uses an advanced URL rewrite rule to extract data from the request body and add it to the upstream request as a URL query parameter.\n\nThe configuration uses a regular expression to  extract the email addresses from the request body, then uses the Tyk context variables to add them to rewritten URL as query values."
 							},
 							"response": []
 						},
