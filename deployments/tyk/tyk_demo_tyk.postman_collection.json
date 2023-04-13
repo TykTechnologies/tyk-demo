@@ -2101,9 +2101,11 @@
 											"    pm.response.to.have.status(200);",
 											"});",
 											"",
-											"pm.test(\"URL rewritten to contain email address from payload\", function () {",
+											"pm.test(\"URL rewritten to contain email addresses from payload\", function () {",
 											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.args.email).to.eql(\"dave@example.com\");",
+											"    pm.expect(jsonData.args[\"personal-email\"]).to.eql(\"personal@example.com\");",
+											"    pm.expect(jsonData.args[\"business-email\"]).to.eql(\"business@example.com\");",
+											"",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2115,7 +2117,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"email\":\"dave@example.com\",\n\t\"name\":\"Dave\"\n}",
+									"raw": "{\n\t\"personalEmail\":\"personal@example.com\",\n    \"businessEmail\":\"business@example.com\",\n\t\"name\":\"Dave\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"

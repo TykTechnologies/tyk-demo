@@ -299,7 +299,7 @@
                         "reverse": false
                       }
                     },
-                    "rewrite_to": "/anything/url-rewrite-trigger-payload?email=$tyk_context.trigger-0-payload-0"
+                    "rewrite_to": "/anything/url-rewrite-trigger-payload?personal-email=$tyk_context.trigger-0-payload-0&business-email=$tyk_context.trigger-0-payload-1"
                   }
                 ]
               },
