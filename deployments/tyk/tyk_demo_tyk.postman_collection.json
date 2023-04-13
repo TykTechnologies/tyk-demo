@@ -2136,7 +2136,7 @@
 										"url-rewrite-trigger-payload"
 									]
 								},
-								"description": "This request uses an advanced URL rewrite rule to extract data from the request body and add it to the upstream request as a URL query parameter.\n\nThe configuration uses a regular expression to  extract the email address from the request body, then uses the Tyk context variables to add the value as part of the rewritten URL."
+								"description": "This request uses an advanced URL rewrite rule to extract data from the request body and add it to the upstream request as a URL query parameter.\n\nThe configuration uses a regular expression to  extract the email addresses from the request body, then uses the Tyk context variables to add them to rewritten URL as query values."
 							},
 							"response": []
 						},
