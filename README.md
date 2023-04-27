@@ -27,6 +27,14 @@ Each feature deployment has its own directory, with the necessary files to deplo
 
 There is a focus on simplicity. Docker Compose is used to provision the containers, and bootstrap scripts are used to initialise the environment so that it is ready to use straight away - applying configuration and populating data.
 
+## Requirements
+
+### License requirements
+- Get a valid [Tyk Self-Managed license](https://tyk.io/pricing-self-managed/) key (click **"start now"** under **Free trial**). **This is a self-service option!**
+- If you want to run MDCB deployment (distributed set up with control plane and data plans), then you need to [contact Tyk team](https://tyk.io/pricing-self-managed/) to get a license key. Please leave it if it's the first time you are trying out Tyk and you are not in a position to get engaged at this moment.
+
+### Software
+docker compose
 
 ## Repository Structure
 
@@ -48,7 +56,13 @@ The `docker-compose.yml` files in this repo use Docker environment variables to 
 
 As per standard Docker convention, the Docker environment variables are stored in a file called `.env`, which is in the repository root directory.
 
-Notable environment variables are:
+You can use `.env.example` as a starting point for your `.env` file.
+
+You must set `DASHBOARD_LICENCE` variable with the valid license key you previously got. 
+If you are using the MDCB (`mdcb`) deployment, then you need to do the same for `MDCB_LICENCE` variable.
+
+
+### Notable environment variables are:
 
 | Variable | Description | Required | Default |
 | -------- | ----------- | -------- | ------- | 
@@ -66,8 +80,6 @@ There are various other environment variables used, but it's not normally necess
 Unless you have a specific reason to do so, it's not recommended to set the `*_VERSION` environment variables e.g. `GATEWAY_VERSION`. Doing so will effectively pin the image tag of the container, which could cause the `bootstrap.sh` scripts to fail, as they are written to operate against the image tags specified in the `docker-compose.yml` files.
 
 Many of the containers are configured to use `.env` as an environment file. This means that any standard Tyk environment variables added to `.env` will be available in the container e.g. setting `DB_AUDIT_ENABLED=true` enables auditing in the Dashboard.
-
-You can use `.env.example` as a starting point for your `.env` file. You must obtain a valid Tyk Dashboard licence and use it to set the `DASHBOARD_LICENCE` variable. If you are using the MDCB (`mdcb`) deployment, then you need to do the same for the `MDCB_LICENCE` variable.
 
 # Getting Started
 
