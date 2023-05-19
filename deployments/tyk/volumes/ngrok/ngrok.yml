@@ -1,0 +1,5 @@
+version: 2
+tunnels:
+  tyk-gateway:
+    proto: http
+    addr: tyk-gateway:8080

@@ -129,16 +129,18 @@ services:
     networks:
       - tyk
   www-ngrok:
-    image: ${NGROK_IMAGE:-wernight}/ngrok:latest
+    image: ngrok/ngrok:3.3.0-alpine
     networks:
       - tyk
+    command:
+      - "start"
+      - "--all"
+      - "--config"
+      - "/etc/ngrok.yml"
+    volumes:
+      - ./deployments/tyk/volumes/ngrok/ngrok.yml:/etc/ngrok.yml
     ports:
       - 4040:4040
-    environment:
-      - NGROK_PORT=tyk-gateway:8080
-    deploy:
-      restart_policy:
-        condition: on-failure
 
 volumes:
   tyk-redis-data:
