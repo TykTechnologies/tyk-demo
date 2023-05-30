@@ -6116,7 +6116,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.sendRequest(\"http://\" + pm.variables.get(\"ngrok.host\") + \":\" + pm.variables.get(\"ngrok.port\") + \"/api/tunnels/command_line\", function (err, response) {",
+									"pm.sendRequest(\"http://\" + pm.variables.get(\"ngrok.host\") + \":\" + pm.variables.get(\"ngrok.port\") + \"/api/tunnels/tyk-gateway\", function (err, response) {",
 									"",
 									"    ngrokPublicUrl = response.json().public_url;",
 									"",
