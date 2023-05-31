@@ -481,9 +481,9 @@ bootstrap_progress
 
 log_message "Getting ngrok public URL for Tyk Gateway"
 ngrok_dashboard_url="http://localhost:4040"
-ngrok_ip_api_endpoint="$ngrok_dashboard_url/api/tunnels"
+ngrok_ip_api_endpoint="$ngrok_dashboard_url/api/tunnels/tyk-gateway"
 log_message "  Getting data from $ngrok_ip_api_endpoint"
-ngrok_public_url=$(curl --fail --silent --show-error ${ngrok_ip_api_endpoint} | jq ".tunnels[0].public_url" --raw-output)
+ngrok_public_url=$(curl --fail --silent --show-error ${ngrok_ip_api_endpoint} | jq ".public_url" --raw-output)
 if [ "$?" != 0 ]; then
   echo "Error getting ngrok configuration from $ngrok_ip_api_endpoint"
   exit 1
