@@ -205,7 +205,7 @@ Deployments to remove:
 
 # Resuming
 
-Deployments can be resumed if their containers have stopped. This is useful for situations where you want to resume using Tyk Demo after Docker has been restarted. Resuming deployments just restarts the existing contains and uses the existing volumes. This means that resumed deployments don't need to be rebootstrapped as they already contain the necessary data.
+Deployments can be resumed if their containers have stopped. This is useful for situations where you want to resume using Tyk Demo after its containers have been stopped, such as when Docker is restarted. Resuming deployments uses the existing containers and volumes, which means that the deployment resumes using its previous state. As such, it's not necessary to rebootstrap the deployment, as all the necessary data is already available.
 
 The script automatically determines which deployments to resume by reading the deployments listed in `.bootstrap/bootstrapped_deployments`.
 
@@ -221,6 +221,8 @@ The script will display the deployments to be resumed. For example:
 Deployments to resume:
   tyk
 ```
+
+If you want to rebootstrap the deployments, then run the `./down.sh` script before running `./up.sh`. This will remove the containers and volumes of the existing deployments, which then allows the `./up.sh` script to bootstrap the deployments.
 
 # Redeploying
 
