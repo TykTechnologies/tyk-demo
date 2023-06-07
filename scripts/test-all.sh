@@ -69,7 +69,7 @@ do
         result_codes[${#result_codes[@]}]=3
         continue
     else
-        echo "  Collection contains tests."
+        echo -e "  Collection contains tests. ${GREEN}Proceeding${NOCOLOUR} with deployment tests."
     fi
 
     echo "Creating deployment: $deployment_name"

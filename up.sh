@@ -2,7 +2,7 @@
 
 source scripts/common.sh
 
-# persistence of bootstrap.log file is disabled by default, meaning the file is 
+# persistence of bootstrap.log file is disabled by default, meaning the file is recreated between each bootstrap to prevent it from growing too large
 # to enable persistence, use argument "persist-log" when running this script
 persist_log=false
 
@@ -48,70 +48,67 @@ else
   set_docker_environment_value "INSTRUMENTATION_ENABLED" "0"
 fi
 
-# list of deployments to bootstrap
+# deployment lists
 deployments_to_create=()
+commands_to_process=()
+available_deployments=(deployments/*)
 
+# establish list of existing deployments to resume
+echo "Deployments to resume:"
 if [[ -s .bootstrap/bootstrapped_deployments ]]; then
-  echo "Existing deployments found. Only newly specified deployments will be created."
+  while read existing_deployment; do
+    echo "  $existing_deployment"
+  done < .bootstrap/bootstrapped_deployments
+
+  echo "Note: Resumed deployments are not rebootstrapped - they use their existing volumes"
+  echo "Tip: To rebootstrap deployments, you must first remove them using the down.sh script"
 else
-  echo "No existing deployments found. All specified deployments will be created."
-  # create a file which contains names of all the deployments
-  # this determines the order in which the deployments are bootstrapped
-  # the default "tyk" deployment is added automatically as the first deployment
-  echo "tyk" >> .bootstrap/bootstrapped_deployments
+  echo "  None"
+  # tyk is always added to the deployment list when no deployments exist
   deployments_to_create+=("tyk")
 fi
 
-deployment_names=(deployments/*)
-# process arguments
-for argument in "$@"; do  
-  argument_is_deployment=false
+# parse script arguments to establish lists of new deployments to create, and commands to process
+for argument in "$@"; do
+  # "tyk" deployment is handled automatically, so ignore it and continue to the next argument
+  [ "$argument" == "tyk" ] && continue
 
-  # "tyk" deployment is handled automatically, so ignore and continue to next argument
-  [ "$deployment_name" == "tyk" ] && continue
-
-  # process arguments that refer to deployments
-  for deployment_name in "${deployment_names[@]}"
-  do
-    if [ "deployments/$argument" = "$deployment_name" ]; then
-      argument_is_deployment=true
-
-      # skip existing deployments, to avoid rebootstrapping
-      if [ ! -z $(grep "$argument" ".bootstrap/bootstrapped_deployments") ]; then 
-        echo "Deployment \"$argument\" already exists, skipping."
-        break
-      fi
-
-      echo "$argument" >> .bootstrap/bootstrapped_deployments
-      deployments_to_create+=("$argument")
-      break
-    fi
-  done  
-
-  # skip to next argument if this argument has already been processed as a deployment
-  [ "$argument_is_deployment" = true ] && continue
-
-  # process arguments that are not deployments
-  case $argument in
-  "persist-log")
-    echo "Persisting bootstrap log"
-    persist_log=true;;
-  *) echo "Argument \"$argument\" is unknown, ignoring.";; 
-  esac
+  # check if argument refers to a deployment
+  if [ -d "deployments/$argument" ]; then
+    # skip existing deployments, to avoid rebootstrapping
+    [ ! -z $(grep "$argument" ".bootstrap/bootstrapped_deployments") ] && break
+    # otherwise, queue deployment to be created
+    deployments_to_create+=("$argument")
+  else
+    commands_to_process+=("$argument")
+  fi  
 done
-
-# check if bootstrap is needed
-if [ ${#deployments_to_create[@]} -eq 0 ]; then
-  echo "Specified deployments already exist. Exiting."
-  echo "Tip: If you want to recreate the existing deployment, run the down.sh script first."
-  exit
-fi
 
 # display deployments to bootstrap
 echo "Deployments to create:"
-for deployment in "${deployments_to_create[@]}"; do
-  echo "  $deployment"
-done
+if (( ${#deployments_to_create[@]} != 0 )); then
+  for deployment in "${deployments_to_create[@]}"; do
+    echo "$deployment" >> .bootstrap/bootstrapped_deployments
+    echo "  $deployment"
+  done
+else
+  echo "  None"
+fi
+
+# display commands to process
+echo "Commands to process:"
+if (( ${#commands_to_process[@]} != 0 )); then
+  for command in "$commands_to_process"; do    
+    case $command in
+      "persist-log")
+        echo "  Persisting bootstrap log"
+        persist_log=true;;
+      *) echo "Command \"$command\" is unknown, ignoring.";; 
+    esac
+  done
+else
+  echo "  None"
+fi
 
 # clear log, if it is not persisted
 if [ "$persist_log" = false ]; then
@@ -136,6 +133,6 @@ for deployment in "${deployments_to_create[@]}"; do
   fi
 done
 
-# Confirm bootstrap is complete
-printf "\nTyk Demo bootstrap completed\n"
-printf "\n----------------------------\n\n"
+# Confirm initialisation process is complete
+printf "\nTyk Demo initialisation process completed"
+printf "\n-----------------------------------------\n\n"
