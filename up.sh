@@ -50,30 +50,21 @@ fi
 
 # deployment lists
 deployments_to_create=()
-deployments_to_resume=()
 commands_to_process=()
 available_deployments=(deployments/*)
 
 # establish list of existing deployments to resume
-tyk_deployment_exists=false
 echo "Deployments to resume:"
 if [[ -s .bootstrap/bootstrapped_deployments ]]; then
   while read existing_deployment; do
     echo "  $existing_deployment"
-    deployments_to_resume+=("$existing_deployment")
-    if [ "$existing_deployment" = "tyk" ]; then
-      tyk_deployment_exists=true
-    fi
   done < .bootstrap/bootstrapped_deployments
 
-  echo "Note: Resumed deployments are not rebootstrapped - they use the existing volumes"
+  echo "Note: Resumed deployments are not rebootstrapped - they use their existing volumes"
   echo "Tip: To rebootstrap deployments, you must first remove them using the down.sh script"
 else
   echo "  None"
-fi
-
-# add tyk to deployment list if it doesn't already exist
-if [ "$tyk_deployment_exists" = false ]; then
+  # tyk is always added to the deployment list when no deployments exist
   deployments_to_create+=("tyk")
 fi
 
