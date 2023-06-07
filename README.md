@@ -136,13 +136,13 @@ In addition to this, some features require entries in the `.env` file. These are
 
 ## Step 4: Bring the deployment up
 
-To bootstrap the system we will run the `up.sh` script, which will run the necessary `docker-compose` and `bootstrap` commands to start the containers and bootstrap the system. 
+To bootstrap the system we will run the `up.sh` script, which will run the necessary `docker compose` and `bootstrap` commands to start the containers and bootstrap the system. 
 
 ```
 ./up.sh
 ```
 
-The script displays a message, showing the deployments it will create:
+The script displays a message, showing the deployments it will create. For example:
 
 ```
 Deployments to create:
@@ -203,6 +203,25 @@ Deployments to remove:
   tyk
 ```
 
+# Resuming
+
+Deployments can be resumed if their containers have stopped. This is useful for situations where you want to resume using Tyk Demo after Docker has been restarted. Resuming deployments just restarts the existing contains and uses the existing volumes. This means that resumed deployments don't need to be rebootstrapped as they already contain the necessary data.
+
+The script automatically determines which deployments to resume by reading the deployments listed in `.bootstrap/bootstrapped_deployments`.
+
+To resume deployments, run the `./up.sh` command:
+
+```
+./up.sh
+```
+
+The script will display the deployments to be resumed. For example:
+
+```
+Deployments to resume:
+  tyk
+```
+
 # Redeploying
 
 To redeploy an existing deployment, run the `./down.sh` script followed by the `./up.sh` script:
@@ -223,10 +242,13 @@ For example, if `./up.sh` has already been run, there will be a standard `tyk` d
 ./up.sh sso
 ```
 
-Note that existing deployments do not need to be specified. The script detects existing deployments and skips them. A message is displayed to confirm the situation:
+Note that existing deployments do not need to be specified. The script detects existing deployments and automatically resumes them. A message is displayed to confirm the situation:
 
 ```
-Existing deployments found. Only newly specified deployments will be created.
+Deployments to resume:
+  tyk
+Note: Resumed deployments are not rebootstrapped - they use their existing volumes
+Tip: To rebootstrap deployments, you must first remove them using the down.sh script
 Deployments to create:
   sso
 ```
