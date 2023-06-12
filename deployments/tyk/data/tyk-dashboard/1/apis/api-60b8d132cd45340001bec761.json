@@ -336,9 +336,7 @@
       "pre": [
         {
           "name": "WriteDataToContext",
-          "path": "plugins/go/example/example-go-plugin.so",
-          "require_session": false,
-          "raw_body_only": false
+          "path": "plugins/go/example/example-go-plugin.so"
         },
         {
           "name": "RequestLogger",
@@ -364,8 +362,8 @@
       },
       "response": [
         {
-        "name": "AddContextDataToResponse",
-        "path": "plugins/go/example/example-go-plugin.so"
+          "name": "AddContextDataToResponse",
+          "path": "plugins/go/example/example-go-plugin.so"
         }
       ],
       "driver": "goplugin",
