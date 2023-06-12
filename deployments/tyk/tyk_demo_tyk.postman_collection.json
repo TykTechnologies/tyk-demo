@@ -228,6 +228,43 @@
 								"description": "This request uses a Go plugin to take the JWT provided in the `authorization` header, parse it, extract the value of the `pol` payload property then add the value to the request as a header.\n\nThe value can be see in the `headers.X-Jwt-Policy-Id` JSON property of the response body.\n\nThe API itself doesn't use authentication or process the JWT in any other way. It's purely an example of using a Go plugin."
 							},
 							"response": []
+						},
+						{
+							"name": "Middleware - Go - Context Data & Response",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Context data is returned in response header\", function () {",
+											"    pm.response.to.have.header(\"Data-From-Context\", \"MyContextData\")",
+											"});",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/go-plugin-api-no-auth/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"go-plugin-api-no-auth",
+										"get"
+									]
+								},
+								"description": "This request shows two things:\n\n1. Passing of data between plugin functions.\n2. Running plugins for the response.\n\nThe first, passing data between plugin functions, is achieved using the context object. In this example, the `WriteDataToContext` function is executed during the request phase. It writes a key value pair to the context; `MyContextDataKey` / `MyContextData`. \n\nThe data is then retrieved later in the response phase by the `AddContextDataToResponse` function, which extracts the data from the request context. This also serves as the second part of this example, by executing the plugin on the response to write the data as a header; `Data-From-Context` / `MyContextValue`."
+							},
+							"response": []
 						}
 					]
 				},
