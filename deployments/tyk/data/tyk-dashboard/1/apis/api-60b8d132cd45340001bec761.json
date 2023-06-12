@@ -335,6 +335,10 @@
     "custom_middleware": {
       "pre": [
         {
+          "name": "WriteDataToContext",
+          "path": "plugins/go/example/example-go-plugin.so"
+        },
+        {
           "name": "RequestLogger",
           "path": "plugins/go/example/example-go-plugin.so",
           "require_session": false,
@@ -356,7 +360,12 @@
         "require_session": false,
         "raw_body_only": false
       },
-      "response": [],
+      "response": [
+        {
+          "name": "AddContextDataToResponse",
+          "path": "plugins/go/example/example-go-plugin.so"
+        }
+      ],
       "driver": "goplugin",
       "id_extractor": {
         "extract_from": "",

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -165,6 +166,34 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 // AddHelloWorldHeader adds custom "Hello: World" header to the request
 func AddHelloWorldHeader(rw http.ResponseWriter, r *http.Request) {
 	r.Header.Add("Hello", "World")
+}
+
+// Writes a string data to the context, which can then be read later
+func WriteDataToContext(rw http.ResponseWriter, r *http.Request) {
+	logger.Info("WriteDataToContext is called")
+
+	// copy the request context
+	ctx := r.Context()
+	// add the data
+	ctx = context.WithValue(ctx, "MyContextDataKey", "MyContextData")
+	// copy the request object, but with new context
+	r2 := r.WithContext(ctx)
+	// replace request object with new version
+	*r = *r2
+}
+
+// Reads data from the context and adds it to the response
+func AddContextDataToResponse(rw http.ResponseWriter, res *http.Response, req *http.Request) {
+	logger.Info("AddContextDataToResponse is called")
+
+	ctx := req.Context()
+	// get the data
+	myContextData := ctx.Value("MyContextDataKey")
+	// check that it isn't nil
+	if myContextData != nil {
+		// add it as a response header
+		res.Header.Add("Data-From-Context", myContextData.(string))
+	}
 }
 
 // Called once plugin is loaded, this is where we put all initialization work for plugin
