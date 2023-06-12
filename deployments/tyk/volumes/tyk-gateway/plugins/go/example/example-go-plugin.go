@@ -172,9 +172,13 @@ func AddHelloWorldHeader(rw http.ResponseWriter, r *http.Request) {
 func WriteDataToContext(rw http.ResponseWriter, r *http.Request) {
 	logger.Info("WriteDataToContext is called")
 
+	// copy the request context
 	ctx := r.Context()
+	// add the data
 	ctx = context.WithValue(ctx, "MyContextDataKey", "MyContextData")
+	// copy the request object, but with new context
 	r2 := r.WithContext(ctx)
+	// replace request object with new version
 	*r = *r2
 }
 
@@ -183,9 +187,11 @@ func AddContextDataToResponse(rw http.ResponseWriter, res *http.Response, req *h
 	logger.Info("AddContextDataToResponse is called")
 
 	ctx := req.Context()
+	// get the data
 	myContextData := ctx.Value("MyContextDataKey")
-
+	// check that it isn't nil
 	if myContextData != nil {
+		// add it as a response header
 		res.Header.Add("Data-From-Context", myContextData.(string))
 	}
 }
