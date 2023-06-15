@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "df8d6afb-eed5-4dcc-906f-2e6a7e89e3de",
+		"_postman_id": "672bf376-8435-48b0-a80a-a77423fb0ef5",
 		"name": "Tyk Demo - MDCB",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -11,7 +11,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "539d4ce1-8a88-40cf-91a9-b03880e30ffb",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -38,13 +37,147 @@
 				"description": "This is a basic test request to check that the MDCB Worker Gateway is working ok.\n\nA `200 OK` status code and JSON response should be received in the response."
 			},
 			"response": []
+		},
+		{
+			"name": "Basic Authenticated Request",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImF1dGhfa2V5IiwiaCI6Im11cm11cjY0In0=",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-worker-gateway.host}}/basic-protected-api/anything/abc123",
+					"protocol": "http",
+					"host": [
+						"{{tyk-worker-gateway.host}}"
+					],
+					"path": [
+						"basic-protected-api",
+						"anything",
+						"abc123"
+					]
+				},
+				"description": "This basic request uses an API key created during the bootstrap process to authenticate a request to a protected API."
+			},
+			"response": []
+		},
+		{
+			"name": "Dynamic Authentication via MDCB",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// create a key so that at we can use it in the request",
+							"pm.sendRequest(",
+							"    {",
+							"        url: 'http://' + pm.variables.get(\"tyk-gateway.host\") + '/tyk/keys',",
+							"        method: 'POST',",
+							"        header: 'x-tyk-authorization: ' + pm.variables.get(\"tyk-gateway.api-key\"),",
+							"        body: JSON.stringify({ \"last_check\": 0, \"allowance\": 1000, \"rate\": 1000, \"per\": 60, \"throttle_interval\": -1, \"throttle_retry_limit\": -1, \"expires\": 0, \"quota_max\": -1, \"quota_renews\": 1587524070, \"quota_remaining\": -1, \"quota_renewal_rate\": -1, \"access_rights\": { \"accbdd1b89e84ec97f4f16d4e3197d5c\": { \"api_name\": \"Basic Protected API\", \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\": [\"Default\"], \"allowed_urls\": [], \"limit\": null, \"allowance_scope\": \"\" } }, \"org_id\": \"5e9d9544a1dcd60001d0ed20\" })",
+							"    },",
+							"    (error, response) => { ",
+							"        pm.expect(response.code).to.eql(200);",
+							"        // key id needed for request, and to delete after tests",
+							"        pm.variables.set(\"key-id\", response.json().key);",
+							"    }",
+							");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"New key used in request\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.headers.Authorization).to.eql(pm.variables.get(\"key-id\"));",
+							"});",
+							"",
+							"pm.sendRequest(",
+							"    {",
+							"        url: 'http://' + pm.variables.get(\"tyk-gateway.host\") + '/tyk/keys/' + pm.variables.get(\"key-id\"),",
+							"        method: 'DELETE',",
+							"        header: 'x-tyk-authorization: ' + pm.variables.get(\"tyk-gateway.api-key\")",
+							"    },",
+							"    (error, response) => {",
+							"            pm.expect(response.code).to.eq(200);",
+							"        }",
+							"); "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{key-id}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-worker-gateway.host}}/basic-protected-api/anything/abc123",
+					"protocol": "http",
+					"host": [
+						"{{tyk-worker-gateway.host}}"
+					],
+					"path": [
+						"basic-protected-api",
+						"anything",
+						"abc123"
+					]
+				},
+				"description": "This request shows how a Tyk worker Gateway can dynamically authenticate a request using an unknown key.\n\nIn this scenario, a new API key is create in the control plane. This is then immediately used in the `Authorization` header of the request. At this point, the data plane worker Gateway does not know about the key, as the key currently only exists in the control plane. The worker gateway then dynamically retrieves the key via MDCB, enabling it to successfully authenticate the request.\n\nIn an MDCB architecture, data synchronisation between the data plane and control plane occurs periodically. But data can be requested dynamically if it's required prior to synchronisation taking place."
+			},
+			"response": []
 		}
 	],
-	"protocolProfileBehavior": {},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
 			"key": "tyk-worker-gateway.host",
 			"value": "tyk-worker-gateway.localhost:8090"
+		},
+		{
+			"key": "tyk-gateway.host",
+			"value": "tyk-gateway.localhost:8080",
+			"type": "default"
+		},
+		{
+			"key": "tyk-gateway.api-key",
+			"value": "28d220fd77974a4facfb07dc1e49c2aa",
+			"type": "default"
 		}
 	]
 }
