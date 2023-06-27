@@ -58,25 +58,21 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	// Get the global config - it's needed in various places
 	conf := config.Global()
 	// Create a Redis Controller, which will handle the Redis connection for the storage
-	rc := storage.NewRedisController(r.Context())
+	rc := storage.NewRedisController(context.Background())
 	// Create a storage object, which will handle Redis operations using "apikey-" key prefix
-	store := storage.RedisCluster{KeyPrefix: "apikey-", HashKeys: conf.HashKeys, RedisController: rc}
+	rs := storage.RedisCluster{KeyPrefix: "apikey-", HashKeys: conf.HashKeys, RedisController: rc}
 
-	go rc.ConnectToRedis(r.Context(), nil, &conf)
-	for i := 0; i < 5; i++ { // max 5 attempts - should only take 2
+	go rc.ConnectToRedis(context.Background(), nil, &conf)
+
+	// wait for Redis connection
+	for {
 		if rc.Connected() {
 			logger.Info("Redis Controller connected")
 			break
 		}
-		logger.Warn("Redis Controller not connected, will retry")
+		logger.Warn("Redis Controller not connected yet, waiting...")
 
-		time.Sleep(10 * time.Millisecond)
-	}
-
-	if !rc.Connected() {
-		logger.Error("Could not connect to storage")
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
+		time.Sleep(50 * time.Millisecond)
 	}
 
 	if conf.HashKeys {
@@ -116,7 +112,7 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	logger.Info("Lookup key: ", lookupKey)
 
 	// Check if key exists
-	exists, err := store.Exists(lookupKey)
+	exists, err := rs.Exists(lookupKey)
 	if err != nil {
 		logger.Error("Couldn't check if key exists in Redis: ", err)
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -129,7 +125,7 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	// Use key to get session from Redis storage
-	sessionJson, err := store.GetKey(lookupKey)
+	sessionJson, err := rs.GetKey(lookupKey)
 	if err != nil {
 		logger.Error("Couldn't get session from Redis: ", err)
 		rw.WriteHeader(http.StatusInternalServerError)
