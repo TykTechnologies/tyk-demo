@@ -71,7 +71,7 @@ services:
       - tyk-redis
       - tyk-gateway
   tyk-pump:
-    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.7.0}
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.8.1}
     ports:
       - 8083:8083
     networks:
