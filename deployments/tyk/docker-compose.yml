@@ -116,6 +116,10 @@ services:
     environment:
       - SWAGGER_HOST=http://swagger-petstore:8080
       - SWAGGER_URL=http://localhost:8080/swagger-petstore
+  json-placeholder:
+    image: svenwal/jsonplaceholder:1.1
+    networks:
+      - tyk
   http-server:
     image: httpd:2.4.46-alpine
     networks:
