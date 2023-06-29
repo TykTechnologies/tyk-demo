@@ -212,6 +212,7 @@
     "use_standard_auth": true,
     "use_go_plugin_auth": false,
     "enable_coprocess_auth": false,
+    "custom_plugin_auth_enabled": false,
     "jwt_signing_method": "",
     "jwt_source": "",
     "jwt_identity_base_field": "",
@@ -310,6 +311,7 @@
           "port_data_path": "",
           "target_path": "",
           "use_target_list": false,
+          "cache_disabled": false,
           "cache_timeout": 60,
           "endpoint_returns_list": false
         },
@@ -334,6 +336,7 @@
         "port_data_path": "",
         "target_path": "",
         "use_target_list": false,
+        "cache_disabled": false,
         "cache_timeout": 0,
         "endpoint_returns_list": false
       },
@@ -353,6 +356,7 @@
       "post": [],
       "post_key_auth": [],
       "auth_check": {
+        "disabled": false,
         "name": "",
         "path": "",
         "require_session": false,
@@ -361,12 +365,14 @@
       "response": [],
       "driver": "",
       "id_extractor": {
+        "disabled": false,
         "extract_from": "",
         "extract_with": "",
         "extractor_config": {}
       }
     },
     "custom_middleware_bundle": "",
+    "custom_middleware_bundle_disabled": false,
     "cache_options": {
       "cache_timeout": 60,
       "enable_cache": true,
@@ -428,6 +434,7 @@
     "do_not_track": false,
     "enable_context_vars": false,
     "config_data": {},
+    "config_data_disabled": false,
     "tag_headers": [],
     "global_rate_limit": {
       "rate": 0,
@@ -450,7 +457,8 @@
         "data_sources": []
       },
       "proxy": {
-        "auth_headers": {}
+        "auth_headers": {},
+        "request_headers": {}
       },
       "subgraph": {
         "sdl": ""

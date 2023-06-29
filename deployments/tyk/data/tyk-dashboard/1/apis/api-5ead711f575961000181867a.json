@@ -107,6 +107,7 @@
     "use_standard_auth": false,
     "use_go_plugin_auth": false,
     "enable_coprocess_auth": false,
+    "custom_plugin_auth_enabled": false,
     "jwt_signing_method": "",
     "jwt_source": "",
     "jwt_identity_base_field": "",
@@ -368,6 +369,7 @@
             ],
             "virtual": [
               {
+                "disabled": false,
                 "response_function_name": "virtualEndpointDemonstrationFunction",
                 "function_source_type": "blob",
                 "function_source_uri": "ZnVuY3Rpb24gdmlydHVhbEVuZHBvaW50RGVtb25zdHJhdGlvbkZ1bmN0aW9uKHJlcXVlc3QsIHNlc3Npb24sIGNvbmZpZykgewogIHZhciByZXNwb25zZU9iamVjdCA9IHsgCiAgICBCb2R5OiAiVmlydHVhbCBlbmRwb2ludCByZXNwb25zZSBib2R5IiwgCiAgICBDb2RlOiAyMDAgCiAgfQogIHJldHVybiBUeWtKc1Jlc3BvbnNlKHJlc3BvbnNlT2JqZWN0LCBzZXNzaW9uLm1ldGFfZGF0YSkKfQ==",
@@ -512,6 +514,7 @@
           "port_data_path": "",
           "target_path": "",
           "use_target_list": false,
+          "cache_disabled": false,
           "cache_timeout": 60,
           "endpoint_returns_list": false
         },
@@ -536,6 +539,7 @@
         "port_data_path": "",
         "target_path": "",
         "use_target_list": false,
+        "cache_disabled": false,
         "cache_timeout": 0,
         "endpoint_returns_list": false
       },
@@ -555,6 +559,7 @@
       "post": [],
       "post_key_auth": [],
       "auth_check": {
+        "disabled": false,
         "name": "",
         "path": "",
         "require_session": false,
@@ -563,12 +568,14 @@
       "response": [],
       "driver": "",
       "id_extractor": {
+        "disabled": false,
         "extract_from": "",
         "extract_with": "",
         "extractor_config": {}
       }
     },
     "custom_middleware_bundle": "",
+    "custom_middleware_bundle_disabled": false,
     "cache_options": {
       "cache_timeout": 5,
       "enable_cache": true,
@@ -620,6 +627,7 @@
     "do_not_track": false,
     "enable_context_vars": true,
     "config_data": {},
+    "config_data_disabled": false,
     "tag_headers": [],
     "global_rate_limit": {
       "rate": 0,
@@ -642,7 +650,8 @@
         "data_sources": []
       },
       "proxy": {
-        "auth_headers": {}
+        "auth_headers": {},
+        "request_headers": {}
       },
       "subgraph": {
         "sdl": ""
