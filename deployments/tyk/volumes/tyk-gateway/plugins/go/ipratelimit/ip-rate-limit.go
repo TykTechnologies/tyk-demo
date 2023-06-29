@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -21,14 +22,14 @@ func IPRateLimiter(rw http.ResponseWriter, r *http.Request) {
 	// Get the global config - it's needed in various places
 	conf := config.Global()
 	// Create a Redis Controller, which will handle the Redis connection for the storage
-	rc := storage.NewRedisController(r.Context())
+	rc := storage.NewRedisController(context.Background())
 	// Create a storage object, which will handle Redis operations using "apikey-" key prefix
-	store := storage.RedisCluster{KeyPrefix: "apikey-", HashKeys: conf.HashKeys, RedisController: rc}
+	rs := storage.RedisCluster{KeyPrefix: "apikey-", HashKeys: conf.HashKeys, RedisController: rc}
 	// The "test" query param denotes that the request is part of a test
 	testKeyId := r.URL.Query().Get("test")
 	isTestRequest := testKeyId != ""
 
-	go rc.ConnectToRedis(r.Context(), nil, &conf)
+	go rc.ConnectToRedis(context.Background(), nil, &conf)
 	for i := 0; i < 5; i++ { // max 5 attempts - should only take 2
 		if rc.Connected() {
 			logger.Info("Redis Controller connected")
@@ -92,7 +93,7 @@ func IPRateLimiter(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = store.SetKey(lookupKey, string(j), 0)
+	err = rs.SetKey(lookupKey, string(j), 0)
 	if err != nil {
 		logger.Error("Could not store key: ", err)
 		rw.WriteHeader(http.StatusInternalServerError)
