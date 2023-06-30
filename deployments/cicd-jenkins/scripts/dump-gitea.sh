@@ -9,4 +9,4 @@ check_docker_compose_version
 
 eval "$(generate_docker_compose_command) exec -d -u git gitea sh -c \"cd /data/gitea; rm gitea-dump.zip; gitea dump -c /data/gitea/conf/app.ini --f gitea-dump.zip\""
 
-docker cp $(get_service_container_id gitea):/data/gitea/gitea-dump.zip deployments/cicd/volumes/gitea/gitea-dump.zip
+docker cp $(get_service_container_id gitea):/data/gitea/gitea-dump.zip deployments/cicd-jenkins/volumes/gitea/gitea-dump.zip

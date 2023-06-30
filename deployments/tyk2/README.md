@@ -21,4 +21,4 @@ Critical values, such as database connection strings are overridden with environ
 
 ## Usage
 
-This deployment is intended to be used in conjunction with the CI/CD feature, but it can be deployed separately if desired. When deployed with `cicd`, Jenkins is used to automate the deployment of API Definitions and Policies from the default environment to this environment.
+This deployment is intended to be used in conjunction with the CI/CD feature, but it can be deployed separately if desired. When deployed with `cicd-jenkins`, Jenkins is used to automate the deployment of API Definitions and Policies from the default environment to this environment.

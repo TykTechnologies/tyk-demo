@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source scripts/common.sh
-deployment="CI/CD"
+deployment="CI/CD Jenkins"
 log_start_deployment
 bootstrap_progress
 
@@ -11,11 +11,11 @@ dashboard2_base_url="http://localhost:3002"
 
 log_message "Verifying that Tyk Environment 2 deployment exists by checking for tyk2-dashboard service"
 tyk2_dashboard_service=$(eval $(generate_docker_compose_command) top tyk2-dashboard)
-# Fail if cicd deployment is made without the tyk2 deployment
+# Fail if cicd-jenkins deployment is made without the tyk2 deployment
 if [ "$tyk2_dashboard_service" == "" ]; then
   log_message "  ERROR: Tyk Environment 2 deployment not found."
-  log_message "         CI/CD feature will not work as intended. Ensure 'tyk2' deployment is included when using 'cicd' deployment."
-  log_message "         To resolve, run up.sh script with 'tyk2' parameter: ./up.sh tyk2 cicd"
+  log_message "         CI/CD feature will not work as intended. Ensure 'tyk2' deployment is included when using 'cicd-jenkins' deployment."
+  log_message "         To resolve, run up.sh script with 'tyk2' parameter: ./up.sh tyk2 cicd-jenkins"
   exit 1
 fi
 log_ok
@@ -87,7 +87,7 @@ bootstrap_progress
 
 log_message "Add, commit and push Jenkinsfile to repo"
 # commit Jenkinsfile to repo (left uncommitted until now so it can be easily edited)
-cp ./deployments/cicd/data/jenkins/Jenkinsfile $gitea_tyk_data_repo_path
+cp ./deployments/cicd-jenkins/data/jenkins/Jenkinsfile $gitea_tyk_data_repo_path
 git -C $gitea_tyk_data_repo_path add . 1>/dev/null 2>&1
 git -C $gitea_tyk_data_repo_path commit -m "Adding Jenkinsfile" 1>/dev/null 2>&1
 git -C $gitea_tyk_data_repo_path push "http://$gitea_username:$gitea_password@localhost:13000/gitea-user/tyk-data.git/" 1>/dev/null 2>>bootstrap.log
@@ -99,12 +99,12 @@ log_ok
 bootstrap_progress
 
 log_message "Checking for local Jenkins plugin cache"
-if ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1> /dev/null 2>&1; then
+if ls deployments/cicd-jenkins/volumes/jenkins/plugins/*.jpi 1> /dev/null 2>&1; then
   log_message "  Plugins found, will use local cache instead of downloading plugins"
 else
   log_message "  Plugins not found, downloading plugins to local cache... (please be patient, this can take a long time)"
   attempt_count=0
-  until ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1>/dev/null 2>&1; do
+  until ls deployments/cicd-jenkins/volumes/jenkins/plugins/*.jpi 1>/dev/null 2>&1; do
     attempt_count=$((attempt_count+1))
     $(generate_docker_compose_command) exec -T jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins/plugins.txt --latest false --verbose 1>>bootstrap.log 2>&1
     if [ "$?" != "0" ]; then
@@ -166,8 +166,8 @@ log_ok
 bootstrap_progress
 
 log_message "Writing Jenkins credentials import file, using Tyk Dashboard credentials generated during bootstrap."
-sed "s/TYK2_DASHBOARD_CREDENTIALS/$dashboard2_user_api_credentials/g" deployments/cicd/data/jenkins/credentials-global-template.xml > \
-  deployments/cicd/volumes/jenkins/bootstrap-import/credentials-global.xml
+sed "s/TYK2_DASHBOARD_CREDENTIALS/$dashboard2_user_api_credentials/g" deployments/cicd-jenkins/data/jenkins/credentials-global-template.xml > \
+  deployments/cicd-jenkins/volumes/jenkins/bootstrap-import/credentials-global.xml
 log_ok
 
 log_message "Waiting for Jenkins CLI to be ready, before running CLI commands"
