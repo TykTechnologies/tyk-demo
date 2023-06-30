@@ -251,14 +251,17 @@ build_go_plugin () {
   log_message "Building Go Plugin $go_plugin_path using tag $gateway_image_tag"
   # only build the plugin if the currently built version is different to the Gateway version or the plugin shared object file does not exist
   if [ "$go_plugin_build_version" != "$gateway_image_tag" ] || [ ! -f $go_plugin_path ]; then
+    # default Go build targets
     goarch="amd64"
-    os=$(uname -m)
-    log_message "Architecture: $os"
-    if [ "$os" == 'arm64' ]; then
-      goarch=$os
+    goos="linux"
+    # get the current platform
+    platform=$(uname -m)
+    log_message "  Current hardware platform: $platform"
+    if [ "$platform" == 'arm64' ]; then
+      goarch=$platform
     fi
-    log_message "goarch: $goarch"
-    docker run --rm -v $go_plugin_directory:/plugin-source -e GOOS=linux -e GOARCH=$goarch --platform linux/amd64 tykio/tyk-plugin-compiler:$gateway_image_tag $go_plugin_filename
+    log_message "  Target Go Platform: $goos/$goarch"
+    docker run --rm -v $go_plugin_directory:/plugin-source -e GOOS=$goos -e GOARCH=$goarch --platform linux/amd64 tykio/tyk-plugin-compiler:$gateway_image_tag $go_plugin_filename
     plugin_container_exit_code="$?"
     if [[ "$plugin_container_exit_code" -ne "0" ]]; then
       log_message "  ERROR: Tyk Plugin Compiler container returned error code: $plugin_container_exit_code"
