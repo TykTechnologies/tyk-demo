@@ -98,28 +98,30 @@ fi
 log_ok
 bootstrap_progress
 
-log_message "Checking for local Jenkins plugin cache"
-if ls deployments/cicd-jenkins/volumes/jenkins/plugins/*.jpi 1> /dev/null 2>&1; then
-  log_message "  Plugins found, will use local cache instead of downloading plugins"
-else
-  log_message "  Plugins not found, downloading plugins to local cache... (please be patient, this can take a long time)"
-  attempt_count=0
-  until ls deployments/cicd-jenkins/volumes/jenkins/plugins/*.jpi 1>/dev/null 2>&1; do
-    attempt_count=$((attempt_count+1))
-    $(generate_docker_compose_command) exec -T jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins/plugins.txt --latest false --verbose 1>>bootstrap.log 2>&1
-    if [ "$?" != "0" ]; then
-      if [ "$attempt_count" = "5" ]; then
-        log_message "  Maximum retry count reached. Aborting."
-        echo "ERROR: Unable to download Jenkins plugins"
-        exit 1
-      else 
-        log_message "  Failed to download Jenkins plugins, retrying"
-        sleep 3
-      fi      
-    fi
-  done
-  log_ok
+log_message "Add, commit and push Postman Collection to repo"
+cp deployments/cicd-jenkins/data/jenkins/tyk_demo_cicd_jenkins.postman_collection.json $gitea_tyk_data_repo_path
+git -C $gitea_tyk_data_repo_path add . 1>/dev/null 2>&1
+git -C $gitea_tyk_data_repo_path commit -m "Adding Postman Collection" 1>/dev/null 2>&1
+git -C $gitea_tyk_data_repo_path push "http://$gitea_username:$gitea_password@localhost:13000/gitea-user/tyk-data.git/" 1>/dev/null 2>>bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Failed git operations"
+  exit 1
 fi
+log_ok
+bootstrap_progress
+
+log_message "Synchronising local Jenkins plugin cache"
+log_message "  Note: this can take a long time on first run"
+plugin_result=""
+until [ "$plugin_result" == "0" ]; do
+  $(generate_docker_compose_command) exec -T jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins/plugins.txt --latest false --verbose 1>>bootstrap.log 2>&1
+  plugin_result="$?"
+  if [ "$?" != "0" ]; then
+    log_message "  Failed to download Jenkins plugins, retrying"
+    sleep 3
+  fi
+done
+log_ok
 bootstrap_progress
 
 log_message "Copying local plugin cache to Jenkins"
@@ -134,6 +136,16 @@ bootstrap_progress
 log_message "Updating configuration file"
 # this approach is used to avoid "Device or resource busy" issue when using a volume mapping
 $(generate_docker_compose_command) exec -T jenkins cp /tmp/bootstrap-import/config.xml /var/jenkins_home/config.xml
+if [ "$?" != "0" ]; then
+  echo "ERROR: Failed to update Jenkins configuration file"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Updating NodeJS plugin configuration file"
+# this approach is used to avoid "Device or resource busy" issue when using a volume mapping
+$(generate_docker_compose_command) exec -T jenkins cp /tmp/bootstrap-import/jenkins.plugins.nodejs.tools.NodeJSInstallation.xml /var/jenkins_home/jenkins.plugins.nodejs.tools.NodeJSInstallation.xml
 if [ "$?" != "0" ]; then
   echo "ERROR: Failed to update Jenkins configuration file"
   exit 1
@@ -185,7 +197,7 @@ while [ "$jenkins_response" != "0" ]; do
   bootstrap_progress
 done
 
-log_message "Importing 'global' credentials into Jenkins, for authenticating with Tyk Dashboard during pipeline script."
+log_message "Importing 'global' credentials into Jenkins, for authenticating with Tyk Dashboard during pipeline script"
 jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket import-credentials-as-xml system::system::jenkins < /tmp/bootstrap-import/credentials-global.xml\"; echo \$?" 2>>bootstrap.log)
 if [ "$jenkins_response" != "0" ]; then
   echo "ERROR: Failed to import Jenkins credentials"
@@ -194,7 +206,7 @@ fi
 log_ok
 bootstrap_progress
 
-log_message "Creating 'APIs and Policies' job in Jenkins, to execute deployment scripts when source code changes are detected."
+log_message "Creating 'APIs and Policies' job in Jenkins, to execute deployment scripts when source code changes are detected"
 jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'apis-and-policies' < /tmp/bootstrap-import/job-apis-and-policies.xml\"; echo \$?" 2>>bootstrap.log)
 if [ "$jenkins_response" != "0" ]; then
   echo "ERROR: Failed to create Jenkins job"
@@ -202,6 +214,16 @@ if [ "$jenkins_response" != "0" ]; then
 fi
 log_ok
 bootstrap_progress
+
+log_message "Creating 'Test' job in Jenkins"
+jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'test' < /tmp/bootstrap-import/job-test.xml\"; echo \$?" 2>>bootstrap.log)
+if [ "$jenkins_response" != "0" ]; then
+  echo "ERROR: Failed to create Jenkins job"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
 
 log_end_deployment
 
