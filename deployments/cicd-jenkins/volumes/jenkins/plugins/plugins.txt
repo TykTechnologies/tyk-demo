@@ -82,3 +82,4 @@ matrix-auth:3.0
 pam-auth:1.6.1
 ldap:2.7
 email-ext:2.86
+nodejs:1.5.1
