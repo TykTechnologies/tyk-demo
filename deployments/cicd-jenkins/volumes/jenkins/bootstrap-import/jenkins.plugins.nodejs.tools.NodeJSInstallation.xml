@@ -1,0 +1,20 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<jenkins.plugins.nodejs.tools.NodeJSInstallation_-DescriptorImpl plugin="nodejs@1.5.1">
+  <installations class="jenkins.plugins.nodejs.tools.NodeJSInstallation-array">
+    <jenkins.plugins.nodejs.tools.NodeJSInstallation>
+      <name>nodejs</name>
+      <properties>
+        <hudson.tools.InstallSourceProperty>
+          <installers>
+            <jenkins.plugins.nodejs.tools.NodeJSInstaller>
+              <id>18.16.1</id>
+              <npmPackages>newman</npmPackages>
+              <npmPackagesRefreshHours>72</npmPackagesRefreshHours>
+              <force32Bit>false</force32Bit>
+            </jenkins.plugins.nodejs.tools.NodeJSInstaller>
+          </installers>
+        </hudson.tools.InstallSourceProperty>
+      </properties>
+    </jenkins.plugins.nodejs.tools.NodeJSInstallation>
+  </installations>
+</jenkins.plugins.nodejs.tools.NodeJSInstallation_-DescriptorImpl>
