@@ -196,6 +196,9 @@ func AddContextDataToResponse(rw http.ResponseWriter, res *http.Response, req *h
 	}
 }
 
+// Applies a mask to analytics data
+// This example replaces the value stored for the 'origin' field with asterisks
+// Only applies to analytics data record, the response to the client remains unchanged
 func MaskAnalyticsData(record *analytics.AnalyticsRecord) {
 	logger.Info("MaskAnalyticsData Started")
 
