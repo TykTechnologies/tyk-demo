@@ -456,7 +456,7 @@
       "per": 0
     },
     "strip_auth_data": false,
-    "enable_detailed_recording": false,
+    "enable_detailed_recording": true,
     "graphql": {
       "enabled": false,
       "execution_mode": "proxyOnly",
@@ -485,7 +485,11 @@
         "disable_query_batching": false
       }
     },
-    "analytics_plugin": {},
+    "analytics_plugin": {
+      "enable": true,
+      "func_name": "MaskAnalyticsData",
+      "plugin_path": "plugins/go/example/example-go-plugin.so"
+    },
     "tags": []
   },
   "hook_references": [],
