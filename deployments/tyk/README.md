@@ -94,7 +94,7 @@ During the bootstrap script, the Go source in `deployments/tyk/volumes/tyk-gatew
 
 #### Analytics Plugin
 
-An example [analytics plugin](https://tyk.io/docs/plugins/plugin-types/analytics-plugins/) function can be found in the [example go plugin](deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.go). The function is called called *MaskAnalyticsData*, and it demonstrates the analytics plugin functionality by replacing the value of the analytics `origin` with asterisks. The effect of this can be seen by sending a request to the Go Plugin API (No Auth) and viewing the corresponding analytics record in the Dashboard, where the `origin` field in the *Response* body data will be `"origin": "****"`.
+An example [analytics plugin](https://tyk.io/docs/plugins/plugin-types/analytics-plugins/) function can be found in the [example go plugin](deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.go). The function is called called *MaskAnalyticsData*, and it demonstrates analytics plugin functionality by replacing the value of the `origin` field with asterisks. This effect of this can be seen by sending a request to the [Go Plugin API (No Auth)](http://tyk-gateway.localhost:8080/go-plugin-api-no-auth/get) and viewing the corresponding analytics record in the Dashboard, where the `origin` field in the *Response* body data will be `"origin": "****"`.
 
 ### WebSockets and Server-Sent Events
 
