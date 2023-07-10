@@ -88,9 +88,13 @@ The source and manifest file for the plugin are available in `deployments/tyk/vo
 
 ### Go Plugin
 
-A [Go Plugin](https://tyk.io/docs/plugins/supported-languages/golang/) is implemented for the *Go Plugin API*. It is a basic implementation which adds a header to the request. See the *Middleware - Go* request (API Definitions > Middleware > Middleware - Go) in the Postman collection for an example.
+A [Go Plugin](https://tyk.io/docs/plugins/supported-languages/golang/) is implemented for the *Go Plugin API*. It is a basic implementation which (1) adds a header to the request and (2) masks/obfuscates some response data in the analytics log. See the *Middleware - Go* request (API Definitions > Middleware > Middleware - Go) in the Postman collection for an example.
 
 During the bootstrap script, the Go source in `deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.go` is complied into a shared object library file (`deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.so`), which is referenced by the *Go Plugin API*. A special container is used to build the library file, using the same Go version used to build the Gateway.
+
+#### Analytics Plugin
+
+An example [analytics plugin](https://tyk.io/docs/plugins/plugin-types/analytics-plugins/) function can be found in the [example go plugin](deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.go). The function is called called *MaskAnalyticsData*, and it demonstrates analytics plugin functionality by replacing the value of the `origin` field with asterisks. This effect of this can be seen by sending a request to the [Go Plugin API (No Auth)](http://tyk-gateway.localhost:8080/go-plugin-api-no-auth/get) and viewing the corresponding analytics record in the Dashboard, where the `origin` field in the *Response* body data will be `"origin": "****"`.
 
 ### WebSockets and Server-Sent Events
 

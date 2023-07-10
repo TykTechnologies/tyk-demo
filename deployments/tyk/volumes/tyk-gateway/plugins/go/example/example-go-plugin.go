@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -9,6 +10,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/buger/jsonparser"
+
+	"github.com/TykTechnologies/tyk-pump/analytics"
 	"github.com/TykTechnologies/tyk/config"
 	"github.com/TykTechnologies/tyk/ctx"
 	"github.com/TykTechnologies/tyk/log"
@@ -189,6 +193,34 @@ func AddContextDataToResponse(rw http.ResponseWriter, res *http.Response, req *h
 	if myContextData != nil {
 		// add it as a response header
 		res.Header.Add("Data-From-Context", myContextData.(string))
+	}
+}
+
+// Applies a mask to analytics data
+// This example replaces the value stored for the 'origin' field with asterisks
+// Only applies to analytics data record, the response to the client remains unchanged
+func MaskAnalyticsData(record *analytics.AnalyticsRecord) {
+	logger.Info("MaskAnalyticsData Started")
+
+	d, err := base64.StdEncoding.DecodeString(record.RawResponse)
+	if err != nil {
+		return
+	}
+
+	var mask = []byte("\"****\"")
+	const endOfHeaders = "\r\n\r\n"
+	paths := [][]string{
+		{"origin"},
+		{"data", "origin"},
+	}
+	if i := bytes.Index(d, []byte(endOfHeaders)); i > 0 || (i+4) < len(d) {
+		body := d[i+4:]
+		jsonparser.EachKey(body, func(idx int, _ []byte, _ jsonparser.ValueType, _ error) {
+			body, _ = jsonparser.Set(body, mask, paths[idx]...)
+		}, paths...)
+		if err == nil {
+			record.RawResponse = base64.StdEncoding.EncodeToString(append(d[:i+4], body...))
+		}
 	}
 }
 
