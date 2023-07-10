@@ -92,6 +92,10 @@ A [Go Plugin](https://tyk.io/docs/plugins/supported-languages/golang/) is implem
 
 During the bootstrap script, the Go source in `deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.go` is complied into a shared object library file (`deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.so`), which is referenced by the *Go Plugin API*. A special container is used to build the library file, using the same Go version used to build the Gateway.
 
+#### Analytics Plugin
+
+An example [analytics plugin](https://tyk.io/docs/plugins/plugin-types/analytics-plugins/) function can be found in the [example go plugin](deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.go). The function is called called *MaskAnalyticsData*, and it demonstrates the analytics plugin functionality by replacing the value of the analytics `origin` with asterisks. The effect of this can be seen by sending a request to the Go Plugin API (No Auth) and viewing the corresponding analytics record in the Dashboard, where the `origin` field in the *Response* body data will be `"origin": "****"`.
+
 ### WebSockets and Server-Sent Events
 
 These examples use the *Echo Server* API Definition, which is configured to proxy to `echo-server:8080`, a simple echo server container. The echo server echoes back any message it receives, and has special endpoints which enable demonstration of WebSockets and Server-Sent Events.
