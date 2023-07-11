@@ -38,7 +38,7 @@ newman run tyk_demo_cicd_jenkins.postman_collection.json</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
-      <command>echo &quot;Deploying from ${BRANCH_NAME}&quot;</command>
+      <command>echo &quot;Deploying from ${GIT_BRANCH}&quot;</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>
