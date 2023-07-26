@@ -1,0 +1,27 @@
+version: "2"
+services:
+  # Jaeger
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:1.47
+    ports:
+      - "16686:16686"  # Dashboard
+      - "14269:14269"  # Health Check
+    networks:
+      - tyk
+  # Collector
+  collector-gateway:
+    image: otel/opentelemetry-collector:0.81.0
+    volumes:
+      - ./deployments/otel/volumes/otel-collector.yml:/etc/otel-collector.yml
+    command: [ "--config=/etc/otel-collector.yml" ]
+    ports:
+      - "13133:13133" # health_check extension
+    depends_on:
+      - jaeger-all-in-one
+    networks:
+      - tyk
+
+
+
+networks:
+  tyk:
