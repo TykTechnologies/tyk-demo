@@ -16,7 +16,7 @@ Run the `up.sh` script with the `otel` parameter:
 
 ## Usage 
 
-To use Jaeger, open the [Jaeger Dashboard](http://localhost:16686/) in a browser. On the *search* page lets you search for traces with filters:
+To use Jaeger, open the [Jaeger Dashboard](http://localhost:16686/) in a browser. The *Search* page displays trace data based on filters:
 
 - For *Service*, select `tyk-gateway` to see traces from the Tyk gateway, or select `jaeger-query` to see traces from the Jaeger application.
 - The values for *Operation* change based on the *service*. Leave it on `all` to see everything.
