@@ -16,4 +16,10 @@ Run the `up.sh` script with the `otel` parameter:
 
 ## Usage 
 
-To use Jaeger, open the [Jaeger Dashboard](http://localhost:16686/) in a browser and click the magnifying glass icon, this will conduct a search for all available traces. You can add filters for the trace search. There should be at least one trace entry for the "Basic Open API", which is made during the bootstrap process. If you don't see any data, try changing the duration filter to a longer period.
+To use Jaeger, open the [Jaeger Dashboard](http://localhost:16686/) in a browser. On the *search* page lets you search for traces with filters:
+
+- For *Service*, select `tyk-gateway` to see traces from the Tyk gateway, or select `jaeger-query` to see traces from the Jaeger application.
+- The values for *Operation* change based on the *service*. Leave it on `all` to see everything.
+- *Lookback* filters by time, by limiting displayed data to the selected time period. 
+
+Tyk Demo generates trace data as a byproduct of the bootstrap process, so you should see trace entries for the `tyk-gateway` service without having to send any API requests yourself. However, if you don't see any data, try increasing the duration of the *Lookback* filter to a longer period, or generate some fresh trace data by [sending a basic request](http://tyk-gateway.localhost:8080/basic-open-api/get) to the Gateway.
