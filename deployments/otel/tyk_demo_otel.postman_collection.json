@@ -1,0 +1,108 @@
+{
+	"info": {
+		"_postman_id": "df22ddbe-24c9-4084-9f6e-c4e8022186cb",
+		"name": "Tyk Demo - OTel",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Tyk Gateway Trace Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Trace data exists for Tyk Gateway\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data).to.not.be.empty",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Generate trace data by sending a request to the Gateway",
+							"// Tyk Demo bootstrap process also generates trace data, but it may be outside of the default 1 hour lookback period",
+							"pm.sendRequest(",
+							"    {",
+							"        url: \"http://\" + pm.variables.get(\"tyk-gateway.host\") + \"/basic-open-api/get\",",
+							"        method: \"GET\"",
+							"    }, ",
+							"    (error, response) => { ",
+							"        pm.expect(response.code).to.eql(200);",
+							"    }",
+							");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{jaeger.host}}/api/traces?limit=20&lookback=1h&service=tyk-gateway",
+					"protocol": "http",
+					"host": [
+						"{{jaeger.host}}"
+					],
+					"path": [
+						"api",
+						"traces"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "20"
+						},
+						{
+							"key": "lookback",
+							"value": "1h"
+						},
+						{
+							"key": "service",
+							"value": "tyk-gateway"
+						}
+					]
+				},
+				"description": "This requests gets the Jaeger trace data for the Tyk gateway. The data is usually displayed in graphic form within the Jaeger application, but here it is retrieved in its raw JSON format. \n\nThe data is filtered by the request parameters. They specify the `tyk-gateway` service, traces within the last hour, and a maximum of 20 results.\n\nThe traces contain information about the requests processed by the gateway and, most usefully, which middleware were run and how long they took to execute.\n\nThis information can be useful when configuring endpoints and debugging requests, as helps explain gateway behaviour."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "jaeger.host",
+			"value": "localhost:16686",
+			"type": "default"
+		},
+		{
+			"key": "tyk-gateway.host",
+			"value": "tyk-gateway.localhost:8080",
+			"type": "default"
+		}
+	]
+}
