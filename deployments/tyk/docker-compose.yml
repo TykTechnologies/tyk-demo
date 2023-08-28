@@ -22,7 +22,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-gateway:
-    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.1.0}
+    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.2.0-rc1}
     ports:
       - 8080:8080
       - 8086:8086
@@ -40,6 +40,9 @@ services:
       - TYK_GW_HTTPSERVEROPTIONS_FLUSHINTERVAL=1
       - TYK_GW_ANALYTICSCONFIG_ENABLEGEOIP=true
       - TYK_GW_ANALYTICSCONFIG_GEOIPDBLOCATION=/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
+      - TYK_GW_OPENTELEMETRY_ENABLED=true
+      - TYK_GW_OPENTELEMETRY_EXPORTER=grpc
+      - TYK_GW_OPENTELEMETRY_ENDPOINT=collector-gateway:4317
     env_file:
       - .env
     volumes:

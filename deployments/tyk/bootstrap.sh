@@ -16,13 +16,11 @@ log_ok
 bootstrap_progress
 
 log_message "Checking Dashboard licence exists"
-if ! grep -q "DASHBOARD_LICENCE=" .env
-then
+if ! grep -q "DASHBOARD_LICENCE=" .env; then
   log_message "ERROR: Dashboard licence missing from Docker environment file (.env). Add a licence to the DASHBOARD_LICENCE environment variable."
   exit 1
 fi
-if grep -q "DASHBOARD_LICENCE=add_your_dashboard_licence_here" .env
-then
+if grep -q "DASHBOARD_LICENCE=add_your_dashboard_licence_here" .env; then
   log_message "ERROR: Placeholder Dashboard licence found in Docker environment file (.env). Replace \"add_your_dashboard_licence_here\" with your Tyk licence."
   exit 1
 fi
@@ -497,22 +495,20 @@ log_ok
 
 log_end_deployment
 
+NOCOLOUR='\033[0m'
+CYAN='\033[0;36m'
+
 echo -e "\033[2K
 
-            #####################                  ####               
-            #####################                  ####               
-                    #####                          ####               
-  /////////         #####    ((.            (((    ####          (((  
-  ///////////,      #####    ####         #####    ####       /####   
-  ////////////      #####    ####         #####    ####      #####    
-  ////////////      #####    ####         #####    ##############     
-    //////////      #####    ####         #####    ##############     
-                    #####    ####         #####    ####      ,####    
-                    #####    ##################    ####        ####   
-                    #####      ########## #####    ####         ####  
-                                         #####                        
-                             ################                         
-                               ##########/                            
+              ▓▓▓▓▓▓▓▓▓▓▓▓▓          ▓▓▓
+                   ▓▓▓               ▓▓▓
+        ${CYAN}▓▓▓▓▓${NOCOLOUR}      ▓▓▓  ▓▓▓     ▓▓▓  ▓▓▓     ▓▓
+        ${CYAN}▓▓▓▓▓▓▓${NOCOLOUR}    ▓▓▓  ▓▓▓     ▓▓▓  ▓▓▓    ▓▓
+          ${CYAN}▓▓▓▓▓${NOCOLOUR}    ▓▓▓  ▓▓▓     ▓▓▓  ▓▓▓▓▓▓▓▓▓
+                   ▓▓▓  ▓▓▓     ▓▓▓  ▓▓▓    ▓▓ 
+                   ▓▓▓   ▓▓▓▓▓▓▓▓▓▓  ▓▓▓     ▓▓
+                                ▓▓▓  
+                         ▓▓▓▓▓▓▓▓▓
 
 ▼ Tyk
   ▽ Dashboard ($(get_service_image_tag "tyk-dashboard"))

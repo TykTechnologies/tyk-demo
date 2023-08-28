@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   tyk-mdcb:
-    image: tykio/tyk-mdcb-docker:${MDCB_VERSION:-v2.2.0}
+    image: tykio/tyk-mdcb-docker:${MDCB_VERSION:-v2.3.0}
     networks:
       - tyk
     volumes:
