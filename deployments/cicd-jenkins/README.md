@@ -110,10 +110,10 @@ Note that although the Poll SCM option is enabled, the configuration should be l
 
 ### Integration Testing
 
-The Jenkins job is configured to execute tests as part of the build process. To do this, it uses the Newman test runner to run the tests in the repo Postman collection. This is performed via a shell command:
+The Jenkins job is configured to execute tests as part of the build process. To do this, it uses the Newman test runner to run the tests in the repo's Postman collection. This is performed via a shell command:
 
 ```
 newman run tyk_demo_cicd_jenkins.postman_collection.json
 ```
 
-Newman is installed as a NPM package in Jenkins.
+Newman is installed as an NPM package in Jenkins, so it can be used as part of the build scripts.
