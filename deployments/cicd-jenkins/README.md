@@ -115,3 +115,5 @@ The Jenkins job is configured to execute tests as part of the build process. To 
 ```
 newman run tyk_demo_cicd_jenkins.postman_collection.json
 ```
+
+Newman is installed as a NPM package in Jenkins.
