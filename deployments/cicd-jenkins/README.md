@@ -107,3 +107,11 @@ For this to work, the Gitea makes a request to Jenkins using this URL http://jen
 2. The job *build trigger* is configured to use *Poll SCM*
 
 Note that although the Poll SCM option is enabled, the configuration should be left emtpy, as we don't want Jenkins to actually poll the git repo on a schedule. This would be inefficient, and defeats the point of dynamic webhook approach. However, Jenkins still needs to poll for change, but only when triggered to do so by the webhook, so the empty configuration will allow it to do that, but without making repetitive and unnecessary poll requests.
+
+### Integration Testing
+
+The Jenkins job is configured to execute tests as part of the build process. To do this, it uses the Newman test runner to run the tests in the repo Postman collection. This is performed via a shell command:
+
+```
+newman run tyk_demo_cicd_jenkins.postman_collection.json
+```
