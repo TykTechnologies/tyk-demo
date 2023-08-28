@@ -106,4 +106,4 @@ For this to work, the Gitea makes a request to Jenkins using this URL http://jen
 1. The job *repository URL* matches the `url` value passed by the webhook
 2. The job *build trigger* is configured to use *Poll SCM*
 
-Note that althgouh the Poll SCM option is enabled, the configuration should be left emtpy, as we don't want Jenkins to actually poll the git repo on a schedule. This would be inefficient, and defeats the point of dynamic webhook approach. However, Jenkins still needs to poll for change, but only when triggered to do so by the webhook, so the empty configuration will allow it to do that, but without making repetitive and unnecessary poll requests.
+Note that although the Poll SCM option is enabled, the configuration should be left emtpy, as we don't want Jenkins to actually poll the git repo on a schedule. This would be inefficient, and defeats the point of dynamic webhook approach. However, Jenkins still needs to poll for change, but only when triggered to do so by the webhook, so the empty configuration will allow it to do that, but without making repetitive and unnecessary poll requests.
