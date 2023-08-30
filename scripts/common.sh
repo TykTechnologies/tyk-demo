@@ -309,6 +309,21 @@ create_organisation () {
   log_message "    Portal Hostname: $portal_hostname"
 }
 
+apply_opa_rules () {
+  local opa_rules_data_path="$1"
+  local api_key="$2"
+
+  log_message "  Applying OPA rules data: $opa_rules_data_path"
+  # encode the OPA rego string so it can be used as a JSON value
+  encoded_opa_rules=$(jq -n --arg opa_rules "$(cat $opa_rules_data_path)" '{"open_policy":{"rules":$opa_rules}}')
+
+  local api_response=$(curl -X PUT $dashboard_base_url/api/org/opa -s \
+    -H "Authorization: $api_key" \
+    -d "$encoded_opa_rules" 2>> bootstrap.log)
+
+  log_json_result "$api_response"
+}
+
 create_dashboard_user () {
   local dashboard_user_data_path="$1"
   local api_key="$2"

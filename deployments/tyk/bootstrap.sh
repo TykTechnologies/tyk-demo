@@ -196,6 +196,16 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     # get admin user dashboard API key for Dashboard API calls
     dashboard_user_api_key=$(get_context_data "$data_group" "dashboard-user" "$admin_user_index" "api-key")
 
+    # OPA Rules
+    log_message "Creating OPA Rules"
+    opa_rules_data_path="$data_group_path/opa-rules.rego"
+    if [[ -f $opa_rules_data_path ]]; then
+      apply_opa_rules "$opa_rules_data_path" "$dashboard_user_api_key"
+    else
+      log_message "  No OPA rules found at path $opa_rules_data_path, skipping"
+    fi
+    bootstrap_progress
+
     # User Groups
     log_message "Creating Dashboard User Groups"
     index=1
