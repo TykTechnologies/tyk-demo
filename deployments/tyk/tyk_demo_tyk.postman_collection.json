@@ -8545,6 +8545,132 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "Dashboard Functionality",
+			"item": [
+				{
+					"name": "OPA Rules - Enforce Authentication (Part 1)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"OPA error message received\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.Message).to.eql(\"access denied: API must not allow unauthenticated access\");",
+									"});",
+									"",
+									"// remove temporary dashboard API credentials",
+									"tyk.dashboardApi.tools.apiKey.delete(pm);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tyk-dashboard.api-key}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"api_definition\": {\n        \"api_id\": \"16927156abd1430853af3298fee687cb\",\n        \"use_keyless\": true,\n        \"cache_options\": {\n            \"cache_timeout\": 60,\n            \"enable_cache\": true\n        },\n        \"active\": true,\n        \"auth\": {\n            \"auth_header_name\": \"Authorization\"\n        },\n        \"hmac_allowed_clock_skew\": -1,\n        \"uptime_tests\": {\n            \"config\": {\n                \"service_discovery\": {\n                    \"cache_timeout\": 60\n                }\n            }\n        },\n        \"name\": \"OPA Enforce Auth #auth-required\",\n        \"slug\": \"opa-enforce-auth\",\n        \"CORS\": {\n            \"max_age\": 24,\n            \"allowed_headers\": [\n                \"Origin\",\n                \"Accept\",\n                \"Content-Type\",\n                \"X-Requested-With\",\n                \"Authorization\"\n            ],\n            \"allowed_origins\": [\n                \"*\"\n            ],\n            \"allowed_methods\": [\n                \"GET\",\n                \"POST\",\n                \"HEAD\"\n            ]\n        },\n        \"proxy\": {\n            \"target_url\": \"http://httpbin/\",\n            \"strip_listen_path\": true,\n            \"listen_path\": \"/opa-enforce-auth/\",\n            \"disable_strip_slash\": true\n        },\n        \"version_data\": {\n            \"not_versioned\": true,\n            \"versions\": {\n                \"Default\": {\n                    \"name\": \"Default\",\n                    \"use_extended_paths\": true\n                }\n            }\n        },\n        \"definition\": {\n            \"location\": \"header\",\n            \"key\": \"x-api-version\"\n        },\n        \"org_id\": \"5e9d9544a1dcd60001d0ed20\",\n        \"auth_configs\": {\n            \"authToken\": {\n                \"auth_header_name\": \"Authorization\"\n            },\n            \"basic\": {\n                \"auth_header_name\": \"Authorization\"\n            },\n            \"coprocess\": {\n                \"auth_header_name\": \"Authorization\"\n            },\n            \"hmac\": {\n                \"auth_header_name\": \"Authorization\"\n            },\n            \"jwt\": {\n                \"auth_header_name\": \"Authorization\"\n            },\n            \"oauth\": {\n                \"auth_header_name\": \"Authorization\"\n            },\n            \"oidc\": {\n                \"auth_header_name\": \"Authorization\"\n            }\n        },\n        \"id\": \"64ecbd32968be10001dc671c\"\n    }\n}"
+						},
+						"url": {
+							"raw": "http://{{tyk-dashboard.host}}/api/apis/16927156abd1430853af3298fee687cb",
+							"protocol": "http",
+							"host": [
+								"{{tyk-dashboard.host}}"
+							],
+							"path": [
+								"api",
+								"apis",
+								"16927156abd1430853af3298fee687cb"
+							]
+						},
+						"description": "This request demonstrates the OPA rules functionality in the dashboard.\n\nIt attempts to remove authentication from an API definition that is tagged with `#auth-required`. This tag has a corresponding OPA rule that prevents authentication from being removed from API definitions.\n\nThe OPA rule is set up as follows:\n- Activates on `write` operation for `api` objects\n- API definition name must contain the tag `#auth-required`\n- API definition field `use_keyless` must be set to `true`\n\nIf these assertations are all true then the request is rejected with a `403 Forbidden` response. The response contains a contextual error message taken directly from the OPA rule, which in this case reads \"access denied: API must not allow unauthenticated access\".\n\nUsing the `#requires-auth` tag to target the OPA rule enables it to be easily applied to other API Definitions too."
+					},
+					"response": []
+				},
+				{
+					"name": "OPA Rules - Enforce Authentication (Part 2)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// remove temporary dashboard API credentials",
+									"tyk.dashboardApi.tools.apiKey.delete(pm);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tyk-dashboard.api-key}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"api_definition\": {\n        \"api_id\": \"16927156abd1430853af3298fee687cb\",\n        \"use_keyless\": false,\n        \"cache_options\": {\n            \"cache_timeout\": 60,\n            \"enable_cache\": true\n        },\n        \"active\": true,\n        \"auth\": {\n            \"auth_header_name\": \"Authorization\"\n        },\n        \"hmac_allowed_clock_skew\": -1,\n        \"uptime_tests\": {\n            \"config\": {\n                \"service_discovery\": {\n                    \"cache_timeout\": 60\n                }\n            }\n        },\n        \"name\": \"OPA Enforce Auth #auth-required\",\n        \"slug\": \"opa-enforce-auth\",\n        \"CORS\": {\n            \"max_age\": 24,\n            \"allowed_headers\": [\n                \"Origin\",\n                \"Accept\",\n                \"Content-Type\",\n                \"X-Requested-With\",\n                \"Authorization\"\n            ],\n            \"allowed_origins\": [\n                \"*\"\n            ],\n            \"allowed_methods\": [\n                \"GET\",\n                \"POST\",\n                \"HEAD\"\n            ]\n        },\n        \"proxy\": {\n            \"target_url\": \"http://httpbin/\",\n            \"strip_listen_path\": true,\n            \"listen_path\": \"/opa-enforce-auth/\",\n            \"disable_strip_slash\": true\n        },\n        \"version_data\": {\n            \"not_versioned\": true,\n            \"versions\": {\n                \"Default\": {\n                    \"name\": \"Default\",\n                    \"use_extended_paths\": true\n                }\n            }\n        },\n        \"definition\": {\n            \"location\": \"header\",\n            \"key\": \"x-api-version\"\n        },\n        \"org_id\": \"5e9d9544a1dcd60001d0ed20\",\n        \"auth_configs\": {\n            \"authToken\": {\n                \"auth_header_name\": \"Authorization\"\n            },\n            \"basic\": {\n                \"auth_header_name\": \"Authorization\"\n            },\n            \"coprocess\": {\n                \"auth_header_name\": \"Authorization\"\n            },\n            \"hmac\": {\n                \"auth_header_name\": \"Authorization\"\n            },\n            \"jwt\": {\n                \"auth_header_name\": \"Authorization\"\n            },\n            \"oauth\": {\n                \"auth_header_name\": \"Authorization\"\n            },\n            \"oidc\": {\n                \"auth_header_name\": \"Authorization\"\n            }\n        },\n        \"id\": \"64ecbd32968be10001dc671c\"\n    }\n}"
+						},
+						"url": {
+							"raw": "http://{{tyk-dashboard.host}}/api/apis/16927156abd1430853af3298fee687cb",
+							"protocol": "http",
+							"host": [
+								"{{tyk-dashboard.host}}"
+							],
+							"path": [
+								"api",
+								"apis",
+								"16927156abd1430853af3298fee687cb"
+							]
+						},
+						"description": "Following on from part 1, this request has `use_keyless` set to `false`, so is successful and results in a `200` response."
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Creates a Dashboard API key that can be used for requests within this folder.",
+							"// Each request is expected to call `tyk.dashboardApi.tools.apiKey.delete(pm);` at the end of its test so that the key is removed.",
+							"tyk.dashboardApi.tools.apiKey.create(pm);"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
 		}
 	],
 	"event": [
