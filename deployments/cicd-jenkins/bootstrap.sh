@@ -112,6 +112,9 @@ bootstrap_progress
 
 log_message "Synchronising local Jenkins plugin cache"
 log_message "  Note: this can take a long time on first run"
+# A temporary location is used for mapping plugin .jpi files between the host and the container.
+# - This means the .jpi files need to be copied into the actual jenkins plugin directory, so they can be used by Jenkins.
+# - It is more effcient than mapping directly to the Jenkins plugin directory, as it prevents the uncompressed plugin assets from being transferred back onto the host.
 plugin_result=""
 until [ "$plugin_result" == "0" ]; do
   $(generate_docker_compose_command) exec -T jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins/plugins.txt --latest false --verbose 1>>bootstrap.log 2>&1
