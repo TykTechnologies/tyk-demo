@@ -182,14 +182,46 @@ sed "s/TYK2_DASHBOARD_CREDENTIALS/$dashboard2_user_api_credentials/g" deployment
   deployments/cicd-jenkins/volumes/jenkins/bootstrap-import/credentials-global.xml
 log_ok
 
+log_message "Creating temporary directory in Jenkins container"
+# this is to store the jenkins CLI binary
+$(generate_docker_compose_command) exec -T jenkins mkdir /tmp/jenkins
+log_ok
+bootstrap_progress
+
+log_message "Waiting for Jenkins web server to become available"
+jenkins_response=""
+while [ "$jenkins_response" != "200" ]; do
+  docker_compose_command="$(generate_docker_compose_command) exec -T jenkins bash -c \"curl --silent --output /dev/null --write-out \"%{http_code}\" http://localhost:8080/login\""
+  jenkins_response=$(eval $docker_compose_command)
+  if [ "$jenkins_response" != "200" ]; then
+    log_message "  Jenkins is not ready (status:$jenkins_response), retrying... "
+    sleep 2
+  else
+    log_ok
+  fi
+  bootstrap_progress
+done
+
+log_message "Downloading Jenkins CLI"
+jenkins_response=""
+docker_compose_command="$(generate_docker_compose_command) exec -T jenkins bash -c \"curl -s --output /tmp/jenkins/jenkins-cli.jar --write-out \"%{http_code}\" http://localhost:8080/jnlpJars/jenkins-cli.jar\""
+jenkins_response=$(eval $docker_compose_command)
+if [ "$jenkins_response" != "200" ]; then
+  log_message "  ERROR: Could not download Jenkins CLI"
+else
+  log_ok
+fi
+bootstrap_progress
+
+
 log_message "Waiting for Jenkins CLI to be ready, before running CLI commands"
 # After the container restart, Jenkins functionality will not work for a little while, so we have to test if it's ready by checking the exit code of a CLI call
 jenkins_response=""
 while [ "$jenkins_response" != "0" ]; do
-  docker_compose_command="$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket who-am-i >/dev/null 2>&1\"; echo \$?"
+  docker_compose_command="$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/jenkins/jenkins-cli.jar -s http://localhost:8080/ -webSocket who-am-i >/dev/null 2>&1\"; echo \$?"
   jenkins_response=$(eval $docker_compose_command)
   if [ "$jenkins_response" != "0" ]; then
-    log_message "  Jenkins CLI is not ready, retrying..."
+    log_message "  Jenkins CLI is not ready (status:$jenkins_response), retrying..."
     sleep 2
   else
     log_ok
@@ -198,7 +230,7 @@ while [ "$jenkins_response" != "0" ]; do
 done
 
 log_message "Importing 'global' credentials into Jenkins, for authenticating with Tyk Dashboard during pipeline script"
-jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket import-credentials-as-xml system::system::jenkins < /tmp/bootstrap-import/credentials-global.xml\"; echo \$?" 2>>bootstrap.log)
+jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/jenkins/jenkins-cli.jar -s http://localhost:8080/ -webSocket import-credentials-as-xml system::system::jenkins < /tmp/bootstrap-import/credentials-global.xml\"; echo \$?" 2>>bootstrap.log)
 if [ "$jenkins_response" != "0" ]; then
   echo "ERROR: Failed to import Jenkins credentials"
   exit 1
@@ -207,7 +239,7 @@ log_ok
 bootstrap_progress
 
 log_message "Creating 'APIs and Policies' job in Jenkins, to execute deployment scripts when source code changes are detected"
-jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'apis-and-policies' < /tmp/bootstrap-import/job-apis-and-policies.xml\"; echo \$?" 2>>bootstrap.log)
+jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/jenkins/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'apis-and-policies' < /tmp/bootstrap-import/job-apis-and-policies.xml\"; echo \$?" 2>>bootstrap.log)
 if [ "$jenkins_response" != "0" ]; then
   echo "ERROR: Failed to create Jenkins job"
   exit 1
@@ -216,7 +248,16 @@ log_ok
 bootstrap_progress
 
 log_message "Creating 'Test' job in Jenkins"
-jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'test' < /tmp/bootstrap-import/job-test.xml\"; echo \$?" 2>>bootstrap.log)
+jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/jenkins/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'test' < /tmp/bootstrap-import/job-test.xml\"; echo \$?" 2>>bootstrap.log)
+if [ "$jenkins_response" != "0" ]; then
+  echo "ERROR: Failed to create Jenkins job"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Creating 'Test2' job in Jenkins"
+jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/jenkins/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'test2' < /tmp/bootstrap-import/job-test2.xml\"; echo \$?" 2>>bootstrap.log)
 if [ "$jenkins_response" != "0" ]; then
   echo "ERROR: Failed to create Jenkins job"
   exit 1
