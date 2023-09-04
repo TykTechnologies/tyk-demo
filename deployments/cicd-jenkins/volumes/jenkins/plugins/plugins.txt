@@ -1,4 +1,5 @@
-docker-workflow:563.vd5d2e5c4007f
 workflow-aggregator:596.v8c21c963d92d
-nodejs:1.5.1
-git:4.14.3
+nodejs:1.6.1
+git:5.2.0
+workflow-support:839.v35e2736cfd5c
+ionicons-api:45.vf54fca_5d2154

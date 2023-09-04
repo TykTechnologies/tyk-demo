@@ -128,12 +128,16 @@ log_ok
 bootstrap_progress
 
 log_message "Copying local plugin cache to Jenkins"
-$(generate_docker_compose_command) exec -T jenkins sh -c "cp /usr/share/jenkins/ref/plugins/*.jpi /var/jenkins_home/plugins"
-if [ "$?" != "0" ]; then
-  echo "ERROR: Failed to copy local plugin cache to Jenkins"
-  exit 1
+if ls ./deployments/cicd-jenkins/volumes/jenkins/plugins/*.jpi 1> /dev/null 2>&1; then
+  $(generate_docker_compose_command) exec -T jenkins sh -c "cp /usr/share/jenkins/ref/plugins/*.jpi /var/jenkins_home/plugins"
+  if [ "$?" != "0" ]; then
+    echo "ERROR: Failed to copy local plugin cache to Jenkins"
+    exit 1
+  fi
+  log_ok
+else
+  log_message "  No local plugins found, skipping"
 fi
-log_ok
 bootstrap_progress
 
 log_message "Updating configuration file"

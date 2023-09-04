@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   jenkins:
-    image: jenkins/jenkins:2.361.1
+    image: jenkins/jenkins:2.414.1
     ports:
       - 8070:8080
     networks:
