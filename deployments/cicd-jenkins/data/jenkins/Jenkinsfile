@@ -1,22 +1,36 @@
+// This Jenkinsfile gets committed to the git repo as part of the bootstrap process
+// It is used by Jenkins to configure the 'Tyk APIs and Policies' job
 pipeline {
     agent any
+
+    checkout poll: false, scm: scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'http://gitea:13000/gitea-user/tyk-data']])
 
     environment {
         tyk2_dashboard_credentials = credentials('tyk2-dashboard-credentials')
     }
 
     stages {
-        stage('deploy') {
-            when {
-                expression { env.BRANCH_NAME == 'master' }
-            }
+        stage('Deploy to test environment') {
             steps {
                 script {
+                    echo "Current branch is ${env.BRANCH_NAME}"
                     if (fileExists('.tyk.json')) {
-                        echo "Deploying from ${env.BRANCH_NAME}"
-                        sh "./tyk-sync sync -d http://tyk2-dashboard:3000 -s ${env.tyk2_dashboard_credentials} -p ."
+                        sh '/opt/tyk-sync/tyk-sync --version'
+                        sh '/opt/tyk-sync/tyk-sync sync -d http://tyk2-dashboard:3000 -s ${env.tyk2_dashboard_credentials} -p .'
                     } else {
-                        echo 'No files to deploy'
+                        error 'Unable to perform deployment as .tyk.json file is missing'
+                    }
+                }
+            }
+        }
+        stage('Run tests on test environment') {
+            steps {
+                script {
+                    if (fileExists('tyk_demo_cicd_jenkins.postman_collection.json')) {
+                        // note that this collection performs only a superficial test, to expedite the demonstation 
+                        sh 'newman run tyk_demo_cicd_jenkins.postman_collection.json'
+                    } else {
+                        error 'Unable to run tests as tyk_demo_cicd_jenkins.postman_collection.json file is missing'
                     }
                 }
             }

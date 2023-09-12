@@ -63,6 +63,11 @@ bootstrap_progress
 log_message "Waiting for Gitea to be ready after restart"
 wait_for_response $gitea_base_url "200"
 
+log_message "Creating Gitea API token"
+api_response=$(curl -H "Content-Type: application/json" -k -d '{"name":"gitea-api-token"}' -u gitea-user:qx3zZ9VAgyLVjemSJWeYF6e8 http://localhost:13000/api/v1/users/gitea-user/tokens)
+gitea_api_token=$(echo $api_response | jq -r '.sha1')
+log_message "  Gitea API token: $gitea_api_token"
+
 log_message "Clearing Git repo path"
 gitea_tyk_data_repo_path="/tmp/tyk-demo/tyk-data"
 echo $gitea_tyk_data_repo_path > .context-data/gitea-tyk-data-repo-path
@@ -219,6 +224,53 @@ else
   log_ok
 fi
 bootstrap_progress
+
+
+log_message "Generating Jenkins crumb to enable this script to authenticate Jenkins API calls"
+# this request sets the session cookie, which is needed by subsequent requests
+api_response=$(curl -c .context-data/jenkins-cookies 'http://localhost:8070/crumbIssuer/api/json')
+jenkins_crumb_header_key=$(echo $api_response | jq -r '.crumbRequestField')
+jenkins_crumb_header_value=$(echo $api_response | jq -r '.crumb')
+log_message "  Jenkins crumb header key: $jenkins_crumb_header_key"
+log_message "  Jenkins crumb header value: $jenkins_crumb_header_value"
+bootstrap_progress
+
+log_message "Creating Git access token to enable Gitea to send webhook requests to Jenkins"
+# this request uses the session cookie
+api_response=$(curl -b .context-data/jenkins-cookies \
+--request POST 'http://localhost:8070/manage/descriptorByName/hudson.plugins.git.ApiTokenPropertyConfiguration/generate?apiTokenName=git-access-token' \
+-H "$jenkins_crumb_header_key:$jenkins_crumb_header_value")
+jenkins_git_access_token=$(echo $api_response | jq -r '.data.value')
+if [ "$jenkins_git_access_token" != "" ]; then
+  log_message "  Jenkins git access token: $jenkins_git_access_token"
+else
+  echo "ERROR: Unable to create git access token in Jenkins"
+  exit 1
+fi
+bootstrap_progress
+
+log_message "Updating Gitea repo webhook to include Git access token"
+# first, get the webhook data
+gitea_webhook_data=$(curl -H "Content-Type: application/json" -v \
+-H "Authorization: token $gitea_api_token" \
+http://localhost:13000/api/v1/repos/gitea-user/tyk-data/hooks/1)
+# then, add the token to the query
+gitea_webhook_data_url=$(echo "$gitea_webhook_data" | jq -r '.config.url')
+gitea_webhook_data=$(echo "$gitea_webhook_data" | jq --arg data "$gitea_webhook_data_url&token=$jenkins_git_access_token" '.config.url = $data')
+# finally, write the updated data back into gitea
+curl -H "Content-Type: application/json" -v \
+-H "Authorization: token $gitea_api_token" \
+--request PATCH http://localhost:13000/api/v1/repos/gitea-user/tyk-data/hooks/1 \
+--data-raw "$gitea_webhook_data"
+bootstrap_progress
+
+log_message "Installing Tyk Sync on Jenkins container"
+# using this approach to install Tyk Sync due to there not being a release for debian 'bookworm' at time of writing
+docker exec -u root tyk-demo-jenkins-1 bash -c "apt update;
+apt install -y binutils; 
+curl "https://packagecloud.io/tyk/tyk-sync/packages/debian/buster/tyk-sync_1.4.0_amd64.deb/download.deb?distro_version_id=150" -L --output tyk-sync.deb; 
+ar x tyk-sync.deb; 
+tar xvf data.tar.gz" 1>bootstrap.log 2>&1
 
 
 log_message "Waiting for Jenkins CLI to be ready, before running CLI commands"

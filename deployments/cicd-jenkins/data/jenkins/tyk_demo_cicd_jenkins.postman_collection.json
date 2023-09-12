@@ -24,10 +24,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://tyk-gateway:8080/basic-open-api/get",
+					"raw": "http://tyk2-gateway:8080/basic-open-api/get",
 					"protocol": "http",
 					"host": [
-						"tyk-gateway:8080"
+						"tyk2-gateway:8080"
 					],
 					"path": [
 						"basic-open-api",
