@@ -2,7 +2,7 @@
 
 source scripts/common.sh
 
-# persistence of bootstrap.log file is disabled by default, meaning the file is recreated between each bootstrap to prevent it from growing too large
+# persistence of log files is disabled by default, meaning the files are recreated between each bootstrap to prevent them from growing too large
 # to enable persistence, use argument "persist-log" when running this script
 persist_log=false
 
@@ -30,6 +30,9 @@ mkdir -p .context-data 1> /dev/null
 
 # make the .bootstrap directory
 mkdir -p .bootstrap 1> /dev/null
+
+# make the logs directory
+mkdir -p logs 1> /dev/null
 
 # check if docker compose version is v1.x
 check_docker_compose_version
@@ -101,7 +104,7 @@ if (( ${#commands_to_process[@]} != 0 )); then
   for command in "$commands_to_process"; do    
     case $command in
       "persist-log")
-        echo "  Persisting bootstrap log"
+        echo "  Logs will be persisted"
         persist_log=true;;
       *) echo "Command \"$command\" is unknown, ignoring.";; 
     esac
@@ -110,9 +113,10 @@ else
   echo "  None"
 fi
 
-# clear log, if it is not persisted
+# clear logs, if they are not persisted
 if [ "$persist_log" = false ]; then
-  echo -n > bootstrap.log
+  echo -n > logs/bootstrap.log
+  rm logs/container-*.log # there can be multiple container logs
 fi
 
 # bring the containers up
@@ -128,7 +132,9 @@ fi
 for deployment in "${deployments_to_create[@]}"; do
   eval "deployments/$deployment/bootstrap.sh"
   if [ "$?" != 0 ]; then
-    echo "Error occurred during bootstrap of $deployment, when running deployments/$deployment/bootstrap.sh. Check bootstrap.log for details."
+    capture_container_logs
+    echo "Error occurred during bootstrap of $deployment, when running deployments/$deployment/bootstrap.sh"
+    echo "Log files can be found in the the logs directory"
     exit 1
   fi
 done

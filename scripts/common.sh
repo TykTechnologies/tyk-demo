@@ -38,7 +38,7 @@ log_ok () {
 }
 
 log_message () {
-  echo "$(date -u) $1" >> bootstrap.log
+  echo "$(date -u) $1" >> logs/bootstrap.log
 }
 
 log_start_deployment () {
@@ -94,9 +94,9 @@ wait_for_response () {
     # header can be provided if auth is needed
     if [ "$header" != "" ]
     then
-      status=$(curl -k -I -s -m5 $url -H "$header" 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
+      status=$(curl -k -I -s -m5 $url -H "$header" 2>> logs/bootstrap.log | head -n 1 | cut -d$' ' -f2)
     else
-      status=$(curl -k -I -s -m5 -X $http_method $url 2>> bootstrap.log | head -n 1 | cut -d$' ' -f2)
+      status=$(curl -k -I -s -m5 -X $http_method $url 2>> logs/bootstrap.log | head -n 1 | cut -d$' ' -f2)
     fi
 
     if [ "$status" == "$desired_status" ]
@@ -148,6 +148,10 @@ hot_reload () {
     log_message "    Reload request failed: $result"
     return 1
   fi
+}
+
+capture_container_logs () {
+  eval $(generate_docker_compose_command) logs > logs/containers-$(date +%s).log
 }
 
 set_context_data () {
@@ -294,7 +298,7 @@ create_organisation () {
   log_message "  Creating Organisation: $organisation_name"
   local api_response=$(curl $dashboard_base_url/admin/organisations/import -s \
     -H "admin-auth: $api_key" \
-    -d @$organisation_data_path 2>> bootstrap.log)
+    -d @$organisation_data_path 2>> logs/bootstrap.log)
 
   # validate result
   log_json_result "$api_response"
@@ -320,7 +324,7 @@ create_dashboard_user () {
   log_message "  Creating Dashboard User: $(jq -r '.email_address' $dashboard_user_data_path)"
   local api_response=$(curl $dashboard_base_url/admin/users -s \
     -H "admin-auth: $api_key" \
-    -d @$dashboard_user_data_path 2>> bootstrap.log)
+    -d @$dashboard_user_data_path 2>> logs/bootstrap.log)
 
   # validate result
   log_json_result "$api_response"
@@ -349,7 +353,7 @@ create_dashboard_user () {
     --data-raw '{
         "new_password":"'$dashboard_user_password'",
         "user_permissions": { "IsAdmin": "admin" }
-      }' 2>> bootstrap.log)
+      }' 2>> logs/bootstrap.log)
 
   log_json_result "$api_response"
 
@@ -367,7 +371,7 @@ create_user_group () {
   log_message "  Creating User Group: $user_group_name"
   local api_response=$(curl $dashboard_base_url/api/usergroups -s \
     -H "Authorization: $api_key" \
-    -d @$user_group_data_path 2>> bootstrap.log)
+    -d @$user_group_data_path 2>> logs/bootstrap.log)
 
   # validate result
   log_json_result "$api_response"
@@ -389,7 +393,7 @@ create_webhook () {
   log_message "  Creating Webhook: $webhook_name"
   local api_response=$(curl $dashboard_base_url/api/hooks -s \
     -H "Authorization: $api_key" \
-    -d @$webhook_data_path 2>> bootstrap.log)
+    -d @$webhook_data_path 2>> logs/bootstrap.log)
 
   # validate result
   log_json_result "$api_response"
@@ -404,13 +408,13 @@ initialise_portal () {
   log_message "  Creating default settings"
   local api_response=$(curl $dashboard_base_url/api/portal/configuration -s \
     -H "Authorization: $api_key" \
-    -d "{}" 2>> bootstrap.log)
+    -d "{}" 2>> logs/bootstrap.log)
   log_json_result "$api_response"
 
   log_message "  Initialising Catalogue"
   api_response=$(curl $dashboard_base_url/api/portal/catalogue -s \
     -H "Authorization: $api_key" \
-    -d '{"org_id": "'$organisation_id'"}' 2>> bootstrap.log)
+    -d '{"org_id": "'$organisation_id'"}' 2>> logs/bootstrap.log)
   log_json_result "$api_response"
   
   catalogue_id=$(echo "$api_response" | jq -r '.Message')
@@ -426,7 +430,7 @@ create_portal_page () {
 
   log_json_result "$(curl $dashboard_base_url/api/portal/pages -s \
     -H "Authorization: $api_key" \
-    -d @$page_data_path 2>> bootstrap.log)"
+    -d @$page_data_path 2>> logs/bootstrap.log)"
 }
 
 create_portal_developer () {
@@ -439,7 +443,7 @@ create_portal_developer () {
 
   local api_response=$(curl $dashboard_base_url/api/portal/developers -s \
     -H "Authorization: $api_key" \
-    -d @$developer_data_path 2>> bootstrap.log)
+    -d @$developer_data_path 2>> logs/bootstrap.log)
   log_json_result "$api_response"
 
   set_context_data "$data_group" "portal-developer" "$index" "email" "$developer_email"
@@ -456,7 +460,7 @@ create_portal_graphql_documentation () {
   local api_response=$(curl $dashboard_base_url/api/portal/documentation -s \
     -H "Authorization: $api_key" \
     -d '{"api_id":"","doc_type":"graphql","documentation":"graphql"}' \
-      2>> bootstrap.log)
+      2>> logs/bootstrap.log)
 
   log_json_result "$api_response"
 
@@ -479,7 +483,7 @@ create_portal_documentation () {
   local api_response=$(curl $dashboard_base_url/api/portal/documentation -s \
     -H "Authorization: $api_key" \
     -d "$documentation_payload" \
-      2>> bootstrap.log)
+      2>> logs/bootstrap.log)
 
   log_json_result "$api_response"
 
@@ -500,7 +504,7 @@ create_portal_catalogue () {
 
   # get the existing catalogue
   catalogue="$(curl $dashboard_base_url/api/portal/catalogue -s \
-    -H "Authorization: $api_key" 2>> bootstrap.log)"
+    -H "Authorization: $api_key" 2>> logs/bootstrap.log)"
 
   # add documentation id to new catalogue
   new_catalogue=$(jq --arg documentation_id "$documentation_id" '.documentation = $documentation_id' $catalogue_data_path)
@@ -510,7 +514,7 @@ create_portal_catalogue () {
 
   log_json_result "$(curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
     -H "Authorization: $api_key" \
-    -d "$updated_catalogue" 2>> bootstrap.log)"
+    -d "$updated_catalogue" 2>> logs/bootstrap.log)"
 }
 
 create_api () {
@@ -543,13 +547,13 @@ create_api () {
     # we just create OAS APIs, rather than import them, as the import endpoint doesn't allow for the id to be maintained, so it makes no difference
     api_response="$(curl $dashboard_base_url/api/apis/oas -s \
       -H "authorization: $dashboard_api_key" \
-      -d "$api_data" 2>> bootstrap.log)"
+      -d "$api_data" 2>> logs/bootstrap.log)"
   else
     # Tyk API
     import_request_payload=$(jq --slurpfile new_api "$api_data_path" '.apis += $new_api' deployments/tyk/data/tyk-dashboard/admin-api-apis-import-template.json)
     api_response="$(curl $dashboard_base_url/admin/apis/import -s \
       -H "admin-auth: $admin_api_key" \
-      -d "$import_request_payload" 2>> bootstrap.log)"
+      -d "$import_request_payload" 2>> logs/bootstrap.log)"
   fi
   log_json_result "$api_response"
 
@@ -589,7 +593,7 @@ create_api () {
     # Tyk API
     api_response="$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
       -H "Authorization: $dashboard_api_key" \
-      -d "$api_data" 2>> bootstrap.log)"
+      -d "$api_data" 2>> logs/bootstrap.log)"
   fi
   log_json_result "$api_response"
 
@@ -609,7 +613,7 @@ create_policy () {
 
   api_response="$(curl $dashboard_base_url/admin/policies/import -s \
     -H "admin-auth: $api_key" \
-    -d "$import_request_payload" 2>> bootstrap.log)"
+    -d "$import_request_payload" 2>> logs/bootstrap.log)"
 
   log_json_result "$api_response"
 
@@ -621,7 +625,7 @@ create_policy () {
 
   api_response="$(curl $dashboard_base_url/graphql -s \
     -H "Authorization: $dashboard_api_key" \
-    -d "$update_request_payload" 2>> bootstrap.log)"
+    -d "$update_request_payload" 2>> logs/bootstrap.log)"
 
   # currently custom approach to extracting the graphql response status
   response_status="$(jq -r '.data.update_policy.status' <<< "$api_response")"
@@ -653,7 +657,7 @@ create_basic_key () {
 
   api_response_status_code="$(curl $dashboard_base_url/api/apis/keys/basic/$username -s -w "%{http_code}" -o /dev/null \
     -H "Authorization: $api_key" \
-    -d @$basic_key_data_path 2>> bootstrap.log)"
+    -d @$basic_key_data_path 2>> logs/bootstrap.log)"
 
   # custom validation
   if [[ "$api_response_status_code" == "200" ]]; then
@@ -682,7 +686,7 @@ create_bearer_token () {
   # currently hard-coded to target a single gateway "$gateway_base_url"
   api_response=$(curl $gateway_base_url/tyk/keys/$key_name -s \
     -H "x-tyk-authorization: $api_key" \
-    -d @$bearer_token_data_path 2>> bootstrap.log)
+    -d @$bearer_token_data_path 2>> logs/bootstrap.log)
 
   response_status="$(jq -r '.status' <<< "$api_response")"
 
@@ -708,7 +712,7 @@ create_oauth_client () {
 
   local api_response=$(curl $dashboard_base_url/api/apis/oauth/$api_id -s \
     -H "Authorization: $api_key" \
-    -d @$oauth_client_data_path 2>> bootstrap.log)
+    -d @$oauth_client_data_path 2>> logs/bootstrap.log)
 
   local response_client_id=$(jq -r '.client_id' <<< "$api_response")
   local response_client_secret=$(jq -r '.secret' <<< "$api_response")

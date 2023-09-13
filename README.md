@@ -173,7 +173,7 @@ Multiple features can be deployed at the same time by providing multiple feature
 
 ### Bootstrap logging
 
-The bootstrap scripts provide feedback on progress in the `bootstrap.log` file.
+The bootstrap scripts provide feedback on progress in the `logs/bootstrap.log` file.
 
 ## Step 5: Log into the Dashboard
 
@@ -275,7 +275,7 @@ One possible reason is that you are using Brew's base64 binary, since Brew's ver
 
 ### Bootstrap gets stuck with `Request unsuccessful: wanted '200'...` message
 
-It is normal to see this message in the `bootstrap.log` file. It appears when the bootstrap script is waiting for a service to become available before proceeding to the next step. The number of times the message is repeated depends on the performance of your system, as errors are usually due to waiting for a service to start up. So you may find that this message is repeated many times, but will eventually stop and the bootstrap process moves on.
+It is normal to see this message in the `logs/bootstrap.log` file. It appears when the bootstrap script is waiting for a service to become available before proceeding to the next step. The number of times the message is repeated depends on the performance of your system, as errors are usually due to waiting for a service to start up. So you may find that this message is repeated many times, but will eventually stop and the bootstrap process moves on.
 
 If the message repeats without moving on then the service being tested is experiencing a problem. In this situation you should:
 

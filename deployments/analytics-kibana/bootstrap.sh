@@ -14,14 +14,14 @@ log_message "Adding index pattern to Kibana"
 log_http_result "$(curl $kibana_base_url/api/saved_objects/index-pattern/1208b8f0-815b-11ea-b0b2-c9a8a88fbfb2?overwrite=true -s -o /dev/null -w "%{http_code}" \
   -H 'Content-Type: application/json' \
   -H 'kbn-xsrf: true' \
-  -d @deployments/analytics-kibana/data/kibana/index-patterns/tyk-analytics.json 2>> bootstrap.log)"
+  -d @deployments/analytics-kibana/data/kibana/index-patterns/tyk-analytics.json 2>> logs/bootstrap.log)"
 bootstrap_progress
 
 log_message "Adding visualisation to Kibana"
 log_http_result "$(curl $kibana_base_url/api/saved_objects/visualization/407e91c0-8168-11ea-9323-293461ad91e5?overwrite=true -s -o /dev/null -w "%{http_code}" \
   -H 'Content-Type: application/json' \
   -H 'kbn-xsrf: true' \
-  -d @deployments/analytics-kibana/data/kibana/visualizations/request-count-by-time.json 2>> bootstrap.log)"
+  -d @deployments/analytics-kibana/data/kibana/visualizations/request-count-by-time.json 2>> logs/bootstrap.log)"
 bootstrap_progress
 
 log_message "Stopping the tyk-pump service (from Tyk deployment), preventing it from consuming the analytics records which we want to be processed by the Pump from this deployment."
@@ -43,7 +43,7 @@ log_ok
 bootstrap_progress
 
 log_message "Sending a test request to provide Kibana with data, as Tyk bootstrap requests will not have been picked up by the Pump from this deployment"
-log_http_result "$(curl -s localhost:8080/basic-open-api/get -o /dev/null -w "%{http_code}" 2>> bootstrap.log)"
+log_http_result "$(curl -s localhost:8080/basic-open-api/get -o /dev/null -w "%{http_code}" 2>> logs/bootstrap.log)"
 bootstrap_progress
 
 log_end_deployment

@@ -18,22 +18,16 @@ jobs:
         run: sudo ./scripts/update-hosts.sh
       - name: Bootstrap and Test All Eligible Deployments
         run: sudo ./scripts/test-all.sh
-      - name: Store Bootstrap Log
+      - name: Store Logs
         if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
-          name: bootstrap-log
-          path: bootstrap.log
-      - name: Store Test Log
-        if: success() || failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-log
-          path: test.log
+          name: logs
+          path: logs/
       - name: Show Bootstrap Log
         if: success() || failure()
-        run: cat bootstrap.log
+        run: cat logs/bootstrap.log
       - name: Show Test Log
         if: success() || failure()
-        run: cat test.log
+        run: cat logs/test.log
       - run: echo "🍏 This job's status is ${{ job.status }}."

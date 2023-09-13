@@ -32,8 +32,9 @@ else
 fi
 
 # clear log files
-echo -n > test.log
-echo -n > bootstrap.log
+echo -n > logs/test.log
+echo -n > logs/bootstrap.log
+rm logs/container-*.log # there can be multiple container logs
 
 declare -a result_names
 declare -a result_codes
@@ -98,10 +99,10 @@ do
             run "/etc/postman/tyk_demo.postman_collection.json" \
             --environment /etc/postman/test.postman_environment.json \
             --insecure \
-            | tee -a test.log
+            | tee -a logs/test.log
     )
-    # output of above command is captured in test.log file
-    # file will contain control characters, so is advised to use command "less -r test.log", or similar, to view it
+    # output of above command is captured in logs/test.log file
+    # file will contain control characters, so is advised to use command "less -r logs/test.log", or similar, to view it
 
     if [ "$?" != "0" ]; then
         echo -e "Tests ${RED}failed${NOCOLOUR} for $deployment_name deployment"
