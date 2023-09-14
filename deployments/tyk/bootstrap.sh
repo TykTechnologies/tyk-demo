@@ -102,10 +102,7 @@ fi
 log_ok
 bootstrap_progress
 
-# Wait for Dashboard API
-
-log_message "Waiting for Dashboard API to be ready"
-wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
+wait_for_liveness
 
 # Python plugin
 
