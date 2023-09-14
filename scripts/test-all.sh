@@ -34,7 +34,7 @@ fi
 # clear log files
 echo -n > logs/test.log
 echo -n > logs/bootstrap.log
-rm logs/container-*.log # there can be multiple container logs
+rm logs/containers-*.log # there can be multiple container logs
 
 declare -a result_names
 declare -a result_codes
