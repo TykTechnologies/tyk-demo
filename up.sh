@@ -132,7 +132,7 @@ fi
 for deployment in "${deployments_to_create[@]}"; do
   eval "deployments/$deployment/bootstrap.sh"
   if [ "$?" != 0 ]; then
-    capture_container_logs
+    capture_container_logs $deployment
     echo "Error occurred during bootstrap of $deployment, when running deployments/$deployment/bootstrap.sh"
     echo "Log files can be found in the the logs directory"
     exit 1

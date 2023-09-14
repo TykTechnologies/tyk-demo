@@ -151,7 +151,7 @@ hot_reload () {
 }
 
 capture_container_logs () {
-  eval $(generate_docker_compose_command) logs > logs/containers-$(date +%s).log
+  eval $(generate_docker_compose_command) logs > logs/containers-$1-$(date +%s).log
 }
 
 set_context_data () {
