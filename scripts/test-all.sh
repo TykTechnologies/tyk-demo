@@ -19,6 +19,10 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NOCOLOUR='\033[0m'
 
+echo_and_log () {
+  echo -e $1 | tee -a logs/test.log
+}
+
 echo "Checking for active deployments"
 if [ ! -s .bootstrap/bootstrapped_deployments ]; then
    echo "  No active deployments found - proceeding with tests"
@@ -45,21 +49,21 @@ do
     deployment_name=${deployment_dir##*/}
     result_names[${#result_names[@]}]=$deployment_name
 
-    echo "Processing deployment: $deployment_name"
+    echo_and_log "Processing deployment: $deployment_name"
 
     # Script assumes postman file name is based on deployment name, but with underscores instead of hyphens
     postman_collection_file_name="tyk_demo_${deployment_name//-/_}.postman_collection.json"
     postman_collection_path="$deployment_dir/$postman_collection_file_name"
 
     # If the deployment doesn't have a postman collection then there are no tests to perform, so the deployment can be skipped
-    echo "Validating deployment's Postman collection ($postman_collection_file_name)"
+    echo_and_log "Validating deployment's Postman collection ($postman_collection_file_name)"
 
     if [ -z "$(ls -A $postman_collection_path 2>/dev/null)" ]; then
-        echo -e "  Collection not found. ${BLUE}Skipping${NOCOLOUR} to next deployment."
+        echo_and_log -e "  Collection not found. ${BLUE}Skipping${NOCOLOUR} to next deployment."
         result_codes[${#result_codes[@]}]=2
         continue
     else
-        echo "  Collection found."
+        echo_and_log "  Collection found."
     fi
 
     # If the collection doesn't contain any tests then the deployment can be skipped
@@ -76,16 +80,16 @@ do
     echo "Creating deployment: $deployment_name"
     ./up.sh $deployment_name persist-log
     if [ "$?" != "0" ]; then
-        echo -e "  ${RED}Failed${NOCOLOUR} to create $deployment_name deployment"
+        echo_and_log "  ${RED}Failed${NOCOLOUR} to create $deployment_name deployment"
         result_codes[${#result_codes[@]}]=4
-        echo "Removing deployment: $deployment_name"
+        echo_and_log "Removing deployment: $deployment_name"
         ./down.sh
         continue
     else
-        echo "  Successfully created $deployment_name deployment"
+        echo_and_log "  Successfully created $deployment_name deployment"
     fi
 
-    echo "Testing deployment: $deployment_name "
+    echo_and_log "Testing deployment: $deployment_name "
     # Provide the 'test' environment variables, so newman can target the correct hosts from within the docker network
     # --insecure option is used due to self-signed certificates
     # pipefail option is set so that failure of docker command can be detected
@@ -105,29 +109,29 @@ do
     # file will contain control characters, so is advised to use command "less -r logs/test.log", or similar, to view it
 
     if [ "$?" != "0" ]; then
-        echo -e "Tests ${RED}failed${NOCOLOUR} for $deployment_name deployment"
+        echo_and_log "Tests ${RED}failed${NOCOLOUR} for $deployment_name deployment"
         result_codes[${#result_codes[@]}]=1
     else
-        echo -e "Tests ${GREEN}passed${NOCOLOUR} for $deployment_name deployment"
+        echo_and_log "Tests ${GREEN}passed${NOCOLOUR} for $deployment_name deployment"
         result_codes[${#result_codes[@]}]=0
     fi
 
-    echo "Removing deployment: $deployment_name"
+    echo_and_log "Removing deployment: $deployment_name"
     ./down.sh
 
     if [ "$?" != "0" ]; then
-        echo -e "  ${RED}Failed${NOCOLOUR} to remove $deployment_name deployment"
+        echo_and_log "  ${RED}Failed${NOCOLOUR} to remove $deployment_name deployment"
         result_codes[${#result_codes[@]}]=5
         # failing to remove a deployment may negatively affect subsequent deployments and tests
         continue
     else
-        echo "  Successfully removed $deployment_name deployment"
+        echo_and_log "  Successfully removed $deployment_name deployment"
     fi
 done
 
-echo -e "\nTesting complete"
+echo_and_log "\nTesting complete"
 
-echo -e "\nTest Results:"
+echo_and_log "\nTest Results:"
 test_pass_count=0
 test_fail_count=0
 test_skip_count=0
@@ -135,39 +139,39 @@ for i in "${!result_codes[@]}"
 do 
   case ${result_codes[$i]} in
     0)
-        echo -e "${GREEN}Pass${NOCOLOUR} ${result_names[$i]} - Tests passed"
+        echo_and_log "${GREEN}Pass${NOCOLOUR} ${result_names[$i]} - Tests passed"
         test_pass_count=$((test_pass_count+1));;
     1) 
-        echo -e "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Tests failed"
+        echo_and_log "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Tests failed"
         test_fail_count=$((test_fail_count+1));;
     2) 
-        echo -e "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No collection"
+        echo_and_log "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No collection"
         test_skip_count=$((test_skip_count+1));;
     3) 
-        echo -e "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No tests"
+        echo_and_log "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No tests"
         test_skip_count=$((test_skip_count+1));;
     4) 
-        echo -e "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Create failed"
+        echo_and_log "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Create failed"
         test_fail_count=$((test_fail_count+1));;
     5) 
-        echo -e "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Remove failed"
+        echo_and_log "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Remove failed"
         test_fail_count=$((test_fail_count+1));;
     *) 
-        echo "ERROR: Unexpected result code. Exiting."
+        echo_and_log "ERROR: Unexpected result code. Exiting."
         exit 2;;
     esac
 done
 
-echo -e "\nTest Result Totals:"
-echo -e "${GREEN}Pass${NOCOLOUR}:$test_pass_count"
-echo -e "${RED}Fail${NOCOLOUR}:$test_fail_count"
-echo -e "${BLUE}Skip${NOCOLOUR}:$test_skip_count"
+echo_and_log "\nTest Result Totals:"
+echo_and_log "${GREEN}Pass${NOCOLOUR}:$test_pass_count"
+echo_and_log "${RED}Fail${NOCOLOUR}:$test_fail_count"
+echo_and_log "${BLUE}Skip${NOCOLOUR}:$test_skip_count"
 
-echo -e "\nExit Status:"
+echo_and_log "\nExit Status:"
 if [ $test_fail_count = 0 ]; then
-    echo "No failures detected, exiting with code 0"
+    echo_and_log "No failures detected, exiting with code 0"
     exit 0
 else
-    echo "Failures detected, exiting with code 1"
+    echo_and_log "Failures detected, exiting with code 1"
     exit 1
 fi
