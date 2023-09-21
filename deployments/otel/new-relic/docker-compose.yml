@@ -1,0 +1,17 @@
+version: "2"
+services:
+  # Collector
+  collector-gateway:
+    image: otel/opentelemetry-collector:0.81.0
+    volumes:
+      - ./deployments/otel/new-relic/volumes/otel-collector.yml:/etc/otel-collector.yml
+    command: [ "--config=/etc/otel-collector.yml" ]
+    ports:
+      - "13133:13133" # health_check extension
+    networks:
+      - tyk
+
+
+
+networks:
+  tyk:
