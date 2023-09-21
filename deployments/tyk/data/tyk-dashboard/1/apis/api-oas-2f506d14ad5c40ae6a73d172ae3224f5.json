@@ -1,0 +1,166 @@
+{
+    "components": {},
+    "info": {
+        "title": "httpbin API",
+        "version": "1.0.0"
+    },
+    "openapi": "3.0.0",
+    "paths": {
+        "/anything": {
+            "get": {
+                "operationId": "anythingGET",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                },
+                "summary": "Return anything"
+            }
+        },
+        "/delay": {
+            "get": {
+                "operationId": "delayGET",
+                "parameters": [
+                    {
+                        "description": "Time to delay in seconds",
+                        "in": "query",
+                        "name": "delay",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                },
+                "summary": "Delay response by a specified time"
+            }
+        },
+        "/get": {
+            "get": {
+                "operationId": "getGET",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                },
+                "summary": "Return GET request data"
+            }
+        },
+        "/post": {
+            "post": {
+                "operationId": "postPOST",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                },
+                "summary": "Return POST request data"
+            }
+        },
+        "/status/{statusCode}": {
+            "get": {
+                "operationId": "status/{statusCode}GET",
+                "parameters": [
+                    {
+                        "description": "HTTP status code",
+                        "in": "path",
+                        "name": "statusCode",
+                        "required": true,
+                        "schema": {
+                            "format": "int32",
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                },
+                "summary": "Return a response with the specified status code"
+            }
+        },
+        "/uuid": {
+            "get": {
+                "operationId": "uuidGET",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                },
+                "summary": "Return a UUID"
+            }
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8181/api-validate-request"
+        }
+    ],
+    "x-tyk-api-gateway": {
+        "info": {
+            "dbId": "650c2cb686341f0f820173e1",
+            "id": "2f506d14ad5c40ae6a73d172ae3224f5",
+            "name": "httpbin API",
+            "orgId": "646490d486341f29c665c45c",
+            "state": {
+                "active": true
+            }
+        },
+        "middleware": {
+            "operations": {
+                "anythingGET": {
+                    "allow": {
+                        "enabled": true
+                    }
+                },
+                "delayGET": {
+                    "allow": {
+                        "enabled": true
+                    },
+                    "validateRequest": {
+                        "enabled": true,
+                        "errorResponseCode": 422
+                    }
+                },
+                "getGET": {
+                    "allow": {
+                        "enabled": true
+                    }
+                },
+                "postPOST": {
+                    "allow": {
+                        "enabled": true
+                    }
+                },
+                "status/{statusCode}GET": {
+                    "allow": {
+                        "enabled": true
+                    },
+                    "validateRequest": {
+                        "enabled": true,
+                        "errorResponseCode": 422
+                    }
+                },
+                "uuidGET": {
+                    "allow": {
+                        "enabled": true
+                    }
+                }
+            }
+        },
+        "server": {
+            "listenPath": {
+                "strip": true,
+                "value": "/api-validate-request"
+            }
+        },
+        "upstream": {
+            "url": "http://httpbin.org"
+        }
+    }
+}
