@@ -1,3 +1,4 @@
+---
 version: '3.3'
 services:
   tyk-mdcb:
@@ -38,6 +39,6 @@ services:
       - "63791:6379"
     networks:
       - tyk
-    
+
 volumes:
   tyk-worker-redis-data:

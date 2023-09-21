@@ -26,3 +26,6 @@ rules:
   document-end:
     present: false
     level: error
+
+ignore:
+  - deployments/analytics-datadog/data/datadog.yaml

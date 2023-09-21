@@ -1,5 +1,8 @@
+---
 name: Tyk Demo API Tests
-on: [push]
+on: # yamllint disable-line rule:truthy
+  - push
+
 jobs:
   Tyk-Demo-Api-Tests:
     runs-on: ubuntu-latest
