@@ -1,0 +1,96 @@
+{
+    "components": {
+        "securitySchemes": {
+            "authToken": {
+                "in": "header",
+                "name": "Authorization",
+                "type": "apiKey"
+            }
+        }
+    },
+    "info": {
+        "title": "Basic Protected API",
+        "version": "Default"
+    },
+    "openapi": "3.0.6",
+    "paths": {
+        "/anything/ignored": {
+            "get": {
+                "operationId": "anything/ignoredGET",
+                "responses": {
+                    "default": {
+                        "description": ""
+                    }
+                }
+            }
+        }
+    },
+    "security": [
+        {
+            "authToken": []
+        }
+    ],
+    "x-tyk-api-gateway": {
+        "info": {
+            "dbId": "650c30e5a1ed7e6c97e78b62",
+            "id": "e653474b5049417e532e08e4e33ed19b",
+            "name": "Basic Protected API",
+            "orgId": "650c04faa1ed7e7420871360",
+            "state": {
+                "active": true
+            }
+        },
+        "middleware": {
+            "global": {
+                "cache": {
+                    "enabled": true,
+                    "timeout": 60
+                },
+                "cors": {
+                    "enabled": false,
+                    "maxAge": 24
+                }
+            },
+            "operations": {
+                "anything/ignoredGET": {
+                    "ignoreAuthentication": {
+                        "enabled": true
+                    }
+                }
+            }
+        },
+        "server": {
+            "authentication": {
+                "enabled": true,
+                "securitySchemes": {
+                    "authToken": {
+                        "enabled": true
+                    }
+                }
+            },
+            "listenPath": {
+                "strip": true,
+                "value": "/oas-basic-protected-api/"
+            },
+            "slug": "basic-protected-api"
+        },
+        "upstream": {
+            "serviceDiscovery": {
+                "cache": {
+                    "enabled": true
+                },
+                "enabled": false
+            },
+            "test": {
+                "serviceDiscovery": {
+                    "cache": {
+                        "enabled": true,
+                        "timeout": 60
+                    },
+                    "enabled": false
+                }
+            },
+            "url": "http://httpbin/"
+        }
+    }
+}
