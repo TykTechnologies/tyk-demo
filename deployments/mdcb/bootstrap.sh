@@ -7,7 +7,7 @@ log_start_deployment
 bootstrap_progress
 
 log_message "Setting global variables"
-worker_gateway_base_url="http://tyk-worker-gateway.localhost:8084"
+worker_gateway_base_url="http://tyk-worker-gateway.localhost:8090"
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 log_ok
 bootstrap_progress

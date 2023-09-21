@@ -4,7 +4,6 @@
   "api_definition": {
     "id": "5ebcad27bcec140001bca92d",
     "name": "Load Balanced API",
-    "expiration": "",
     "slug": "uptime",
     "listen_port": 0,
     "protocol": "",
@@ -13,6 +12,10 @@
     "org_id": "5e9d9544a1dcd60001d0ed20",
     "use_keyless": true,
     "use_oauth2": false,
+    "external_oauth": {
+      "enabled": false,
+      "providers": []
+    },
     "use_openid": false,
     "openid_options": {
       "providers": [],
@@ -204,13 +207,12 @@
     "use_mutual_tls_auth": false,
     "client_certificates": [],
     "upstream_certificates": {},
-    "upstream_certificates_disabled": false,
     "pinned_public_keys": {},
-    "certificate_pinning_disabled": false,
     "enable_jwt": false,
     "use_standard_auth": false,
     "use_go_plugin_auth": false,
     "enable_coprocess_auth": false,
+    "custom_plugin_auth_enabled": false,
     "jwt_signing_method": "",
     "jwt_source": "",
     "jwt_identity_base_field": "",
@@ -222,14 +224,8 @@
     "jwt_not_before_validation_skew": 0,
     "jwt_skip_kid": false,
     "scopes": {
-      "jwt": {
-        "scope_claim_name": "",
-        "scope_to_policy": {}
-      },
-      "oidc": {
-        "scope_claim_name": "",
-        "scope_to_policy": {}
-      }
+      "jwt": {},
+      "oidc": {}
     },
     "jwt_scope_to_policy_mapping": {},
     "jwt_scope_claim_name": "",
@@ -273,7 +269,9 @@
             "black_list": []
           },
           "use_extended_paths": true,
-          "extended_paths": {},
+          "extended_paths": {
+            "persist_graphql": []
+          },
           "global_headers": {},
           "global_headers_remove": [],
           "global_response_headers": {},
@@ -297,6 +295,7 @@
           "port_data_path": "",
           "target_path": "",
           "use_target_list": false,
+          "cache_disabled": false,
           "cache_timeout": 60,
           "endpoint_returns_list": false
         },
@@ -324,6 +323,7 @@
         "port_data_path": "",
         "target_path": "",
         "use_target_list": false,
+        "cache_disabled": false,
         "cache_timeout": 0,
         "endpoint_returns_list": false
       },
@@ -343,6 +343,7 @@
       "post": [],
       "post_key_auth": [],
       "auth_check": {
+        "disabled": false,
         "name": "",
         "path": "",
         "require_session": false,
@@ -351,12 +352,14 @@
       "response": [],
       "driver": "",
       "id_extractor": {
+        "disabled": false,
         "extract_from": "",
         "extract_with": "",
         "extractor_config": {}
       }
     },
     "custom_middleware_bundle": "",
+    "custom_middleware_bundle_disabled": false,
     "cache_options": {
       "cache_timeout": 60,
       "enable_cache": true,
@@ -402,11 +405,11 @@
       "debug": false
     },
     "domain": "",
-    "domain_disabled": false,
     "certificates": [],
     "do_not_track": false,
     "enable_context_vars": false,
     "config_data": {},
+    "config_data_disabled": false,
     "tag_headers": [],
     "global_rate_limit": {
       "rate": 0,
@@ -429,7 +432,8 @@
         "data_sources": []
       },
       "proxy": {
-        "auth_headers": {}
+        "auth_headers": {},
+        "request_headers": {}
       },
       "subgraph": {
         "sdl": ""
@@ -441,14 +445,8 @@
         "disable_query_batching": false
       }
     },
-    "analytics_plugin": {
-      "enable": false,
-      "plugin_path": "",
-      "func_name": ""
-    },
-    "tags_disabled": false,
-    "tags": [],
-    "is_oas": false
+    "analytics_plugin": {},
+    "tags": []
   },
   "hook_references": [],
   "is_site": false,

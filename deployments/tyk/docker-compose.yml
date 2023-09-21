@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   tyk-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v4.3.1}
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.1.0}
     ports:
       - 3000:3000
     networks:
@@ -11,18 +11,18 @@ services:
       - ./deployments/tyk/volumes/tyk-dashboard/certs:/opt/tyk-dashboard/certs
       - ./deployments/tyk/volumes/tyk-dashboard/catalogue.html:/opt/tyk-dashboard/portal/templates/catalogue.html
       - ./deployments/tyk/volumes/tyk-dashboard/navigation.html:/opt/tyk-dashboard/portal/templates/navigation.html
-      - ./deployments/tyk/volumes/tyk-dashboard/audit.log:/opt/tyk-dashboard/audit.log
+      - ./deployments/tyk/volumes/tyk-dashboard/audit:/opt/tyk-dashboard/audit
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Dashboard licence missing from Docker environment file .env. Review The Getting Started steps in README.md.}
       - TYK_LOGLEVEL=${DASHBOARD_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
     env_file:
-    - .env
+      - .env
     depends_on:
       - tyk-redis
       - tyk-mongo
   tyk-gateway:
-    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v4.3.2-rc4}
+    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.2.0-rc1}
     ports:
       - 8080:8080
       - 8086:8086
@@ -40,8 +40,11 @@ services:
       - TYK_GW_HTTPSERVEROPTIONS_FLUSHINTERVAL=1
       - TYK_GW_ANALYTICSCONFIG_ENABLEGEOIP=true
       - TYK_GW_ANALYTICSCONFIG_GEOIPDBLOCATION=/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
+      - TYK_GW_OPENTELEMETRY_ENABLED=true
+      - TYK_GW_OPENTELEMETRY_EXPORTER=grpc
+      - TYK_GW_OPENTELEMETRY_ENDPOINT=collector-gateway:4317
     env_file:
-    - .env
+      - .env
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
@@ -52,7 +55,11 @@ services:
     depends_on:
       - tyk-redis
   tyk-gateway-2:
+<<<<<<< HEAD
     image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v4.3.2-rc4}
+=======
+    image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v5.1.0}
+>>>>>>> 2ef48a2ddf58b0d429e3208064d4c6cd215d8221
     ports:
       - 8081:8080
     networks:
@@ -62,7 +69,7 @@ services:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-false}
     env_file:
-    - .env
+      - .env
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk-2.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
@@ -71,9 +78,13 @@ services:
       - tyk-redis
       - tyk-gateway
   tyk-pump:
+<<<<<<< HEAD
     image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.7.0}
+=======
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.8.1}
+>>>>>>> 2ef48a2ddf58b0d429e3208064d4c6cd215d8221
     ports:
-    - 8083:8083
+      - 8083:8083
     networks:
       - tyk
     volumes:
@@ -82,7 +93,7 @@ services:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_LOGLEVEL=${PUMP_LOGLEVEL:-info}
     env_file:
-    - .env
+      - .env
     depends_on:
       - tyk-redis
       - tyk-mongo
@@ -96,7 +107,7 @@ services:
       - tyk
   tyk-mongo:
     image: mongo:4.0
-    command: ["mongod", "--smallfiles"]
+    command: [ "mongod", "--smallfiles" ]
     ports:
       - "27017:27017"
     volumes:
@@ -116,6 +127,10 @@ services:
     environment:
       - SWAGGER_HOST=http://swagger-petstore:8080
       - SWAGGER_URL=http://localhost:8080/swagger-petstore
+  json-placeholder:
+    image: svenwal/jsonplaceholder:1.1
+    networks:
+      - tyk
   http-server:
     image: httpd:2.4.46-alpine
     networks:
@@ -129,20 +144,23 @@ services:
     networks:
       - tyk
   www-ngrok:
-    image: ${NGROK_IMAGE:-wernight}/ngrok:latest
+    image: ngrok/ngrok:3.3.0-alpine
     networks:
       - tyk
+    command:
+      - "start"
+      - "--all"
+      - "--config"
+      - "/etc/ngrok.yml"
+    volumes:
+      - ./deployments/tyk/volumes/ngrok/ngrok.yml:/etc/ngrok.yml
     ports:
       - 4040:4040
-    environment:
-      - NGROK_PORT=tyk-gateway:8080
-    deploy:
-      restart_policy:
-        condition: on-failure
 
 volumes:
   tyk-redis-data:
   tyk-mongo-data:
+
 
 networks:
   tyk:

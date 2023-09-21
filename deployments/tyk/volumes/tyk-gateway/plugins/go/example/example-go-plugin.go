@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -8,6 +10,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/buger/jsonparser"
+
+	"github.com/TykTechnologies/tyk-pump/analytics"
 	"github.com/TykTechnologies/tyk/config"
 	"github.com/TykTechnologies/tyk/ctx"
 	"github.com/TykTechnologies/tyk/log"
@@ -57,25 +62,21 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	// Get the global config - it's needed in various places
 	conf := config.Global()
 	// Create a Redis Controller, which will handle the Redis connection for the storage
-	rc := storage.NewRedisController(r.Context())
+	rc := storage.NewRedisController(context.Background())
 	// Create a storage object, which will handle Redis operations using "apikey-" key prefix
-	store := storage.RedisCluster{KeyPrefix: "apikey-", HashKeys: conf.HashKeys, RedisController: rc}
+	rs := storage.RedisCluster{KeyPrefix: "apikey-", HashKeys: conf.HashKeys, RedisController: rc}
 
-	go rc.ConnectToRedis(r.Context(), nil, &conf)
-	for i := 0; i < 5; i++ { // max 5 attempts - should only take 2
+	go rc.ConnectToRedis(context.Background(), nil, &conf)
+
+	// wait for Redis connection
+	for {
 		if rc.Connected() {
 			logger.Info("Redis Controller connected")
 			break
 		}
-		logger.Warn("Redis Controller not connected, will retry")
+		logger.Warn("Redis Controller not connected yet, waiting...")
 
-		time.Sleep(10 * time.Millisecond)
-	}
-
-	if !rc.Connected() {
-		logger.Error("Could not connect to storage")
-		rw.WriteHeader(http.StatusInternalServerError)
-		return
+		time.Sleep(50 * time.Millisecond)
 	}
 
 	if conf.HashKeys {
@@ -115,7 +116,7 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	logger.Info("Lookup key: ", lookupKey)
 
 	// Check if key exists
-	exists, err := store.Exists(lookupKey)
+	exists, err := rs.Exists(lookupKey)
 	if err != nil {
 		logger.Error("Couldn't check if key exists in Redis: ", err)
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -128,7 +129,7 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	// Use key to get session from Redis storage
-	sessionJson, err := store.GetKey(lookupKey)
+	sessionJson, err := rs.GetKey(lookupKey)
 	if err != nil {
 		logger.Error("Couldn't get session from Redis: ", err)
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -165,6 +166,62 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 // AddHelloWorldHeader adds custom "Hello: World" header to the request
 func AddHelloWorldHeader(rw http.ResponseWriter, r *http.Request) {
 	r.Header.Add("Hello", "World")
+}
+
+// Writes a string data to the context, which can then be read later
+func WriteDataToContext(rw http.ResponseWriter, r *http.Request) {
+	logger.Info("WriteDataToContext is called")
+
+	// copy the request context
+	ctx := r.Context()
+	// add the data
+	ctx = context.WithValue(ctx, "MyContextDataKey", "MyContextData")
+	// copy the request object, but with new context
+	r2 := r.WithContext(ctx)
+	// replace request object with new version
+	*r = *r2
+}
+
+// Reads data from the context and adds it to the response
+func AddContextDataToResponse(rw http.ResponseWriter, res *http.Response, req *http.Request) {
+	logger.Info("AddContextDataToResponse is called")
+
+	ctx := req.Context()
+	// get the data
+	myContextData := ctx.Value("MyContextDataKey")
+	// check that it isn't nil
+	if myContextData != nil {
+		// add it as a response header
+		res.Header.Add("Data-From-Context", myContextData.(string))
+	}
+}
+
+// Applies a mask to analytics data
+// This example replaces the value stored for the 'origin' field with asterisks
+// Only applies to analytics data record, the response to the client remains unchanged
+func MaskAnalyticsData(record *analytics.AnalyticsRecord) {
+	logger.Info("MaskAnalyticsData Started")
+
+	d, err := base64.StdEncoding.DecodeString(record.RawResponse)
+	if err != nil {
+		return
+	}
+
+	var mask = []byte("\"****\"")
+	const endOfHeaders = "\r\n\r\n"
+	paths := [][]string{
+		{"origin"},
+		{"data", "origin"},
+	}
+	if i := bytes.Index(d, []byte(endOfHeaders)); i > 0 || (i+4) < len(d) {
+		body := d[i+4:]
+		jsonparser.EachKey(body, func(idx int, _ []byte, _ jsonparser.ValueType, _ error) {
+			body, _ = jsonparser.Set(body, mask, paths[idx]...)
+		}, paths...)
+		if err == nil {
+			record.RawResponse = base64.StdEncoding.EncodeToString(append(d[:i+4], body...))
+		}
+	}
 }
 
 // Called once plugin is loaded, this is where we put all initialization work for plugin

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a9113903-34dd-4848-9dc9-1294e77d5687",
+		"_postman_id": "ce7dd0df-d3de-469a-b994-e40c1efea92d",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -226,6 +226,43 @@
 									]
 								},
 								"description": "This request uses a Go plugin to take the JWT provided in the `authorization` header, parse it, extract the value of the `pol` payload property then add the value to the request as a header.\n\nThe value can be see in the `headers.X-Jwt-Policy-Id` JSON property of the response body.\n\nThe API itself doesn't use authentication or process the JWT in any other way. It's purely an example of using a Go plugin."
+							},
+							"response": []
+						},
+						{
+							"name": "Middleware - Go - Context Data & Response",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Context data is returned in response header\", function () {",
+											"    pm.response.to.have.header(\"Data-From-Context\", \"MyContextData\")",
+											"});",
+											"",
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/go-plugin-api-no-auth/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"go-plugin-api-no-auth",
+										"get"
+									]
+								},
+								"description": "This request shows two things:\n\n1. Passing of data between plugin functions.\n2. Running plugins for the response.\n\nThe first, passing data between plugin functions, is achieved using the context object. In this example, the `WriteDataToContext` function is executed during the request phase. It writes a key value pair to the context; `MyContextDataKey` / `MyContextData`. \n\nThe data is then retrieved later in the response phase by the `AddContextDataToResponse` function, which extracts the data from the request context. This also serves as the second part of this example, by executing the plugin on the response to write the data as a header; `Data-From-Context` / `MyContextValue`."
 							},
 							"response": []
 						}
@@ -2091,6 +2128,56 @@
 							"response": []
 						},
 						{
+							"name": "Plugin - URL Rewrite (part 9 - request body)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"URL rewritten to contain email addresses from payload\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.args[\"personal-email\"]).to.eql(\"personal@example.com\");",
+											"    pm.expect(jsonData.args[\"business-email\"]).to.eql(\"business@example.com\");",
+											"",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"personalEmail\":\"personal@example.com\",\n    \"businessEmail\":\"business@example.com\",\n\t\"name\":\"Dave\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/url-rewrite-trigger-payload",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"url-rewrite-trigger-payload"
+									]
+								},
+								"description": "This request uses an advanced URL rewrite rule to extract data from the request body and add it to the upstream request as a URL query parameter.\n\nThe configuration uses a regular expression to  extract the email addresses from the request body, then uses the Tyk context variables to add them to rewritten URL as query values."
+							},
+							"response": []
+						},
+						{
 							"name": "Plugin - Modify Headers",
 							"event": [
 								{
@@ -3050,6 +3137,88 @@
 							"response": []
 						},
 						{
+							"name": "Context Variables",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"'Context-Variable-Request-Data' header contains posted form data\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    // order of data can change, so check for pairs separately",
+											"    pm.expect(jsonData.headers[\"Context-Variable-Request-Data\"]).to.include(\"foo:bar\").and.include(\"fizz:buzz\");",
+											"});",
+											"",
+											"pm.test(\"'Context-Variable-Remote-Address' header is not empty\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    // check value is not empty, rather than try to match IPv4/v6 address",
+											"    pm.expect(jsonData.headers[\"Context-Variable-Remote-Address\"]).to.not.equal(\"\");",
+											"});",
+											"",
+											"pm.test(\"'Context-Variable-Path-Parts' header contains requested path parts\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers[\"Context-Variable-Path-Parts\"]).to.equal(\"plugin-demo-api,anything,context-variables\");",
+											"});",
+											"",
+											"pm.test(\"'Context-Variable-Path' header contains requested path\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers[\"Context-Variable-Path\"]).to.equal(\"/plugin-demo-api/anything/context-variables\");",
+											"});",
+											"",
+											"pm.test(\"'Context-Variable-Header-Cat' header value of Cat HTTP header\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers[\"Context-Variable-Header-Cat\"]).to.equal(\"Ralph\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Cat",
+										"value": "Ralph",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "foo",
+											"value": "bar",
+											"type": "default"
+										},
+										{
+											"key": "fizz",
+											"value": "buzz",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/plugin-demo-api/anything/context-variables",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"plugin-demo-api",
+										"anything",
+										"context-variables"
+									]
+								},
+								"description": "This request has the Gateway inject several of Tyk's context variables into the request headers. Tyk can inject various contextual data into the request as it processes it - see https://tyk.io/docs/context-variables/.\n\nThe result can be seen in the response body, which shows the injected headers:\n\n- `\"Context-Variable-Header-Cat\": \"Ralph\"`: The value of the HTTP header `Cat`\n- `\"Context-Variable-Path\": \"/plugin-demo-api/anything/context-variable-request-data\"`: The full requested path\n- `\"Context-Variable-Path-Parts\": \"plugin-demo-api,anything,context-variable-request-data\"`: The path as comma-separated parts\n- `\"Context-Variable-Remote-Address\": \"172.26.0.1\"`: The request source IP address\n`\"Context-Variable-Request-Data\": \"foo:bar;fizz:buzz\"`: The URL encoded posted form data"
+							},
+							"response": []
+						},
+						{
 							"name": "Segmentation (part 1) - Tags match",
 							"event": [
 								{
@@ -3573,139 +3742,41 @@
 											"response": []
 										},
 										{
-											"name": "Custom Authentication - IP Rate Limiter (part 1)",
+											"name": "Custom Authentication - IP Rate Limiter",
 											"event": [
 												{
 													"listen": "test",
 													"script": {
 														"exec": [
-															"pm.test(\"Status code is 200\", function () {",
-															"    pm.response.to.have.status(200);    ",
-															"});"
-														],
-														"type": "text/javascript"
-													}
-												}
-											],
-											"request": {
-												"method": "GET",
-												"header": [],
-												"url": {
-													"raw": "http://{{tyk-gateway.host}}/go-ip-rate-limit/get",
-													"protocol": "http",
-													"host": [
-														"{{tyk-gateway.host}}"
-													],
-													"path": [
-														"go-ip-rate-limit",
-														"get"
-													]
-												},
-												"description": "This request uses an invalid key, so fails with an HTTP 401 response."
-											},
-											"response": [
-												{
-													"name": "Custom Authentication - IP Rate Limiter",
-													"originalRequest": {
-														"method": "GET",
-														"header": [
-															{
-																"key": "Authorization",
-																"value": "def",
-																"type": "text"
-															}
-														],
-														"url": {
-															"raw": "http://{{tyk-gateway.host}}/go-plugin-api/get",
-															"protocol": "http",
-															"host": [
-																"{{tyk-gateway.host}}"
-															],
-															"path": [
-																"go-plugin-api",
-																"get"
-															]
-														}
-													},
-													"_postman_previewlanguage": "Text",
-													"header": [],
-													"cookie": [],
-													"body": ""
-												}
-											]
-										},
-										{
-											"name": "Custom Authentication - IP Rate Limiter (part 2)",
-											"event": [
-												{
-													"listen": "test",
-													"script": {
-														"exec": [
-															"pm.test(\"Status code is 200\", function () {",
-															"    pm.response.to.have.status(200);    ",
-															"});"
-														],
-														"type": "text/javascript"
-													}
-												}
-											],
-											"request": {
-												"method": "GET",
-												"header": [],
-												"url": {
-													"raw": "http://{{tyk-gateway.host}}/go-ip-rate-limit/get",
-													"protocol": "http",
-													"host": [
-														"{{tyk-gateway.host}}"
-													],
-													"path": [
-														"go-ip-rate-limit",
-														"get"
-													]
-												},
-												"description": "This request uses an invalid key, so fails with an HTTP 401 response."
-											},
-											"response": [
-												{
-													"name": "Custom Authentication - IP Rate Limiter",
-													"originalRequest": {
-														"method": "GET",
-														"header": [
-															{
-																"key": "Authorization",
-																"value": "def",
-																"type": "text"
-															}
-														],
-														"url": {
-															"raw": "http://{{tyk-gateway.host}}/go-plugin-api/get",
-															"protocol": "http",
-															"host": [
-																"{{tyk-gateway.host}}"
-															],
-															"path": [
-																"go-plugin-api",
-																"get"
-															]
-														}
-													},
-													"_postman_previewlanguage": "Text",
-													"header": [],
-													"cookie": [],
-													"body": ""
-												}
-											]
-										},
-										{
-											"name": "Custom Authentication - IP Rate Limiter Part 3",
-											"event": [
-												{
-													"listen": "test",
-													"script": {
-														"exec": [
+															"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
 															"",
-															"pm.test(\"Status code is 429 because custom rate limit on IP is enforced.\", function () {",
-															"    pm.response.to.have.status(429);",
+															"// this unique test key is needed to ensure that the test will always operate as expected, and not interfere with the end-user request and visa versa.",
+															"testKeyId = pm.variables.replaceIn('{{$randomUUID}}');",
+															"",
+															"// rate limit request object, using test key",
+															"rateLimitRequest = {",
+															"    url: 'http://' + tykGatewayHost + '/go-ip-rate-limit/anything?test=' + testKeyId,",
+															"    method: 'GET'",
+															"};",
+															"",
+															"// make 3 requests in quick succession and test that the third is blocked by the rate limiter",
+															"pm.test(\"3rd request is rate limited\", function () {",
+															"",
+															"    pm.sendRequest(rateLimitRequest, function (err, response) {",
+															"        // first request is within rate limit",
+															"        pm.expect(response.code).to.eql(200);",
+															"",
+															"        pm.sendRequest(rateLimitRequest, function (err, response) {",
+															"            // second request is within rate limit",
+															"            pm.expect(response.code).to.eql(200);",
+															"",
+															"            pm.sendRequest(rateLimitRequest, function (err, response) {",
+															"                // third request exceeds rate limit and 429 status is returned",
+															"                pm.expect(response.code).to.eql(429);",
+															"",
+															"            });            ",
+															"        });",
+															"    });",
 															"});"
 														],
 														"type": "text/javascript"
@@ -3726,7 +3797,7 @@
 														"get"
 													]
 												},
-												"description": "This request uses an invalid key, so fails with an HTTP 401 response."
+												"description": "This request uses custom Go middleware to enforce a rate limit of 2 requests every 5 seconds. The reason for using custom middleware to implement this is that it uses the client IP address to aggregate the requests, rather than an client-supplied API key.\n\nTry running this request 3 times within 5 seconds to see the rate limiter take effect."
 											},
 											"response": [
 												{
@@ -3942,6 +4013,510 @@
 											"response": []
 										}
 									]
+								}
+							]
+						},
+						{
+							"name": "Rate Limit Per Path",
+							"item": [
+								{
+									"name": "Rate Limit Per Path - Part 1 (no rate limit)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
+													"",
+													"// make a random id to use as our key id",
+													"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
+													"",
+													"// create request object to generate test key",
+													"// key uses the random id, so it doesn't interfere with any other keys",
+													"// key is linked to the Rate Limit Proxy policy",
+													"var rateLimitTestKeyCreateRequest = {",
+													"  url: 'http://' + tykGatewayHost + '/tyk/keys/' + keyId,",
+													"  method: 'POST',",
+													"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
+													"  body: {",
+													"      mode: 'raw',",
+													"      raw: JSON.stringify({",
+													"    \"allowance\": 1000,",
+													"    \"rate\": 1000,",
+													"    \"per\": 60,",
+													"    \"throttle_interval\": -1,",
+													"    \"throttle_retry_limit\": -1,",
+													"    \"max_query_depth\": -1,",
+													"    \"quota_max\": -1,",
+													"    \"quota_renews\": 1679562223,",
+													"    \"quota_renewal_rate\": -1,",
+													"    \"access_rights\": {",
+													"        \"c252af6eaf2e43ca5c89465af4f481c1\": {",
+													"            \"versions\": [",
+													"                \"Default\"",
+													"            ],",
+													"            \"limit\": {",
+													"                \"rate\": 3,",
+													"                \"per\": 6,",
+													"                \"throttle_interval\": -1,",
+													"                \"throttle_retry_limit\": -1,",
+													"                \"max_query_depth\": -1,",
+													"                \"quota_max\": -1,",
+													"                \"quota_renewal_rate\": -1",
+													"            },",
+													"            \"allowance_scope\": \"c252af6eaf2e43ca5c89465af4f481c1\"",
+													"        },",
+													"        \"d1dfc6a927a046c54c0ed470f19757cc\": {",
+													"            \"versions\": [",
+													"                \"Default\"",
+													"            ],",
+													"            \"limit\": {",
+													"                \"rate\": 1000,",
+													"                \"per\": 60,",
+													"                \"throttle_interval\": -1,",
+													"                \"throttle_retry_limit\": -1,",
+													"                \"max_query_depth\": -1,",
+													"                \"quota_max\": -1,",
+													"                \"quota_renewal_rate\": -1",
+													"            },",
+													"            \"allowance_scope\": \"641c15dd0fffb800010197bf\"",
+													"        },",
+													"        \"d371b83b249845a2497ab9a947fd6210\": {",
+													"            \"versions\": [",
+													"                \"Default\"",
+													"            ],",
+													"            \"limit\": {",
+													"                \"rate\": 1,",
+													"                \"per\": 5,",
+													"                \"throttle_interval\": -1,",
+													"                \"throttle_retry_limit\": -1,",
+													"                \"max_query_depth\": -1,",
+													"                \"quota_max\": -1,",
+													"                \"quota_renewal_rate\": -1",
+													"            },",
+													"            \"allowance_scope\": \"d371b83b249845a2497ab9a947fd6210\"",
+													"        }",
+													"    },",
+													"    \"org_id\": \"5e9d9544a1dcd60001d0ed20\",",
+													"    \"apply_policies\": [",
+													"        \"641c15dd0fffb800010197bf\"",
+													"    ]",
+													"})",
+													"  }",
+													"};",
+													"",
+													"// create the test key",
+													"pm.sendRequest(rateLimitTestKeyCreateRequest, function (err, response) { ",
+													"    ",
+													"    // get the actual key id",
+													"    var jsonData = response.json();",
+													"    keyId=jsonData.key;",
+													"",
+													"    // test key is now created, so we can start using it in tests",
+													"    pm.test(\"No rate limit enforced\", function () {",
+													"",
+													"        // rate limit request object, using test key",
+													"        var rateLimitRequest = {",
+													"            url: 'http://' + tykGatewayHost + '/rate-limit-proxy-api/anything/no-rate-limit',",
+													"            method: 'GET',",
+													"            header: 'Authorization:' + keyId",
+													"        };",
+													"        ",
+													"        pm.sendRequest(rateLimitRequest, function (err, response) {",
+													"            // first request is within rate limit",
+													"            pm.expect(response.code).to.eql(200);",
+													"",
+													"            pm.sendRequest(rateLimitRequest, function (err, response) {",
+													"                // second request is within rate limit",
+													"                pm.expect(response.code).to.eql(200);",
+													"",
+													"                pm.sendRequest(rateLimitRequest, function (err, response) {",
+													"                    // third request is within rate limit",
+													"                    pm.expect(response.code).to.eql(200);",
+													"",
+													"                    pm.sendRequest(rateLimitRequest, function (err, response) {",
+													"                        // fourth request is within rate limit",
+													"                        pm.expect(response.code).to.eql(200);",
+													"                    ",
+													"                        // tidy up - delete test key",
+													"                        var rateLimitTestKeyDeleteRequest = {",
+													"                            url: 'http://' + tykGatewayHost + '/tyk/keys/' + keyId,",
+													"                            method: 'DELETE',",
+													"                            header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
+													"                        };",
+													"                    ",
+													"                        pm.sendRequest(rateLimitTestKeyDeleteRequest, function (err, response) { });",
+													"                    });",
+													"",
+													"                });",
+													"            });",
+													"        });",
+													"    });",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6InJhdGVfbGltaXRfcGVyX3BhdGgiLCJoIjoibXVybXVyNjQifQ==",
+												"type": "default"
+											}
+										],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/rate-limit-proxy-api/anything/no-rate-limit",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"rate-limit-proxy-api",
+												"anything",
+												"no-rate-limit"
+											]
+										},
+										"description": "This series of requests shows how to implement per-path rate limiting.\n\nIt uses three separate API Definitions, URL Rewriting and Per-API Policy Settings to achieve the effect.\n\nThe purpose of two of the API Definitions, _Rate Limit API Path 1/2_, is to facilitate Per-API Policy Settings. With the remaining API Definition, _Rate Limit Proxy API_, acting as the API access point, which uses URL rewrites to redirect the request to the other API Definitions, thereby enacting the rate limiting.\n\nNote that the URL Redirects must not use the Looping feature, as this will bypass the rate limiting."
+									},
+									"response": []
+								},
+								{
+									"name": "Rate Limit Per Path - Part 2 (1 request per 5 seconds)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
+													"",
+													"// make a random id to use as our key id",
+													"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
+													"",
+													"// create request object to generate test key",
+													"// key uses the random id, so it doesn't interfere with any other keys",
+													"// key is linked to the Rate Limit Proxy policy",
+													"var rateLimitTestKeyCreateRequest = {",
+													"  url: 'http://' + tykGatewayHost + '/tyk/keys/' + keyId,",
+													"  method: 'POST',",
+													"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
+													"  body: {",
+													"      mode: 'raw',",
+													"      raw: JSON.stringify({",
+													"    \"allowance\": 1000,",
+													"    \"rate\": 1000,",
+													"    \"per\": 60,",
+													"    \"throttle_interval\": -1,",
+													"    \"throttle_retry_limit\": -1,",
+													"    \"max_query_depth\": -1,",
+													"    \"quota_max\": -1,",
+													"    \"quota_renews\": 1679562223,",
+													"    \"quota_renewal_rate\": -1,",
+													"    \"access_rights\": {",
+													"        \"c252af6eaf2e43ca5c89465af4f481c1\": {",
+													"            \"versions\": [",
+													"                \"Default\"",
+													"            ],",
+													"            \"limit\": {",
+													"                \"rate\": 3,",
+													"                \"per\": 6,",
+													"                \"throttle_interval\": -1,",
+													"                \"throttle_retry_limit\": -1,",
+													"                \"max_query_depth\": -1,",
+													"                \"quota_max\": -1,",
+													"                \"quota_renewal_rate\": -1",
+													"            },",
+													"            \"allowance_scope\": \"c252af6eaf2e43ca5c89465af4f481c1\"",
+													"        },",
+													"        \"d1dfc6a927a046c54c0ed470f19757cc\": {",
+													"            \"versions\": [",
+													"                \"Default\"",
+													"            ],",
+													"            \"limit\": {",
+													"                \"rate\": 1000,",
+													"                \"per\": 60,",
+													"                \"throttle_interval\": -1,",
+													"                \"throttle_retry_limit\": -1,",
+													"                \"max_query_depth\": -1,",
+													"                \"quota_max\": -1,",
+													"                \"quota_renewal_rate\": -1",
+													"            },",
+													"            \"allowance_scope\": \"641c15dd0fffb800010197bf\"",
+													"        },",
+													"        \"d371b83b249845a2497ab9a947fd6210\": {",
+													"            \"versions\": [",
+													"                \"Default\"",
+													"            ],",
+													"            \"limit\": {",
+													"                \"rate\": 1,",
+													"                \"per\": 5,",
+													"                \"throttle_interval\": -1,",
+													"                \"throttle_retry_limit\": -1,",
+													"                \"max_query_depth\": -1,",
+													"                \"quota_max\": -1,",
+													"                \"quota_renewal_rate\": -1",
+													"            },",
+													"            \"allowance_scope\": \"d371b83b249845a2497ab9a947fd6210\"",
+													"        }",
+													"    },",
+													"    \"org_id\": \"5e9d9544a1dcd60001d0ed20\",",
+													"    \"apply_policies\": [",
+													"        \"641c15dd0fffb800010197bf\"",
+													"    ]",
+													"})",
+													"  }",
+													"};",
+													"",
+													"// create the test key",
+													"pm.sendRequest(rateLimitTestKeyCreateRequest, function (err, response) { ",
+													"    // get the actual key id",
+													"    var jsonData = response.json();",
+													"    keyId=jsonData.key;",
+													"",
+													"    var rateLimitRequest;",
+													"",
+													"    // test key is now created, so we can start using it in tests",
+													"    pm.test(\"Rate limiter triggered after 1 request\", function () {",
+													"",
+													"        // rate limit request object, using test key",
+													"        rateLimitRequest = {",
+													"            url: 'http://' + tykGatewayHost + '/rate-limit-proxy-api/anything/rate-limit-1-per-5',",
+													"            method: 'GET',",
+													"            header: 'Authorization:' + keyId",
+													"        };",
+													"        ",
+													"        pm.sendRequest(rateLimitRequest, function (err, response) {",
+													"            // first request is within rate limit",
+													"            pm.expect(response.code).to.eql(200);",
+													"",
+													"            pm.sendRequest(rateLimitRequest, function (err, response) {",
+													"                // second request exceeds rate limit",
+													"                pm.expect(response.code).to.eql(429);",
+													"",
+													"                ",
+													"            });",
+													"        });",
+													"    });",
+													"",
+													"    // test for successful request after rate limit period has elapsed",
+													"    setTimeout(function() {",
+													"        pm.test(\"Status code is 200 after rate limit period has elapsed\", function () {",
+													"            pm.sendRequest(rateLimitRequest, function (err, response) {",
+													"                pm.expect(response.code).to.eql(200);",
+													"",
+													"                // tidy up - delete test key",
+													"                var rateLimitTestKeyDeleteRequest = {",
+													"                    url: 'http://' + tykGatewayHost + '/tyk/keys/' + keyId,",
+													"                    method: 'DELETE',",
+													"                    header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
+													"                };",
+													"",
+													"                pm.sendRequest(rateLimitTestKeyDeleteRequest, function (err, response) { });",
+													"            });",
+													"        });",
+													"    }, 5100);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6InJhdGVfbGltaXRfcGVyX3BhdGgiLCJoIjoibXVybXVyNjQifQ==",
+												"type": "default"
+											}
+										],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/rate-limit-proxy-api/anything/rate-limit-1-per-5",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"rate-limit-proxy-api",
+												"anything",
+												"rate-limit-1-per-5"
+											]
+										},
+										"description": "This request calls an endpoint which is redirected to a different API that has a rate limit defined of 1 request per 5 seconds.\n\nThe rate limit is set in the policy, which uses per-API settings.\n\nFrom a consumer perspective, they are not exposed to the redirection, as it happens server-side within the API gateway. The base path is the same as in Part 1 (`rate-limit-api`). It is only the last part of the path which changes (`rate-limit-1-per-5`). The API Gateway matches this path with the URL redirect."
+									},
+									"response": []
+								},
+								{
+									"name": "Rate Limit Per Path - Part 3 (3 requests per 6 seconds)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var tykGatewayHost = pm.variables.get(\"tyk-gateway.host\");",
+													"",
+													"// make a random id to use as our key id",
+													"var keyId = pm.variables.replaceIn('{{$randomUUID}}');",
+													"",
+													"// create request object to generate test key",
+													"// key uses the random id, so it doesn't interfere with any other keys",
+													"// key is linked to the Rate Limit Proxy policy",
+													"var rateLimitTestKeyCreateRequest = {",
+													"  url: 'http://' + tykGatewayHost + '/tyk/keys/' + keyId,",
+													"  method: 'POST',",
+													"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
+													"  body: {",
+													"    mode: 'raw',",
+													"    raw: JSON.stringify({",
+													"        \"allowance\": 1000,",
+													"        \"rate\": 1000,",
+													"        \"per\": 60,",
+													"        \"throttle_interval\": -1,",
+													"        \"throttle_retry_limit\": -1,",
+													"        \"max_query_depth\": -1,",
+													"        \"quota_max\": -1,",
+													"        \"quota_renews\": 1679562223,",
+													"        \"quota_renewal_rate\": -1,",
+													"        \"access_rights\": {",
+													"            \"c252af6eaf2e43ca5c89465af4f481c1\": {",
+													"                \"versions\": [",
+													"                    \"Default\"",
+													"                ],",
+													"                \"limit\": {",
+													"                    \"rate\": 3,",
+													"                    \"per\": 6,",
+													"                    \"throttle_interval\": -1,",
+													"                    \"throttle_retry_limit\": -1,",
+													"                    \"max_query_depth\": -1,",
+													"                    \"quota_max\": -1,",
+													"                    \"quota_renewal_rate\": -1",
+													"                },",
+													"                \"allowance_scope\": \"c252af6eaf2e43ca5c89465af4f481c1\"",
+													"            },",
+													"            \"d1dfc6a927a046c54c0ed470f19757cc\": {",
+													"                \"versions\": [",
+													"                    \"Default\"",
+													"                ],",
+													"                \"limit\": {",
+													"                    \"rate\": 1000,",
+													"                    \"per\": 60,",
+													"                    \"throttle_interval\": -1,",
+													"                    \"throttle_retry_limit\": -1,",
+													"                    \"max_query_depth\": -1,",
+													"                    \"quota_max\": -1,",
+													"                    \"quota_renewal_rate\": -1",
+													"                },",
+													"                \"allowance_scope\": \"641c15dd0fffb800010197bf\"",
+													"            },",
+													"            \"d371b83b249845a2497ab9a947fd6210\": {",
+													"                \"versions\": [",
+													"                    \"Default\"",
+													"                ],",
+													"                \"limit\": {",
+													"                    \"rate\": 1,",
+													"                    \"per\": 5,",
+													"                    \"throttle_interval\": -1,",
+													"                    \"throttle_retry_limit\": -1,",
+													"                    \"max_query_depth\": -1,",
+													"                    \"quota_max\": -1,",
+													"                    \"quota_renewal_rate\": -1",
+													"                },",
+													"                \"allowance_scope\": \"d371b83b249845a2497ab9a947fd6210\"",
+													"            }",
+													"        },",
+													"        \"org_id\": \"5e9d9544a1dcd60001d0ed20\",",
+													"        \"apply_policies\": [",
+													"            \"641c15dd0fffb800010197bf\"",
+													"        ]",
+													"    })",
+													"  }",
+													"};",
+													"",
+													"// create the test key",
+													"pm.sendRequest(rateLimitTestKeyCreateRequest, function (err, response) { ",
+													"    ",
+													"    // get the actual key id",
+													"    var jsonData = response.json();",
+													"    keyId=jsonData.key;",
+													"    var rateLimitRequest;",
+													"",
+													"    // test key is now created, so we can start using it in tests",
+													"    pm.test(\"Rate limiter triggererd after 3 requests\", function () {",
+													"",
+													"        // rate limit request object, using test key",
+													"        rateLimitRequest = {",
+													"            url: 'http://' + tykGatewayHost + '/rate-limit-proxy-api/anything/rate-limit-3-per-6',",
+													"            method: 'GET',",
+													"            header: 'Authorization:' + keyId",
+													"        };",
+													"        ",
+													"        pm.sendRequest(rateLimitRequest, function (err, response) {",
+													"            // first request is within rate limit",
+													"            pm.expect(response.code).to.eql(200);",
+													"            pm.sendRequest(rateLimitRequest, function (err, response) {",
+													"                // second request is within rate limit",
+													"                pm.expect(response.code).to.eql(200);",
+													"                pm.sendRequest(rateLimitRequest, function (err, response) {",
+													"                    // third request is within rate limit",
+													"                    pm.expect(response.code).to.eql(200);",
+													"                    pm.sendRequest(rateLimitRequest, function (err, response) {",
+													"                        // fourth request exceeds rate limit",
+													"                        pm.expect(response.code).to.eql(429);",
+													"                    });",
+													"                });",
+													"            });",
+													"        });",
+													"    });",
+													"",
+													"    // test for successful request after rate limit period has elapsed",
+													"    setTimeout(function() {",
+													"        pm.test(\"Status code is 200 after rate limit period has elapsed\", function () {",
+													"            pm.sendRequest(rateLimitRequest, function (err, response) {",
+													"                pm.expect(response.code).to.eql(200);",
+													"",
+													"                // tidy up - delete test key",
+													"                var rateLimitTestKeyDeleteRequest = {",
+													"                    url: 'http://' + tykGatewayHost + '/tyk/keys/' + keyId,",
+													"                    method: 'DELETE',",
+													"                    header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa'",
+													"                };",
+													"",
+													"                pm.sendRequest(rateLimitTestKeyDeleteRequest, function (err, response) { });",
+													"            });",
+													"        });",
+													"    }, 6100);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6InJhdGVfbGltaXRfcGVyX3BhdGgiLCJoIjoibXVybXVyNjQifQ==",
+												"type": "default"
+											}
+										],
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/rate-limit-proxy-api/anything/rate-limit-3-per-6",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"rate-limit-proxy-api",
+												"anything",
+												"rate-limit-3-per-6"
+											]
+										},
+										"description": "This request is the almost the same as the previous request (part 2). The difference is that the path is requests has a different rate limit applied - 3 requests per 6 seconds, instead of 1 per 5."
+									},
+									"response": []
 								}
 							]
 						},
@@ -5578,7 +6153,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.sendRequest(\"http://\" + pm.variables.get(\"ngrok.host\") + \":\" + pm.variables.get(\"ngrok.port\") + \"/api/tunnels/command_line\", function (err, response) {",
+									"pm.sendRequest(\"http://\" + pm.variables.get(\"ngrok.host\") + \":\" + pm.variables.get(\"ngrok.port\") + \"/api/tunnels/tyk-gateway\", function (err, response) {",
 									"",
 									"    ngrokPublicUrl = response.json().public_url;",
 									"",
@@ -7054,7 +7629,8 @@
 													"    pm.expect(jsonData.user_permissions.IsAdmin).to.equal(\"admin\");",
 													"    pm.expect(jsonData.first_name).to.equal(pm.variables.get(\"user-first-name\"));",
 													"    pm.expect(jsonData.last_name).to.equal(pm.variables.get(\"user-last-name\"));",
-													"    pm.expect(jsonData.email_address).to.equal(pm.variables.get(\"user-email-address\"));",
+													"    // Tyk converts email addresses to lower case, so we validate against a lower case email address",
+													"    pm.expect(jsonData.email_address).to.equal(pm.variables.get(\"user-email-address\").toLowerCase());",
 													"});",
 													"",
 													"// tidy up",

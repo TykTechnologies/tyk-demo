@@ -1,13 +1,14 @@
 version: '3.3'
 services:
   waf:
-    image: owasp/modsecurity-crs:v3.0
+    image: owasp/modsecurity-crs:3.3.4-apache-202302060502
     networks:
       - tyk
     ports:
       - "8500:80"
     environment:
       - PARANOIA=1
+      - BACKEND=http://httpbin
     deploy:
       restart_policy:
         condition: any

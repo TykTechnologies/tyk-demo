@@ -16,13 +16,11 @@ log_ok
 bootstrap_progress
 
 log_message "Checking Dashboard licence exists"
-if ! grep -q "DASHBOARD_LICENCE=" .env
-then
+if ! grep -q "DASHBOARD_LICENCE=" .env; then
   log_message "ERROR: Dashboard licence missing from Docker environment file (.env). Add a licence to the DASHBOARD_LICENCE environment variable."
   exit 1
 fi
-if grep -q "DASHBOARD_LICENCE=add_your_dashboard_licence_here" .env
-then
+if grep -q "DASHBOARD_LICENCE=add_your_dashboard_licence_here" .env; then
   log_message "ERROR: Placeholder Dashboard licence found in Docker environment file (.env). Replace \"add_your_dashboard_licence_here\" with your Tyk licence."
   exit 1
 fi
@@ -47,10 +45,17 @@ gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq 
 gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
 bootstrap_progress
 
+log_message "Creating new audit log file to prevent uncontrolled growth between deployments"
+echo -n > deployments/tyk/volumes/tyk-dashboard/audit/audit.log
+log_ok
+bootstrap_progress
+
 # Certificates
 
+log_message "OpenSSL version used for generating certs: $(docker exec $(get_service_container_id tyk-gateway) sh -c "openssl version")"
+
 log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
-openssl req -x509 -newkey rsa:4096 -subj "/CN=tyk-gateway-2.localhost" -keyout deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.pem -out deployments/tyk/volumes/tyk-gateway/certs/tls-certificate.pem -days 365 -nodes >/dev/null 2>>bootstrap.log
+docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tyk-gateway-2.localhost\" -keyout certs/tls-private-key.pem -out certs/tls-certificate.pem -days 365 -nodes" >/dev/null 2>>bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not generate self-signed certificate"
   exit 1
@@ -59,7 +64,7 @@ log_ok
 bootstrap_progress
 
 log_message "Generating private key for secure messaging and signing"
-openssl genrsa -out deployments/tyk/volumes/tyk-gateway/certs/private-key.pem 2048 >/dev/null 2>>bootstrap.log
+docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl genrsa -out certs/private-key.pem 2048" >/dev/null 2>>bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not generate private key"
   exit 1
@@ -68,7 +73,7 @@ log_ok
 bootstrap_progress
 
 log_message "Copying private key to the Dashboard"
-cp deployments/tyk/volumes/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs
+docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs 2>>bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not copy private key"
   exit 1
@@ -77,7 +82,7 @@ log_ok
 bootstrap_progress
 
 log_message "Generating public key for secure messaging and signing"
-openssl rsa -in deployments/tyk/volumes/tyk-gateway/certs/private-key.pem -pubout -out deployments/tyk/volumes/tyk-gateway/certs/public-key.pem >/dev/null 2>>bootstrap.log
+docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl rsa -in certs/private-key.pem -pubout -out certs/public-key.pem" >/dev/null 2>>bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not generate public key"
   exit 1
@@ -105,7 +110,7 @@ wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $
 # Python plugin
 
 log_message "Building Python plugin bundle"
-eval "$(generate_docker_compose_command) exec -T -d tyk-gateway sh -c \"cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem\"" 1> /dev/null 2>> bootstrap.log
+docker exec -d $(get_service_container_id tyk-gateway) sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1> /dev/null 2>> bootstrap.log
 if [ "$?" != 0 ]; then
   echo "Error occurred when building Python plugin bundle"
   exit 1
@@ -474,9 +479,9 @@ bootstrap_progress
 
 log_message "Getting ngrok public URL for Tyk Gateway"
 ngrok_dashboard_url="http://localhost:4040"
-ngrok_ip_api_endpoint="$ngrok_dashboard_url/api/tunnels"
+ngrok_ip_api_endpoint="$ngrok_dashboard_url/api/tunnels/tyk-gateway"
 log_message "  Getting data from $ngrok_ip_api_endpoint"
-ngrok_public_url=$(curl --fail --silent --show-error ${ngrok_ip_api_endpoint} | jq ".tunnels[0].public_url" --raw-output)
+ngrok_public_url=$(curl --fail --silent --show-error ${ngrok_ip_api_endpoint} | jq ".public_url" --raw-output)
 if [ "$?" != 0 ]; then
   echo "Error getting ngrok configuration from $ngrok_ip_api_endpoint"
   exit 1
@@ -490,22 +495,20 @@ log_ok
 
 log_end_deployment
 
+NOCOLOUR='\033[0m'
+CYAN='\033[0;36m'
+
 echo -e "\033[2K
 
-            #####################                  ####               
-            #####################                  ####               
-                    #####                          ####               
-  /////////         #####    ((.            (((    ####          (((  
-  ///////////,      #####    ####         #####    ####       /####   
-  ////////////      #####    ####         #####    ####      #####    
-  ////////////      #####    ####         #####    ##############     
-    //////////      #####    ####         #####    ##############     
-                    #####    ####         #####    ####      ,####    
-                    #####    ##################    ####        ####   
-                    #####      ########## #####    ####         ####  
-                                         #####                        
-                             ################                         
-                               ##########/                            
+              ▓▓▓▓▓▓▓▓▓▓▓▓▓          ▓▓▓
+                   ▓▓▓               ▓▓▓
+        ${CYAN}▓▓▓▓▓${NOCOLOUR}      ▓▓▓  ▓▓▓     ▓▓▓  ▓▓▓     ▓▓
+        ${CYAN}▓▓▓▓▓▓▓${NOCOLOUR}    ▓▓▓  ▓▓▓     ▓▓▓  ▓▓▓    ▓▓
+          ${CYAN}▓▓▓▓▓${NOCOLOUR}    ▓▓▓  ▓▓▓     ▓▓▓  ▓▓▓▓▓▓▓▓▓
+                   ▓▓▓  ▓▓▓     ▓▓▓  ▓▓▓    ▓▓ 
+                   ▓▓▓   ▓▓▓▓▓▓▓▓▓▓  ▓▓▓     ▓▓
+                                ▓▓▓  
+                         ▓▓▓▓▓▓▓▓▓
 
 ▼ Tyk
   ▽ Dashboard ($(get_service_image_tag "tyk-dashboard"))

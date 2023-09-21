@@ -4,7 +4,9 @@
 
 This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple deployment, where you can choose what features to include.
 
-It has been built to enable the sharing of knowledge and combining of effort amongst client-facing technical Tyk folks.
+Tyk Demo was built to enable the sharing of knowledge and combining of effort amongst client-facing technical Tyk folks. But it's also useful to anyone interested in playing with a Tyk installation.
+
+The repo contains various Postman collections that make it easy to explore and experience Tyk's features and functionality.
 
 See the [Contributor Guide](CONTRIBUTING.md) for information on how to contribute to and extend this repository.
 
@@ -27,6 +29,14 @@ Each feature deployment has its own directory, with the necessary files to deplo
 
 There is a focus on simplicity. Docker Compose is used to provision the containers, and bootstrap scripts are used to initialise the environment so that it is ready to use straight away - applying configuration and populating data.
 
+## Requirements
+
+### License requirements
+- Get a valid [Tyk Self-Managed license](https://tyk.io/pricing-self-managed/) key (click **"start now"** under **Free trial**). **This is a self-service option!**
+- If you want to run MDCB deployment (distributed set up with control plane and data plans), then you need to [contact Tyk team](https://tyk.io/pricing-self-managed/) to get a license key. Please leave it if it's the first time you are trying out Tyk and you are not in a position to get engaged at this moment.
+
+### Software
+docker compose
 
 ## Repository Structure
 
@@ -48,7 +58,13 @@ The `docker-compose.yml` files in this repo use Docker environment variables to 
 
 As per standard Docker convention, the Docker environment variables are stored in a file called `.env`, which is in the repository root directory.
 
-Notable environment variables are:
+You can use `.env.example` as a starting point for your `.env` file.
+
+You must set `DASHBOARD_LICENCE` variable with the valid license key you previously got. 
+If you are using the MDCB (`mdcb`) deployment, then you need to do the same for `MDCB_LICENCE` variable.
+
+
+### Notable environment variables are:
 
 | Variable | Description | Required | Default |
 | -------- | ----------- | -------- | ------- | 
@@ -66,8 +82,6 @@ There are various other environment variables used, but it's not normally necess
 Unless you have a specific reason to do so, it's not recommended to set the `*_VERSION` environment variables e.g. `GATEWAY_VERSION`. Doing so will effectively pin the image tag of the container, which could cause the `bootstrap.sh` scripts to fail, as they are written to operate against the image tags specified in the `docker-compose.yml` files.
 
 Many of the containers are configured to use `.env` as an environment file. This means that any standard Tyk environment variables added to `.env` will be available in the container e.g. setting `DB_AUDIT_ENABLED=true` enables auditing in the Dashboard.
-
-You can use `.env.example` as a starting point for your `.env` file. You must obtain a valid Tyk Dashboard licence and use it to set the `DASHBOARD_LICENCE` variable. If you are using the MDCB (`mdcb`) deployment, then you need to do the same for the `MDCB_LICENCE` variable.
 
 # Getting Started
 
@@ -124,13 +138,13 @@ In addition to this, some features require entries in the `.env` file. These are
 
 ## Step 4: Bring the deployment up
 
-To bootstrap the system we will run the `up.sh` script, which will run the necessary `docker-compose` and `bootstrap` commands to start the containers and bootstrap the system. 
+To bootstrap the system we will run the `up.sh` script, which will run the necessary `docker compose` and `bootstrap` commands to start the containers and bootstrap the system. 
 
 ```
 ./up.sh
 ```
 
-The script displays a message, showing the deployments it will create:
+The script displays a message, showing the deployments it will create. For example:
 
 ```
 Deployments to create:
@@ -191,6 +205,27 @@ Deployments to remove:
   tyk
 ```
 
+# Resuming
+
+Deployments can be resumed if their containers have stopped. This is useful for situations where you want to resume using Tyk Demo after its containers have been stopped, such as when Docker is restarted. Resuming deployments uses the existing containers and volumes, which means that the deployment resumes using its previous state. As such, it's not necessary to rebootstrap the deployment, as all the necessary data is already available.
+
+The script automatically determines which deployments to resume by reading the deployments listed in `.bootstrap/bootstrapped_deployments`.
+
+To resume deployments, run the `./up.sh` command:
+
+```
+./up.sh
+```
+
+The script will display the deployments to be resumed. For example:
+
+```
+Deployments to resume:
+  tyk
+```
+
+If you want to rebootstrap the deployments, then run the `./down.sh` script before running `./up.sh`. This will remove the containers and volumes of the existing deployments, which then allows the `./up.sh` script to bootstrap the deployments.
+
 # Redeploying
 
 To redeploy an existing deployment, run the `./down.sh` script followed by the `./up.sh` script:
@@ -211,10 +246,13 @@ For example, if `./up.sh` has already been run, there will be a standard `tyk` d
 ./up.sh sso
 ```
 
-Note that existing deployments do not need to be specified. The script detects existing deployments and skips them. A message is displayed to confirm the situation:
+Note that existing deployments do not need to be specified. The script detects existing deployments and automatically resumes them. A message is displayed to confirm the situation:
 
 ```
-Existing deployments found. Only newly specified deployments will be created.
+Deployments to resume:
+  tyk
+Note: Resumed deployments are not rebootstrapped - they use their existing volumes
+Tip: To rebootstrap deployments, you must first remove them using the down.sh script
 Deployments to create:
   sso
 ```

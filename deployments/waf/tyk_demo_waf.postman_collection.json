@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "eeb6bf53-3960-4bb4-aaf0-0a1f1239dfb5",
+		"_postman_id": "9806a85d-289d-423f-be8f-ba8e2fdae08d",
 		"name": "Tyk Demo - WAF",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -11,14 +11,14 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "b8e091fa-5bf4-429b-af47-84fbb05fddd6",
 						"exec": [
 							"pm.test(\"Response time is less than 200ms\", function () {",
 							"    pm.expect(pm.response.responseTime).to.be.below(200);",
 							"});",
 							"",
-							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"hello world\");",
+							"pm.test(\"Non-empty UUID response returned\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.uuid).is.not.empty;",
 							"});"
 						],
 						"type": "text/javascript"
@@ -29,14 +29,16 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8500",
+					"raw": "http://{{waf.host}}/uuid",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"{{waf.host}}"
 					],
-					"port": "8500"
+					"path": [
+						"uuid"
+					]
 				},
-				"description": "This request checks that the Web Application Firewall (WAF) is operational.\n\nIt should return a HTTP 200 response with the body text `hello world`."
+				"description": "This request checks that the Web Application Firewall (WAF) is operational.\n\nIt should return a HTTP 200 response with a JSON body containing a UUID."
 			},
 			"response": []
 		},
@@ -46,7 +48,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e35f2848-c599-49c2-b2b6-271fe944c0bb",
 						"exec": [
 							"pm.test(\"Status code is 403\", function () {",
 							"    pm.response.to.have.status(403);",
@@ -60,11 +61,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8500/?param=\"<script>alert(1);</script>\"",
+					"raw": "{{waf.host}}/?param=\"<script>alert(1);</script>\"",
 					"host": [
-						"localhost"
+						"{{waf.host}}"
 					],
-					"port": "8500",
 					"path": [
 						""
 					],
@@ -85,7 +85,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9497f7bc-b1be-4c0d-9832-7016ff2c61ac",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -99,11 +98,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/waf/ip",
+					"raw": "{{tyk-gateway.host}}/waf/ip",
 					"host": [
-						"localhost"
+						"{{tyk-gateway.host}}"
 					],
-					"port": "8080",
 					"path": [
 						"waf",
 						"ip"
@@ -119,7 +117,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "a5902804-e15d-4cc8-b974-208783e9cb2f",
 						"exec": [
 							"pm.test(\"Status code is 400\", function () {",
 							"    pm.response.to.have.status(400);",
@@ -138,11 +135,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/waf/ip?param=\"<script>alert(1);</script>\"",
+					"raw": "{{tyk-gateway.host}}/waf/ip?param=\"<script>alert(1);</script>\"",
 					"host": [
-						"localhost"
+						"{{tyk-gateway.host}}"
 					],
-					"port": "8080",
 					"path": [
 						"waf",
 						"ip"
@@ -159,5 +155,14 @@
 			"response": []
 		}
 	],
-	"protocolProfileBehavior": {}
+	"variable": [
+		{
+			"key": "waf.host",
+			"value": "localhost:8500"
+		},
+		{
+			"key": "tyk-gateway.host",
+			"value": "tyk-gateway.localhost:8080"
+		}
+	]
 }
