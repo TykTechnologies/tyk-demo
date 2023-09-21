@@ -98,7 +98,7 @@ jobs:
       run: |
         npm run test
       env:
-        URL: "http://tyk-dashboard.localhost:3000/
+        URL: "http://tyk-dashboard.localhost:3000/"
       working-directory: tyk-analytics-tests/playwright
         
     - uses: actions/upload-artifact@v3
