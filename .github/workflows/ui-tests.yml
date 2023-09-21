@@ -48,6 +48,9 @@ jobs:
         TOKEN: '${{ secrets.ORG_GH_TOKEN }}'
       run: >
         git config --global url."https://${TOKEN}@github.com".insteadOf "https://github.com"
+
+    - name: Checkout demo repostory
+      uses: actions/checkout@v2
     
     - name: Check if test framework branch exists
       id: check_test_branch
