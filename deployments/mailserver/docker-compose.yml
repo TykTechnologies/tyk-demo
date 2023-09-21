@@ -1,7 +1,7 @@
-version: '3.3'
+version: '3.8'
 services:
   mailserver:
-    image: marcopas/docker-mailslurper
+    image: marcopas/docker-mailslurper:${MAILSLURPER_VERSION}
     networks:
       - tyk
     ports:

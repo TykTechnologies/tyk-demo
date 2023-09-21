@@ -1,8 +1,8 @@
-version: "2"
+version: "3.8"
 services:
   # Jaeger
   jaeger-all-in-one:
-    image: jaegertracing/all-in-one:1.47
+    image: jaegertracing/all-in-one:${JAEGER_VERSION}
     ports:
       - "16686:16686"  # Dashboard
       - "14269:14269"  # Health Check
@@ -10,7 +10,7 @@ services:
       - tyk
   # Collector
   collector-gateway:
-    image: otel/opentelemetry-collector:0.81.0
+    image: otel/opentelemetry-collector:${OTEL_COLLECTOR_VERSION}
     volumes:
       - ./deployments/otel/volumes/otel-collector.yml:/etc/otel-collector.yml
     command: [ "--config=/etc/otel-collector.yml" ]

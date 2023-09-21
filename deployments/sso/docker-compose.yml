@@ -1,7 +1,7 @@
-version: '3.3'
+version: '3.8'
 services:
   tyk-dashboard-sso:
-    image: tykio/tyk-dashboard:${DASHBOARD_SSO_VERSION:-v5.1.0}
+    image: tykio/tyk-dashboard:${DASHBOARD_SSO_VERSION}
     ports:
       - 3001:3000
     networks:
@@ -19,7 +19,7 @@ services:
       - tyk-mongo
       - tyk-redis
   tyk-identity-broker:
-    image: tykio/tyk-identity-broker:${TIB_VERSION:-v1.4.1}
+    image: tykio/tyk-identity-broker:${TIB_VERSION}
     networks:
       - tyk
     ports:
@@ -30,7 +30,7 @@ services:
     volumes:
       - ./deployments/sso/volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf
   ldap-server:
-    image: dwimberger/ldap-ad-it:latest
+    image: dwimberger/ldap-ad-it:${LDAP_SERVER_VERSION}
     networks:
       - tyk
     volumes:

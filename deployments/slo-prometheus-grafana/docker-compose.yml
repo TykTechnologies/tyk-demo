@@ -1,7 +1,7 @@
-version: '3.3'
+version: '3.8'
 services:
   tyk-slo-pump:
-    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.8.1}
+    image: tykio/tyk-pump-docker-pub:${PUMP_SLO_VERSION}
     ports:
     - 8091:8083
     - 8092:8092
@@ -18,7 +18,7 @@ services:
       - tyk-redis
   
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:${PROMETHEUS_VERSION}
     volumes:
       - ./deployments/slo-prometheus-grafana/volumes/prometheus/:/etc/prometheus
       - prometheus-data:/prometheus
@@ -31,7 +31,7 @@ services:
       - tyk
 
   k6:
-    image: grafana/k6:latest
+    image: grafana/k6:${K6_VERSION}
     networks:
       - tyk
     ports:
@@ -40,7 +40,7 @@ services:
       - ./deployments/slo-prometheus-grafana/volumes/k6/:/scripts
 
   grafana:
-    image: grafana/grafana-oss
+    image: grafana/grafana-oss:${GRAFANA_VERSION}
     ports:
       - 3020:3000
     volumes:

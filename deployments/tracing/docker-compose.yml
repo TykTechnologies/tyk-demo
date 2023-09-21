@@ -1,7 +1,7 @@
-version: '3.3'
+version: '3.8'
 services:
   zipkin:
-    image: openzipkin/zipkin-slim:2.21.7
+    image: openzipkin/zipkin-slim:${ZIPKIN_VERSION}
     ports:
       - 9411:9411
     networks:
