@@ -51,7 +51,7 @@ jobs:
 
     - name: Checkout demo repostory
       uses: actions/checkout@v2
-    
+
     - name: Check if test framework branch exists
       id: check_test_branch
       run: |
@@ -77,7 +77,7 @@ jobs:
       run: sudo ./scripts/update-hosts.sh
 
     - name: start tyk demo
-      run: /up.sh
+      run: ./up.sh
       env:
         DASHBOARD_VERSION: ${{ github.event.inputs.dashboard_image_tag }}
         GATEWAY_VERSION: ${{ github.event.inputs.gateway_image_tag }}
