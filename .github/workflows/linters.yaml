@@ -1,0 +1,24 @@
+---
+name: Run linters
+on: # yamllint disable-line rule:truthy
+  - push
+
+jobs:
+  yamllint:
+    name: Yamllint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git - checkout pull request branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run yaml linter
+        uses: karancode/yamllint-github-action@master
+        with:
+          yamllint_file_or_dir: .
+          yamllint_config_datapath: .yamllint.yaml
+          yamllint_strict: strict
+          yamllint_comment: true
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.ORG_GH_TOKEN }}

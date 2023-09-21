@@ -1,0 +1,28 @@
+---
+extends: default
+
+rules:
+  # 180 chars should be enough, but don't fail if a line is longer.
+  line-length:
+    max: 180
+    level: warning
+  comments:
+    min-spaces-from-content: 1
+  brackets:
+    forbid: false
+    min-spaces-inside: 1
+    max-spaces-inside: 1
+    min-spaces-inside-empty: 0
+    max-spaces-inside-empty: 1
+  braces:
+    forbid: false
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+    min-spaces-inside-empty: 0
+    max-spaces-inside-empty: 1
+  document-start:
+    present: true
+    level: error
+  document-end:
+    present: false
+    level: error
