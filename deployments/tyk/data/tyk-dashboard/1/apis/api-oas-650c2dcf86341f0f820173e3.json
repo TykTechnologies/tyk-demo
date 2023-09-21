@@ -3,7 +3,7 @@
         "securitySchemes": {
             "apiKey": {
                 "in": "header",
-                "name": "api_key",
+                "name": "Authrization",
                 "type": "apiKey"
             }
         }
@@ -173,14 +173,14 @@
     ],
     "servers": [
         {
-            "url": "http://localhost:8181/api-with-response-body"
+            "url": "http://localhost:8181/api-with-auth-token"
         }
     ],
     "x-tyk-api-gateway": {
         "info": {
-            "dbId": "650c2f6486341f0f820173e7",
-            "id": "89f1315059bc45594e731ec3b18c8cc8",
-            "name": "httpbin API",
+            "dbId": "650c2dcf86341f0f820173e3",
+            "id": "b45a8f243a6a468566b0d0ff34747c0c",
+            "name": "API with Authentication Token",
             "orgId": "646490d486341f29c665c45c",
             "state": {
                 "active": true
@@ -191,11 +191,6 @@
                 "anythingGET": {
                     "allow": {
                         "enabled": true
-                    },
-                    "transformResponseBody": {
-                        "body": "ewogICAgImhvc3QiOiB7eyAuaGVhZGVycy5Ib3N0IH19Cn0=",
-                        "enabled": true,
-                        "format": "json"
                     }
                 },
                 "delayGET": {
@@ -226,9 +221,17 @@
             }
         },
         "server": {
+            "authentication": {
+                "enabled": true,
+                "securitySchemes": {
+                    "apiKey": {
+                        "enabled": true
+                    }
+                }
+            },
             "listenPath": {
                 "strip": true,
-                "value": "/api-with-response-body"
+                "value": "/api-with-auth-token"
             }
         },
         "upstream": {

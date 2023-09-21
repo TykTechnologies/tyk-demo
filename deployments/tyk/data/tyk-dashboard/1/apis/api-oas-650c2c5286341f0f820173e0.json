@@ -98,14 +98,14 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8181/api-validate-request"
+            "url": "http://localhost:8181/api-with-cache"
         }
     ],
     "x-tyk-api-gateway": {
         "info": {
-            "dbId": "650c2cb686341f0f820173e1",
-            "id": "2f506d14ad5c40ae6a73d172ae3224f5",
-            "name": "httpbin API",
+            "dbId": "650c2c5286341f0f820173e0",
+            "id": "274fefb9a9a2468658c4c0895db82fb7",
+            "name": "API with Cache",
             "orgId": "646490d486341f29c665c45c",
             "state": {
                 "active": true
@@ -121,10 +121,6 @@
                 "delayGET": {
                     "allow": {
                         "enabled": true
-                    },
-                    "validateRequest": {
-                        "enabled": true,
-                        "errorResponseCode": 422
                     }
                 },
                 "getGET": {
@@ -140,10 +136,6 @@
                 "status/{statusCode}GET": {
                     "allow": {
                         "enabled": true
-                    },
-                    "validateRequest": {
-                        "enabled": true,
-                        "errorResponseCode": 422
                     }
                 },
                 "uuidGET": {
@@ -156,7 +148,7 @@
         "server": {
             "listenPath": {
                 "strip": true,
-                "value": "/api-validate-request"
+                "value": "/api-with-cache"
             }
         },
         "upstream": {

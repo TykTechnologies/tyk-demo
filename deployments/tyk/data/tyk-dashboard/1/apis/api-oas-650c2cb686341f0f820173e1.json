@@ -1,13 +1,5 @@
 {
-    "components": {
-        "securitySchemes": {
-            "apiKey": {
-                "in": "header",
-                "name": "Authrization",
-                "type": "apiKey"
-            }
-        }
-    },
+    "components": {},
     "info": {
         "title": "httpbin API",
         "version": "1.0.0"
@@ -19,11 +11,6 @@
                 "operationId": "anythingGET",
                 "responses": {
                     "200": {
-                        "content": {
-                            "text/plain": {
-                                "example": "This is anything."
-                            }
-                        },
                         "description": "Successful response"
                     }
                 },
@@ -46,21 +33,6 @@
                 ],
                 "responses": {
                     "200": {
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "args": {
-                                        "delay": 3
-                                    },
-                                    "headers": {
-                                        "Accept": "application/json",
-                                        "Host": "httpbin.org"
-                                    },
-                                    "origin": "192.168.0.1",
-                                    "url": "https://httpbin.org/delay/3"
-                                }
-                            }
-                        },
                         "description": "Successful response"
                     }
                 },
@@ -72,19 +44,6 @@
                 "operationId": "getGET",
                 "responses": {
                     "200": {
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "args": {},
-                                    "headers": {
-                                        "Accept": "application/json",
-                                        "Host": "httpbin.org"
-                                    },
-                                    "origin": "192.168.0.1",
-                                    "url": "https://httpbin.org/get"
-                                }
-                            }
-                        },
                         "description": "Successful response"
                     }
                 },
@@ -96,23 +55,6 @@
                 "operationId": "postPOST",
                 "responses": {
                     "200": {
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "args": {},
-                                    "data": {},
-                                    "files": {},
-                                    "form": {},
-                                    "headers": {
-                                        "Accept": "application/json",
-                                        "Content-Length": "0",
-                                        "Host": "httpbin.org"
-                                    },
-                                    "json": null,
-                                    "url": "https://httpbin.org/post"
-                                }
-                            }
-                        },
                         "description": "Successful response"
                     }
                 },
@@ -136,14 +78,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "content": {
-                            "application/json": {
-                                "example": {
-                                    "message": "This is a custom response with status code {statusCode}"
-                                }
-                            }
-                        },
-                        "description": "Successful response with the specified status code"
+                        "description": "Successful response"
                     }
                 },
                 "summary": "Return a response with the specified status code"
@@ -154,11 +89,6 @@
                 "operationId": "uuidGET",
                 "responses": {
                     "200": {
-                        "content": {
-                            "text/plain": {
-                                "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-                            }
-                        },
                         "description": "Successful response"
                     }
                 },
@@ -166,21 +96,16 @@
             }
         }
     },
-    "security": [
-        {
-            "apiKey": []
-        }
-    ],
     "servers": [
         {
-            "url": "http://localhost:8181/api-with-auth-token"
+            "url": "http://localhost:8181/api-validate-request"
         }
     ],
     "x-tyk-api-gateway": {
         "info": {
-            "dbId": "650c2dcf86341f0f820173e3",
-            "id": "b45a8f243a6a468566b0d0ff34747c0c",
-            "name": "httpbin API",
+            "dbId": "650c2cb686341f0f820173e1",
+            "id": "2f506d14ad5c40ae6a73d172ae3224f5",
+            "name": "API with Validate Request",
             "orgId": "646490d486341f29c665c45c",
             "state": {
                 "active": true
@@ -196,6 +121,10 @@
                 "delayGET": {
                     "allow": {
                         "enabled": true
+                    },
+                    "validateRequest": {
+                        "enabled": true,
+                        "errorResponseCode": 422
                     }
                 },
                 "getGET": {
@@ -211,6 +140,10 @@
                 "status/{statusCode}GET": {
                     "allow": {
                         "enabled": true
+                    },
+                    "validateRequest": {
+                        "enabled": true,
+                        "errorResponseCode": 422
                     }
                 },
                 "uuidGET": {
@@ -221,17 +154,9 @@
             }
         },
         "server": {
-            "authentication": {
-                "enabled": true,
-                "securitySchemes": {
-                    "apiKey": {
-                        "enabled": true
-                    }
-                }
-            },
             "listenPath": {
                 "strip": true,
-                "value": "/api-with-auth-token"
+                "value": "/api-validate-request"
             }
         },
         "upstream": {

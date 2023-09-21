@@ -167,7 +167,7 @@
         "info": {
             "dbId": "650c2d5686341f0f820173e2",
             "id": "42dbc5245e87492a7ccb5a0432d37ec4",
-            "name": "httpbin API",
+            "name": "API with Mock Response",
             "orgId": "646490d486341f29c665c45c",
             "state": {
                 "active": true

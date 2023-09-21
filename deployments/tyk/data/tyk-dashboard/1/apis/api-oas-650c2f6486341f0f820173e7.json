@@ -1,5 +1,13 @@
 {
-    "components": {},
+    "components": {
+        "securitySchemes": {
+            "apiKey": {
+                "in": "header",
+                "name": "api_key",
+                "type": "apiKey"
+            }
+        }
+    },
     "info": {
         "title": "httpbin API",
         "version": "1.0.0"
@@ -11,6 +19,11 @@
                 "operationId": "anythingGET",
                 "responses": {
                     "200": {
+                        "content": {
+                            "text/plain": {
+                                "example": "This is anything."
+                            }
+                        },
                         "description": "Successful response"
                     }
                 },
@@ -33,6 +46,21 @@
                 ],
                 "responses": {
                     "200": {
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "args": {
+                                        "delay": 3
+                                    },
+                                    "headers": {
+                                        "Accept": "application/json",
+                                        "Host": "httpbin.org"
+                                    },
+                                    "origin": "192.168.0.1",
+                                    "url": "https://httpbin.org/delay/3"
+                                }
+                            }
+                        },
                         "description": "Successful response"
                     }
                 },
@@ -44,6 +72,19 @@
                 "operationId": "getGET",
                 "responses": {
                     "200": {
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "args": {},
+                                    "headers": {
+                                        "Accept": "application/json",
+                                        "Host": "httpbin.org"
+                                    },
+                                    "origin": "192.168.0.1",
+                                    "url": "https://httpbin.org/get"
+                                }
+                            }
+                        },
                         "description": "Successful response"
                     }
                 },
@@ -55,6 +96,23 @@
                 "operationId": "postPOST",
                 "responses": {
                     "200": {
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "args": {},
+                                    "data": {},
+                                    "files": {},
+                                    "form": {},
+                                    "headers": {
+                                        "Accept": "application/json",
+                                        "Content-Length": "0",
+                                        "Host": "httpbin.org"
+                                    },
+                                    "json": null,
+                                    "url": "https://httpbin.org/post"
+                                }
+                            }
+                        },
                         "description": "Successful response"
                     }
                 },
@@ -78,7 +136,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful response"
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "This is a custom response with status code {statusCode}"
+                                }
+                            }
+                        },
+                        "description": "Successful response with the specified status code"
                     }
                 },
                 "summary": "Return a response with the specified status code"
@@ -89,6 +154,11 @@
                 "operationId": "uuidGET",
                 "responses": {
                     "200": {
+                        "content": {
+                            "text/plain": {
+                                "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                            }
+                        },
                         "description": "Successful response"
                     }
                 },
@@ -96,16 +166,21 @@
             }
         }
     },
+    "security": [
+        {
+            "apiKey": []
+        }
+    ],
     "servers": [
         {
-            "url": "http://localhost:8181/api-with-cache"
+            "url": "http://localhost:8181/api-with-response-body"
         }
     ],
     "x-tyk-api-gateway": {
         "info": {
-            "dbId": "650c2c5286341f0f820173e0",
-            "id": "274fefb9a9a2468658c4c0895db82fb7",
-            "name": "httpbin API",
+            "dbId": "650c2f6486341f0f820173e7",
+            "id": "89f1315059bc45594e731ec3b18c8cc8",
+            "name": "API with Response Body",
             "orgId": "646490d486341f29c665c45c",
             "state": {
                 "active": true
@@ -116,6 +191,11 @@
                 "anythingGET": {
                     "allow": {
                         "enabled": true
+                    },
+                    "transformResponseBody": {
+                        "body": "ewogICAgImhvc3QiOiB7eyAuaGVhZGVycy5Ib3N0IH19Cn0=",
+                        "enabled": true,
+                        "format": "json"
                     }
                 },
                 "delayGET": {
@@ -148,7 +228,7 @@
         "server": {
             "listenPath": {
                 "strip": true,
-                "value": "/api-with-cache"
+                "value": "/api-with-response-body"
             }
         },
         "upstream": {

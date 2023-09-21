@@ -173,14 +173,14 @@
     ],
     "servers": [
         {
-            "url": "http://localhost:8181/api-with-cors"
+            "url": "http://localhost:8181/api-with-multi-middleware"
         }
     ],
     "x-tyk-api-gateway": {
         "info": {
-            "dbId": "650c2f1786341f0f820173e6",
-            "id": "42bfdc1097144ef6413f582ca8f94f52",
-            "name": "httpbin API",
+            "dbId": "650c2e1c86341f0f820173e4",
+            "id": "dcb1ae9a2d5a47cb426526f06eebafcd",
+            "name": "API with multiple middleware",
             "orgId": "646490d486341f29c665c45c",
             "state": {
                 "active": true
@@ -188,31 +188,117 @@
         },
         "middleware": {
             "global": {
-                "cors": {
-                    "allowedHeaders": [
-                        "Accept",
-                        "Content-Type",
-                        "Origin",
-                        "X-Requested-With",
-                        "Authorization"
-                    ],
-                    "allowedMethods": [
-                        "GET",
-                        "HEAD",
-                        "POST"
-                    ],
-                    "allowedOrigins": [
-                        "*"
-                    ],
+                "cache": {
                     "enabled": true,
-                    "maxAge": 24
+                    "timeout": 60
+                }
+            },
+            "operations": {
+                "anythingGET": {
+                    "allow": {
+                        "enabled": true
+                    },
+                    "mockResponse": {
+                        "enabled": true,
+                        "fromOASExamples": {
+                            "code": 200,
+                            "enabled": true
+                        }
+                    }
+                },
+                "delayGET": {
+                    "allow": {
+                        "enabled": true
+                    },
+                    "mockResponse": {
+                        "enabled": true,
+                        "fromOASExamples": {
+                            "code": 200,
+                            "contentType": "application/json",
+                            "enabled": true
+                        }
+                    },
+                    "validateRequest": {
+                        "enabled": true,
+                        "errorResponseCode": 422
+                    }
+                },
+                "getGET": {
+                    "allow": {
+                        "enabled": true
+                    },
+                    "mockResponse": {
+                        "enabled": true,
+                        "fromOASExamples": {
+                            "code": 200,
+                            "contentType": "application/json",
+                            "enabled": true
+                        }
+                    }
+                },
+                "postPOST": {
+                    "allow": {
+                        "enabled": true
+                    },
+                    "mockResponse": {
+                        "enabled": true,
+                        "fromOASExamples": {
+                            "code": 200,
+                            "contentType": "application/json",
+                            "enabled": true
+                        }
+                    }
+                },
+                "status/{statusCode}GET": {
+                    "allow": {
+                        "enabled": true
+                    },
+                    "mockResponse": {
+                        "enabled": true,
+                        "fromOASExamples": {
+                            "code": 200,
+                            "contentType": "application/json",
+                            "enabled": true
+                        }
+                    },
+                    "validateRequest": {
+                        "enabled": true,
+                        "errorResponseCode": 422
+                    }
+                },
+                "uuidGET": {
+                    "allow": {
+                        "enabled": true
+                    },
+                    "cache": {
+                        "cacheResponseCodes": [
+                            200
+                        ],
+                        "enabled": true,
+                        "timeout": 5
+                    },
+                    "mockResponse": {
+                        "enabled": true,
+                        "fromOASExamples": {
+                            "code": 200,
+                            "enabled": true
+                        }
+                    }
                 }
             }
         },
         "server": {
+            "authentication": {
+                "enabled": true,
+                "securitySchemes": {
+                    "apiKey": {
+                        "enabled": true
+                    }
+                }
+            },
             "listenPath": {
                 "strip": true,
-                "value": "/api-with-cors"
+                "value": "/api-with-multi-middleware"
             }
         },
         "upstream": {
