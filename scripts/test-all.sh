@@ -59,7 +59,7 @@ do
     echo_and_log "Validating deployment's Postman collection ($postman_collection_file_name)"
 
     if [ -z "$(ls -A $postman_collection_path 2>/dev/null)" ]; then
-        echo_and_log -e "  Collection not found. ${BLUE}Skipping${NOCOLOUR} to next deployment."
+        echo_and_log "  Collection not found. ${BLUE}Skipping${NOCOLOUR} to next deployment."
         result_codes[${#result_codes[@]}]=2
         continue
     else
@@ -70,14 +70,14 @@ do
     # The jq command finds "listen" fields which have the value "test", if none are returned then the collection doesn't contain any tests
     postman_collection_tests=$(jq '..|.listen?|select(.=="test")' $postman_collection_path)
     if [[ "$postman_collection_tests" == "" ]]; then
-        echo -e "  Collection does not contain any tests. ${BLUE}Skipping${NOCOLOUR} to next deployment."
+        echo_and_log "  Collection does not contain any tests. ${BLUE}Skipping${NOCOLOUR} to next deployment."
         result_codes[${#result_codes[@]}]=3
         continue
     else
-        echo -e "  Collection contains tests. ${GREEN}Proceeding${NOCOLOUR} with deployment tests."
+        echo_and_log "  Collection contains tests. ${GREEN}Proceeding${NOCOLOUR} with deployment tests."
     fi
 
-    echo "Creating deployment: $deployment_name"
+    echo_and_log "Creating deployment: $deployment_name"
     ./up.sh $deployment_name persist-log
     if [ "$?" != "0" ]; then
         echo_and_log "  ${RED}Failed${NOCOLOUR} to create $deployment_name deployment"
