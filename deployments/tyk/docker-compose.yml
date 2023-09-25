@@ -54,6 +54,7 @@ services:
       - ./deployments/tyk/volumes/databases/GeoLite2-Country.mmdb:/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
     depends_on:
       - tyk-redis
+      - tyk-dashboard
   tyk-gateway-2:
     image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v5.1.0}
     ports:
@@ -73,6 +74,7 @@ services:
     depends_on:
       - tyk-redis
       - tyk-gateway
+      - tyk-dashboard
   tyk-pump:
     image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.8.1}
     ports:

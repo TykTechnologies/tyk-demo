@@ -52,6 +52,9 @@ bootstrap_progress
 
 # Certificates
 
+log_message "Wait for services to be ready before beginning to bootstrap"
+wait_for_liveness
+
 log_message "OpenSSL version used for generating certs: $(docker exec $(get_service_container_id tyk-gateway) sh -c "openssl version")"
 
 log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
@@ -102,6 +105,7 @@ fi
 log_ok
 bootstrap_progress
 
+log_message "Wait for services to be available after restart"
 wait_for_liveness
 
 # Python plugin
@@ -145,10 +149,10 @@ bootstrap_progress
 build_go_plugin "ip-rate-limit.so" "ipratelimit"
 bootstrap_progress
 
-log_message "Liveness Health Check"
-wait_for_liveness
-
 # Dashboard Data
+
+log_message "Wait for services to be ready before importing data"
+wait_for_liveness
 
 # The order these are processed in is important, due to dependencies between objects
 log_message "Processing Dashboard Data"
