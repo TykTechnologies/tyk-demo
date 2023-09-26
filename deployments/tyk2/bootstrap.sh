@@ -23,7 +23,7 @@ dashboard_user_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard
 dashboard_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/1/users/user-1.json)
 dashboard2_user_api_response=$(curl $dashboard2_base_url/admin/users -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @deployments/tyk/data/tyk-dashboard/1/users/user-1.json 2>> bootstrap.log \
+  -d @deployments/tyk/data/tyk-dashboard/1/users/user-1.json 2>> logs/bootstrap.log \
   | jq -r '. | {api_key:.Message, id:.Meta.id}')
 dashboard2_user_id=$(echo $dashboard2_user_api_response | jq -r '.id')
 dashboard2_user_api_credentials=$(echo $dashboard2_user_api_response | jq -r '.api_key')
