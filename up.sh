@@ -38,7 +38,8 @@ mkdir -p logs 1> /dev/null
 check_docker_compose_version
 
 # ensure Docker environment variables are correctly set before creating containers
-# these allow for tracing and instrumentation deployments to be easily used, without having to manually set the environment variables
+# these allow for specialised deployments to be easily used, without having to manually set the environment variables
+# this approach aims to avoid misconfiguration and issues related to that
 if [[ "$*" == *tracing* ]]; then
   set_docker_environment_value "TRACING_ENABLED" "true"
 else
@@ -49,6 +50,12 @@ if [[ "$*" == *instrumentation* ]]; then
   set_docker_environment_value "INSTRUMENTATION_ENABLED" "1"
 else
   set_docker_environment_value "INSTRUMENTATION_ENABLED" "0"
+fi
+
+if [[ "$*" == *otel* ]]; then
+  set_docker_environment_value "OPENTELEMETRY_ENABLED" "true"
+else
+  set_docker_environment_value "OPENTELEMETRY_ENABLED" "false"
 fi
 
 # deployment lists
@@ -116,7 +123,8 @@ fi
 # clear logs, if they are not persisted
 if [ "$persist_log" = false ]; then
   echo -n > logs/bootstrap.log
-  rm logs/container-*.log # there can be multiple container logs
+  rm logs/container-*.log 1>/dev/null 2>&1 # there can be multiple container logs
+  # test.log file is not cleared, as it is responsibilty of the test scripts
 fi
 
 # bring the containers up
