@@ -1,10 +1,11 @@
+---
 version: '3.3'
 services:
   tyk-slo-pump:
     image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.8.1}
     ports:
-    - 8091:8083
-    - 8092:8092
+      - 8091:8083
+      - 8092:8092
     networks:
       - tyk
     volumes:
@@ -13,10 +14,10 @@ services:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_LOGLEVEL=${PUMP_LOGLEVEL:-info}
     env_file:
-    - .env
+      - .env
     depends_on:
       - tyk-redis
-  
+
   prometheus:
     image: prom/prometheus
     volumes:
@@ -49,7 +50,7 @@ services:
       - grafana-data:/var/lib/grafana
     networks:
       - tyk
-      
+
 volumes:
   grafana-data:
   prometheus-data:

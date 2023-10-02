@@ -1,9 +1,10 @@
+---
 version: '3.3'
 services:
   dd-agent:
     image: gcr.io/datadoghq/agent:latest
     networks:
-    - tyk
+      - tyk
     ports:
       - 8126:8126/udp
     volumes:

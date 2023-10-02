@@ -1,3 +1,4 @@
+---
 version: '3.9'
 services:
   tyk-postgres:
@@ -5,4 +6,4 @@ services:
     environment:
       - POSTGRES_PASSWORD=qtpNQY8UKPH3YrDk
     networks:
-    - tyk
+      - tyk
