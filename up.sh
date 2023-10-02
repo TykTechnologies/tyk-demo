@@ -123,7 +123,8 @@ fi
 # clear logs, if they are not persisted
 if [ "$persist_log" = false ]; then
   echo -n > logs/bootstrap.log
-  rm logs/container-*.log # there can be multiple container logs
+  rm logs/container-*.log 1>/dev/null # there can be multiple container logs
+  # test.log file is not cleared, as it is responsibilty of the test scripts
 fi
 
 # bring the containers up
