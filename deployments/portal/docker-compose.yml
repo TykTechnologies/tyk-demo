@@ -2,7 +2,7 @@
 version: '3.3'
 services:
   tyk-portal:
-    image: tykio/portal:v1.2.0
+    image: tykio/portal:v1.7.0
     networks:
       - tyk
     env_file:
