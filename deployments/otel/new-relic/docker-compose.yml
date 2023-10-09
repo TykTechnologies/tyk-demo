@@ -6,12 +6,11 @@ services:
     volumes:
       - ./deployments/otel/new-relic/volumes/otel-collector.yml:/etc/otel-collector.yml
     command: [ "--config=/etc/otel-collector.yml" ]
+    environment:
+      - NEW_RELIC_API_KEY
     ports:
       - "13133:13133" # health_check extension
     networks:
       - tyk
-
-
-
 networks:
   tyk:

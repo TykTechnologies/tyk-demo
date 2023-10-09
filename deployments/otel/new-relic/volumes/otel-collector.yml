@@ -11,7 +11,7 @@ exporters:
   otlphttp:
     endpoint: "https://otlp.nr-data.net"
     headers:
-      api-Key: <NEW_RELIC_API_KEY>
+      api-Key: ${NEW_RELIC_API_KEY}
 extensions:
   health_check:
   pprof:

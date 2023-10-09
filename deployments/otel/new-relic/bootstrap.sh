@@ -1,6 +1,11 @@
 #!/bin/bash
-
 source scripts/common.sh
+
+if ! grep -q "NEW_RELIC_API_KEY=" .env; then
+  echo "ERROR: New Relic API Key missing from Docker environment file. Add your API Key to the NEW_RELIC_API_KEY variable in the .env file."
+  exit 1
+fi
+
 deployment="Open Telemetry + New Relic"
 log_start_deployment
 bootstrap_progress
