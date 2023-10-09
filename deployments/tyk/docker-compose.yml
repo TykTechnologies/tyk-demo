@@ -55,11 +55,7 @@ services:
       - tyk-redis
       - tyk-dashboard
   tyk-gateway-2:
-<<<<<<< HEAD
-    image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v4.3.2-rc4}
-=======
     image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v5.1.0}
->>>>>>> 2ef48a2ddf58b0d429e3208064d4c6cd215d8221
     ports:
       - 8081:8080
     networks:
@@ -79,11 +75,7 @@ services:
       - tyk-gateway
       - tyk-dashboard
   tyk-pump:
-<<<<<<< HEAD
-    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.7.0}
-=======
     image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.8.1}
->>>>>>> 2ef48a2ddf58b0d429e3208064d4c6cd215d8221
     ports:
       - 8083:8083
     networks:
