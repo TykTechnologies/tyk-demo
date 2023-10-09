@@ -30,14 +30,27 @@ http://localhost:8090/topics
 
 Click on the owlshop-customers and on the + symbol to expand the items from the values.
 
-<img width="963" alt="Redpanda console items" src="./redpanda_console_items.png">
+<img width="963" alt="Tyk Dashboard Playground" src="./volumes/redpanda/console/redpanda_console_items.png">
 
 
 2. Check out the dashboard in Tyk
 
 Go to [Tyk Dashboard](http://localhost:3000/) in your browser, open the API section and access to the Kafka OWL Shop Playground
 
-<img width="963" alt="Tyk Dashboard Playground" src="./volumes/redpanda/console/redpanda_console_items.png">
+On the play ground add the following subcription configuration to start retreiving values:
+
+```
+subscription Customers {
+    owlShopCustomers {
+        customerType
+        email
+        firstName
+        gender
+        id
+        lastName
+    }
+}
+```
 
 Click the play button and see the data coming in:
 ![Tyk UDG Playground](./volumes/dashboard/tyk_dashboard_udg_kafka.png)
