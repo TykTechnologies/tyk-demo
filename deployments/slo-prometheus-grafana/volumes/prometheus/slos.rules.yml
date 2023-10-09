@@ -1,3 +1,4 @@
+---
 # This file based on the work from
 # https://landing.google.com/sre/workbook/chapters/alerting-on-slos/
 
@@ -15,7 +16,6 @@ groups:
 
   - name: slo_metrics
     rules:
-
       - record: job:slo_errors_per_request:ratio_rate10m
         expr: sum by (job,api_name) (rate(task:http_response_error_count[10m])) / sum by (job,api_name) (rate(task:http_response_total_count[10m]))
 

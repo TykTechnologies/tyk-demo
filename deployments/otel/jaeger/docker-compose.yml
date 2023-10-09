@@ -1,3 +1,4 @@
+---
 version: "2"
 services:
   # Jaeger
@@ -20,8 +21,6 @@ services:
       - jaeger-all-in-one
     networks:
       - tyk
-
-
 
 networks:
   tyk:

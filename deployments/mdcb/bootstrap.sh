@@ -34,12 +34,12 @@ bootstrap_progress
 
 # set up MDCB user in Dashboard
 log_message "Creating Dashboard MDCB user, to obtain Dashboard API credentials"
-dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret 2>> bootstrap.log)
+dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret 2>> logs/bootstrap.log)
 dashboard_mdcb_user_email=$(jq -r '.email_address' deployments/mdcb/data/tyk-dashboard/dashboard-mdcb-user.json)
 dashboard_mdcb_user_password=$(jq -r '.password' deployments/mdcb/data/tyk-dashboard/dashboard-mdcb-user.json)
 dashboard_mdcb_user_api_response=$(curl $dashboard_base_url/admin/users -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d @deployments/mdcb/data/tyk-dashboard/dashboard-mdcb-user.json 2>> bootstrap.log \
+  -d @deployments/mdcb/data/tyk-dashboard/dashboard-mdcb-user.json 2>> logs/bootstrap.log \
   | jq -r '. | {api_key:.Message, id:.Meta.id}')
 dashboard_mdcb_user_id=$(echo $dashboard_mdcb_user_api_response | jq -r '.id')
 dashboard_mdcb_user_api_credentials=$(echo $dashboard_mdcb_user_api_response | jq -r '.api_key')

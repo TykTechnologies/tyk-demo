@@ -47,7 +47,7 @@ log_ok
 bootstrap_progress
 
 log_message "Regenerating Gitea hooks"
-$(generate_docker_compose_command) exec -T -u git gitea gitea admin regenerate hooks 1>>/dev/null 2>>bootstrap.log
+$(generate_docker_compose_command) exec -T -u git gitea gitea admin regenerate hooks 1>>/dev/null 2>>logs/bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Failed to regenerate Gitea hooks"
   exit 1
@@ -77,7 +77,7 @@ bootstrap_progress
 
 log_message "Cloning repo from Gitea to repo path"
 # clone repo
-git clone -q http://localhost:13000/gitea-user/tyk-data.git $gitea_tyk_data_repo_path 1>/dev/null 2>>bootstrap.log
+git clone -q http://localhost:13000/gitea-user/tyk-data.git $gitea_tyk_data_repo_path 1>/dev/null 2>>logs/bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Failed to clone repo from Gitea to repo path $gitea_tyk_data_repo_path"
   exit 1
@@ -90,7 +90,7 @@ log_message "Add, commit and push Jenkinsfile to repo"
 cp ./deployments/cicd/data/jenkins/Jenkinsfile $gitea_tyk_data_repo_path
 git -C $gitea_tyk_data_repo_path add . 1>/dev/null 2>&1
 git -C $gitea_tyk_data_repo_path commit -m "Adding Jenkinsfile" 1>/dev/null 2>&1
-git -C $gitea_tyk_data_repo_path push "http://$gitea_username:$gitea_password@localhost:13000/gitea-user/tyk-data.git/" 1>/dev/null 2>>bootstrap.log
+git -C $gitea_tyk_data_repo_path push "http://$gitea_username:$gitea_password@localhost:13000/gitea-user/tyk-data.git/" 1>/dev/null 2>>logs/bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Failed git operations"
   exit 1
@@ -106,7 +106,7 @@ else
   attempt_count=0
   until ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1>/dev/null 2>&1; do
     attempt_count=$((attempt_count+1))
-    $(generate_docker_compose_command) exec -T jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins/plugins.txt --latest false --verbose 1>>bootstrap.log 2>&1
+    $(generate_docker_compose_command) exec -T jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins/plugins.txt --latest false --verbose 1>>logs/bootstrap.log 2>&1
     if [ "$?" != "0" ]; then
       if [ "$attempt_count" = "5" ]; then
         log_message "  Maximum retry count reached. Aborting."
@@ -150,7 +150,7 @@ log_message "Checking Tyk Environment 2 Dashboard API is accessible"
 dashboard2_user_api_credentials=$(cat .context-data/dashboard2-user-api-credentials)
 result=""
 while [ "$result" != "200" ]; do
-  result=$(curl $dashboard2_base_url/api/apis -s -o /dev/null -w "%{http_code}" -H "authorization: $dashboard2_user_api_credentials" 2>> bootstrap.log)
+  result=$(curl $dashboard2_base_url/api/apis -s -o /dev/null -w "%{http_code}" -H "authorization: $dashboard2_user_api_credentials" 2>> logs/bootstrap.log)
   if [ "$result" == "401" ]; then
     log_message "  ERROR: Unable to make API calls to Tyk Environment 2 Dashboard."
     log_message "         CI/CD feature will not work as intended."
@@ -186,7 +186,7 @@ while [ "$jenkins_response" != "0" ]; do
 done
 
 log_message "Importing 'global' credentials into Jenkins, for authenticating with Tyk Dashboard during pipeline script."
-jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket import-credentials-as-xml system::system::jenkins < /tmp/bootstrap-import/credentials-global.xml\"; echo \$?" 2>>bootstrap.log)
+jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket import-credentials-as-xml system::system::jenkins < /tmp/bootstrap-import/credentials-global.xml\"; echo \$?" 2>>logs/bootstrap.log)
 if [ "$jenkins_response" != "0" ]; then
   echo "ERROR: Failed to import Jenkins credentials"
   exit 1
@@ -195,7 +195,7 @@ log_ok
 bootstrap_progress
 
 log_message "Creating 'APIs and Policies' job in Jenkins, to execute deployment scripts when source code changes are detected."
-jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'apis-and-policies' < /tmp/bootstrap-import/job-apis-and-policies.xml\"; echo \$?" 2>>bootstrap.log)
+jenkins_response=$(eval "$(generate_docker_compose_command) exec -T jenkins bash -c \"java -jar /tmp/bootstrap-import/jenkins-cli.jar -s http://localhost:8080/ -webSocket create-job 'apis-and-policies' < /tmp/bootstrap-import/job-apis-and-policies.xml\"; echo \$?" 2>>logs/bootstrap.log)
 if [ "$jenkins_response" != "0" ]; then
   echo "ERROR: Failed to create Jenkins job"
   exit 1

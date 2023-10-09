@@ -51,7 +51,7 @@ identity_broker_profile_tyk_dashboard_data=$(cat deployments/sso/data/tyk-identi
   sed 's/DASHBOARD_USER_GROUP_ADMIN/'"$user_group_admin_id"'/')
 log_http_result "$(curl $identity_broker_base_url/api/profiles/tyk-dashboard -s -w "%{http_code}" -o /dev/null \
   -H "Authorization: $identity_broker_api_credentials" \
-  -d "$(echo $identity_broker_profile_tyk_dashboard_data)" 2>> bootstrap.log)"
+  -d "$(echo $identity_broker_profile_tyk_dashboard_data)" 2>> logs/bootstrap.log)"
 bootstrap_progress
 
 log_message "Creating profile for LDAP / Token"
@@ -61,7 +61,7 @@ identity_broker_profile_ldap_token_data=$(cat deployments/sso/data/tyk-identity-
   sed 's/DASHBOARD_USER_API_CREDENTIALS/'"$dashboard_user_api_credentials"'/')
 log_http_result "$(curl $identity_broker_base_url/api/profiles/ldap-token -s -w "%{http_code}" -o /dev/null \
   -H "Authorization: $identity_broker_api_credentials" \
-  -d "$(echo $identity_broker_profile_ldap_token_data)" 2>> bootstrap.log)"
+  -d "$(echo $identity_broker_profile_ldap_token_data)" 2>> logs/bootstrap.log)"
 bootstrap_progress
 
 log_end_deployment

@@ -1,3 +1,4 @@
+---
 version: '3.3'
 services:
   tyk-splunk:
@@ -10,7 +11,7 @@ services:
       - SPLUNK_START_ARGS=--accept-license
       - SPLUNK_PASSWORD=mypassword
     networks:
-     - tyk
+      - tyk
     volumes:
       - splunk-data:/opt/splunk/var
       - splunk-data:/opt/splunk/etc

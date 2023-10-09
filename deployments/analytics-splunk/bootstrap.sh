@@ -15,7 +15,7 @@ log_message "Adding http event collector"
 log_http_result "$(curl -k $splunk_base_mgmt_url/servicesNS/admin/splunk_httpinput/data/inputs/http -s -o .context-data/splunk-http-collector -w "%{http_code}" \
   -u admin:mypassword \
   -d name=tyk \
-  -d output_mode=json 2>> bootstrap.log)"
+  -d output_mode=json 2>> logs/bootstrap.log)"
 bootstrap_progress
 
 # set Splunk token and restart the Splunk Pump container
@@ -54,7 +54,7 @@ bootstrap_progress
 
 log_message "Sending a test request to provide Splunk with data"
 # since request sent in base bootstrap process will not have been picked up by elasticsearch-enabled pump
-log_http_result "$(curl -s localhost:8080/basic-open-api/get -o /dev/null -w "%{http_code}" 2>> bootstrap.log)"
+log_http_result "$(curl -s localhost:8080/basic-open-api/get -o /dev/null -w "%{http_code}" 2>> logs/bootstrap.log)"
 bootstrap_progress
 
 log_end_deployment

@@ -2,7 +2,7 @@
 
 source scripts/common.sh
 
-# persistence of bootstrap.log file is disabled by default, meaning the file is recreated between each bootstrap to prevent it from growing too large
+# persistence of log files is disabled by default, meaning the files are recreated between each bootstrap to prevent them from growing too large
 # to enable persistence, use argument "persist-log" when running this script
 persist_log=false
 
@@ -31,11 +31,15 @@ mkdir -p .context-data 1> /dev/null
 # make the .bootstrap directory
 mkdir -p .bootstrap 1> /dev/null
 
+# make the logs directory
+mkdir -p logs 1> /dev/null
+
 # check if docker compose version is v1.x
 check_docker_compose_version
 
 # ensure Docker environment variables are correctly set before creating containers
-# these allow for tracing and instrumentation deployments to be easily used, without having to manually set the environment variables
+# these allow for specialised deployments to be easily used, without having to manually set the environment variables
+# this approach aims to avoid misconfiguration and issues related to that
 if [[ "$*" == *tracing* ]]; then
   set_docker_environment_value "TRACING_ENABLED" "true"
 else
@@ -46,6 +50,12 @@ if [[ "$*" == *instrumentation* ]]; then
   set_docker_environment_value "INSTRUMENTATION_ENABLED" "1"
 else
   set_docker_environment_value "INSTRUMENTATION_ENABLED" "0"
+fi
+
+if [[ "$*" == *otel* ]]; then
+  set_docker_environment_value "OPENTELEMETRY_ENABLED" "true"
+else
+  set_docker_environment_value "OPENTELEMETRY_ENABLED" "false"
 fi
 
 # deployment lists
@@ -101,7 +111,7 @@ if (( ${#commands_to_process[@]} != 0 )); then
   for command in "$commands_to_process"; do    
     case $command in
       "persist-log")
-        echo "  Persisting bootstrap log"
+        echo "  Logs will be persisted"
         persist_log=true;;
       *) echo "Command \"$command\" is unknown, ignoring.";; 
     esac
@@ -110,9 +120,11 @@ else
   echo "  None"
 fi
 
-# clear log, if it is not persisted
+# clear logs, if they are not persisted
 if [ "$persist_log" = false ]; then
-  echo -n > bootstrap.log
+  echo -n > logs/bootstrap.log
+  rm logs/container-*.log 1>/dev/null 2>&1 # there can be multiple container logs
+  # test.log file is not cleared, as it is responsibilty of the test scripts
 fi
 
 # bring the containers up
@@ -128,7 +140,9 @@ fi
 for deployment in "${deployments_to_create[@]}"; do
   eval "deployments/$deployment/bootstrap.sh"
   if [ "$?" != 0 ]; then
-    echo "Error occurred during bootstrap of $deployment, when running deployments/$deployment/bootstrap.sh. Check bootstrap.log for details."
+    capture_container_logs $deployment
+    echo "Error occurred during bootstrap of $deployment, when running deployments/$deployment/bootstrap.sh"
+    echo "Log files can be found in the the logs directory"
     exit 1
   fi
 done

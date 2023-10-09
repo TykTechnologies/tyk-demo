@@ -1,11 +1,12 @@
+---
 global:
-  scrape_interval:     15s
+  scrape_interval: 15s
   evaluation_interval: 15s
 
 rule_files:
- - "slos.rules.yml"
+  - "slos.rules.yml"
 
 scrape_configs:
   - job_name: tyk
     static_configs:
-      - targets: ['host.docker.internal:8092']
+      - targets: [ 'host.docker.internal:8092' ]
