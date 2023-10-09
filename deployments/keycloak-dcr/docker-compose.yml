@@ -1,3 +1,4 @@
+---
 version: '3.3'
 services:
   keycloak-db:
@@ -13,7 +14,7 @@ services:
     volumes:
       - keycloak-data:/var/lib/postresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "keycloak"]
+      test: [ "CMD", "pg_isready", "-U", "keycloak" ]
       interval: 30s
       timeout: 30s
       retries: 3
@@ -25,7 +26,7 @@ services:
     image: jboss/keycloak:11.0.2
     depends_on:
       - keycloak-db
-    command: ["-Djboss.http.port=8180"]
+    command: [ "-Djboss.http.port=8180" ]
     networks:
       - tyk
     ports:

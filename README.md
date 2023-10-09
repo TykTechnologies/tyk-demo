@@ -52,6 +52,26 @@ The deployment directories (`deployments/*`) contain the various deployments whi
 
 All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.md` files specific to the deployment. They may also contain directories called `data` or `volumes`, which hold the data necessary during bootstrapping or providing as mapped volumes into the container.
 
+### Feature Deployments
+* [Analytics to Datadog](deployments/analytics-datadog/README.md)
+* [Analytics to Kibana](deployments/analytics-kibana/README.md)
+* [Analytics to Splunk](deployments/analytics-splunk/README.md)
+* [Bench test suite](deployments/bench/README.md)
+* [CI/CD with Jenkins](deployments/cicd/README.md)
+* [Federation](deployments/federation/README.md)
+* [Instrumentation](deployments/instrumentation/README.md)
+* [Keycloak](deployments/keycloak-dcr/README.md)
+* [Mail server](deployments/mailserver/README.md)
+* [MDCB](deployments/mdcb/README.md)
+* [MQTT](deployments/mqtt/README.md)
+* [OpenTelemetry with Jaeger](deployments/otel/README.md)
+* [Portal](deployments/portal/README.md)
+* [SLIs and SLOs with Prometheus and Grafana](deployments/slo-prometheus-grafana/README.md)
+* [SSO](deployments/sso/README.md)
+* [WAF](deployments/waf/README.md)
+* [Zipkin](deployments/tracing/README.md)
+
+
 ## Environment variables
 
 The `docker-compose.yml` files in this repo use Docker environment variables to set OS environment variables for the Dashboard, Gateway and Pump containers. The allows aspects of the Tyk and Docker configration to be overridden without having to make changes to the source configuration files.
@@ -173,7 +193,7 @@ Multiple features can be deployed at the same time by providing multiple feature
 
 ### Bootstrap logging
 
-The bootstrap scripts provide feedback on progress in the `bootstrap.log` file.
+The bootstrap scripts provide feedback on progress in the `logs/bootstrap.log` file.
 
 ## Step 5: Log into the Dashboard
 
@@ -275,7 +295,7 @@ One possible reason is that you are using Brew's base64 binary, since Brew's ver
 
 ### Bootstrap gets stuck with `Request unsuccessful: wanted '200'...` message
 
-It is normal to see this message in the `bootstrap.log` file. It appears when the bootstrap script is waiting for a service to become available before proceeding to the next step. The number of times the message is repeated depends on the performance of your system, as errors are usually due to waiting for a service to start up. So you may find that this message is repeated many times, but will eventually stop and the bootstrap process moves on.
+It is normal to see this message in the `logs/bootstrap.log` file. It appears when the bootstrap script is waiting for a service to become available before proceeding to the next step. The number of times the message is repeated depends on the performance of your system, as errors are usually due to waiting for a service to start up. So you may find that this message is repeated many times, but will eventually stop and the bootstrap process moves on.
 
 If the message repeats without moving on then the service being tested is experiencing a problem. In this situation you should:
 

@@ -1,3 +1,4 @@
+---
 version: '3.8'
 services:
   tyk-dashboard:
@@ -40,9 +41,7 @@ services:
       - TYK_GW_HTTPSERVEROPTIONS_FLUSHINTERVAL=1
       - TYK_GW_ANALYTICSCONFIG_ENABLEGEOIP=true
       - TYK_GW_ANALYTICSCONFIG_GEOIPDBLOCATION=/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
-      - TYK_GW_OPENTELEMETRY_ENABLED=true
-      - TYK_GW_OPENTELEMETRY_EXPORTER=grpc
-      - TYK_GW_OPENTELEMETRY_ENDPOINT=collector-gateway:4317
+      - TYK_GW_OPENTELEMETRY_ENABLED=${OPENTELEMETRY_ENABLED:-false}
     env_file:
       - .env
     volumes:
@@ -54,6 +53,7 @@ services:
       - ./deployments/tyk/volumes/databases/GeoLite2-Country.mmdb:/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
     depends_on:
       - tyk-redis
+      - tyk-dashboard
   tyk-gateway-2:
 <<<<<<< HEAD
     image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v4.3.2-rc4}
@@ -77,6 +77,7 @@ services:
     depends_on:
       - tyk-redis
       - tyk-gateway
+      - tyk-dashboard
   tyk-pump:
 <<<<<<< HEAD
     image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.7.0}
