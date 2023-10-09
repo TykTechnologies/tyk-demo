@@ -1,3 +1,4 @@
+---
 receivers:
   otlp:
     protocols:
@@ -19,9 +20,9 @@ extensions:
   zpages:
     endpoint: :55679
 service:
-  extensions: [pprof, zpages, health_check]
+  extensions: [ pprof, zpages, health_check ]
   pipelines:
     traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlphttp]
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ otlphttp ]
