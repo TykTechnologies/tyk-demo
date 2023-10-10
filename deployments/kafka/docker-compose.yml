@@ -1,5 +1,7 @@
+---
 version: '3.9'
 services:
+  #Redpanda
   redpanda:
     image: vectorized/redpanda:latest
     command:
@@ -12,14 +14,13 @@ services:
       - --pandaproxy-addr 0.0.0.0:8082
       - --advertise-pandaproxy-addr localhost:8082
     ports:
-      - 8091:8081
-      - 8092:8082
-      - 9092:9092
-      - 29092:29092
-
+      - "8091:8081"
+      - "8092:8082"
+      - "9092:9092"
+      - "29092:29092"
     networks:
       - tyk
-
+  #Redpanda console
   console:
     image: docker.redpanda.com/vectorized/console:master-173596f
     restart: on-failure
@@ -44,7 +45,7 @@ services:
       - redpanda
     networks:
       - tyk
-
+  #Redpanada data generator
   connect:
     image: cnfldemos/cp-server-connect-datagen:0.5.0-6.2.0
     hostname: connect
@@ -53,9 +54,8 @@ services:
       - redpanda
     ports:
       - "8093:8083"
-
     networks:
-        - tyk
+      - tyk
     environment:
       CONNECT_BOOTSTRAP_SERVERS: 'redpanda:29092'
       CONNECT_REST_ADVERTISED_HOST_NAME: connect
@@ -72,13 +72,9 @@ services:
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://redpanda:8081
       CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
       CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
-      
-      
-
   # OwlShop is a service that simulates an ecommerce shop that has producers and consumers. It will setup
   # a few Kafka topics, produces to them and also consumes the data again via consumer groups.
   owl-shop:
-    #image: quay.io/cloudhut/owl-shop:v1.2.0
     image: quay.io/cloudhut/owl-shop:latest
     environment:
       - SHOP_KAFKA_BROKERS=redpanda:29092
@@ -88,4 +84,4 @@ services:
     depends_on:
       - redpanda
     networks:
-        - tyk
+      - tyk
