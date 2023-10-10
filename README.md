@@ -131,6 +131,14 @@ sudo apt-get install jq
 
 See the [JQ installation page](https://stedolan.github.io/jq/download/) for other operating systems.
 
+### openssl
+
+The bootstrap script uses `openssl` for generating self-signed certificate for TLS connections. It can be installed as follows:
+
+```
+brew install openssl
+```
+
 ## Step 2: Map Tyk Demo hostnames to localhost IP
 
 Run the `update-hosts.sh` script to add host entries for the Tyk Dashboard and Portal to `/etc/hosts`:
