@@ -18,4 +18,6 @@ log_end_deployment
 
 echo -e "\033[2K
 ▼ OTel
-  ▽ New Relic"
+  ▽ New Relic Dashboard
+                    URL : https://one.newrelic.com
+"
