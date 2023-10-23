@@ -21,7 +21,7 @@ This deployment will create a GraphQL proxy-only API to the chat example app fro
 
 It is then accessible via `ws://tyk-gateway.localhost:8080/subscriptions-chat/`.
 
-As exporting postman collection does not work for WebSocket requests ([feature request](https://github.com/postmanlabs/postman-app-support/issues/11252)), you can find example messages here:
+As it's currently not possible to export a Postman collection that contains WebSocket requests ([feature request](https://github.com/postmanlabs/postman-app-support/issues/11252)), to demonstrate this example you will have create the requests in Postman yourself using the following examples. Remember to use the *WebSocket* request type.
 
 #### graphql-ws
 Set the header `Sec-WebSocket-Protocol` to `graphql-ws`.
