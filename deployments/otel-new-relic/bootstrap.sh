@@ -1,8 +1,8 @@
 #!/bin/bash
 source scripts/common.sh
 
-if ! grep -q "NEW_RELIC_API_KEY=" .env; then
-  echo "ERROR: New Relic API Key missing from Docker environment file. Add your API Key to the NEW_RELIC_API_KEY variable in the .env file."
+if ! grep -q "NEW_RELIC_LICENSE_KEY=" .env; then
+  echo "ERROR: New Relic Licence Key missing from Docker environment file. Add your key to the NEW_RELIC_LICENSE_KEY variable in the .env file."
   exit 1
 fi
 

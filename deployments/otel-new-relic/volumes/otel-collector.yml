@@ -9,10 +9,10 @@ receivers:
 processors:
   batch:
 exporters:
-  otlphttp:
-    endpoint: "https://otlp.nr-data.net"
-    headers:
-      api-Key: ${NEW_RELIC_API_KEY}
+  otlp:
+   endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT}:4317
+   headers:
+     api-key: ${NEW_RELIC_LICENSE_KEY}
 extensions:
   health_check:
   pprof:
@@ -25,4 +25,4 @@ service:
     traces:
       receivers: [ otlp ]
       processors: [ batch ]
-      exporters: [ otlphttp ]
+      exporters: [ otlp ]

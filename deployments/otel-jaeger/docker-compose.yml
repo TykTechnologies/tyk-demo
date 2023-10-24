@@ -13,7 +13,7 @@ services:
   collector-gateway:
     image: otel/opentelemetry-collector:0.81.0
     volumes:
-      - ./deployments/otel/jaeger/volumes/otel-collector.yml:/etc/otel-collector.yml
+      - ./deployments/otel-jaeger/volumes/otel-collector.yml:/etc/otel-collector.yml
     command: [ "--config=/etc/otel-collector.yml" ]
     ports:
       - "13133:13133" # health_check extension

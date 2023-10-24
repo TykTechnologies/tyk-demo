@@ -8,7 +8,7 @@ It has been configured to use in-memory storage, so will not retain data once th
 
 ## Setup
 
-Run the `up.sh` script with the `otel/jaeger` parameter:
+Run the `up.sh` script with the `otel-jaeger` parameter:
 
 ```
 ./up.sh otel/jaeger
