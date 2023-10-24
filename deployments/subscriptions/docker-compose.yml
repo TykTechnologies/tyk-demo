@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  subscriptions-chatapp:
+    build: ./deployments/subscriptions
+    ports:
+      - ${SUBSCRIPTIONS_CHAT_APP_PORT:-8093}:8085
+    networks:
+      - tyk
