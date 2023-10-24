@@ -7,22 +7,28 @@ receivers:
       grpc:
         endpoint: 0.0.0.0:4317
 processors:
-  batch:
+  batch: null
 exporters:
   otlp:
-   endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT}:4317
-   headers:
-     api-key: ${NEW_RELIC_LICENSE_KEY}
+    endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT}:4317
+    headers:
+      api-key: ${NEW_RELIC_LICENSE_KEY}
 extensions:
-  health_check:
+  health_check: null
   pprof:
     endpoint: :1888
   zpages:
     endpoint: :55679
 service:
-  extensions: [ pprof, zpages, health_check ]
+  extensions:
+    - pprof
+    - zpages
+    - health_check
   pipelines:
     traces:
-      receivers: [ otlp ]
-      processors: [ batch ]
-      exporters: [ otlp ]
+      receivers:
+        - otlp
+      processors:
+        - batch
+      exporters:
+        - otlp
