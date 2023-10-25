@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source scripts/common.sh
-deployment="Open Telemetry"
+deployment="Open Telemetry + Jaeger"
 log_start_deployment
 bootstrap_progress
 
