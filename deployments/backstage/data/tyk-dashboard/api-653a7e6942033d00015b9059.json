@@ -273,7 +273,7 @@
             "persist_graphql": []
           },
           "global_headers": {
-            "Authorization": "19dbf943e52b494b54e5c984d1ac5d06"
+            "Authorization": "to_be_replaced"
           },
           "global_headers_remove": [],
           "global_response_headers": {},
