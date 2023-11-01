@@ -10,6 +10,9 @@ kibana_base_url="http://localhost:5601"
 log_message "Waiting for kibana to return desired response"
 wait_for_response "$kibana_base_url/app/kibana" "200"
 
+log_message "Pausing briefly before attempting to apply Kibana configuration, to avoid receiving HTTP 429 (too many requests)"
+sleep 2
+
 log_message "Adding index pattern to Kibana"
 log_http_result "$(curl $kibana_base_url/api/saved_objects/index-pattern/1208b8f0-815b-11ea-b0b2-c9a8a88fbfb2?overwrite=true -s -o /dev/null -w "%{http_code}" \
   -H 'Content-Type: application/json' \
