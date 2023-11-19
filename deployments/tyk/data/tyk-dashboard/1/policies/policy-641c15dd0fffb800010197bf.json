@@ -6,6 +6,31 @@
   "state": "active",
   "access_rights_array": [
     {
+      "api_name": "Rate Limit Path API 1",
+      "api_id": "d371b83b249845a2497ab9a947fd6210",
+      "versions": [
+        "Default"
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "allowed_types": [],
+      "disable_introspection": false,
+      "limit": {
+        "rate": 1,
+        "per": 5,
+        "throttle_interval": -1,
+        "throttle_retry_limit": -1,
+        "max_query_depth": -1,
+        "quota_max": -1,
+        "quota_renews": 0,
+        "quota_remaining": 0,
+        "quota_renewal_rate": -1,
+        "set_by_policy": false
+      },
+      "field_access_rights": [],
+      "allowance_scope": ""
+    },
+    {
       "api_name": "Rate Limit Path API 2",
       "api_id": "c252af6eaf2e43ca5c89465af4f481c1",
       "versions": [
@@ -41,31 +66,6 @@
       "allowed_types": [],
       "disable_introspection": false,
       "limit": null,
-      "field_access_rights": [],
-      "allowance_scope": ""
-    },
-    {
-      "api_name": "Rate Limit Path API 1",
-      "api_id": "d371b83b249845a2497ab9a947fd6210",
-      "versions": [
-        "Default"
-      ],
-      "allowed_urls": [],
-      "restricted_types": [],
-      "allowed_types": [],
-      "disable_introspection": false,
-      "limit": {
-        "rate": 1,
-        "per": 5,
-        "throttle_interval": -1,
-        "throttle_retry_limit": -1,
-        "max_query_depth": -1,
-        "quota_max": -1,
-        "quota_renews": 0,
-        "quota_remaining": 0,
-        "quota_renewal_rate": -1,
-        "set_by_policy": false
-      },
       "field_access_rights": [],
       "allowance_scope": ""
     }

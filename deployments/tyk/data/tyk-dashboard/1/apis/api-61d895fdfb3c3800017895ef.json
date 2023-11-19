@@ -523,11 +523,15 @@
               "default_type_name": "User"
             }
           }
-        ]
+        ],
+        "global_headers": []
       },
       "proxy": {
         "auth_headers": {},
-        "request_headers": {}
+        "request_headers": {},
+        "use_response_extensions": {
+          "on_error_forwarding": false
+        }
       },
       "subgraph": {
         "sdl": ""
@@ -540,7 +544,8 @@
       }
     },
     "analytics_plugin": {},
-    "tags": []
+    "tags": [],
+    "detailed_tracing": false
   },
   "hook_references": [],
   "is_site": false,

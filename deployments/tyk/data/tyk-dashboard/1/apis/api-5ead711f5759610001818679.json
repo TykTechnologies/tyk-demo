@@ -323,11 +323,15 @@
       },
       "engine": {
         "field_configs": [],
-        "data_sources": []
+        "data_sources": [],
+        "global_headers": []
       },
       "proxy": {
         "auth_headers": {},
-        "request_headers": {}
+        "request_headers": {},
+        "use_response_extensions": {
+          "on_error_forwarding": false
+        }
       },
       "subgraph": {
         "sdl": ""
@@ -342,7 +346,8 @@
     "analytics_plugin": {},
     "tags": [
       "tyk-gateway-2"
-    ]
+    ],
+    "detailed_tracing": false
   },
   "hook_references": [],
   "is_site": false,
