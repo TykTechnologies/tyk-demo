@@ -1,16 +1,16 @@
 {
-  "created_at": "2021-11-17T03:07:19Z",
+  "created_at": "2023-11-30T11:06:08Z",
   "api_model": {},
   "api_definition": {
-    "id": "619471e736dbb90001b7aed6",
-    "name": "Cookie Redirect Target 1",
-    "slug": "cookie-redirect-rewrite",
+    "id": "65686ca0f57de80001acf0c6",
+    "name": "External HTTPbin",
+    "slug": "external-httpbin",
     "listen_port": 0,
     "protocol": "",
     "enable_proxy_protocol": false,
-    "api_id": "c42b7e7abf5c4e59709e09b7739df27e",
+    "api_id": "627efb71ebae49df7a853b9769b65fce",
     "org_id": "5e9d9544a1dcd60001d0ed20",
-    "use_keyless": true,
+    "use_keyless": false,
     "use_oauth2": false,
     "external_oauth": {
       "enabled": false,
@@ -209,7 +209,7 @@
     "upstream_certificates": {},
     "pinned_public_keys": {},
     "enable_jwt": false,
-    "use_standard_auth": false,
+    "use_standard_auth": true,
     "use_go_plugin_auth": false,
     "enable_coprocess_auth": false,
     "custom_plugin_auth_enabled": false,
@@ -272,9 +272,7 @@
           "extended_paths": {
             "persist_graphql": []
           },
-          "global_headers": {
-            "redirect-target": "1"
-          },
+          "global_headers": {},
           "global_headers_remove": [],
           "global_response_headers": {},
           "global_response_headers_remove": [],
@@ -306,8 +304,8 @@
     },
     "proxy": {
       "preserve_host_header": false,
-      "listen_path": "/cookie-redirect-rewrite/",
-      "target_url": "http://httpbin/anything/redirect-target-1/",
+      "listen_path": "/external-httpbin/",
+      "target_url": "http://httpbin.org/",
       "disable_strip_slash": true,
       "strip_listen_path": true,
       "enable_load_balancing": false,
@@ -370,7 +368,7 @@
     },
     "session_lifetime": 0,
     "active": true,
-    "internal": true,
+    "internal": false,
     "auth_provider": {
       "name": "",
       "storage_engine": "",
