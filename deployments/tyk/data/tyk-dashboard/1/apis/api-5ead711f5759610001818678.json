@@ -299,7 +299,7 @@
               "api_model": {},
               "event_timeout": 60,
               "header_map": {},
-              "id": "649d3621c1da160001f3f2e1",
+              "id": "65687b7aaedc3d0001953a3d",
               "method": "POST",
               "name": "Webhook Receiver Post",
               "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -354,11 +354,15 @@
       },
       "engine": {
         "field_configs": [],
-        "data_sources": []
+        "data_sources": [],
+        "global_headers": []
       },
       "proxy": {
         "auth_headers": {},
-        "request_headers": {}
+        "request_headers": {},
+        "use_response_extensions": {
+          "on_error_forwarding": false
+        }
       },
       "subgraph": {
         "sdl": ""
@@ -371,7 +375,8 @@
       }
     },
     "analytics_plugin": {},
-    "tags": []
+    "tags": [],
+    "detailed_tracing": false
   },
   "hook_references": [
     {
@@ -379,7 +384,7 @@
       "event_timeout": 60,
       "hook": {
         "api_model": {},
-        "id": "649d3621c1da160001f3f2e1",
+        "id": "65687b7aaedc3d0001953a3d",
         "org_id": "5e9d9544a1dcd60001d0ed20",
         "name": "Webhook Receiver Post",
         "method": "POST",
