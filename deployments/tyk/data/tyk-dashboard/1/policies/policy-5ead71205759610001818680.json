@@ -1,6 +1,6 @@
 {
   "auth_type": "other",
-  "auth_types": null,
+  "auth_types": [],
   "state": "active",
   "access_rights_array": [],
   "graphql_enabled": false,
