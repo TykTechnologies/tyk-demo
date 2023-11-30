@@ -1,0 +1,24 @@
+{
+	"last_check": 0,
+	"allowance": 1000,
+	"rate": 1000,
+	"per": 60,
+	"throttle_interval": -1,
+	"throttle_retry_limit": -1,
+	"expires": 0,
+	"quota_max": -1,
+	"quota_renews": 1587524070,
+	"quota_remaining": -1,
+	"quota_renewal_rate": -1,
+	"access_rights": {
+		"627efb71ebae49df7a853b9769b65fce": {
+			"api_name": "Extenal HTTPbin",
+			"api_id": "627efb71ebae49df7a853b9769b65fce",
+			"versions": ["Default"],
+			"allowed_urls": [],
+			"limit": null,
+			"allowance_scope": ""
+		}
+	},
+	"org_id": "5e9d9544a1dcd60001d0ed20"
+}
