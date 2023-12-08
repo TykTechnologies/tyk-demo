@@ -8,15 +8,14 @@ bootstrap_progress
 
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 dashboard_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
+dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret 2>> logs/bootstrap.log)
 
-log_message "Updating Dashboard API definition to use current Dashboard API key"
-updated_api_data=$(jq --compact-output --raw-output --arg dashboard_api_key "$dashboard_api_key" '.api_definition.version_data.versions.Default.global_headers.Authorization = $dashboard_api_key' deployments/backstage/data/tyk-dashboard/api-653a7e6942033d00015b9059.json)
-log_ok
-
-log_message "Adding updated Dashboard API definition to Tyk"
-log_json_result "$(curl $dashboard_base_url/api/apis -s \
-    -H "Authorization: $dashboard_api_key" \
-    -d "$updated_api_data")"
+log_message "Adding API event webhook to default organisation"
+updated_org_data=$(jq '.event_options += { "api_event": { "webhook": "http://host.docker.internal:7007/api/catalog/tyk/api", "email": "", "redis": false } }' < deployments/tyk/data/tyk-dashboard/1/organisation.json)
+api_response=$(curl $dashboard_base_url/admin/organisations/5e9d9544a1dcd60001d0ed20 --request PUT -s \
+    -H "admin-auth: $dashboard_admin_api_credentials" \
+    -d "$updated_org_data" 2>> logs/bootstrap.log)
+log_json_result "$api_response"
 
 bootstrap_progress
 log_end_deployment
