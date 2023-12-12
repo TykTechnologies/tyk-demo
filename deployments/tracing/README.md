@@ -1,3 +1,8 @@
+WARNING: OpenTracing support in Tyk has been deprecated in favor of OpenTelemetry. This deployment will be removed in a future release. 
+
+OpenTelemetry documentaiton: https://tyk.io/docs/product-stack/tyk-gateway/advanced-configurations/distributed-tracing/open-telemetry/open-telemetry-overview/
+
+
 # Zipkin
 
 Zipkin can demonstrate open tracing. It has a [Dashboard](http://localhost:9411) you can use to view traces.
