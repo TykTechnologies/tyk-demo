@@ -214,32 +214,17 @@ get_licence_payload () {
   echo $decoded_licence_payload
 }
 
-get_days_from_now() {
-  # get timestamp for now, to compare licence expiry against
-  now=$(date '+%s') 
-  # calculate the number of seconds remaining for the licence
-  licence_seconds_remaining=$(expr $1 - $now)
-  # calculate the number of days remaining for the licence (this sets a global variable, allowing the value to be used elsewhere)
-  echo $(expr $licence_seconds_remaining / 86400)
-}
-
 check_licence_expiry () {
+  licence_payload=$(get_licence_payload $1)
   # read licence expiry
-  licence_expiry=$($(get_licence_payload $1) | jq -r '.exp')   
-  
-  # # get timestamp for now, to compare licence expiry against
-  # now=$(date '+%s') 
-  # # calculate the number of seconds remaining for the licence
-  # licence_seconds_remaining=$(expr $licence_expiry - $now)
-  
+  licence_expiry=$(echo $licence_payload | jq -r '.exp')
+  # calculate the number of seconds remaining for the licence
+  licence_seconds_remaining=$(expr $licence_expiry - $(date '+%s'))
   # calculate the number of days remaining for the licence (this sets a global variable, allowing the value to be used elsewhere)
-  licence_days_remaining=$(get_days_from_now $licence_expiry)
+  licence_days_remaining=$(expr $licence_seconds_remaining / 86400)
   
-
-  
-
   # check if licence time remaining (in seconds) is less or equal to 0
-  if [[ "$licence_seconds_remaining" -le "0" ]]; then
+  if [ "$licence_seconds_remaining" -le "0" ]; then
     log_message "  ERROR: Licence $1 has expired"
     return 1; # does not meet requirements
   else
