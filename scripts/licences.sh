@@ -14,6 +14,7 @@ fi
 # check if jq available
 command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: JQ is required, but it's not installed"; exit 1; }
 
+# names of environment variables in the .env file to contain the Tyk licence data 
 licence_names=("DASHBOARD_LICENCE" "MDCB_LICENCE")
 found=false
 
@@ -27,6 +28,7 @@ for name in ${licence_names[@]}; do
     found=true
     payload=$(get_licence_payload $name)
     expiry=$(echo $payload | jq -r '.exp')   
+    # calculate days remaining, as otherwise it is only stored in the hard to read unix time format
     days_remaining=$(get_days_from_now $expiry)
     
     if [ $days_remaining > 0 ]; then
