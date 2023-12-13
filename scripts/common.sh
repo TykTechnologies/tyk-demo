@@ -203,22 +203,39 @@ generate_docker_compose_command () {
   echo "$command_docker_compose"
 }
 
-check_licence_expiry () {
+get_licence_payload () {
   # read licence line from .env file
   licence_line=$(grep "$1=" .env)
   # extract licence JWT
   encoded_licence_jwt=$(echo $licence_line | sed -E 's/^[A-Z_]+=(.+)$/\1/')
   # decode licence payload
   decoded_licence_payload=$(decode_jwt $encoded_licence_jwt)
-  # read licence expiry
-  licence_expiry=$(echo $decoded_licence_payload | jq -r '.exp')   
-  
+
+  echo $decoded_licence_payload
+}
+
+get_days_from_now() {
   # get timestamp for now, to compare licence expiry against
   now=$(date '+%s') 
   # calculate the number of seconds remaining for the licence
-  licence_seconds_remaining=$(expr $licence_expiry - $now)
+  licence_seconds_remaining=$(expr $1 - $now)
   # calculate the number of days remaining for the licence (this sets a global variable, allowing the value to be used elsewhere)
-  licence_days_remaining=$(expr $licence_seconds_remaining / 86400)
+  echo $(expr $licence_seconds_remaining / 86400)
+}
+
+check_licence_expiry () {
+  # read licence expiry
+  licence_expiry=$($(get_licence_payload $1) | jq -r '.exp')   
+  
+  # # get timestamp for now, to compare licence expiry against
+  # now=$(date '+%s') 
+  # # calculate the number of seconds remaining for the licence
+  # licence_seconds_remaining=$(expr $licence_expiry - $now)
+  
+  # calculate the number of days remaining for the licence (this sets a global variable, allowing the value to be used elsewhere)
+  licence_days_remaining=$(get_days_from_now $licence_expiry)
+  
+
   
 
   # check if licence time remaining (in seconds) is less or equal to 0
