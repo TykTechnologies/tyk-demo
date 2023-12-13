@@ -23,21 +23,21 @@ for name in ${licence_names[@]}; do
         continue
     fi
 
-    echo -e "\nLicence name: $name"
+    echo -e "\n$name"
     
     found=true
     payload=$(get_licence_payload $name)
-    expiry=$(echo $payload | jq -r '.exp')   
-    # calculate days remaining, as otherwise it is only stored in the hard to read unix time format
-    days_remaining=$(get_days_from_now $expiry)
+    expiry=$(echo $payload | jq -r '.exp')
+    seconds_remaining=$(expr $expiry - $(date '+%s'))
+    # calculate days remaining, to provide a more understandable format to the user
+    days_remaining=$(expr $seconds_remaining / 86400)
     
-    if [ $days_remaining > 0 ]; then
-        echo "Days remaining: $days_remaining"
+    if [ "$seconds_remaining" -le "0" ]; then
+        echo "WARNING, licence expired"
     else
-        echo "WARNING, LICENCE EXPIRED!"
+        echo "$days_remaining days remaining"
     fi
 
-    echo "Licence data:"
     echo $payload | jq
 done
 
