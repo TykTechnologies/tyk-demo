@@ -32,13 +32,14 @@ for name in ${licence_names[@]}; do
     if [ $days_remaining > 0 ]; then
         echo "Days remaining: $days_remaining"
     else
-        echo "LICENCE EXPIRED!"
+        echo "WARNING, LICENCE EXPIRED!"
     fi
 
     echo "Licence data:"
     echo $payload | jq
 done
 
+# check if no licences found
 if [ "$found" = false ]; then
     echo "ERROR: No licences found"
     echo "Please ensure that the .env file contains an entry for at least one of these variables:"
@@ -47,7 +48,3 @@ if [ "$found" = false ]; then
     done
     exit 1
 fi
-
-# check if no licences found and if not show help message
-
-# licence_expiry=$($(get_licence_payload $1) | jq -r '.exp')   
