@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Displays information about the Tyk Dashboard and MDCB licences defined in the .env file
+# Displays information about the Tyk Dashboard and MDCB (optional) licences defined in the .env file
 
 source scripts/common.sh
 
@@ -19,6 +19,7 @@ licence_names=("DASHBOARD_LICENCE" "MDCB_LICENCE")
 found=false
 
 for name in ${licence_names[@]}; do
+    # if licence is not found, skip to next
     if ! grep -q "$name=" .env; then
         continue
     fi
@@ -29,13 +30,11 @@ for name in ${licence_names[@]}; do
     payload=$(get_licence_payload $name)
     expiry=$(echo $payload | jq -r '.exp')
     seconds_remaining=$(expr $expiry - $(date '+%s'))
-    # calculate days remaining, to provide a more understandable format to the user
-    days_remaining=$(expr $seconds_remaining / 86400)
-    
+
     if [ "$seconds_remaining" -le "0" ]; then
-        echo "WARNING, licence expired"
+        echo "Warning, licence has expired"
     else
-        echo "$days_remaining days remaining"
+        echo "Licence has $(expr $seconds_remaining / 86400) days remaining"
     fi
 
     echo $payload | jq
