@@ -2,19 +2,19 @@
 
 # Displays information about the Tyk Dashboard and MDCB licences defined in the .env file
 
-# This script must be run from the repo root i.e. ./scripts/licence.sh
-
 source scripts/common.sh
 
+# check if .env file found
+if [ ! -f .env ]; then
+    echo "ERROR: Could not find .env file"
+    echo -e "Please ensure that:\n- This script is run from the repository root i.e. ./scripts/licences.sh\n- The .env file exists"
+    exit 1
+fi
 
-# check if .env file found, if not print error and exit 1
-
-# if [ ! -f .env ]; then
-#     echo "Could not find .env file. Please ensure that this script is run from the repository root."
-# fi
+# check if jq available
+command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: JQ is required, but it's not installed"; exit 1; }
 
 licence_names=("DASHBOARD_LICENCE" "MDCB_LICENCE")
-
 found=false
 
 for name in ${licence_names[@]}; do
@@ -38,6 +38,15 @@ for name in ${licence_names[@]}; do
     echo "Licence data:"
     echo $payload | jq
 done
+
+if [ "$found" = false ]; then
+    echo "ERROR: No licences found"
+    echo "Please ensure that the .env file contains an entry for at least one of these variables:"
+    for name in ${licence_names[@]}; do
+        echo "- $name"
+    done
+    exit 1
+fi
 
 # check if no licences found and if not show help message
 
