@@ -33,23 +33,24 @@ for name in ${licence_names[@]}; do
     issued=$(echo $payload | jq -r '.iat')
     if [ "$issued" != "null" ]; then
         # "date -r" command works on OSX, but may not work on some linux variants
-        echo "Issued: $(date -r $issued)"
+        echo "Issue date: $(date -r $issued)"
     fi
 
     # time remaining
     expiry=$(echo $payload | jq -r '.exp')
+    printf "Expiry date: $(date -r $expiry)"
     seconds_remaining=$(expr $expiry - $(date '+%s'))
     if [ "$seconds_remaining" -le "0" ]; then
-        echo "Days remaining: Expired!"
+        printf " (expired)\n"
     else
-        echo "Days remaining: $(expr $seconds_remaining / 86400)"
+        printf " ($(expr $seconds_remaining / 86400) days remaining)\n"
     fi
 
     # maximum number of gateways
     allowed_nodes=$(echo $payload | jq -r '.allowed_nodes')
     if [ "$allowed_nodes" != "null" ]; then
         gateways_allowed=$(awk -F"," '{print NF}' <<< "$allowed_nodes")
-        echo "Maximum gateways allowed: $gateways_allowed"
+        echo "Gateway allowance: $gateways_allowed"
     fi
 
     # full payload
