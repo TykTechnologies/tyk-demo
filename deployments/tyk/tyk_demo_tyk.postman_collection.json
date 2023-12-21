@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "ce7dd0df-d3de-469a-b994-e40c1efea92d",
+		"_postman_id": "02a77c7c-11f8-4447-b52e-2e94deec4215",
 		"name": "Tyk Demo",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6131676"
 	},
 	"item": [
 		{
@@ -3313,7 +3314,7 @@
 										"get"
 									]
 								},
-								"description": "This request shows that `tyk-gateway-2` is not able to proxy requests for the **Basic Protected API**. \n\nA `404 Not Found` response is returned when this API is requested. This is because the API does not have any segmentation tags applied, and `tyk-gateway-2` has the segmentation tag `tyk-gateway-2`, which means that it will only load API Definitions which also have this tag. \n\n**Basic Protected API** is available through `tyk-gateway`, as it does not have segmentation enabled. This is demonstrated in the test."
+								"description": "This request shows that `tyk-gateway-2` is not able to proxy requests for the **Basic Protected API**.\n\nA `404 Not Found` response is returned when this API is requested. This is because the API does not have any segmentation tags applied, and `tyk-gateway-2` has the segmentation tag `tyk-gateway-2`, which means that it will only load API Definitions which also have this tag.\n\n**Basic Protected API** is available through `tyk-gateway`, as it does not have segmentation enabled. This is demonstrated in the test."
 							},
 							"response": []
 						}
@@ -6147,22 +6148,71 @@
 					"response": []
 				},
 				{
+					"name": "Geolocation - pre-request validation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code != 200) {",
+									"    console.warn(\"Unable to get Ngrok data, skipping geolocation tests\")",
+									"    // if we can't get the Ngrok data then we need to skip the geolocation request, and move to the 'safe' post-request placeholder instead",
+									"    postman.setNextRequest(\"Geolocation - post-request placeholder\")",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/ngrok-dashboard-api/tunnels/tyk-gateway",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"ngrok-dashboard-api",
+								"tunnels",
+								"tyk-gateway"
+							]
+						},
+						"description": "This requests checks that ngrok is operational, and if it find a problem it prevents the geolocation tests from running by redirecting the test runner to the next request."
+					},
+					"response": []
+				},
+				{
 					"name": "Geolocation",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.sendRequest(\"http://\" + pm.variables.get(\"ngrok.host\") + \":\" + pm.variables.get(\"ngrok.port\") + \"/api/tunnels/tyk-gateway\", function (err, response) {",
+									"var ngrokApiEndpointUrl = \"http://\" + pm.variables.get(\"tyk-gateway.host\") + \"/ngrok-dashboard-api/tunnels/tyk-gateway\"",
 									"",
-									"    ngrokPublicUrl = response.json().public_url;",
+									"pm.sendRequest(ngrokApiEndpointUrl, function (err, response) {",
+									"    if (err != null) {",
+									"        console.warn(\"Error while getting Ngrok data:\", err)",
+									"        pm.execution.skipRequest()",
+									"    } else {",
+									"        if (response.code != 200) {",
+									"            console.warn(\"Error while getting Ngrok data:\", response.json())",
+									"            pm.execution.skipRequest()",
+									"        } else {",
+									"            ngrokPublicUrl = response.json().public_url;",
 									"",
-									"    if (ngrokPublicUrl == \"\") {",
-									"        throw new Error('Could not get Ngrok public URL.')",
+									"            if (ngrokPublicUrl == \"\") {",
+									"                console.warn('Could not get Ngrok public URL.')",
+									"                pm.execution.skipRequest()",
+									"            } else {            ",
+									"                pm.variables.set(\"ngrok.public-url\", ngrokPublicUrl);",
+									"            }",
+									"        }",
 									"    }",
-									"",
-									"    pm.variables.set(\"ngrok.public-url\", ngrokPublicUrl);",
-									"});"
+									"});",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -6171,9 +6221,15 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
+									"var ngrokPublicUrl = pm.variables.get(\"ngrok.public-url\");",
+									"",
+									"if (ngrokPublicUrl == null || ngrokPublicUrl == \"\") {",
+									"    console.warn(\"Skipping Ngrok tests as no public URL set\")",
+									"} else {",
+									"    pm.test(\"Status code is 200\", function () {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -6192,7 +6248,27 @@
 								"get"
 							]
 						},
-						"description": "This request goes via the public Ngrok URL, which then gets routed through to the API Gateway.\n\nThe Gateway can geolocate this request, as it originates from outside of the local network. You can see the result of this in the *Activity By Location* report in the Tyk Dashboard.\n\nThe Gateway matches the IP address against the Maxmind database to find you location."
+						"description": "**Note**: If Ngrok is not configured, then this request will not run.\n\n---\n\nThis request goes via the public Ngrok URL, which then gets routed through to the API Gateway.\n\nThe Gateway can geolocate this request, as it originates from outside of the local network. You can see the result of this in the _Activity By Location_ report in the Tyk Dashboard.\n\nThe Gateway matches the IP address against the Maxmind database to find you location."
+					},
+					"response": []
+				},
+				{
+					"name": "Geolocation - post-request placeholder",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/basic-open-api/get",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"basic-open-api",
+								"get"
+							]
+						},
+						"description": "This request serves as a placeholder, as the point to which the test runner is redirected to if ngrok data cannot be found."
 					},
 					"response": []
 				}

@@ -149,11 +149,12 @@ services:
       - ./deployments/tyk/volumes/ngrok/ngrok.yml:/etc/ngrok.yml
     ports:
       - 4040:4040
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN-}
 
 volumes:
   tyk-redis-data:
   tyk-mongo-data:
-
 
 networks:
   tyk:

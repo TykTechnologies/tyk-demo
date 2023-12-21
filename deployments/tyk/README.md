@@ -151,13 +151,14 @@ The ngrok deployment contains a dashboard which records all requests which pass 
 
 - [ngrok dashboard](http://localhost:4040)
 
+**Important**: Ngrok requires an auth token. You must provide your own token by creating an Ngrok account via their website. Once you have an auth token (note, "auth token", not "api key", ngrok has both), add it to the Tyk Demo `.env` file as `NGROK_AUTHTOKEN` e.g. `NGROK_AUTHTOKEN=MY-AUTH-TOKEN-123`.
+
 #### Usage
 
 The Ngrok tunnel URL is displayed in the output of the bootstrap script (`./up.sh`). 
 The URL will be something that looks like this: `http://11e3-103-252-202-110.ngrok.io`
 
-APIs can be accessed through the tunnel URL using the same paths as they are accessed through the Gateway URL. 
-For example, using the example tunnel URL provided above, the Basic Open API can be accessed as follows:
+APIs can be accessed through the tunnel URL using the same paths as they are accessed through the Gateway URL. For example, using the example tunnel URL provided above, the Basic Open API can be accessed as follows:
 
 - Gateway URL: http://tyk-gateway.localhost:8080/basic-open-api/get
 - External Tunnel URL: http://11e3-103-252-202-110.ngrok.io/basic-open-api/get
