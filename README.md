@@ -97,6 +97,7 @@ If you are using the MDCB (`mdcb`) deployment, then you need to do the same for 
 | MDCB_USER_API_CREDENTIALS | Sets the credentials used by the Tyk MDCB to authenticate with the Dashboard | Yes, if using the `mdcb` deployment, otherwise no | None - Set automatically by the `bootstrap.sh` script |
 | PMP_SPLUNK_META_COLLECTORTOKEN | Sets the credentials used by the Tyk Pump to authenticate with the Splunk collector | Yes, if using the `analytics-splunk` deployment, otherwise no | None - Set automatically by the `bootstrap.sh` script |
 | NEW_RELIC_API_KEY | Sets the API Key used by the OpenTelemetry collector to send data to New Relic | Yes, if using the `otel/new-relic` deployment, otherwise no | None - **Must** be manually set |
+| NGROK_AUTHTOKEN | Sets the authentication token used by the Ngrok agent | Yes, if use of Ngrok/geolocation is required, otherwise no | None - **Must** be manually set |
 
 There are various other environment variables used, but it's not normally necessary to set them. See the [Tyk environment variables documentation](https://tyk.io/docs/tyk-environment-variables/) for more information. The exception being the variables used for the DataDog Analytics deployment (`analytics-datadog`), which has its own set of variables for configuring the DataDog integration - see the [Setup section of that deployment's readme](https://github.com/TykTechnologies/tyk-demo/blob/master/deployments/analytics-datadog/README.md#setup) for more information.
 
