@@ -203,26 +203,28 @@ generate_docker_compose_command () {
   echo "$command_docker_compose"
 }
 
-check_licence_expiry () {
+get_licence_payload () {
   # read licence line from .env file
   licence_line=$(grep "$1=" .env)
   # extract licence JWT
   encoded_licence_jwt=$(echo $licence_line | sed -E 's/^[A-Z_]+=(.+)$/\1/')
   # decode licence payload
   decoded_licence_payload=$(decode_jwt $encoded_licence_jwt)
+
+  echo $decoded_licence_payload
+}
+
+check_licence_expiry () {
+  licence_payload=$(get_licence_payload $1)
   # read licence expiry
-  licence_expiry=$(echo $decoded_licence_payload | jq -r '.exp')   
-  
-  # get timestamp for now, to compare licence expiry against
-  now=$(date '+%s') 
+  licence_expiry=$(echo $licence_payload | jq -r '.exp')
   # calculate the number of seconds remaining for the licence
-  licence_seconds_remaining=$(expr $licence_expiry - $now)
+  licence_seconds_remaining=$(expr $licence_expiry - $(date '+%s'))
   # calculate the number of days remaining for the licence (this sets a global variable, allowing the value to be used elsewhere)
   licence_days_remaining=$(expr $licence_seconds_remaining / 86400)
   
-
   # check if licence time remaining (in seconds) is less or equal to 0
-  if [[ "$licence_seconds_remaining" -le "0" ]]; then
+  if [ "$licence_seconds_remaining" -le "0" ]; then
     log_message "  ERROR: Licence $1 has expired"
     return 1; # does not meet requirements
   else
