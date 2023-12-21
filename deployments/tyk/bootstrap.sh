@@ -121,7 +121,7 @@ bootstrap_progress
 
 log_message "Copying Python bundle to http-server"
 # we don't use a 'docker compose' command here as docker compose version 1 does not support 'cp'
-docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip 2>>logs/bootstrap.log
+docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip 2>> logs/bootstrap.log
 if [ "$?" != 0 ]; then
   echo "Error occurred when copying Python bundle to http-server"
   exit 1
@@ -478,21 +478,34 @@ fi
 log_ok
 bootstrap_progress
 
-log_message "Getting ngrok public URL for Tyk Gateway"
-ngrok_dashboard_url="http://localhost:4040"
-ngrok_ip_api_endpoint="$ngrok_dashboard_url/api/tunnels/tyk-gateway"
-log_message "  Getting data from $ngrok_ip_api_endpoint"
-ngrok_public_url=$(curl --fail --silent --show-error ${ngrok_ip_api_endpoint} | jq ".public_url" --raw-output)
-if [ "$?" != 0 ]; then
-  echo "Error getting ngrok configuration from $ngrok_ip_api_endpoint"
-  exit 1
+# Ngrok
+
+ngrok_available=false
+if ! grep -q "NGROK_AUTHTOKEN=" .env; then
+  log_message "Ngrok auth token is not set, so Ngrok will not be available"
+  log_message "To enable Ngrok, set the NGROK_AUTHTOKEN value in the Tyk Demo .env file"
+else
+  log_message "Getting Ngrok public URL for Tyk Gateway"
+  ngrok_dashboard_url="http://localhost:4040"
+  ngrok_ip_api_endpoint="$ngrok_dashboard_url/api/tunnels/tyk-gateway"
+  log_message "  Getting data from $ngrok_ip_api_endpoint"
+  ngrok_public_url=$(curl -s --show-error ${ngrok_ip_api_endpoint} 2>> logs/bootstrap.log | jq ".public_url" --raw-output)
+  
+  # we want to handle ngrok failure gracefully, such that it doesn't prevent the bootstrap from completing
+  if [ "$?" != 0 ]; then
+    log_message "  ERROR: Unable to get Ngrok configuration from $ngrok_ip_api_endpoint"
+    ngrok_public_url="not configured"
+  else
+    if [ "$ngrok_public_url" = "" ]; then
+      log_message "  ERROR: The Ngrok public URL is empty"
+      ngrok_public_url="not configured"
+    else
+      log_message "  Ngrok public URL: $ngrok_public_url"
+      ngrok_available=true
+      log_ok  
+    fi
+  fi
 fi
-if [ "$ngrok_public_url" = "" ]; then
-  echo "Error: ngrok public URL is empty"
-  exit 1
-fi
-log_message "  Ngrok public URL: $ngrok_public_url"
-log_ok
 
 log_end_deployment
 
@@ -547,7 +560,10 @@ echo -e "\033[2K
   ▽ Gateway 2 ($(get_service_image_tag "tyk-gateway-2"))
                     URL : $gateway2_base_url  
      Gateway API Header : x-tyk-authorization
-        Gateway API Key : $gateway2_api_credentials
+        Gateway API Key : $gateway2_api_credentials"
+if [ "$ngrok_available" = "true" ]; then
+  echo -e "
   ▽ Ngrok
              Public URL : $ngrok_public_url
           Dashboard URL : $ngrok_dashboard_url"
+fi
