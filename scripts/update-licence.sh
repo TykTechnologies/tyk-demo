@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# Use to update your licence key, instead of editing the file directly
+# Usage: run it with the license key as an input
 #
 # Prompt user for the new license key
 #
