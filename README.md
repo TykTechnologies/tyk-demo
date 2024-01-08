@@ -69,7 +69,7 @@ All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.
 * [SLIs and SLOs with Prometheus and Grafana](deployments/slo-prometheus-grafana/README.md)
 * [SSO](deployments/sso/README.md)
 * [WAF](deployments/waf/README.md)
-* [Zipkin](deployments/tracing/README.md)
+* (deprecated) [OpenTracing/Zipkin]
 
 
 ## Environment variables
