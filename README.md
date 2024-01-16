@@ -74,7 +74,7 @@ All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.
 
 ## Environment variables
 
-The `docker-compose.yml` files in this repo use Docker environment variables to set OS environment variables for the Dashboard, Gateway and Pump containers. The allows aspects of the Tyk and Docker configration to be overridden without having to make changes to the source configuration files.
+The `docker-compose.yml` files in this repo use Docker environment variables to set OS environment variables for the Dashboard, Gateway and Pump containers. This allows aspects of the Tyk and Docker configuration to be overridden without having to make changes to the source configuration files.
 
 As per standard Docker convention, the Docker environment variables are stored in a file called `.env`, which is in the repository root directory.
 
@@ -121,13 +121,13 @@ The bootstrap script uses JQ for extracting data from JSON objects, it can be in
 
 Install on OS X using Homebrew:
 
-```
+```bash
 brew install jq
 ```
 
 Install on Debian/Ubuntu using APT:
 
-```
+```bash
 sudo apt-get install jq
 ```
 
@@ -137,7 +137,7 @@ See the [JQ installation page](https://stedolan.github.io/jq/download/) for othe
 
 Run the `update-hosts.sh` script to add host entries for the Tyk Dashboard and Portal to `/etc/hosts`:
 
-```
+```bash
 sudo ./scripts/update-hosts.sh
 ```
 
@@ -150,7 +150,7 @@ The custom hostnames will be used by the Dashboard and Gateway to:
 
 The `tyk/docker-compose.yml` and `tyk2/docker-compose.yml` files use a Docker environment variable to set the dashboard licence. To set this, create a file called `.env` in the root directory of the repo, then set the content of the file as follows, replacing `<YOUR_LICENCE>` with your Dashboard licence:
 
-```
+```env
 DASHBOARD_LICENCE=<YOUR_LICENCE>
 ```
 
@@ -162,7 +162,7 @@ In addition to this, some features require entries in the `.env` file. These are
 
 To bootstrap the system we will run the `up.sh` script, which will run the necessary `docker compose` and `bootstrap` commands to start the containers and bootstrap the system. 
 
-```
+```bash
 ./up.sh
 ```
 
@@ -189,7 +189,7 @@ The feature names are the directory names from the `deployments` directory.
 
 Multiple features can be deployed at the same time by providing multiple feature parameters. For example, to deploy `analytics-kibana` and `instrumentation`:
 
-```
+```bash
 ./up.sh analytics-kibana instrumentation
 ```
 
@@ -205,7 +205,7 @@ When you log into the Dashboard, you will find the imported APIs and Policies ar
 
 ## Step 6 (optional): Import Postman collection
 
-There are Postman collections which compliment the deployments. They contain many example requests which demonstrate Tyk features and functionality in the deployments. If a deployment has a collection it will be in the deployment directory.
+There are Postman collections which complement the deployments. They contain many example requests which demonstrate Tyk features and functionality in the deployments. If a deployment has a collection it will be in the deployment directory.
 
 The collection for the base *Tyk* Deployment is called `tyk_demo.postman_collection.json`. Import it into [Postman](https://postman.com) to start making requests.
 
@@ -216,7 +216,7 @@ You don't need to declare which component to remove, since they have already be
 
 To delete the containers and associated volumes:
 
-```
+```bash
 ./down.sh
 ```
 
@@ -235,7 +235,7 @@ The script automatically determines which deployments to resume by reading the d
 
 To resume deployments, run the `./up.sh` command:
 
-```
+```bash
 ./up.sh
 ```
 
@@ -252,7 +252,7 @@ If you want to rebootstrap the deployments, then run the `./down.sh` script befo
 
 To redeploy an existing deployment, run the `./down.sh` script followed by the `./up.sh` script:
 
-```
+```bash
 ./down.sh && ./up.sh
 ```
 
@@ -260,11 +260,11 @@ This deletes the containers and volumes associated with the existing deployment,
 
 # Appending to an existing deployment
 
-Feature deployments can be added to existing deployment by running the `up.sh` script consecutively. This avoids having to remove the existing deployment with the `down.sh` script.
+Feature deployments can be added to existing deployments by running the `up.sh` script consecutively. This avoids having to remove the existing deployment with the `down.sh` script.
 
 For example, if `./up.sh` has already been run, there will be a standard `tyk` deployment currently deployed. To add the `sso` deployment to the existing deployment, run:
 
-```
+```bash
 ./up.sh sso
 ```
 
@@ -281,27 +281,36 @@ Deployments to create:
 
 # Check running containers, logs, restart
 
-It is difficult to use the usual docker-compose command in this project since we have various files and project directory. To make commands such as `ps` or `restart` easier to run I have created the script `./docker-compose-command.sh`. You can use it in the same way as you would with docker-compose:
-- To check runnng processes: `./docker-compose-command.sh ps`
+It is difficult to use the usual docker-compose command in this project since we have various files and project directories. To make commands such as `ps` or `restart` easier to run I have created the script `./docker-compose-command.sh`. You can use it in the same way as you would with docker-compose:
+- To check running processes: `./docker-compose-command.sh ps`
 - To restart the gateway: `./docker-compose-command.sh restart tyk-gateway`
-- To tail the logs in the redis container: `./docker-compose-command.sh logs -f tyk-redis`
+- To tail the logs in the Redis container: `./docker-compose-command.sh logs -f tyk-redis`
 - To bash into redis container: `./docker-compose-command.sh exec tyk-redis bash`
 
 # Troubleshooting
 
+### Tyk Demo installation hasn't finished with the usual output of hostnames and a password to login into the Dashboard
+The license key might be missing or expired. You can see a message about it in *bootstrap.log*.
+You can use `./scripts/update-licence.s` to quickly update the licence key
+
+```bash
+./scripts/update-licence.sh my-licence-key
+```
+
+
 ### Application error when opening the documentation in the portal
 
-You will also see an error in the field that has the base64 encode of the OAS in the catalogue document.
+You will also see an error in the field that has the base64 encoding of the OAS in the catalogue document.
 Since the value cannot be base64 *decoded* it means that the base64 *encoding* failed during bootstrap.
-One possible reason is that you are using Brew's base64 binary, since Brew's version inserts `\r` to the output rather than just output the base64 encoding as is. You can run `whereis base64` to find out. The expected path should be `/usr/bin/base64`.
+One possible reason is that you are using Brew's base64 binary since Brew's version inserts `\r` to the output rather than just output the base64 encoding as is. You can run `whereis base64` to find out. The expected path should be `/usr/bin/base64`.
 
 ### Bootstrap gets stuck with `Request unsuccessful: wanted '200'...` message
 
 It is normal to see this message in the `logs/bootstrap.log` file. It appears when the bootstrap script is waiting for a service to become available before proceeding to the next step. The number of times the message is repeated depends on the performance of your system, as errors are usually due to waiting for a service to start up. So you may find that this message is repeated many times, but will eventually stop and the bootstrap process moves on.
 
-If the message repeats without moving on then the service being tested is experiencing a problem. In this situation you should:
+If the message repeats without moving on then the service being tested is experiencing a problem. In this situation, you should:
 
 - Check for error messages in the container logs of the service being tested.
-- Ensure Docker has sufficient resources to run the deployment. The standard `tyk` deployment should be ok with just 1GB RAM, but it is recommended to make more RAM available (2GB+) when combining multiple deployments together.
+- Ensure Docker has sufficient resources to run the deployment. The standard `tyk` deployment should be ok with just 1GB RAM, but it is recommended to make more RAM available (2GB+) when combining multiple deployments.
 
 These steps will help you diagnose the source of the problem.
