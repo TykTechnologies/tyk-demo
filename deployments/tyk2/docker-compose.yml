@@ -9,13 +9,13 @@ services:
       - tyk
     volumes:
       - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
-      - ./deployments/tyk/volumes/tyk-dashboard/private-key.pem:/opt/tyk-dashboard/private-key.pem
+      - ./deployments/tyk/volumes/tyk-dashboard/certs:/opt/tyk-dashboard/certs
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Please set DASHBOARD_LICENCE in .env}
       - TYK_DB_MONGOURL=mongodb://tyk2-mongo:27017/tyk_analytics
       - TYK_DB_REDISHOST=tyk2-redis
       - TYK_DB_TYKAPI_HOST=http://tyk2-gateway
-      - TYK_DB_HOSTCONFIG_OVERRIDEHOSTNAME=localhost:8085
+      - TYK_DB_HOSTCONFIG_GATEWAYHOSTNAME=localhost:8085
       - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
     depends_on:
       - tyk2-redis

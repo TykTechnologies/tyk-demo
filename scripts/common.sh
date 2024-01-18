@@ -8,6 +8,24 @@ declare -a tyk_demo_hostnames=("tyk-dashboard.localhost" "tyk-portal.localhost" 
 spinner_chars="/-\|"
 spinner_count=1
 
+# Check that variables that are expected to be provided by sourcing script are avaiable.
+# These variables should be set in the script that sources this file.
+# Note: Use this function by calling it near the start of functions that require the variables listed in the variablesToCheck array.
+function check_variables() {
+  # add more variables to the array as needed
+  variablesToCheck=("dashboard_base_url")
+  errorFound=false
+
+  for var in ${variablesToCheck[@]}; do
+    if [ -z "${!var}" ]; then
+      log_message "  ERROR: variable \"$var\" is not available in scripts/common.sh - this may cause errors. Please ensure that the script sourcing this library sets the value of this variable prior to calling any functions."
+      errorFound=true
+    fi
+  done
+
+  if $errorFound; then exit 1; fi
+}
+
 bootstrap_progress () {
   printf "  Bootstrapping $deployment ${spinner_chars:spinner_count++%${#spinner_chars}:1} \r"
 }
@@ -296,6 +314,8 @@ create_organisation () {
   local organisation_name=$(jq -r '.owner_name' $organisation_data_path)
   local portal_hostname=$(jq -r '.cname' $organisation_data_path)
 
+  check_variables
+
   # create organisation in Tyk Dashboard database
   log_message "  Creating Organisation: $organisation_name"
   local api_response=$(curl $dashboard_base_url/admin/organisations/import -s \
@@ -321,6 +341,8 @@ create_dashboard_user () {
   local data_group="$3"
   local index="$4"
   local dashboard_user_password=$(jq -r '.password' $dashboard_user_data_path)
+  
+  check_variables
   
   # create user in Tyk Dashboard database
   log_message "  Creating Dashboard User: $(jq -r '.email_address' $dashboard_user_data_path)"
@@ -369,6 +391,8 @@ create_user_group () {
   local index="$4"
   local user_group_name=$(jq -r '.name' $user_group_data_path)
 
+  check_variables
+
   # create user group in Tyk Dashboard database
   log_message "  Creating User Group: $user_group_name"
   local api_response=$(curl $dashboard_base_url/api/usergroups -s \
@@ -391,6 +415,8 @@ create_webhook () {
   local api_key="$2"
   local webhook_name=$(jq -r '.name' $webhook_data_path)
 
+  check_variables
+
   # create webhook in Tyk Dashboard database
   log_message "  Creating Webhook: $webhook_name"
   local api_response=$(curl $dashboard_base_url/api/hooks -s \
@@ -406,6 +432,8 @@ create_webhook () {
 initialise_portal () {
   local organisation_id="$1"
   local api_key="$2"
+
+  check_variables
 
   log_message "  Creating default settings"
   local api_response=$(curl $dashboard_base_url/api/portal/configuration -s \
@@ -428,6 +456,8 @@ create_portal_page () {
   local api_key="$2"
   local page_title=$(jq -r '.title' $page_data_path)
 
+  check_variables
+
   log_message "  Creating Page: $page_title"
 
   log_json_result "$(curl $dashboard_base_url/api/portal/pages -s \
@@ -441,8 +471,10 @@ create_portal_developer () {
   local index="$3"
   local developer_email=$(jq -r '.email' $developer_data_path)
   local developer_password=$(jq -r '.password' $developer_data_path)
-  log_message "  Creating Developer: $developer_email"
 
+  check_variables
+
+  log_message "  Creating Developer: $developer_email"
   local api_response=$(curl $dashboard_base_url/api/portal/developers -s \
     -H "Authorization: $api_key" \
     -d @$developer_data_path 2>> logs/bootstrap.log)
@@ -457,8 +489,10 @@ create_portal_developer () {
 create_portal_graphql_documentation () {
   local api_key="$1"
   local documentation_title="$2"
-  log_message "  Creating Documentation: $documentation_title"
+  
+  check_variables
 
+  log_message "  Creating Documentation: $documentation_title"
   local api_response=$(curl $dashboard_base_url/api/portal/documentation -s \
     -H "Authorization: $api_key" \
     -d '{"api_id":"","doc_type":"graphql","documentation":"graphql"}' \
@@ -477,6 +511,9 @@ create_portal_documentation () {
   local documentation_data_path="$1"
   local api_key="$2"
   local documentation_title=$(jq -r '.info.title' $documentation_data_path)
+  
+  check_variables
+
   log_message "  Creating Documentation: $documentation_title"
 
   encoded_documentation=$(cat $documentation_data_path | base64)
@@ -501,6 +538,8 @@ create_portal_catalogue () {
   local api_key="$2"
   local documentation_id="$3"
   local catalogue_name=$(jq -r '.name' $catalogue_data_path)
+
+  check_variables
 
   log_message "  Adding Catalogue Entry: $catalogue_name"
 
@@ -528,6 +567,8 @@ create_api () {
   local api_id=""
   # API data format differs depending on type of API, which we can determine by the file name containing 'oas'
   local api_is_oas=$([[ $api_data_path =~ api-oas-[a-z0-9]+\.json$ ]] && echo true || echo false)
+
+  check_variables
 
   # get the id and name of the API
   if [ "$api_is_oas" == true ]; then
@@ -609,6 +650,8 @@ create_policy () {
   local policy_name=$(jq -r '.name' $policy_data_path)
   local policy_id=$(jq -r '._id' $policy_data_path)
 
+  check_variables
+
   log_message "  Importing Policy: $policy_name"
 
   import_request_payload=$(jq --slurpfile new_policy "$policy_data_path" '.Data += $new_policy' deployments/tyk/data/tyk-dashboard/admin-api-policies-import-template.json)
@@ -650,6 +693,8 @@ create_basic_key () {
   local username="$(echo "$file_name" | cut -d. -f1 | cut -d- -f3)"
   local password="$(jq -r '.basic_auth_data.password' $basic_key_data_path)"
 
+  check_variables
+
   if [[ "$username" == "" ]]; then
     log_message "ERROR: Could not extract username from filename $file_name"
     exit 1
@@ -677,6 +722,8 @@ create_bearer_token () {
   local file_name="$(basename $bearer_token_data_path)"
   # key name is taken from the filename, using the 4th hypenated segment and excluding the extension e.g. "bearer-token-1-mytoken.json" results in "mytoken"
   local key_name="$(echo "$file_name" | cut -d. -f1 | cut -d- -f4)"
+
+  check_variables
 
   if [[ "$key_name" == "" ]]; then
     log_message "ERROR: Could not extract key name from filename $file_name"
@@ -709,6 +756,8 @@ create_oauth_client () {
   local api_id=$(cat $oauth_client_data_path | jq -r '.api_id')
   local client_id=$(cat $oauth_client_data_path | jq -r '.client_id')
   local client_secret=$(cat $oauth_client_data_path | jq -r '.secret')
+
+  check_variables
 
   log_message "  Adding OAuth Client: $client_id"
 
