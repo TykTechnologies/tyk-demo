@@ -8,6 +8,14 @@ declare -a tyk_demo_hostnames=("tyk-dashboard.localhost" "tyk-portal.localhost" 
 spinner_chars="/-\|"
 spinner_count=1
 
+# check that commonly used variables are avaiable
+# these should be set in the script that sources this file
+function check_variables() {
+  if [ "$dashboard_base_url" == "" ]; then
+    log_message "  WARNING: variable \"dashboard_base_url\" is not set - this may cause errors. Please ensure that the script sourcing this library sets the value of this variable prior to calling any functions."
+  fi
+}
+
 bootstrap_progress () {
   printf "  Bootstrapping $deployment ${spinner_chars:spinner_count++%${#spinner_chars}:1} \r"
 }
@@ -528,6 +536,8 @@ create_api () {
   local api_id=""
   # API data format differs depending on type of API, which we can determine by the file name containing 'oas'
   local api_is_oas=$([[ $api_data_path =~ api-oas-[a-z0-9]+\.json$ ]] && echo true || echo false)
+
+  check_variables
 
   # get the id and name of the API
   if [ "$api_is_oas" == true ]; then
