@@ -1,0 +1,70 @@
+{
+	"info": {
+		"_postman_id": "6b1b47e9-b957-4b42-8fd9-2d8968132e27",
+		"name": "Tyk Demo - Tyk 2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6131676"
+	},
+	"item": [
+		{
+			"name": "Basic Test Request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{tyk2-gateway.host}}/basic-open-api/get",
+					"protocol": "http",
+					"host": [
+						"{{tyk2-gateway.host}}"
+					],
+					"path": [
+						"basic-open-api",
+						"get"
+					]
+				},
+				"description": "This is a basic request that testing that the gateway has loaded the API definition and we are able to access the API"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "tyk2-gateway.host",
+			"value": "localhost:8085",
+			"type": "string"
+		}
+	]
+}
