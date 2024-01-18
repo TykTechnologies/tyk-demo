@@ -15,7 +15,7 @@ services:
       - TYK_DB_MONGOURL=mongodb://tyk2-mongo:27017/tyk_analytics
       - TYK_DB_REDISHOST=tyk2-redis
       - TYK_DB_TYKAPI_HOST=http://tyk2-gateway
-      - TYK_DB_HOSTCONFIG_OVERRIDEHOSTNAME=localhost:8085
+      - TYK_DB_HOSTCONFIG_GATEWAYHOSTNAME=localhost:8085
       - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
     depends_on:
       - tyk2-redis
