@@ -58,6 +58,12 @@ else
   set_docker_environment_value "OPENTELEMETRY_ENABLED" "false"
 fi
 
+if [[ "$*" == *otel-jaeger* ]]; then
+  set_docker_environment_value "OPENTELEMETRY_ENDPOINT" "jaeger-all-in-one:4317"
+else
+  set_docker_environment_value "OPENTELEMETRY_ENDPOINT" ""
+fi
+
 # deployment lists
 deployments_to_create=()
 commands_to_process=()

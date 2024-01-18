@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source scripts/common.sh
-deployment="Open Telemetry + Jaeger"
+deployment="OpenTelemetry + Jaeger"
 log_start_deployment
 bootstrap_progress
 
@@ -12,8 +12,6 @@ log_message "Waiting for Jaeger to respond ok"
 wait_for_response "$jaeger_health_url" "200"
 bootstrap_progress
 
-otc_health_url="http://localhost:13133"
-wait_for_response "$otc_health_url" "200"
 bootstrap_progress
 
 log_end_deployment

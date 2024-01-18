@@ -25,6 +25,8 @@ services:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-0}
       - TYK_GW_SLAVEOPTIONS_APIKEY=${MDCB_USER_API_CREDENTIALS:-placeholder}
+      - TYK_GW_OPENTELEMETRY_ENABLED=${OPENTELEMETRY_ENABLED:-false}
+      - TYK_GW_OPENTELEMETRY_ENDPOINT=${OPENTELEMETRY_ENDPOINT:-false}
     volumes:
       - ./deployments/mdcb/volumes/tyk-worker-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
