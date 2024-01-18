@@ -5,15 +5,15 @@ deployment="Tyk Environment 2"
 log_start_deployment
 bootstrap_progress
 
-dashboard2_base_url="http://localhost:3002"
+dashboard_base_url="http://localhost:3002"
 gateway2_base_url="http://localhost:8085"
 
 log_message "Waiting for Tyk 2 Dashboard to respond ok"
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
-wait_for_response "$dashboard2_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
+wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
 
 log_message "Importing organisation"
-log_json_result "$(curl $dashboard2_base_url/admin/organisations/import -s \
+log_json_result "$(curl $dashboard_base_url/admin/organisations/import -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d @deployments/tyk/data/tyk-dashboard/1/organisation.json)"
 bootstrap_progress
@@ -21,7 +21,7 @@ bootstrap_progress
 log_message "Creating Dashboard user"
 dashboard_user_email=$(jq -r '.email_address' deployments/tyk/data/tyk-dashboard/1/users/user-1.json)
 dashboard_user_password=$(jq -r '.password' deployments/tyk/data/tyk-dashboard/1/users/user-1.json)
-dashboard2_user_api_response=$(curl $dashboard2_base_url/admin/users -s \
+dashboard2_user_api_response=$(curl $dashboard_base_url/admin/users -s \
   -H "admin-auth: $dashboard_admin_api_credentials" \
   -d @deployments/tyk/data/tyk-dashboard/1/users/user-1.json 2>> logs/bootstrap.log \
   | jq -r '. | {api_key:.Message, id:.Meta.id}')
@@ -36,7 +36,7 @@ log_ok
 bootstrap_progress
 
 log_message "Resetting Dashboard user password"
-log_json_result "$(curl $dashboard2_base_url/api/users/$dashboard2_user_id/actions/reset -s \
+log_json_result "$(curl $dashboard_base_url/api/users/$dashboard2_user_id/actions/reset -s \
   -H "authorization: $dashboard2_user_api_credentials" \
   --data-raw '{
       "new_password":"'$dashboard_user_password'",
@@ -44,12 +44,17 @@ log_json_result "$(curl $dashboard2_base_url/api/users/$dashboard2_user_id/actio
     }')"
 bootstrap_progress
 
+log_message "Creating basic example API"
+# this API is used for testing that the deployment is functioning correctly
+create_api "deployments/tyk/data/tyk-dashboard/1/apis/api-5ead711f5759610001818679.json" "$dashboard_admin_api_credentials" "$dashboard2_user_api_credentials"
+bootstrap_progress
+
 log_end_deployment
 
 echo -e "\033[2K
 ▼ Tyk Environment 2
   ▽ Dashboard ($(get_service_image_tag "tyk2-dashboard"))
-                    URL : $dashboard2_base_url
+                    URL : $dashboard_base_url
        Admin API Header : admin-auth
           Admin API Key : $dashboard_admin_api_credentials
    Dashboard API Header : Authorization       
