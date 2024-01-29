@@ -12,7 +12,7 @@ dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_
 
 # this assumes that the backstage backend is available on the host machine on port 7007, and that it has the tyk entitiy provider installed
 log_message "Adding API event webhook to default organisation"
-updated_org_data=$(jq '.event_options += { "api_event": { "webhook": "http://host.docker.internal:7007/api/catalog/tyk/sync", "email": "", "redis": false } }' < deployments/tyk/data/tyk-dashboard/1/organisation.json)
+updated_org_data=$(jq '.event_options += { "api_event": { "webhook": "http://host.docker.internal:7007/api/catalog/tyk/development/sync", "email": "", "redis": false } }' < deployments/tyk/data/tyk-dashboard/1/organisation.json)
 api_response=$(curl $dashboard_base_url/admin/organisations/5e9d9544a1dcd60001d0ed20 --request PUT -s \
     -H "admin-auth: $dashboard_admin_api_credentials" \
     -d "$updated_org_data" 2>> logs/bootstrap.log)
