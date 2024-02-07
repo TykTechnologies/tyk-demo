@@ -254,6 +254,7 @@
       "key": "x-api-version",
       "strip_path": true,
       "strip_versioning_data": false,
+      "fallback_to_default": false,
       "versions": {}
     },
     "version_data": {

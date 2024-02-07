@@ -149,6 +149,7 @@
       "key": "x-api-version",
       "strip_path": false,
       "strip_versioning_data": false,
+      "fallback_to_default": false,
       "versions": {}
     },
     "version_data": {
@@ -299,7 +300,7 @@
               "api_model": {},
               "event_timeout": 60,
               "header_map": {},
-              "id": "65687b7aaedc3d0001953a3d",
+              "id": "65c346e723520c0001ddd045",
               "method": "POST",
               "name": "Webhook Receiver Post",
               "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -384,7 +385,7 @@
       "event_timeout": 60,
       "hook": {
         "api_model": {},
-        "id": "65687b7aaedc3d0001953a3d",
+        "id": "65c346e723520c0001ddd045",
         "org_id": "5e9d9544a1dcd60001d0ed20",
         "name": "Webhook Receiver Post",
         "method": "POST",
