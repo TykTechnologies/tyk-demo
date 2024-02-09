@@ -5,7 +5,7 @@ source scripts/common.sh
 tyk_auth=$(get_context_data "1" "dashboard-user" "1" "api-key") # get api key from context data - Tyk Demo must already be deployed for this to work!
 tyk_org=$(get_context_data "1" "organisation" "1" "id")
 tyk_mode="pro" # Tyk Demo is a self-managed "pro" deployment
-tyk_url="host.docker.internal:3000" # Tyk Dashboard port 3000 is exposed on host
+tyk_url="http://host.docker.internal:3000" # Tyk Dashboard port 3000 is exposed on host
 
 # read arguments or use defaults if not found
 operator_namespace=$([ -z "$1" ] && echo "tyk-operator-system" || echo "$1")
