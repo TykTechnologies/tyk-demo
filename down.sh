@@ -24,6 +24,15 @@ command_docker_compose="$(generate_docker_compose_command) down -v --remove-orph
 echo "Running docker compose command: $command_docker_compose"
 eval $command_docker_compose
 
+# run teardown scripts, if they exist
+while read deployment; do
+  teardownPath="deployments/$deployment/teardown.sh"
+  if [ -f $teardownPath ]; then
+    echo "Performing teardown for $deployment"
+    eval ./deployments/$deployment/teardown.sh
+  fi
+done < .bootstrap/bootstrapped_deployments
+
 if [ "$?" == 0 ]; then
   echo "All containers were stopped and removed"
   
