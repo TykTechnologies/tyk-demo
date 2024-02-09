@@ -24,6 +24,7 @@ if [ "$?" == "0" ]; then
     echo -n "Secret '$secret_name' already exists in namespace '$operator_namespace'. Do you want to delete the existing secret and recreate? (y/n): "
     read recreate
     if [ "$recreate" != "y" ]; then
+        echo "Secret not recreated - exiting"
         exit 1
     fi
     kubectl delete secret/$secret_name -n $operator_namespace
@@ -38,4 +39,4 @@ kubectl create secret -n $operator_namespace generic $secret_name \
   --from-literal "TYK_URL=$tyk_url" \
   --from-literal "TYK_TLS_INSECURE_SKIP_VERIFY=true"
 
-kubectl get secret/tyk-operator-conf -n tyk-operator-system -o json | jq '.data'
+kubectl get secret/$secret_name -n $operator_namespace -o json | jq '.data'
