@@ -12,14 +12,14 @@ operator_namespace=$([ -z "$1" ] && echo "tyk-operator-system" || echo "$1")
 secret_name=$([ -z "$2" ] && echo "tyk-operator-conf" || echo "$2")
 
 # exit if namespace does not exist
-kubectl get namespace $operator_namespace > /dev/null
+kubectl get namespace $operator_namespace 2>/dev/null 1>&2
 if [ "$?" != "0" ]; then
     echo "Namespace '$operator_namespace' does not exist. Please ensure you have installed Tyk Operator and are using the correct namespace."
     exit 1
 fi
 
 # if secret already exists then verify with user before overwriting
-kubectl get secret/$secret_name -n $operator_namespace > /dev/null
+kubectl get secret/$secret_name -n $operator_namespace 2>/dev/null 1>&2
 if [ "$?" == "0" ]; then
     echo -n "Secret '$secret_name' already exists in namespace '$operator_namespace'. Do you want to delete the existing secret and recreate? (y/n): "
     read recreate
@@ -39,4 +39,4 @@ kubectl create secret -n $operator_namespace generic $secret_name \
   --from-literal "TYK_URL=$tyk_url" \
   --from-literal "TYK_TLS_INSECURE_SKIP_VERIFY=true"
 
-kubectl get secret/$secret_name -n $operator_namespace -o json | jq '.data'
+kubectl get secret/$secret_name -n $operator_namespace -o json | jq '.'
