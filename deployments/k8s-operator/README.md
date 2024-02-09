@@ -36,21 +36,7 @@ Once the deployment is complete, the operator is ready to synchronise.
 To create an API, firstly use `kubectl apply` to generate an API definition CRD.
 
 ```
-cat <<EOF | kubectl apply -f -
-apiVersion: tyk.tyk.io/v1alpha1
-kind: ApiDefinition
-metadata:
-  name: operator-httpbin
-spec:
-  name: Operator httpbin
-  use_keyless: true
-  protocol: http
-  active: true
-  proxy:
-    target_url: http://httpbin
-    listen_path: /operator-httpbin
-    strip_listen_path: true
-EOF
+kubectl apply -f deployments/k8s-operator/data/tyk-operator/httpbin.yml
 ```
 
 You will see the response:
