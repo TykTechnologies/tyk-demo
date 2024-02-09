@@ -42,7 +42,7 @@ kubectl apply -f deployments/k8s-operator/data/tyk-operator/httpbin.yml
 You will see the response:
 
 ```
-apidefinition.tyk.tyk.io/httpbin created
+apidefinition.tyk.tyk.io/operator-httpbin
 ```
 
 The Operator will quickly detect the change, automatically processing the CRD and pushing it into the Dashboard. You will then be able to see the "Operator httpbin" API listed in the [Dashboard APIs page](http://tyk-dashboard.localhost:3000/apis). 
