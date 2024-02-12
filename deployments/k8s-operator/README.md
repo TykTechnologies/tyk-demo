@@ -36,7 +36,7 @@ Once the deployment is complete, the operator is ready to synchronise.
 To create an API, firstly use `kubectl apply` to generate an API definition CRD.
 
 ```
-kubectl apply -f deployments/k8s-operator/data/tyk-operator/httpbin.yml
+kubectl apply -f deployments/k8s-operator/data/tyk-operator/httpbin.yaml
 ```
 
 You will see the response:
