@@ -24,29 +24,33 @@ command_docker_compose="$(generate_docker_compose_command) down -v --remove-orph
 echo "Running docker compose command: $command_docker_compose"
 eval $command_docker_compose
 
+if [ "$?" != 0 ]; then
+  echo "Error when running 'docker compose down' command"
+  exit 1
+fi
+
 # run teardown scripts, if they exist
 while read deployment; do
   teardownPath="deployments/$deployment/teardown.sh"
   if [ -f $teardownPath ]; then
-    echo "Performing teardown for $deployment"
+    echo "Performing teardown for $deployment deployment"
     eval ./deployments/$deployment/teardown.sh
+    if [ "$?" != 0 ]; then
+      echo "Error when running teardown for $deployment deployment"
+    fi
   fi
 done < .bootstrap/bootstrapped_deployments
 
-if [ "$?" == 0 ]; then
-  echo "All containers were stopped and removed"
-  
-  # deleted bundle assets to prevent them being reused on next startup:
-  # 1. remove all zip files from bundle server 
-  rm deployments/tyk/volumes/http-server/*.zip 2> /dev/null
-  # 2. clear bundle cache from gateway
-  rm -rf deployments/tyk/volumes/tyk-gateway/middleware/bundles 2> /dev/null
+echo "All containers were stopped and removed"
 
-  # clear the bootstraped deployments
-  echo -n > .bootstrap/bootstrapped_deployments
+# delete bundle assets to prevent them being reused on next startup:
+# 1. remove all zip files from bundle server 
+rm deployments/tyk/volumes/http-server/*.zip 2> /dev/null
+# 2. clear bundle cache from gateway
+rm -rf deployments/tyk/volumes/tyk-gateway/middleware/bundles 2> /dev/null
 
-  # clear context data
-  rm -f .context-data/* 1> /dev/null
-else
-  echo "Error occurred during the following the down command."
-fi 
+# clear the bootstraped deployments
+echo -n > .bootstrap/bootstrapped_deployments
+
+# clear context data
+rm -f .context-data/* 1> /dev/null
