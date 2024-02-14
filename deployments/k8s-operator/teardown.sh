@@ -9,10 +9,10 @@ if [ "$namespace" == "" ]; then
 fi
 
 log_message "Removing example API CRD" 
-kubectl get -n $namespace -f deployments/k8s-operator/data/tyk-operator/httpbin.yaml >>logs/bootstrap.log
+kubectl get -n $namespace -f deployments/k8s-operator/data/tyk-operator/httpbin.yaml 1>/dev/null 2>>logs/bootstrap.log
 if [[ "$?" == 0 ]]; then
     log_message "  Example API CRD found - deleting" 
-    kubectl delete -n $namespace -f deployments/k8s-operator/data/tyk-operator/httpbin.yaml >>logs/bootstrap.log
+    kubectl delete -n $namespace -f deployments/k8s-operator/data/tyk-operator/httpbin.yaml 1>/dev/null 2>>logs/bootstrap.log
     if [[ "$?" != "0" ]]; then
         log_message "ERROR: Unable to delete example API CRD"
     else
@@ -23,7 +23,7 @@ else
 fi
 
 log_message "Uninstalling Tyk Operator"
-helm uninstall tyk-operator -n $namespace >>logs/bootstrap.log
+helm uninstall tyk-operator -n $namespace 1>/dev/null 2>>logs/bootstrap.log
 if [[ "$?" != 0 ]]; then
     log_message "ERROR: Tyk Operator uninstallation failed"
 else
@@ -31,7 +31,7 @@ else
 fi
 
 log_message "Removing Tyk Operator configuration" 
-kubectl get secret tyk-operator-conf -n $namespace >>logs/bootstrap.log
+kubectl get secret tyk-operator-conf -n $namespace 1>/dev/null 2>>logs/bootstrap.log
 if [[ "$?" == 0 ]]; then
     log_message "  Tyk Operator configuration found - deleting"
     kubectl delete secret tyk-operator-conf -n $namespace >>logs/bootstrap.log
@@ -45,7 +45,7 @@ else
 fi
 
 log_message "Deleting Tyk Operator namespace"
-kubectl delete namespace $namespace >>logs/bootstrap.log
+kubectl delete namespace $namespace 1>/dev/null 2>>logs/bootstrap.log
 if [[ "$?" != 0 ]]; then
     log_message "ERROR: Unable to delete Tyk Operator namespace"
 else
