@@ -64,7 +64,7 @@ All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.
 * [Mail server](deployments/mailserver/README.md)
 * [MDCB](deployments/mdcb/README.md)
 * [MQTT](deployments/mqtt/README.md)
-* [OpenTelemetry with Jaeger](deployments/otel/README.md)
+* [OpenTelemetry with Jaeger](deployments/otel-jaeger/README.md)
 * [Portal](deployments/portal/README.md)
 * [SLIs and SLOs with Prometheus and Grafana](deployments/slo-prometheus-grafana/README.md)
 * [SSO](deployments/sso/README.md)
