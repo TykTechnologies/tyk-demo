@@ -5,51 +5,70 @@ deployment="Kubernetes Operator"
 
 log_start_deployment
 
-tyk_operator_namespace="tyk-demo"
-tyk_operator_version="0.16.0"
-cert_manager_namespace="cert-manager"
+tyk_operator_install_version="0.16.0"
 
-log_message "Checking Helm installation requirements"
-if ! command -v helm >/dev/null; then
-  log_message "  Helm not found - please install Helm v3 or later"
+log_message "Checking Kubernetes requirements"
+if ! command -v kubectl >/dev/null; then
+  log_message "ERROR: kubectl not found - please install Kubernetes v1.19 or later"
 fi
-helm_version=$(helm version --short)
-if [[ $helm_version =~ ^v[0-2]+\. ]]; then
-  log_message "ERROR: Helm version v3 or later is required - found version $helm_version"
-  exit 1
+k8s_version=$(kubectl version 2>/dev/null | grep 'Client Version:' | awk '{print $3}')
+log_message "  Found kubectl $k8s_version"
+if [[ $k8s_version =~ ^v([0-9]+)\.([0-9]+)\. ]]; then
+  k8s_major_version="${BASH_REMATCH[1]}"
+  k8s_minor_version="${BASH_REMATCH[2]}"
+  if [[ $k8s_major_version == 0 ]]; then
+    log_message "ERROR: Kubernetes version 1.19+ is required"
+    exit 1
+  fi
+  if [[ $k8s_major_version == 1 ]] && [[ $k8s_minor_version -le 18 ]]; then
+    log_message "ERROR: Kubernetes version 1.19+ is required"
+    exit 1
+  fi 
 else
-  log_message "  Found Helm version $helm_version"
+  log_message "ERROR: Unable to read kubectl version number"
+  exit 1
 fi
+log_ok
 bootstrap_progress
 
-# allow default namespaces to be overridden with env var
-if [[ ! -z "${TYK_DEMO_CERT_MANAGER_NAMESPACE}" ]]; then
-  cert_manager_namespace="${TYK_DEMO_CERT_MANAGER_NAMESPACE}"
-  log_message "Cert Manager namespace overridden with value from env var TYK_DEMO_CERT_MANAGER_NAMESPACE: $cert_manager_namespace"
+log_message "Checking Helm requirements"
+if ! command -v helm >/dev/null; then
+  log_message "ERROR: Helm not found - please install Helm v3 or later"
+  exit 1
 fi
-log_message "Using namespace '$cert_manager_namespace' for Certificate Manager"
-if [[ ! -z "${TYK_DEMO_TYK_OPERATOR_NAMESPACE}" ]]; then
-  tyk_operator_namespace="${TYK_DEMO_TYK_OPERATOR_NAMESPACE}"
-  log_message "Tyk Operator namespace overridden with value from env var TYK_DEMO_TYK_OPERATOR_NAMESPACE: $tyk_operator_namespace"
+helm_version=$(helm version --short)
+log_message "  Found Helm $helm_version"
+if [[ $helm_version =~ ^v[0-2]\. ]]; then
+  log_message "ERROR: Helm v3 or later is required"
+  exit 1
 fi
-log_message "Using namespace '$tyk_operator_namespace' for Tyk Operator"
+log_ok
+bootstrap_progress
 
-set_context_data "1" "operator" "1" "namespace" "$tyk_operator_namespace"
-
-log_message "Checking that Cert Manager is deployed"
-cert_manager_pod_count=$(kubectl get pods -l app=cert-manager --field-selector status.phase=Running -n $cert_manager_namespace -o json | jq '.items | length')
+log_message "Checking Cert Manager is deployed"
+cert_manager_pod_count=$(kubectl get pods -l app=cert-manager --field-selector status.phase=Running -A -o json | jq '.items | length')
 if [ "$cert_manager_pod_count" == "0" ]; then
   log_message "ERROR: Could not find any running pods for 'cert-manager' app in the $cert_manager_namespace namespace"
   log_message "  Please ensure that Cert Manager is installed before making this deployment"
-  log_message "  Note that env var TYK_DEMO_CERT_MANAGER_NAMESPACE can be used to specify the namespace searched for Cert Manager pods"
+  log_message "  Note: script looks in 'cert-manager' namespace, if installed elsewhere then specify with TYK_DEMO_CERT_MANAGER_NAMESPACE env var"
   exit 1
-else 
-  log_message "  Found $cert_manager_pod_count pods in 'running' phase with label 'app=cert-manager'"
-  log_ok
 fi
+log_ok
 bootstrap_progress
 
-log_message "Adding tyk-operator chart repository"
+log_message "Verfiying target namespace"
+tyk_operator_namespace="tyk-demo"
+# allow default namespace to be overridden with env var
+if [[ ! -z "${TYK_DEMO_K8S_OPERATOR_NAMESPACE}" ]]; then
+  log_message "  Env var override found"
+  tyk_operator_namespace="${TYK_DEMO_K8S_OPERATOR_NAMESPACE}"
+fi
+log_message "  Tyk Operator namespace: $tyk_operator_namespace"
+set_context_data "1" "operator" "1" "namespace" "$tyk_operator_namespace"
+log_ok
+bootstrap_progress
+
+log_message "Adding Tyk Helm chart repository"
 helm repo add tyk-helm https://helm.tyk.io/public/helm/charts/ >>logs/bootstrap.log
 if [ "$?" != 0 ]; then
   log_message "ERROR: Unable to add tyk-operator chart repository"
@@ -58,10 +77,10 @@ fi
 log_ok
 bootstrap_progress
 
-log_message "Updating helm repo charts"
+log_message "Updating Helm repositories"
 helm repo update >>logs/bootstrap.log
 if [ "$?" != 0 ]; then
-  log_message "ERROR: Unable to update helm repo charts"
+  log_message "ERROR: Unable to update helm repositories"
   exit 1
 fi
 log_ok
@@ -77,7 +96,7 @@ log_ok
 bootstrap_progress
 
 log_message "Installing Tyk Operator"
-helm install tyk-operator --version $tyk_operator_version tyk-helm/tyk-operator -n $tyk_operator_namespace >>logs/bootstrap.log
+helm install tyk-operator --version $tyk_operator_install_version tyk-helm/tyk-operator -n $tyk_operator_namespace >>logs/bootstrap.log
 if [ "$?" != 0 ]; then
   log_message "ERROR: Unable to install tyk-operator"
   exit 1
@@ -86,13 +105,41 @@ log_ok
 bootstrap_progress
 
 log_message "Creating Tyk Operator configuration"
-eval ./scripts/setup-operator-secrets.sh $tyk_operator_namespace >>logs/bootstrap.log
+# this is the default dashboard host for locally hosted K8s, such as Docker Desktop, but this can be overriden using TYK_DEMO_DASHBOARD_HOST env var
+dashboard_host="http://host.docker.internal:3000"
+if [ "${TYK_DEMO_DASHBOARD_HOST}" ]; then
+  log_message "  Env var override found for dashboard host"
+  dashboard_host="${TYK_DEMO_DASHBOARD_HOST}"
+fi
+log_message "  Dashboard host: $dashboard_host"
+eval ./deployments/k8s-operator/scripts/setup-operator-secrets.sh $tyk_operator_namespace $dashboard_host >>logs/bootstrap.log
 if [ "$?" != 0 ]; then
   log_message "ERROR: Unable to create Tyk Operator configuration"
   exit 1
 fi
 log_ok
 bootstrap_progress
+
+log_message "Creating example API CRD"
+status=1
+retry_count=0
+retry_max=15
+while [ $status != 0 ]; do
+  # this can fail due to async nature of k8s service deployments, so retries may be needed
+  kubectl apply -n $tyk_operator_namespace -f deployments/k8s-operator/data/tyk-operator/httpbin.yaml 1>/dev/null 2>>logs/bootstrap.log
+  status=$?
+  if [ $status != 0 ]; then
+    retry_count=$((retry_count+1))
+    if [ $retry_count -gt $retry_max ]; then
+      log_message "ERROR: Maximum retries reached. Aborting"
+      exit 1
+    fi
+    log_message "  Apply failed, retrying..."
+    bootstrap_progress
+    sleep 2
+  fi
+done
+log_ok
 
 log_end_deployment
 
