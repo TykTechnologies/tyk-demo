@@ -1,7 +1,7 @@
 apiVersion: tyk.tyk.io/v1alpha1
 kind: ApiDefinition
 metadata:
- name: tyk-operator-httpbin-example
+ name: httpbin-example
 spec:
  name: Operator httpbin
  use_keyless: true
