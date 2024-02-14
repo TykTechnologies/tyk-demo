@@ -13,8 +13,8 @@ kubectl get -n $namespace -f deployments/k8s-operator/data/tyk-operator/httpbin.
 if [[ "$?" == 0 ]]; then
     log_message "  Example API CRD found - deleting" 
     kubectl delete -n $namespace -f deployments/k8s-operator/data/tyk-operator/httpbin.yaml
-    if [[ "$?" == "0" ]]; then
-        log_message "ERROR: Unable to delete example API CRD: tyk-operator-httpbin-example"
+    if [[ "$?" != "0" ]]; then
+        log_message "ERROR: Unable to delete example API CRD"
     else
         log_ok
     fi
@@ -35,7 +35,7 @@ kubectl get secret tyk-operator-conf -n $namespace >>logs/bootstrap.log
 if [[ "$?" == 0 ]]; then
     log_message "  Tyk Operator configuration found - deleting"
     kubectl delete secret tyk-operator-conf -n $namespace >>logs/bootstrap.log
-    if [[ "$?" == "0" ]]; then
+    if [[ "$?" != "0" ]]; then
         log_message "ERROR: Unable to delete Tyk Operator configuration"
     else
         log_ok
