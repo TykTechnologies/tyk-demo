@@ -9,10 +9,10 @@ if [ "$namespace" == "" ]; then
 fi
 
 log_message "Removing example API CRD" 
-kubectl get tykapis tyk-operator-httpbin-example -n $namespace >>logs/bootstrap.log
+kubectl get -n $namespace -f deployments/k8s-operator/data/tyk-operator/httpbin.yaml >>logs/bootstrap.log
 if [[ "$?" == 0 ]]; then
     log_message "  Example API CRD found - deleting" 
-    kubectl delete tykapis tyk-operator-httpbin-example
+    kubectl delete -n $namespace -f deployments/k8s-operator/data/tyk-operator/httpbin.yaml
     if [[ "$?" == "0" ]]; then
         log_message "ERROR: Unable to delete example API CRD: tyk-operator-httpbin-example"
     else
