@@ -5,11 +5,11 @@ source scripts/common.sh
 tyk_auth=$(get_context_data "1" "dashboard-user" "1" "api-key") # get api key from context data - Tyk Demo must already be deployed for this to work!
 tyk_org=$(get_context_data "1" "organisation" "1" "id")
 tyk_mode="pro" # Tyk Demo is a self-managed "pro" deployment
-tyk_url="http://host.docker.internal:3000" # Tyk Dashboard port 3000 is exposed on host
 
 # read arguments or use defaults if not found
 operator_namespace=$([ -z "$1" ] && echo "tyk-operator-system" || echo "$1")
-secret_name=$([ -z "$2" ] && echo "tyk-operator-conf" || echo "$2")
+tyk_url=$([ -z "$2" ] && echo "http://host.docker.internal:3000" || echo "$2")  # default port 3000 is exposed on host, but the hostname may need to be updated if the k8s installation if outside of local host
+secret_name=$([ -z "$3" ] && echo "tyk-operator-conf" || echo "$3")
 
 # exit if namespace does not exist
 kubectl get namespace $operator_namespace 2>/dev/null 1>&2
