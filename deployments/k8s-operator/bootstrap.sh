@@ -140,10 +140,17 @@ while [ $status != 0 ]; do
   fi
 done
 log_ok
-
+example_api_listen_path=$(kubectl get tykapis httpbin-example -n tyk-demo -o json | jq '.spec.proxy.listen_path')
+example_api_name=$(kubectl get tykapis httpbin-example -n tyk-demo -o json | jq '.metadata.name')
+gateway_base_url=$(get_context_data "1" "gateway" "1" "base-url")
 log_end_deployment
 
 echo -e "\033[2K
 ▼ Kubernetes Operator
-  ▽ Tyk Operator (v$tyk_operator_version)
-              Namespace : $tyk_operator_namespace"
+  ▽ Tyk Operator (v$tyk_operator_install_version)
+              Namespace : $tyk_operator_namespace
+       Target Dashboard : $dashboard_host
+  ▽ Example API CRD
+              Namespace : $tyk_operator_namespace
+                   Name : $example_api_name
+               Endpoint : $gateway_base_url$example_api_listen_path"
