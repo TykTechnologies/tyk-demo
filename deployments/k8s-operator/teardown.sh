@@ -12,7 +12,7 @@ log_message "Removing example API CRD"
 kubectl get -n $namespace -f deployments/k8s-operator/data/tyk-operator/httpbin.yaml >>logs/bootstrap.log
 if [[ "$?" == 0 ]]; then
     log_message "  Example API CRD found - deleting" 
-    kubectl delete -n $namespace -f deployments/k8s-operator/data/tyk-operator/httpbin.yaml
+    kubectl delete -n $namespace -f deployments/k8s-operator/data/tyk-operator/httpbin.yaml >>logs/bootstrap.log
     if [[ "$?" != "0" ]]; then
         log_message "ERROR: Unable to delete example API CRD"
     else
