@@ -7,8 +7,8 @@ The Operator monitors Kubernetes for Tyk API CRDs. When it detects a change, it 
 ## Prerequisites
 
 The follow are required in order to use this deployment:
-- Docker Desktop with Kubernetes enabled
-- Helm
+- Kubernetes v1.19+, with cert-manager already deployed
+- Helm v3+
 - Internet connection
 
 ## Setup
