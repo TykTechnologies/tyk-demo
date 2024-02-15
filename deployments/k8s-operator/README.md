@@ -90,7 +90,7 @@ The source CRD for this API can be found in the deployment directory `deployment
 
 ### Creating an API
 
-Use `kubectl apply` with the *Hello World* CRD to generate an API definition resource in Kubernetes:
+Use `kubectl apply` to add API CRDs to Kubernetes. For example, using the provided *Hello World* CRD:
 
 ```
 kubectl -n tyk-demo apply -f deployments/k8s-operator/data/tyk-operator/hello-world.yaml
@@ -108,7 +108,7 @@ The CRD will be listed as a `tykapis` resource, as shown by this `kubectl` comma
 kubectl -n tyk-demo get tykapis
 ```
 
-Displays both the newly created *hello world* API as well as the *httpbin example* API created by the bootstrap script:
+This displays both the newly created *hello world* API as well as the *httpbin example* API created by the bootstrap script:
 
 ```
 NAME              DOMAIN   LISTENPATH              PROXY.TARGETURL   ENABLED   STATUS
@@ -116,7 +116,7 @@ hello-world                /operator-hello-world   http://httpbin    true      S
 httpbin-example            /operator-httpbin       http://httpbin    true      Successful
 ```
 
-By this point, the Operator will have processed the CRD and reconciled the changes with the Dashboard, which in turn will have updated the Gateway. You will be able to see the *Operator hello world* API listed in the [Dashboard APIs page](http://tyk-dashboard.localhost:3000/apis), as well as access the API via the Gateway. Try running a simple `curl` request to see it in action:
+The Operator processes the CRD, reconciling it with the Dashboard, which subsequently updates the Gateway. The *Operator hello world* API is now listed in the [Dashboard APIs page](http://tyk-dashboard.localhost:3000/apis), as well as being accessible via the Gateway. Try running a simple `curl` request to see it in action:
 
 ```
 curl http://tyk-gateway.localhost:8080/operator-hello-world/get
