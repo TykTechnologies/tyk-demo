@@ -116,7 +116,7 @@ fi
 log_message "  Dashboard host: $dashboard_host"
 log_message "  API key: $api_key"
 log_message "  Organisation id: $organisation_id"
-eval ./deployments/k8s-operator/scripts/setup-operator-secrets.sh \
+eval ./deployments/k8s-operator/scripts/setup-operator-config.sh \
   -a $api_key \
   -o $organisation_id \
   -m "pro" \
