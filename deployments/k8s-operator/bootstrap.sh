@@ -125,7 +125,7 @@ status=1
 retry_count=0
 retry_max=15
 while [ $status != 0 ]; do
-  # this can fail due to async nature of k8s service deployments, so retries may be needed
+  # this will likely fail for the first few attempts until the webhook service is operational, so several retries are likely needed
   kubectl apply -n $tyk_operator_namespace -f deployments/k8s-operator/data/tyk-operator/httpbin.yaml 1>/dev/null 2>>logs/bootstrap.log
   status=$?
   if [ $status != 0 ]; then
@@ -134,7 +134,7 @@ while [ $status != 0 ]; do
       log_message "ERROR: Maximum retries reached. Aborting"
       exit 1
     fi
-    log_message "  Apply failed, retrying..."
+    log_message "  Attempt $retry_count failed, retrying..."
     bootstrap_progress
     sleep 2
   fi
