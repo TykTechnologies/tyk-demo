@@ -52,7 +52,9 @@ Note that the Kubernetes Cert Manager is not removed as part of the down.sh. As 
 No manual configuration needed. The script automatically sets up the operator and other necessary resources. The Tyk Demo context data, such as object ids and credentials are providing to the Operator, enabling it to synchronise data via the Tyk Dashboard API.
 
 ### Operator Config Script
-It's possible to change the Tyk Operator configuration by running the `setup-operator-secrets.sh` script. It accepts several arguments which correspond to the various configuration options.
+It's possible to change the Tyk Operator configuration by running the `setup-operator-secrets.sh` script. Note that this is not normally necessary, as the bootstrap process automatically perform the configuration. However, if you make changes that necessitate changes to the Tyk Operator config, then this script may be useful.
+
+The script accepts several arguments which correspond to the various configuration options:
 
 | Argument     | Mandatory | Description    | Default |
 |--------------|-----------|------------|-----|
