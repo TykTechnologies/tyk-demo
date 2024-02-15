@@ -74,7 +74,7 @@ Example usage:
 
 ## Usage
 
-Once the deployment is complete, the operator is ready to synchronise.
+The Operator is ready once the bootstrap has finished.
 
 ### Accessing the example API
 
