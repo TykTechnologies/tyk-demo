@@ -48,9 +48,8 @@ bootstrap_progress
 log_message "Checking Cert Manager is deployed"
 cert_manager_pod_count=$(kubectl get pods -l app=cert-manager --field-selector status.phase=Running -A -o json | jq '.items | length')
 if [ "$cert_manager_pod_count" == "0" ]; then
-  log_message "ERROR: Could not find any running pods for 'cert-manager' app in the $cert_manager_namespace namespace"
+  log_message "ERROR: Could not find any running pods for 'cert-manager' app"
   log_message "  Please ensure that Cert Manager is installed before making this deployment"
-  log_message "  Note: script looks in 'cert-manager' namespace, if installed elsewhere then specify with TYK_DEMO_CERT_MANAGER_NAMESPACE env var"
   exit 1
 fi
 log_ok
