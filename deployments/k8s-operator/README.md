@@ -2,7 +2,7 @@
 
 This deployment demonstrates how the Tyk Operator automatically keeps API definitions in sync between Kubernetes and your Tyk Dashboard.
 
-The Tyk Operator acts as your Kubernetes API management assistant, automating the tedious setup and updates. Here's what it does:
+The Tyk Operator acts as your Kubernetes API management assistant, automatically configuring your Tyk deployment. Here's what it does:
 - **Watches Kubernetes API CRDs**: Your API definitions are stored in Kubernetes as Custom Resource Definitions (CRDs). The Operator monitors these for any changes you make.
 - **Syncs with Tyk Dashboard**: If it detects a change, it seamlessly talks to the Tyk Dashboard, adding or removing the corresponding API as needed.
 - **Dashboard informs Gateways**: The Dashboard acts as the central command centre, broadcasting the updates to all connected Tyk Gateways.
