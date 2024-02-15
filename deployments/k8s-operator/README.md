@@ -32,7 +32,7 @@ The [Kubernetes Cert Manager](https://cert-manager.io/) is a prerequisite for th
 The `install-cert-manager.sh` script can be run as follows:
 
 ```
-deployments/k8s-operator/scripts/install-cert-manager.sh
+./deployments/k8s-operator/scripts/install-cert-manager.sh
 ```
 
 ## Removal
