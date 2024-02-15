@@ -1,37 +1,53 @@
 # Kubernetes Tyk Operator Deployment
 
-This deployment shows how to use the Tyk Operator to automatically sync API definitions with your Tyk deployment.
+This deployment demonstrates how the Tyk Operator synchronises API definitions stored as Custom Resource Definitions (CRDs) on Kubernetes with a Tyk deployment.
 
-The Operator monitors Kubernetes for Tyk API CRDs. When it detects a change, it perform a synchronisation with the Tyk Dashboard, adding or removing the APIs as needed. The Dashboard then synchronises the changes with the Gateways that it's managing.
+The Tyk Operator acts as your Kubernetes API management sidekick, automating the tedious setup and updates. Here's what it does:
+- **Watches Kubernetes API CRDs**: Think of these as blueprints for your APIs, stored in Kubernetes. The Operator keeps a hawk-eye on any changes you make.
+- **Syncs with Tyk Dashboard**: If it detects a new API or modifications, it seamlessly talks to the Tyk Dashboard, adding or removing the corresponding API as needed.
+- **Dashboard informs Gateways**: The Dashboard acts as the central command centre, broadcasting the updates to all connected Tyk Gateways.
+
+This means:
+- **No manual configuration**: Focus on developing awesome APIs, and the Operator handles the deployment behind the scenes.
+- **Declarative management**: Define your APIs in CRDs, and the Operator ensures every Gateway reflects those changes.
+- **Consistent state**: Forget about configuration drift! The Operator keeps everything in sync, even across multiple Gateways.
+
+Think of it as infrastructure as code for your APIs, giving you a robust and automated way to manage them within your Kubernetes environment.
 
 ## Prerequisites
 
-The follow are required in order to use this deployment:
-- Kubernetes v1.19+, with cert-manager already deployed
-- Helm v3+
-- Internet connection
+Kubernetes:
+- Version 1.19 or later
+- Active Cert Manager deployment
 
-Note that this deployment has been designed to work with the embedded Kubernetes environment provided by Docker Desktop. However, it should also work with other Kubernetes installations, as long as the `kubectl` and `helm` commands function correctly.
+Helm:
+- Version 3 or later
+
+Compatibility:
+- While designed for Docker Desktop's embedded Kubernetes environment, this deployment should also work on other Kubernetes installations. 
+- Ensure both `kubectl` and `helm` commands are functioning correctly on your system.
 
 ## Setup
 
-Run the `up.sh` script with the `k8s-operator` parameter:
+Ensure you have `kubectl` and `helm` tools installed and configured with access to your Kubernetes cluster.
+
+In your terminal, navigate to the Tyk Demo root directory and run:
 
 ```
 ./up.sh k8s-operator
 ```
 
-This creates the deployment as part of the standard Tyk Demo bootstrap.
-
-The process uses `kubectl` and `helm` commands to deploy the Operator and other resources into Kubernetes, with all resources deployed into a `tyk-demo` namespace.
+This script automates the deployment process using `kubectl` and `helm`. It sets up the Operator and related resources within the `tyk-demo` namespace in your Kubernetes cluster.
 
 ### Kubernetes Cert Manager
 
-The [Kubernetes Cert Manager](https://cert-manager.io/) is a prerequisite for the deployment. But since it is a centralised Kubernetes system resource, it is not installed by deployment bootstrap script. If you don't have the Cert Manager installed, you can either:
-- Follow the [official installation documentation](https://cert-manager.io/docs/installation/)
-- Run the `install-cert-manager.sh` script, which uses the helm chart approach as specified in the official documentation
+This deployment requires the [Kubernetes Cert Manager](https://cert-manager.io/). Installing it is outside the scope of the bootstrap script.
 
-The `install-cert-manager.sh` script can be run as follows:
+Installation Options:
+- **Manual Installation**: Follow the official installation documentation (https://cert-manager.io/docs/installation/) for detailed instructions. This approach offers maximum flexibility and control.
+- **Simplified Installation**: Run the provided `install-cert-manager.sh` script, which uses the Helm chart method described in the official documentation. This script provides a simple, quick setup.
+
+Running the script:
 
 ```
 ./deployments/k8s-operator/scripts/install-cert-manager.sh
@@ -39,22 +55,24 @@ The `install-cert-manager.sh` script can be run as follows:
 
 ## Removal
 
-To remove the deployment, use the `down.sh` script as usual:
+To remove the deployment, execute the `down.sh` script:
 
 ```
 ./down.sh
 ```
 
-This will remove the containers deployed using the docker compose file, as well as the resources deployed into Kubernetes by the bootstrap process.
+This script automates the removal process:
+- **Docker Containers**: Removes all Docker containers, volumes and networks spun up from the standard docker-compose bootstrap process
+- **Kubernetes Resources**: Removes the `tyk-demo` namespace from Kubernetes, along with all the resources provisioned within it during the *Kubernetes Operator* deployment bootstrap
 
-Note that the Kubernetes Cert Manager is not removed as part of the down.sh. As a centralised Kubernetes resource, it is not good practice for it to be arbitrarily removed by Tyk Demo.
+**Important Note**: The Kubernetes Cert Manager is not removed by the `down.sh` script. The Cert Manager functions as a central resource within your Kubernetes cluster, potentially managing certificates for various applications. Deleting it could disrupt other services that rely on it. If you wish to remove it, please do so manually.
 
 ## Configuration
 
-No manual configuration needed. The script automatically sets up the operator and other necessary resources. The Tyk Demo context data, such as object ids and credentials are providing to the Operator, enabling it to synchronise data via the Tyk Dashboard API.
+No manual configuration needed. The script automatically sets up the Operator and other necessary resources. The Tyk Demo context data, such as object ids and credentials, are provided to the Operator, enabling it to synchronise data via the Tyk Dashboard API.
 
 ### Operator Config Script
-It's possible to change the Tyk Operator configuration by running the `setup-operator-secrets.sh` script. Note that this is not normally necessary, as the bootstrap process automatically perform the configuration. However, if you make changes that necessitate changes to the Tyk Operator config, then this script may be useful.
+It's possible to change the Tyk Operator configuration by running the `setup-operator-secrets.sh` script. Note that this is not normally necessary, as the bootstrap process automatically performs the configuration. However, if you make changes that necessitate changes to the Tyk Operator config, then this script may be useful.
 
 The script accepts several arguments which correspond to the various configuration options:
 
@@ -74,41 +92,50 @@ Example usage:
 
 ## Usage
 
-The Operator is ready once the bootstrap has finished.
+The Operator is ready to use once the bootstrap has finished.
 
 ### Accessing the example API
 
-The *Operator httpbin* API is deployed using the Operator during the bootstrap process. This can be accessed using `curl`:
+The *Operator httpbin* API is automatically deployed as part of the initial bootstrap process.
+
+It's accessible using the following curl command:
 
 ```
 curl http://tyk-gateway.localhost:8080/operator-httpbin/get
 ```
 
-This will return the typical httpbin json response.
+This command will return the standard httpbin JSON response, verifying successful connectivity and functionality.
 
-The source CRD for this API can be found in the deployment directory `deployments/k8s-operator/data/tyk-operator/httpbin.yaml`.
+Notes:
+- The CRD for this API is located at `deployments/k8s-operator/data/tyk-operator/httpbin.yaml`
+- The API is deployed under the `/operator-httpbin` prefix within the Tyk Gateway instance
+- This implementation serves as a basic demonstration of the Operator's capabilities and can be customised or extended according to specific needs
 
 ### Creating an API
 
-Use `kubectl apply` to add API CRDs to Kubernetes. For example, using the provided *Hello World* CRD:
+#### 1. Apply the CRD
+
+Use `kubectl apply` to deploy a CRD YAML file representing your API definition. This example uses the provided `hello-world.yaml` file:
 
 ```
 kubectl -n tyk-demo apply -f deployments/k8s-operator/data/tyk-operator/hello-world.yaml
 ```
 
-You will see the response:
+Expect the response:
 
 ```
 apidefinition.tyk.tyk.io/hello-world created
 ```
 
-The CRD will be listed as a `tykapis` resource, as shown by this `kubectl` command:
+#### 2. Verify CRD Creation
+
+Confirm the successful deployment of the CRD using `kubectl`:
 
 ```
 kubectl -n tyk-demo get tykapis
 ```
 
-This displays both the newly created *hello world* API as well as the *httpbin example* API created by the bootstrap script:
+This should display both the newly created `hello-world` API and any existing ones (e.g. `httpbin-example`):
 
 ```
 NAME              DOMAIN   LISTENPATH              PROXY.TARGETURL   ENABLED   STATUS
@@ -116,11 +143,23 @@ hello-world                /operator-hello-world   http://httpbin    true      S
 httpbin-example            /operator-httpbin       http://httpbin    true      Successful
 ```
 
-The Operator processes the CRD, reconciling it with the Dashboard, which subsequently updates the Gateway. The *Operator hello world* API is now listed in the [Dashboard APIs page](http://tyk-dashboard.localhost:3000/apis), as well as being accessible via the Gateway. Try running a simple `curl` request to see it in action:
+#### 3. Verify Synchronisation
+
+The Tyk Operator processes the CRD, synchronising it with the Tyk Dashboard, which updates the Gateways accordingly.
+
+Verifying reconciliation process:
+
+1. API is listed in the Dashboard
+In the [Dashboard APIs page](http://tyk-dashboard.localhost:3000/apis), you should see the newly created *Operator hello world* API listed amongst others.
+
+2. API is accessible via the Gateway
+Execute a simple `curl` request to verify API accessibility:
 
 ```
 curl http://tyk-gateway.localhost:8080/operator-hello-world/get
 ```
+
+A successful response indicates the API is functioning correctly.
 
 ### Displaying Tyk APIs in Kubernetes
 
@@ -145,7 +184,9 @@ To delete an API, use `kubectl delete`. For example:
 kubectl -n tyk-demo delete tykapis httpbin-example
 ```
 
-The Operator will synchronise this change, removing the API from the Tyk Dashboard and Gateway. Attempting to access the API will result in a `404 Not Found` response:
+The Operator will synchronise this change, removing the API from the Tyk Dashboard and Gateway. 
+
+Attempting to access the API after it's been deleted will result in a `404 Not Found` response. For example, running the following command will return a `404` error:
 
 ```
 curl http://tyk-gateway.localhost:8080/operator-httpbin/get
