@@ -156,6 +156,26 @@ example_api_listen_path=$(kubectl get tykapis httpbin-example -n tyk-demo -o jso
 example_api_name=$(kubectl get tykapis httpbin-example -n tyk-demo -o json | jq '.metadata.name' -r)
 gateway_base_url=$(get_context_data "1" "gateway" "1" "base-url")
 
+log_message "Validating API deployment"
+response_code=""
+retry_count=0
+retry_max=5
+while [[ $response_code -ne 200 ]]; do
+  response_code=$(curl -s -o /dev/null -w "%{http_code}" $gateway_base_url$example_api_listen_path/get)
+
+  if [[ $response_code -ne 200 ]]; then
+    retry_count=$((retry_count+1))
+    if [ $retry_count -gt $retry_max ]; then
+      log_message "ERROR: Maximum retries reached. Aborting"
+      exit 1
+    fi
+    log_message "  Attempt $retry_count failed, retrying..."
+    bootstrap_progress
+    sleep 2
+  fi
+done
+log_ok
+
 log_end_deployment
 
 echo -e "\033[2K
