@@ -11,6 +11,8 @@ The follow are required in order to use this deployment:
 - Helm v3+
 - Internet connection
 
+Note that this deployment has been designed to work with the embedded Kubernetes environment provided by Docker Desktop. However, it should also work with other Kubernetes installations, as long as the `kubectl` and `helm` commands function correctly.
+
 ## Setup
 
 Run the `up.sh` script with the `k8s-operator` parameter:
