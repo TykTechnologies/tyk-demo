@@ -38,7 +38,7 @@ log_message "Removing Tyk Operator configuration"
 kubectl get secret tyk-operator-conf -n $namespace 1>/dev/null 2>>logs/bootstrap.log
 if [[ "$?" == 0 ]]; then
     log_message "  Tyk Operator configuration found - deleting"
-    kubectl delete secret tyk-operator-conf -n $namespace >>logs/bootstrap.log
+    kubectl delete secret tyk-operator-conf -n $namespace 1>/dev/null 2>>logs/bootstrap.log
     if [[ "$?" != "0" ]]; then
         log_message "ERROR: Unable to delete Tyk Operator configuration"
     else
