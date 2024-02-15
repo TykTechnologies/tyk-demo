@@ -1,16 +1,16 @@
 # Kubernetes Tyk Operator Deployment
 
-This deployment demonstrates how the Tyk Operator synchronises API definitions stored as Custom Resource Definitions (CRDs) on Kubernetes with a Tyk deployment.
+This deployment demonstrates how the Tyk Operator automatically keeps API definitions in sync between Kubernetes and your Tyk Dashboard.
 
-The Tyk Operator acts as your Kubernetes API management sidekick, automating the tedious setup and updates. Here's what it does:
-- **Watches Kubernetes API CRDs**: Think of these as blueprints for your APIs, stored in Kubernetes. The Operator keeps a hawk-eye on any changes you make.
-- **Syncs with Tyk Dashboard**: If it detects a new API or modifications, it seamlessly talks to the Tyk Dashboard, adding or removing the corresponding API as needed.
+The Tyk Operator acts as your Kubernetes API management assistant, automating the tedious setup and updates. Here's what it does:
+- **Watches Kubernetes API CRDs**: Your API definitions are stored in Kubernetes as Custom Resource Definitions (CRDs). The Operator monitors these for any changes you make.
+- **Syncs with Tyk Dashboard**: If it detects a change, it seamlessly talks to the Tyk Dashboard, adding or removing the corresponding API as needed.
 - **Dashboard informs Gateways**: The Dashboard acts as the central command centre, broadcasting the updates to all connected Tyk Gateways.
 
 This means:
-- **No manual configuration**: Focus on developing awesome APIs, and the Operator handles the deployment behind the scenes.
+- **No manual configuration**: Focus on developing APIs, and the Operator handles the deployment behind the scenes.
 - **Declarative management**: Define your APIs in CRDs, and the Operator ensures every Gateway reflects those changes.
-- **Consistent state**: Forget about configuration drift! The Operator keeps everything in sync, even across multiple Gateways.
+- **Consistent state**: Forget about configuration drift. The Operator keeps everything in sync, even across multiple Gateways.
 
 Think of it as infrastructure as code for your APIs, giving you a robust and automated way to manage them within your Kubernetes environment.
 
