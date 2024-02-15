@@ -106,13 +106,24 @@ bootstrap_progress
 
 log_message "Creating Tyk Operator configuration"
 # this is the default dashboard host for locally hosted K8s, such as Docker Desktop, but this can be overriden using TYK_DEMO_DASHBOARD_HOST env var
+api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
+organisation_id=$(get_context_data "1" "organisation" "1" "id")
 dashboard_host="http://host.docker.internal:3000"
 if [ "${TYK_DEMO_DASHBOARD_HOST}" ]; then
   log_message "  Env var override found for dashboard host"
   dashboard_host="${TYK_DEMO_DASHBOARD_HOST}"
 fi
 log_message "  Dashboard host: $dashboard_host"
-eval ./deployments/k8s-operator/scripts/setup-operator-secrets.sh $tyk_operator_namespace $dashboard_host >>logs/bootstrap.log
+log_message "  API key: $api_key"
+log_message "  Organisation id: $organisation_id"
+eval ./deployments/k8s-operator/scripts/setup-operator-secrets.sh \
+  -a $api_key \
+  -o $organisation_id \
+  -m "pro" \
+  -n $tyk_operator_namespace \
+  -u $dashboard_host \
+  -s tyk-operator-conf \
+  >>logs/bootstrap.log
 if [ "$?" != 0 ]; then
   log_message "ERROR: Unable to create Tyk Operator configuration"
   exit 1
@@ -140,9 +151,11 @@ while [ $status != 0 ]; do
   fi
 done
 log_ok
+
 example_api_listen_path=$(kubectl get tykapis httpbin-example -n tyk-demo -o json | jq '.spec.proxy.listen_path' -r)
 example_api_name=$(kubectl get tykapis httpbin-example -n tyk-demo -o json | jq '.metadata.name' -r)
 gateway_base_url=$(get_context_data "1" "gateway" "1" "base-url")
+
 log_end_deployment
 
 echo -e "\033[2K
