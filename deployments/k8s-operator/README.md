@@ -19,25 +19,39 @@ Run the `up.sh` script with the `k8s-operator` parameter:
 ./up.sh k8s-operator
 ```
 
-This perform the standard Tyk Demo bootstrap and also installs the Tyk Operator into the local Docker Desktop Kubernetes environment.
+This creates the deployment as part of the standard Tyk Demo bootstrap.
 
-The script uses `kubectl` and `helm` commands to deploy the Operator and other resources into Kubernetes. Everything is deployed into the `tyk-demo` namespace.
+The process uses `kubectl` and `helm` commands to deploy the Operator and other resources into Kubernetes, with all resources deployed into a `tyk-demo` namespace.
 
-An example API, *Operator httpbin*, is deployed using the Operator as part of the bootstrap process.
+### Kubernetes Cert Manager
 
-## Teardown
+The [Kubernetes Cert Manager](https://cert-manager.io/) is a prerequisite for the deployment. But since it is a centralised Kubernetes system resource, it is not installed by deployment bootstrap script. If you don't have the Cert Manager installed, you can either:
+- Follow the [official installation documentation](https://cert-manager.io/docs/installation/)
+- Run the `install-cert-manager.sh` script, which uses the helm chart approach as specified in the official documentation
 
-To remove the deployment, use the `down.sh` script as usual. This will remove the containers deployed using the docker compose file, as well as the resources deployed into Kubernetes:
+The `install-cert-manager.sh` script can be run as follows:
+
+```
+deployments/k8s-operator/scripts/install-cert-manager.sh
+```
+
+## Removal
+
+To remove the deployment, use the `down.sh` script as usual:
 
 ```
 ./down.sh
 ```
 
-### Configuration
+This will remove the containers deployed using the docker compose file, as well as the resources deployed into Kubernetes by the bootstrap process.
+
+Note that the Kubernetes Cert Manager is not removed as part of the down.sh. As a centralised Kubernetes resource, it is not good practice for it to be arbitrarily removed by Tyk Demo.
+
+## Configuration
 
 No manual configuration needed. The script automatically sets up the operator and other necessary resources. The Tyk Demo context data, such as object ids and credentials are providing to the Operator, enabling it to synchronise data via the Tyk Dashboard API.
 
-#### Operator Config Script
+### Operator Config Script
 It's possible to change the Tyk Operator configuration by running the `setup-operator-secrets.sh` script. It accepts several arguments which correspond to the various configuration options.
 
 | Argument     | Mandatory | Description    | Default |
