@@ -24,14 +24,16 @@ Helm:
 - Version 3 or later
 
 Compatibility:
-- While designed for Docker Desktop's embedded Kubernetes environment, this deployment should also work on other Kubernetes installations. 
+- This deployment is intended for use with Docker Desktop's embedded Kubernetes environment. However, it should also work on other Kubernetes installations.
 - Ensure both `kubectl` and `helm` commands are functioning correctly on your system.
 
 ## Setup
 
 Ensure you have `kubectl` and `helm` tools installed and configured with access to your Kubernetes cluster.
 
-In your terminal, navigate to the Tyk Demo root directory and run:
+For Docker Desktop users, ensure that the embedded Kubernetes is enabled.
+
+When you are ready to begin, open your terminal, navigate to the Tyk Demo root directory and run:
 
 ```
 ./up.sh k8s-operator
