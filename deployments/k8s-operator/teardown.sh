@@ -2,6 +2,10 @@
 
 source scripts/common.sh
 
+deployment="Kubernetes Operator"
+
+log_start_teardown
+
 namespace=$(get_context_data "1" "operator" "1" "namespace")
 
 if [ "$namespace" == "" ]; then
@@ -51,3 +55,5 @@ if [[ "$?" != 0 ]]; then
 else
     log_ok
 fi
+
+log_end_teardown

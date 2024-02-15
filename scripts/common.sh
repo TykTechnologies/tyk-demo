@@ -67,6 +67,14 @@ log_end_deployment () {
   log_message "END ▶ $deployment deployment bootstrap"
 }
 
+log_start_teardown () {
+  log_message "START ▶ $deployment deployment teardown"
+}
+
+log_end_teardown () {
+  log_message "END ▶ $deployment deployment teardown"
+}
+
 set_docker_environment_value () {
   setting_current_value=$(grep "$1" .env)
   setting_desired_value="$1=$2"
