@@ -29,9 +29,10 @@ Compatibility:
 
 ## Setup
 
-Ensure you have `kubectl` and `helm` tools installed and configured with access to your Kubernetes cluster.
-
-For Docker Desktop users, ensure that the embedded Kubernetes is enabled.
+Before you begin, ensure that:
+- The `kubectl` and `helm` tools are installed and configured with access to your Kubernetes cluster
+- The Cert Manager is installed in the Kubernetes cluster (see *Kubernetes Cert Manager* section below for more information)
+- For Docker Desktop users who want to use the embedded Kubernetes cluster, ensure that it's enabled in the Docker Desktop options.
 
 When you are ready to begin, open your terminal, navigate to the Tyk Demo root directory and run:
 
@@ -43,11 +44,9 @@ This script automates the deployment process using `kubectl` and `helm`. It sets
 
 ### Kubernetes Cert Manager
 
-This deployment requires the [Kubernetes Cert Manager](https://cert-manager.io/). Installing it is outside the scope of the bootstrap script.
-
-Installation Options:
+This deployment requires the [Kubernetes Cert Manager](https://cert-manager.io/). If it's already installed in your Kubenetes cluster, great, no further action is needed. However, if you don't have it installed, installation is outside the scope of the bootstrap script, but you have two options:
 - **Manual Installation**: Follow the official installation documentation (https://cert-manager.io/docs/installation/) for detailed instructions. This approach offers maximum flexibility and control.
-- **Simplified Installation**: Run the provided `install-cert-manager.sh` script, which uses the Helm chart method described in the official documentation. This script provides a simple, quick setup.
+- **Simplified Installation**: Run the provided `install-cert-manager.sh` script, which follows the Helm chart method described in the official documentation. This script provides a simple, quick setup.
 
 Running the script:
 
