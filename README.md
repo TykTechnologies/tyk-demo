@@ -32,10 +32,11 @@ This approach focuses on simplicity. Running a single command triggers Docker Co
 - If you want to run the MDCB deployment (distributed set up with control plane and data planes), then you need to [contact the Tyk team](https://tyk.io/pricing-self-managed/) to get an MDCB license key.
 
 ### Software
+The base deployment requires:
 - Docker Desktop, with Docker Compose
 - jq
 
-Kubernetes is required by some deployments - but the Kubernetes embedded in Docker Desktop can be used.
+Note that some feature deployments may have additional requirements. See deployment readmes for more information.
 
 ## Repository Structure
 
