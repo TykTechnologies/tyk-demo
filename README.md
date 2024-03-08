@@ -2,21 +2,21 @@
 
 # Tyk Demo
 
-This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple deployment, where you can choose what features to include.
+Tyk Demo is a Tyk deployment that's pre-configured with a wide range of examples that demonstrate Tyk's features and functionality. The deployment uses Docker Compose for speed and simplicity, enabling you to choose you to choose the features you'd like to deploy.
 
-Tyk Demo was built to enable the sharing of knowledge and combining of effort amongst client-facing technical Tyk folks. But it's also useful to anyone interested in playing with a Tyk installation.
+The primary use case for Tyk Demo is to act as a centralised knowledge sharing resource for client-facing technical Tyk staff. However, it's also useful to anyone interested in playing with a Tyk installation.
 
-The repo contains various Postman collections that make it easy to explore and experience Tyk's features and functionality.
+Postman collections are included for some deployments. These are configured to target the features and functionality available in the deployments, making it easy to explore and experience Tyk.
 
 See the [Contributor Guide](CONTRIBUTING.md) for information on how to contribute to and extend this repository.
 
-> :warning: Please note that this repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system or approach. 
+> :warning: Please note that this repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system or approach.
 
 If you encounter a problem using this repository, please try to fix it yourself and create a pull request so that others can benefit.
 
 # Overview
 
-The concept is that there is a **base deployment** of Tyk, which gives you the usual Tyk components: Gateway, Dashboard, Pump, plus the databases Redis and MongoDB. This standard deployment can be extended by including additional **feature deployments** as needed. The feature deployments cover particular scenarios for Tyk, such as:
+This project uses a concept of *deployments* that enable the user to choose what is deployed. There is a *base deployment*, which gives you the standard Tyk components: Gateway, Dashboard, Pump, plus the databases Redis and MongoDB, and other supporting software related that enhance the demo experience. This standard deployment can be extended by including additional *feature deployments* as needed. The feature deployments cover particular scenarios for Tyk, such as:
 
 * Single sign on
 * Analytics export
@@ -25,9 +25,9 @@ The concept is that there is a **base deployment** of Tyk, which gives you the u
 * 2nd Tyk Environment
 * Instrumentation
 
-Each feature deployment has its own directory, with the necessary files to deploy the feature and a readme to describe how to use it.
+Each feature deployment has its own directory, containing all the files necessary to deploy the feature, along with other supporting information, such as documentation.
 
-There is a focus on simplicity. Docker Compose is used to provision the containers, and bootstrap scripts are used to initialise the environment so that it is ready to use straight away - applying configuration and populating data.
+This approach has been taken with the goal of simplicity. You run a single command, triggering Docker Compose to create the containers and bootstrap scripts initialise the environment. Everything is handled automatically, from applying configuration to populating data.
 
 ## Requirements
 
@@ -36,7 +36,10 @@ There is a focus on simplicity. Docker Compose is used to provision the containe
 - If you want to run MDCB deployment (distributed set up with control plane and data plans), then you need to [contact Tyk team](https://tyk.io/pricing-self-managed/) to get a license key. Please leave it if it's the first time you are trying out Tyk and you are not in a position to get engaged at this moment.
 
 ### Software
-docker compose
+- Docker Desktop, with Docker Compose
+- jq
+
+Kubernetes is required by some deployments - but the Kubernetes embedded in Docker Desktop can be used.
 
 ## Repository Structure
 
@@ -48,7 +51,7 @@ docker compose
 
 ## Deployments
 
-The deployment directories (`deployments/*`) contain the various deployments which can be made with this repo. The **base deployment** is in the `deployments/tyk` directory. The other directories are **feature deployments**, which extend the base deployment functionality and require the base deployment in order to function correctly.
+The deployment directories (`deployments/*`) contain the various deployments which can be made with this repo. The *base deployment* is in the `deployments/tyk` directory. The other directories are *feature deployments*, which extend the base deployment functionality and require the base deployment in order to function correctly.
 
 All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.md` files specific to the deployment. They may also contain directories called `data` or `volumes`, which hold the data necessary during bootstrapping or providing as mapped volumes into the container.
 
