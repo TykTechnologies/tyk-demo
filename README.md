@@ -2,11 +2,11 @@
 
 # Tyk Demo
 
-Tyk Demo provides a pre-configured deployment that comes with a wide range of examples that demonstrate Tyk's functionality. It uses Docker Compose for speed and simplicity, enabling you to choose the features you'd like to deploy.
+Tyk Demo offers a pre-configured deployment that includes various examples showcasing Tyk's capabilities. Powered by Docker Compose for swift setup, it allows you to pick and choose the features you want to explore.
 
-The primary use case for Tyk Demo is to act as a centralised knowledge sharing resource for client-facing technical Tyk staff. However, it's also useful to anyone interested in playing with a Tyk installation.
+The primary use case for Tyk Demo is to act as a centralised knowledge sharing resource for client-facing technical Tyk staff. However, anyone curious about Tyk can benefit from Tyk Demo. It's hands-on sandbox environment allows anyone to experiment and learn more about Tyk's features.
 
-Postman collections are included for some deployments. These are configured to target the features and functionality available in the deployments, making it easy to explore and experience Tyk.
+Postman collections are included for some deployments. These are pre-configured to interact with the features and functionality available in the deployments, making it easy to explore and experience Tyk.
 
 See the [Contributor Guide](CONTRIBUTING.md) for information on how to contribute to and extend this repository.
 
