@@ -18,8 +18,8 @@ If you encounter a problem using this repository, please try to fix it yourself 
 
 This project leverages a concept of deployments, enabling users to choose what gets deployed.
 
-- Base deployment: The mandatory deployment that provides standard Tyk components (Gateway, Dashboard, Pump), databases (Redis and MongoDB), and other supporting software to enhance the demo experience.
-- Feature deployments: Extend the base deployment functionality. These deployments cover specific scenarios for Tyk, such as single sign-on, analytics export, etc.
+- **Base deployment**: The mandatory deployment that provides standard Tyk components (Gateway, Dashboard, Pump), databases (Redis and MongoDB), and other supporting software to enhance the demo experience.
+- **Feature deployments**: Extend the base deployment functionality. These deployments cover specific scenarios for Tyk, such as single sign-on, analytics export, etc.
 
 Each deployment has a dedicated directory containing all necessary deployment files and additional information.
 
