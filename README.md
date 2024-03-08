@@ -16,24 +16,20 @@ If you encounter a problem using this repository, please try to fix it yourself 
 
 # Overview
 
-This project uses a concept of *deployments* that enable the user to choose what is deployed. There is a *base deployment*, which gives you the standard Tyk components: Gateway, Dashboard, Pump, plus the databases Redis and MongoDB, and other supporting software related that enhance the demo experience. This standard deployment can be extended by including additional *feature deployments* as needed. The feature deployments cover particular scenarios for Tyk, such as:
+This project leverages a concept of deployments, enabling users to choose what gets deployed.
 
-* Single sign on
-* Analytics export
-* Tracking
-* CI/CD
-* 2nd Tyk Environment
-* Instrumentation
+- Base deployment: The mandatory deployment that provides standard Tyk components (Gateway, Dashboard, Pump), databases (Redis and MongoDB), and other supporting software to enhance the demo experience.
+- Feature deployments: Extend the base deployment functionality. These deployments cover specific scenarios for Tyk, such as single sign-on, analytics export, etc.
 
-Each feature deployment has its own directory, containing all the files necessary to deploy the feature, along with other supporting information, such as documentation.
+Each deployment has a dedicated directory containing all necessary deployment files and additional information.
 
-This approach has been taken with the goal of simplicity. You run a single command, triggering Docker Compose to create the containers and bootstrap scripts initialise the environment. Everything is handled automatically, from applying configuration to populating data.
+This approach focuses on simplicity. Running a single command triggers Docker Compose to create containers, and bootstrap scripts initialise the environment. Everything is handled automatically, from configuration application to data population.
 
 ## Requirements
 
 ### License requirements
 - Get a valid [Tyk Self-Managed license](https://tyk.io/pricing-self-managed/) key (click **"start now"** under **Free trial**). **This is a self-service option!**
-- If you want to run MDCB deployment (distributed set up with control plane and data plans), then you need to [contact Tyk team](https://tyk.io/pricing-self-managed/) to get a license key. Please leave it if it's the first time you are trying out Tyk and you are not in a position to get engaged at this moment.
+- If you want to run the MDCB deployment (distributed set up with control plane and data planes), then you need to [contact the Tyk team](https://tyk.io/pricing-self-managed/) to get an MDCB license key.
 
 ### Software
 - Docker Desktop, with Docker Compose
