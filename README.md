@@ -2,7 +2,7 @@
 
 # Tyk Demo
 
-Tyk Demo is a Tyk deployment that comes pre-configured with a wide range of examples demonstrating Tyk features and functionality. The deployment uses Docker Compose for speed and simplicity, enabling you to choose you the features you'd like to deploy.
+Tyk Demo provides a pre-configured Tyk deployment that comes with a wide range of pre-configured examples. It uses Docker Compose for speed and simplicity, enabling you to choose you the features you'd like to deploy.
 
 The primary use case for Tyk Demo is to act as a centralised knowledge sharing resource for client-facing technical Tyk staff. However, it's also useful to anyone interested in playing with a Tyk installation.
 
