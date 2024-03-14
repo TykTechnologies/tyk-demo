@@ -36,6 +36,7 @@ else
 fi
 
 # clear log files
+mkdir logs 1>/dev/null 2>&1 # create logs directory before creating files
 echo -n > logs/test.log
 echo -n > logs/bootstrap.log
 rm logs/containers-*.log 1>/dev/null # there can be multiple container logs
