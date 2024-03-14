@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source scripts/common.sh
-deployment="GraphQL Federations"
+deployment="GraphQL Federation"
 log_start_deployment
 
 # Setup variables
