@@ -11,7 +11,7 @@ jobs:
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
       - name: Check Out Repository Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - name: Create Environment File
         run: |
@@ -23,7 +23,7 @@ jobs:
         run: sudo ./scripts/test-all.sh
       - name: Store Logs
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: logs
           path: logs/
