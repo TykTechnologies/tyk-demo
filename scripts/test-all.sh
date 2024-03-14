@@ -78,7 +78,7 @@ do
     fi
 
     echo_and_log "Creating deployment: $deployment_name"
-    ./up.sh $deployment_name persist-log
+    ./up.sh $deployment_name persist-log hide-progress
     if [ "$?" != "0" ]; then
         echo_and_log "  ${RED}Failed${NOCOLOUR} to create $deployment_name deployment"
         result_codes[${#result_codes[@]}]=4

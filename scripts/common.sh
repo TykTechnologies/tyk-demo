@@ -27,7 +27,9 @@ function check_variables() {
 }
 
 bootstrap_progress () {
-  printf "  Bootstrapping $deployment ${spinner_chars:spinner_count++%${#spinner_chars}:1} \r"
+  if [ ! -f .bootstrap/hide_progress ]; then
+    printf "  Bootstrapping $deployment ${spinner_chars:spinner_count++%${#spinner_chars}:1} \r"
+  fi
 }
 
 log_http_result () {
