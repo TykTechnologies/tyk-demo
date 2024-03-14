@@ -119,15 +119,19 @@ fi
 # display commands to process
 echo "Commands to process:"
 if (( ${#commands_to_process[@]} != 0 )); then
-  for command in "$commands_to_process"; do    
+  for command in "${commands_to_process[@]}"; do    
     case $command in
       "persist-log")
         echo "  persist-log: Logs will be persisted"
-        persist_log=true;;
+        persist_log=true
+        ;;
       "hide-progress")
-        echo "  hide-progress: Progress meter will not be shown"
-        touch .bootstrap/hide_progress;;
-      *) echo "Command \"$command\" is unknown, ignoring.";; 
+        echo "  hide-progress: Deployment progress meter will not be shown"
+        touch .bootstrap/hide_progress
+        ;;
+      *) 
+        echo "Command \"$command\" is unknown, ignoring."
+        ;; 
     esac
   done
 else
