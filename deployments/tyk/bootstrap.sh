@@ -111,33 +111,36 @@ wait_for_liveness
 
 # Python plugin
 
-log_message "Building Python plugin bundle"
-docker exec -d $(get_service_container_id tyk-gateway) sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1> /dev/null 2>> logs/bootstrap.log
-if [ "$?" != 0 ]; then
-  echo "Error occurred when building Python plugin bundle"
-  exit 1
-fi
-log_ok
-bootstrap_progress
+#### Python plugin build temporarily removed due to Python not being bundled with v5.3 gateway release. 
+#### This will be reinstated once there is an established process.
 
-log_message "Copying Python bundle to http-server"
-# we don't use a 'docker compose' command here as docker compose version 1 does not support 'cp'
-docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip 2>> logs/bootstrap.log
-if [ "$?" != 0 ]; then
-  echo "Error occurred when copying Python bundle to http-server"
-  exit 1
-fi
-log_ok
-bootstrap_progress
+# log_message "Building Python plugin bundle"
+# docker exec -d $(get_service_container_id tyk-gateway) sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1> /dev/null 2>> logs/bootstrap.log
+# if [ "$?" != 0 ]; then
+#   echo "Error occurred when building Python plugin bundle"
+#   exit 1
+# fi
+# log_ok
+# bootstrap_progress
 
-log_message "Removing Python bundle intermediate assets"
-rm -r deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
-if [ "$?" != 0 ]; then
-  echo "Error occurred when removing Python bundle intermediate assets"
-  exit 1
-fi
-log_ok
-bootstrap_progress
+# log_message "Copying Python bundle to http-server"
+# # we don't use a 'docker compose' command here as docker compose version 1 does not support 'cp'
+# docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip 2>> logs/bootstrap.log
+# if [ "$?" != 0 ]; then
+#   echo "Error occurred when copying Python bundle to http-server"
+#   exit 1
+# fi
+# log_ok
+# bootstrap_progress
+
+# log_message "Removing Python bundle intermediate assets"
+# rm -r deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
+# if [ "$?" != 0 ]; then
+#   echo "Error occurred when removing Python bundle intermediate assets"
+#   exit 1
+# fi
+# log_ok
+# bootstrap_progress
 
 # Go plugins
 
@@ -422,28 +425,31 @@ do
 done
 log_ok
 
-log_message "Checking Gateway - Python middleware"
-result=""
-reload_attempt=0
-while [ "$result" != "0" ]
-do
-  wait_for_response "$gateway_base_url/python-middleware-api/get" "200" "" 3
-  result="$?"
-  if [ "$result" != "0" ]
-  then
-    reload_attempt=$((reload_attempt+1))
-    if [ "$reload_attempt" -lt "3"  ]; then
-      log_message "  Gateway not returning desired response, attempting hot reload"
-      hot_reload "$gateway_base_url" "$gateway_api_credentials"
-      sleep 2
-    else
-      log_message "  Maximum reload attempt reached"
-      exit 1
-    fi
-  fi
-  bootstrap_progress
-done
-log_ok
+#### Python check temporarily removed due to Python not being bundled with v5.3 gateway release. 
+#### This will be reinstated once there is an established process.
+
+# log_message "Checking Gateway - Python middleware"
+# result=""
+# reload_attempt=0
+# while [ "$result" != "0" ]
+# do
+#   wait_for_response "$gateway_base_url/python-middleware-api/get" "200" "" 3
+#   result="$?"
+#   if [ "$result" != "0" ]
+#   then
+#     reload_attempt=$((reload_attempt+1))
+#     if [ "$reload_attempt" -lt "3"  ]; then
+#       log_message "  Gateway not returning desired response, attempting hot reload"
+#       hot_reload "$gateway_base_url" "$gateway_api_credentials"
+#       sleep 2
+#     else
+#       log_message "  Maximum reload attempt reached"
+#       exit 1
+#     fi
+#   fi
+#   bootstrap_progress
+# done
+# log_ok
 
 log_message "Checking Gateway - Go plugin"
 result=""
