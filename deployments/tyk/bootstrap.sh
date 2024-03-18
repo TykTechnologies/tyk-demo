@@ -355,15 +355,22 @@ bootstrap_progress
 
 log_message "Checking Gateway - Anonymous API access"
 result=""
+reload_attempt=0
 while [ "$result" != "0" ]
 do
   wait_for_response "$gateway_base_url/basic-open-api/get" "200" "" 3
   result="$?"
   if [ "$result" != "0" ]
   then
-    log_message "  Gateway not returning desired response, attempting hot reload"
-    hot_reload "$gateway_base_url" "$gateway_api_credentials"
-    sleep 2
+    reload_attempt=$((reload_attempt+1))
+    if [ "$reload_attempt" -lt "3"  ]; then
+      log_message "  Gateway not returning desired response, attempting hot reload"
+      hot_reload "$gateway_base_url" "$gateway_api_credentials"
+      sleep 2
+    else
+      log_message "  Maximum reload attempt reached"
+      exit 1
+    fi
   fi
   bootstrap_progress
 done
@@ -371,15 +378,22 @@ log_ok
 
 log_message "Checking Gateway - Authenticated API access (bearer token)"
 result=""
+reload_attempt=0
 while [ "$result" != "0" ]
 do
   wait_for_response "$gateway_base_url/basic-protected-api/get" "200" "Authorization:auth_key" 3
   result="$?"
   if [ "$result" != "0" ]
   then
-    log_message "  Gateway not returning desired response, attempting hot reload"
-    hot_reload "$gateway_base_url" "$gateway_api_credentials"
-    sleep 2
+    reload_attempt=$((reload_attempt+1))
+    if [ "$reload_attempt" -lt "3"  ]; then
+      log_message "  Gateway not returning desired response, attempting hot reload"
+      hot_reload "$gateway_base_url" "$gateway_api_credentials"
+      sleep 2
+    else
+      log_message "  Maximum reload attempt reached"
+      exit 1
+    fi
   fi
   bootstrap_progress
 done
@@ -387,15 +401,22 @@ log_ok
 
 log_message "Checking Gateway - Authenticated API access (basic)"
 result=""
+reload_attempt=0
 while [ "$result" != "0" ]
 do
   wait_for_response "$gateway_base_url/basic-authentication-api/get" "200" "Authorization:Basic YmFzaWNfYXV0aF91c2VybmFtZTpiYXNpYy1hdXRoLXBhc3N3b3Jk" 3
   result="$?"
   if [ "$result" != "0" ]
   then
-    log_message "  Gateway not returning desired response, attempting hot reload"
-    hot_reload "$gateway_base_url" "$gateway_api_credentials"
-    sleep 2
+    reload_attempt=$((reload_attempt+1))
+    if [ "$reload_attempt" -lt "3"  ]; then
+      log_message "  Gateway not returning desired response, attempting hot reload"
+      hot_reload "$gateway_base_url" "$gateway_api_credentials"
+      sleep 2
+    else
+      log_message "  Maximum reload attempt reached"
+      exit 1
+    fi
   fi
   bootstrap_progress
 done
@@ -403,15 +424,22 @@ log_ok
 
 log_message "Checking Gateway - Python middleware"
 result=""
+reload_attempt=0
 while [ "$result" != "0" ]
 do
   wait_for_response "$gateway_base_url/python-middleware-api/get" "200" "" 3
   result="$?"
   if [ "$result" != "0" ]
   then
-    log_message "  Gateway not returning desired response, attempting hot reload"
-    hot_reload "$gateway_base_url" "$gateway_api_credentials"
-    sleep 2
+    reload_attempt=$((reload_attempt+1))
+    if [ "$reload_attempt" -lt "3"  ]; then
+      log_message "  Gateway not returning desired response, attempting hot reload"
+      hot_reload "$gateway_base_url" "$gateway_api_credentials"
+      sleep 2
+    else
+      log_message "  Maximum reload attempt reached"
+      exit 1
+    fi
   fi
   bootstrap_progress
 done
@@ -419,15 +447,22 @@ log_ok
 
 log_message "Checking Gateway - Go plugin"
 result=""
+reload_attempt=0
 while [ "$result" != "0" ]
 do
   wait_for_response "$gateway_base_url/go-plugin-api-no-auth/get" "200" "" 3
   result="$?"
   if [ "$result" != "0" ]
   then
-    log_message "  Gateway not returning desired response, attempting hot reload"
-    hot_reload "$gateway_base_url" "$gateway_api_credentials"
-    sleep 2
+    reload_attempt=$((reload_attempt+1))
+    if [ "$reload_attempt" -lt "3"  ]; then
+      log_message "  Gateway not returning desired response, attempting hot reload"
+      hot_reload "$gateway_base_url" "$gateway_api_credentials"
+      sleep 2
+    else
+      log_message "  Maximum reload attempt reached"
+      exit 1
+    fi
   fi
   bootstrap_progress
 done
@@ -435,15 +470,22 @@ log_ok
 
 log_message "Checking Gateway 2 - Anonymous API access"
 result=""
+reload_attempt=0
 while [ "$result" != "0" ]
 do
   wait_for_response "$gateway2_base_url/basic-open-api/get" "200" "" 3
   result="$?"
   if [ "$result" != "0" ]
   then
-    log_message "  Gateway 2 not returning desired response, attempting hot reload"
-    hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
-    sleep 2
+    reload_attempt=$((reload_attempt+1))
+    if [ "$reload_attempt" -lt "3"  ]; then
+      log_message "  Gateway 2 not returning desired response, attempting hot reload"
+      hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
+      sleep 2
+    else
+      log_message "  Maximum reload attempt reached"
+      exit 1
+    fi
   fi
   bootstrap_progress
 done
