@@ -354,6 +354,24 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     log_message "Creating OAuth Clients"
     for file in $data_group_path/oauth/clients/*; do
       if [[ -f $file ]]; then
+        # before attempting to create the key we check that the API gateway has loaded the OAuth API, otherwise the request will fail
+        target_api_id=$(cat deployments/tyk/data/tyk-dashboard/1/oauth/clients/oauth-client-1.json | jq '.api_id' --raw-output)
+        target_api_result=""
+        attempt_count=0
+        while [ "$target_api_result" != "200" ]; do
+          attempt_count=$((attempt_count+1))
+          if [ "$attempt_count" -gt "10"  ]; then
+            echo "ERROR: Target OAuth API not available on Gateway"
+            exit 1
+          fi
+          target_api_result=$(curl "$gateway_base_url/tyk/apis/$target_api_id" -o /dev/null -s -w "%{http_code}\n" -H "x-tyk-authorization: $gateway_api_credentials")
+          if [ "$target_api_result" != "200" ]; then
+            log_message "  Target API not yet loaded by Gateway, waiting..."
+            bootstrap_progress
+            sleep 2
+          fi
+        done
+        # reaching this point means that the gateway has loaded target OAuth API
         create_oauth_client "$file" "$dashboard_user_api_key"
         bootstrap_progress        
       fi
