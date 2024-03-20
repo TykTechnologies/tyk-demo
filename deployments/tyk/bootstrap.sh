@@ -58,6 +58,12 @@ wait_for_liveness
 
 log_message "OpenSSL version used for generating certs: $(docker exec $(get_service_container_id tyk-gateway) sh -c "openssl version")"
 
+log_message "Removing any pre-existing certs"
+rm deployments/tyk/volumes/tyk-dashboard/certs/*.pem 1> /dev/null 2>> logs/bootstrap.log
+rm deployments/tyk/volumes/tyk-gateway/certs/*.pem 1> /dev/null 2>> logs/bootstrap.log
+log_ok
+sleep 1
+
 log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
 docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tyk-gateway-2.localhost\" -keyout certs/tls-private-key.pem -out certs/tls-certificate.pem -days 365 -nodes" >>logs/bootstrap.log
 if [ "$?" != "0" ]; then
@@ -66,6 +72,7 @@ if [ "$?" != "0" ]; then
 fi
 log_ok
 bootstrap_progress
+sleep 1
 
 log_message "Generating private key for secure messaging and signing"
 docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl genrsa -out certs/private-key.pem 2048" >>logs/bootstrap.log
@@ -75,7 +82,18 @@ if [ "$?" != "0" ]; then
 fi
 log_ok
 bootstrap_progress
+sleep 1
 
+log_message "Checking that certificate is ready"
+while [ ! -f deployments/tyk/volumes/tyk-gateway/certs/private-key.pem ]; do
+  log_message "  Not ready, waiting..."
+  bootstrap_progress
+  sleep 2
+done
+log_ok
+bootstrap_progress
+
+sleep 1
 log_message "Copying private key to the Dashboard"
 docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs >>logs/bootstrap.log
 if [ "$?" != "0" ]; then
@@ -85,6 +103,7 @@ fi
 log_ok
 bootstrap_progress
 
+sleep 1
 log_message "Generating public key for secure messaging and signing"
 docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl rsa -in certs/private-key.pem -pubout -out certs/public-key.pem" >>logs/bootstrap.log
 if [ "$?" != "0" ]; then
@@ -326,6 +345,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
       fi
     done
 
+    sleep 2
     # OAuth - Clients
     log_message "Creating OAuth Clients"
     for file in $data_group_path/oauth/clients/*; do
