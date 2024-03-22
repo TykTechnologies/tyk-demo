@@ -254,6 +254,12 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
       fi
     done
 
+    log_message "Waiting for API availability"
+    # this api id is for the 'basic open api', and will validate that the Gateway has loaded it after it was added to the Dashboard
+    wait_for_api_loaded "727dad853a8a45f64ab981154d1ffdad" "$gateway_base_url" "$gateway_api_credentials"
+    log_ok
+    bootstrap_progress
+
     # Policies
     log_message "Creating Policies"
     for file in $data_group_path/policies/*; do
