@@ -6,6 +6,8 @@ log_start_deployment
 bootstrap_progress
 
 kibana_base_url="http://localhost:5601"
+gateway_base_url="http://$(jq -r '.host_config.override_hostname' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
+gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
 
 log_message "Waiting for kibana to return desired response"
 wait_for_response "$kibana_base_url/app/kibana" "200"
@@ -44,6 +46,12 @@ if [ "$service_process" != "" ]; then
 fi
 log_ok
 bootstrap_progress
+
+log_message "Wait for API availability"
+# this api id is for the 'basic open api' called by the next section
+wait_for_api_loaded "727dad853a8a45f64ab981154d1ffdad" "$gateway_base_url" "$gateway_api_credentials"
+log_ok
+bootstrap_progress        
 
 log_message "Sending a test request to provide Kibana with data, as Tyk bootstrap requests will not have been picked up by the Pump from this deployment"
 log_http_result "$(curl -s localhost:8080/basic-open-api/get -o /dev/null -w "%{http_code}" 2>> logs/bootstrap.log)"
