@@ -1,5 +1,5 @@
 ---
-version: '3.3'
+version: "3.3"
 services:
   keycloak-db:
     image: postgres:9.6
@@ -10,17 +10,21 @@ services:
     networks:
       - tyk
     ports:
-      - "25432:5432"
+      - 25432:5432
     volumes:
       - keycloak-data:/var/lib/postresql/data
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "keycloak" ]
+      test:
+        - CMD
+        - pg_isready
+        - -U
+        - keycloak
       interval: 30s
       timeout: 30s
       retries: 3
     restart: on-failure
     deploy:
-      restart_policy: 
+      restart_policy:
         condition: on-failure
   keycloak:
     image: keycloak/keycloak:24.0.1
@@ -29,8 +33,9 @@ services:
     networks:
       - tyk
     ports:
-      - "8180:8180"
-    command: ["start-dev"]
+      - 8180:8180
+    command:
+      - start-dev
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: keycloak-db
@@ -43,4 +48,4 @@ services:
       KC_HEALTH_ENABLED: true
       KC_HTTP_PORT: 8180
 volumes:
-  keycloak-data:
+  keycloak-data: null
