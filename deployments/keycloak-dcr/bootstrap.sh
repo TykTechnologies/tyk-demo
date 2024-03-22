@@ -106,7 +106,7 @@ bootstrap_progress
 log_end_deployment
 
 echo -e "\033[2K
-▼ IdP
+▼ Dynamic Client Registration
   ▽ Keycloak
             Browser URL : $keycloak_base_url
-                  Login : admin/admin"
+      Username/Password : admin/admin"
