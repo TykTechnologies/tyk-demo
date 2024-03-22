@@ -788,6 +788,27 @@ create_oauth_client () {
   fi
 }
 
+wait_for_api_loaded () {
+  api_id="$1"
+  gateway_url="$2"
+  gateway_auth="$3"
+  target_api_result=""
+  attempt_count=0
+  while [ "$target_api_result" != "200" ]; do
+    attempt_count=$((attempt_count+1))
+    if [ "$attempt_count" -gt "10"  ]; then
+      echo "ERROR: Target API ($target_api_id) not available on Gateway ($gateway_url) - max retry reached"
+      exit 1
+    fi
+    target_api_result=$(curl "$gateway_url/tyk/apis/$target_api_id" -o /dev/null -s -w "%{http_code}\n" -H "x-tyk-authorization: $gateway_auth")
+    if [ "$target_api_result" != "200" ]; then
+      log_message "  Waiting for $api_id to become available on $gateway_url..."
+      bootstrap_progress
+      sleep 2
+    fi
+  done
+}
+
 wait_for_liveness () {
 
   attempt_count=0
