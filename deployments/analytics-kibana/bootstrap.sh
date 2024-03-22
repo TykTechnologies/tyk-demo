@@ -47,7 +47,7 @@ fi
 log_ok
 bootstrap_progress
 
-log_message "Wait for API availability"
+log_message "Waiting for API availability"
 # this api id is for the 'basic open api' called by the next section
 wait_for_api_loaded "727dad853a8a45f64ab981154d1ffdad" "$gateway_base_url" "$gateway_api_credentials"
 log_ok

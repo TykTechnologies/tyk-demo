@@ -24,7 +24,7 @@ bootstrap_progress
 create_api "deployments/federation/data/apis-supergraph.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
 bootstrap_progress
 
-log_message "Wait for API availability"
+log_message "Waiting for API availability"
 for file in deployments/federation/data/*; do
   if [[ -f $file ]]; then
     target_api_id=$(cat $file | jq '.api_definition.api_id' --raw-output)
