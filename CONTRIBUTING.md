@@ -137,7 +137,7 @@ These utility scripts are available in the `scripts` directory:
 * `add-gateway.sh`: Creates a new Tyk Gateway container, using the same configuration as the base Tyk deployment Gateway
 * `common.sh`: Contains functions useful for bootstrap scripts
 * `export.sh`: Uses the Dashboard API to export API and Policy definitions, overwriting data used to bootstrap the base Tyk deployment
-* `test.sh`: Uses a Newman container to run the Postman collection tests for only the **Tyk** deployment
+* `test.sh`: Uses a Newman container to run the Postman collection tests for all deployment that are currently bootstrapped
 * `test-all.sh`: As `test.sh`, but runs for all deployments
 * `update-hosts.sh`: Adds the necessary hosts to the `/etc/hosts` file
 
