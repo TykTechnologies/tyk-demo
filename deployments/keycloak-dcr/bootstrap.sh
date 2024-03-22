@@ -10,14 +10,13 @@ dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_
 dashboard_user_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
 gateway_base_url="http://tyk-gateway.localhost:8080"
 gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
-keycloak_base_url="http://keycloak:8180/auth"
-keycloak_admin_url="http://keycloak:8180/auth/admin"
+keycloak_base_url="http://keycloak:8180"
 
 log_message "Waiting for Dashboard API to be ready"
 wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
 
 log_message "Waiting for Keycloak to respond ok"
-wait_for_response "$keycloak_base_url/" "200"
+wait_for_response "$keycloak_base_url/health/ready" "200"
 
 
 log_message "Obtaining keycloak user access token"
@@ -34,7 +33,7 @@ bootstrap_progress
 
 
 log_message "Creating a new initial access token"
-api_response="$(curl $keycloak_admin_url/realms/master/clients-initial-access -s \
+api_response="$(curl $keycloak_base_url/admin/realms/master/clients-initial-access -s \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $access_token" \
   -d '{"count": 5}')"
@@ -109,5 +108,5 @@ log_end_deployment
 echo -e "\033[2K
 ▼ IdP
   ▽ Keycloak
-            Browser URL : $keycloak_admin_url
+            Browser URL : $keycloak_base_url
                   Login : admin/admin"
