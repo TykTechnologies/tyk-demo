@@ -18,13 +18,19 @@ trap onExit EXIT;
 
 # loop through bootstrapped deployments
 while IFS= read -r deployment; do
+    collection_path="$(pwd)/deployments/$deployment/tyk_demo_${deployment//-/_}.postman_collection.json"
+    if [ ! -f $collection_path ]; then
+        echo "$deployment deployment does not contain a postman collection"
+        continue
+    fi
+
     echo "Running tests for $deployment deployment"
 
     # Provide the 'test' environment variables, so newman can target the correct hosts from within the docker network
     # --insecure option is used due to self-signed certificates
     docker run -t --rm \
         --network tyk-demo_tyk \
-        -v $(pwd)/deployments/$deployment/tyk_demo_$deployment.postman_collection.json:/etc/postman/tyk_demo.postman_collection.json \
+        -v $collection_path:/etc/postman/tyk_demo.postman_collection.json \
         -v $(pwd)/test.postman_environment.json:/etc/postman/test.postman_environment.json \
         postman/newman:alpine \
         run "/etc/postman/tyk_demo.postman_collection.json" \
