@@ -177,7 +177,7 @@
             "use_go_plugin_auth": false,
             "enable_coprocess_auth": false,
             "jwt_signing_method": "rsa",
-            "jwt_source": "aHR0cDovL2tleWNsb2FrOjgxODAvYXV0aC9yZWFsbXMvbWFzdGVyL3Byb3RvY29sL29wZW5pZC1jb25uZWN0L2NlcnRz",
+            "jwt_source": "aHR0cDovL2tleWNsb2FrOjgxODAvcmVhbG1zL21hc3Rlci9wcm90b2NvbC9vcGVuaWQtY29ubmVjdC9jZXJ0cw==",
             "jwt_identity_base_field": "sub",
             "jwt_client_base_field": "",
             "jwt_policy_field_name": "pol",
@@ -258,7 +258,7 @@
             "proxy": {
                 "preserve_host_header": false,
                 "listen_path": "/keycloak-dcr-api/",
-                "target_url": "http://httpbin.org",
+                "target_url": "http://httpbin",
                 "disable_strip_slash": true,
                 "strip_listen_path": true,
                 "enable_load_balancing": false,

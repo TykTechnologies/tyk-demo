@@ -58,6 +58,11 @@ wait_for_liveness
 
 log_message "OpenSSL version used for generating certs: $(docker exec $(get_service_container_id tyk-gateway) sh -c "openssl version")"
 
+log_message "Removing any pre-existing certs"
+rm deployments/tyk/volumes/tyk-dashboard/certs/*.pem 1> /dev/null 2>> logs/bootstrap.log
+rm deployments/tyk/volumes/tyk-gateway/certs/*.pem 1> /dev/null 2>> logs/bootstrap.log
+log_ok
+
 log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
 docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tyk-gateway-2.localhost\" -keyout certs/tls-private-key.pem -out certs/tls-certificate.pem -days 365 -nodes" >>logs/bootstrap.log
 if [ "$?" != "0" ]; then
@@ -76,12 +81,31 @@ fi
 log_ok
 bootstrap_progress
 
+log_message "Checking that certificate is ready"
+while [ ! -f deployments/tyk/volumes/tyk-gateway/certs/private-key.pem ]; do
+  log_message "  Not ready, waiting..."
+  bootstrap_progress
+  sleep 2
+done
+log_ok
+bootstrap_progress
+
 log_message "Copying private key to the Dashboard"
-docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs >>logs/bootstrap.log
-if [ "$?" != "0" ]; then
-  echo "ERROR: Could not copy private key"
-  exit 1
-fi
+cert_check=""
+begin_cert="-----BEGIN PRIVATE KEY-----"
+while [ "$cert_check" != "$begin_cert" ]; do
+  docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs >>logs/bootstrap.log
+  if [ "$?" != "0" ]; then
+    echo "ERROR: Could not copy private key"
+    exit 1
+  fi
+  cert_check=$(head -n 1 deployments/tyk/volumes/tyk-dashboard/certs/private-key.pem)
+  if [ "$cert_check" != "$begin_cert" ]; then
+    log_message "  Could not find private key data, retrying copy"
+    bootstrap_progress
+    sleep 1
+  fi
+done
 log_ok
 bootstrap_progress
 
@@ -111,33 +135,36 @@ wait_for_liveness
 
 # Python plugin
 
-log_message "Building Python plugin bundle"
-docker exec -d $(get_service_container_id tyk-gateway) sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1> /dev/null 2>> logs/bootstrap.log
-if [ "$?" != 0 ]; then
-  echo "Error occurred when building Python plugin bundle"
-  exit 1
-fi
-log_ok
-bootstrap_progress
+#### Python plugin build temporarily removed due to Python not being bundled with v5.3 gateway release. 
+#### This will be reinstated once there is an established process.
 
-log_message "Copying Python bundle to http-server"
-# we don't use a 'docker compose' command here as docker compose version 1 does not support 'cp'
-docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip 2>> logs/bootstrap.log
-if [ "$?" != 0 ]; then
-  echo "Error occurred when copying Python bundle to http-server"
-  exit 1
-fi
-log_ok
-bootstrap_progress
+# log_message "Building Python plugin bundle"
+# docker exec -d $(get_service_container_id tyk-gateway) sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1> /dev/null 2>> logs/bootstrap.log
+# if [ "$?" != 0 ]; then
+#   echo "Error occurred when building Python plugin bundle"
+#   exit 1
+# fi
+# log_ok
+# bootstrap_progress
 
-log_message "Removing Python bundle intermediate assets"
-rm -r deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
-if [ "$?" != 0 ]; then
-  echo "Error occurred when removing Python bundle intermediate assets"
-  exit 1
-fi
-log_ok
-bootstrap_progress
+# log_message "Copying Python bundle to http-server"
+# # we don't use a 'docker compose' command here as docker compose version 1 does not support 'cp'
+# docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip 2>> logs/bootstrap.log
+# if [ "$?" != 0 ]; then
+#   echo "Error occurred when copying Python bundle to http-server"
+#   exit 1
+# fi
+# log_ok
+# bootstrap_progress
+
+# log_message "Removing Python bundle intermediate assets"
+# rm -r deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
+# if [ "$?" != 0 ]; then
+#   echo "Error occurred when removing Python bundle intermediate assets"
+#   exit 1
+# fi
+# log_ok
+# bootstrap_progress
 
 # Go plugins
 
@@ -226,6 +253,12 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
         bootstrap_progress
       fi
     done
+
+    log_message "Waiting for API availability"
+    # this api id is for the 'basic open api', and will validate that the Gateway has loaded it after it was added to the Dashboard
+    wait_for_api_loaded "727dad853a8a45f64ab981154d1ffdad" "$gateway_base_url" "$gateway_api_credentials"
+    log_ok
+    bootstrap_progress
 
     # Policies
     log_message "Creating Policies"
@@ -327,6 +360,10 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     log_message "Creating OAuth Clients"
     for file in $data_group_path/oauth/clients/*; do
       if [[ -f $file ]]; then
+        target_api_id=$(cat $file | jq '.api_id' --raw-output)
+        # before attempting to create the key we check that the API gateway has loaded the OAuth API, otherwise the request will fail
+        wait_for_api_loaded "$target_api_id" "$gateway_base_url" "$gateway_api_credentials"
+        # reaching this point means that the gateway has loaded target OAuth API
         create_oauth_client "$file" "$dashboard_user_api_key"
         bootstrap_progress        
       fi
@@ -355,15 +392,22 @@ bootstrap_progress
 
 log_message "Checking Gateway - Anonymous API access"
 result=""
+reload_attempt=0
 while [ "$result" != "0" ]
 do
   wait_for_response "$gateway_base_url/basic-open-api/get" "200" "" 3
   result="$?"
   if [ "$result" != "0" ]
   then
-    log_message "  Gateway not returning desired response, attempting hot reload"
-    hot_reload "$gateway_base_url" "$gateway_api_credentials"
-    sleep 2
+    reload_attempt=$((reload_attempt+1))
+    if [ "$reload_attempt" -lt "3"  ]; then
+      log_message "  Gateway not returning desired response, attempting hot reload"
+      hot_reload "$gateway_base_url" "$gateway_api_credentials"
+      sleep 2
+    else
+      log_message "  Maximum reload attempt reached"
+      exit 1
+    fi
   fi
   bootstrap_progress
 done
@@ -371,15 +415,22 @@ log_ok
 
 log_message "Checking Gateway - Authenticated API access (bearer token)"
 result=""
+reload_attempt=0
 while [ "$result" != "0" ]
 do
   wait_for_response "$gateway_base_url/basic-protected-api/get" "200" "Authorization:auth_key" 3
   result="$?"
   if [ "$result" != "0" ]
   then
-    log_message "  Gateway not returning desired response, attempting hot reload"
-    hot_reload "$gateway_base_url" "$gateway_api_credentials"
-    sleep 2
+    reload_attempt=$((reload_attempt+1))
+    if [ "$reload_attempt" -lt "3"  ]; then
+      log_message "  Gateway not returning desired response, attempting hot reload"
+      hot_reload "$gateway_base_url" "$gateway_api_credentials"
+      sleep 2
+    else
+      log_message "  Maximum reload attempt reached"
+      exit 1
+    fi
   fi
   bootstrap_progress
 done
@@ -387,47 +438,71 @@ log_ok
 
 log_message "Checking Gateway - Authenticated API access (basic)"
 result=""
+reload_attempt=0
 while [ "$result" != "0" ]
 do
   wait_for_response "$gateway_base_url/basic-authentication-api/get" "200" "Authorization:Basic YmFzaWNfYXV0aF91c2VybmFtZTpiYXNpYy1hdXRoLXBhc3N3b3Jk" 3
   result="$?"
   if [ "$result" != "0" ]
   then
-    log_message "  Gateway not returning desired response, attempting hot reload"
-    hot_reload "$gateway_base_url" "$gateway_api_credentials"
-    sleep 2
+    reload_attempt=$((reload_attempt+1))
+    if [ "$reload_attempt" -lt "3"  ]; then
+      log_message "  Gateway not returning desired response, attempting hot reload"
+      hot_reload "$gateway_base_url" "$gateway_api_credentials"
+      sleep 2
+    else
+      log_message "  Maximum reload attempt reached"
+      exit 1
+    fi
   fi
   bootstrap_progress
 done
 log_ok
 
-log_message "Checking Gateway - Python middleware"
-result=""
-while [ "$result" != "0" ]
-do
-  wait_for_response "$gateway_base_url/python-middleware-api/get" "200" "" 3
-  result="$?"
-  if [ "$result" != "0" ]
-  then
-    log_message "  Gateway not returning desired response, attempting hot reload"
-    hot_reload "$gateway_base_url" "$gateway_api_credentials"
-    sleep 2
-  fi
-  bootstrap_progress
-done
-log_ok
+#### Python check temporarily removed due to Python not being bundled with v5.3 gateway release. 
+#### This will be reinstated once there is an established process.
+
+# log_message "Checking Gateway - Python middleware"
+# result=""
+# reload_attempt=0
+# while [ "$result" != "0" ]
+# do
+#   wait_for_response "$gateway_base_url/python-middleware-api/get" "200" "" 3
+#   result="$?"
+#   if [ "$result" != "0" ]
+#   then
+#     reload_attempt=$((reload_attempt+1))
+#     if [ "$reload_attempt" -lt "3"  ]; then
+#       log_message "  Gateway not returning desired response, attempting hot reload"
+#       hot_reload "$gateway_base_url" "$gateway_api_credentials"
+#       sleep 2
+#     else
+#       log_message "  Maximum reload attempt reached"
+#       exit 1
+#     fi
+#   fi
+#   bootstrap_progress
+# done
+# log_ok
 
 log_message "Checking Gateway - Go plugin"
 result=""
+reload_attempt=0
 while [ "$result" != "0" ]
 do
   wait_for_response "$gateway_base_url/go-plugin-api-no-auth/get" "200" "" 3
   result="$?"
   if [ "$result" != "0" ]
   then
-    log_message "  Gateway not returning desired response, attempting hot reload"
-    hot_reload "$gateway_base_url" "$gateway_api_credentials"
-    sleep 2
+    reload_attempt=$((reload_attempt+1))
+    if [ "$reload_attempt" -lt "3"  ]; then
+      log_message "  Gateway not returning desired response, attempting hot reload"
+      hot_reload "$gateway_base_url" "$gateway_api_credentials"
+      sleep 2
+    else
+      log_message "  Maximum reload attempt reached"
+      exit 1
+    fi
   fi
   bootstrap_progress
 done
@@ -435,15 +510,22 @@ log_ok
 
 log_message "Checking Gateway 2 - Anonymous API access"
 result=""
+reload_attempt=0
 while [ "$result" != "0" ]
 do
   wait_for_response "$gateway2_base_url/basic-open-api/get" "200" "" 3
   result="$?"
   if [ "$result" != "0" ]
   then
-    log_message "  Gateway 2 not returning desired response, attempting hot reload"
-    hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
-    sleep 2
+    reload_attempt=$((reload_attempt+1))
+    if [ "$reload_attempt" -lt "3"  ]; then
+      log_message "  Gateway 2 not returning desired response, attempting hot reload"
+      hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
+      sleep 2
+    else
+      log_message "  Maximum reload attempt reached"
+      exit 1
+    fi
   fi
   bootstrap_progress
 done

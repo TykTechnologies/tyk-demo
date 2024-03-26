@@ -1,12 +1,13 @@
 {
 	"info": {
-		"_postman_id": "536c8d57-c0d1-4ed3-b934-812b0e84809e",
+		"_postman_id": "a9424867-b45b-4bdc-b2c9-06c88e548e25",
 		"name": "Tyk Demo - Keycloak DCR",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6131676"
 	},
 	"item": [
 		{
-			"name": "Obtain access token from keycloak",
+			"name": "Part 1 - Obtain access token from keycloak",
 			"event": [
 				{
 					"listen": "test",
@@ -55,13 +56,12 @@
 					]
 				},
 				"url": {
-					"raw": "http://{{keycloak.host}}/auth/realms/{{realm}}/protocol/openid-connect/token",
+					"raw": "http://{{keycloak.host}}/realms/{{realm}}/protocol/openid-connect/token",
 					"protocol": "http",
 					"host": [
 						"{{keycloak.host}}"
 					],
 					"path": [
-						"auth",
 						"realms",
 						"{{realm}}",
 						"protocol",
@@ -69,19 +69,19 @@
 						"token"
 					]
 				},
-				"description": "Obtain SAT (service account token)"
+				"description": "Obtain SAT (service account token)\n\nTo use this example, you must update the `client_id` and `client_secret` values, using those of the OAuth client created by following the guidance as described in the _usage_ section of the deployment readme."
 			},
 			"response": []
 		},
 		{
-			"name": "Call API",
+			"name": "Part 2 - Call API",
 			"request": {
 				"auth": {
 					"type": "bearer",
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJwVGNPWFZRUHNMRzNSSVpzUFpHc2lET2JUTjZBNkluV0UtMi1COGUxR1pZIn0.eyJleHAiOjE2NDMzNjQxMDMsImlhdCI6MTY0MzM2NDA0MywianRpIjoiZWMyMTg5NWYtZjE3Zi00MzMzLWIwNjgtNjhhZWFmYjdkNTExIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MTgwL2F1dGgvcmVhbG1zL21hc3RlciIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJjZTczNjM5Yy04YjRiLTQzYzEtYWMyYi04ZTgyOWMwMjYzZWYiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiI5NDQwNzkyMS04N2Y2LTQzZWYtYmQyNi04Zjg3ZTFlYTJkNDYiLCJzZXNzaW9uX3N0YXRlIjoiY2MyMjI1OTctNTA2NC00MzJiLWIxNzctZjcwNTIwOTkwYjZlIiwiYWNyIjoiMSIsInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwiY2xpZW50SWQiOiI5NDQwNzkyMS04N2Y2LTQzZWYtYmQyNi04Zjg3ZTFlYTJkNDYiLCJjbGllbnRIb3N0IjoiMTkyLjE2OC4wLjEiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6InNlcnZpY2UtYWNjb3VudC05NDQwNzkyMS04N2Y2LTQzZWYtYmQyNi04Zjg3ZTFlYTJkNDYiLCJjbGllbnRBZGRyZXNzIjoiMTkyLjE2OC4wLjEifQ.c3QWZHTTeRiENTvZ9Yf2ncsK414MxyJgbpI3zAOQRoycAv_8UYXTSx_24PyHem-SIPA8gQo7FHA9uOmWQIpgBgS2Qudqv7tQuvuiYl-QCMYHSBGLb_kFZVCC8d7tt7jPx136YmoEhxAUodVZxw0rHPg5k4ljt67LCZjudwbpBXk87oxuL5cdem623DNamSqr7ecLuRgcksdpO-e1qEKVwN9TCCToyOP8t4Lu4rIW4ju30OnJlACvM8XN0I5jRf0YAVfODFkO5PKGivtuZcPbDnIBzn0fn3PAW17XnL12brtaIw726hsouNZdHWiDWcl4h057BJuqBfdnraT8F2p3Vg",
+							"value": "<token>",
 							"type": "string"
 						}
 					]
@@ -98,7 +98,8 @@
 						"keycloak-dcr-api",
 						"get"
 					]
-				}
+				},
+				"description": "Set the authorization token using the token generated in Part 1. This will grant access to the API."
 			},
 			"response": []
 		}
@@ -131,12 +132,17 @@
 		},
 		{
 			"key": "keycloak.host",
-			"value": "localhost:8180",
+			"value": "keycloak:8180",
 			"type": "string"
 		},
 		{
 			"key": "realm",
 			"value": "master",
+			"type": "string"
+		},
+		{
+			"key": "test-runner-ignore",
+			"value": "true",
 			"type": "string"
 		}
 	]
