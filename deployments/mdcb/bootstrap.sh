@@ -77,11 +77,17 @@ bootstrap_progress
 log_message "Checking that worker Gateway is accessible (tyk-worker-gateway)"
 worker_gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
 result=""
+reload_attempt=0
 while [ "$result" != "0" ]; do
   wait_for_response "$worker_gateway_base_url/basic-open-api/get" "200" "" 3
   result="$?"
   if [ "$result" != "0" ]; then
-    log_message "  Gateway not returning desired response, attempting hot reload"
+    if [ "$reload_attempt" -gt "3" ]; then
+      log_message "  ERROR: Unable to access API via tyk-worker-gateway (max retry count reached)"
+      exit 1
+    fi
+    reload_attempt=$((reload_attempt+1))
+    log_message "  Gateway not returning desired response, attempting hot reload (attempt #$reload_attempt)"
     hot_reload "$worker_gateway_base_url" "$worker_gateway_api_credentials" 
     sleep 2
   fi

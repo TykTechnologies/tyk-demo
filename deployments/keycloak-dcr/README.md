@@ -13,7 +13,7 @@ Run `keycloak-dcr` as one of your deployment configs, ie
 ./up.sh keycloak-dcr
 ```
 
-Visit `http://localhost:8180/auth/admin/` to access the keycloak admin console, and login with the credentials `admin/admin`
+Visit `http://keycloak:8180/` to access the keycloak admin console, and login with the credentials `admin/admin`
 
 Under the Client Registration tab you should find that an `initial access` token has been automagically created during the deployment bootstrap.
 

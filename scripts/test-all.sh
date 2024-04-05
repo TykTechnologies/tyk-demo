@@ -5,8 +5,9 @@
 # Expect the script to take a while to complete, as each deployment has to be created, tested and removed
 # For a deployment to be tested, three criteria must be met:
 #   1. The deployment must contain a correctly-named Postman collection: e.g. for development directory "foo-bar", the postman collection should be called "tyk_demo_foo_bar.postman_collection.json"
-#   2. The Postman collection must contain at least one test
-#   3. The deployment must be successfully created
+#   2. The Postman collection must not contain a variable called "test-runner-ignore" with the value "true"
+#   3. The Postman collection must contain at least one test
+#   4. The deployment must be successfully created
 # Deployments which don't meet the criteria are skipped
 # A test is considered successful if a deployment can be created, tested and removed without error
 # The scope of testing is limited to the tests defined within the Postman collection
@@ -36,6 +37,7 @@ else
 fi
 
 # clear log files
+mkdir logs 1>/dev/null 2>&1 # create logs directory before clearing files
 echo -n > logs/test.log
 echo -n > logs/bootstrap.log
 rm logs/containers-*.log 1>/dev/null # there can be multiple container logs
@@ -66,6 +68,16 @@ do
         echo_and_log "  Collection found."
     fi
 
+    # If the postman collection contains a variable "test-runner-ignore" with value "true" then skip to next deployment
+    ignore_flag=$(jq '.variable[] | select(.key=="test-runner-ignore").value' --raw-output $postman_collection_path)
+    if [ "$ignore_flag" == "true" ]; then
+        echo_and_log "  Collection contains ignore flag. ${BLUE}Skipping${NOCOLOUR} to next deployment."
+        result_codes[${#result_codes[@]}]=3
+        continue
+    else
+        echo_and_log "  Collection does not contain ignore flag."
+    fi
+
     # If the collection doesn't contain any tests then the deployment can be skipped
     # The jq command finds "listen" fields which have the value "test", if none are returned then the collection doesn't contain any tests
     postman_collection_tests=$(jq '..|.listen?|select(.=="test")' $postman_collection_path)
@@ -78,7 +90,7 @@ do
     fi
 
     echo_and_log "Creating deployment: $deployment_name"
-    ./up.sh $deployment_name persist-log
+    ./up.sh $deployment_name persist-log hide-progress
     if [ "$?" != "0" ]; then
         echo_and_log "  ${RED}Failed${NOCOLOUR} to create $deployment_name deployment"
         result_codes[${#result_codes[@]}]=4

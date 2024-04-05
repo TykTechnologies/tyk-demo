@@ -27,7 +27,9 @@ function check_variables() {
 }
 
 bootstrap_progress () {
-  printf "  Bootstrapping $deployment ${spinner_chars:spinner_count++%${#spinner_chars}:1} \r"
+  if [ ! -f .bootstrap/hide_progress ]; then
+    printf "  Bootstrapping $deployment ${spinner_chars:spinner_count++%${#spinner_chars}:1} \r"
+  fi
 }
 
 log_http_result () {
@@ -784,6 +786,27 @@ create_oauth_client () {
     log_message "ERROR: API response does not contain expected OAuth client data. API response returned $api_response."
     exit 1
   fi
+}
+
+wait_for_api_loaded () {
+  api_id="$1"
+  gateway_url="$2"
+  gateway_auth="$3"
+  target_api_result=""
+  attempt_count=0
+  while [ "$target_api_result" != "200" ]; do
+    attempt_count=$((attempt_count+1))
+    if [ "$attempt_count" -gt "10"  ]; then
+      echo "ERROR: Target API ($target_api_id) not available on Gateway ($gateway_url) - max retry reached"
+      exit 1
+    fi
+    target_api_result=$(curl "$gateway_url/tyk/apis/$target_api_id" -o /dev/null -s -w "%{http_code}\n" -H "x-tyk-authorization: $gateway_auth")
+    if [ "$target_api_result" != "200" ]; then
+      log_message "  Waiting for $api_id to become available on $gateway_url..."
+      bootstrap_progress
+      sleep 2
+    fi
+  done
 }
 
 wait_for_liveness () {
