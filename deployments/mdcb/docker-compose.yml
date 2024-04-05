@@ -2,7 +2,7 @@
 version: '3.3'
 services:
   tyk-mdcb:
-    image: tykio/tyk-mdcb-docker:${MDCB_VERSION:-v2.5.0-rc6}
+    image: tykio/tyk-mdcb-docker:${MDCB_VERSION:-v2.5.0}
     ports:
       - 9091:9091
     networks:
@@ -16,7 +16,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-worker-gateway:
-    image: tykio/tyk-gateway:${GATEWAY_WORKER_VERSION:-v5.3.0-rc8}
+    image: tykio/tyk-gateway:${GATEWAY_WORKER_VERSION:-v5.3.0}
     ports:
       - 8090:8080
     networks:
