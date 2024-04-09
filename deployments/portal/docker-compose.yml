@@ -2,7 +2,7 @@
 version: '3.3'
 services:
   tyk-portal:
-    image: tykio/portal:v1.7.0
+    image: tykio/portal:v1.8.5
     networks:
       - tyk
     env_file:
@@ -13,3 +13,13 @@ services:
     volumes:
       - ./deployments/portal/volumes/database/portal.db:/opt/portal/portal.db
       - ./deployments/portal/volumes/assets/:/opt/portal/public/system/products/
+  tyk-portal-postgres:
+    image: postgres:16-alpine
+    networks:
+      - tyk
+    volumes:
+      - ./deployments/portal/volumes/database/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - .env
+    ports:
+      - 5432:5432
