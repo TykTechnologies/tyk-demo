@@ -76,7 +76,7 @@ services:
       - tyk-gateway
       - tyk-dashboard
   tyk-pump:
-    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.8.3}
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.9.0}
     ports:
       - 8083:8083
     networks:

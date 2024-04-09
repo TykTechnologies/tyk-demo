@@ -5,7 +5,7 @@ deployment="Kubernetes Operator"
 
 log_start_deployment
 
-tyk_operator_install_version="0.16.0"
+tyk_operator_install_version="0.17.0"
 
 log_message "Checking Kubernetes requirements"
 if ! command -v kubectl >/dev/null; then
