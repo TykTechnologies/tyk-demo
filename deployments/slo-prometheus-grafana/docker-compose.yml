@@ -1,5 +1,5 @@
 ---
-version: '3.3'
+version: '3.8'
 services:
   tyk-slo-pump:
     image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.8.3}

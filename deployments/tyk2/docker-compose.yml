@@ -1,5 +1,5 @@
 ---
-version: '3.3'
+version: '3.8'
 services:
   tyk2-dashboard:
     image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.2.5}

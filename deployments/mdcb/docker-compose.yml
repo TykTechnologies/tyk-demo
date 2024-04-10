@@ -1,5 +1,5 @@
 ---
-version: '3.3'
+version: '3.8'
 services:
   tyk-mdcb:
     image: tykio/tyk-mdcb-docker:${MDCB_VERSION:-v2.4.1}
