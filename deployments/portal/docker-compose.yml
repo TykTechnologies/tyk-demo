@@ -5,12 +5,15 @@ services:
     image: tykio/portal:v1.8.5
     networks:
       - tyk
+    environment:
+      - PORTAL_AUDIT_LOG_PATH=/opt/portal/
     env_file:
       - .env
     ports:
       - 3100:3001
     entrypoint: /opt/portal/dev-portal
     volumes:
+      - ./deployments/portal/volumes/portal.log:/opt/portal/portal.log
       - ./deployments/portal/volumes/database/portal.db:/opt/portal/portal.db
       - ./deployments/portal/volumes/assets/:/opt/portal/public/system/products/
   tyk-portal-postgres:

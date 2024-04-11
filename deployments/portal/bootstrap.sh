@@ -6,6 +6,10 @@ deployment="Portal"
 log_start_deployment
 bootstrap_progress
 
+log_message "Overwriting old portal log with empty logfile."
+cp ./deployments/portal/volumes/portal.log.example ./deployments/portal/volumes/portal.log
+
+
 # Grab the Dashboard License line from ENV file
 licence_line=$(grep "DASHBOARD_LICENCE=" .env)
 # Parse out the DASHBOARD_LICENSE= bit
@@ -34,6 +38,8 @@ set_docker_environment_value "PORTAL_DOCRENDERER" stoplight
 set_docker_environment_value "PORTAL_REFRESHINTERVAL" 10
 set_docker_environment_value "PORTAL_LOG_LEVEL" debug
 set_docker_environment_value "PORTAL_LOG_FORMAT" dev
+set_docker_environment_value "PORTAL_AUDIT_LOG_ENABLE" true
+
 
 
 # Create Plans and Policies for NEW Developer Portal
@@ -235,30 +241,19 @@ for plan in "${plans[@]}"; do
   --header "Authorization: $portal_admin_api_token")
   plan_response=$(echo $plan_response | jq -r '.Catalogues = [1]')
   plan_response=$(echo $plan_response | jq -r '.Quota = -1')
-  if [ "$plan" -ge 2 ]
+  if [ "$plan" -ge 3 ]
   then
     plan_response=$(echo $plan_response | jq -r '.Catalogues = [1, 2]')
   fi
-  api_response=$(curl --location --request PUT 'http://tyk-portal.localhost:3100/portal-api/plans/2' -s \
+  api_response=$(curl --location --request PUT "http://tyk-portal.localhost:3100/portal-api/plans/$plan" -s \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/json' \
   --header "Authorization: $portal_admin_api_token" \
   --data "$plan_response")
-  log_message "PLAN UPDATED: $api_response"
   unset api_response plan_response
 done
-
 log_ok
 bootstrap_progress
-
-
-
-
-
-
-
-
-
 
 
 

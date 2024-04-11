@@ -22,8 +22,5 @@ To use this deployment, run the `up.sh` script with the `portal` parameter:
 ```
 
 This install comes bootstrapped with an admin user, an external api consumer user and an internal api developer user. 
-Initially the portal comes bootstrapped with a default admin user but becomes overwritten with a SQLite database containing users, organizations, and image assets. 
-The SQLite database file is located within deployments/portal/volumes/database/portal.db.
-
-### Dependencies
-<li> SQLite </li>
+The Portal will spin up a Postgres database containing portal configurations as well as assets. 
+There is an exposed logfile in the directory `./deployments/portal/volumes/portal.log` for debugging purposes.
