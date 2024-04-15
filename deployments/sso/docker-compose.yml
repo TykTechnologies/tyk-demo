@@ -1,5 +1,4 @@
 ---
-version: '3.8'
 services:
   tyk-dashboard-sso:
     image: tykio/tyk-dashboard:${DASHBOARD_SSO_VERSION:-v5.2.5}

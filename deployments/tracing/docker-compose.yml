@@ -1,5 +1,4 @@
 ---
-version: '3.8'
 services:
   zipkin:
     image: openzipkin/zipkin-slim:2.21.7

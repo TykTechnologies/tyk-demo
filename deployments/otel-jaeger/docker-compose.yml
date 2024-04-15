@@ -1,5 +1,4 @@
 ---
-version: "2"
 services:
   # Jaeger
   jaeger-all-in-one:

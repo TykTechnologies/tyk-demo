@@ -1,5 +1,4 @@
 ---
-version: '3.8'
 services:
   waf:
     image: owasp/modsecurity-crs:3.3.4-apache-202302060502
