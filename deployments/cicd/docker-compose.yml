@@ -1,5 +1,4 @@
 ---
-version: '3.3'
 services:
   jenkins:
     image: jenkins/jenkins:2.319.2-lts-alpine

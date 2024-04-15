@@ -1,5 +1,4 @@
 ---
-version: '3.3'
 services:
   bench:
     image: mangomm/go-bench-suite
