@@ -122,6 +122,7 @@
       "jwt": {},
       "oidc": {}
     },
+    "idp_client_id_mapping_disabled": false,
     "jwt_scope_to_policy_mapping": {},
     "jwt_scope_claim_name": "",
     "notifications": {
@@ -168,58 +169,72 @@
           "extended_paths": {
             "track_endpoints": [
               {
+                "disabled": false,
                 "path": "/posts/{id}/comments",
                 "method": "GET"
               },
               {
+                "disabled": false,
                 "path": "/albums/{id}/photos",
                 "method": "GET"
               },
               {
+                "disabled": false,
                 "path": "/comments/{id}",
                 "method": "GET"
               },
               {
+                "disabled": false,
                 "path": "/photos/{id}",
                 "method": "GET"
               },
               {
+                "disabled": false,
                 "path": "/albums/{id}",
                 "method": "GET"
               },
               {
+                "disabled": false,
                 "path": "/users/{id}",
                 "method": "GET"
               },
               {
+                "disabled": false,
                 "path": "/todos/{id}",
                 "method": "GET"
               },
               {
+                "disabled": false,
                 "path": "/posts/{id}",
                 "method": "GET"
               },
               {
+                "disabled": false,
                 "path": "/comments",
                 "method": "GET"
               },
               {
+                "disabled": false,
                 "path": "/photos",
                 "method": "GET"
               },
               {
+                "disabled": false,
                 "path": "/albums",
                 "method": "GET"
               },
               {
+                "disabled": false,
                 "path": "/users",
                 "method": "GET"
               },
               {
+                "disabled": false,
                 "path": "/todos",
                 "method": "GET"
               },
               {
+                "disabled": false,
                 "path": "/posts",
                 "method": "GET"
               }
@@ -228,8 +243,10 @@
           },
           "global_headers": {},
           "global_headers_remove": [],
+          "global_headers_disabled": false,
           "global_response_headers": {},
           "global_response_headers_remove": [],
+          "global_response_headers_disabled": false,
           "ignore_endpoint_case": false,
           "global_size_limit": 0,
           "override_target": ""
@@ -363,6 +380,7 @@
     "config_data_disabled": false,
     "tag_headers": [],
     "global_rate_limit": {
+      "disabled": false,
       "rate": 0,
       "per": 0
     },
@@ -398,6 +416,9 @@
         "merged_sdl": "",
         "global_headers": {},
         "disable_query_batching": false
+      },
+      "introspection": {
+        "disabled": false
       }
     },
     "analytics_plugin": {},

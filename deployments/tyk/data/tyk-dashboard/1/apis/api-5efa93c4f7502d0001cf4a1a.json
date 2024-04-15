@@ -227,6 +227,7 @@
       "jwt": {},
       "oidc": {}
     },
+    "idp_client_id_mapping_disabled": false,
     "jwt_scope_to_policy_mapping": {},
     "jwt_scope_claim_name": "",
     "notifications": {
@@ -275,8 +276,10 @@
           },
           "global_headers": {},
           "global_headers_remove": [],
+          "global_headers_disabled": false,
           "global_response_headers": {},
           "global_response_headers_remove": [],
+          "global_response_headers_disabled": false,
           "ignore_endpoint_case": false,
           "global_size_limit": 0,
           "override_target": ""
@@ -418,6 +421,7 @@
     "config_data_disabled": false,
     "tag_headers": [],
     "global_rate_limit": {
+      "disabled": false,
       "rate": 0,
       "per": 0
     },
@@ -453,6 +457,9 @@
         "merged_sdl": "",
         "global_headers": {},
         "disable_query_batching": false
+      },
+      "introspection": {
+        "disabled": false
       }
     },
     "analytics_plugin": {},

@@ -122,6 +122,7 @@
       "jwt": {},
       "oidc": {}
     },
+    "idp_client_id_mapping_disabled": false,
     "jwt_scope_to_policy_mapping": {},
     "jwt_scope_claim_name": "",
     "notifications": {
@@ -186,8 +187,10 @@
           },
           "global_headers": {},
           "global_headers_remove": [],
+          "global_headers_disabled": false,
           "global_response_headers": {},
           "global_response_headers_remove": [],
+          "global_response_headers_disabled": false,
           "ignore_endpoint_case": false,
           "global_size_limit": 0,
           "override_target": ""
@@ -300,7 +303,7 @@
               "api_model": {},
               "event_timeout": 60,
               "header_map": {},
-              "id": "65c346e723520c0001ddd045",
+              "id": "661cf7f2bf12140001bc2352",
               "method": "POST",
               "name": "Webhook Receiver Post",
               "org_id": "5e9d9544a1dcd60001d0ed20",
@@ -338,6 +341,7 @@
     "config_data_disabled": false,
     "tag_headers": [],
     "global_rate_limit": {
+      "disabled": false,
       "rate": 0,
       "per": 0
     },
@@ -373,6 +377,9 @@
         "merged_sdl": "",
         "global_headers": {},
         "disable_query_batching": false
+      },
+      "introspection": {
+        "disabled": false
       }
     },
     "analytics_plugin": {},
@@ -385,7 +392,7 @@
       "event_timeout": 60,
       "hook": {
         "api_model": {},
-        "id": "65c346e723520c0001ddd045",
+        "id": "661cf7f2bf12140001bc2352",
         "org_id": "5e9d9544a1dcd60001d0ed20",
         "name": "Webhook Receiver Post",
         "method": "POST",

@@ -122,6 +122,7 @@
       "jwt": {},
       "oidc": {}
     },
+    "idp_client_id_mapping_disabled": false,
     "jwt_scope_to_policy_mapping": {},
     "jwt_scope_claim_name": "",
     "notifications": {
@@ -170,8 +171,10 @@
           },
           "global_headers": {},
           "global_headers_remove": [],
+          "global_headers_disabled": false,
           "global_response_headers": {},
           "global_response_headers_remove": [],
+          "global_response_headers_disabled": false,
           "ignore_endpoint_case": false,
           "global_size_limit": 0,
           "override_target": ""
@@ -252,6 +255,7 @@
             ],
             "transform_headers": [
               {
+                "disabled": false,
                 "delete_headers": [],
                 "add_headers": {
                   "Context-Variable-Header-Cat": "$tyk_context.headers_Cat",
@@ -265,6 +269,7 @@
                 "act_on": false
               },
               {
+                "disabled": false,
                 "delete_headers": [
                   "Delete-Header"
                 ],
@@ -286,6 +291,7 @@
             ],
             "circuit_breakers": [
               {
+                "disabled": false,
                 "path": "status/500",
                 "method": "GET",
                 "threshold_percent": 0.5,
@@ -296,6 +302,7 @@
             ],
             "url_rewrites": [
               {
+                "disabled": false,
                 "path": "/anything/url-rewrite-trigger-payload",
                 "method": "POST",
                 "match_pattern": "/anything/url-rewrite-trigger-payload",
@@ -319,6 +326,7 @@
                 ]
               },
               {
+                "disabled": false,
                 "path": "/anything/url-rewrite",
                 "method": "GET",
                 "match_pattern": "/anything/url-rewrite",
@@ -367,6 +375,7 @@
                 ]
               },
               {
+                "disabled": false,
                 "path": "/cache-slow-endpoint",
                 "method": "GET",
                 "match_pattern": "/cache-slow-endpoint",
@@ -374,6 +383,7 @@
                 "triggers": []
               },
               {
+                "disabled": false,
                 "path": "anything/looping",
                 "method": "GET",
                 "match_pattern": "anything/looping",
@@ -395,6 +405,7 @@
             ],
             "size_limits": [
               {
+                "disabled": false,
                 "path": "/anything/request-size-limit",
                 "method": "POST",
                 "size_limit": 9
@@ -410,6 +421,7 @@
             ],
             "track_endpoints": [
               {
+                "disabled": false,
                 "path": "/anything/track-endpoint",
                 "method": "GET"
               }
@@ -451,8 +463,10 @@
           "global_headers_remove": [
             "global-delete"
           ],
+          "global_headers_disabled": false,
           "global_response_headers": {},
           "global_response_headers_remove": [],
+          "global_response_headers_disabled": false,
           "ignore_endpoint_case": false,
           "global_size_limit": 0,
           "override_target": ""
@@ -471,8 +485,10 @@
           },
           "global_headers": {},
           "global_headers_remove": [],
+          "global_headers_disabled": false,
           "global_response_headers": {},
           "global_response_headers_remove": [],
+          "global_response_headers_disabled": false,
           "ignore_endpoint_case": false,
           "global_size_limit": 0,
           "override_target": ""
@@ -507,8 +523,10 @@
           },
           "global_headers": {},
           "global_headers_remove": [],
+          "global_headers_disabled": false,
           "global_response_headers": {},
           "global_response_headers_remove": [],
+          "global_response_headers_disabled": false,
           "ignore_endpoint_case": false,
           "global_size_limit": 0,
           "override_target": ""
@@ -649,6 +667,7 @@
     "config_data_disabled": false,
     "tag_headers": [],
     "global_rate_limit": {
+      "disabled": false,
       "rate": 0,
       "per": 0
     },
@@ -684,6 +703,9 @@
         "merged_sdl": "",
         "global_headers": {},
         "disable_query_batching": false
+      },
+      "introspection": {
+        "disabled": false
       }
     },
     "analytics_plugin": {},
