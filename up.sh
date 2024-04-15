@@ -6,6 +6,11 @@ source scripts/common.sh
 # to enable persistence, use argument "persist-log" when running this script
 persist_log=false
 
+# the hide_progress file determines whether the bootstrap_progress function creates output
+# this is preferable in CICD tests as it prevent pollution of the logs with these messages which are user focussed
+# use the "hide-progress" flag to enable this
+rm .bootstrap/hide_progress 1>/dev/null 2>&1
+
 echo "Bringing Tyk Demo deployment UP"
 
 # check .env file exists
@@ -114,12 +119,19 @@ fi
 # display commands to process
 echo "Commands to process:"
 if (( ${#commands_to_process[@]} != 0 )); then
-  for command in "$commands_to_process"; do    
+  for command in "${commands_to_process[@]}"; do    
     case $command in
       "persist-log")
-        echo "  Logs will be persisted"
-        persist_log=true;;
-      *) echo "Command \"$command\" is unknown, ignoring.";; 
+        echo "  persist-log: Logs will be persisted"
+        persist_log=true
+        ;;
+      "hide-progress")
+        echo "  hide-progress: Deployment progress meter will not be shown"
+        touch .bootstrap/hide_progress
+        ;;
+      *) 
+        echo "Command \"$command\" is unknown, ignoring."
+        ;; 
     esac
   done
 else

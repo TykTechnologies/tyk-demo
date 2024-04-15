@@ -54,7 +54,7 @@
         "dcr_options": {
             "idp_host": "http://keycloak:8180/",
             "access_token": "ACCESS_TOKEN",
-            "registration_endpoint": "http://keycloak:8180/auth/realms/master/clients-registrations/openid-connect",
+            "registration_endpoint": "http://keycloak:8180/realms/master/clients-registrations/openid-connect",
             "provider": "keycloak",
             "grant_types": [
                 "client_credentials"

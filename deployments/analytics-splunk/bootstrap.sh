@@ -7,6 +7,8 @@ bootstrap_progress
 
 splunk_base_url="http://localhost:8000"
 splunk_base_mgmt_url="https://localhost:8089"
+gateway_base_url="http://$(jq -r '.host_config.override_hostname' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
+gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
 
 log_message "Waiting for splunk to return desired response"
 wait_for_response "$splunk_base_url/en-GB/account/login" "200"
@@ -51,6 +53,14 @@ if [ "$service_process" != "" ]; then
 fi
 log_ok
 bootstrap_progress
+
+log_message "Waiting for API availability"
+# this api id is for the 'basic open api' called by the next section
+wait_for_api_loaded "727dad853a8a45f64ab981154d1ffdad" "$gateway_base_url" "$gateway_api_credentials"
+# this api id is for the 'httpbin acme' API called by the deployment tests
+wait_for_api_loaded "93fd5c15961041115974216e7a3e7175" "$gateway_base_url" "$gateway_api_credentials"
+log_ok
+bootstrap_progress        
 
 log_message "Sending a test request to provide Splunk with data"
 # since request sent in base bootstrap process will not have been picked up by elasticsearch-enabled pump

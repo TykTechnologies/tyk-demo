@@ -149,6 +149,7 @@
       "key": "x-api-version",
       "strip_path": false,
       "strip_versioning_data": false,
+      "fallback_to_default": false,
       "versions": {}
     },
     "version_data": {
@@ -234,6 +235,19 @@
                 },
                 "path": "/anything/body-transform",
                 "method": "POST"
+              }
+            ],
+            "transform_response": [
+              {
+                "disabled": false,
+                "template_data": {
+                  "input_type": "json",
+                  "template_mode": "blob",
+                  "enable_session": false,
+                  "template_source": "e3sgLiB8IHhtbE1hcnNoYWwgfX0="
+                },
+                "path": "anything/body-transform-json-to-xml",
+                "method": "GET"
               }
             ],
             "transform_headers": [
@@ -610,7 +624,12 @@
     "blacklisted_ips": [],
     "dont_set_quota_on_create": false,
     "expire_analytics_after": 0,
-    "response_processors": [],
+    "response_processors": [
+      {
+        "name": "response_body_transform",
+        "options": {}
+      }
+    ],
     "CORS": {
       "enable": false,
       "allowed_origins": [],

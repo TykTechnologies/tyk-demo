@@ -2,41 +2,41 @@
 
 # Tyk Demo
 
-This repo provides an example installation of Tyk. It uses Docker Compose to provide a quick, simple deployment, where you can choose what features to include.
+Tyk Demo offers a pre-configured deployment that includes various examples showcasing Tyk's capabilities. Powered by Docker Compose for swift setup, it allows you to pick and choose the features you want to explore.
 
-Tyk Demo was built to enable the sharing of knowledge and combining of effort amongst client-facing technical Tyk folks. But it's also useful to anyone interested in playing with a Tyk installation.
+The primary use case for Tyk Demo is to act as a centralised knowledge sharing resource for client-facing technical Tyk staff. However, anyone curious about Tyk can benefit from Tyk Demo. It's hands-on sandbox environment allows anyone to experiment and learn more about Tyk's features.
 
-The repo contains various Postman collections that make it easy to explore and experience Tyk's features and functionality.
+Postman collections are included for some deployments. These are pre-configured to interact with the features and functionality available in the deployments, making it easy to explore and experience Tyk.
 
 See the [Contributor Guide](CONTRIBUTING.md) for information on how to contribute to and extend this repository.
 
-> :warning: Please note that this repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system or approach. 
+> :warning: Please note that this repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system or approach.
 
 If you encounter a problem using this repository, please try to fix it yourself and create a pull request so that others can benefit.
 
 # Overview
 
-The concept is that there is a **base deployment** of Tyk, which gives you the usual Tyk components: Gateway, Dashboard, Pump, plus the databases Redis and MongoDB. This standard deployment can be extended by including additional **feature deployments** as needed. The feature deployments cover particular scenarios for Tyk, such as:
+This project leverages a concept of deployments, enabling users to choose what gets deployed.
 
-* Single sign on
-* Analytics export
-* Tracking
-* CI/CD
-* 2nd Tyk Environment
-* Instrumentation
+- **Base deployment**: The mandatory deployment that provides standard Tyk components (Gateway, Dashboard, Pump), databases (Redis and MongoDB), and other supporting software to enhance the demo experience.
+- **Feature deployments**: Extend the base deployment functionality. These deployments cover specific scenarios for Tyk, such as single sign-on, analytics export, etc.
 
-Each feature deployment has its own directory, with the necessary files to deploy the feature and a readme to describe how to use it.
+Each deployment has a dedicated directory containing all necessary deployment files and additional information.
 
-There is a focus on simplicity. Docker Compose is used to provision the containers, and bootstrap scripts are used to initialise the environment so that it is ready to use straight away - applying configuration and populating data.
+This approach focuses on simplicity. Running a single command triggers Docker Compose to create containers, and bootstrap scripts initialise the environment. Everything is handled automatically, from configuration application to data population.
 
 ## Requirements
 
 ### License requirements
 - Get a valid [Tyk Self-Managed license](https://tyk.io/pricing-self-managed/) key (click **"start now"** under **Free trial**). **This is a self-service option!**
-- If you want to run MDCB deployment (distributed set up with control plane and data plans), then you need to [contact Tyk team](https://tyk.io/pricing-self-managed/) to get a license key. Please leave it if it's the first time you are trying out Tyk and you are not in a position to get engaged at this moment.
+- If you want to run the MDCB deployment (distributed set up with control plane and data planes), then you need to [contact the Tyk team](https://tyk.io/pricing-self-managed/) to get an MDCB license key.
 
 ### Software
-docker compose
+The base deployment requires:
+- Docker Desktop, with Docker Compose
+- jq
+
+Note that some feature deployments may have additional requirements. See deployment readmes for more information.
 
 ## Repository Structure
 
@@ -48,7 +48,7 @@ docker compose
 
 ## Deployments
 
-The deployment directories (`deployments/*`) contain the various deployments which can be made with this repo. The **base deployment** is in the `deployments/tyk` directory. The other directories are **feature deployments**, which extend the base deployment functionality and require the base deployment in order to function correctly.
+The deployment directories (`deployments/*`) contain the various deployments which can be made with this repo. The *base deployment* is in the `deployments/tyk` directory. The other directories are *feature deployments*, which extend the base deployment functionality and require the base deployment in order to function correctly.
 
 All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.md` files specific to the deployment. They may also contain directories called `data` or `volumes`, which hold the data necessary during bootstrapping or providing as mapped volumes into the container.
 
@@ -64,7 +64,7 @@ All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.
 * [Mail server](deployments/mailserver/README.md)
 * [MDCB](deployments/mdcb/README.md)
 * [MQTT](deployments/mqtt/README.md)
-* [OpenTelemetry with Jaeger](deployments/otel/README.md)
+* [OpenTelemetry with Jaeger](deployments/otel-jaeger/README.md)
 * [Portal](deployments/portal/README.md)
 * [SLIs and SLOs with Prometheus and Grafana](deployments/slo-prometheus-grafana/README.md)
 * [SSO](deployments/sso/README.md)
