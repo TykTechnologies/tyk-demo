@@ -52,7 +52,7 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "62ff3c131a8e070001a96b28",
+      "dbId": "661cf7fdbf12140001bc2353",
       "id": "b84fe1a04e5648927971c0557971565c",
       "name": "OAS HTTPbin",
       "orgId": "5e9d9544a1dcd60001d0ed20",
@@ -80,8 +80,7 @@
       "listenPath": {
         "strip": true,
         "value": "/oas-httpbin/"
-      },
-      "slug": "oas-httpbin"
+      }
     },
     "upstream": {
       "url": "http://httpbin/"
