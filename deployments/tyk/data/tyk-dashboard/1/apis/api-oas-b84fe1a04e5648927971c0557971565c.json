@@ -43,6 +43,33 @@
         },
         "summary": "Validate request body against JSON schema"
       }
+    },
+    "/mock-response": {
+      "get": {
+        "operationId": "mock-responseget",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "mockBody": "hello world body"
+                }
+              }
+            },
+            "description": "Return a 200 OK",
+            "headers": {
+              "Mock-Header": {
+                "description": "Add a mock header",
+                "schema": {
+                  "example": "hello world header",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Returns a mock response"
+      }
     }
   },
   "servers": [
@@ -52,7 +79,7 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "661cf7fdbf12140001bc2353",
+      "dbId": "661cfde574a7e30001847176",
       "id": "b84fe1a04e5648927971c0557971565c",
       "name": "OAS HTTPbin",
       "orgId": "5e9d9544a1dcd60001d0ed20",
@@ -72,6 +99,16 @@
           "validateRequest": {
             "enabled": true,
             "errorResponseCode": 422
+          }
+        },
+        "mock-responseget": {
+          "mockResponse": {
+            "enabled": true,
+            "fromOASExamples": {
+              "code": 200,
+              "contentType": "application/json",
+              "enabled": true
+            }
           }
         }
       }

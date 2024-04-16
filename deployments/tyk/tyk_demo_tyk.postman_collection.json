@@ -5480,6 +5480,49 @@
 								"description": "Example of JSON schema validation using an OAS API definition.\n\nThe validation of this request fails, as it is missing the \"lastName\" field in the body data."
 							},
 							"response": []
+						},
+						{
+							"name": "OAS - Mock Response",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Body JSON contains 'hello world body'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.mockBody).to.eql(\"hello world body\");",
+											"});",
+											"",
+											"pm.test(\"Headers contiain 'hello world header'\", function () {",
+											"    pm.response.to.be.header(\"Mock-Header\", \"hello world header\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/mock-response",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"mock-response"
+									]
+								},
+								"description": "This request calls a mock endpoint on an OAS-based API.\n\nIt returns a mock response that contains a mock body JSON object and mock header (`Mock-Header`)."
+							},
+							"response": []
 						}
 					]
 				}
