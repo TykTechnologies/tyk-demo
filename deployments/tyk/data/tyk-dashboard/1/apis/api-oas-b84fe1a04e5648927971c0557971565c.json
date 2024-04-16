@@ -6,6 +6,17 @@
   },
   "openapi": "3.0.3",
   "paths": {
+    "/anything/transform-body-request": {
+      "post": {
+        "operationId": "anything/transform-body-requestpost",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Transforms request body data"
+      }
+    },
     "/anything/validate-request-body": {
       "post": {
         "operationId": "anything/validate-request-bodypost",
@@ -95,6 +106,13 @@
         }
       },
       "operations": {
+        "anything/transform-body-requestpost": {
+          "transformRequestBody": {
+            "body": "ewogICJ2YWx1ZTEiOiAie3sudmFsdWUyfX0iLAogICJ2YWx1ZTIiOiAie3sudmFsdWUxfX0iLAogICJyZXFIZWFkZXIiOiAie3suX3R5a19jb250ZXh0LmhlYWRlcnNfWF9IZWFkZXJ9fSIsCiAgInJlcVBhcmFtIjogInt7Ll90eWtfY29udGV4dC5yZXF1ZXN0X2RhdGEucGFyYW19fSIKfQ==",
+            "enabled": true,
+            "format": "json"
+          }
+        },
         "anything/validate-request-bodypost": {
           "validateRequest": {
             "enabled": true,
