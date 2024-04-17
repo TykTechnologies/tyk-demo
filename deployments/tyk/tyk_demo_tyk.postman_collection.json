@@ -5406,7 +5406,8 @@
 											"    pm.expect(jsonData.json.age).to.eql(46);",
 											"});"
 										],
-										"type": "text/javascript"
+										"type": "text/javascript",
+										"packages": {}
 									}
 								}
 							],
@@ -5423,7 +5424,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request-body",
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
@@ -5431,7 +5432,7 @@
 									"path": [
 										"oas-httpbin",
 										"anything",
-										"validate-request-body"
+										"validate-request"
 									]
 								},
 								"description": "Example of JSON schema validation using an OAS API definition.\n\nThis request succeeds as it contains the two required fields (firstName, lastName), and the age provided is an integer."
@@ -5449,7 +5450,8 @@
 											"    pm.response.to.have.status(422);",
 											"});"
 										],
-										"type": "text/javascript"
+										"type": "text/javascript",
+										"packages": {}
 									}
 								}
 							],
@@ -5466,7 +5468,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request-body",
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
@@ -5474,7 +5476,7 @@
 									"path": [
 										"oas-httpbin",
 										"anything",
-										"validate-request-body"
+										"validate-request"
 									]
 								},
 								"description": "Example of JSON schema validation using an OAS API definition.\n\nThe validation of this request fails, as it is missing the \"lastName\" field in the body data."
@@ -5510,13 +5512,14 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/mock-response",
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/mock-response",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
 									],
 									"path": [
 										"oas-httpbin",
+										"anything",
 										"mock-response"
 									]
 								},
@@ -5567,7 +5570,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/transform-body-request?param=foo",
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/request-body-transform?param=foo",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
@@ -5575,7 +5578,7 @@
 									"path": [
 										"oas-httpbin",
 										"anything",
-										"transform-body-request"
+										"request-body-transform"
 									],
 									"query": [
 										{
