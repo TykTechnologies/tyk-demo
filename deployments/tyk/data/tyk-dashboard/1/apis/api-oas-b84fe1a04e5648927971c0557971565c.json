@@ -6,6 +6,17 @@
   },
   "openapi": "3.0.3",
   "paths": {
+    "/anything/method-transform": {
+      "put": {
+        "operationId": "anything/method-transformput",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Transforms HTTP method from PUT to POST"
+      }
+    },
     "/anything/mock-response": {
       "get": {
         "operationId": "anything/mock-responseget",
@@ -117,6 +128,12 @@
         }
       },
       "operations": {
+        "anything/method-transformput": {
+          "transformRequestMethod": {
+            "enabled": true,
+            "toMethod": "POST"
+          }
+        },
         "anything/mock-responseget": {
           "mockResponse": {
             "enabled": true,

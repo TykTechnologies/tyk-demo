@@ -5641,6 +5641,52 @@
 								"description": "This request uses the OAS header transform middleware to alter request headers before it is proxied to the upstream server.\n\nThe transformation:\n\n- Adds the `Added-Header` header with the value `foo`\n- Deletes the `Deleted-Header` header\n    \n\nThe results of this can be seen in the `headers` part of the response body JSON, which contains the headers by the server."
 							},
 							"response": []
+						},
+						{
+							"name": "OAS - Method Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"})",
+											"",
+											"pm.test('Method was changed', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.method).to.be.equal('POST');",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Deleted-Header",
+										"value": "bar",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/method-transform",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"method-transform"
+									]
+								},
+								"description": "This request uses the OAS method transform middleware to change the HTTP method from `PUT` to `POST`."
+							},
+							"response": []
 						}
 					]
 				}
