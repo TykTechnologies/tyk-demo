@@ -5389,7 +5389,7 @@
 					"name": "OAS",
 					"item": [
 						{
-							"name": "OAS - JSON Validation part 1",
+							"name": "OAS - Validate Request - JSON part 1",
 							"event": [
 								{
 									"listen": "test",
@@ -5440,7 +5440,7 @@
 							"response": []
 						},
 						{
-							"name": "OAS - JSON Validation part 2",
+							"name": "OAS - Validate Request - JSON part 2",
 							"event": [
 								{
 									"listen": "test",
@@ -5528,7 +5528,7 @@
 							"response": []
 						},
 						{
-							"name": "OAS - Transform Request Body",
+							"name": "OAS - Request Body Transform",
 							"event": [
 								{
 									"listen": "test",
@@ -5588,6 +5588,57 @@
 									]
 								},
 								"description": "This request uses the OAS body transform middleware to alter the request body before it is proxied to the upstream server.\n\nThe transformation swaps the values of the `value1` and `value2` body fields, and creates two new fields that are populated with data from the a request header and a URL parameter."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Request Header Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"})",
+											"",
+											"pm.test('Request header was added', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Added-Header']).to.be.equal('foo');",
+											"})",
+											"",
+											"pm.test('Request header was deleted', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Deleted-Header']).to.be.undefined;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Deleted-Header",
+										"value": "bar",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/request-header-transform",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"request-header-transform"
+									]
+								},
+								"description": "This request uses the OAS header transform middleware to alter request headers before it is proxied to the upstream server.\n\nThe transformation:\n\n- Adds the `Added-Header` header with the value `foo`\n- Deletes the `Deleted-Header` header\n    \n\nThe results of this can be seen in the `headers` part of the response body JSON, which contains the headers by the server."
 							},
 							"response": []
 						}

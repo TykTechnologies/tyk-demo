@@ -44,6 +44,17 @@
         "summary": "Transforms request body data"
       }
     },
+    "/anything/request-header-transform": {
+      "get": {
+        "operationId": "anything/request-header-transformget",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Adds a header and removes a header"
+      }
+    },
     "/anything/validate-request": {
       "post": {
         "operationId": "anything/validate-requestpost",
@@ -121,6 +132,20 @@
             "body": "ewogICJ2YWx1ZTEiOiAie3sudmFsdWUyfX0iLAogICJ2YWx1ZTIiOiAie3sudmFsdWUxfX0iLAogICJyZXFIZWFkZXIiOiAie3suX3R5a19jb250ZXh0LmhlYWRlcnNfWF9IZWFkZXJ9fSIsCiAgInJlcVBhcmFtIjogInt7Ll90eWtfY29udGV4dC5yZXF1ZXN0X2RhdGEucGFyYW19fSIKfQ==",
             "enabled": true,
             "format": "json"
+          }
+        },
+        "anything/request-header-transformget": {
+          "transformRequestHeaders": {
+            "add": [
+              {
+                "name": "Added-Header",
+                "value": "foo"
+              }
+            ],
+            "enabled": true,
+            "remove": [
+              "Deleted-Header"
+            ]
           }
         },
         "anything/validate-requestpost": {
