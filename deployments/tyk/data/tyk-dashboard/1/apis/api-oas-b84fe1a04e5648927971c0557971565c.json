@@ -66,6 +66,17 @@
         "summary": "Adds a header and removes a header"
       }
     },
+    "/anything/response-body-transform": {
+      "get": {
+        "operationId": "anything/response-body-transformget",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Transform the response body using a golang template file"
+      }
+    },
     "/anything/validate-request": {
       "post": {
         "operationId": "anything/validate-requestpost",
@@ -112,7 +123,7 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "661f8f9040cc7e00017b9af4",
+      "dbId": "6620cda992ace4000153115c",
       "id": "b84fe1a04e5648927971c0557971565c",
       "name": "OAS HTTPbin",
       "orgId": "5e9d9544a1dcd60001d0ed20",
@@ -163,6 +174,13 @@
             "remove": [
               "Deleted-Header"
             ]
+          }
+        },
+        "anything/response-body-transformget": {
+          "transformResponseBody": {
+            "enabled": true,
+            "format": "json",
+            "path": "middleware/response-body-transform/response-body-transform-template.tmpl"
           }
         },
         "anything/validate-requestpost": {

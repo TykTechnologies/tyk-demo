@@ -5592,7 +5592,7 @@
 							"response": []
 						},
 						{
-							"name": "OAS - Request Header Transform",
+							"name": "OAS - Response Body Transform (file based)",
 							"event": [
 								{
 									"listen": "test",
@@ -5602,15 +5602,16 @@
 											"    pm.response.to.have.status(200);",
 											"})",
 											"",
-											"pm.test('Request header was added', function () {",
+											"pm.test('Response body contains template data', function () {",
 											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.headers['Added-Header']).to.be.equal('foo');",
+											"    pm.expect(jsonData.hello).to.be.equal('world');",
 											"})",
 											"",
-											"pm.test('Request header was deleted', function () {",
+											"pm.test('Response body contains upstream response data', function () {",
 											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.headers['Deleted-Header']).to.be.undefined;",
-											"});"
+											"    pm.expect(jsonData.responseData.method).to.be.equal('GET');",
+											"    pm.expect(jsonData.responseData.origin).to.not.be.undefined;",
+											"})"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -5627,7 +5628,7 @@
 									}
 								],
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/request-header-transform",
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/response-body-transform",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
@@ -5635,10 +5636,10 @@
 									"path": [
 										"oas-httpbin",
 										"anything",
-										"request-header-transform"
+										"response-body-transform"
 									]
 								},
-								"description": "This request uses the OAS header transform middleware to alter request headers before it is proxied to the upstream server.\n\nThe transformation:\n\n- Adds the `Added-Header` header with the value `foo`\n- Deletes the `Deleted-Header` header\n    \n\nThe results of this can be seen in the `headers` part of the response body JSON, which contains the headers by the server."
+								"description": "This request uses a body transform middleware based on a template file - `deployments/tyk/volumes/tyk-gateway/middleware/response-body-transform/response-body-transform-template.tmpl`.\n\nThe template transforms the response from the upstream API before returning it to the client."
 							},
 							"response": []
 						},
