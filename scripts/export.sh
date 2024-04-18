@@ -21,12 +21,17 @@ for data_group in "${data_groups[@]}"; do\
       api_id=$(jq -r '.api_definition.id' <<< $api)
       api_file_name="api-$api_id.json"
       echo "  $api_name"
-      # if API is OAS spec, then retrieve the OAS document and use a different file name
+      # if API is OAS spec, then retrieve use some different values
       if [[ "$api_is_oas" == "true" ]]; then
+        # update api_id to use static id
+        api_id=$(jq -r '.api_definition.api_id' <<< $api)
+        # update API specification document to use OAS-style API definition
         api=$(curl $dashboard_base_url/api/apis/oas/$api_id -s \
           -H "Authorization:${dashboard_keys[$index]}")
+        # update file name to denote that the contents are an OAS-style API definition
         api_file_name="api-oas-$api_id.json"
       fi
+
       echo "$api" | jq '.' > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/apis/$api_file_name"
     fi 
   done <<< "$apis"

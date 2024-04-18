@@ -5389,7 +5389,7 @@
 					"name": "OAS",
 					"item": [
 						{
-							"name": "OAS - JSON Validation part 1",
+							"name": "OAS - Validate Request - JSON part 1",
 							"event": [
 								{
 									"listen": "test",
@@ -5406,7 +5406,8 @@
 											"    pm.expect(jsonData.json.age).to.eql(46);",
 											"});"
 										],
-										"type": "text/javascript"
+										"type": "text/javascript",
+										"packages": {}
 									}
 								}
 							],
@@ -5423,7 +5424,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request-body",
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
@@ -5431,7 +5432,7 @@
 									"path": [
 										"oas-httpbin",
 										"anything",
-										"validate-request-body"
+										"validate-request"
 									]
 								},
 								"description": "Example of JSON schema validation using an OAS API definition.\n\nThis request succeeds as it contains the two required fields (firstName, lastName), and the age provided is an integer."
@@ -5439,7 +5440,7 @@
 							"response": []
 						},
 						{
-							"name": "OAS - JSON Validation part 2",
+							"name": "OAS - Validate Request - JSON part 2",
 							"event": [
 								{
 									"listen": "test",
@@ -5449,7 +5450,8 @@
 											"    pm.response.to.have.status(422);",
 											"});"
 										],
-										"type": "text/javascript"
+										"type": "text/javascript",
+										"packages": {}
 									}
 								}
 							],
@@ -5466,7 +5468,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request-body",
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
@@ -5474,10 +5476,339 @@
 									"path": [
 										"oas-httpbin",
 										"anything",
-										"validate-request-body"
+										"validate-request"
 									]
 								},
 								"description": "Example of JSON schema validation using an OAS API definition.\n\nThe validation of this request fails, as it is missing the \"lastName\" field in the body data."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Mock Response",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Body JSON contains 'hello world body'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.mockBody).to.eql(\"hello world body\");",
+											"});",
+											"",
+											"pm.test(\"Headers contiain 'hello world header'\", function () {",
+											"    pm.response.to.be.header(\"Mock-Header\", \"hello world header\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/mock-response",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"mock-response"
+									]
+								},
+								"description": "This request calls a mock endpoint on an OAS-based API.\n\nIt returns a mock response that contains a mock body JSON object and mock header (`Mock-Header`)."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Method Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('Method was changed', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.method).to.be.equal('POST');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/method-transform",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"method-transform"
+									]
+								},
+								"description": "This request uses the OAS method transform middleware to change the HTTP method from `PUT` to `POST`."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Request Header Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('Header was added', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Added-Header']).to.be.equal('foo');",
+											"});",
+											"",
+											"pm.test('Header was removed', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Deleted-Header']).to.be.undefined;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Deleted-Header",
+										"value": "bar",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/request-header-transform",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"request-header-transform"
+									]
+								},
+								"description": "This request uses the OAS request header transform middleware to add a header (\\`Added-Header\\`) and delete a header (\\`Deleted-Header\\`).\n\nThe presence of these headers can be verified in the API response, which lists the headers it received in the `headers` part of the JSON body."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Request Body Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Request data has been transformed\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.json.reqHeader).to.eql(\"bar\");",
+											"    pm.expect(jsonData.json.reqParam).to.eql(\"[foo]\");",
+											"    pm.expect(jsonData.json.value1).to.eql(\"value 2\");",
+											"    pm.expect(jsonData.json.value2).to.eql(\"value 1\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Header",
+										"value": "bar",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"value1\":\"value 1\",\n    \"value2\":\"value 2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/request-body-transform?param=foo",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"request-body-transform"
+									],
+									"query": [
+										{
+											"key": "param",
+											"value": "foo"
+										}
+									]
+								},
+								"description": "This request uses the OAS body transform middleware to alter the request body before it is proxied to the upstream server.\n\nThe transformation swaps the values of the `value1` and `value2` body fields, and creates two new fields that are populated with data from the a request header and a URL parameter."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Response Body Transform (file based)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"})",
+											"",
+											"pm.test('Response body contains template data', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.hello).to.be.equal('world');",
+											"})",
+											"",
+											"pm.test('Response body contains upstream response data', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.responseData.method).to.be.equal('GET');",
+											"    pm.expect(jsonData.responseData.origin).to.not.be.undefined;",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/response-body-transform",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"response-body-transform"
+									]
+								},
+								"description": "This request uses a body transform middleware based on a template file - `deployments/tyk/volumes/tyk-gateway/middleware/response-body-transform/response-body-transform-template.tmpl`.\n\nThe template transforms the response from the upstream API before returning it to the client."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Response Header Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"})",
+											"",
+											"pm.test('Header was added', function () {",
+											"    pm.response.to.be.header('Hello', 'world');",
+											"})",
+											"",
+											"pm.test('Header was removed', function () {",
+											"    pm.response.to.not.have.header('Server');",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/response-header-transform",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"response-header-transform"
+									]
+								},
+								"description": "This request uses the OAS method transform middleware to change the HTTP method from `PUT` to `POST`."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - URL Rewrite",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('URL was rewritten', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.url).to.be.equal('http://httpbin/anything/test/url-rewrite');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/url-rewrite/test",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"url-rewrite",
+										"test"
+									]
+								},
+								"description": "This requests uses the OAS URL rewrite middleware to rewrite the URL sent to the upstream API, such that the last two path elements are swapped - `/url-rewrite/test` becomes `/test/url-rewrite`.\n\nThis can be checked in the `url` field of the API JSON response body."
 							},
 							"response": []
 						}

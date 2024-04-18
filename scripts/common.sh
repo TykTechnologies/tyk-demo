@@ -597,7 +597,7 @@ create_api () {
   api_response=""
   if [ "$api_is_oas" == true ]; then
     # OAS API
-    # we just create OAS APIs, rather than import them, as the import endpoint doesn't allow for the id to be maintained, so it makes no difference
+    # we just create OAS APIs, rather than import them, as the API id is maintained through the x-tyk-api-gateway.info.id field
     api_response="$(curl $dashboard_base_url/api/apis/oas -s \
       -H "authorization: $dashboard_api_key" \
       -d "$api_data" 2>> logs/bootstrap.log)"

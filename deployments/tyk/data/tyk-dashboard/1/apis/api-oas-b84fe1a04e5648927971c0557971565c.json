@@ -1,0 +1,247 @@
+{
+  "components": {},
+  "info": {
+    "title": "OAS HTTPbin",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "/anything/method-transform": {
+      "put": {
+        "operationId": "anything/method-transformput",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Transforms HTTP method from PUT to POST"
+      }
+    },
+    "/anything/mock-response": {
+      "get": {
+        "operationId": "anything/mock-responseget",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "mockBody": "hello world body"
+                }
+              }
+            },
+            "description": "Return a 200 OK",
+            "headers": {
+              "Mock-Header": {
+                "description": "Add a mock header",
+                "schema": {
+                  "example": "hello world header",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Returns a mock response"
+      }
+    },
+    "/anything/request-body-transform": {
+      "post": {
+        "operationId": "anything/request-body-transformpost",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Transforms request body data"
+      }
+    },
+    "/anything/request-header-transform": {
+      "get": {
+        "operationId": "anything/request-header-transformget",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Adds a header and removes a header"
+      }
+    },
+    "/anything/response-body-transform": {
+      "get": {
+        "operationId": "anything/response-body-transformget",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Transform the response body using a golang template file"
+      }
+    },
+    "/anything/response-header-transform": {
+      "get": {
+        "operationId": "anything/response-header-transformget",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Transforms headers in upstream API response"
+      }
+    },
+    "/anything/url-rewrite": {
+      "get": {
+        "operationId": "anything/url-rewriteget",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Rewrites the URL sent to upstream API"
+      }
+    },
+    "/anything/validate-request": {
+      "post": {
+        "operationId": "anything/validate-requestpost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "age": {
+                    "description": "Age in years",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "firstName",
+                  "lastName"
+                ],
+                "title": "Person",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Validate request body against JSON schema"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://tyk-gateway.localhost:8080/oas-httpbin/"
+    }
+  ],
+  "x-tyk-api-gateway": {
+    "info": {
+      "dbId": "6620cda992ace4000153115c",
+      "id": "b84fe1a04e5648927971c0557971565c",
+      "name": "OAS HTTPbin",
+      "orgId": "5e9d9544a1dcd60001d0ed20",
+      "state": {
+        "active": true
+      }
+    },
+    "middleware": {
+      "global": {
+        "cache": {
+          "enabled": true,
+          "timeout": 60
+        }
+      },
+      "operations": {
+        "anything/method-transformput": {
+          "transformRequestMethod": {
+            "enabled": true,
+            "toMethod": "POST"
+          }
+        },
+        "anything/mock-responseget": {
+          "mockResponse": {
+            "enabled": true,
+            "fromOASExamples": {
+              "code": 200,
+              "contentType": "application/json",
+              "enabled": true
+            }
+          }
+        },
+        "anything/request-body-transformpost": {
+          "transformRequestBody": {
+            "body": "ewogICJ2YWx1ZTEiOiAie3sudmFsdWUyfX0iLAogICJ2YWx1ZTIiOiAie3sudmFsdWUxfX0iLAogICJyZXFIZWFkZXIiOiAie3suX3R5a19jb250ZXh0LmhlYWRlcnNfWF9IZWFkZXJ9fSIsCiAgInJlcVBhcmFtIjogInt7Ll90eWtfY29udGV4dC5yZXF1ZXN0X2RhdGEucGFyYW19fSIKfQ==",
+            "enabled": true,
+            "format": "json"
+          }
+        },
+        "anything/request-header-transformget": {
+          "transformRequestHeaders": {
+            "add": [
+              {
+                "name": "Added-Header",
+                "value": "foo"
+              }
+            ],
+            "enabled": true,
+            "remove": [
+              "Deleted-Header"
+            ]
+          }
+        },
+        "anything/response-body-transformget": {
+          "transformResponseBody": {
+            "enabled": true,
+            "format": "json",
+            "path": "middleware/response-body-transform/response-body-transform-template.tmpl"
+          }
+        },
+        "anything/response-header-transformget": {
+          "transformResponseHeaders": {
+            "add": [
+              {
+                "name": "Hello",
+                "value": "world"
+              }
+            ],
+            "enabled": true,
+            "remove": [
+              "Server"
+            ]
+          }
+        },
+        "anything/url-rewriteget": {
+          "urlRewrite": {
+            "enabled": true,
+            "pattern": "anything\\/([^/]+)\\/([^/]+)",
+            "rewriteTo": "anything/$2/$1"
+          }
+        },
+        "anything/validate-requestpost": {
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        }
+      }
+    },
+    "server": {
+      "listenPath": {
+        "strip": true,
+        "value": "/oas-httpbin/"
+      }
+    },
+    "upstream": {
+      "url": "http://httpbin/"
+    }
+  }
+}
