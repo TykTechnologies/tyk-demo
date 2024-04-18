@@ -5528,6 +5528,103 @@
 							"response": []
 						},
 						{
+							"name": "OAS - Method Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"})",
+											"",
+											"pm.test('Method was changed', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.method).to.be.equal('POST');",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Deleted-Header",
+										"value": "bar",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/method-transform",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"method-transform"
+									]
+								},
+								"description": "This request uses the OAS method transform middleware to change the HTTP method from `PUT` to `POST`."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Request Header Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"})",
+											"",
+											"pm.test('Header was added', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Added-Header']).to.be.equal('foo');",
+											"})",
+											"",
+											"pm.test('Header was removed', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Deleted-Header']).to.be.undefined;",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Deleted-Header",
+										"value": "bar",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/request-header-transform",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"request-header-transform"
+									]
+								},
+								"description": "This request uses the OAS request header transform middleware to add a header (\\`Added-Header\\`) and delete a header (\\`Deleted-Header\\`).\n\nThe presence of these headers can be verified in the API response, which lists the headers it received in the `headers` part of the JSON body."
+							},
+							"response": []
+						},
+						{
 							"name": "OAS - Request Body Transform",
 							"event": [
 								{
@@ -5640,52 +5737,6 @@
 									]
 								},
 								"description": "This request uses a body transform middleware based on a template file - `deployments/tyk/volumes/tyk-gateway/middleware/response-body-transform/response-body-transform-template.tmpl`.\n\nThe template transforms the response from the upstream API before returning it to the client."
-							},
-							"response": []
-						},
-						{
-							"name": "OAS - Method Transform",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test('Status code is 200', function () {",
-											"    pm.response.to.have.status(200);",
-											"})",
-											"",
-											"pm.test('Method was changed', function () {",
-											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.method).to.be.equal('POST');",
-											"})"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Deleted-Header",
-										"value": "bar",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/method-transform",
-									"protocol": "http",
-									"host": [
-										"{{tyk-gateway.host}}"
-									],
-									"path": [
-										"oas-httpbin",
-										"anything",
-										"method-transform"
-									]
-								},
-								"description": "This request uses the OAS method transform middleware to change the HTTP method from `PUT` to `POST`."
 							},
 							"response": []
 						},
