@@ -88,6 +88,17 @@
         "summary": "Transforms headers in upstream API response"
       }
     },
+    "/anything/url-rewrite": {
+      "get": {
+        "operationId": "anything/url-rewriteget",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Rewrites the URL sent to upstream API"
+      }
+    },
     "/anything/validate-request": {
       "post": {
         "operationId": "anything/validate-requestpost",
@@ -206,6 +217,13 @@
             "remove": [
               "Server"
             ]
+          }
+        },
+        "anything/url-rewriteget": {
+          "urlRewrite": {
+            "enabled": true,
+            "pattern": "anything\\/([^/]+)\\/([^/]+)",
+            "rewriteTo": "anything/$2/$1"
           }
         },
         "anything/validate-requestpost": {
