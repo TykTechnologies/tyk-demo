@@ -5688,6 +5688,55 @@
 								"description": "This request uses the OAS method transform middleware to change the HTTP method from `PUT` to `POST`."
 							},
 							"response": []
+						},
+						{
+							"name": "OAS - Response Header Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"})",
+											"",
+											"pm.test('Header was added', function () {",
+											"    pm.response.to.be.header('Hello', 'world');",
+											"})",
+											"",
+											"pm.test('Header was removed', function () {",
+											"    pm.response.to.not.have.header('Server');",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Deleted-Header",
+										"value": "bar",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/response-header-transform",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"response-header-transform"
+									]
+								},
+								"description": "This request uses the OAS method transform middleware to change the HTTP method from `PUT` to `POST`."
+							},
+							"response": []
 						}
 					]
 				}

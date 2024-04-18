@@ -77,6 +77,17 @@
         "summary": "Transform the response body using a golang template file"
       }
     },
+    "/anything/response-header-transform": {
+      "get": {
+        "operationId": "anything/response-header-transformget",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Transforms headers in upstream API response"
+      }
+    },
     "/anything/validate-request": {
       "post": {
         "operationId": "anything/validate-requestpost",
@@ -181,6 +192,20 @@
             "enabled": true,
             "format": "json",
             "path": "middleware/response-body-transform/response-body-transform-template.tmpl"
+          }
+        },
+        "anything/response-header-transformget": {
+          "transformResponseHeaders": {
+            "add": [
+              {
+                "name": "Hello",
+                "value": "world"
+              }
+            ],
+            "enabled": true,
+            "remove": [
+              "Server"
+            ]
           }
         },
         "anything/validate-requestpost": {
