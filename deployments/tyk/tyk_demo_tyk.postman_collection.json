@@ -5808,7 +5808,7 @@
 										"test"
 									]
 								},
-								"description": "This requests uses the OAS URL rewrite middleware to rewrite the URL sent to the upstream API, such that the last two path elements are swapped.\n\nThis can be checked in the `url` field of the API JSON response body."
+								"description": "This requests uses the OAS URL rewrite middleware to rewrite the URL sent to the upstream API, such that the last two path elements are swapped - `/url-rewrite/test` becomes `/test/url-rewrite`.\n\nThis can be checked in the `url` field of the API JSON response body."
 							},
 							"response": []
 						}
