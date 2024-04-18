@@ -5550,13 +5550,7 @@
 							],
 							"request": {
 								"method": "PUT",
-								"header": [
-									{
-										"key": "Deleted-Header",
-										"value": "bar",
-										"type": "text"
-									}
-								],
+								"header": [],
 								"url": {
 									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/method-transform",
 									"protocol": "http",
@@ -5717,13 +5711,7 @@
 							],
 							"request": {
 								"method": "GET",
-								"header": [
-									{
-										"key": "Deleted-Header",
-										"value": "bar",
-										"type": "text"
-									}
-								],
+								"header": [],
 								"url": {
 									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/response-body-transform",
 									"protocol": "http",
@@ -5766,13 +5754,7 @@
 							],
 							"request": {
 								"method": "GET",
-								"header": [
-									{
-										"key": "Deleted-Header",
-										"value": "bar",
-										"type": "text"
-									}
-								],
+								"header": [],
 								"url": {
 									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/response-header-transform",
 									"protocol": "http",
