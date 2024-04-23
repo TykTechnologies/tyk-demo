@@ -14,26 +14,38 @@ timestamp_to_epoch() {
 # Function to process JSON and compare timestamps
 process_json() {
     local length=$(jq '. | length' <<< "$json_array")
+
     for (( i=0; i<$length; i++ )); do
         local current=$(jq -r ".[$i]" <<< "$json_array")
         local response_code=$(jq -r '.responsecode' <<< "$current")
-        if [ "$response_code" = "429" ]; then
-            local current_timestamp=$(jq -r '.timestamp' <<< "$current")
-            local next_index=$((i + 5))
-            if [ "$next_index" -lt "$length" ]; then
-                local next=$(jq -r ".[$next_index]" <<< "$json_array")
-                local next_timestamp=$(jq -r '.timestamp' <<< "$next")
-                local current_epoch=$(timestamp_to_epoch "$current_timestamp")
-                local next_epoch=$(timestamp_to_epoch "$next_timestamp")
-                if [ "$current_epoch" != "Error: Unsupported date format" ] && [ "$next_epoch" != "Error: Unsupported date format" ]; then
-                    local diff=$((next_epoch - current_epoch))
-                    if [ "$diff" -le 1 ]; then
-                        echo "Timestamps within 1 second:"
-                        echo "Record $i: $current_timestamp"
-                        echo "Record $next_index: $next_timestamp"
-                    fi
-                fi
-            fi
+
+        if [ "$response_code" != "429" ]; then
+            continue
+        fi
+
+        local current_timestamp=$(jq -r '.timestamp' <<< "$current")
+        local next_index=$((i + 5))
+
+        if [ "$next_index" -ge "$length" ]; then
+            continue
+        fi
+
+        local next=$(jq -r ".[$next_index]" <<< "$json_array")
+        local next_timestamp=$(jq -r '.timestamp' <<< "$next")
+
+        local current_epoch=$(timestamp_to_epoch "$current_timestamp")
+        local next_epoch=$(timestamp_to_epoch "$next_timestamp")
+
+        if [ "$current_epoch" = "Error: Unsupported date format" ] || [ "$next_epoch" = "Error: Unsupported date format" ]; then
+            continue
+        fi
+
+        local diff=$((next_epoch - current_epoch))
+
+        if [ "$diff" -le 1 ]; then
+            echo "Timestamps within 1 second:"
+            echo "Record $i: $current_timestamp"
+            echo "Record $next_index: $next_timestamp"
         fi
     done
 }
