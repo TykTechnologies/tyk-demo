@@ -6,7 +6,6 @@ NUM_REQUESTS=20
 REQUESTS_PER_SECOND=5
 RATE_LIMIT_QUANTITY=5
 RATE_LIMIT_PERIOD=1
-TEMP_DATA_PATH="deployments/test-rate-limit/temp.json"
 
 # Convert timestamp to milliseconds since epoch
 timestamp_to_epoch_ms() {
