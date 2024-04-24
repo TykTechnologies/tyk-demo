@@ -108,6 +108,9 @@ bootstrap_progress
 portal_admin_api_token=$(echo $api_response | jq -r .data.api_token)
 set_docker_environment_value "PORTAL_ADMIN_API_TOKEN" $portal_admin_api_token
 
+# Set Context Data for Portal User
+set_context_data "1" "enterprise-portal-admin" "1" "api-key" "$portal_admin_api_token"
+
 log_message "Waiting for the bootstrap to complete ..."
 sleep 5 #TODO: Deprecate this when advanced ready endpoint is available
 
