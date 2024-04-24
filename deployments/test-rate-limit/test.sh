@@ -4,11 +4,15 @@
 NUM_CLIENTS=1
 NUM_REQUESTS=20
 REQUESTS_PER_SECOND=5
+RATE_LIMIT_QUANTITY=5
+RATE_LIMIT_PERIOD=1
 TEMP_DATA_PATH="deployments/test-rate-limit/temp.json"
 
-timestamp_to_epoch() {
+timestamp_to_epoch_ms() {
     local timestamp="$1"
-    date -u -d "$timestamp" "+%s" 2>/dev/null || date -jf "%Y-%m-%dT%H:%M:%S" "$timestamp" "+%s" 2>/dev/null || echo "Error: Unsupported date format"
+    local epoch=$(date -jf "%Y-%m-%dT%H:%M:%S" "$timestamp" "+%s" 2>/dev/null)
+    local milliseconds="${timestamp:20:3}"
+    echo $((10#$epoch$milliseconds))
 }
 
 # Function to process JSON and compare timestamps
@@ -24,7 +28,7 @@ process_json() {
         fi
 
         local current_timestamp=$(jq -r '.timestamp' <<< "$current")
-        local next_index=$((i + 5))
+        local next_index=$((i + $RATE_LIMIT_QUANTITY))
 
         if [ "$next_index" -ge "$length" ]; then
             continue
@@ -32,20 +36,19 @@ process_json() {
 
         local next=$(jq -r ".[$next_index]" <<< "$json_array")
         local next_timestamp=$(jq -r '.timestamp' <<< "$next")
-
-        local current_epoch=$(timestamp_to_epoch "$current_timestamp")
-        local next_epoch=$(timestamp_to_epoch "$next_timestamp")
+        
+        local current_epoch=$(timestamp_to_epoch_ms "$current_timestamp")
+        local next_epoch=$(timestamp_to_epoch_ms "$next_timestamp")
 
         if [ "$current_epoch" = "Error: Unsupported date format" ] || [ "$next_epoch" = "Error: Unsupported date format" ]; then
             continue
         fi
 
-        local diff=$((next_epoch - current_epoch))
+        local diff_ms=$((current_epoch - next_epoch))
+        local rate_limit_window_ms=$(($RATE_LIMIT_PERIOD * 1000))
 
-        if [ "$diff" -le 1 ]; then
-            echo "Timestamps within 1 second:"
-            echo "Record $i: $current_timestamp"
-            echo "Record $next_index: $next_timestamp"
+        if [ "$diff_ms" -le "$rate_limit_window_ms" ]; then
+            echo "Records $i/$next_index diff:${diff_ms}ms ($current_timestamp / $next_timestamp)"
         fi
     done
 }
@@ -65,15 +68,15 @@ analytics_data=$(docker exec -it tyk-demo-tyk-mongo-1 mongo tyk_analytics --quie
 # Process and format analytics data into JSON array
 json_array=""
 while IFS= read -r line; do
-  # Remove trailing newline
-  line=${line%?}
-  # Fix invalid JSON (ObjectId & ISODate conversion)
-  line=$(echo "$line" | sed 's/ObjectId("\([^"]*\)")/\"\1\"/; s/ISODate("\([^"]*\)")/\"\1\"/')
-  # Add comma except for the first element
-  if [[ -n "$json_array" ]]; then
+    # Remove trailing newline
+    line=${line%?}
+    # Fix invalid JSON (ObjectId & ISODate conversion)
+    line=$(echo "$line" | sed 's/ObjectId("\([^"]*\)")/\"\1\"/; s/ISODate("\([^"]*\)")/\"\1\"/')
+    # Add comma except for the first element
+    if [[ -n "$json_array" ]]; then
     json_array+=","
-  fi
-  json_array+=$line
+    fi
+    json_array+=$line
 done <<< "$analytics_data"
 
 # Wrap the processed data in square brackets for valid JSON array
@@ -86,6 +89,4 @@ echo "Analyzing for potential rate limiting violations (responsecode 429)"
 
 process_json "$json_array"
 
-# Removed unused temporary data handling section
-
-echo "Rate limit analysis completed."
+echo "Rate limit analysis completed"
