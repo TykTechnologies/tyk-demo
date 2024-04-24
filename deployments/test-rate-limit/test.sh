@@ -16,6 +16,22 @@ timestamp_to_epoch_ms() {
     echo $((10#$epoch$milliseconds))
 }
 
+# Process data into JSON array
+process_analytics_data() {
+    local analytics_data="$1"
+    local json_array=""
+
+    while IFS= read -r line; do
+        line=${line%?} # Remove trailing newline
+        line=$(echo "$line" | sed 's/ObjectId("\([^"]*\)")/\"\1\"/; s/ISODate("\([^"]*\)")/\"\1\"/') # Fix JSON
+        if [[ -n "$json_array" ]]; then
+            json_array+=","
+        fi
+        json_array+=$line
+    done <<< "$analytics_data"
+    echo "[$json_array]" # Wrap in array and output
+}
+
 # Process JSON and detect rate limiting violations
 process_json() {
     local json_array="$1"
@@ -44,17 +60,14 @@ process_json() {
         local current_epoch=$(timestamp_to_epoch_ms "$current_timestamp")
         local next_epoch=$(timestamp_to_epoch_ms "$next_timestamp")
 
-        # Skip if timestamp format is unsupported
-        if [ "$current_epoch" = "Error: Unsupported date format" ] || [ "$next_epoch" = "Error: Unsupported date format" ]; then
-            continue
-        fi
-
         local diff_ms=$((current_epoch - next_epoch))
         local rate_limit_window_ms=$(($RATE_LIMIT_PERIOD * 1000))
 
-        # Output potential violations
+        # Validate rate limit enforcement
         if [ "$diff_ms" -le "$rate_limit_window_ms" ]; then
-            echo "Potential rate limit violation: Records $i/$next_index, diff:${diff_ms}ms ($current_timestamp / $next_timestamp)"
+            echo "Rate limit CORRECTLY enforced: Records $i/$next_index, diff:${diff_ms}ms ($current_timestamp / $next_timestamp)"
+        else
+            echo "Rate limit INCORRECTLY enforced: Records $i/$next_index, diff:${diff_ms}ms ($current_timestamp / $next_timestamp)"
         fi
     done
 }
@@ -70,23 +83,12 @@ sleep 3
 # Fetch and process analytics data
 echo "Fetching analytics data from tyk_analytics collection"
 analytics_data=$(docker exec -it tyk-demo-tyk-mongo-1 mongo tyk_analytics --quiet --eval "db.getCollection('z_tyk_analyticz_5e9d9544a1dcd60001d0ed20').find({},{timestamp:1, responsecode:1}).sort({timestamp:-1}).limit($NUM_REQUESTS)")
+json_array=$(process_analytics_data "$analytics_data")
 
-# Process data into JSON array
-json_array=""
-while IFS= read -r line; do
-    line=${line%?} # Remove trailing newline
-    line=$(echo "$line" | sed 's/ObjectId("\([^"]*\)")/\"\1\"/; s/ISODate("\([^"]*\)")/\"\1\"/') # Fix JSON
-    if [[ -n "$json_array" ]]; then
-        json_array+=","
-    fi
-    json_array+=$line
-done <<< "$analytics_data"
-json_array="[$json_array]" # Wrap in array
-
-# Display formatted JSON
+# Display source analytics data
 echo "$json_array" | jq '.'
 
-# Analyze for rate limiting violations
-echo "Analyzing for potential rate limiting violations (responsecode 429)"
+# Analyse rate limiting enforcement
+echo "Analysing rate limiting enforcement"
 process_json "$json_array"
 echo "Rate limit analysis completed"
