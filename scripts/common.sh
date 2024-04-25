@@ -568,6 +568,14 @@ create_portal_catalogue () {
     -d "$updated_catalogue" 2>> logs/bootstrap.log)"
 }
 
+read_api () {
+  local api_key="$1"
+  local api_id="$2"
+  api_response="$(curl $dashboard_base_url/api/apis/$api_id -s \
+    -H "authorization: $api_key" 2>> logs/bootstrap.log)"
+  echo "$api_response"
+}
+
 create_api () {
   local api_data_path="$1"
   local admin_api_key="$2"
