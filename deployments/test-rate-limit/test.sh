@@ -40,6 +40,7 @@ process_analytics_data() {
 analyse_rate_limiting() {
     local json_array="$1"
     local length=$(jq '. | length' <<< "$json_array")
+    local success=true
 
     for (( i=0; i<$length; i++ )); do
         local current=$(jq -r ".[$i]" <<< "$json_array")
@@ -68,31 +69,55 @@ analyse_rate_limiting() {
         local rate_limit_window_ms=$((RATE_LIMIT_PERIOD * 1000))
 
         # Validate rate limit enforcement
-        if [ "$diff_ms" -le "$rate_limit_window_ms" ]; then
-            echo "Rate limit CORRECTLY enforced: Records $i/$next_index, diff:${diff_ms}ms ($current_timestamp / $next_timestamp)"
-        else
-            echo "Rate limit INCORRECTLY enforced: Records $i/$next_index, diff:${diff_ms}ms ($current_timestamp / $next_timestamp)"
+        if [ "$diff_ms" -gt "$rate_limit_window_ms" ]; then
+            success=false
+            echo "Rate limit incorrectly enforced: Records $i/$next_index, diff:${diff_ms}ms ($current_timestamp / $next_timestamp)"
         fi
     done
+
+    if [[ "$success" == "true" ]]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
-# Simulate load
-echo "Generating requests: $NUM_CLIENTS client(s), sending $NUM_REQUESTS requests at $REQUESTS_PER_SECOND per second"
-hey -c "$NUM_CLIENTS" -q "$REQUESTS_PER_SECOND" -n "$NUM_REQUESTS" -H "Authorization: 5per1b" "$API_ENDPOINT"
+analytics_data=""
 
-# Wait for analytics data to be available
-echo "Waiting for analytics data..."
-sleep 3
+# Handle script arguments
+if [[ $# -gt 0 ]]; then
+    data_file="$1"
+    echo "Using data file: $data_file"
+    # Read data from file and assign to analytics_data variable
+    analytics_data=$(cat "$data_file")
+else
+    # Simulate load
+    echo "Generating requests: $NUM_CLIENTS client(s), sending $NUM_REQUESTS requests at $REQUESTS_PER_SECOND per second"
+    hey -c "$NUM_CLIENTS" -q "$REQUESTS_PER_SECOND" -n "$NUM_REQUESTS" -H "Authorization: 5per1b" "$API_ENDPOINT"
 
-# Fetch and process analytics data
-echo "Fetching analytics data from $MONGO_COLLECTION_NAME collection"
-analytics_data=$(docker exec -it "$MONGO_CONTAINER_NAME" mongo "$MONGO_DB_NAME" --quiet --eval "db.getCollection('$MONGO_COLLECTION_NAME').find({},{timestamp:1, responsecode:1}).sort({timestamp:-1}).limit($NUM_REQUESTS)")
-json_array=$(process_analytics_data "$analytics_data")
+    # Wait for analytics data to be available
+    echo "Waiting for analytics data..."
+    sleep 3
+
+    # Fetch and process analytics data
+    echo "Fetching analytics data from $MONGO_COLLECTION_NAME collection"
+    mongo_data=$(docker exec -it "$MONGO_CONTAINER_NAME" mongo "$MONGO_DB_NAME" --quiet --eval "db.getCollection('$MONGO_COLLECTION_NAME').find({},{timestamp:1, responsecode:1}).sort({timestamp:-1}).limit($NUM_REQUESTS)")
+    analytics_data=$(process_analytics_data "$mongo_data")
+fi
 
 # Display source analytics data
-echo "$json_array" | jq '.'
+echo "Data to be analysed"
+echo "$analytics_data" | jq '.'
 
 # Analyse rate limiting enforcement
 echo "Analysing rate limiting enforcement"
-analyse_rate_limiting "$json_array"
+analyse_rate_limiting "$analytics_data"
+
+result=$?
+if [ $result -eq 0 ]; then
+    echo "No errors detected"
+fi
+
 echo "Rate limit analysis completed"
+
+exit $result
