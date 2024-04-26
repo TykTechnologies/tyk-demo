@@ -146,8 +146,8 @@
     },
     "enable_jwt": false,
     "do_not_track": false,
-    "name": "Load Balanced API Auth",
-    "slug": "load-balanced-api-auth",
+    "name": "Load Balanced Gateways",
+    "slug": "load-balanced-gateways",
     "analytics_plugin": {},
     "oauth_meta": {
       "allowed_access_types": [],
@@ -201,7 +201,7 @@
       "preserve_host_header": false,
       "strip_listen_path": true,
       "enable_load_balancing": true,
-      "listen_path": "/load-balanced-api-auth/",
+      "listen_path": "/load-balanced-gateways/",
       "disable_strip_slash": true
     },
     "client_certificates": [],
