@@ -9,6 +9,9 @@
         "authorization": "5per1_basic_protected_api",
         "apiId": "accbdd1b89e84ec97f4f16d4e3197d5c"
     },
+    "key": {
+        "filename": "bearer-token-1-5per1_basic_protected_api.json"
+    },
     "test": {
         "passRate": 50
     }

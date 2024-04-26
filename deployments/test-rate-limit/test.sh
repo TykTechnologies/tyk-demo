@@ -16,7 +16,7 @@ timestamp_to_epoch_ms() {
     # Use parameter expansion with a character class to capture digits only
     milliseconds=${timestamp##*.}  # Double ## removes everything before the last dot
     milliseconds=${milliseconds%[!0-9]}  # Remove everything except digits from the end
-    # Add trailing 0 padding to ms values that are 1 or 2 digits
+    # Add trailing 0 padding to ms values that only have 1 or 2 digits
     case ${#milliseconds} in
         1) milliseconds="${milliseconds}00" ;;
         2) milliseconds="${milliseconds}0" ;;
@@ -29,9 +29,9 @@ timestamp_to_epoch_ms() {
 analyse_rate_limiting() {
     local analytics_data="$1"
     local rate_limit="$2"
-    local rate_duration="$3"
+    local rate_period="$3"
     local length=$(jq '.data | length' <<< "$analytics_data")
-    local rate_limit_window_ms=$((rate_duration * 1000))
+    local rate_limit_window_ms=$((rate_period * 1000))
     local comparison_count=0
 
     for (( i=0; i<$length; i++ )); do
@@ -42,7 +42,7 @@ analyse_rate_limiting() {
         if [ "$response_code" != "429" ]; then
             continue
         fi
-        
+
         comparison_count=$((comparison_count+1))
         local success=true
         local current_timestamp=$(jq -r '.TimeStamp' <<< "$current")
@@ -69,7 +69,7 @@ analyse_rate_limiting() {
             echo "  Diff: ${diff_ms}ms ($current_timestamp / $next_timestamp)"
         fi
 
-        if success; then 
+        if [[ $success -eq 1 ]]; then 
             echo "  Result: pass"
         else 
             echo "  Result: fail"
@@ -118,13 +118,13 @@ get_analytics_data() {
 }
 
 for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
-    target_authorization=$(jq '.target.authorization' -r $test_plan_path)
-    target_url=$(jq '.target.url' -r $test_plan_path)
-    target_api_id=$(jq '.target.apiId' -r $test_plan_path)
+    target_authorization=$(jq -r '.target.authorization' $test_plan_path)
+    target_url=$(jq -r '.target.url' $test_plan_path)
+    target_api_id=$(jq -r '.target.apiId' $test_plan_path)
     load_clients=$(jq '.load.clients' $test_plan_path)
     load_rate=$(jq '.load.rate' $test_plan_path)
     load_total=$(jq '.load.total' $test_plan_path)
-    key_file_path="deployments/test-rate-limit/data/tyk-gateway/keys/bearer-token-1-$target_authorization.json"
+    key_file_path="deployments/test-rate-limit/data/tyk-gateway/keys/$(jq -r '.key.filename' $test_plan_path)"
     key_rate=$(jq '.access_rights[] | .limit.rate' $key_file_path)
     key_rate_period=$(jq '.access_rights[] | .limit.per' $key_file_path)
 
@@ -134,7 +134,7 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     
     analytics_data=$(get_analytics_data $target_api_id $current_time $load_total)
     rl_hits=$(jq '[.data[] | select(.ResponseCode == 429)] | length' <<< "$analytics_data")
-    analyse_rate_limiting "$analytics_data" $rate_limit $rate_duration
+    analyse_rate_limiting "$analytics_data" $key_rate $key_rate_period
 done
 
 exit
