@@ -155,37 +155,6 @@ get_analytics_data() {
     echo "$data"
 }
 
-
-    # echo "Analysing static data"
-
-
-
-    # analytics_data=$(cat $static_analytics_data_path)
-    # key_rate=$(jq '.access_rights[] | .limit.rate' $static_key_path)
-    # key_rate_period=$(jq '.access_rights[] | .limit.per' $static_key_path)
-
-    # analyse_rate_limit_enforcement "$analytics_data" $key_rate $key_rate_period
-
-    # if [ $? -eq 0 ]; then
-    #     echo -e "\nNo errors detected"
-    # else
-    #     echo -e "\nErrors detected"
-    # fi
-
-get_analytics_from_requests() {
-    local test_plan_path="$1"
-    local test_plan_file_name=$(basename "${test_plan_path%.*}")
-    
-    local key_file_path="deployments/test-rate-limit/data/tyk-gateway/keys/$(jq -r '.key.filename' $test_plan_path)"
-    local key_rate=$(jq '.access_rights[] | .limit.rate' $key_file_path)
-    local key_rate_period=$(jq '.access_rights[] | .limit.per' $key_file_path)
-
-
-    local analytics_data=$()
-
-    echo $analytics_data > .context-data/rl-analytics-$test_plan_file_name.json
-}
-
 echo -e "\nRunning test plans"
 for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     test_plan_file_name=$(basename "${test_plan_path%.*}")
