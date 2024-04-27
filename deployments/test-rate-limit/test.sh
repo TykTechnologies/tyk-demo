@@ -40,7 +40,7 @@ analyse_rate_limit_enforcement() {
     local code_429_error_count=0
     local result=0
 
-    echo -e "Analysing analytics records\n  Count: $analytics_record_count\n  Rate Limit Window: ${rate_limit_window_ms}ms"
+    echo -e "\nAnalysing analytics records\n  Count: $analytics_record_count\n  Rate Limit Window: ${rate_limit_window_ms}ms"
     
     for (( i=0; i<$analytics_record_count; i++ )); do
         local current=$(jq -r ".data[$i]" <<< "$analytics_data")
@@ -212,8 +212,8 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
             analytics_data=$(get_analytics_data $target_api_id $current_time $load_total)
             ;;
         "file")
-            analytics_data_path=$(jq '.file.analyticsDataPath' $test_plan_path)
-            if [ ! -f "$analytics_data_path" ]; then
+            analytics_data_path=$(jq '.file.analyticsDataPath' -r $test_plan_path)
+            if [ ! -f $analytics_data_path ]; then
                 echo "ERROR: Analytics data file does not exist: $analytics_data_path"
                 exit 1
             fi
@@ -225,13 +225,6 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
             ;;
     esac
 
-    # echo "ANALYTICS DATA:$analytics_data"
-    # jq '.' <<< "$analytics_data"
-    echo "$analytics_data" > .context-data/a
-    # rl_hits=$(jq '[.data[] | select(.ResponseCode == 429)] | length' <<< "$analytics_data")
-    # request_total=$(jq '.data[] | length' <<< "$analytics_data")
-    # failure_rate=$(awk "BEGIN {print ($rl_hits / $request_total) * 100}")
-    
     analyse_rate_limit_enforcement "$analytics_data" $key_rate $key_rate_period
 
     if [ $? -eq 0 ]; then
