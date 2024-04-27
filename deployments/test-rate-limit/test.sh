@@ -2,12 +2,9 @@
 
 source scripts/common.sh
 
-dashboard_base_url="http://tyk-dashboard.localhost:$(jq -r '.listen_port' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
-gateway_base_url="$(get_context_data "1" "gateway" "1" "base-url")"
-gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
-
-# Test parameters
-readonly NUM_CLIENTS=1
+readonly dashboard_base_url="http://tyk-dashboard.localhost:$(jq -r '.listen_port' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
+readonly gateway_base_url="$(get_context_data "1" "gateway" "1" "base-url")"
+readonly gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
 readonly TYK_DASHBOARD_API_KEY="$(cat .context-data/1-dashboard-user-1-api-key)"
 
 # Function to convert timestamp to milliseconds since epoch
@@ -122,7 +119,7 @@ generate_requests() {
     local requests_total="$3"
     local target_url="$4"
     local api_key="$5"
-    echo -e "Generating requests:\n  Clients: $clients\n  Requests per Second: $requests_per_second\n  Total Requests: $requests_total\n  Target URL: $target_url\n  Authorization: $api_key"
+    echo -e "\nGenerating requests:\n  Clients: $clients\n  Requests per Second: $requests_per_second\n  Total Requests: $requests_total\n  Target URL: $target_url\n  Authorization: $api_key"
     hey -c "$clients" -q "$requests_per_second" -n "$requests_total" -H "Authorization: $api_key" "$target_url"
 }
 
@@ -164,7 +161,7 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     key_rate_period=$(jq '.access_rights[] | .limit.per' $key_file_path)
     analytics_data=""
 
-    echo -e "\nTest plan \"$test_plan_file_name\":\n  Data source: $test_data_source"
+    echo -e "\nRunning test plan \"$test_plan_file_name\":\n  Data source: $test_data_source"
 
     case $test_data_source in
         "requests")
@@ -202,3 +199,5 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
         echo -e "\nErrors detected"
     fi
 done
+
+echo -e "\nScript complete"
