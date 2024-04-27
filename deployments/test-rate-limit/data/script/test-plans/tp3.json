@@ -1,7 +1,7 @@
 {
     "dataSource": "file",
     "file": {
-        "analyticsDataPath": "deployments/test-rate-limit/data/script/simulation/dummy-analytics-data-success.json"
+        "analyticsDataPath": "deployments/test-rate-limit/data/script/simulation/dummy-analytics-data-failure.json"
     },
     "key": {
         "filename": "bearer-token-1-5per1_basic_protected_api.json"
