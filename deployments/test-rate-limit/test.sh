@@ -23,8 +23,8 @@ timestamp_to_epoch_ms() {
     echo $((10#$epoch$milliseconds))
 }
 
-write_test_result() {
-
+append_to_test_summary() {
+    sed -i '' "$ s/$/ $1/" .context-data/rl-test-summary
 }
 
 # Function to analyse rate limiting enforcement
@@ -40,6 +40,8 @@ analyse_rate_limit_enforcement() {
     local rl_enforce_ok_count=0
     local rl_enforce_error_count=0
     local result=0
+
+    append_to_test_summary $analytics_record_count
 
     echo -e "\nAnalysing analytics records\n  Count: $analytics_record_count\n  Rate Limit Window: ${rate_limit_window_ms}ms"
     
@@ -98,19 +100,23 @@ analyse_rate_limit_enforcement() {
         fi
     done
 
+
     echo -e "\nStatus Codes Summary:
     200: $code_200_count
     429: $code_429_count
   Other: $code_other_count"
+    append_to_test_summary "$code_429_count $rl_enforce_ok_count $rl_enforce_error_count"
 
     echo -e "\nRate Limit Enforcement Summary:"
     case $code_429_count in
         0)  
             echo "  Rate limit not triggered" 
+            append_to_test_summary "n/a"
             ;;
         *)  
             local rl_success=$(awk "BEGIN {print ($rl_enforce_ok_count / $code_429_count) * 100}")
             echo "  $rl_success% success" 
+            append_to_test_summary "$rl_success"
             ;;
     esac 
 
@@ -156,6 +162,10 @@ get_analytics_data() {
     echo "$data"
 }
 
+test_summary_path=".context-data/rl-test-summary"
+# clear the test summary file
+> $test_summary_path
+
 echo -e "\nRunning test plans"
 for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     test_plan_file_name=$(basename "${test_plan_path%.*}")
@@ -165,6 +175,7 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     key_rate_period=$(jq '.access_rights[] | .limit.per' $key_file_path)
     analytics_data=""
 
+    echo "$test_plan_file_name" >> $test_summary_path
     echo -e "\nRunning test plan \"$test_plan_file_name\":\n  Data source: $test_data_source"
 
     case $test_data_source in
@@ -199,9 +210,19 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
 
     if [ $? -eq 0 ]; then
         echo -e "\nNo errors detected"
+        append_to_test_summary "pass"
     else
         echo -e "\nErrors detected"
+        append_to_test_summary "fail"
     fi
+
+    # echo -e "" >> $test_summary_path
 done
 
-echo -e "\nScript complete"
+echo -e "\nTest plans complete"
+
+echo -e "\nTest Summary"
+awk -v HEADER="TestPlan  ReqTotal  RLHit  RLOk  RLError  RLSuccess  Result" '
+    BEGIN { print HEADER }
+    { printf("%-9s %8s %6s %5s %8s %10s %7s\n", $1, $2, $3, $4, $5, $6, $7) }
+' $test_summary_path
