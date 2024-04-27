@@ -33,8 +33,8 @@ analyse_rate_limit_enforcement() {
     local code_429_count=0
     local code_200_count=0
     local code_other_count=0
-    local code_429_ok_count=0
-    local code_429_error_count=0
+    local rl_enforce_ok_count=0
+    local rl_enforce_error_count=0
     local result=0
 
     echo -e "\nAnalysing analytics records\n  Count: $analytics_record_count\n  Rate Limit Window: ${rate_limit_window_ms}ms"
@@ -85,10 +85,10 @@ analyse_rate_limit_enforcement() {
         fi
 
         if [[ $success -eq 1 ]]; then
-            code_429_ok_count=$((code_429_ok_count+1))
+            rl_enforce_ok_count=$((rl_enforce_ok_count+1))
             echo "  Result: pass"
         else 
-            code_429_ok_count=$((code_429_error_count+1))
+            rl_enforce_error_count=$((rl_enforce_error_count+1))
             echo "  Result: fail"
             result=1
         fi
@@ -105,7 +105,7 @@ analyse_rate_limit_enforcement() {
             echo "  Rate limit not triggered" 
             ;;
         *)  
-            local rl_success=$(awk "BEGIN {print ($code_429_ok_count / $code_429_count) * 100}")
+            local rl_success=$(awk "BEGIN {print ($rl_enforce_ok_count / $code_429_count) * 100}")
             echo "  $rl_success% success" 
             ;;
     esac 
