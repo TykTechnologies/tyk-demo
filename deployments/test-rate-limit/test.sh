@@ -23,6 +23,10 @@ timestamp_to_epoch_ms() {
     echo $((10#$epoch$milliseconds))
 }
 
+write_test_result() {
+
+}
+
 # Function to analyse rate limiting enforcement
 analyse_rate_limit_enforcement() {
     local analytics_data="$1"
@@ -144,7 +148,7 @@ get_analytics_data() {
         if [ $analytics_count -eq $request_count ]; then
             done=true
         else
-            # give time for analytics data to be processed
+            # pause, to allow time for analytics data to be processed
             sleep 1
         fi
     done
