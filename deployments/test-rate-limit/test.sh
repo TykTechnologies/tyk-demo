@@ -4,6 +4,7 @@ source scripts/common.sh
 
 dashboard_base_url="http://tyk-dashboard.localhost:$(jq -r '.listen_port' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
 gateway_base_url="$(get_context_data "1" "gateway" "1" "base-url")"
+gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
 
 # Test parameters
 readonly NUM_CLIENTS=1
@@ -26,34 +27,51 @@ timestamp_to_epoch_ms() {
 }
 
 # Function to analyse rate limiting enforcement
-analyse_rate_limiting() {
+analyse_rate_limit_enforcement() {
     local analytics_data="$1"
     local rate_limit="$2"
     local rate_period="$3"
-    local length=$(jq '.data | length' <<< "$analytics_data")
+    local analytics_record_count=$(jq '[.data[]] | length' <<< "$analytics_data")
     local rate_limit_window_ms=$((rate_period * 1000))
-    local comparison_count=0
+    local code_429_count=0
+    local code_200_count=0
+    local code_other_count=0
+    local code_429_ok_count=0
+    local code_429_error_count=0
+    local result=0
 
-    for (( i=0; i<$length; i++ )); do
+    echo -e "Analysing analytics records\n  Count: $analytics_record_count\n  Rate Limit Window: ${rate_limit_window_ms}ms"
+    
+    for (( i=0; i<$analytics_record_count; i++ )); do
         local current=$(jq -r ".data[$i]" <<< "$analytics_data")
         local response_code=$(jq -r '.ResponseCode' <<< "$current")
 
-        # Check if response code indicates rate limit exceeded
-        if [ "$response_code" != "429" ]; then
-            continue
-        fi
+        # Move to next record if not a 429
+        case $response_code in
+            200)  
+                code_200_count=$((code_200_count+1))
+                continue  
+                ;;
+            429)  
+                code_429_count=$((code_429_count+1)) 
+                ;;
+            *)  
+                code_other_count=$((code_other_count+1))
+                continue 
+                ;;  
+        esac 
 
-        comparison_count=$((comparison_count+1))
         local success=true
         local current_timestamp=$(jq -r '.TimeStamp' <<< "$current")
         local next_index=$((i + rate_limit))
 
-        echo "Comparison $comparison_count"
-        echo "  Records: $i / $next_index"
+        echo -e "\nRate Limit Review $code_429_count"
+        echo "  Analyitcs Records: $i / $next_index"
 
         # Check if next index is within array bounds
-        if [ "$next_index" -ge "$length" ]; then
+        if [ "$next_index" -ge "$analytics_record_count" ]; then
             echo "  Request hit rate limit too soon"
+            rl_error=$((rl_error+1))
             success=false
         else
             local next=$(jq -r ".data[$next_index]" <<< "$analytics_data")
@@ -65,17 +83,35 @@ analyse_rate_limiting() {
             local diff_ms=$((current_epoch - next_epoch))
             success=$(( diff_ms <= rate_limit_window_ms ))
 
-            echo "  Epochs: $current_epoch / $next_epoch"
-            echo "  Diff: ${diff_ms}ms ($current_timestamp / $next_timestamp)"
+            echo "  Timestamps: $current_timestamp / $next_timestamp"
+            echo "  Diff: ${diff_ms}ms"
         fi
 
-        if [[ $success -eq 1 ]]; then 
+        if [[ $success -eq 1 ]]; then
+            code_429_ok_count=$((code_429_ok_count+1))
             echo "  Result: pass"
         else 
+            code_429_ok_count=$((code_429_error_count+1))
             echo "  Result: fail"
             result=1
         fi
     done
+
+    echo -e "\nStatus Codes Summary:
+    200: $code_200_count
+    429: $code_429_count
+  Other: $code_other_count"
+
+    echo -e "\nRate Limit Enforcement Summary:"
+    case $code_429_count in
+        0)  
+            echo "  Rate limit not triggered" 
+            ;;
+        *)  
+            local rl_success=$(awk "BEGIN {print ($code_429_ok_count / $code_429_count) * 100}")
+            echo "  $rl_success% success" 
+            ;;
+    esac 
 
     return $result
 }
@@ -86,7 +122,7 @@ generate_requests() {
     local requests_total="$3"
     local target_url="$4"
     local api_key="$5"
-    echo "Generating requests: $clients client(s), sending $requests_total requests at $requests_per_second per second to $target_url"
+    echo -e "Generating requests:\n  Clients: $clients\n  Requests per Second: $requests_per_second\n  Total Requests: $requests_total\n  Target URL: $target_url\n  Authorization: $api_key"
     hey -c "$clients" -q "$requests_per_second" -n "$requests_total" -H "Authorization: $api_key" "$target_url"
 }
 
@@ -98,7 +134,7 @@ get_key_test_data() {
 get_analytics_data() {
     local api_id="$1"
     local from_epoch="$2"
-    local test_count="$3"
+    local request_count="$3"
     local url="$dashboard_base_url/api/logs/?start=$from_epoch&p=-1&api=$api_id"
     local data=""
     local done=false
@@ -107,9 +143,11 @@ get_analytics_data() {
         data=$(curl -s -H "Authorization: $TYK_DASHBOARD_API_KEY" $url)
         analytics_count=$(jq '.data | length' <<< "$data")
         
-        if [ $analytics_count -eq $test_count ]; then
+        # check that there is equivalent amount of analytics records to API requests sent
+        if [ $analytics_count -eq $request_count ]; then
             done=true
         else
+            # give time for analytics data to be processed
             sleep 1
         fi
     done
@@ -117,75 +155,88 @@ get_analytics_data() {
     echo "$data"
 }
 
+
+    # echo "Analysing static data"
+
+
+
+    # analytics_data=$(cat $static_analytics_data_path)
+    # key_rate=$(jq '.access_rights[] | .limit.rate' $static_key_path)
+    # key_rate_period=$(jq '.access_rights[] | .limit.per' $static_key_path)
+
+    # analyse_rate_limit_enforcement "$analytics_data" $key_rate $key_rate_period
+
+    # if [ $? -eq 0 ]; then
+    #     echo -e "\nNo errors detected"
+    # else
+    #     echo -e "\nErrors detected"
+    # fi
+
+get_analytics_from_requests() {
+    local test_plan_path="$1"
+    local test_plan_file_name=$(basename "${test_plan_path%.*}")
+    
+    local key_file_path="deployments/test-rate-limit/data/tyk-gateway/keys/$(jq -r '.key.filename' $test_plan_path)"
+    local key_rate=$(jq '.access_rights[] | .limit.rate' $key_file_path)
+    local key_rate_period=$(jq '.access_rights[] | .limit.per' $key_file_path)
+
+
+    local analytics_data=$()
+
+    echo $analytics_data > .context-data/rl-analytics-$test_plan_file_name.json
+}
+
+echo -e "\nRunning test plans"
 for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
-    target_authorization=$(jq -r '.target.authorization' $test_plan_path)
-    target_url=$(jq -r '.target.url' $test_plan_path)
-    target_api_id=$(jq -r '.target.apiId' $test_plan_path)
-    load_clients=$(jq '.load.clients' $test_plan_path)
-    load_rate=$(jq '.load.rate' $test_plan_path)
-    load_total=$(jq '.load.total' $test_plan_path)
+    test_plan_file_name=$(basename "${test_plan_path%.*}")
+    test_data_source=$(jq -r '.dataSource' $test_plan_path)
     key_file_path="deployments/test-rate-limit/data/tyk-gateway/keys/$(jq -r '.key.filename' $test_plan_path)"
     key_rate=$(jq '.access_rights[] | .limit.rate' $key_file_path)
     key_rate_period=$(jq '.access_rights[] | .limit.per' $key_file_path)
+    analytics_data=""
 
-    current_time=$(date +%s)
+    echo -e "\nTest plan \"$test_plan_file_name\":\n  Data source: $test_data_source"
 
-    generate_requests $load_clients $load_rate $load_total $target_url $target_authorization
+    case $test_data_source in
+        "requests")
+            target_authorization=$(jq -r '.requests.target.authorization' $test_plan_path)
+            target_url=$(jq -r '.requests.target.url' $test_plan_path)
+            target_api_id=$(jq -r '.requests.target.apiId' $test_plan_path)
+            load_clients=$(jq '.requests.load.clients' $test_plan_path)
+            load_rate=$(jq '.requests.load.rate' $test_plan_path)
+            load_total=$(jq '.requests.load.total' $test_plan_path)
+            current_time=$(date +%s)
+            create_bearer_token $key_file_path $gateway_api_credentials
+            generate_requests $load_clients $load_rate $load_total $target_url $target_authorization
+            delete_bearer_token_dash $target_authorization $target_api_id $TYK_DASHBOARD_API_KEY
+            analytics_data=$(get_analytics_data $target_api_id $current_time $load_total)
+            ;;
+        "file")
+            analytics_data_path=$(jq '.file.analyticsDataPath' $test_plan_path)
+            if [ ! -f "$analytics_data_path" ]; then
+                echo "ERROR: Analytics data file does not exist: $analytics_data_path"
+                exit 1
+            fi
+            analytics_data=$(cat $analytics_data_path)
+            ;;
+        *) 
+            echo "ERROR: unknown data source: $test_data_source"
+            exit 1 
+            ;;
+    esac
+
+    # echo "ANALYTICS DATA:$analytics_data"
+    # jq '.' <<< "$analytics_data"
+    echo "$analytics_data" > .context-data/a
+    # rl_hits=$(jq '[.data[] | select(.ResponseCode == 429)] | length' <<< "$analytics_data")
+    # request_total=$(jq '.data[] | length' <<< "$analytics_data")
+    # failure_rate=$(awk "BEGIN {print ($rl_hits / $request_total) * 100}")
     
-    analytics_data=$(get_analytics_data $target_api_id $current_time $load_total)
-    rl_hits=$(jq '[.data[] | select(.ResponseCode == 429)] | length' <<< "$analytics_data")
-    analyse_rate_limiting "$analytics_data" $key_rate $key_rate_period
-done
+    analyse_rate_limit_enforcement "$analytics_data" $key_rate $key_rate_period
 
-exit
-
-# process keys
-for key_path in deployments/test-rate-limit/data/tyk-gateway/keys/*; do
-    key_file_name=$(basename "${key_path%.*}")
-    api_key=${key_file_name##*-}
-    rate_limit=$(jq '.access_rights[] | .limit.rate' $key_path)
-    rate_duration=$(jq '.access_rights[] | .limit.per' $key_path)
-    request_count=$((rate_limit * 4))
-    api_id=$(jq '.access_rights[] | .api_id' -r $key_path)
-    api_data="$(read_api $TYK_DASHBOARD_API_KEY $api_id)"
-    listen_path=$(jq '.api_definition.proxy.listen_path' -r <<< "$api_data")
-    request_url="${gateway_base_url}${listen_path}get"
-    current_time=$(date +%s)
-    generate_requests $rate_limit $request_count $request_url $api_key
-
-    # Wait for analytics data to be available
-    echo "Waiting for analytics data..."
-    sleep 3
-
-    # Fetch and extract analytics data
-    analytics_data=$(get_analytics_data $api_id $current_time)
-
-    # Analyse rate limiting enforcement
-    echo "Analysing rate limiting enforcement"
-    analyse_rate_limiting "$analytics_data" $rate_limit $rate_duration
     if [ $? -eq 0 ]; then
-        echo "No errors detected"
+        echo -e "\nNo errors detected"
     else
-        echo "Errors detected"
+        echo -e "\nErrors detected"
     fi
-
-    echo "Rate limit analysis completed"
-
 done
-
-# fi
-
-# # Display source analytics data
-# echo "Data to be analysed"
-# echo "$analytics_data" | jq '.'
-
-# Analyse rate limiting enforcement
-
-# result=$?
-# if [ $result -eq 0 ]; then
-#     echo "No errors detected"
-# fi
-
-# echo "Rate limit analysis completed"
-
-# exit $result
