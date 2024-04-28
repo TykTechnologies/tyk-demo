@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# TODO:
+# - store analysis detail in file
+# - change display format to awk table
+# - add more test plans for load balanced apis etc
+
 source scripts/common.sh
 
 readonly dashboard_base_url="http://tyk-dashboard.localhost:$(jq -r '.listen_port' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
@@ -170,7 +175,7 @@ echo -e "\nRunning test plans"
 for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     test_plan_file_name=$(basename "${test_plan_path%.*}")
     test_data_source=$(jq -r '.dataSource' $test_plan_path)
-    key_file_path="deployments/test-rate-limit/data/tyk-gateway/keys/$(jq -r '.key.filename' $test_plan_path)"
+    key_file_path=$(jq -r '.key.filePath' $test_plan_path)
     key_rate=$(jq '.access_rights[] | .limit.rate' $key_file_path)
     key_rate_period=$(jq '.access_rights[] | .limit.per' $key_file_path)
     analytics_data=""

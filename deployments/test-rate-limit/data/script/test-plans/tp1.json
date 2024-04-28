@@ -13,6 +13,6 @@
         }
     },
     "key": {
-        "filename": "bearer-token-1-5per1_basic_protected_api.json"
+        "filePath": "deployments/test-rate-limit/data/tyk-gateway/keys/bearer-token-1-5per1_basic_protected_api.json"
     }
 }
