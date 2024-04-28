@@ -10,7 +10,7 @@
     "quota_renewal_rate": -1,
     "access_rights": {
         "b3646044133146df48cd911c2a46a648": {
-            "api_name": "Load Balanced API Auth",
+            "api_name": "Load Balanced Gateways",
             "api_id": "b3646044133146df48cd911c2a46a648",
             "versions": [
                 "Default"
