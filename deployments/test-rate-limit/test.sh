@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# TODO:
-# - store analysis detail in file
-# - change display format to awk table
-
 source scripts/common.sh
 
 readonly dashboard_base_url="http://tyk-dashboard.localhost:$(jq -r '.listen_port' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
@@ -12,7 +8,6 @@ readonly gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.c
 readonly TYK_DASHBOARD_API_KEY="$(cat .context-data/1-dashboard-user-1-api-key)"
 readonly TEST_SUMMARY_PATH=".context-data/rl-test-output-summary"
 readonly TEST_DETAIL_PATH=".context-data/rl-test-output-detail"
-
 
 # Function to convert timestamp to milliseconds since epoch
 timestamp_to_epoch_ms() {
@@ -55,7 +50,7 @@ analyse_rate_limit_enforcement() {
 
     append_to_test_summary $analytics_record_count
 
-    echo -e "\nAnalysing analytics records\n  Count: $analytics_record_count\n  Rate Limit Window: ${rate_limit_window_ms}ms"
+    echo -e "Analysing $analytics_record_count analytics records using RL window of ${rate_limit_window_ms}ms"
     
     for (( i=0; i<$analytics_record_count; i++ )); do
         local current=$(jq -r ".data[$i]" <<< "$analytics_data")
@@ -81,9 +76,6 @@ analyse_rate_limit_enforcement() {
         local current_timestamp=$(jq -r '.TimeStamp' <<< "$current")
         local next_index=$((i + rate_limit))
 
-        echo -e "\nRate Limit Review $code_429_count"
-        echo "  Analyitcs Records: $i / $next_index"
-
         # Check if next index is within array bounds
         if [ "$next_index" -ge "$analytics_record_count" ]; then
             echo "  Request hit rate limit too soon"
@@ -98,9 +90,6 @@ analyse_rate_limit_enforcement() {
 
             local diff_ms=$((current_epoch - next_epoch))
             success=$(( diff_ms <= rate_limit_window_ms ))
-
-            echo "  Timestamps: $current_timestamp / $next_timestamp"
-            echo "  Diff: ${diff_ms}ms"
         fi
 
         append_to_test_detail "$code_429_count $i $next_index $current_timestamp $next_timestamp $diff_ms $rate_limit_window_ms"
@@ -115,21 +104,16 @@ analyse_rate_limit_enforcement() {
         fi
     done
 
-    echo -e "\nStatus Codes Summary:
-    200: $code_200_count
-    429: $code_429_count
-  Other: $code_other_count"
     append_to_test_summary "$code_200_count $code_429_count $code_other_count $rl_enforce_ok_count $rl_enforce_error_count"
 
-    echo -e "\nRate Limit Enforcement Summary:"
     case $code_429_count in
         0)  
-            echo "  Rate limit not triggered" 
+            echo "Rate limit not triggered" 
             append_to_test_summary "n/a"
             ;;
         *)  
             local rl_success=$(echo "scale=2; ($rl_enforce_ok_count / $code_429_count) * 100" | bc)
-            echo "  $rl_success% success" 
+            echo "Rate limit $rl_success% successfully enforced" 
             append_to_test_summary "$rl_success"
             ;;
     esac
@@ -143,8 +127,7 @@ generate_requests() {
     local requests_total="$3"
     local target_url="$4"
     local api_key="$5"
-    echo -e "\nGenerating requests:\n  Clients: $clients\n  Requests per Second: $requests_per_second\n  Total Requests: $requests_total\n  Target URL: $target_url\n  Authorization: $api_key"
-    hey -c "$clients" -q "$requests_per_second" -n "$requests_total" -H "Authorization: $api_key" "$target_url"
+    hey -c "$clients" -q "$requests_per_second" -n "$requests_total" -H "Authorization: $api_key" "$target_url" 1> /dev/null
 }
 
 get_key_test_data() {
@@ -180,7 +163,6 @@ get_analytics_data() {
 > $TEST_SUMMARY_PATH
 > $TEST_DETAIL_PATH
 
-echo -e "\nRunning test plans"
 for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     test_plan_file_name=$(basename "${test_plan_path%.*}")
     test_data_source=$(jq -r '.dataSource' $test_plan_path)
@@ -190,7 +172,7 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     analytics_data=""
 
     echo "$test_plan_file_name" >> $TEST_SUMMARY_PATH
-    echo -e "\nRunning test plan \"$test_plan_file_name\":\n  Data source: $test_data_source"
+    echo -e "\nRunning test plan \"$test_plan_file_name\" using \"$test_data_source\" data source"
 
     case $test_data_source in
         "requests")
@@ -202,11 +184,13 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
             load_total=$(jq '.requests.load.total' $test_plan_path)
             current_time=$(date +%s)
             create_bearer_token $key_file_path $gateway_api_credentials
+            echo "Generating $load_total requests @ ${load_rate}rps for $target_url"
             generate_requests $load_clients $load_rate $load_total $target_url $target_authorization
             delete_bearer_token_dash $target_authorization $target_api_id $TYK_DASHBOARD_API_KEY
             analytics_data=$(get_analytics_data $target_api_id $current_time $load_total)
             ;;
         "file")
+            echo "Loading analytics data from $test_plan_path"
             analytics_data_path=$(jq '.file.analyticsDataPath' -r $test_plan_path)
             if [ ! -f $analytics_data_path ]; then
                 echo "ERROR: Analytics data file does not exist: $analytics_data_path"
@@ -220,15 +204,12 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
             ;;
     esac
 
-    analyse_rate_limit_enforcement "$analytics_data" $key_rate $key_rate_period $test_plan_file_name
-
     append_to_test_detail "$code_429_count $i $next_index $current_timestamp $next_timestamp $diff_ms $rate_limit_window_ms"
 
+    analyse_rate_limit_enforcement "$analytics_data" $key_rate $key_rate_period $test_plan_file_name
     if [ $? -eq 0 ]; then
-        echo -e "\nNo errors detected"
         append_to_test_summary "pass"
     else
-        echo -e "\nErrors detected"
         append_to_test_summary "fail"
     fi
 done
