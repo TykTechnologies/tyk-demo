@@ -22,7 +22,7 @@ done
 # Function to convert timestamp to milliseconds since epoch
 timestamp_to_epoch_ms() {
     local timestamp="$1"
-    local epoch=$(date -jf "%Y-%m-%dT%H:%M:%S" "$timestamp" "+%s" 2>/dev/null)
+    local epoch="$(date -jf "%Y-%m-%dT%H:%M:%S" "$timestamp" "+%s" 2>/dev/null)"
     # Use parameter expansion with a character class to capture digits only
     milliseconds=${timestamp##*.}  # Double ## removes everything before the last dot
     milliseconds=${milliseconds%[!0-9]}  # Remove everything except digits from the end
@@ -32,7 +32,7 @@ timestamp_to_epoch_ms() {
         2) milliseconds="${milliseconds}0" ;;
         *) ;;
     esac
-    echo $((10#$epoch$milliseconds))
+    echo "$epoch$milliseconds"
 }
 
 append_to_test_summary() {
@@ -224,10 +224,19 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
             ;;
     esac
 
+#START
+    parsed_data_file_path=".context-data/rl-test-data-$test_plan_file_name-parsed.csv"
+    > $parsed_data_file_path
+    
+    while IFS=' ' read -r http_code timestamp
+    do
+        echo "$http_code $(timestamp_to_epoch_ms "$timestamp")" >> $parsed_data_file_path
+    done <<< "$(jq -r '.data[] | [.ResponseCode, .TimeStamp] | join(" ")' <<< "$analytics_data")"
+#END
     append_to_test_detail "$code_429_count $i $next_index $current_timestamp $next_timestamp $diff_ms $rate_limit_window_ms"
 
     if [ "$export_analytics" == "true" ]; then
-        echo "$analytics_data" > .context-data/rl-test-analytics-data-$test_plan_file_name.json
+        echo "$analytics_data" > .context-data/rl-test-analytics-export-$test_plan_file_name.json
     fi
 
     analyse_rate_limit_enforcement "$analytics_data" $key_rate $key_rate_period $test_plan_file_name
