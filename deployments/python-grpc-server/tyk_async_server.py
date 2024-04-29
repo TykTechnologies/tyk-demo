@@ -18,8 +18,8 @@ import coprocess_object_pb2
 from coprocess_common_pb2 import HookType
 from coprocess_session_state_pb2 import SessionState
 
-SECRET = "MTBhZjBlODI5N2JjNDYyNWE1YzM4NWFlYjE4OTVlNzQ="
-VALID_TOKEN = "eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImYxM2Y5MWI5NzU0MjQ3ZTk5ZWI1MzQxNzNhZTA4ZTY4IiwiaCI6Im11cm11cjY0In0="
+SECRET = "NjUxZjQ4NTJlY2Q3NDk3ZWE2MWNiYzNjYzM0NWVkZjE="
+VALID_TOKEN = "eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6IjJiYjE1MDU1ZjQ1YzQzNDA5ZTIwMDFkMzg3MmRkMjU0IiwiaCI6Im11cm11cjY0In0="
 
 
 def set_response_error(object: coprocess_object_pb2.Object, code: int, message: str) -> None:
