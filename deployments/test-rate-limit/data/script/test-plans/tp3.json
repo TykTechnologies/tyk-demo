@@ -1,4 +1,5 @@
 {
+    "enabled": false,
     "dataSource": "file",
     "file": {
         "analyticsDataPath": "deployments/test-rate-limit/data/script/simulation/dummy-analytics-data-failure.json"

@@ -8,6 +8,16 @@ readonly gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.c
 readonly TYK_DASHBOARD_API_KEY="$(cat .context-data/1-dashboard-user-1-api-key)"
 readonly TEST_SUMMARY_PATH=".context-data/rl-test-output-summary"
 readonly TEST_DETAIL_PATH=".context-data/rl-test-output-detail"
+save_analytics=false
+
+while getopts ":s" opt; do
+  case $opt in
+    s) save_analytics=true
+      ;;
+    \?) echo "Invalid option: -$OPTARG" >&2; exit 1
+      ;;
+  esac
+done
 
 # Function to convert timestamp to milliseconds since epoch
 timestamp_to_epoch_ms() {
@@ -53,6 +63,7 @@ analyse_rate_limit_enforcement() {
     echo -e "Analysing $analytics_record_count analytics records using rate limit window of ${rate_limit_window_ms}ms"
     
     for (( i=0; i<$analytics_record_count; i++ )); do
+        printf "\rCompleted: %d/%d" "$((i+1))" "$analytics_record_count"
         local current=$(jq -r ".data[$i]" <<< "$analytics_data")
         local response_code=$(jq -r '.ResponseCode' <<< "$current")
 
@@ -78,7 +89,8 @@ analyse_rate_limit_enforcement() {
 
         # Check if next index is within array bounds
         if [ "$next_index" -ge "$analytics_record_count" ]; then
-            echo "  Request hit rate limit too soon"
+            next_timestamp="-"
+            diff_ms="-"
             rl_error=$((rl_error+1))
             success=false
         else
@@ -165,6 +177,13 @@ get_analytics_data() {
 
 for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     test_plan_file_name=$(basename "${test_plan_path%.*}")
+    text_plan_enabled=$(jq -r '.enabled' $test_plan_path)
+
+    if [ "$text_plan_enabled" != "true" ]; then
+        echo -e "\nSkipping test plan \"$test_plan_file_name\": not enabled"
+        continue
+    fi
+
     test_data_source=$(jq -r '.dataSource' $test_plan_path)
     key_file_path=$(jq -r '.key.filePath' $test_plan_path)
     key_rate=$(jq '.access_rights[] | .limit.rate' $key_file_path)
@@ -205,6 +224,10 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     esac
 
     append_to_test_detail "$code_429_count $i $next_index $current_timestamp $next_timestamp $diff_ms $rate_limit_window_ms"
+
+    if [ $save_analytics ]; then
+        echo "$analytics_data" > .context-data/rl-test-analytics-data-$test_plan_file_name.json
+    fi
 
     analyse_rate_limit_enforcement "$analytics_data" $key_rate $key_rate_period $test_plan_file_name
     if [ $? -eq 0 ]; then
