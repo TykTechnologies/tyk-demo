@@ -1,0 +1,10 @@
+---
+services:
+  tyk-python-grpc-server:
+    build:
+      context: ./deployments/python-grpc-server
+    image: tykio/python-grpc-server:latest
+    ports:
+      - 50051:50051
+    networks:
+      - tyk
