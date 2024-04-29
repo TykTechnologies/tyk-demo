@@ -115,7 +115,8 @@ analyse_rate_limit_enforcement() {
             result=1
         fi
     done
-
+    printf "\n" # new line needed after progress meter completed
+    
     append_to_test_summary "$code_200_count $code_429_count $code_other_count $rl_enforce_ok_count $rl_enforce_error_count"
 
     case $code_429_count in
