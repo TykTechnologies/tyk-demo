@@ -190,12 +190,12 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
             analytics_data=$(get_analytics_data $target_api_id $current_time $load_total)
             ;;
         "file")
-            echo "Loading analytics data from $test_plan_path"
             analytics_data_path=$(jq '.file.analyticsDataPath' -r $test_plan_path)
             if [ ! -f $analytics_data_path ]; then
                 echo "ERROR: Analytics data file does not exist: $analytics_data_path"
                 exit 1
             fi
+            echo "Loading analytics data from $analytics_data_path"
             analytics_data=$(cat $analytics_data_path)
             ;;
         *) 
