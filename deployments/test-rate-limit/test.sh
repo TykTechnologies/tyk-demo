@@ -3,7 +3,6 @@
 # TODO:
 # - store analysis detail in file
 # - change display format to awk table
-# - add more test plans for load balanced apis etc
 
 source scripts/common.sh
 
@@ -11,6 +10,9 @@ readonly dashboard_base_url="http://tyk-dashboard.localhost:$(jq -r '.listen_por
 readonly gateway_base_url="$(get_context_data "1" "gateway" "1" "base-url")"
 readonly gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
 readonly TYK_DASHBOARD_API_KEY="$(cat .context-data/1-dashboard-user-1-api-key)"
+readonly TEST_SUMMARY_PATH=".context-data/rl-test-output-summary"
+readonly TEST_DETAIL_PATH=".context-data/rl-test-output-detail"
+
 
 # Function to convert timestamp to milliseconds since epoch
 timestamp_to_epoch_ms() {
@@ -29,7 +31,11 @@ timestamp_to_epoch_ms() {
 }
 
 append_to_test_summary() {
-    sed -i '' "$ s/$/ $1/" .context-data/rl-test-summary
+    sed -i '' "$ s/$/ $1/" $TEST_SUMMARY_PATH
+}
+
+append_to_test_detail() {
+    sed -i '' "$ s/$/ $1/" $TEST_DETAIL_PATH
 }
 
 # Function to analyse rate limiting enforcement
@@ -37,6 +43,7 @@ analyse_rate_limit_enforcement() {
     local analytics_data="$1"
     local rate_limit="$2"
     local rate_period="$3"
+    local test_plan_name="$4"
     local analytics_record_count=$(jq '[.data[]] | length' <<< "$analytics_data")
     local rate_limit_window_ms=$((rate_period * 1000))
     local code_429_count=0
@@ -69,6 +76,7 @@ analyse_rate_limit_enforcement() {
                 ;;  
         esac 
 
+        echo "$test_plan_name" >> $TEST_DETAIL_PATH
         local success=true
         local current_timestamp=$(jq -r '.TimeStamp' <<< "$current")
         local next_index=$((i + rate_limit))
@@ -95,22 +103,23 @@ analyse_rate_limit_enforcement() {
             echo "  Diff: ${diff_ms}ms"
         fi
 
+        append_to_test_detail "$code_429_count $i $next_index $current_timestamp $next_timestamp $diff_ms $rate_limit_window_ms"
+
         if [[ $success -eq 1 ]]; then
             rl_enforce_ok_count=$((rl_enforce_ok_count+1))
-            echo "  Result: pass"
+            append_to_test_detail "pass"
         else 
             rl_enforce_error_count=$((rl_enforce_error_count+1))
-            echo "  Result: fail"
+            append_to_test_detail "fail"
             result=1
         fi
     done
-
 
     echo -e "\nStatus Codes Summary:
     200: $code_200_count
     429: $code_429_count
   Other: $code_other_count"
-    append_to_test_summary "$code_429_count $rl_enforce_ok_count $rl_enforce_error_count"
+    append_to_test_summary "$code_200_count $code_429_count $code_other_count $rl_enforce_ok_count $rl_enforce_error_count"
 
     echo -e "\nRate Limit Enforcement Summary:"
     case $code_429_count in
@@ -123,7 +132,7 @@ analyse_rate_limit_enforcement() {
             echo "  $rl_success% success" 
             append_to_test_summary "$rl_success"
             ;;
-    esac 
+    esac
 
     return $result
 }
@@ -167,9 +176,9 @@ get_analytics_data() {
     echo "$data"
 }
 
-test_summary_path=".context-data/rl-test-summary"
-# clear the test summary file
-> $test_summary_path
+# clear the test output files
+> $TEST_SUMMARY_PATH
+> $TEST_DETAIL_PATH
 
 echo -e "\nRunning test plans"
 for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
@@ -180,7 +189,7 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     key_rate_period=$(jq '.access_rights[] | .limit.per' $key_file_path)
     analytics_data=""
 
-    echo "$test_plan_file_name" >> $test_summary_path
+    echo "$test_plan_file_name" >> $TEST_SUMMARY_PATH
     echo -e "\nRunning test plan \"$test_plan_file_name\":\n  Data source: $test_data_source"
 
     case $test_data_source in
@@ -211,7 +220,9 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
             ;;
     esac
 
-    analyse_rate_limit_enforcement "$analytics_data" $key_rate $key_rate_period
+    analyse_rate_limit_enforcement "$analytics_data" $key_rate $key_rate_period $test_plan_file_name
+
+    append_to_test_detail "$code_429_count $i $next_index $current_timestamp $next_timestamp $diff_ms $rate_limit_window_ms"
 
     if [ $? -eq 0 ]; then
         echo -e "\nNo errors detected"
@@ -220,14 +231,16 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
         echo -e "\nErrors detected"
         append_to_test_summary "fail"
     fi
-
-    # echo -e "" >> $test_summary_path
 done
 
 echo -e "\nTest plans complete"
 
-echo -e "\nTest Summary"
-awk -v HEADER="TestPlan  ReqTotal  RLHit  RLOk  RLError  RLSuccess  Result" '
-    BEGIN { print HEADER }
-    { printf("%-9s %8s %6s %5s %8s %10s %7s\n", $1, $2, $3, $4, $5, $6, $7) }
-' $test_summary_path
+echo -e "\nDetailed Results"
+awk -f deployments/test-rate-limit/data/script/test-output-detail-template.awk $TEST_DETAIL_PATH
+
+echo -e "\nOverall Summary"
+awk -f deployments/test-rate-limit/data/script/test-output-summary-template.awk $TEST_SUMMARY_PATH
+# wk -v HEADER="TestPlan  ReqTotal  Res200  Res429  ResOther  RLOk  RLError  RLSuccess  Result" '
+#     BEGIN { print HEADER }
+#     { printf("%-9s %8s %7s %7s %9s %5s %8s %10s %7s\n", $1, $2, $3, $4, $5, $6, $7, $8, $9) }
+# ' $TEST_SUMMARY_PATH
