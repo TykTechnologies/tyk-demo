@@ -33,7 +33,7 @@ append_to_test_detail() {
     sed -i '' "$ s/$/ $1/" $TEST_DETAIL_PATH
 }
 
-# Function to analyse rate limiting enforcement
+# Analyses analytics data to validate whether rate limits were correctly enforced
 analyse_rate_limit_enforcement() {
     local analytics_data="$1"
     local rate_limit="$2"
@@ -50,7 +50,7 @@ analyse_rate_limit_enforcement() {
 
     append_to_test_summary $analytics_record_count
 
-    echo -e "Analysing $analytics_record_count analytics records using RL window of ${rate_limit_window_ms}ms"
+    echo -e "Analysing $analytics_record_count analytics records using rate limit window of ${rate_limit_window_ms}ms"
     
     for (( i=0; i<$analytics_record_count; i++ )); do
         local current=$(jq -r ".data[$i]" <<< "$analytics_data")
@@ -109,7 +109,7 @@ analyse_rate_limit_enforcement() {
     case $code_429_count in
         0)  
             echo "Rate limit not triggered" 
-            append_to_test_summary "n/a"
+            append_to_test_summary "-"
             ;;
         *)  
             local rl_success=$(echo "scale=2; ($rl_enforce_ok_count / $code_429_count) * 100" | bc)
@@ -184,7 +184,7 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
             load_total=$(jq '.requests.load.total' $test_plan_path)
             current_time=$(date +%s)
             create_bearer_token $key_file_path $gateway_api_credentials
-            echo "Generating $load_total requests @ ${load_rate}rps for $target_url"
+            echo "Generating $load_total requests @ ${load_rate}rps at $target_url"
             generate_requests $load_clients $load_rate $load_total $target_url $target_authorization
             delete_bearer_token_dash $target_authorization $target_api_id $TYK_DASHBOARD_API_KEY
             analytics_data=$(get_analytics_data $target_api_id $current_time $load_total)
