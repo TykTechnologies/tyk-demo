@@ -1,0 +1,19 @@
+{
+    "enabled": true,
+    "dataSource": "requests",
+    "requests": {
+        "load": {
+            "clients": 1,
+            "rate": 60,
+            "total": 1200  
+        },
+        "target": {
+            "url": "http://localhost:8080/load-balanced-gateways/get",
+            "authorization": "120per2_load_balanced_gateways",
+            "apiId": "b3646044133146df48cd911c2a46a648"
+        }
+    },
+    "key": {
+        "filePath": "deployments/test-rate-limit/data/tyk-gateway/keys/bearer-token-1-120per2_load_balanced_gateways.json"
+    }
+}
