@@ -8,11 +8,11 @@ readonly gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.c
 readonly TYK_DASHBOARD_API_KEY="$(cat .context-data/1-dashboard-user-1-api-key)"
 readonly TEST_SUMMARY_PATH=".context-data/rl-test-output-summary"
 readonly TEST_DETAIL_PATH=".context-data/rl-test-output-detail"
-save_analytics=false
+export_analytics=false
 
 while getopts ":s" opt; do
   case $opt in
-    s) save_analytics=true
+    s) export_analytics=true
       ;;
     \?) echo "Invalid option: -$OPTARG" >&2; exit 1
       ;;
@@ -226,7 +226,7 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
 
     append_to_test_detail "$code_429_count $i $next_index $current_timestamp $next_timestamp $diff_ms $rate_limit_window_ms"
 
-    if [ $save_analytics ]; then
+    if [ "$export_analytics" == "true" ]; then
         echo "$analytics_data" > .context-data/rl-test-analytics-data-$test_plan_file_name.json
     fi
 
@@ -240,7 +240,7 @@ done
 
 echo -e "\nTest plans complete"
 
-echo -e "\nDetailed Results"
+echo -e "\nRate Limit Analysis"
 awk -f deployments/test-rate-limit/data/script/test-output-detail-template.awk $TEST_DETAIL_PATH
 
 echo -e "\nSummary Results"
