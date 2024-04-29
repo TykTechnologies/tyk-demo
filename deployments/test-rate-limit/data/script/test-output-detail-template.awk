@@ -1,6 +1,6 @@
 BEGIN {
     # Define column widths
-    plan_width = 5
+    plan_width = 8
     num_width = 5
     req_idx_width = 7
     comp_idx_width = 8
@@ -21,7 +21,7 @@ BEGIN {
     # Data rows
     if ($1 != prev_plan) {
         printf "%-*s  %-*s  %-*s  %-*s  %-*s  %-*s  %-*s  %-*s  %-*s\n",
-            plan_width, "-----", num_width, "-----", req_idx_width, "-------", comp_idx_width, "--------",
+            plan_width, "--------", num_width, "-----", req_idx_width, "-------", comp_idx_width, "--------",
             req_ts_width, "------------------------", comp_ts_width, "------------------------",
             ms_diff_width, "-------", ms_limit_width, "-------", result_width, "------"
     }

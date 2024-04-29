@@ -1,6 +1,6 @@
 BEGIN {
     # Define column widths
-    plan_width = 5
+    plan_width = 8
     req_total_width = 9
     res_200_width = 7
     res_429_width = 7
