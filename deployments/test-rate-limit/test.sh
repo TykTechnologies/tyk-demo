@@ -128,7 +128,7 @@ analyse_rate_limit_enforcement() {
             append_to_test_summary "n/a"
             ;;
         *)  
-            local rl_success=$(awk "BEGIN {print ($rl_enforce_ok_count / $code_429_count) * 100}")
+            local rl_success=$(echo "scale=2; ($rl_enforce_ok_count / $code_429_count) * 100" | bc)
             echo "  $rl_success% success" 
             append_to_test_summary "$rl_success"
             ;;
@@ -238,9 +238,5 @@ echo -e "\nTest plans complete"
 echo -e "\nDetailed Results"
 awk -f deployments/test-rate-limit/data/script/test-output-detail-template.awk $TEST_DETAIL_PATH
 
-echo -e "\nOverall Summary"
+echo -e "\nSummary Results"
 awk -f deployments/test-rate-limit/data/script/test-output-summary-template.awk $TEST_SUMMARY_PATH
-# wk -v HEADER="TestPlan  ReqTotal  Res200  Res429  ResOther  RLOk  RLError  RLSuccess  Result" '
-#     BEGIN { print HEADER }
-#     { printf("%-9s %8s %7s %7s %9s %5s %8s %10s %7s\n", $1, $2, $3, $4, $5, $6, $7, $8, $9) }
-# ' $TEST_SUMMARY_PATH
