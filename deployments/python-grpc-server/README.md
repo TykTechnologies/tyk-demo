@@ -7,8 +7,8 @@ To accomplish this a gRPC server has been implemented that complies with Tyk's [
 This deployment contains the following files:
 - File *tyk_async_server.py* contains the implementation of a Python gRPC server that implements the [ServiceDispatcher](https://github.com/TykTechnologies/tyk/blob/master/coprocess/proto/coprocess_object.proto) interface. The server implementation also has a custom authentication plugin
 for verifying HMAC signature and key ID.
-- Dockerfile that supports building a docker image to install Python grpcio-tools and generates the protbuf bindings for Python. It then starts the Python gRPC server when run.
-- hmac.sh is a bash that allows sending a signed request to the grpc-custom-auth API for a given key ID and secret.
+- Dockerfile that supports building a docker image to install Python grpcio-tools and generates the protbuf bindings for Python. When a container is run for this image it starts the Python gRPC server when run.
+- hmac.sh is a bash script in the scripts folder that allows sending a signed request to the *grpc-custom-auth* API for a given key ID and secret. The *grpc-custom-auth* API verifies the HMAC signature and key.
 
 ## Prerequisites installed by Docker
 
@@ -28,8 +28,7 @@ Enter the following command `./up.sh python-grpc-server` to start the Python gRP
 
 ## Configure Tyk Gateway To Serve Plugins Using The gRPC Server
 
-Tyk Gateway needs to be configured with *coprocess* enabled in addition to the URL of the gRPC server. This has been done for you in the tyk-demo
-repository.
+Tyk Gateway needs to be configured with *coprocess* enabled in addition to the URL of the gRPC server. This has been done for you in the tyk-demo repository.
 
 Within the root of the *tyk.conf* file, add the following:
 
@@ -102,6 +101,7 @@ gRPC plugins can be configured within the *custom_middleware* section of the *ap
 ```
 
 In the above listing, the plugin *driver* parameter has been set to *grpc*. Two plugins are configured within the *custom_middleware* section: a *pre request* plugin and a *response* plugin.
+
 The *response* plugin is configured with *require_session* enabled, so that Tyk Gateway will send details for the authenticated key / user with the gRPC request. Note, this is not configured
 for *pre request* plugins that are triggered before authentication in the request lifecycle.
 
@@ -109,8 +109,7 @@ Tyk Gateway will forward details of an incoming request to the gRPC server, for 
 
 ### Tyk OAS API
 
-To quickly get started, a Tyk OAS API can be created by importing the infamous pet store OAS [JSON](https://petstore3.swagger.io/api/v3/openapi.json) schema. Then the [findByStatus](https://petstore3.swagger.io/api/v3/pet/findByStatus?status=available)
-endpoint can be used for testing. The resulting Tyk OAS API Definition contains the OAS JSON schema with an *x-tyk-api-gateway* section appended.
+To quickly get started, a Tyk OAS API can be created by importing the infamous pet store OAS [JSON](https://petstore3.swagger.io/api/v3/openapi.json) schema. Then the [findByStatus](https://petstore3.swagger.io/api/v3/pet/findByStatus?status=available) endpoint can be used for testing. The resulting Tyk OAS API Definition contains the OAS JSON schema with an *x-tyk-api-gateway* section appended.
 
 The gRPC plugin can be configured within the *middleware* section of *x-tyk-api-gateway*:
 
@@ -163,6 +162,7 @@ The gRPC plugin can be configured within the *middleware* section of *x-tyk-api-
 ```
 
 In the above listing, the plugin *driver* parameter has been set to *grpc*. Two plugins are configured within the *middleware* section: a *pre request* plugin and a *response* plugin.
+
 The *response* plugin is configured with *requireSession* enabled, so that Tyk Gateway will send details for the authenticated key / user with the gRPC request. Note, this is not configurable
 for *pre request* plugins that are triggered before authentication in the request lifecycle.
 
