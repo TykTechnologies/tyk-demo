@@ -29,6 +29,15 @@ done
 bootstrap_progress        
 log_ok
 
+# Keys - bearer hmac
+log_message "Creating Bearer Tokens"
+for file in deployments/python-grpc-server/data/keys/bearer-token/*; do
+  if [[ -f $file ]]; then
+    create_bearer_token "$file" "$gateway_api_credentials"
+    bootstrap_progress        
+  fi
+done
+
 log_end_deployment
 
 echo -e "\033[2K
