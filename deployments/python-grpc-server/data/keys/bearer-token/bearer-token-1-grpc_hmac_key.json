@@ -1,0 +1,29 @@
+{
+    "quota_max": 1000,
+    "quota_renews": 1596929526,
+    "quota_remaining": 1000,
+    "quota_reset": 1596843126,
+    "quota_used": 0,
+    "expires": -1,
+    "org_id": "5e9d9544a1dcd60001d0ed20",
+    "access_rights": {
+        "662facb2f03e750001a03500": {
+            "api_id": "662facb2f03e750001a03500",
+            "api_name": "python-grpc-custom-auth",
+            "versions": ["Default"],
+            "allowed_urls": [],
+            "limit": null,
+            "quota_max": 1000,
+            "quota_renews": 1596929526,
+            "quota_remaining": 1000,
+            "quota_reset": 1596843126,
+            "quota_used": 0,
+            "per": 1,
+            "expires": -1
+        }
+    },
+    "enable_detailed_recording": true,
+    "hmac_enabled": true,
+    "hmac_string": "secret",
+    "meta_data": {}
+}
