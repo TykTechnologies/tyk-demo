@@ -1,14 +1,13 @@
 # Python gRPC Plugin for Tyk Gateway
 
-This repository implements a basic Tyk Python gRPC server that listens for requests received from the Tyk Gateway and outputs the incoming request payload in JSON format. 
+This repository implements a basic Tyk Python gRPC server that listens for requests received from the Tyk Gateway and outputs the incoming request payload in JSON format. It also implements a custom authentication plugin that verifies a HMAC signature and key. 
 
 To accomplish this a gRPC server has been implemented that complies with Tyk's [ServiceDispatcher](https://github.com/TykTechnologies/tyk/blob/master/coprocess/proto/coprocess_object.proto) protobuf service.
 
 This deployment contains the following files:
-- File *tyk_async_server.py* contains the implementation of a Python gRPC server that implements the [ServiceDispatcher](https://github.com/TykTechnologies/tyk/blob/master/coprocess/proto/coprocess_object.proto) interface. The server implementation also has a custom authentication plugin
-for verifying HMAC signature and key ID.
+- File *tyk_async_server.py* contains the implementation of a Python gRPC server that implements the [ServiceDispatcher](https://github.com/TykTechnologies/tyk/blob/master/coprocess/proto/coprocess_object.proto) interface. The server implementation also has a custom authentication plugin for verifying HMAC signature and key ID.
 - Dockerfile that supports building a docker image to install Python grpcio-tools and generates the protbuf bindings for Python. When a container is run for this image it starts the Python gRPC server when run.
-- hmac.sh is a bash script in the scripts folder that allows sending a signed request to the *grpc-custom-auth* API for a given key ID and secret. The *grpc-custom-auth* API verifies the HMAC signature and key.
+- hmac.sh is a bash script in the scripts folder that allows sending a HMAC signed request to the *python-grpc-custom-auth* API for a given key ID and secret. The API verifies the HMAC signature and key.
 
 ## Prerequisites installed by Docker
 
@@ -39,11 +38,11 @@ Within the root of the *tyk.conf* file, add the following:
 }
 ```
 
-Alternatively, the following environment variables can be set:
+Alternatively, the following environment variables can be set in your .env file:
 
 ```bash
 TYK_GW_COPROCESSOPTIONS_ENABLECOPROCESS=true
-TYK_GW_COPROCESSOPTIONS_COPROCESSGRPCSERVER=tcp://<host>:<port>
+TYK_GW_COPROCESSOPTIONS_COPROCESSGRPCSERVER=tcp://tyk-python-grpc-server:50051
 ```
 
 ## Configure Your API To Use The gRPC Plugin
@@ -347,7 +346,3 @@ class PythonDispatcher(coprocess_object_pb2_grpc.DispatcherServicer):
 - The *Dispatch* method uses the *MessageToJson* function provided, by Google's protobuf API, to output the message
 received from the Gateway in JSON format. The plugin hook type is inspected in the request payload and an output message is displayed to indicate the type of plugin received.
 - The *DispatchEvent* method outputs the JSON payload of an event for dispatch. 
-
-## Protobuf Issues
-Google Python Protobuf tooling does not use relative import statements in the generated Python classes.
-https://github.com/protocolbuffers/protobuf/issues/1491#issuecomment-1648982084
