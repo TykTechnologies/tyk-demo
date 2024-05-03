@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source scripts/common.sh
-deployment="Python-gRPC-Server"
+deployment="Python gRPC Server"
 
 log_start_deployment
 bootstrap_progress
