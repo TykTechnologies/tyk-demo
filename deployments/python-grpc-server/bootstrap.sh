@@ -44,7 +44,7 @@ echo -e "\033[2K
 ▼ Python gRPC Server
   ▽ gRPC Server
                     URL : http://localhost:50051
-  ▽ gRPC Test API (custom auth plugin for HMAC signed authentication key)
+  ▽ Example API (custom Python gRPC auth plugin for HMAC signed authentication key)
                     URL : http://localhost:8080/grpc-custom-auth/
             HMAC secret : secret
          HMAC algorithm : hmac-sha512
