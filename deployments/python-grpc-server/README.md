@@ -2,6 +2,22 @@
 
 This repository implements a basic Tyk Python gRPC server that listens for requests received from the Tyk Gateway and outputs the incoming request payload in JSON format. It also implements a custom authentication plugin that verifies an HMAC signature and key. 
 
+## How To Make A Request?
+
+Requests should be made to the API with a HMAC signed key in the *Authorization* header, and a date/time string in the *Date* header. An example request is shown in the curl command below:
+
+```bash
+curl -v -H 'Date: Fri, 03 May 2024 12:00:42 GMT' \
+-H 'Authorization: Signature keyId="eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImdycGNfaG1hY19rZXkiLCJoIjoibXVybXVyNjQifQ==", \
+algorithm="hmac-sha512",signature="9kwBK%2FyrjbSHJDI7INAhBmhHLTHRDkIe2uRWHEP8bgQFQvfXRksm6t2MHeLUyk9oosWDZyC17AbGeP8EFqrp%2BA%3D%3D"' \
+http://localhost:8080/grpc-custom-auth/get
+```
+
+- The *Date* header contains a date string formatted as follows: *Fri, 03 May 2024 11:06:00 GMT*.
+- The *Authorization* header contains a [HMAC signature](https://tyk.io/docs/basic-config-and-security/security/authentication-authorization/hmac-signatures/). This is calculated with the date string, signed using the *hmac-sha512* algorithm with a base64 encoded secret value of *secret*. The HMAC signature is then encoded as base 64. 
+
+## What Has Been Implemented?
+
 To accomplish this, a gRPC server has been implemented that complies with Tyk's [ServiceDispatcher](https://github.com/TykTechnologies/tyk/blob/master/coprocess/proto/coprocess_object.proto) protobuf service.
 
 This deployment contains the following files:
