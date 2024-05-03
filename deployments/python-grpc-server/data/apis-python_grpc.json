@@ -1,7 +1,7 @@
 {
     "api_definition": {
         "id": "662facb2f03e750001a03500",
-        "name": "python-grpc-custom-auth",
+        "name": "Python gRPC Custom Auth",
         "slug": "temp",
         "listen_port": 0,
         "protocol": "",
@@ -307,7 +307,7 @@
         "proxy": {
             "preserve_host_header": false,
             "listen_path": "/grpc-custom-auth/",
-            "target_url": "http://httpbin.org/",
+            "target_url": "http://httpbin/",
             "disable_strip_slash": true,
             "strip_listen_path": true,
             "enable_load_balancing": false,

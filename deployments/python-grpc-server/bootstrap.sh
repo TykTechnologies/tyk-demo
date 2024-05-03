@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source scripts/common.sh
-deployment="Python-gRPC-Server"
+deployment="Python gRPC Server"
 
 log_start_deployment
 bootstrap_progress
@@ -41,12 +41,12 @@ done
 log_end_deployment
 
 echo -e "\033[2K
-▼ Python-gRPC-Server
+▼ Python gRPC Server
   ▽ gRPC Server
                     URL : http://localhost:50051
-   ▽ gRPC Test API (custom auth plugin for HMAC signed authentication key)
-                    URL : http://localhost:8080//grpc-custom-auth/
-                    HMAC secret: secret
-                    HMAC algorithm: hmac-sha512
-                    HMAC key ID: eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImdycGNfaG1hY19rZXkiLCJoIjoibXVybXVyNjQifQ==
+  ▽ Example API (custom Python gRPC auth plugin for HMAC signed authentication key)
+                    URL : http://localhost:8080/grpc-custom-auth/
+            HMAC secret : secret
+         HMAC algorithm : hmac-sha512
+            HMAC key ID : eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImdycGNfaG1hY19rZXkiLCJoIjoibXVybXVyNjQifQ==
 "
