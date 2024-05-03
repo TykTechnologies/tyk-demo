@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BASE_URL=http://localhost:8080
-ENDPOINT=/grpc-custom-auth/
+ENDPOINT=/grpc-custom-auth/get
 HMAC_ALGORITHM=hmac-sha512
 HMAC_SECRET=c2VjcmV0
 KEY=eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImdycGNfaG1hY19rZXkiLCJoIjoibXVybXVyNjQifQ==
