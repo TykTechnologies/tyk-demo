@@ -29,6 +29,8 @@ echo "signature: $signature"
 echo "url_encoded_signature: $url_encoded_signature"
 
 # Make the curl request using headers
+printf "\n\n----\n\nMaking request to  http://localhost:8080/grpc-custom-auth/get\n\n"
+set -x
 curl -v -H "Date: ${date}" \
     -H "Authorization: Signature keyId=\"${KEY}\",algorithm=\"${HMAC_ALGORITHM}\",signature=\"${url_encoded_signature}\"" \
     ${REQUEST_URL}
