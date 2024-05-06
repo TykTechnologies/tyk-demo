@@ -38,6 +38,14 @@ for file in deployments/python-grpc-server/data/keys/bearer-token/*; do
   fi
 done
 
+log_message "Set environment variable for coprocess gRPC server"
+set_docker_environment_value "TYK_GW_COPROCESSOPTIONS_COPROCESSGRPCSERVER" "tcp://tyk-python-grpc-server:50051"
+log_ok
+
+log_message "Restart Tyk Gateway to pick up env var change"
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway 1>/dev/null 2>>logs/bootstrap.log
+log_ok
+
 log_end_deployment
 
 echo -e "\033[2K
