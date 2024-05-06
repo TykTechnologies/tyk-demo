@@ -30,6 +30,7 @@ services:
       - ./deployments/mdcb/volumes/tyk-worker-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
       - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+      - ./deployments/tyk/volumes/tyk-gateway/plugins:/opt/tyk-gateway/plugins
     depends_on:
       - tyk-worker-redis
       - tyk-mdcb
