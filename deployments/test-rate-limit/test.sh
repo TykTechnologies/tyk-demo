@@ -10,9 +10,9 @@ readonly TEST_SUMMARY_PATH=".context-data/rl-test-output-summary"
 readonly TEST_DETAIL_PATH=".context-data/rl-test-output-detail"
 export_analytics=false
 
-while getopts ":s" opt; do
+while getopts ":e" opt; do
   case $opt in
-    s) export_analytics=true
+    e) export_analytics=true
       ;;
     \?) echo "Invalid option: -$OPTARG" >&2; exit 1
       ;;
