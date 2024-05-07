@@ -224,84 +224,36 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
             ;;
     esac
 
-    echo "$analytics_data" > .context-data/rl-test-data-$test_plan_file_name.csv
+    # save analytics data to file
+    # echo "$analytics_data" > .context-data/rl-analytics-data-$test_plan_file_name.csv
 #START
-log_message "START TS EPOCH $(date)"
-    parsed_data_file_path=".context-data/rl-test-data-$test_plan_file_name-parsed.csv"
-    # > $parsed_data_file_path
-    
-
-    # TODO: USE AWK TO PROCESS THE ANALYTICS DATA, without need for ts conversion beforehand, because it is now done in awk
-    # line_count=0
-    # while IFS=' ' read -r http_code timestamp
-    # do
-    #     # lines+=("$http_code $(timestamp_to_epoch_ms "$timestamp")")
-    #     echo "$http_code $timestamp" >> $parsed_data_file_path
-    # done <<< "$(jq -r '.data[] | [.ResponseCode, .TimeStamp] | join(" ")' <<< "$analytics_data")"
-
+    log_message "START PARSE $(date)"
+    parsed_data_file_path=".context-data/rl-parsed-data-$test_plan_file_name.csv"
     jq -r '.data[] | [.ResponseCode, .TimeStamp] | join(" ")' <<< "$analytics_data" > $parsed_data_file_path
-log_message "END TS EPOCH $(date)"
+    log_message "END PARSE $(date)"
 
-log_message "START ANALYSIS $(date)"
-awk -f deployments/test-rate-limit/data/script/rl-analysis-template.awk $parsed_data_file_path
-
-log_message "END ANALYSIS $(date)"
-
-# # Function to get the value of a specific field in a line
-# get_field() {
-#     local line="$1"
-#     local field_number="$2"
-#     echo "$line" | awk "{print \$$field_number}"
-# }
-
-# # Iterate through the array
-# for ((i = 0; i < ${#lines[@]}; i++)); do
-#     # Get the first field of the current line
-#     first_field=$(get_field "${lines[$i]}" 1)
-
-#     # Check if the first field is 429
-#     if [ "$first_field" = "429" ]; then
-#         # Get the current value to compare
-#         current_value=$(get_field "${lines[$i]}" 2)
-#         # Get the value of the line 5 rows ahead
-#         next_line_index=$((i + 5))
-        
-#         # Ensure the next line exists
-#         if [ "$next_line_index" -lt "${#lines[@]}" ]; then
-#             next_value=$(get_field "${lines[$next_line_index]}" 2)
-
-#             # Check if the values differ by more than 1000
-#             difference=$((current_value - next_value))
-#             echo "$current_value $next_value $difference"
-#             # OK UP TO HERE, FIX THIS
-#             # ALSO NEED TO INCLUDE MORE DATA IN ARRAY SO IT CAN BE ADDED TO OUTPUT
-#             if [ "$difference" -gt 1000 ] || [ "$difference" -lt -1000 ]; then
-#                 echo "Values differ by more than 1000 between line $((i + 1)) and line $((next_line_index + 1)): $current_value and $next_value"
-#             fi
-#         fi
-#     fi
-# done
-
+    log_message "START ANALYSIS $(date)"
+    # log_message "kr:$key_rate kp:$key_per"
+    awk -v test_plan_file_name="$test_plan_file_name" \
+        -v rate_limit="$key_rate" \
+        -v rate_limit_period="$key_rate_period" \
+        -f deployments/test-rate-limit/data/script/rl-analysis-template.awk $parsed_data_file_path >> $TEST_DETAIL_PATH
+    log_message "END ANALYSIS $(date)"
 
 #END
 
-
-
-
-
-
-    append_to_test_detail "$code_429_count $i $next_index $current_timestamp $next_timestamp $diff_ms $rate_limit_window_ms"
+    # append_to_test_detail "$code_429_count $i $next_index $current_timestamp $next_timestamp $diff_ms $rate_limit_window_ms"
 
     if [ "$export_analytics" == "true" ]; then
         echo "$analytics_data" > .context-data/rl-test-analytics-export-$test_plan_file_name.json
     fi
 
-    analyse_rate_limit_enforcement "$analytics_data" $key_rate $key_rate_period $test_plan_file_name
-    if [ $? -eq 0 ]; then
-        append_to_test_summary "pass"
-    else
-        append_to_test_summary "fail"
-    fi
+    # analyse_rate_limit_enforcement "$analytics_data" $key_rate $key_rate_period $test_plan_file_name
+    # if [ $? -eq 0 ]; then
+    #     append_to_test_summary "pass"
+    # else
+    #     append_to_test_summary "fail"
+    # fi
 done
 
 echo -e "\nTest plans complete"
