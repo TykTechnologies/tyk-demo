@@ -224,22 +224,26 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
             ;;
     esac
 
+    echo "$analytics_data" > .context-data/rl-test-data-$test_plan_file_name.csv
 #START
 log_message "START TS EPOCH $(date)"
     parsed_data_file_path=".context-data/rl-test-data-$test_plan_file_name-parsed.csv"
-    > $parsed_data_file_path
+    # > $parsed_data_file_path
     
+
+    # TODO: USE AWK TO PROCESS THE ANALYTICS DATA, without need for ts conversion beforehand, because it is now done in awk
     # line_count=0
-    while IFS=' ' read -r http_code timestamp
-    do
-        # lines+=("$http_code $(timestamp_to_epoch_ms "$timestamp")")
-        echo "$http_code $(timestamp_to_epoch_ms "$timestamp") $timestamp" >> $parsed_data_file_path
-    done <<< "$(jq -r '.data[] | [.ResponseCode, .TimeStamp] | join(" ")' <<< "$analytics_data")"
+    # while IFS=' ' read -r http_code timestamp
+    # do
+    #     # lines+=("$http_code $(timestamp_to_epoch_ms "$timestamp")")
+    #     echo "$http_code $timestamp" >> $parsed_data_file_path
+    # done <<< "$(jq -r '.data[] | [.ResponseCode, .TimeStamp] | join(" ")' <<< "$analytics_data")"
+
+    jq -r '.data[] | [.ResponseCode, .TimeStamp] | join(" ")' <<< "$analytics_data" > $parsed_data_file_path
 log_message "END TS EPOCH $(date)"
 
-
 log_message "START ANALYSIS $(date)"
-awk -f deployments/test-rate-limit/data/script/rl-analysis-template.awk "$parsed_data_file_path"
+awk -f deployments/test-rate-limit/data/script/rl-analysis-template.awk $parsed_data_file_path
 
 log_message "END ANALYSIS $(date)"
 
