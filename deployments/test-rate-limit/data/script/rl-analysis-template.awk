@@ -5,12 +5,21 @@ function get_field(line, field_number) {
 
 # Define a function to process timestamp string
 function timestamp_to_epoch_ms(ts) {
+    # remove the Z from end of timestamp
+    ts = substr(ts, 1, length(ts)-1) 
     # Split the timestamp into parts
     split(ts, date_time_parts, "T")
     split(date_time_parts[1], date_parts, "-")
-    split(date_time_parts[2], time_ms_parts, ".")
-    split(time_ms_parts[1], time_parts, ":")
 
+    # handle timestamps that lack ms element e.g. 2024-05-08T17:49:58Z
+    millisecond_exist = date_time_parts[2] ~ /\./
+    if (millisecond_exist) {
+        split(date_time_parts[2], time_ms_parts, ".")
+        split(time_ms_parts[1], time_parts, ":")
+    } else {
+        split(date_time_parts[2], time_parts, ":")
+    }
+    
     # Set year, month, day, hour, minute, and second
     year = date_parts[1]
     month = date_parts[2]
@@ -18,7 +27,7 @@ function timestamp_to_epoch_ms(ts) {
     hour = time_parts[1]
     minute = time_parts[2]
     second = time_parts[3]
-    millisecond = substr(time_ms_parts[2], 1, length(time_ms_parts[2])-1) # remove the Z from end
+    millisecond = millisecond_exist ? time_ms_parts[2] : "000" 
     
     # add zero padding to ensure millisecond is 3 digits
     len = length(millisecond)
@@ -98,7 +107,7 @@ END {
         }
     }
 
-    rl_success_percent = (rl_pass_count / status_429_count) * 100
+    rl_success_percent = status_429_count == 0 ? 100 : (rl_pass_count / status_429_count) * 100
     overall_result = rl_success_percent == 100 ? "pass" : "fail"
     print test_plan_file_name, line_count, status_200_count, status_429_count, status_other_count, rl_pass_count, rl_fail_count, rl_success_percent, overall_result >> summary_data_path
 }

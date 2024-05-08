@@ -1,0 +1,10 @@
+{
+    "enabled": true,
+    "dataSource": "file",
+    "file": {
+        "analyticsDataPath": "deployments/test-rate-limit/data/script/simulation/dummy-analytics-data-edgecase.json"
+    },
+    "key": {
+        "filePath": "deployments/test-rate-limit/data/tyk-gateway/keys/bearer-token-1-5per1_basic_protected_api.json"
+    }
+}
