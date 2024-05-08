@@ -50,17 +50,22 @@ BEGIN {
 }
 
 END {
-    comparison_count = 0
     rate_limit_window_ms = rate_limit_period * 1000
+    status_200_count = 0
+    status_429_count = 0
+    status_other_count = 0
+    rl_pass_count = 0
+    rl_fail_count = 0
 
     # Iterate through the lines array
     for (i = 0; i < line_count; i++) {
         # Get the status code of the current line
         status_code = get_field(lines[i], 1)
         
-        # Check if the status code is 429
-        if (status_code == 429) {
-            comparison_count++
+        if (status_code == 200) {
+            status_200_count++
+        } else if (status_code == 429) {
+            status_429_count++
 
             # Get the current timestamp
             current_timestamp = get_field(lines[i], 2)
@@ -78,13 +83,22 @@ END {
                 # Get the millisecond difference
                 difference_ms = current_epoch_ms - next_epoch_ms
 
-                result = "pass"
                 if (difference_ms > rate_limit_window_ms) {
                     result = "fail"
+                    rl_fail_count++
+                } else {
+                    result = "pass"
+                    rl_pass_count++
                 }
 
-                print test_plan_file_name, comparison_count, i, next_line_index, current_timestamp, next_timestamp, difference_ms, rate_limit_window_ms, result
+                print test_plan_file_name, status_429_count, i, next_line_index, current_timestamp, next_timestamp, difference_ms, rate_limit_window_ms, result
             }
+        } else {
+            status_other_count++
         }
     }
+
+    rl_success_percent = (rl_pass_count / status_429_count) * 100
+    overall_result = rl_success_percent == 100 ? "pass" : "fail"
+    print test_plan_file_name, line_count, status_200_count, status_429_count, status_other_count, rl_pass_count, rl_fail_count, rl_success_percent, overall_result >> summary_data_path
 }

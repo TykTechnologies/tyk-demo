@@ -191,7 +191,6 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     key_rate_period=$(jq '.access_rights[] | .limit.per' $key_file_path)
     analytics_data=""
 
-    echo "$test_plan_file_name" >> $TEST_SUMMARY_PATH
     echo -e "\nRunning test plan \"$test_plan_file_name\" using \"$test_data_source\" data source"
 
     case $test_data_source in
@@ -224,32 +223,26 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
             ;;
     esac
 
-    # save analytics data to file
-    # echo "$analytics_data" > .context-data/rl-analytics-data-$test_plan_file_name.csv
-#START
-    log_message "START PARSE $(date)"
+    echo "Parsing data"
     parsed_data_file_path=".context-data/rl-parsed-data-$test_plan_file_name.csv"
     jq -r '.data[] | [.ResponseCode, .TimeStamp] | join(" ")' <<< "$analytics_data" > $parsed_data_file_path
-    log_message "END PARSE $(date)"
 
-    log_message "START ANALYSIS $(date)"
-    # log_message "kr:$key_rate kp:$key_per"
+    log_message "Analysing data"
     awk -v test_plan_file_name="$test_plan_file_name" \
         -v rate_limit="$key_rate" \
         -v rate_limit_period="$key_rate_period" \
+        -v summary_data_path="$TEST_SUMMARY_PATH" \
         -f deployments/test-rate-limit/data/script/rl-analysis-template.awk $parsed_data_file_path >> $TEST_DETAIL_PATH
-    log_message "END ANALYSIS $(date)"
-
-#END
 
     if [ "$export_analytics" == "true" ]; then
+        log_message "Exporting analytics data"
         echo "$analytics_data" > .context-data/rl-test-analytics-export-$test_plan_file_name.json
     fi
 done
 
 echo -e "\nTest plans complete"
 
-echo -e "\nRate Limit Analysis"
+echo -e "\nDetailed Rate Limit Analysis"
 awk -f deployments/test-rate-limit/data/script/test-output-detail-template.awk $TEST_DETAIL_PATH
 
 echo -e "\nSummary Results"
