@@ -242,18 +242,9 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
 
 #END
 
-    # append_to_test_detail "$code_429_count $i $next_index $current_timestamp $next_timestamp $diff_ms $rate_limit_window_ms"
-
     if [ "$export_analytics" == "true" ]; then
         echo "$analytics_data" > .context-data/rl-test-analytics-export-$test_plan_file_name.json
     fi
-
-    # analyse_rate_limit_enforcement "$analytics_data" $key_rate $key_rate_period $test_plan_file_name
-    # if [ $? -eq 0 ]; then
-    #     append_to_test_summary "pass"
-    # else
-    #     append_to_test_summary "fail"
-    # fi
 done
 
 echo -e "\nTest plans complete"
