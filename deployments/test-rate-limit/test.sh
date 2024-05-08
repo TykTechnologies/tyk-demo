@@ -9,130 +9,23 @@ readonly TYK_DASHBOARD_API_KEY="$(cat .context-data/1-dashboard-user-1-api-key)"
 readonly TEST_SUMMARY_PATH=".context-data/rl-test-output-summary"
 readonly TEST_DETAIL_PATH=".context-data/rl-test-output-detail"
 export_analytics=false
+run_all=false
 
-while getopts ":e" opt; do
+while getopts "ae" opt; do
   case $opt in
-    e) export_analytics=true
+    a) 
+        run_all=true
+        echo "All test plans will be run"
       ;;
-    \?) echo "Invalid option: -$OPTARG" >&2; exit 1
+    e) 
+        export_analytics=true
+        echo "Analytics data will be exported"
+      ;;
+    \?) 
+        echo "Invalid option: -$OPTARG" >&2; exit 1
       ;;
   esac
 done
-
-# Function to convert timestamp to milliseconds since epoch
-timestamp_to_epoch_ms() {
-    local timestamp="$1"
-    local epoch="$(date -jf "%Y-%m-%dT%H:%M:%S" "$timestamp" "+%s" 2>/dev/null)"
-    # Use parameter expansion with a character class to capture digits only
-    milliseconds=${timestamp##*.}  # Double ## removes everything before the last dot
-    milliseconds=${milliseconds%[!0-9]}  # Remove everything except digits from the end
-    # Add trailing 0 padding to ms values that only have 1 or 2 digits
-    case ${#milliseconds} in
-        1) milliseconds="${milliseconds}00" ;;
-        2) milliseconds="${milliseconds}0" ;;
-        *) ;;
-    esac
-    echo "$epoch$milliseconds"
-}
-
-append_to_test_summary() {
-    sed -i '' "$ s/$/ $1/" $TEST_SUMMARY_PATH
-}
-
-append_to_test_detail() {
-    sed -i '' "$ s/$/ $1/" $TEST_DETAIL_PATH
-}
-
-# Analyses analytics data to validate whether rate limits were correctly enforced
-analyse_rate_limit_enforcement() {
-    local analytics_data="$1"
-    local rate_limit="$2"
-    local rate_period="$3"
-    local test_plan_name="$4"
-    local analytics_record_count=$(jq '[.data[]] | length' <<< "$analytics_data")
-    local rate_limit_window_ms=$((rate_period * 1000))
-    local code_429_count=0
-    local code_200_count=0
-    local code_other_count=0
-    local rl_enforce_ok_count=0
-    local rl_enforce_error_count=0
-    local result=0
-
-    append_to_test_summary $analytics_record_count
-
-    echo -e "Analysing $analytics_record_count analytics records using rate limit window of ${rate_limit_window_ms}ms"
-    
-    for (( i=0; i<$analytics_record_count; i++ )); do
-        printf "\rCompleted: %d/%d" "$((i+1))" "$analytics_record_count"
-        local current=$(jq -r ".data[$i]" <<< "$analytics_data")
-        local response_code=$(jq -r '.ResponseCode' <<< "$current")
-
-        # Move to next record if not a 429
-        case $response_code in
-            200)  
-                code_200_count=$((code_200_count+1))
-                continue  
-                ;;
-            429)  
-                code_429_count=$((code_429_count+1)) 
-                ;;
-            *)  
-                code_other_count=$((code_other_count+1))
-                continue 
-                ;;  
-        esac 
-
-        echo "$test_plan_name" >> $TEST_DETAIL_PATH
-        local success=true
-        local current_timestamp=$(jq -r '.TimeStamp' <<< "$current")
-        local next_index=$((i + rate_limit))
-
-        # Check if next index is within array bounds
-        if [ "$next_index" -ge "$analytics_record_count" ]; then
-            next_timestamp="-"
-            diff_ms="-"
-            rl_error=$((rl_error+1))
-            success=false
-        else
-            local next=$(jq -r ".data[$next_index]" <<< "$analytics_data")
-            local next_timestamp=$(jq -r '.TimeStamp' <<< "$next")
-
-            local current_epoch=$(timestamp_to_epoch_ms "$current_timestamp")
-            local next_epoch=$(timestamp_to_epoch_ms "$next_timestamp")
-
-            local diff_ms=$((current_epoch - next_epoch))
-            success=$(( diff_ms <= rate_limit_window_ms ))
-        fi
-
-        append_to_test_detail "$code_429_count $i $next_index $current_timestamp $next_timestamp $diff_ms $rate_limit_window_ms"
-
-        if [[ $success -eq 1 ]]; then
-            rl_enforce_ok_count=$((rl_enforce_ok_count+1))
-            append_to_test_detail "pass"
-        else 
-            rl_enforce_error_count=$((rl_enforce_error_count+1))
-            append_to_test_detail "fail"
-            result=1
-        fi
-    done
-    printf "\n" # new line needed after progress meter completed
-    
-    append_to_test_summary "$code_200_count $code_429_count $code_other_count $rl_enforce_ok_count $rl_enforce_error_count"
-
-    case $code_429_count in
-        0)  
-            echo "Rate limit not triggered" 
-            append_to_test_summary "-"
-            ;;
-        *)  
-            local rl_success=$(echo "scale=2; ($rl_enforce_ok_count / $code_429_count) * 100" | bc)
-            echo "Rate limit $rl_success% successfully enforced" 
-            append_to_test_summary "$rl_success"
-            ;;
-    esac
-
-    return $result
-}
 
 generate_requests() {
     local clients="$1"
@@ -180,7 +73,7 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     test_plan_file_name=$(basename "${test_plan_path%.*}")
     text_plan_enabled=$(jq -r '.enabled' $test_plan_path)
 
-    if [ "$text_plan_enabled" != "true" ]; then
+    if [ "$run_all" = false -a "$text_plan_enabled" != "true" ]; then
         echo -e "\nSkipping test plan \"$test_plan_file_name\": not enabled"
         continue
     fi
