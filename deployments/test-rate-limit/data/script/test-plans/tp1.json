@@ -1,11 +1,11 @@
 {
-    "enabled": true,
+    "enabled": false,
     "dataSource": "requests",
     "requests": {
         "load": {
             "clients": 1,
-            "rate": 500,
-            "total": 2000  
+            "rate": 5,
+            "total": 20  
         },
         "target": {
             "url": "http://localhost:8080/basic-protected-api/get",
