@@ -1,0 +1,12 @@
+---
+services:
+  tyk-python-grpc-server:
+    build:
+      context: ./deployments/plugin-python-grpc
+      args:
+        GATEWAY_VERSION: ${GATEWAY_VERSION:-v5.3.0}
+    image: tykio/python-grpc-server:${GATEWAY_VERSION:-v5.3.0}
+    ports:
+      - 50051:50051
+    networks:
+      - tyk
