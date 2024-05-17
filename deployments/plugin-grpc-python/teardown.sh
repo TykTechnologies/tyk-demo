@@ -2,7 +2,7 @@
 
 source scripts/common.sh
 
-deployment="Python gRPC Server"
+deployment="Plugin gRPC Python"
 
 log_start_teardown
 
