@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source scripts/common.sh
-deployment="Plugin gRPC Python"
+deployment="Python gRPC Plugin"
 
 log_start_deployment
 bootstrap_progress
@@ -49,7 +49,7 @@ log_ok
 log_end_deployment
 
 echo -e "\033[2K
-▼ Plugin gRPC Python
+▼ Python gRPC Plugin
   ▽ gRPC Server
                     URL : http://localhost:50051
   ▽ Example API (custom Python gRPC auth plugin for HMAC signed authentication key)
