@@ -2,7 +2,7 @@
 services:
   tyk-python-grpc-server:
     build:
-      context: ./deployments/plugin-grpc-python
+      context: ./deployments/plugin-python-grpc
       args:
         GATEWAY_VERSION: ${GATEWAY_VERSION:-v5.3.0}
     image: tykio/python-grpc-server:${GATEWAY_VERSION:-v5.3.0}

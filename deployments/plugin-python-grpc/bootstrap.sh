@@ -14,12 +14,12 @@ dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_
 dashboard_user_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
 
 # Create custom-auth API for Python gRPC
-create_api "deployments/plugin-grpc-python/data/apis-python_grpc.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+create_api "deployments/plugin-python-grpc/data/apis-python_grpc.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
 bootstrap_progress
 
 # Check that the API has loaded
 log_message "Waiting for API availability"
-for file in deployments/plugin-grpc-python/data/*; do
+for file in deployments/plugin-python-grpc/data/*; do
   if [[ -f $file ]]; then
     target_api_id=$(cat $file | jq '.api_definition.api_id' --raw-output)
     wait_for_api_loaded "$target_api_id" "$gateway_base_url" "$gateway_api_credentials"
@@ -31,7 +31,7 @@ log_ok
 
 # Keys - bearer hmac
 log_message "Creating Bearer Tokens"
-for file in deployments/plugin-grpc-python/data/keys/bearer-token/*; do
+for file in deployments/plugin-python-grpc/data/keys/bearer-token/*; do
   if [[ -f $file ]]; then
     create_bearer_token "$file" "$gateway_api_credentials"
     bootstrap_progress        
