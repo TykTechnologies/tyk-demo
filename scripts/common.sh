@@ -99,6 +99,13 @@ set_docker_environment_value () {
   fi
 }
 
+delete_docker_environment_value () {
+  setting_key="$1"
+  # don't include the "=" in the setting_key, it is automatically added
+  sed -i.bak '/^'"$setting_key"'=/d' .env
+  rm .env.bak
+}
+
 wait_for_response () {
   url="$1"
   status=""
