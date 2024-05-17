@@ -13,7 +13,7 @@ gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq 
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
 dashboard_user_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
 
-# Create custom-auth API for Python gRCP
+# Create custom-auth API for Python gRPC
 create_api "deployments/plugin-grpc-python/data/apis-python_grpc.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
 bootstrap_progress
 
