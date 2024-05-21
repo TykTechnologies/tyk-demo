@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# TODO: check calculation of summary totals e.g. that 429 = total of RLpass + RLfail
-
 source scripts/common.sh
 
 readonly dashboard_base_url="http://tyk-dashboard.localhost:$(jq -r '.listen_port' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
