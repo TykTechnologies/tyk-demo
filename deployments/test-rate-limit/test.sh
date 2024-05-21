@@ -22,7 +22,7 @@ while getopts "ae" opt; do
         echo "Analytics data will be exported"
       ;;
     \?) 
-        echo "Invalid option: -$OPTARG" >&2; exit 1
+        exit 1
       ;;
   esac
 done
