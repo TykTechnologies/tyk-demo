@@ -1,2740 +1,2822 @@
 {
-  "info": {
-    "_postman_id": "47098f49-49d6-498f-8821-d5518a15a9ab",
-    "name": "Tyk Demo - Enterprise Portal",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "17724260"
-  },
-  "item": [
-    {
-      "name": "Orgs and teams/Get all orgs",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "application/json",
-            "type": "text",
-            "disabled": true
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": ""
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/organisations",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "organisations"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Orgs and teams/Get an org by ID",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "application/json",
-            "type": "text",
-            "disabled": true
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": ""
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/organisations/1",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "organisations",
-            "1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Orgs and teams/Get teams for an org",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "application/json",
-            "type": "text",
-            "disabled": true
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": ""
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/organisations/2/teams",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "organisations",
-            "2",
-            "teams"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Orgs and teams/Get a team by ID",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "application/json",
-            "type": "text",
-            "disabled": true
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": ""
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/organisations/1/teams/1",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "organisations",
-            "1",
-            "teams",
-            "1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Orgs and teams/Create an org",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n\t\"Name\": \"Test org 2\"\n}"
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/organisations",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "organisations"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Orgs and teams/Update an org",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n\t\"Name\": \"Test org 3\"\n}"
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/organisations/2",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "organisations",
-            "2"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Orgs and teams/Delete an org",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n\t\"Name\": \"Test org 3\"\n}"
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/organisations/2",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "organisations",
-            "2"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Orgs and teams/Create a team",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n\t\"Name\": \"Test team 3\"\n}"
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/organisations/1/teams",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "organisations",
-            "1",
-            "teams"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Orgs and teams/Update a team",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n\t\"Name\": \"Test team 4\",\n\t\"Users\": [\n\t\t2\n\t]\n}"
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/organisations/1/teams/3",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "organisations",
-            "1",
-            "teams",
-            "3"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Orgs and teams/Delete a team",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "application/json",
-            "type": "text",
-            "disabled": true
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": ""
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/organisations/1/teams/3",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "organisations",
-            "1",
-            "teams",
-            "3"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Products/Get all products",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/products",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "products"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Products/Get a product by ID",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true,
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"Catalogues\": null,\n    \"Content\": \"Test\",\n    \"DCREnabled\": false,\n    \"Description\": \"\",\n    \"DisplayName\": \"\",\n    \"Feature\": false,\n    \"Logo\": \"\",\n    \"Name\": \"Product\",\n    \"Path\": \"product\",\n    \"Scopes\": \"\",\n    \"Tags\": null,\n    \"Templates\": null\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/products/1",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "products",
-            "1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Products/Update a product",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"Catalogues\": null,\n    \"Content\": \"Test\",\n    \"DCREnabled\": false,\n    \"Description\": \"\",\n    \"DisplayName\": \"\",\n    \"Feature\": false,\n    \"Logo\": \"\",\n    \"Name\": \"Product\",\n    \"Path\": \"product\",\n    \"Scopes\": \"\",\n    \"Tags\": null,\n    \"Templates\": null\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/products/1",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "products",
-            "1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Plans/Get all plans",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/plans",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "plans"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Plans/Get a plan by ID",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/plans/3",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "plans",
-            "3"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Plans/Update a plan",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"AutoApproveAccessRequests\": false,\n    \"Catalogues\": null,\n    \"Description\": \"Test\",\n    \"DisplayName\": \"\",\n    \"JWTScope\": \"\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/plans/3",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "plans",
-            "3"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Apps and credentials/Get all apps",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/apps",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "apps"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Apps and credentials/Get an app by ID",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/apps/2",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "apps",
-            "2"
-          ]
-        }
-      },
-      "response": [
-        {
-          "name": "Apps and credentials/Get an app by ID",
-          "originalRequest": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "{{jwt}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "http://{{tyk-portal.host}}/portal-api/apps/13",
-              "protocol": "http",
-              "host": [
-                "{{tyk-portal.host}}"
-              ],
-              "path": [
-                "portal-api",
-                "apps",
-                "13"
-              ]
-            }
-          },
-          "status": "OK",
-          "code": 200,
-          "_postman_previewlanguage": "json",
-          "header": [
-            {
-              "key": "Access-Control-Allow-Origin",
-              "value": "*"
-            },
-            {
-              "key": "Cache-Control",
-              "value": "no-store"
-            },
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "key": "Pragma",
-              "value": "no-cache"
-            },
-            {
-              "key": "Date",
-              "value": "Thu, 16 Mar 2023 09:46:17 GMT"
-            },
-            {
-              "key": "Content-Length",
-              "value": "1634"
-            }
-          ],
-          "cookie": [],
-          "body": "{\n    \"AccessRequests\": [\n        {\n            \"AuthType\": \"jwt\",\n            \"Catalogue\": \"Public Catalogue\",\n            \"Client\": \"Test application\",\n            \"Credentials\": [\n                {\n                    \"AccessRequest\": \"AccessRequest#15\",\n                    \"Credential\": \"\",\n                    \"CredentialHash\": \"\",\n                    \"DCRRegistrationAccessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1NTY0MTFlMC1iOGZkLTRhNDEtOWFhYS1iYzNhMDJmZmQzNDUifQ.eyJleHAiOjAsImlhdCI6MTY3ODQzNzAzOSwianRpIjoiZjkwYTNiNzktMjFlMC00Mzc1LTgxYmQtNmUyYmIwMmU4ZjgyIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo5OTk5L3JlYWxtcy9EQ1IiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0Ojk5OTkvcmVhbG1zL0RDUiIsInR5cCI6IlJlZ2lzdHJhdGlvbkFjY2Vzc1Rva2VuIiwicmVnaXN0cmF0aW9uX2F1dGgiOiJhdXRoZW50aWNhdGVkIn0.hxe8Yp3R-oRymgdXYPrbE_E59_OvxXdEOfQ9RCwUfKc\",\n                    \"DCRRegistrationClientURI\": \"http://localhost:9999/realms/DCR/clients-registrations/openid-connect/7c64c6e4-3b47-4532-ae1a-835e321f6f9d\",\n                    \"DCRResponse\": \"\",\n                    \"Expires\": \"\",\n                    \"GrantType\": \"implicit,client_credentials\",\n                    \"ID\": 12,\n                    \"OAuthClientID\": \"7c64c6e4-3b47-4532-ae1a-835e321f6f9d\",\n                    \"OAuthClientSecret\": \"3pdiIIuqwM8bJt3KhWKKdqHFFLZCwLt4\",\n                    \"RedirectURI\": \"\",\n                    \"ResponseType\": \"id_token,id_token token\",\n                    \"Scope\": \"free_plan product_payments\",\n                    \"TokenEndpoints\": \"client_secret_basic\"\n                }\n            ],\n            \"DCREnabled\": true,\n            \"DCRTemplateID\": 3,\n            \"ID\": 15,\n            \"Plan\": \"Free plan\",\n            \"Products\": [\n                \"Payment product\"\n            ],\n            \"ProviderID\": 0,\n            \"ProvisionImmediately\": false,\n            \"Status\": \"approved\",\n            \"User\": \"User#19\"\n        }\n    ],\n    \"CreatedAt\": \"2023-03-10 12:08:15\",\n    \"Description\": \"\",\n    \"ID\": 13,\n    \"Name\": \"Test application\",\n    \"RedirectURLs\": \"\",\n    \"UserID\": 19\n}"
-        }
-      ]
-    },
-    {
-      "name": "Apps and credentials/Get access requests for an application",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/apps/2/access-requests",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "apps",
-            "2",
-            "access-requests"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Apps and credentials/Get an access requests by ID",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/apps/2/access-requests/1",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "apps",
-            "2",
-            "access-requests",
-            "1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Apps and credentials/Get all credentials for an app",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/apps/2/access-requests/6/credentials",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "apps",
-            "2",
-            "access-requests",
-            "6",
-            "credentials"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Apps and credentials/Get a credential by ID",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/apps/2/access-requests/7/credentials/2",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "apps",
-            "2",
-            "access-requests",
-            "7",
-            "credentials",
-            "2"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Apps and credentials/Delete an access request",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/apps/2/access-requests/1",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "apps",
-            "2",
-            "access-requests",
-            "1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Apps and credentials/Create a new access request",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"PlanID\": 1,\n    \"ProductIDs\": [2],\n    \"DCRTemplateID\": 1\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/apps/2/provision",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "apps",
-            "2",
-            "provision"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Apps and credentials/Delete a credential",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/apps/2/access-requests/7/credentials/2",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "apps",
-            "2",
-            "access-requests",
-            "7",
-            "credentials",
-            "2"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Apps and credentials/Delete an application",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/apps/14",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "apps",
-            "14"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Apps and credentials/Create a new app",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"Description\": \"\",\n    \"Name\": \"An app\",\n    \"RedirectURLs\": \"\",\n    \"UserID\": \"2\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/apps",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "apps"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Users/Get all users",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        },
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/users",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "users"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Users/Create a new user",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"Active\": true,\n    \"Email\": \"test-developer@tyk.io\",\n    \"First\": \"Test\",\n    \"Last\": \"Developer\",\n    \"OrganisationID\": 1,\n    \"Provider\": \"password\",\n    \"Role\": \"consumer-team-member\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/users",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "users"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Users/Get a user by ID",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        },
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/users/2",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "users",
-            "2"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Users/Delete a user",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/users/2",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "users",
-            "2"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Users/Update a user",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"Active\": true,\n    \"First\": \"Updated\",\n    \"ID\": 5,\n    \"Last\": \"Developer\",\n    \"Organisation\": \"Default Organisation\",\n    \"OrganisationID\": 2,\n    \"Provider\": \"password\",\n    \"ResetPassword\": false,\n    \"Role\": \"super-admin\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/users/5",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "users",
-            "5"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Access requests/Get all access requests",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/access_requests",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "access_requests"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Access requests/Get an access requests by ID",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/access_requests/1",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "access_requests",
-            "1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Access requests/Get developer for an access request",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/access_requests/6/user",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "access_requests",
-            "6",
-            "user"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Access requests/Get plan for an access request",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/access_requests/6/plan",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "access_requests",
-            "6",
-            "plan"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Access requests/Get catalogue for an access request",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/access_requests/6/catalogue",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "access_requests",
-            "6",
-            "catalogue"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Access requests/Get application to which the access request belongs to",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/access_requests/6/client",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "access_requests",
-            "6",
-            "client"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Access requests/Approve an access request",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/access_requests/8/approve",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "access_requests",
-            "8",
-            "approve"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Access requests/Reject an access request",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/access_requests/9/reject",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "access_requests",
-            "9",
-            "reject"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Access requests/Delete an access request",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/access_requests/9",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "access_requests",
-            "9"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Catalogues/Get all catalogues",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/catalogues",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "catalogues"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Catalogues/Get a catalogue by ID",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/catalogues/1",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "catalogues",
-            "1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Catalogues/Create a new catalogue",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"Name\": \"Test API catalogue\",\n  \"VisibilityStatus\": \"Private\",\n  \"NameWithSlug\": \"test-api-catalogue\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/catalogues",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "catalogues"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Catalogues/Update a catalogue",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"Name\": \"Test API catalogue\",\n    \"OrgCatalogues\": [],\n    \"Plans\": [1,2],\n    \"Products\": [1,2],\n    \"VisibilityStatus\": \"Private\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/catalogues/3",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "catalogues",
-            "3"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Catalogues/Add a new audience to a catalogue",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"TeamID\": \"1\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/catalogues/3/audiences",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "catalogues",
-            "3",
-            "audiences"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Catalogues/Get all audience for a catalogue",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        },
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"TeamID\": \"1\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/catalogues/3/audiences",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "catalogues",
-            "3",
-            "audiences"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Catalogues/Remove an audience from a catalogue",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"TeamID\": \"1\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/catalogues/3/audiences/1",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "catalogues",
-            "3",
-            "audiences",
-            "1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Catalogues/Get an audience for a catalogue by ID",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        },
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"TeamID\": \"1\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/catalogues/3/audiences/1",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "catalogues",
-            "3",
-            "audiences",
-            "1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Catalogues/Remove a catalogue",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/catalogues/3",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "catalogues",
-            "3"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Configuration/Get current configuration of the portal",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/configs",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "configs"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "API Providers/Get all providers",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/providers",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "providers"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "API Providers/Get a provider by ID",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/providers/1",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "providers",
-            "1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "API Providers/Update configuration of a provider",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"Configuration\": {\n        \"ID\": 1,\n        \"MetaData\": \"{\\\"URL\\\":\\\"http://host.docker.internal:3000\\\",\\\"Secret\\\":\\\"a4ce530caf364ac96fb08b565c8703e9\\\",\\\"OrgID\\\":\\\"5e9d9544a1dcd60001d0ed20\\\",\\\"Gateway\\\":\\\"\\\",\\\"PoliciesTags\\\":[]}\"\n    },\n    \"Name\": \"Tyk Dashboard\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/providers/1",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "providers",
-            "1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Pages/Get all pages",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/pages",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "pages"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Pages/Get a page by ID",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/pages/3",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "pages",
-            "3"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Pages/Create a new page",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"AllowFormSubmission\": false,\n  \"Path\": \"/portal/test-rest-post\",\n  \"Status\": \"Published\",\n  \"Template\": \"catalogue\",\n  \"Title\": \"Test Rest Post\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/pages",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "pages"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Pages/Update a page",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"AllowFormSubmission\": false,\n    \"Path\": \"/portal/catalogue-products\",\n    \"Status\": \"Draft\",\n    \"Template\": \"catalogue\",\n    \"Title\": \"Product Catalogues\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/pages/3",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "pages",
-            "3"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Pages/Delete a page",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/pages/3",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "pages",
-            "3"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Pages/Get content blocks for a page",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/pages/3/content-blocks",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "pages",
-            "3",
-            "content-blocks"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Pages/Get content block by ID",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/pages/3/content-blocks/48",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "pages",
-            "3",
-            "content-blocks",
-            "48"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Pages/Create a new content block for a page",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"Content\": \"Welcome to Tyk Developer Portal! We support independent developers, start'ups and enterprises in creating innovative applications with our Tyk APIs and SDKs. Catapult your business model and join us in innovating digital progress around API management and beyond.\",\n  \"Name\": \"HeaderDescription\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/pages/3/content-blocks",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "pages",
-            "3",
-            "content-blocks"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Pages/Update a content block",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"Content\": \"Welcome to Tyk Developer Portal! We support independent developers, start'ups and enterprises in creating innovative applications with our Tyk APIs and SDKs. Catapult your business model and join us in innovating digital progress around API management and beyond.\",\n  \"Name\": \"UpdatedBlock\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/pages/3/content-blocks/48",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "pages",
-            "3",
-            "content-blocks",
-            "48"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Pages/Delete a content block",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {
-          "accept": true
-        }
-      },
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "{{jwt}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/portal-api/pages/3/content-blocks/48",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "portal-api",
-            "pages",
-            "3",
-            "content-blocks",
-            "48"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Bootstrap the portal",
-      "protocolProfileBehavior": {
-        "disabledSystemHeaders": {}
-      },
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"username\":\"raava@tyk.io\",\n    \"password\": \"test123\",\n    \"first_name\":\"Raava\",\n    \"last_name\":\"Admin\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/api/bootstrap",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "api",
-            "bootstrap"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Probes/Liveness probe",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/live",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "live"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Probes/Readiness probe",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://{{tyk-portal.host}}/ready",
-          "protocol": "http",
-          "host": [
-            "{{tyk-portal.host}}"
-          ],
-          "path": [
-            "ready"
-          ]
-        }
-      },
-      "response": []
-    }
-  ],
-  "variable": [
-    {
-      "key": "tyk-portal.host",
-      "value": "tyk-portal.localhost:3100"
-    }
-  ]
+	"info": {
+		"_postman_id": "b16f79d9-8b69-414b-b434-16b23cfe6844",
+		"name": "Tyk Demo - Enterprise Portal",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17724260"
+	},
+	"item": [
+		{
+			"name": "Orgs and teams/Get all orgs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Organizations are returned\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    // Expect at least Default Organisation and External Developers to be Returned",
+							"    pm.expect(jsonData.length).to.be.above(2);",
+							"",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/organisations",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"organisations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Orgs and teams/Get an org by ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Organizations are returned by ID\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    // Expect Organization with ID of 1 is returned",
+							"    pm.expect(jsonData.ID).to.eql(1);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/organisations/1",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"organisations",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Orgs and teams/Get teams for an org",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"At least 1 Team Returned for Organization\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    // Expect at least Default Organisation and External Developers to be Returned",
+							"    pm.expect(jsonData).not.eq(undefined);    ",
+							"    pm.expect(jsonData.length).to.be.above(0);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/organisations/1/teams",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"organisations",
+						"1",
+						"teams"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Orgs and teams/Get a team by ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"At least 1 Team Returned for Organization\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    // Expect at least One Team to be returned",
+							"    pm.expect(jsonData).not.eq(undefined);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/organisations/1/teams/1",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"organisations",
+						"1",
+						"teams",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Orgs and teams/Create an org",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Name\": \"Test org 2\"\n}"
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/organisations",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"organisations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Orgs and teams/Update an org",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Name\": \"Test org 3\"\n}"
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/organisations/2",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"organisations",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Orgs and teams/Delete an org",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Name\": \"Test org 3\"\n}"
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/organisations/2",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"organisations",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Orgs and teams/Create a team",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Name\": \"Test team 3\"\n}"
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/organisations/1/teams",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"organisations",
+						"1",
+						"teams"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Orgs and teams/Update a team",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Name\": \"Test team 4\",\n\t\"Users\": [\n\t\t2\n\t]\n}"
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/organisations/1/teams/3",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"organisations",
+						"1",
+						"teams",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Orgs and teams/Delete a team",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/organisations/1/teams/3",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"organisations",
+						"1",
+						"teams",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Products/Get all products",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/products",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Products/Get a product by ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Catalogues\": null,\n    \"Content\": \"Test\",\n    \"DCREnabled\": false,\n    \"Description\": \"\",\n    \"DisplayName\": \"\",\n    \"Feature\": false,\n    \"Logo\": \"\",\n    \"Name\": \"Product\",\n    \"Path\": \"product\",\n    \"Scopes\": \"\",\n    \"Tags\": null,\n    \"Templates\": null\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/products/1",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"products",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Products/Update a product",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Catalogues\": null,\n    \"Content\": \"Test\",\n    \"DCREnabled\": false,\n    \"Description\": \"\",\n    \"DisplayName\": \"\",\n    \"Feature\": false,\n    \"Logo\": \"\",\n    \"Name\": \"Product\",\n    \"Path\": \"product\",\n    \"Scopes\": \"\",\n    \"Tags\": null,\n    \"Templates\": null\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/products/1",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"products",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Plans/Get all plans",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/plans",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"plans"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Plans/Get a plan by ID",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/plans/3",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"plans",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Plans/Update a plan",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"AutoApproveAccessRequests\": false,\n    \"Catalogues\": null,\n    \"Description\": \"Test\",\n    \"DisplayName\": \"\",\n    \"JWTScope\": \"\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/plans/3",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"plans",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps and credentials/Get all apps",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/apps",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"apps"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps and credentials/Get an app by ID",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/apps/2",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"apps",
+						"2"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Apps and credentials/Get an app by ID",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://{{tyk-portal.host}}/portal-api/apps/13",
+							"protocol": "http",
+							"host": [
+								"{{tyk-portal.host}}"
+							],
+							"path": [
+								"portal-api",
+								"apps",
+								"13"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-store"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 16 Mar 2023 09:46:17 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "1634"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"AccessRequests\": [\n        {\n            \"AuthType\": \"jwt\",\n            \"Catalogue\": \"Public Catalogue\",\n            \"Client\": \"Test application\",\n            \"Credentials\": [\n                {\n                    \"AccessRequest\": \"AccessRequest#15\",\n                    \"Credential\": \"\",\n                    \"CredentialHash\": \"\",\n                    \"DCRRegistrationAccessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1NTY0MTFlMC1iOGZkLTRhNDEtOWFhYS1iYzNhMDJmZmQzNDUifQ.eyJleHAiOjAsImlhdCI6MTY3ODQzNzAzOSwianRpIjoiZjkwYTNiNzktMjFlMC00Mzc1LTgxYmQtNmUyYmIwMmU4ZjgyIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo5OTk5L3JlYWxtcy9EQ1IiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0Ojk5OTkvcmVhbG1zL0RDUiIsInR5cCI6IlJlZ2lzdHJhdGlvbkFjY2Vzc1Rva2VuIiwicmVnaXN0cmF0aW9uX2F1dGgiOiJhdXRoZW50aWNhdGVkIn0.hxe8Yp3R-oRymgdXYPrbE_E59_OvxXdEOfQ9RCwUfKc\",\n                    \"DCRRegistrationClientURI\": \"http://localhost:9999/realms/DCR/clients-registrations/openid-connect/7c64c6e4-3b47-4532-ae1a-835e321f6f9d\",\n                    \"DCRResponse\": \"\",\n                    \"Expires\": \"\",\n                    \"GrantType\": \"implicit,client_credentials\",\n                    \"ID\": 12,\n                    \"OAuthClientID\": \"7c64c6e4-3b47-4532-ae1a-835e321f6f9d\",\n                    \"OAuthClientSecret\": \"3pdiIIuqwM8bJt3KhWKKdqHFFLZCwLt4\",\n                    \"RedirectURI\": \"\",\n                    \"ResponseType\": \"id_token,id_token token\",\n                    \"Scope\": \"free_plan product_payments\",\n                    \"TokenEndpoints\": \"client_secret_basic\"\n                }\n            ],\n            \"DCREnabled\": true,\n            \"DCRTemplateID\": 3,\n            \"ID\": 15,\n            \"Plan\": \"Free plan\",\n            \"Products\": [\n                \"Payment product\"\n            ],\n            \"ProviderID\": 0,\n            \"ProvisionImmediately\": false,\n            \"Status\": \"approved\",\n            \"User\": \"User#19\"\n        }\n    ],\n    \"CreatedAt\": \"2023-03-10 12:08:15\",\n    \"Description\": \"\",\n    \"ID\": 13,\n    \"Name\": \"Test application\",\n    \"RedirectURLs\": \"\",\n    \"UserID\": 19\n}"
+				}
+			]
+		},
+		{
+			"name": "Apps and credentials/Get access requests for an application",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/apps/2/access-requests",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"apps",
+						"2",
+						"access-requests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps and credentials/Get an access requests by ID",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/apps/2/access-requests/1",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"apps",
+						"2",
+						"access-requests",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps and credentials/Get all credentials for an app",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/apps/2/access-requests/6/credentials",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"apps",
+						"2",
+						"access-requests",
+						"6",
+						"credentials"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps and credentials/Get a credential by ID",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/apps/2/access-requests/7/credentials/2",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"apps",
+						"2",
+						"access-requests",
+						"7",
+						"credentials",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps and credentials/Delete an access request",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/apps/2/access-requests/1",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"apps",
+						"2",
+						"access-requests",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps and credentials/Create a new access request",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"PlanID\": 1,\n    \"ProductIDs\": [2],\n    \"DCRTemplateID\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/apps/2/provision",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"apps",
+						"2",
+						"provision"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps and credentials/Delete a credential",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/apps/2/access-requests/7/credentials/2",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"apps",
+						"2",
+						"access-requests",
+						"7",
+						"credentials",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps and credentials/Delete an application",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/apps/14",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"apps",
+						"14"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apps and credentials/Create a new app",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Description\": \"\",\n    \"Name\": \"An app\",\n    \"RedirectURLs\": \"\",\n    \"UserID\": \"2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/apps",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"apps"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Users/Get all users",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				},
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/users",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Users/Create a new user",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Active\": true,\n    \"Email\": \"test-developer@tyk.io\",\n    \"First\": \"Test\",\n    \"Last\": \"Developer\",\n    \"OrganisationID\": 1,\n    \"Provider\": \"password\",\n    \"Role\": \"consumer-team-member\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/users",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Users/Get a user by ID",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				},
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/users/2",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"users",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Users/Delete a user",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/users/2",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"users",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Users/Update a user",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Active\": true,\n    \"First\": \"Updated\",\n    \"ID\": 5,\n    \"Last\": \"Developer\",\n    \"Organisation\": \"Default Organisation\",\n    \"OrganisationID\": 2,\n    \"Provider\": \"password\",\n    \"ResetPassword\": false,\n    \"Role\": \"super-admin\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/users/5",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"users",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access requests/Get all access requests",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/access_requests",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"access_requests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access requests/Get an access requests by ID",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/access_requests/1",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"access_requests",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access requests/Get developer for an access request",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/access_requests/6/user",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"access_requests",
+						"6",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access requests/Get plan for an access request",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/access_requests/6/plan",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"access_requests",
+						"6",
+						"plan"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access requests/Get catalogue for an access request",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/access_requests/6/catalogue",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"access_requests",
+						"6",
+						"catalogue"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access requests/Get application to which the access request belongs to",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/access_requests/6/client",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"access_requests",
+						"6",
+						"client"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access requests/Approve an access request",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/access_requests/8/approve",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"access_requests",
+						"8",
+						"approve"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access requests/Reject an access request",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/access_requests/9/reject",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"access_requests",
+						"9",
+						"reject"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access requests/Delete an access request",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/access_requests/9",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"access_requests",
+						"9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Catalogues/Get all catalogues",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/catalogues",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"catalogues"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Catalogues/Get a catalogue by ID",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/catalogues/1",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"catalogues",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Catalogues/Create a new catalogue",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"Test API catalogue\",\n  \"VisibilityStatus\": \"Private\",\n  \"NameWithSlug\": \"test-api-catalogue\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/catalogues",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"catalogues"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Catalogues/Update a catalogue",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Name\": \"Test API catalogue\",\n    \"OrgCatalogues\": [],\n    \"Plans\": [1,2],\n    \"Products\": [1,2],\n    \"VisibilityStatus\": \"Private\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/catalogues/3",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"catalogues",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Catalogues/Add a new audience to a catalogue",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"TeamID\": \"1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/catalogues/3/audiences",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"catalogues",
+						"3",
+						"audiences"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Catalogues/Get all audience for a catalogue",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				},
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"TeamID\": \"1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/catalogues/3/audiences",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"catalogues",
+						"3",
+						"audiences"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Catalogues/Remove an audience from a catalogue",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"TeamID\": \"1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/catalogues/3/audiences/1",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"catalogues",
+						"3",
+						"audiences",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Catalogues/Get an audience for a catalogue by ID",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				},
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"TeamID\": \"1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/catalogues/3/audiences/1",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"catalogues",
+						"3",
+						"audiences",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Catalogues/Remove a catalogue",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/catalogues/3",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"catalogues",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Configuration/Get current configuration of the portal",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/configs",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"configs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API Providers/Get all providers",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/providers",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"providers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API Providers/Get a provider by ID",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/providers/1",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"providers",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API Providers/Update configuration of a provider",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Configuration\": {\n        \"ID\": 1,\n        \"MetaData\": \"{\\\"URL\\\":\\\"http://host.docker.internal:3000\\\",\\\"Secret\\\":\\\"a4ce530caf364ac96fb08b565c8703e9\\\",\\\"OrgID\\\":\\\"5e9d9544a1dcd60001d0ed20\\\",\\\"Gateway\\\":\\\"\\\",\\\"PoliciesTags\\\":[]}\"\n    },\n    \"Name\": \"Tyk Dashboard\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/providers/1",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"providers",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pages/Get all pages",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/pages",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"pages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pages/Get a page by ID",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/pages/3",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"pages",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pages/Create a new page",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"AllowFormSubmission\": false,\n  \"Path\": \"/portal/test-rest-post\",\n  \"Status\": \"Published\",\n  \"Template\": \"catalogue\",\n  \"Title\": \"Test Rest Post\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/pages",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"pages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pages/Update a page",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"AllowFormSubmission\": false,\n    \"Path\": \"/portal/catalogue-products\",\n    \"Status\": \"Draft\",\n    \"Template\": \"catalogue\",\n    \"Title\": \"Product Catalogues\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/pages/3",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"pages",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pages/Delete a page",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/pages/3",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"pages",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pages/Get content blocks for a page",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/pages/3/content-blocks",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"pages",
+						"3",
+						"content-blocks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pages/Get content block by ID",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/pages/3/content-blocks/48",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"pages",
+						"3",
+						"content-blocks",
+						"48"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pages/Create a new content block for a page",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Content\": \"Welcome to Tyk Developer Portal! We support independent developers, start'ups and enterprises in creating innovative applications with our Tyk APIs and SDKs. Catapult your business model and join us in innovating digital progress around API management and beyond.\",\n  \"Name\": \"HeaderDescription\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/pages/3/content-blocks",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"pages",
+						"3",
+						"content-blocks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pages/Update a content block",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Content\": \"Welcome to Tyk Developer Portal! We support independent developers, start'ups and enterprises in creating innovative applications with our Tyk APIs and SDKs. Catapult your business model and join us in innovating digital progress around API management and beyond.\",\n  \"Name\": \"UpdatedBlock\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/pages/3/content-blocks/48",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"pages",
+						"3",
+						"content-blocks",
+						"48"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pages/Delete a content block",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{jwt}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/portal-api/pages/3/content-blocks/48",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"portal-api",
+						"pages",
+						"3",
+						"content-blocks",
+						"48"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bootstrap the portal",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\":\"raava@tyk.io\",\n    \"password\": \"test123\",\n    \"first_name\":\"Raava\",\n    \"last_name\":\"Admin\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/api/bootstrap",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"api",
+						"bootstrap"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Probes/Liveness probe",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/live",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"live"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Probes/Readiness probe",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{tyk-portal.host}}/ready",
+					"protocol": "http",
+					"host": [
+						"{{tyk-portal.host}}"
+					],
+					"path": [
+						"ready"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "tyk-portal.host",
+			"value": "tyk-portal.localhost:3100"
+		}
+	]
 }
