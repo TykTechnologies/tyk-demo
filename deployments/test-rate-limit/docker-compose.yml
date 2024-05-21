@@ -53,3 +53,12 @@ services:
     depends_on:
       - tyk-redis
       - tyk-dashboard
+  nginx:
+    image: nginx:1.26.0-perl
+    ports:
+      - 8091:80
+    networks:
+      - tyk
+    volumes:
+      - ./deployments/test-rate-limit/volumes/nginx/nginx.conf:/usr/local/nginx/conf/nginx.conf
+   
