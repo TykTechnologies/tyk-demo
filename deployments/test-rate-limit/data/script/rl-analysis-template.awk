@@ -100,8 +100,13 @@ END {
                     rl_pass_count++
                 }
 
-                print test_plan_file_name, status_429_count, i, next_line_index, current_timestamp, next_timestamp, difference_ms, rate_limit_window_ms, result
+            } else {
+                # count as fail: requests that occur within the initial rate limit request range should not be rate limited
+                # i.e. if the rate limit is 5 per second, the first 5 requests should not be rate limited
+                result = "fail"
+                rl_fail_count++
             }
+            print test_plan_file_name, status_429_count, i, next_line_index, current_timestamp, next_timestamp, difference_ms, rate_limit_window_ms, result
         } else {
             status_other_count++
         }
