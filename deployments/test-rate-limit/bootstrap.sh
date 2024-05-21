@@ -13,7 +13,7 @@ dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_
 dashboard_user_api_credentials=$(cat .context-data/1-dashboard-user-1-api-key)
 
 log_message "Importing APIs"
-create_api deployments/test-rate-limit/data/tyk-dashboard/apis/load-balanced-api-auth.json $dashboard_admin_api_credentials $dashboard_user_api_credentials
+create_api deployments/test-rate-limit/data/tyk-dashboard/apis/gateway_host_header.json $dashboard_admin_api_credentials $dashboard_user_api_credentials
 bootstrap_progress
 
 log_message "Importing Keys"
@@ -23,5 +23,21 @@ for file in deployments/test-rate-limit/data/tyk-gateway/keys/*; do
     bootstrap_progress
   fi
 done
+
+log_message "Restart Gateways to load latest certificates"
+docker restart tyk-demo-tyk-gateway-3-1 tyk-demo-tyk-gateway-4-1 1>/dev/null 2>>logs/bootstrap.log
+if [ "$?" != 0 ]; then
+  echo "Error when restart Gateways to load latest certificates"
+  exit 1
+fi
+log_ok
+
+log_message "Restart nginx to reset load balancer"
+docker restart tyk-demo-nginx-1 1>/dev/null 2>>logs/bootstrap.log
+if [ "$?" != 0 ]; then
+  echo "Error when restarting nginx to reset load balancer"
+  exit 1
+fi
+log_ok
 
 log_end_deployment

@@ -7,7 +7,13 @@
     "enable_coprocess_auth": false,
     "base_identity_provided_by": "",
     "custom_middleware": {
-      "pre": [],
+      "pre": [{
+        "disabled": false,
+        "name": "AddGatewayHostHeader",
+        "path": "plugins/go/example/example-go-plugin.so",
+        "require_session": false,
+        "raw_body_only": false
+      }],
       "post": [],
       "post_key_auth": [],
       "auth_check": {
@@ -18,7 +24,7 @@
         "raw_body_only": false
       },
       "response": [],
-      "driver": "",
+      "driver": "goplugin",
       "id_extractor": {
         "disabled": false,
         "extract_from": "",
@@ -146,8 +152,8 @@
     },
     "enable_jwt": false,
     "do_not_track": false,
-    "name": "Load Balanced Gateways",
-    "slug": "load-balanced-gateways",
+    "name": "Gateway Host Header",
+    "slug": "gateway-host-header",
     "analytics_plugin": {},
     "oauth_meta": {
       "allowed_access_types": [],
@@ -169,7 +175,7 @@
       "events": {}
     },
     "proxy": {
-      "target_url": "",
+      "target_url": "http://httpbin/",
       "service_discovery": {
         "endpoint_returns_list": false,
         "cache_timeout": 0,
@@ -193,15 +199,11 @@
         "ssl_force_common_name_check": false,
         "proxy_url": ""
       },
-      "target_list": [
-        "http://tyk-gateway-3:8080/basic-open-api",
-        "http://tyk-gateway-4:8080/basic-open-api",
-        "http://tyk-gateway:8080/basic-open-api"
-      ],
+      "target_list": [],
       "preserve_host_header": false,
       "strip_listen_path": true,
-      "enable_load_balancing": true,
-      "listen_path": "/load-balanced-gateways/",
+      "enable_load_balancing": false,
+      "listen_path": "/gateway-host-header/",
       "disable_strip_slash": true
     },
     "client_certificates": [],

@@ -10,14 +10,14 @@
     "quota_renewal_rate": -1,
     "access_rights": {
         "b3646044133146df48cd911c2a46a648": {
-            "api_name": "Load Balanced Gateways",
+            "api_name": "Gateway Host Header",
             "api_id": "b3646044133146df48cd911c2a46a648",
             "versions": [
                 "Default"
             ],
             "limit": {
-                "rate": 5,
-                "per": 1,
+                "rate": 120,
+                "per": 2,
                 "throttle_interval": -1,
                 "throttle_retry_limit": -1,
                 "max_query_depth": -1,
