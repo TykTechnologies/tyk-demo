@@ -105,6 +105,8 @@ END {
                 # i.e. if the rate limit is 5 per second, the first 5 requests should not be rate limited
                 result = "fail"
                 rl_fail_count++
+                next_timestamp = "n/a"
+                difference_ms = "n/a"
             }
             print test_plan_file_name, status_429_count, i, next_line_index, current_timestamp, next_timestamp, difference_ms, rate_limit_window_ms, result
         } else {
