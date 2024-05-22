@@ -13,8 +13,25 @@ dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_
 dashboard_user_api_credentials=$(cat .context-data/1-dashboard-user-1-api-key)
 
 log_message "Importing APIs"
-create_api deployments/test-rate-limit/data/tyk-dashboard/apis/gateway_host_header.json $dashboard_admin_api_credentials $dashboard_user_api_credentials
-bootstrap_progress
+for file in deployments/test-rate-limit/data/tyk-dashboard/apis/*; do
+  if [[ -f $file ]]; then
+    create_api $file $dashboard_admin_api_credentials $dashboard_user_api_credentials
+    bootstrap_progress
+  fi
+done
+log_ok
+
+log_message "Importing Policies"
+for file in deployments/test-rate-limit/data/tyk-dashboard/policies/*; do
+  if [[ -f $file ]]; then
+    create_policy $file $dashboard_admin_api_credentials $dashboard_user_api_credentials
+    bootstrap_progress
+  fi
+done
+log_ok
+
+# sleep, to allow gateway to load policy before creating key that relies on it
+sleep 2 
 
 log_message "Importing Keys"
 for file in deployments/test-rate-limit/data/tyk-gateway/keys/*; do
@@ -23,6 +40,7 @@ for file in deployments/test-rate-limit/data/tyk-gateway/keys/*; do
     bootstrap_progress
   fi
 done
+log_ok
 
 log_message "Restart Gateways to load latest certificates"
 docker restart tyk-demo-tyk-gateway-3-1 tyk-demo-tyk-gateway-4-1 1>/dev/null 2>>logs/bootstrap.log
