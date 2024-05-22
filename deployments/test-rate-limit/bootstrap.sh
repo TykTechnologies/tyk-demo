@@ -31,7 +31,7 @@ done
 log_ok
 
 # sleep, to allow gateway to load policy before creating key that relies on it
-sleep 2 
+sleep 5
 
 log_message "Importing Keys"
 for file in deployments/test-rate-limit/data/tyk-gateway/keys/*; do
