@@ -1,0 +1,19 @@
+{
+    "enabled": true,
+    "dataSource": "requests",
+    "requests": {
+        "load": {
+            "clients": 1,
+            "rate": 50,
+            "total": 400  
+        },
+        "target": {
+            "url": "http://localhost:8091/lb1/gateway-host-header/get",
+            "authorization": "120per2_gateway_host_header",
+            "apiId": "b3646044133146df48cd911c2a46a648"
+        }
+    },
+    "key": {
+        "filePath": "deployments/test-rate-limit/data/tyk-gateway/keys/bearer-token-1-120per2_gateway_host_header.json"
+    }
+}
