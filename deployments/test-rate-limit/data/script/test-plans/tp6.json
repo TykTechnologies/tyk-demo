@@ -1,5 +1,5 @@
 {
-    "enabled": true,
+    "enabled": false,
     "dataSource": "requests",
     "requests": {
         "load": {
@@ -8,12 +8,12 @@
             "total": 1200  
         },
         "target": {
-            "url": "http://localhost:8080/load-balanced-gateways/get",
-            "authorization": "120per2_load_balanced_gateways",
+            "url": "http://localhost:8080/gateway-host-header/get",
+            "authorization": "120per2_gateway_host_header",
             "apiId": "b3646044133146df48cd911c2a46a648"
         }
     },
     "key": {
-        "filePath": "deployments/test-rate-limit/data/tyk-gateway/keys/bearer-token-1-120per2_load_balanced_gateways.json"
+        "filePath": "deployments/test-rate-limit/data/tyk-gateway/keys/bearer-token-1-120per2_gateway_host_header.json"
     }
 }
