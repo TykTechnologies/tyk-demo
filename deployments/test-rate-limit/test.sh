@@ -10,22 +10,36 @@ readonly TEST_SUMMARY_PATH=".context-data/rl-test-output-summary"
 readonly TEST_DETAIL_PATH=".context-data/rl-test-output-detail"
 export_analytics=false
 run_all=false
+show_detail=false
 
-while getopts "ae" opt; do
-  case $opt in
-    a) 
+while getopts "ade" opt; do
+  case ${opt} in
+    a ) 
         run_all=true
         echo "All test plans will be run"
       ;;
-    e) 
+    d ) 
+        show_detail=true
+        echo "Detailed analytics will be displayed"
+      ;;
+    e ) 
         export_analytics=true
         echo "Analytics data will be exported"
       ;;
-    \?) 
+    \? ) 
+        echo "Invalid option: -$OPTARG" 1>&2
         exit 1
       ;;
   esac
 done
+
+shift $((OPTIND -1))
+test_plans_to_run=("$@")
+
+if [ ${#test_plans_to_run[@]} -eq 0 ]; then
+  echo "No tests to run. Provide test plan names as arguments. e.g. ./test.sh tp001"
+  exit 0
+fi
 
 generate_requests() {
     local clients="$1"
@@ -68,15 +82,18 @@ get_analytics_data() {
 # clear the test output files
 > $TEST_SUMMARY_PATH
 > $TEST_DETAIL_PATH
+test_plan_run=false
 
-for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
+for test_plan in "${test_plans_to_run[@]}"; do
+    test_plan_path="deployments/test-rate-limit/data/script/test-plans/$test_plan.json"
     test_plan_file_name=$(basename "${test_plan_path%.*}")
-    test_plan_enabled=$(jq -r '.enabled' $test_plan_path)
 
-    if [ "$run_all" = false -a "$test_plan_enabled" != "true" ]; then
-        echo -e "\nSkipping test plan \"$test_plan_file_name\": not enabled"
+    if [ ! -e "$test_plan_path" ]; then
+        echo "Test plan $test_plan_path does not exist"
         continue
     fi
+
+    test_plan_run=true
 
     test_data_source=$(jq -r '.dataSource' $test_plan_path)
     key_file_path=$(jq -r '.key.filePath' $test_plan_path)
@@ -87,7 +104,7 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     key_rate_period=$(jq 'first(.access_rights[] | .limit.per)' $key_file_path)
     analytics_data=""
 
-    echo -e "\nRunning test plan \"$test_plan_file_name\" using \"$test_data_source\" data source"
+    echo -e "\nRunning test plan \"$test_plan_file_name\""
 
     case $test_data_source in
         "requests")
@@ -137,10 +154,16 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     fi
 done
 
-echo -e "\nTest plans complete"
+if [ "$test_plan_run" = "true" ]; then
+    echo -e "\nTest plans complete"
 
-echo -e "\nDetailed Rate Limit Analysis"
-awk -f deployments/test-rate-limit/data/script/test-output-detail-template.awk $TEST_DETAIL_PATH
+    if [ "$show_detail" = "true" ]; then
+        echo -e "\nDetailed Rate Limit Analysis"
+        awk -f deployments/test-rate-limit/data/script/test-output-detail-template.awk $TEST_DETAIL_PATH
+    fi
 
-echo -e "\nSummary Results"
-awk -f deployments/test-rate-limit/data/script/test-output-summary-template.awk $TEST_SUMMARY_PATH
+    echo -e "\nSummary Results"
+    awk -f deployments/test-rate-limit/data/script/test-output-summary-template.awk $TEST_SUMMARY_PATH
+else
+  echo "No results"
+fi
