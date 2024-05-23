@@ -71,9 +71,9 @@ get_analytics_data() {
 
 for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
     test_plan_file_name=$(basename "${test_plan_path%.*}")
-    text_plan_enabled=$(jq -r '.enabled' $test_plan_path)
+    test_plan_enabled=$(jq -r '.enabled' $test_plan_path)
 
-    if [ "$run_all" = false -a "$text_plan_enabled" != "true" ]; then
+    if [ "$run_all" = false -a "$test_plan_enabled" != "true" ]; then
         echo -e "\nSkipping test plan \"$test_plan_file_name\": not enabled"
         continue
     fi
