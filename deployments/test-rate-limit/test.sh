@@ -80,8 +80,11 @@ for test_plan_path in deployments/test-rate-limit/data/script/test-plans/*; do
 
     test_data_source=$(jq -r '.dataSource' $test_plan_path)
     key_file_path=$(jq -r '.key.filePath' $test_plan_path)
-    key_rate=$(jq '.access_rights[] | .limit.rate' $key_file_path)
-    key_rate_period=$(jq '.access_rights[] | .limit.per' $key_file_path)
+    # TODO: This approach 'first' is a hack to deal with keys that have multiple authz configs.
+    # It needs to be updates to get the correct authz config for the api that is to be tested against.
+    # It only happens to work here because the first rate limit is the same as the API to be tested against.
+    key_rate=$(jq 'first(.access_rights[] | .limit.rate)' $key_file_path)
+    key_rate_period=$(jq 'first(.access_rights[] | .limit.per)' $key_file_path)
     analytics_data=""
 
     echo -e "\nRunning test plan \"$test_plan_file_name\" using \"$test_data_source\" data source"
