@@ -149,13 +149,13 @@ END {
         first_epoch = timestamp_to_epoch_ms(first_timestamp)
         last_epoch = timestamp_to_epoch_ms(last_timestamp)
         duration_ms = first_epoch - last_epoch # first is most recent
-        effective_rate_limit = int(status_200_count / (duration_ms / 1000)) # rounded
+        rate_200 = int(status_200_count / (duration_ms / 1000)) # rounded
     } else {
-        effective_rate_limit = 0
+        rate_200 = 0
     }
 
 
     rl_success_percent = status_429_count == 0 ? 100 : (rl_pass_count / line_count) * 100
     overall_result = rl_success_percent == 100 ? "pass" : "fail"
-    print test_plan_file_name, line_count, status_200_count, status_429_count, status_other_count, rl_pass_count, rl_fail_count, rl_success_percent, effective_rate_limit, overall_result >> summary_data_path
+    print test_plan_file_name, line_count, status_200_count, status_429_count, status_other_count, rl_pass_count, rl_fail_count, rl_success_percent, rate_200, overall_result >> summary_data_path
 }
