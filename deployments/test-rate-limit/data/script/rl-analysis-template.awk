@@ -65,24 +65,29 @@ END {
     status_other_count = 0
     rl_pass_count = 0
     rl_fail_count = 0
+    rl200_pass_count = 0
+    rl200_fail_count = 0
+    rl429_pass_count = 0
+    rl429_fail_count = 0
 
     # Iterate through the lines array
     for (i = 0; i < line_count; i++) {
         # Get the status code of the current line
         status_code = get_field(lines[i], 1)
         
-        if (status_code == 200) {
-            status_200_count++
-        } else if (status_code == 429) {
-            status_429_count++
+        if (status_code == 200 || status_code == 429) {
 
+            if (status_code == 200) {
+                status_200_count++
+            } else {
+                status_429_count++
+            }
             # Get the current timestamp
             current_timestamp = get_field(lines[i], 2)
 
             # Get the value of the line at the extent of the rate limit
             next_line_index = i + rate_limit
-            
-            # Ensure the next line exists
+
             if (next_line_index < line_count) {
                 next_timestamp = get_field(lines[next_line_index], 2)
 
@@ -93,18 +98,40 @@ END {
                 difference_ms = current_epoch_ms - next_epoch_ms
 
                 if (difference_ms > rate_limit_window_ms) {
-                    result = "fail"
-                    rl_fail_count++
+                    # the requests are outside of the RL window, so should not be rate limited
+                    if (status_code == 200) {
+                        result = "pass - 200 out RL"
+                        rl_pass_count++
+                        rl200_pass_count++
+                    } else {
+                        result = "fail - 429 out RL"
+                        rl_fail_count++
+                        rl429_fail_count++
+                    }
                 } else {
-                    result = "pass"
-                    rl_pass_count++
+                    # the requests are inside of the RL window, so should be rate limited
+                    if (status_code == 200) {
+                        result = "fail - 200 in RL"
+                        rl_fail_count++
+                        rl200_fail_count++
+                    } else {
+                        result = "pass - 429 in RL"
+                        rl_pass_count++
+                        rl429_pass_count++
+                    }
                 }
-
             } else {
-                # count as fail: requests that occur within the initial rate limit request range should not be rate limited
-                # i.e. if the rate limit is 5 per second, the first 5 requests should not be rate limited
-                result = "fail"
-                rl_fail_count++
+                # requests that occur within the initial rate limit request range should not be rate limited
+                # i.e. if the rate limit is 5 per second, the first 5 requests should not be rate limited regardless of when they occur    
+                if (status_code == 200) {
+                    result = "pass - 200 in init"
+                    rl_pass_count++
+                    rl200_pass_count++
+                } else {
+                    result = "fail - 429 in init"
+                    rl_fail_count++
+                    rl429_fail_count++
+                }
                 next_timestamp = "n/a"
                 difference_ms = "n/a"
             }
@@ -112,9 +139,23 @@ END {
         } else {
             status_other_count++
         }
+    }   
+
+
+    if (status_200_count != 0) {
+        # calculate rate of 200 responses
+        first_timestamp = get_field(lines[0], 2)
+        last_timestamp = get_field(lines[line_count-1], 2)
+        first_epoch = timestamp_to_epoch_ms(first_timestamp)
+        last_epoch = timestamp_to_epoch_ms(last_timestamp)
+        duration_ms = first_epoch - last_epoch # first is most recent
+        effective_rate_limit = int(status_200_count / (duration_ms / 1000)) # rounded
+    } else {
+        effective_rate_limit = 0
     }
 
-    rl_success_percent = status_429_count == 0 ? 100 : (rl_pass_count / status_429_count) * 100
+
+    rl_success_percent = status_429_count == 0 ? 100 : (rl_pass_count / line_count) * 100
     overall_result = rl_success_percent == 100 ? "pass" : "fail"
-    print test_plan_file_name, line_count, status_200_count, status_429_count, status_other_count, rl_pass_count, rl_fail_count, rl_success_percent, overall_result >> summary_data_path
+    print test_plan_file_name, line_count, status_200_count, status_429_count, status_other_count, rl_pass_count, rl_fail_count, rl_success_percent, effective_rate_limit, overall_result >> summary_data_path
 }
