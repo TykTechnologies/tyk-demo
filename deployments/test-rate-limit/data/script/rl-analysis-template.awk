@@ -100,22 +100,26 @@ END {
                 if (difference_ms > rate_limit_window_ms) {
                     # the requests are outside of the RL window, so should not be rate limited
                     if (status_code == 200) {
-                        result = "pass - 200 out RL"
+                        result = "pass"
+                        reason = "200-out-RL"
                         rl_pass_count++
                         rl200_pass_count++
                     } else {
-                        result = "fail - 429 out RL"
+                        result = "fail"
+                        reason = "429-out-RL"
                         rl_fail_count++
                         rl429_fail_count++
                     }
                 } else {
                     # the requests are inside of the RL window, so should be rate limited
                     if (status_code == 200) {
-                        result = "fail - 200 in RL"
+                        result = "fail"
+                        reason = "200-in-RL"
                         rl_fail_count++
                         rl200_fail_count++
                     } else {
-                        result = "pass - 429 in RL"
+                        result = "pass"
+                        reason = "429-in-RL"
                         rl_pass_count++
                         rl429_pass_count++
                     }
@@ -124,18 +128,20 @@ END {
                 # requests that occur within the initial rate limit request range should not be rate limited
                 # i.e. if the rate limit is 5 per second, the first 5 requests should not be rate limited regardless of when they occur    
                 if (status_code == 200) {
-                    result = "pass - 200 in init"
+                    result = "pass"
+                    reason = "200-in-init"
                     rl_pass_count++
                     rl200_pass_count++
                 } else {
-                    result = "fail - 429 in init"
+                    result = "fail"
+                    reason = "429-in-init"
                     rl_fail_count++
                     rl429_fail_count++
                 }
                 next_timestamp = "n/a"
                 difference_ms = "n/a"
             }
-            print test_plan_file_name, status_429_count, i, next_line_index, current_timestamp, next_timestamp, difference_ms, rate_limit_window_ms, result
+            print test_plan_file_name, i, next_line_index, current_timestamp, next_timestamp, status_code, difference_ms, rate_limit_window_ms, result, reason
         } else {
             status_other_count++
         }
