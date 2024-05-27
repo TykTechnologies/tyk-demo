@@ -30,18 +30,6 @@ for file in deployments/test-rate-limit/data/tyk-dashboard/policies/*; do
 done
 log_ok
 
-# sleep, to allow gateway to load policy before creating key that relies on it
-sleep 5
-
-log_message "Importing Keys"
-for file in deployments/test-rate-limit/data/tyk-gateway/keys/*; do
-  if [[ -f $file ]]; then
-    create_bearer_token "$file" "$gateway_api_credentials"
-    bootstrap_progress
-  fi
-done
-log_ok
-
 log_message "Restart Gateways to load latest certificates"
 docker restart tyk-demo-tyk-gateway-3-1 tyk-demo-tyk-gateway-4-1 1>/dev/null 2>>logs/bootstrap.log
 if [ "$?" != 0 ]; then
