@@ -61,8 +61,10 @@ services:
       - 5432:5432
     networks:
       - tyk
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-      - ./deployments/test-rate-limit/volumes/postgres/tyk_analytics_20240501.sql:/usr/local/nginx/tyk_analytics_20240501.sql
+      - ./deployments/test-rate-limit/volumes/postgres/data:/tmp/psql_data
   nginx:
     image: nginx:1.26.0-perl
     ports:
