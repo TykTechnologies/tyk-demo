@@ -1,7 +1,7 @@
 ---
 services:
   tyk-portal:
-    image: tykio/portal:v1.8.3
+    image: tykio/portal:${PORTAL_VERSION:-v1.8.3}
     networks:
       - tyk
     env_file:
