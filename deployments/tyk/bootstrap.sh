@@ -56,7 +56,21 @@ bootstrap_progress
 log_message "Wait for services to be ready before beginning to bootstrap"
 wait_for_liveness
 
-log_message "OpenSSL version used for generating certs: $(docker exec $(get_service_container_id tyk-gateway) sh -c "openssl version")"
+log_message "Creating temporary container for openssl usage"
+temp_docker_container_name="tyk-demo-temp"
+# Remove the container if it already exists
+if docker ps -a --format '{{.Names}}' | grep -q "^$temp_docker_container_name$"; then
+    log_message "  Removing existing container $temp_docker_container_name"
+    docker rm -f $temp_docker_container_name 1>/dev/null 2>>logs/bootstrap.log
+fi
+docker run --name $temp_docker_container_name debian:bookworm sh -c "apt-get update && apt-get install -y openssl" 1>/dev/null 2>>logs/bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not create temporary container"
+  exit 1
+fi
+log_ok
+
+log_message "OpenSSL version used for generating certs: $(docker start $temp_docker_container_name >/dev/null && docker exec -it $temp_docker_container_name sh -c "openssl version")"
 
 log_message "Removing any pre-existing certs"
 rm deployments/tyk/volumes/tyk-dashboard/certs/*.pem 1> /dev/null 2>> logs/bootstrap.log
@@ -64,7 +78,11 @@ rm deployments/tyk/volumes/tyk-gateway/certs/*.pem 1> /dev/null 2>> logs/bootstr
 log_ok
 
 log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
-docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tyk-gateway-2.localhost\" -keyout certs/tls-private-key.pem -out certs/tls-certificate.pem -days 365 -nodes" >>logs/bootstrap.log
+tls_private_key_path="/tmp/tls-private-key.pem"
+private_key_path="/tmp/private-key.pem"
+public_key_path="/tmp/public-key.pem"
+cert_path="/tmp/tls-certificate.pem"
+docker start $temp_docker_container_name >/dev/null && docker exec -d $temp_docker_container_name sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tyk-gateway-2.localhost\" -keyout $tls_private_key_path -out $cert_path -days 365 -nodes" >>logs/bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not generate self-signed certificate"
   exit 1
@@ -73,7 +91,7 @@ log_ok
 bootstrap_progress
 
 log_message "Generating private key for secure messaging and signing"
-docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl genrsa -out certs/private-key.pem 2048" >>logs/bootstrap.log
+docker start $temp_docker_container_name >/dev/null && docker exec -d $temp_docker_container_name sh -c "openssl genrsa -out $private_key_path 2048" >>logs/bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not generate private key"
   exit 1
@@ -82,19 +100,23 @@ log_ok
 bootstrap_progress
 
 log_message "Checking that certificate is ready"
-while [ ! -f deployments/tyk/volumes/tyk-gateway/certs/private-key.pem ]; do
-  log_message "  Not ready, waiting..."
+while true; do
+  docker start $temp_docker_container_name >/dev/null && docker exec $temp_docker_container_name sh -c "[ -f $private_key_path ]"
+  if [ $? -eq 0 ]; then
+    log_ok
+    break
+  else
+    log_message "  Not ready, waiting..."
+    sleep 2
+  fi
   bootstrap_progress
-  sleep 2
 done
-log_ok
-bootstrap_progress
 
 log_message "Copying private key to the Dashboard"
 cert_check=""
 begin_cert="-----BEGIN PRIVATE KEY-----"
 while [ "$cert_check" != "$begin_cert" ]; do
-  docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs >>logs/bootstrap.log
+  docker start $temp_docker_container_name >/dev/null && docker cp $temp_docker_container_name:$private_key_path deployments/tyk/volumes/tyk-dashboard/certs >>logs/bootstrap.log
   if [ "$?" != "0" ]; then
     echo "ERROR: Could not copy private key"
     exit 1
@@ -110,11 +132,25 @@ log_ok
 bootstrap_progress
 
 log_message "Generating public key for secure messaging and signing"
-docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl rsa -in certs/private-key.pem -pubout -out certs/public-key.pem" >>logs/bootstrap.log
+docker start $temp_docker_container_name >/dev/null && docker exec -d $temp_docker_container_name sh -c "openssl rsa -in $private_key_path -pubout -out $public_key_path" >>logs/bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not generate public key"
   exit 1
 fi
+log_ok
+bootstrap_progress
+
+log_message "Copying public key to gateway"
+docker start $temp_docker_container_name >/dev/null && docker cp $temp_docker_container_name:$public_key_path deployments/tyk/volumes/tyk-gateway/certs >>logs/bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not copy public key"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Removing temporary container"
+docker rm -f $temp_docker_container_name >/dev/null
 log_ok
 bootstrap_progress
 
