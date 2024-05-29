@@ -1,7 +1,7 @@
 ---
 services:
   tyk-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.3.0}
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-s5.3.2-rc1}
     ports:
       - 3000:3000
     networks:
@@ -22,7 +22,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-gateway:
-    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.3.0}
+    image: tykio/tyk-gateway:${GATEWAY_VERSION:-s5.4.0-alpha5}
     ports:
       - 8080:8080
       - 8086:8086
@@ -55,7 +55,7 @@ services:
       - tyk-redis
       - tyk-dashboard
   tyk-gateway-2:
-    image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v5.3.0}
+    image: tykio/tyk-gateway:${GATEWAY2_VERSION:-s5.4.0-alpha5}
     ports:
       - 8081:8080
     networks:
