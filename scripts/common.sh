@@ -315,6 +315,7 @@ build_go_plugin () {
     plugin_container_exit_code="$?"
     if [[ "$plugin_container_exit_code" -ne "0" ]]; then
       log_message "  ERROR: Tyk Plugin Compiler container returned error code: $plugin_container_exit_code"
+      log_message "    Tip: The Plugin Compiler image can be overridden by using "PLUGIN_COMPILER_IMAGE_OVERRIDE" in the .env file e.g. PLUGIN_COMPILER_IMAGE_OVERRIDE=v5.4.0"
       exit 1
     fi
     echo $plugin_compiler_image_tag > $go_plugin_build_version_filename
