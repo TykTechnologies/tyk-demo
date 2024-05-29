@@ -12,4 +12,4 @@ docker run \
   -v $(pwd)/deployments/tyk/volumes/tyk-gateway/templates/error_401.json:/opt/tyk-gateway/templates/error_401.json \
   -v $(pwd)/deployments/tyk/volumes/databases/GeoLite2-Country.mmdb:/opt/tyk-gateway/databases/GeoLite2-Country.mmdb \
   --network tyk-demo_tyk \
-  tykio/tyk-gateway:v5.2.5
+  tykio/tyk-gateway:s5.4.0-alpha5
