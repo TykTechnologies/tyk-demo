@@ -284,16 +284,23 @@ _decode_base64_url () {
 decode_jwt () { _decode_base64_url $(echo -n $1 | cut -d "." -f ${2:-2}) | jq .; }
 
 build_go_plugin () {
-  gateway_image_tag=$(get_service_image_tag "tyk-gateway")
+  plugin_compiler_image_tag=$(get_service_image_tag "tyk-gateway")
   go_plugin_filename=$1
   # each plugin must be in its own directory
   go_plugin_directory="$PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/$2"
   go_plugin_build_version_filename=".bootstrap/go-plugin-build-version-$go_plugin_filename"
   go_plugin_build_version=$(cat $go_plugin_build_version_filename)
   go_plugin_path="$go_plugin_directory/$go_plugin_filename"
-  log_message "Building Go Plugin $go_plugin_path using tag $gateway_image_tag"
+
+  # use image override value, if it exists
+  if grep -q "^PLUGIN_COMPILER_IMAGE_OVERRIDE=" ".env"; then
+    plugin_compiler_image_tag=$(grep "^PLUGIN_COMPILER_IMAGE_OVERRIDE=" ".env" | cut -d'=' -f2)
+    log_message "  Using override value for plugin image tag: $value"
+  fi
+
+  log_message "Building Go Plugin $go_plugin_path using tag $plugin_compiler_image_tag"
   # only build the plugin if the currently built version is different to the Gateway version or the plugin shared object file does not exist
-  if [ "$go_plugin_build_version" != "$gateway_image_tag" ] || [ ! -f $go_plugin_path ]; then
+  if [ "$go_plugin_build_version" != "$plugin_compiler_image_tag" ] || [ ! -f $go_plugin_path ]; then
     # default Go build targets
     goarch="amd64"
     goos="linux"
@@ -304,20 +311,20 @@ build_go_plugin () {
       goarch=$platform
     fi
     log_message "  Target Go Platform: $goos/$goarch"
-    docker run --rm -v $go_plugin_directory:/plugin-source -e GOOS=$goos -e GOARCH=$goarch --platform linux/amd64 tykio/tyk-plugin-compiler:$gateway_image_tag $go_plugin_filename
+    docker run --rm -v $go_plugin_directory:/plugin-source -e GOOS=$goos -e GOARCH=$goarch --platform linux/amd64 tykio/tyk-plugin-compiler:$plugin_compiler_image_tag $go_plugin_filename
     plugin_container_exit_code="$?"
     if [[ "$plugin_container_exit_code" -ne "0" ]]; then
       log_message "  ERROR: Tyk Plugin Compiler container returned error code: $plugin_container_exit_code"
       exit 1
     fi
-    echo $gateway_image_tag > $go_plugin_build_version_filename
+    echo $plugin_compiler_image_tag > $go_plugin_build_version_filename
     # the .so file created by the plugin build container includes the target release version and architecture e.g. example-go-plugin_v4.1.0_linux_amd64.so
     # we need to remove these so that the file name matches what's in the API definition e.g. example-go-plugin.so
     rm $go_plugin_directory/$go_plugin_filename
     mv $go_plugin_directory/*.so $go_plugin_directory/$go_plugin_filename
     log_ok
   else
-    log_message "  $go_plugin_filename has already built for $gateway_image_tag, skipping"
+    log_message "  $go_plugin_filename has already built for $plugin_compiler_image_tag, skipping"
     # note: if you want to force a recompile of the plugin .so file, delete the .bootstrap/go-plugin-build-version-<go_plugin_filename> file, or run the docker command manually
   fi
 }
