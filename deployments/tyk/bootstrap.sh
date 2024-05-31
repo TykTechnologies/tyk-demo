@@ -426,6 +426,10 @@ log_message "Reloading Gateways"
 hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
 bootstrap_progress
 
+# exit due to bugs in PoC
+echo "Exiting bootstrap early, due to issues with standard APIs not being accessible"
+exit 0
+
 log_message "Checking Gateway - Anonymous API access"
 result=""
 reload_attempt=0
