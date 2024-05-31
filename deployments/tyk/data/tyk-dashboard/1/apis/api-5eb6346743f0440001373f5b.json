@@ -439,7 +439,8 @@
         "request_headers": {},
         "use_response_extensions": {
           "on_error_forwarding": false
-        }
+        },
+        "request_headers_rewrite": {}
       },
       "subgraph": {
         "sdl": ""

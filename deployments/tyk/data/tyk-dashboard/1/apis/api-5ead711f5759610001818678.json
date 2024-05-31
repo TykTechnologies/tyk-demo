@@ -303,12 +303,13 @@
               "api_model": {},
               "event_timeout": 60,
               "header_map": {},
-              "id": "661cf7f2bf12140001bc2352",
+              "id": "66599f26cf8bf50001c2852e",
               "method": "POST",
               "name": "Webhook Receiver Post",
               "org_id": "5e9d9544a1dcd60001d0ed20",
               "target_path": "http://localhost:8080/webhook-receiver/post",
-              "template_path": ""
+              "template_path": "",
+              "webhook_id": "8870a92fb9f54f36b33347bf86e0b891"
             }
           }
         ]
@@ -367,7 +368,8 @@
         "request_headers": {},
         "use_response_extensions": {
           "on_error_forwarding": false
-        }
+        },
+        "request_headers_rewrite": {}
       },
       "subgraph": {
         "sdl": ""
@@ -392,7 +394,8 @@
       "event_timeout": 60,
       "hook": {
         "api_model": {},
-        "id": "661cf7f2bf12140001bc2352",
+        "id": "66599f26cf8bf50001c2852e",
+        "webhook_id": "",
         "org_id": "5e9d9544a1dcd60001d0ed20",
         "name": "Webhook Receiver Post",
         "method": "POST",
