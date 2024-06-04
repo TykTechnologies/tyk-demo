@@ -303,13 +303,13 @@
               "api_model": {},
               "event_timeout": 60,
               "header_map": {},
-              "id": "66599f26cf8bf50001c2852e",
+              "id": "665edf7b6fe5ee00019a40da",
               "method": "POST",
               "name": "Webhook Receiver Post",
               "org_id": "5e9d9544a1dcd60001d0ed20",
               "target_path": "http://localhost:8080/webhook-receiver/post",
               "template_path": "",
-              "webhook_id": "8870a92fb9f54f36b33347bf86e0b891"
+              "webhook_id": "8c057e6c754d4212a75c08f8cf1d95a3"
             }
           }
         ]
@@ -394,7 +394,7 @@
       "event_timeout": 60,
       "hook": {
         "api_model": {},
-        "id": "66599f26cf8bf50001c2852e",
+        "id": "665edf7b6fe5ee00019a40da",
         "webhook_id": "",
         "org_id": "5e9d9544a1dcd60001d0ed20",
         "name": "Webhook Receiver Post",
