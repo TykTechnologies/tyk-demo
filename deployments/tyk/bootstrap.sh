@@ -92,15 +92,15 @@ bootstrap_progress
 
 log_message "Copying private key to the Dashboard"
 cert_check=""
-begin_cert="-----BEGIN PRIVATE KEY-----"
-while [ "$cert_check" != "$begin_cert" ]; do
+private_key_text="PRIVATE KEY"
+while [[ $cert_check != *"$private_key_text"* ]]; do
   docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs >>logs/bootstrap.log
   if [ "$?" != "0" ]; then
     echo "ERROR: Could not copy private key"
     exit 1
   fi
   cert_check=$(head -n 1 deployments/tyk/volumes/tyk-dashboard/certs/private-key.pem)
-  if [ "$cert_check" != "$begin_cert" ]; then
+  if [ "$cert_check" != *"$private_key_text"* ]; then
     log_message "  Could not find private key data, retrying copy"
     bootstrap_progress
     sleep 1

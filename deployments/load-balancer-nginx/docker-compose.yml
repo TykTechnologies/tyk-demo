@@ -1,0 +1,68 @@
+---
+services:
+  tyk-gateway-3:
+    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.3.0}
+    networks:
+      - tyk
+    environment:
+      - TYK_LOGLEVEL=${GATEWAY_LOGLEVEL:-info}
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
+      - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-false}
+      - TYK_GW_HTTPSERVEROPTIONS_ENABLEHTTP2=true
+      - TYK_GW_PROXYENABLEHTTP2=true
+      - TYK_GW_HTTPSERVEROPTIONS_FLUSHINTERVAL=1
+      - TYK_GW_ANALYTICSCONFIG_ENABLEGEOIP=true
+      - TYK_GW_ANALYTICSCONFIG_GEOIPDBLOCATION=/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
+      - TYK_GW_OPENTELEMETRY_ENABLED=${OPENTELEMETRY_ENABLED:-false}
+      - TYK_GW_OPENTELEMETRY_ENDPOINT=${OPENTELEMETRY_ENDPOINT:-false}
+    env_file:
+      - .env
+    volumes:
+      - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
+      - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
+      - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+      - ./deployments/tyk/volumes/tyk-gateway/plugins:/opt/tyk-gateway/plugins
+      - ./deployments/tyk/volumes/tyk-gateway/templates/error_401.json:/opt/tyk-gateway/templates/error_401.json
+      - ./deployments/tyk/volumes/databases/GeoLite2-Country.mmdb:/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
+    depends_on:
+      - tyk-redis
+      - tyk-dashboard
+  tyk-gateway-4:
+    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.3.0}
+    networks:
+      - tyk
+    environment:
+      - TYK_LOGLEVEL=${GATEWAY_LOGLEVEL:-info}
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
+      - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-false}
+      - TYK_GW_HTTPSERVEROPTIONS_ENABLEHTTP2=true
+      - TYK_GW_PROXYENABLEHTTP2=true
+      - TYK_GW_HTTPSERVEROPTIONS_FLUSHINTERVAL=1
+      - TYK_GW_ANALYTICSCONFIG_ENABLEGEOIP=true
+      - TYK_GW_ANALYTICSCONFIG_GEOIPDBLOCATION=/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
+      - TYK_GW_OPENTELEMETRY_ENABLED=${OPENTELEMETRY_ENABLED:-false}
+      - TYK_GW_OPENTELEMETRY_ENDPOINT=${OPENTELEMETRY_ENDPOINT:-false}
+    env_file:
+      - .env
+    volumes:
+      - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
+      - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
+      - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
+      - ./deployments/tyk/volumes/tyk-gateway/plugins:/opt/tyk-gateway/plugins
+      - ./deployments/tyk/volumes/tyk-gateway/templates/error_401.json:/opt/tyk-gateway/templates/error_401.json
+      - ./deployments/tyk/volumes/databases/GeoLite2-Country.mmdb:/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
+    depends_on:
+      - tyk-redis
+      - tyk-dashboard
+  nginx:
+    image: nginx:1.26.0-perl
+    ports:
+      - 8091:80
+    networks:
+      - tyk
+    volumes:
+      - ./deployments/load-balancer-nginx/volumes/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - tyk-gateway
+      - tyk-gateway-3
+      - tyk-gateway-4

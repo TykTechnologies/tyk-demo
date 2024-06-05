@@ -575,6 +575,14 @@ create_portal_catalogue () {
     -d "$updated_catalogue" 2>> logs/bootstrap.log)"
 }
 
+read_api () {
+  local api_key="$1"
+  local api_id="$2"
+  api_response="$(curl $dashboard_base_url/api/apis/$api_id -s \
+    -H "authorization: $api_key" 2>> logs/bootstrap.log)"
+  echo "$api_response"
+}
+
 create_api () {
   local api_data_path="$1"
   local admin_api_key="$2"
@@ -763,6 +771,49 @@ create_bearer_token () {
     log_message "    Hash: $(jq -r '.key_hash' <<< "$api_response")"
   else
     log_message "ERROR: Could not create bearer token. API response returned $api_response."
+    exit 1
+  fi
+}
+
+delete_bearer_token_dash () {
+  local key_name="$1"
+  local api_id="$2"
+  local api_key="$3"
+
+  log_message "  Deleting Bearer Token: $key_name"
+
+  api_response=$(curl $dashboard_base_url/api/apis/$api_id/keys/$key_name -s \
+    -X DELETE \
+    -H "Authorization: $api_key" 2>> logs/bootstrap.log)
+
+  response_status="$(jq -r '.Status' <<< "$api_response")"
+
+  # custom validation
+  if [[ "$response_status" == "OK" ]]; then
+    log_ok
+  else
+    log_message "ERROR: Could not delete bearer token. API response returned $api_response."
+    exit 1
+  fi
+}
+
+delete_bearer_token() {
+  local key_name="$1"
+  local api_key="$2"
+
+  log_message "  Deleting Bearer Token: $key_name"
+
+  api_response=$(curl $gateway_base_url/tyk/keys/$key_name -s \
+    -X DELETE \
+    -H "x-tyk-authorization: $api_key" 2>> logs/bootstrap.log)
+
+  response_status="$(jq -r '.status' <<< "$api_response")"
+
+  # custom validation
+  if [[ "$response_status" == "ok" ]]; then
+    log_ok
+  else
+    log_message "ERROR: Could not delete bearer token. API response returned $api_response."
     exit 1
   fi
 }
