@@ -2,11 +2,11 @@
 
 This deployment is an example of a load balanced deployment, using a load balancer and gateway cluster. 
 
-The load balancer (Nginx) uses round robin load balancing to spread requests across three gateways. A separate load balancer is used, as this would be the typical real-life scenario, where Tyk gateways are deployed behind a third-party balancer.
+The load balancer (Nginx) uses round robin load balancing to spread requests across three gateways. Tyk could load balance itself, but this isn't a typical real-life approach, so Nginx was chosen instead.
 
 ## Setup
 
-Run the `up.sh` script with the `load-balancer` parameter:
+Run the `up.sh` script with the `load-balancer-nginx` parameter:
 
 ```
 ./up.sh load-balancer
