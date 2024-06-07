@@ -145,7 +145,7 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "66599f31cf8bf50001c28530",
+      "dbId": "665edf7e6fe5ee00019a40dd",
       "id": "b84fe1a04e5648927971c0557971565c",
       "name": "OAS HTTPbin",
       "orgId": "5e9d9544a1dcd60001d0ed20",

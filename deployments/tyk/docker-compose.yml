@@ -109,12 +109,14 @@ services:
       - tyk
   httpbin:
     image: kennethreitz/httpbin:latest
+    platform: linux/amd64
     networks:
       tyk:
         aliases:
           - httpbin2
   swagger-petstore:
     image: swaggerapi/petstore:1.0.5
+    platform: linux/amd64
     networks:
       - tyk
     environment:
