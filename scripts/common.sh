@@ -284,23 +284,33 @@ _decode_base64_url () {
 decode_jwt () { _decode_base64_url $(echo -n $1 | cut -d "." -f ${2:-2}) | jq .; }
 
 build_go_plugin () {
-  plugin_compiler_image_tag=$(get_service_image_tag "tyk-gateway")
+  gateway_image_tag=$(get_service_image_tag "tyk-gateway")
   go_plugin_filename=$1
   # each plugin must be in its own directory
   go_plugin_directory="$PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/$2"
-  go_plugin_build_version_filename=".bootstrap/go-plugin-build-version-$go_plugin_filename"
-  go_plugin_build_version=$(cat $go_plugin_build_version_filename)
   go_plugin_path="$go_plugin_directory/$go_plugin_filename"
+  go_plugin_cache_directory="$PWD/.bootstrap/plugin-cache"
+  go_plugin_cache_version_directory="$go_plugin_cache_directory/$gateway_image_tag"
+  go_plugin_cache_file_path="$go_plugin_cache_version_directory/$go_plugin_filename"
 
   # use image override value, if it exists
   if grep -q "^PLUGIN_COMPILER_IMAGE_OVERRIDE=" ".env"; then
-    plugin_compiler_image_tag=$(grep "^PLUGIN_COMPILER_IMAGE_OVERRIDE=" ".env" | cut -d'=' -f2)
-    log_message "  Using override value for plugin image tag: $value"
+    gateway_image_tag=$(grep "^PLUGIN_COMPILER_IMAGE_OVERRIDE=" ".env" | cut -d'=' -f2)
+    log_message "Using override value for plugin image tag: $gateway_image_tag"
   fi
 
-  log_message "Building Go Plugin $go_plugin_path using tag $plugin_compiler_image_tag"
-  # only build the plugin if the currently built version is different to the Gateway version or the plugin shared object file does not exist
-  if [ "$go_plugin_build_version" != "$plugin_compiler_image_tag" ] || [ ! -f $go_plugin_path ]; then
+  # create cache directories if missing
+  if [ ! -d "$go_plugin_cache_directory" ]; then
+    mkdir $go_plugin_cache_directory
+  fi
+  if [ ! -d "$go_plugin_cache_version_directory" ]; then
+    mkdir $go_plugin_cache_version_directory
+  fi
+
+  log_message "Checking for Go plugin $go_plugin_filename $gateway_image_tag in cache"
+  # build plugin if it does not exist in the cache
+  if [ ! -f $go_plugin_cache_file_path ]; then
+    log_message "  Not found. Building Go plugin $go_plugin_path using tag $gateway_image_tag"
     # default Go build targets
     goarch="amd64"
     goos="linux"
@@ -311,23 +321,37 @@ build_go_plugin () {
       goarch=$platform
     fi
     log_message "  Target Go Platform: $goos/$goarch"
-    docker run --rm -v $go_plugin_directory:/plugin-source -e GOOS=$goos -e GOARCH=$goarch --platform linux/amd64 tykio/tyk-plugin-compiler:$plugin_compiler_image_tag $go_plugin_filename
+    docker run --rm -v $go_plugin_directory:/plugin-source -e GOOS=$goos -e GOARCH=$goarch --platform linux/amd64 tykio/tyk-plugin-compiler:$gateway_image_tag $go_plugin_filename
     plugin_container_exit_code="$?"
     if [[ "$plugin_container_exit_code" -ne "0" ]]; then
       log_message "  ERROR: Tyk Plugin Compiler container returned error code: $plugin_container_exit_code"
       log_message "    Tip: The Plugin Compiler image can be overridden by using \"PLUGIN_COMPILER_IMAGE_OVERRIDE\" in the .env file e.g. PLUGIN_COMPILER_IMAGE_OVERRIDE=v5.4.0"
       exit 1
     fi
-    echo $plugin_compiler_image_tag > $go_plugin_build_version_filename
     # the .so file created by the plugin build container includes the target release version and architecture e.g. example-go-plugin_v4.1.0_linux_amd64.so
     # we need to remove these so that the file name matches what's in the API definition e.g. example-go-plugin.so
     rm $go_plugin_directory/$go_plugin_filename
     mv $go_plugin_directory/*.so $go_plugin_directory/$go_plugin_filename
-    log_ok
+    # copy to cache, to enable built plugins to be reused across bootstraps
+    cp $go_plugin_directory/*.so $go_plugin_cache_version_directory
+
+    # limit the number of plugin caches to prevent uncontrolled growth
+    PLUGIN_CACHE_MAX_SIZE=3
+    plugin_cache_count=$(find "$go_plugin_cache_directory" -maxdepth 1 -type d -not -path "$go_plugin_cache_directory" | wc -l)
+    if [ "$plugin_cache_count" -gt "$PLUGIN_CACHE_MAX_SIZE" ]; then
+      oldest_plugin_cache_path=$(find "$go_plugin_cache_directory" -type d -not -path "$go_plugin_cache_directory" -exec ls -ld -ltr {} + | head -n 1 | awk '{print $9}')
+      if [ -n "$oldest_plugin_cache_path" ]; then
+        log_message "  Pruning oldest plugin cache $oldest_plugin_cache_path"
+        rm "$oldest_plugin_cache_path/*.so"
+        rm -r "$oldest_plugin_cache_path"
+      fi
+    fi
   else
-    log_message "  $go_plugin_filename has already built for $plugin_compiler_image_tag, skipping"
-    # note: if you want to force a recompile of the plugin .so file, delete the .bootstrap/go-plugin-build-version-<go_plugin_filename> file, or run the docker command manually
+    log_message "  Found. Copying Go plugin $go_plugin_filename $gateway_image_tag from cache"
+    cp $go_plugin_cache_file_path $go_plugin_directory/$go_plugin_filename
+    # note: if you want to force a recompile of the plugin .so file, delete the .so file from the applicable .bootstrap/plugin-cache directory
   fi
+  log_ok
 }
 
 create_organisation () {
@@ -583,6 +607,14 @@ create_portal_catalogue () {
     -d "$updated_catalogue" 2>> logs/bootstrap.log)"
 }
 
+read_api () {
+  local api_key="$1"
+  local api_id="$2"
+  api_response="$(curl $dashboard_base_url/api/apis/$api_id -s \
+    -H "authorization: $api_key" 2>> logs/bootstrap.log)"
+  echo "$api_response"
+}
+
 create_api () {
   local api_data_path="$1"
   local admin_api_key="$2"
@@ -771,6 +803,49 @@ create_bearer_token () {
     log_message "    Hash: $(jq -r '.key_hash' <<< "$api_response")"
   else
     log_message "ERROR: Could not create bearer token. API response returned $api_response."
+    exit 1
+  fi
+}
+
+delete_bearer_token_dash () {
+  local key_name="$1"
+  local api_id="$2"
+  local api_key="$3"
+
+  log_message "  Deleting Bearer Token: $key_name"
+
+  api_response=$(curl $dashboard_base_url/api/apis/$api_id/keys/$key_name -s \
+    -X DELETE \
+    -H "Authorization: $api_key" 2>> logs/bootstrap.log)
+
+  response_status="$(jq -r '.Status' <<< "$api_response")"
+
+  # custom validation
+  if [[ "$response_status" == "OK" ]]; then
+    log_ok
+  else
+    log_message "ERROR: Could not delete bearer token. API response returned $api_response."
+    exit 1
+  fi
+}
+
+delete_bearer_token() {
+  local key_name="$1"
+  local api_key="$2"
+
+  log_message "  Deleting Bearer Token: $key_name"
+
+  api_response=$(curl $gateway_base_url/tyk/keys/$key_name -s \
+    -X DELETE \
+    -H "x-tyk-authorization: $api_key" 2>> logs/bootstrap.log)
+
+  response_status="$(jq -r '.status' <<< "$api_response")"
+
+  # custom validation
+  if [[ "$response_status" == "ok" ]]; then
+    log_ok
+  else
+    log_message "ERROR: Could not delete bearer token. API response returned $api_response."
     exit 1
   fi
 }
