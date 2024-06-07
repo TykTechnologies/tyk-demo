@@ -332,7 +332,7 @@ build_go_plugin () {
     PLUGIN_CACHE_MAX_SIZE=3
     plugin_cache_count=$(find "$go_plugin_cache_directory" -maxdepth 1 -type d -not -path "$go_plugin_cache_directory" | wc -l)
     if [ "$plugin_cache_count" -gt "$PLUGIN_CACHE_MAX_SIZE" ]; then
-      oldest_plugin_cache_path=$(find "$go_plugin_cache_directory" -type d -exec ls -ld {} + | sort -k6,7 | head -n 1 | awk '{print $9}')
+      oldest_plugin_cache_path=$(find "$go_plugin_cache_directory" -type d -not -path "$go_plugin_cache_directory" -exec ls -ld {} + | sort -k6,7 | head -n 1 | awk '{print $9}')
       if [ -n "$oldest_plugin_cache_path" ]; then
         log_message "  Pruning oldest plugin cache $oldest_plugin_cache_path"
         rm "$oldest_plugin_cache_path/*.so"
