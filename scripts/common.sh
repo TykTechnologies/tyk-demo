@@ -293,7 +293,7 @@ build_go_plugin () {
   go_plugin_cache_version_directory="$go_plugin_cache_directory/$gateway_image_tag"
   go_plugin_cache_file_path="$go_plugin_cache_version_directory/$go_plugin_filename"
 
-  # create directories if missing
+  # create cache directories if missing
   if [ ! -d "$go_plugin_cache_directory" ]; then
     mkdir $go_plugin_cache_directory
   fi
@@ -301,9 +301,10 @@ build_go_plugin () {
     mkdir $go_plugin_cache_version_directory
   fi
 
-  log_message "Building Go Plugin $go_plugin_path using tag $gateway_image_tag"
+  log_message "Checking for Go plugin $go_plugin_filename $gateway_image_tag in cache"
   # build plugin if it does not exist in the cache
   if [ ! -f $go_plugin_cache_file_path ]; then
+    log_message "  Not found. Building Go plugin $go_plugin_path using tag $gateway_image_tag"
     # default Go build targets
     goarch="amd64"
     goos="linux"
@@ -338,12 +339,12 @@ build_go_plugin () {
         rm -r "$oldest_plugin_cache_path"
       fi
     fi
-    log_ok
   else
-    log_message "  Copying $go_plugin_filename $gateway_image_tag plugin from cache"
+    log_message "  Found. Copying Go plugin $go_plugin_filename $gateway_image_tag from cache"
     cp $go_plugin_cache_file_path $go_plugin_directory/$go_plugin_filename
     # note: if you want to force a recompile of the plugin .so file, delete the .so file from the applicable .bootstrap/plugin-cache directory
   fi
+  log_ok
 }
 
 create_organisation () {
