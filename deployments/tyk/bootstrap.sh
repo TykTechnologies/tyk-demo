@@ -428,6 +428,7 @@ bootstrap_progress
 
 # exit due to bugs in PoC
 echo "Exiting bootstrap early, due to issues with standard APIs not being accessible"
+echo "This is a temporary workaround during PoC - other data is still imported, so you can log in to the dashboard as usual etc"
 exit 0
 
 log_message "Checking Gateway - Anonymous API access"
