@@ -158,6 +158,9 @@
         "cache": {
           "enabled": true,
           "timeout": 60
+        },
+        "contextVariables": {
+          "enabled": true
         }
       },
       "operations": {
