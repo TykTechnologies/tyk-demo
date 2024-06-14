@@ -40,12 +40,6 @@ done < .bootstrap/bootstrapped_deployments
 
 echo "All containers were stopped and removed"
 
-# delete bundle assets to prevent them being reused on next startup:
-# 1. remove all zip files from bundle server 
-rm deployments/tyk/volumes/http-server/*.zip 2> /dev/null
-# 2. clear bundle cache from gateway
-rm -rf deployments/tyk/volumes/tyk-gateway/middleware/bundles 2> /dev/null
-
 # clear the bootstraped deployments
 echo -n > .bootstrap/bootstrapped_deployments
 

@@ -124,14 +124,6 @@ services:
     image: svenwal/jsonplaceholder:1.1
     networks:
       - tyk
-  http-server:
-    image: httpd:2.4.46-alpine
-    networks:
-      - tyk
-    volumes:
-      - ./deployments/tyk/volumes/http-server:/usr/local/apache2/htdocs
-    ports:
-      - "8888:80"
   echo-server:
     image: jmalloc/echo-server:0.3.1
     networks:
