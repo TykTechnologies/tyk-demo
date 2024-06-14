@@ -39,9 +39,6 @@ mkdir -p .bootstrap 1> /dev/null
 # make the logs directory
 mkdir -p logs 1> /dev/null
 
-# check if docker compose version is v1.x
-check_docker_compose_version
-
 # ensure Docker environment variables are correctly set before creating containers
 # these allow for specialised deployments to be easily used, without having to manually set the environment variables
 # this approach aims to avoid misconfiguration and issues related to that
@@ -145,8 +142,11 @@ if [ "$persist_log" = false ]; then
   # test.log file is not cleared, as it is responsibilty of the test scripts
 fi
 
+# log docker compose version
+log_message "$(docker compose version)"
+
 # bring the containers up
-command_docker_compose="$(generate_docker_compose_command) up --remove-orphans -d"
+command_docker_compose="$(generate_docker_compose_command) up --quiet-pull --remove-orphans -d"
 echo "Running docker compose command: $command_docker_compose"
 eval $command_docker_compose
 if [ "$?" != 0 ]; then
