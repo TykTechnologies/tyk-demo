@@ -102,56 +102,6 @@
 							"response": []
 						},
 						{
-							"name": "Middleware - Python",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"// #### Python tests temporarily removed due to Python not being bundled with v5.3 gateway release. ",
-											"// #### This will be reinstated once there is an established process.",
-											"",
-											"// pm.test(\"Status code is 200\", function () {",
-											"//     pm.response.to.have.status(200);",
-											"// });",
-											"",
-											"// pm.test(\"Python middleware pre hook header is present\", function () {",
-											"//     var jsonData = pm.response.json();",
-											"//     pm.expect(jsonData.headers[\"Python-Plugin-Pre-Hook\"]).to.eql(\"Pre Hook\");",
-											"// });",
-											"",
-											"// pm.test(\"Python middleware post hook header is present\", function () {",
-											"//     var jsonData = pm.response.json();",
-											"//     pm.expect(jsonData.headers[\"Python-Plugin-Post-Hook\"]).to.eql(\"Post Hook\");",
-											"// });",
-											"",
-											"// pm.test(\"Python middleware response hook header is present\", function () {",
-											"//     pm.response.to.have.header(\"Python-Plugin-Response-Hook\");",
-											"// });"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://{{tyk-gateway.host}}/python-middleware-api/get",
-									"protocol": "http",
-									"host": [
-										"{{tyk-gateway.host}}"
-									],
-									"path": [
-										"python-middleware-api",
-										"get"
-									]
-								},
-								"description": "This request calls the Python Middleware API, which uses Python to inject a custom header into the request as it is processed by the Gateway.\n\nThis middleware is configured to be activated at the `pre`, `post` and `response` hooks.\n\nThe request goes the `/get` endpoint. The server adds the headers it received into the response body - the custom headers are shown as `\"Python-Plugin-Pre-Hook\": \"Pre Hook\"` and `\"Python-Plugin-Post-Hook\": \"Post Hook\"`.\n\nThe plugin response hook adds a custom header to the response, called `Python-Plugin-Response-Hook`. It also logs the response status code to the Gateway application log. Check the Gateway's application log for entries prefixed with `Python plugin:`.\n\nThe plugin is bundled using the Gateway CLI, which outputs a signed compressed archive. This signature is then verified by the Gateway when it loads the Python plugin."
-							},
-							"response": []
-						},
-						{
 							"name": "Middleware - Go",
 							"event": [
 								{
