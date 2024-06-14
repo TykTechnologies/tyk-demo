@@ -288,12 +288,23 @@ build_go_plugin () {
   go_plugin_filename=$1
   # each plugin must be in its own directory
   go_plugin_directory="$PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/$2"
-  go_plugin_build_version_filename=".bootstrap/go-plugin-build-version-$go_plugin_filename"
-  go_plugin_build_version=$(cat $go_plugin_build_version_filename)
   go_plugin_path="$go_plugin_directory/$go_plugin_filename"
-  log_message "Building Go Plugin $go_plugin_path using tag $gateway_image_tag"
-  # only build the plugin if the currently built version is different to the Gateway version or the plugin shared object file does not exist
-  if [ "$go_plugin_build_version" != "$gateway_image_tag" ] || [ ! -f $go_plugin_path ]; then
+  go_plugin_cache_directory="$PWD/.bootstrap/plugin-cache"
+  go_plugin_cache_version_directory="$go_plugin_cache_directory/$gateway_image_tag"
+  go_plugin_cache_file_path="$go_plugin_cache_version_directory/$go_plugin_filename"
+
+  # create cache directories if missing
+  if [ ! -d "$go_plugin_cache_directory" ]; then
+    mkdir $go_plugin_cache_directory
+  fi
+  if [ ! -d "$go_plugin_cache_version_directory" ]; then
+    mkdir $go_plugin_cache_version_directory
+  fi
+
+  log_message "Checking for Go plugin $go_plugin_filename $gateway_image_tag in cache"
+  # build plugin if it does not exist in the cache
+  if [ ! -f $go_plugin_cache_file_path ]; then
+    log_message "  Not found. Building Go plugin $go_plugin_path using tag $gateway_image_tag"
     # default Go build targets
     goarch="amd64"
     goos="linux"
@@ -310,16 +321,30 @@ build_go_plugin () {
       log_message "  ERROR: Tyk Plugin Compiler container returned error code: $plugin_container_exit_code"
       exit 1
     fi
-    echo $gateway_image_tag > $go_plugin_build_version_filename
     # the .so file created by the plugin build container includes the target release version and architecture e.g. example-go-plugin_v4.1.0_linux_amd64.so
     # we need to remove these so that the file name matches what's in the API definition e.g. example-go-plugin.so
     rm $go_plugin_directory/$go_plugin_filename
     mv $go_plugin_directory/*.so $go_plugin_directory/$go_plugin_filename
-    log_ok
+    # copy to cache, to enable built plugins to be reused across bootstraps
+    cp $go_plugin_directory/*.so $go_plugin_cache_version_directory
+
+    # limit the number of plugin caches to prevent uncontrolled growth
+    PLUGIN_CACHE_MAX_SIZE=3
+    plugin_cache_count=$(find "$go_plugin_cache_directory" -maxdepth 1 -type d -not -path "$go_plugin_cache_directory" | wc -l)
+    if [ "$plugin_cache_count" -gt "$PLUGIN_CACHE_MAX_SIZE" ]; then
+      oldest_plugin_cache_path=$(find "$go_plugin_cache_directory" -type d -not -path "$go_plugin_cache_directory" -exec ls -ld -ltr {} + | head -n 1 | awk '{print $9}')
+      if [ -n "$oldest_plugin_cache_path" ]; then
+        log_message "  Pruning oldest plugin cache $oldest_plugin_cache_path"
+        rm "$oldest_plugin_cache_path/*.so"
+        rm -r "$oldest_plugin_cache_path"
+      fi
+    fi
   else
-    log_message "  $go_plugin_filename has already built for $gateway_image_tag, skipping"
-    # note: if you want to force a recompile of the plugin .so file, delete the .bootstrap/go-plugin-build-version-<go_plugin_filename> file, or run the docker command manually
+    log_message "  Found. Copying Go plugin $go_plugin_filename $gateway_image_tag from cache"
+    cp $go_plugin_cache_file_path $go_plugin_directory/$go_plugin_filename
+    # note: if you want to force a recompile of the plugin .so file, delete the .so file from the applicable .bootstrap/plugin-cache directory
   fi
+  log_ok
 }
 
 create_organisation () {
