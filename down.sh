@@ -4,9 +4,6 @@ source scripts/common.sh
 
 echo "Bringing Tyk Demo deployment DOWN"
 
-# check if docker compose version is v1.x
-check_docker_compose_version
-
 # check if deployments exist
 if [[ -s .bootstrap/bootstrapped_deployments ]]; then
   # display deployments to be removed
