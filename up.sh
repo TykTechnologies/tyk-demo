@@ -142,6 +142,9 @@ if [ "$persist_log" = false ]; then
   # test.log file is not cleared, as it is responsibilty of the test scripts
 fi
 
+# log docker compose version
+log_message "$(docker compose version)"
+
 # bring the containers up
 command_docker_compose="$(generate_docker_compose_command) up --quiet-pull --remove-orphans -d"
 echo "Running docker compose command: $command_docker_compose"
