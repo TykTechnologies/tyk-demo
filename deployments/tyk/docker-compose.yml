@@ -91,7 +91,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-redis:
-    image: redis:6.0.4
+    image: redis:7.2.0
     ports:
       - "6379:6379"
     volumes:
@@ -99,8 +99,7 @@ services:
     networks:
       - tyk
   tyk-mongo:
-    image: mongo:4.0
-    command: [ "mongod", "--smallfiles" ]
+    image: mongo:7.0.9
     ports:
       - "27017:27017"
     volumes:

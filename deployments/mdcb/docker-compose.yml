@@ -36,7 +36,7 @@ services:
       - tyk-mdcb
       - tyk-dashboard
   tyk-worker-redis:
-    image: redis:6.0.4
+    image: redis:7.2.0
     volumes:
       - tyk-worker-redis-data:/data
     ports:
