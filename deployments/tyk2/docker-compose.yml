@@ -56,7 +56,7 @@ services:
       - tyk
   tyk2-redis:
     image: redis:7.2.0
-      volumes:
+    volumes:
       - tyk2-redis-data:/data
     networks:
       - tyk
