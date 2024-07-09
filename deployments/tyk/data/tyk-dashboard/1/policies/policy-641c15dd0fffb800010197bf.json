@@ -25,7 +25,8 @@
         "quota_renews": 0,
         "quota_remaining": 0,
         "quota_renewal_rate": -1,
-        "set_by_policy": false
+        "set_by_policy": false,
+        "smoothing": null
       },
       "field_access_rights": [],
       "allowance_scope": ""
@@ -64,7 +65,8 @@
         "quota_renews": 0,
         "quota_remaining": 0,
         "quota_renewal_rate": -1,
-        "set_by_policy": false
+        "set_by_policy": false,
+        "smoothing": null
       },
       "field_access_rights": [],
       "allowance_scope": ""
@@ -103,7 +105,8 @@
         "quota_renews": 0,
         "quota_remaining": 0,
         "quota_renewal_rate": -1,
-        "set_by_policy": false
+        "set_by_policy": false,
+        "smoothing": null
       },
       "field_access_rights": [],
       "allowance_scope": ""
@@ -142,7 +145,8 @@
         "quota_renews": 0,
         "quota_remaining": 0,
         "quota_renewal_rate": -1,
-        "set_by_policy": false
+        "set_by_policy": false,
+        "smoothing": null
       },
       "field_access_rights": [],
       "allowance_scope": ""
@@ -162,5 +166,6 @@
     "per_api": true
   },
   "last_updated": "1679562215",
-  "meta_data": {}
+  "meta_data": {},
+  "smoothing": null
 }
