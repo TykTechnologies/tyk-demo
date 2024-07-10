@@ -186,25 +186,6 @@ fi
 log_ok
 bootstrap_progress
 
-# log_message "Copying key pair to Gateway container"
-# cert_check=""
-# private_key_text="PRIVATE KEY"
-# while [[ $cert_check != *"$private_key_text"* ]]; do
-#   docker cp $OPENSSL_CONTAINER_NAME:/tmp/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs >>logs/bootstrap.log
-#   if [ "$?" != "0" ]; then
-#     echo "ERROR: Could not copy private key"
-#     exit 1
-#   fi
-#    cert_check=$(head -n 1 deployments/tyk/volumes/tyk-dashboard/certs/private-key.pem)
-#   if [ "$cert_check" != *"$private_key_text"* ]; then
-#     log_message "  Could not find private key data, retrying copy"
-#     bootstrap_progress
-#     sleep 1
-#   fi
-# done
-# log_ok
-# bootstrap_progress
-
 log_message "Removing temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
 docker rm -f $OPENSSL_CONTAINER_NAME
 if [ "$?" != "0" ]; then
