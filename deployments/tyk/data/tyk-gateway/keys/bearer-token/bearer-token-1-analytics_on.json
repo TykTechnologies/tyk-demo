@@ -21,5 +21,6 @@
 		}
     },
     "enable_detailed_recording": true,
-	"org_id": "5e9d9544a1dcd60001d0ed20"
+	"org_id": "5e9d9544a1dcd60001d0ed20",
+	"alias": "analytics on"
 }
