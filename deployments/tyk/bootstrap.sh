@@ -67,7 +67,7 @@ fi
 bootstrap_progress
 
 log_message "Creating temporary container $OPENSSL_CONTAINER_NAME for OpenSSL usage"
-docker run -d --name $OPENSSL_CONTAINER_NAME alpine:3.20.1 tail -f /dev/null > /dev/null
+docker run -d --name $OPENSSL_CONTAINER_NAME alpine:3.20.1 tail -f /dev/null > /dev/null 2>&1
 log_ok
 bootstrap_progress
 
