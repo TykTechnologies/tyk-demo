@@ -289,6 +289,15 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
       fi
     done
 
+    # Certificates
+    log_message "Creating Certificates"
+    for file in $data_group_path/certs/*; do
+      if [[ -f $file ]]; then
+        create_cert "$file" "$dashboard_user_api_key"
+        bootstrap_progress
+      fi
+    done
+
     # APIs
     log_message "Creating APIs"
     for file in $data_group_path/apis/*; do

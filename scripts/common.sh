@@ -362,6 +362,24 @@ create_organisation () {
   log_message "    Portal Hostname: $portal_hostname"
 }
 
+create_cert () {
+  local cert_data_path="$1"
+  local api_key="$2"
+  local cert_name=$(echo $(basename "$cert_data_path") | cut -d'-' -f3 | cut -d'.' -f1)
+  check_variables
+
+  # create cert in Tyk Dashboard database
+  log_message "  Creating Cert: $cert_name"
+  local api_response=$(curl $dashboard_base_url/api/certs -s \
+    -H "Authorization: $api_key" \
+    -d @$cert_data_path 2>> logs/bootstrap.log)
+
+  ## TODO - save fingerprint etc into context data so that it can be referenced by api def?
+
+  # validate result
+  log_json_result "$api_response"
+}
+
 create_dashboard_user () {
   local dashboard_user_data_path="$1"
   local api_key="$2"
