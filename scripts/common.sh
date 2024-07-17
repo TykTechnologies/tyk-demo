@@ -375,7 +375,7 @@ create_cert () {
     -H "Authorization: $api_key" \
     -F "cert=@$cert_data_path;type=application/x-x509-ca-cert" 2>> logs/bootstrap.log)
 
-  ## TODO - save fingerprint etc into context data so that it can be referenced by api def?
+  # Note that cert ids are a combination of the org id and the cert fingerprint, making them predicatable and able to be referenced from other objects
 
   # validate result
   log_json_result "$api_response"
