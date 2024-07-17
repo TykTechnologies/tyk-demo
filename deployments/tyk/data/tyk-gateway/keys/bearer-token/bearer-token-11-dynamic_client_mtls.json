@@ -26,11 +26,6 @@
         }
     },
     "org_id": "5e9d9544a1dcd60001d0ed20",
-    "certificate_meta": {
-        "id": "5e9d9544a1dcd60001d0ed20cd08a75f5441c397a586ded7f45cea266fb684eb82e49691362e286f90b7313f",
-        "issuer": "{\"Country\":null,\"Organization\":null,\"OrganizationalUnit\":null,\"Locality\":null,\"Province\":null,\"StreetAddress\":null,\"PostalCode\":null,\"SerialNumber\":\"\",\"CommonName\":\"mtls-example\",\"Names\":[{\"Type\":[2,5,4,3],\"Value\":\"mtls-example\"}],\"ExtraNames\":null}",
-        "after": "2034-07-08T15:27:04Z",
-        "before": "2024-07-10T15:27:04Z",
-        "subject": "{\"Country\":null,\"Organization\":null,\"OrganizationalUnit\":null,\"Locality\":null,\"Province\":null,\"StreetAddress\":null,\"PostalCode\":null,\"SerialNumber\":\"\",\"CommonName\":\"mtls-example\",\"Names\":[{\"Type\":[2,5,4,3],\"Value\":\"mtls-example\"}],\"ExtraNames\":null}"
-    }
+    "certificate": "5e9d9544a1dcd60001d0ed20cd08a75f5441c397a586ded7f45cea266fb684eb82e49691362e286f90b7313f"
+    // TODO: fix cert attachment to key
 }
