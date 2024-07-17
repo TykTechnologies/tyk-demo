@@ -43,12 +43,13 @@ log_http_result () {
 }
 
 log_json_result () {
-  status=$(echo $1 | jq -r '.Status')
-  if [ "$status" = "OK" ] || [ "$status" = "Ok" ]
-  then
+  # the API returns variation of case for the status field and value, so we have to check them all
+  status=$(echo "$1" | jq 'if (.Status == "OK" or .Status == "Ok" or .Status == "ok" or .status == "OK" or .status == "Ok" or .status == "ok") then true else false end')
+
+  if [ "$status" == "true" ]; then
     log_ok
   else
-    log_message "  ERROR: $(echo $1 | jq -r '.Message')"
+    log_message "  ERROR: $(echo $1 | jq -r '.message // .Message')"
     exit 1
   fi
 }
@@ -372,7 +373,7 @@ create_cert () {
   log_message "  Creating Cert: $cert_name"
   local api_response=$(curl $dashboard_base_url/api/certs -s \
     -H "Authorization: $api_key" \
-    -d @$cert_data_path 2>> logs/bootstrap.log)
+    -F "cert=@$cert_data_path;type=application/x-x509-ca-cert" 2>> logs/bootstrap.log)
 
   ## TODO - save fingerprint etc into context data so that it can be referenced by api def?
 
