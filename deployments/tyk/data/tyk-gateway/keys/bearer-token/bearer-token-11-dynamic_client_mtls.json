@@ -1,0 +1,36 @@
+{
+    "alias": "Dynamic Client MTLS",
+    "rate": 1000,
+    "per": 60,
+    "throttle_interval": -1,
+    "throttle_retry_limit": -1,
+    "quota_max": -1,
+    "quota_renewal_rate": -1,
+    "max_query_depth": -1,
+    "access_rights_array": [
+        {
+            "api_id": "6323a6ed7f7d4fb9473f3ecde19e1477",
+            "api_name": "Dynamic Client MTLS",
+            "versions": [
+                ""
+            ]
+        }
+    ],
+    "access_rights": {
+        "6323a6ed7f7d4fb9473f3ecde19e1477": {
+            "api_name": "Dynamic Client MTLS",
+            "api_id": "6323a6ed7f7d4fb9473f3ecde19e1477",
+            "versions": [
+                ""
+            ]
+        }
+    },
+    "org_id": "5e9d9544a1dcd60001d0ed20",
+    "certificate_meta": {
+        "id": "5e9d9544a1dcd60001d0ed20cd08a75f5441c397a586ded7f45cea266fb684eb82e49691362e286f90b7313f",
+        "issuer": "{\"Country\":null,\"Organization\":null,\"OrganizationalUnit\":null,\"Locality\":null,\"Province\":null,\"StreetAddress\":null,\"PostalCode\":null,\"SerialNumber\":\"\",\"CommonName\":\"mtls-example\",\"Names\":[{\"Type\":[2,5,4,3],\"Value\":\"mtls-example\"}],\"ExtraNames\":null}",
+        "after": "2034-07-08T15:27:04Z",
+        "before": "2024-07-10T15:27:04Z",
+        "subject": "{\"Country\":null,\"Organization\":null,\"OrganizationalUnit\":null,\"Locality\":null,\"Province\":null,\"StreetAddress\":null,\"PostalCode\":null,\"SerialNumber\":\"\",\"CommonName\":\"mtls-example\",\"Names\":[{\"Type\":[2,5,4,3],\"Value\":\"mtls-example\"}],\"ExtraNames\":null}"
+    }
+}
