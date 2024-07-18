@@ -820,8 +820,9 @@ create_bearer_token_dash () {
 
   log_message "  Adding Bearer Token (dash): $key_name"
 
-  api_response=$(curl $dashboard_base_url/api/keys/$key_name -s \
+  api_response=$(curl $dashboard_base_url/api/keys -s \
     -H "Authorization: $api_key" \
+    -H 'Content-Type: application/json' \
     -d @$bearer_token_data_path 2>> logs/bootstrap.log)
 
   # custom validation
@@ -833,7 +834,6 @@ create_bearer_token_dash () {
     log_message "ERROR: Could not create bearer token. API response returned $api_response."
     exit 1
   fi
-
 }
 
 delete_bearer_token_dash () {
