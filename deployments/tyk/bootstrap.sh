@@ -409,6 +409,15 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
       fi
     done
 
+    # Keys - Bearer token
+    log_message "Creating Bearer Token Keys"
+    for file in $data_group_path/keys/bearer-token/*; do
+      if [[ -f $file ]]; then
+        create_bearer_token_dash "$file" "$dashboard_user_api_key"
+        bootstrap_progress        
+      fi
+    done
+
     # OAuth - Clients
     log_message "Creating OAuth Clients"
     for file in $data_group_path/oauth/clients/*; do
