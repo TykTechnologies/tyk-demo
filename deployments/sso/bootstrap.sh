@@ -64,6 +64,10 @@ log_http_result "$(curl $identity_broker_base_url/api/profiles/ldap-token -s -w 
   -d "$(echo $identity_broker_profile_ldap_token_data)" 2>> logs/bootstrap.log)"
 bootstrap_progress
 
+log_message "Restart TIB to load new profiles"
+eval $(generate_docker_compose_command) restart tyk-identity-broker 1> /dev/null 2>> logs/bootstrap.log
+log_ok
+
 log_end_deployment
 
 echo -e "\033[2K
