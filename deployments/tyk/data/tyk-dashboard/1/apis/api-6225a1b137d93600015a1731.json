@@ -1,5 +1,4 @@
 {
-  "created_at": "2022-03-07T06:09:53Z",
   "api_model": {},
   "api_definition": {
     "id": "6225a1b137d93600015a1731",
@@ -603,11 +602,15 @@
         "global_headers": []
       },
       "proxy": {
+        "features": {
+          "use_immutable_headers": false
+        },
         "auth_headers": {},
         "request_headers": {},
         "use_response_extensions": {
           "on_error_forwarding": false
-        }
+        },
+        "request_headers_rewrite": {}
       },
       "subgraph": {
         "sdl": ""
@@ -630,5 +633,7 @@
   "is_site": false,
   "sort_by": 0,
   "user_group_owners": [],
-  "user_owners": []
+  "user_owners": [],
+  "created_at": "2022-03-07T06:09:53Z",
+  "updated_at": "2024-07-09T13:40:16.286Z"
 }
