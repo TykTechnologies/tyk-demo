@@ -4045,6 +4045,51 @@
 											"response": []
 										}
 									]
+								},
+								{
+									"name": "Dynamic Client MTLS",
+									"item": [
+										{
+											"name": "Dynamic Client MTLS - bearer token",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImNkMDhhNzVmNTQ0MWMzOTdhNTg2ZGVkN2Y0NWNlYTI2NmZiNjg0ZWI4MmU0OTY5MTM2MmUyODZmOTBiNzMxM2YiLCJoIjoibXVybXVyNjQifQ==",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "https://{{tyk-gateway-2.host}}/dynamic-client-mtls/get",
+													"protocol": "https",
+													"host": [
+														"{{tyk-gateway-2.host}}"
+													],
+													"path": [
+														"dynamic-client-mtls",
+														"get"
+													]
+												},
+												"description": "This example is a placeholder for the real dynamic client MTLS example, which uses a bash script and `curl` to demonstrate. Run the script from the Tyk Demo repo root as so:\n\n``` bash\n./deployments/tyk/scripts/examples/dynamic-client-mtls.sh\n\n ```\n\nThe `curl` request in the script references the certificate and private key, which the gateway then uses the identify the bearer token (used in the `Authorization` header here). The authorization decision is then based on the access rights defined in the bearer token. The client only needs to provide the certificate, rather than the `Authorization` header, as this request shows."
+											},
+											"response": []
+										}
+									]
 								}
 							]
 						},
