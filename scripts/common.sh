@@ -804,6 +804,38 @@ create_bearer_token () {
   fi
 }
 
+create_bearer_token_dash () {
+  local bearer_token_data_path="$1"
+  local api_key="$2"
+  local file_name="$(basename $bearer_token_data_path)"
+  # key name is taken from the filename, using the 4th hypenated segment and excluding the extension e.g. "bearer-token-1-mytoken.json" results in "mytoken"
+  local key_name="$(echo "$file_name" | cut -d. -f1 | cut -d- -f4)"
+
+  check_variables
+
+  if [[ "$key_name" == "" ]]; then
+    log_message "ERROR: Could not extract key name from filename $file_name"
+    exit 1
+  fi
+
+  log_message "  Adding Bearer Token (dash): $key_name"
+
+  api_response=$(curl $dashboard_base_url/api/keys/$key_name -s \
+    -H "Authorization: $api_key" \
+    -d @$bearer_token_data_path 2>> logs/bootstrap.log)
+
+  # custom validation
+  if echo "$api_response" | jq -e 'has("key_id") and (.key_id | length > 0)' > /dev/null; then
+    log_ok
+    log_message "    Key: $(jq -r '.key_id' <<< "$api_response")"
+    log_message "    Hash: $(jq -r '.key_hash' <<< "$api_response")"
+  else
+    log_message "ERROR: Could not create bearer token. API response returned $api_response."
+    exit 1
+  fi
+
+}
+
 delete_bearer_token_dash () {
   local key_name="$1"
   local api_id="$2"
