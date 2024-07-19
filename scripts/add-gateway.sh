@@ -14,7 +14,7 @@ if [ "$1" == "" ]; then
     -v $(pwd)/deployments/tyk/volumes/tyk-gateway/templates/error_401.json:/opt/tyk-gateway/templates/error_401.json \
     -v $(pwd)/deployments/tyk/volumes/databases/GeoLite2-Country.mmdb:/opt/tyk-gateway/databases/GeoLite2-Country.mmdb \
     --network tyk-demo_tyk \
-    tykio/tyk-gateway:v5.4.0
+    tykio/tyk-gateway:v5.5.0-alpha2
 else
   docker run \
     --name $1 \
@@ -27,5 +27,5 @@ else
     -v $(pwd)/deployments/tyk/volumes/tyk-gateway/templates/error_401.json:/opt/tyk-gateway/templates/error_401.json \
     -v $(pwd)/deployments/tyk/volumes/databases/GeoLite2-Country.mmdb:/opt/tyk-gateway/databases/GeoLite2-Country.mmdb \
     --network tyk-demo_tyk \
-    tykio/tyk-gateway:v5.4.0
+    tykio/tyk-gateway:v5.5.0-alpha2
 fi
