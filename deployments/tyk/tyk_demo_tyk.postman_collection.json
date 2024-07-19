@@ -5848,6 +5848,61 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "Streams",
+					"item": [
+						{
+							"name": "HTTP to Websocket",
+							"item": [
+								{
+									"name": "Post message to websocket",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"message\":\"Hello, Tyk Streams!\"}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://tyk-gateway.localhost:8080/streams-http-to-websocket/post",
+											"protocol": "http",
+											"host": [
+												"tyk-gateway",
+												"localhost"
+											],
+											"port": "8080",
+											"path": [
+												"streams-http-to-websocket",
+												"post"
+											]
+										},
+										"description": "This example uses the gateway to proxy messages between HTTP and WS protocols.\n\nThe HTTP request sends a message payload that the gateway then relays to clients subscribing via a websocket.\n\nTo see this in action, run the two scripts in the `deployments/tyk/scripts/examples/streams` directory:\n\n- `http-to-ws-1.sh`: Listens to the websocket for messages.\n    \n- `http-to-ws-2.sh`: Sends messages to the websocket via HTTP.\n    \n\nThis example request is exact the same as the 2nd script, so can be used for the same purpose."
+									},
+									"response": []
+								}
+							]
+						}
+					]
 				}
 			]
 		},
