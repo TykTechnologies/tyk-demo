@@ -5884,13 +5884,11 @@
 											}
 										},
 										"url": {
-											"raw": "http://tyk-gateway.localhost:8080/streams-http-to-websocket/post",
+											"raw": "http://{{tyk-gateway.host}}/streams-http-to-websocket/post",
 											"protocol": "http",
 											"host": [
-												"tyk-gateway",
-												"localhost"
+												"{{tyk-gateway.host}}"
 											],
-											"port": "8080",
 											"path": [
 												"streams-http-to-websocket",
 												"post"
