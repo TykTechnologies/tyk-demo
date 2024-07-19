@@ -5894,7 +5894,7 @@
 												"post"
 											]
 										},
-										"description": "This example uses the gateway to proxy messages between HTTP and WS protocols.\n\nThe HTTP request sends a message payload that the gateway then relays to clients subscribing via a websocket.\n\nTo see this in action, run the two scripts in the `deployments/tyk/scripts/examples/streams` directory:\n\n- `http-to-ws-1.sh`: Listens to the websocket for messages.\n    \n- `http-to-ws-2.sh`: Sends messages to the websocket via HTTP.\n    \n\nThis example request is exactly the same as the 2nd script, so can be used for the same purpose. Requests sent from here will appear in the terminal window running the 1st script."
+										"description": "This example uses the gateway to proxy messages between HTTP and WS protocols.\n\nThe HTTP request sends a message payload that the gateway then relays to clients subscribing via a websocket.\n\nTo see this in action, run the two scripts in the `deployments/tyk/scripts/examples/streams/http-to-ws` directory:\n\n- `http-to-ws-1.sh`: Listens to the websocket for messages.\n    \n- `http-to-ws-2.sh`: Sends messages to the websocket via HTTP.\n    \n\nThis example request is exactly the same as the 2nd script, so can be used for the same purpose. Requests sent from here will appear in the terminal window running the 1st script."
 									},
 									"response": []
 								}
