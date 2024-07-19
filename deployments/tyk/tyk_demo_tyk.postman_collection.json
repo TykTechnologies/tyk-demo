@@ -5899,6 +5899,54 @@
 									"response": []
 								}
 							]
+						},
+						{
+							"name": "HTTP to Redis Pub/Sub",
+							"item": [
+								{
+									"name": "Post message to Redis Pub/Sub",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "Hello, Tyk Streams!",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/streams-http-to-redis-pubsub/post",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"streams-http-to-redis-pubsub",
+												"post"
+											]
+										},
+										"description": "This example shows how Tyk can proxy messages between HTTP and Redis pub/sub channels.\n\nMessages posted in this example will be sent to the `streams` channel of the Tyk Demo Redis instance.\n\nTo see it in action, run the scripts found in deployments/tyk/scripts/examples/streams/http-to-redis-pubsub:\n\n- `http-to-redis-pubsub-1.sh`: Subscribes to the Redis `streams` channel and waits for messages.\n    \n- `http-to-redis-pubsub-2.sh`: Sends an HTTP POST requests to the gateway that is published into the `streams` channel.\n    \n\nYou can also send the message via this example request - it does the same thing as the 2nd script above."
+									},
+									"response": []
+								}
+							]
 						}
 					]
 				}
