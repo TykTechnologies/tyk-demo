@@ -1,0 +1,80 @@
+{
+  "components": {},
+  "info": {
+    "title": "Streams - HTTP to Kafka",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.3",
+  "paths": {},
+  "servers": [
+    {
+      "url": "http://tyk-gateway.localhost:8080/streams-http-to-kafka/"
+    }
+  ],
+  "x-tyk-api-gateway": {
+    "info": {
+      "dbId": "66a1194158bbbd000191b178",
+      "id": "742ed355325d4bde71c6986543d35c39",
+      "name": "Streams - HTTP to Kafka",
+      "orgId": "5e9d9544a1dcd60001d0ed20",
+      "state": {
+        "active": true
+      }
+    },
+    "middleware": {
+      "global": {
+        "contextVariables": {
+          "enabled": true
+        },
+        "trafficLogs": {
+          "enabled": true
+        }
+      }
+    },
+    "server": {
+      "listenPath": {
+        "strip": true,
+        "value": "/streams-http-to-kafka/"
+      }
+    },
+    "upstream": {
+      "url": "http://httpbin/"
+    }
+  },
+  "x-tyk-streaming": {
+    "streams": {
+      "HTTP to Kafka": {
+        "input": {
+          "http_server": {
+            "path": "/post"
+          },
+          "label": "http_input"
+        },
+        "output": {
+          "kafka": {
+            "addresses": [
+              "kafka:9092"
+            ],
+            "batching": {
+              "byte_size": 0,
+              "check": "",
+              "count": 0,
+              "period": ""
+            },
+            "compression": "none",
+            "key": "",
+            "max_in_flight": 64,
+            "metadata": {
+              "exclude_prefixes": []
+            },
+            "partitioner": "fnv1a_hash",
+            "static_headers": {},
+            "target_version": "3.7.1",
+            "topic": "quickstart-events"
+          },
+          "label": "kafka_output"
+        }
+      }
+    }
+  }
+}
