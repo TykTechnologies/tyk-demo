@@ -210,6 +210,11 @@ bootstrap_progress
 log_message "Wait for services to be available after restart"
 wait_for_liveness
 
+# Kafka
+
+log_message "Creating Kafka topic"
+docker exec tyk-demo-kafka-1 sh -c "/opt/kafka/bin/kafka-topics.sh --create --topic quickstart-events --bootstrap-server localhost:9092"
+
 # Go plugins
 
 build_go_plugin "example-go-plugin.so" "example"
