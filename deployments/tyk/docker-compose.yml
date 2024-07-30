@@ -26,6 +26,8 @@ services:
     ports:
       - 8080:8080
       - 8086:8086
+      - 9002:9002
+      - 9003:9003
     networks:
       tyk:
         aliases:
@@ -142,6 +144,13 @@ services:
       - 4040:4040
     environment:
       - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN-}
+  grpcbin:
+    image: moul/grpcbin:renovate_all
+    networks:
+      - tyk
+    ports:
+      - 9000:9000
+      - 9001:9001
 
 volumes:
   tyk-redis-data:
