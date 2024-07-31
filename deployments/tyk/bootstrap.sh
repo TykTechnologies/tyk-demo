@@ -201,8 +201,8 @@ eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-das
 sleep 2
 log_ok
 
-log_message "Validating that secure messaging is functioning on gateway containers"
-gateway_container_names=("tyk-demo-tyk-gateway-1" "tyk-demo-tyk-gateway-2-1")
+echo "Validating that secure messaging is functioning on gateway containers"
+gateway_service_names=("tyk-gateway" "tyk-gateway-2")
 attempts=0
 max_attempts=3
 phrase="Payload signature is invalid!"
@@ -214,16 +214,16 @@ while true; do
   fi
 
   all_clear=true
-  for container in "${gateway_container_names[@]}"; do
-    if docker logs "$container" 2>&1 | grep -q "$phrase"; then
-      log_message "  Attempt $attempts: Payload signature error detected in the logs of container '$container'."
-      eval $(generate_docker_compose_command) up -d --no-deps --force-recreate $container
+  for gateway_service in "${gateway_service_names[@]}"; do
+    if $(generate_docker_compose_command) logs "$gateway_service" 2>&1 | grep -q "$phrase"; then
+      echo "  Attempt $attempts: Payload signature error detected in the logs of service '$gateway_service'."
+      $(generate_docker_compose_command) up -d --no-deps --force-recreate $gateway_service
       all_clear=false
     fi
   done
 
   if [ "$all_clear" = true ]; then
-    log_message "  Payload signature error is not present in any container logs after $attempts attempts."
+    echo "  Payload signature error is not present in any container logs after $attempts attempts."
     break
   fi
 
