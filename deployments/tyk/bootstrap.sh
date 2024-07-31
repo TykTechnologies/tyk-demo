@@ -195,8 +195,8 @@ fi
 log_ok
 bootstrap_progress
 
-log_message "Recreating containers to ensure new certificates are loaded (tyk-gateway, tyk-gateway-2, tyk-dashboard)"
-eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway tyk-gateway-2 tyk-dashboard
+log_message "Recreating containers to ensure new certificates are loaded (tyk-dashboard, tyk-gateway, tyk-gateway-2)"
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
 # if there are gateways from other deployments connecting to this deployment 
 # (such as MDCB), then they must be recreated to. The MDCB deployment already 
 # handles recreation.
@@ -422,6 +422,8 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
         bootstrap_progress        
       fi
     done
+
+  eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
 
     # OAuth - Clients
     log_message "Creating OAuth Clients"
