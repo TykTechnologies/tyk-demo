@@ -196,6 +196,7 @@ log_ok
 bootstrap_progress
 
 log_message "Recreating containers to load new certificates"
+sleep 2
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
 # pause to allow logs to capture any payload signature errors
 sleep 2
