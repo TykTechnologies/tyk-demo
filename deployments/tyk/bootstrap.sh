@@ -195,9 +195,6 @@ fi
 log_ok
 bootstrap_progress
 
-log_message "DEBUG: gateway cert directory $(docker exec tyk-demo-tyk-gateway-1 ls /opt/tyk-gateway/certs)"
-log_message "DEBUG: dashboard cert directory $(docker exec tyk-demo-tyk-dashboard-1 ls /opt/tyk-dashboard/certs)"
-
 log_message "Recreating containers to ensure new certificates are loaded (tyk-gateway, tyk-gateway-2, tyk-dashboard)"
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway tyk-gateway-2 tyk-dashboard
 # if there are gateways from other deployments connecting to this deployment 
