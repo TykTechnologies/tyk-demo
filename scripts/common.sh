@@ -159,6 +159,33 @@ wait_for_response () {
   done
 }
 
+# TODO: make function here for this, and then check all certs etc exist in bootstrap
+wait_for_file () {
+  local file_path="$1"
+  local container_name="$2"
+  local try_max=10
+  local try_count=0
+  log_message "Waiting for $file_path to be present in $container_name"
+  while true; do
+    ((try_count++))
+    if [ "$try_count" -gt "$try_max" ]; then
+      echo "ERROR: Maximum retry count reached for file $file_path in container $container_name"
+      exit 1
+    fi
+
+    docker exec $container_name sh -c "[ -s $file_path ]"
+    if [ $? -eq 0 ]; then
+      log_ok
+      bootstrap_progress
+      return 0
+    else
+      log_message "  File not present, waiting... $try_count/$try_max"
+      bootstrap_progress
+      sleep 2
+    fi
+  done
+}
+
 hot_reload () {
   gateway_host="$1"
   gateway_secret="$2"
