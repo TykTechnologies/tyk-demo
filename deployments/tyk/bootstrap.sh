@@ -195,17 +195,6 @@ fi
 log_ok
 bootstrap_progress
 
-# eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
-# # if there are gateways from other deployments connecting to this deployment 
-# # (such as MDCB), then they must be recreated to. The MDCB deployment already 
-# # handles recreation.
-# if [ "$?" != "0" ]; then
-#   echo "ERROR: Could not recreate containers"
-#   exit 1
-# fi
-
-
-
 log_message "Recreating containers to load new certificates"
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
 # pause to allow logs to capture any payload signature errors
@@ -240,7 +229,6 @@ while true; do
 
   sleep 3 # Wait for 3 seconds before checking again
 done
-
 log_ok
 bootstrap_progress
 
