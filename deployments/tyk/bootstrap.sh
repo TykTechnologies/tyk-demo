@@ -197,9 +197,8 @@ bootstrap_progress
 
 log_message "Recreating containers to load new certificates"
 sleep 2
-eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
-# pause to allow logs to capture any payload signature errors
-sleep 2
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway
+# attempt hot reloads to test payloads
 log_ok
 
 echo "Validating that secure messaging is functioning on gateway containers"
@@ -208,23 +207,28 @@ attempts=0
 max_attempts=3
 phrase="Payload signature is invalid!"
 while true; do
+  hot_reload "http://tyk-gateway.localhost:8080" "28d220fd77974a4facfb07dc1e49c2aa"
+  hot_reload "https://tyk-gateway-2.localhost:8081" "28d220fd77974a4facfb07dc1e49c2aa"
+  # pause to allow logs to capture any payload signature errors caused by hot reload command
+  sleep 2
+
   attempts=$((attempts + 1))
   if [ "$attempts" -gt "$max_attempts" ]; then
-    echo "Gateways unable to recover from payload signature error"
+    echo "ERROR: Unable to clear '$phrase' from logs"
     exit 1
   fi
 
   all_clear=true
   for gateway_service in "${gateway_service_names[@]}"; do
     if $(generate_docker_compose_command) logs "$gateway_service" 2>&1 | grep -q "$phrase"; then
-      echo "  Attempt $attempts: Payload signature error detected in the logs of service '$gateway_service'."
+      echo "  Attempt $attempts: '$phrase' detected in the logs of service '$gateway_service' - recreating"
       $(generate_docker_compose_command) up -d --no-deps --force-recreate $gateway_service
       all_clear=false
     fi
   done
 
   if [ "$all_clear" = true ]; then
-    echo "  Payload signature error is not present in any container logs after $attempts attempts."
+    echo "  '$phrase' is not present in any container logs after $attempts attempts."
     break
   fi
 
