@@ -423,8 +423,6 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
       fi
     done
 
-  eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
-
     # OAuth - Clients
     log_message "Creating OAuth Clients"
     for file in $data_group_path/oauth/clients/*; do
