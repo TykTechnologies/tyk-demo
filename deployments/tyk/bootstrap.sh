@@ -88,8 +88,8 @@ done
 log_message "OpenSSL version used for generating certs: $(docker exec $OPENSSL_CONTAINER_NAME openssl version)"
 
 log_message "Removing any pre-existing certs"
-rm deployments/tyk/volumes/tyk-dashboard/certs/*.pem 1> /dev/null 2>> logs/bootstrap.log
-rm deployments/tyk/volumes/tyk-gateway/certs/*.pem 1> /dev/null 2>> logs/bootstrap.log
+rm deployments/tyk/volumes/tyk-dashboard/certs/*.pem > /dev/null 2>&1
+rm deployments/tyk/volumes/tyk-gateway/certs/*.pem > /dev/null 2>&1
 log_ok
 bootstrap_progress
 
