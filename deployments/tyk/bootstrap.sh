@@ -111,6 +111,7 @@ while true; do
     sleep 2
   fi
 done
+sleep 1
 
 log_message "Generating private key for secure messaging and signing"
 docker exec -d $OPENSSL_CONTAINER_NAME sh -c "openssl genrsa -out /tmp/private-key.pem 2048" >>logs/bootstrap.log
@@ -130,6 +131,7 @@ while true; do
     sleep 2
   fi
 done
+sleep 1
 
 log_message "Generating public key for secure messaging and signing"
 docker exec -d $OPENSSL_CONTAINER_NAME sh -c "openssl rsa -in /tmp/private-key.pem -pubout -out /tmp/public-key.pem" >>logs/bootstrap.log
@@ -149,6 +151,7 @@ while true; do
     sleep 2
   fi
 done
+sleep 1
 
 log_message "Copying private-key.pem to dashboard volume mount"
 docker cp $OPENSSL_CONTAINER_NAME:/tmp/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs >>logs/bootstrap.log
@@ -158,6 +161,7 @@ if [ "$?" != "0" ]; then
 fi
 log_ok
 bootstrap_progress
+sleep 1
 
 log_message "Copying public-key.pem to gateway volume mount"
 docker cp $OPENSSL_CONTAINER_NAME:/tmp/public-key.pem deployments/tyk/volumes/tyk-gateway/certs >>logs/bootstrap.log
@@ -167,6 +171,7 @@ if [ "$?" != "0" ]; then
 fi
 log_ok
 bootstrap_progress
+sleep 1
 
 log_message "Copying tls-certificate.pem to gateway volume mount"
 docker cp $OPENSSL_CONTAINER_NAME:/tmp/tls-certificate.pem deployments/tyk/volumes/tyk-gateway/certs >>logs/bootstrap.log
@@ -176,6 +181,7 @@ if [ "$?" != "0" ]; then
 fi
 log_ok
 bootstrap_progress
+sleep 1
 
 log_message "Copying tls-private-key.pem to gateway volume mount"
 docker cp $OPENSSL_CONTAINER_NAME:/tmp/tls-private-key.pem deployments/tyk/volumes/tyk-gateway/certs >>logs/bootstrap.log
@@ -185,6 +191,7 @@ if [ "$?" != "0" ]; then
 fi
 log_ok
 bootstrap_progress
+sleep 1
 
 log_message "Removing temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
 docker rm -f $OPENSSL_CONTAINER_NAME
@@ -194,10 +201,11 @@ if [ "$?" != "0" ]; then
 fi
 log_ok
 bootstrap_progress
+sleep 1
 
 log_message "Recreating containers to load new certificates"
 sleep 2
-eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
 # attempt hot reloads to test payloads
 log_ok
 
@@ -210,7 +218,7 @@ while true; do
   hot_reload "http://tyk-gateway.localhost:8080" "28d220fd77974a4facfb07dc1e49c2aa"
   hot_reload "https://tyk-gateway-2.localhost:8081" "28d220fd77974a4facfb07dc1e49c2aa"
   # pause to allow logs to capture any payload signature errors caused by hot reload command
-  sleep 2
+  sleep 5
 
   attempts=$((attempts + 1))
   if [ "$attempts" -gt "$max_attempts" ]; then
@@ -228,11 +236,11 @@ while true; do
   done
 
   if [ "$all_clear" = true ]; then
-    echo "  '$phrase' is not present in any container logs after $attempts attempts."
+    echo "  '$phrase' is not present in any container logs"
     break
   fi
 
-  sleep 3 # Wait for 3 seconds before checking again
+  sleep 5 # Wait for 3 seconds before checking again
 done
 log_ok
 bootstrap_progress
