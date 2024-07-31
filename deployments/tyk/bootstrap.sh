@@ -208,7 +208,7 @@ log_message "Recreating containers to load new certificates"
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
 log_ok
 
-echo "Validating that secure messaging is functioning on gateway containers"
+log_message "Validating that secure messaging is functioning on gateway containers"
 gateway_service_names=("tyk-gateway" "tyk-gateway-2")
 attempts=0
 max_attempts=3
@@ -229,14 +229,14 @@ while true; do
   all_clear=true
   for gateway_service in "${gateway_service_names[@]}"; do
     if $(generate_docker_compose_command) logs "$gateway_service" 2>&1 | grep -q "$phrase"; then
-      echo "  Attempt $attempts: '$phrase' detected in the logs of service '$gateway_service' - recreating"
+      log_message "  Attempt $attempts: '$phrase' detected in the logs of service '$gateway_service' - recreating"
       $(generate_docker_compose_command) up -d --no-deps --force-recreate $gateway_service
       all_clear=false
     fi
   done
 
   if [ "$all_clear" = true ]; then
-    echo "  '$phrase' is not present in any container logs"
+    log_message "  '$phrase' is not present in any container logs"
     break
   fi
 done
