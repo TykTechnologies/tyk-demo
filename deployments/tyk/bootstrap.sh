@@ -195,15 +195,52 @@ fi
 log_ok
 bootstrap_progress
 
-log_message "Recreating containers to ensure new certificates are loaded (tyk-dashboard, tyk-gateway, tyk-gateway-2)"
+# eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
+# # if there are gateways from other deployments connecting to this deployment 
+# # (such as MDCB), then they must be recreated to. The MDCB deployment already 
+# # handles recreation.
+# if [ "$?" != "0" ]; then
+#   echo "ERROR: Could not recreate containers"
+#   exit 1
+# fi
+
+
+
+log_message "Recreating containers to load new certificates"
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
-# if there are gateways from other deployments connecting to this deployment 
-# (such as MDCB), then they must be recreated to. The MDCB deployment already 
-# handles recreation.
-if [ "$?" != "0" ]; then
-  echo "ERROR: Could not recreate containers"
-  exit 1
-fi
+# pause to allow logs to capture any payload signature errors
+sleep 2
+log_ok
+
+log_message "Validating that secure messaging is functioning on gateway containers"
+gateway_container_names=("tyk-demo-tyk-gateway-1" "tyk-demo-tyk-gateway-2-1")
+attempts=0
+max_attempts=3
+phrase="Payload signature is invalid!"
+while true; do
+  attempts=$((attempts + 1))
+  if [ "$attempts" -gt "$max_attempts" ]; then
+    echo "Gateways unable to recover from payload signature error"
+    exit 1
+  fi
+
+  all_clear=true
+  for container in "${gateway_container_names[@]}"; do
+    if docker logs "$container" 2>&1 | grep -q "$phrase"; then
+      log_message "  Attempt $attempts: Payload signature error detected in the logs of container '$container'."
+      eval $(generate_docker_compose_command) up -d --no-deps --force-recreate $container
+      all_clear=false
+    fi
+  done
+
+  if [ "$all_clear" = true ]; then
+    log_message "  Payload signature error is not present in any container logs after $attempts attempts."
+    break
+  fi
+
+  sleep 3 # Wait for 3 seconds before checking again
+done
+
 log_ok
 bootstrap_progress
 
