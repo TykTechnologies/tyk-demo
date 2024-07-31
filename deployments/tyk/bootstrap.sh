@@ -228,10 +228,14 @@ while true; do
 
   all_clear=true
   for gateway_service in "${gateway_service_names[@]}"; do
+    # check service log for presence of error message
     if $(generate_docker_compose_command) logs "$gateway_service" 2>&1 | grep -q "$phrase"; then
       log_message "  Attempt $attempts: '$phrase' detected in the logs of service '$gateway_service' - recreating"
+      # payload issue is resolved by recreating the service
       $(generate_docker_compose_command) up -d --no-deps --force-recreate $gateway_service
       all_clear=false
+      # allow restarted service to initialise
+      sleep 2
     fi
   done
 
