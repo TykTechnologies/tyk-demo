@@ -93,6 +93,7 @@ rm deployments/tyk/volumes/tyk-gateway/certs/*.pem > /dev/null 2>&1
 log_ok
 bootstrap_progress
 
+# sleeps have been added after the cert commands in this section to prevent race conditions
 log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
 docker exec -d $OPENSSL_CONTAINER_NAME sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tyk-gateway-2.localhost\" -keyout /tmp/tls-private-key.pem -out /tmp/tls-certificate.pem -days 365 -nodes" >>logs/bootstrap.log
 if [ "$?" -ne "0" ]; then
@@ -204,9 +205,7 @@ bootstrap_progress
 sleep 1
 
 log_message "Recreating containers to load new certificates"
-sleep 2
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
-# attempt hot reloads to test payloads
 log_ok
 
 echo "Validating that secure messaging is functioning on gateway containers"
@@ -215,10 +214,11 @@ attempts=0
 max_attempts=3
 phrase="Payload signature is invalid!"
 while true; do
+  # attempt hot reloads to test payload delivery process
   hot_reload "http://tyk-gateway.localhost:8080" "28d220fd77974a4facfb07dc1e49c2aa"
   hot_reload "https://tyk-gateway-2.localhost:8081" "28d220fd77974a4facfb07dc1e49c2aa"
   # pause to allow logs to capture any payload signature errors caused by hot reload command
-  sleep 5
+  sleep 2
 
   attempts=$((attempts + 1))
   if [ "$attempts" -gt "$max_attempts" ]; then
@@ -239,8 +239,6 @@ while true; do
     echo "  '$phrase' is not present in any container logs"
     break
   fi
-
-  sleep 5 # Wait for 3 seconds before checking again
 done
 log_ok
 bootstrap_progress
