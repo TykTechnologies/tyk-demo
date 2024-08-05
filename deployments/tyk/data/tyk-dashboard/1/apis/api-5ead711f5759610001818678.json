@@ -1,5 +1,4 @@
 {
-  "created_at": "2020-05-02T13:09:51Z",
   "api_model": {},
   "api_definition": {
     "id": "5ead711f5759610001818678",
@@ -303,12 +302,13 @@
               "api_model": {},
               "event_timeout": 60,
               "header_map": {},
-              "id": "661cf7f2bf12140001bc2352",
+              "id": "668d3db6b393090001341be7",
               "method": "POST",
               "name": "Webhook Receiver Post",
               "org_id": "5e9d9544a1dcd60001d0ed20",
               "target_path": "http://localhost:8080/webhook-receiver/post",
-              "template_path": ""
+              "template_path": "",
+              "webhook_id": "601544cbe2b949b0948470745ed24d94"
             }
           }
         ]
@@ -363,11 +363,15 @@
         "global_headers": []
       },
       "proxy": {
+        "features": {
+          "use_immutable_headers": false
+        },
         "auth_headers": {},
         "request_headers": {},
         "use_response_extensions": {
           "on_error_forwarding": false
-        }
+        },
+        "request_headers_rewrite": {}
       },
       "subgraph": {
         "sdl": ""
@@ -392,7 +396,7 @@
       "event_timeout": 60,
       "hook": {
         "api_model": {},
-        "id": "661cf7f2bf12140001bc2352",
+        "id": "668d3db6b393090001341be7",
         "org_id": "5e9d9544a1dcd60001d0ed20",
         "name": "Webhook Receiver Post",
         "method": "POST",
@@ -406,5 +410,7 @@
   "is_site": false,
   "sort_by": 0,
   "user_group_owners": [],
-  "user_owners": []
+  "user_owners": [],
+  "created_at": "2020-05-02T13:09:51Z",
+  "updated_at": "2024-07-09T13:40:07.227Z"
 }

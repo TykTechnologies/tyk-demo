@@ -1,0 +1,1 @@
+Some example can't be adequately demonstrated from Postman, so they are demonstrated here instead using Bash scripts.

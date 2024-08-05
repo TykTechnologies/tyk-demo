@@ -1,0 +1,33 @@
+{
+    "access_rights_array": [
+        {
+            "api_name": "JWT-RSA",
+            "api_id": "92c06a4330904cae6860c39bac57262b",
+            "versions": [
+                ""
+            ]
+        }
+    ],
+    "allowance": 1000,
+    "rate": 1000,
+    "per": 60,
+    "throttle_interval": -1,
+    "throttle_retry_limit": -1,
+    "max_query_depth": -1,
+    "quota_max": -1,
+    "quota_renewal_rate": -1,
+    "access_rights": {
+        "92c06a4330904cae6860c39bac57262b": {
+            "api_name": "JWT-RSA",
+            "api_id": "92c06a4330904cae6860c39bac57262b",
+            "versions": [
+                ""
+            ]
+        }
+    },
+    "org_id": "5e9d9544a1dcd60001d0ed20",
+    "jwt_data": {
+        "secret": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw1oeaivUHPCSr6i1Q4/I\nxJu+1FFzGMKXuxctGaTn8ElUOdZXiS6faN41EE+anjt9jnW3VLHSWMF6P/feTScG\npLofPpGWTUnhXUmCRua0v3P2z5wdugPvGjekZAZOyYJym3ox1MwgIYnpPdzp+RoY\nBS9QEpu8cAWyRuii0rA0UOZaW11c2neqwBHL0Bwh0qg1nlwlpr65o2LgRxvCWPm8\nYAAEpgU4BMQ+dUUlaB1ijOxNMWg3ae3dmj+fOH058B2uKIA52KzdYhJKLnE+UY0x\n466CJzSDhiVW49WagHJsthu0zM24JB2MvdMi2FJFdwAzbTvq6ky2YN2RHGRVVDN/\ncwIDAQAB\n-----END PUBLIC KEY-----"
+    },
+    "alias": "JWT RSA"
+}

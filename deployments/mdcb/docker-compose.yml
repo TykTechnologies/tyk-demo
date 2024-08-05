@@ -1,7 +1,7 @@
 ---
 services:
   tyk-mdcb:
-    image: tykio/tyk-mdcb-docker:${MDCB_VERSION:-v2.5.1}
+    image: tykio/tyk-mdcb-docker:${MDCB_VERSION:-v2.6.0}
     ports:
       - 9091:9091
     networks:
@@ -15,7 +15,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-worker-gateway:
-    image: tykio/tyk-gateway:${GATEWAY_WORKER_VERSION:-v5.3.2}
+    image: tykio/tyk-gateway:${GATEWAY_WORKER_VERSION:-v5.5.0-rc2}
     ports:
       - 8090:8080
     networks:
@@ -28,7 +28,7 @@ services:
       - TYK_GW_OPENTELEMETRY_ENDPOINT=${OPENTELEMETRY_ENDPOINT:-false}
     volumes:
       - ./deployments/mdcb/volumes/tyk-worker-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
-      - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
+      - tyk-gateway-certs:/opt/tyk-gateway/certs
       - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
       - ./deployments/tyk/volumes/tyk-gateway/plugins:/opt/tyk-gateway/plugins
     depends_on:
@@ -36,7 +36,7 @@ services:
       - tyk-mdcb
       - tyk-dashboard
   tyk-worker-redis:
-    image: redis:6.0.4
+    image: redis:7.2.0
     volumes:
       - tyk-worker-redis-data:/data
     ports:

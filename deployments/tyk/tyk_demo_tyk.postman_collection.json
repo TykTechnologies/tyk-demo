@@ -2267,8 +2267,8 @@
 								"header": [
 									{
 										"key": "x-api-version",
-										"type": "text",
-										"value": "Default"
+										"value": "Default",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -2333,8 +2333,8 @@
 								"header": [
 									{
 										"key": "x-api-version",
-										"type": "text",
-										"value": "Default"
+										"value": "Default",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -2820,8 +2820,8 @@
 								"header": [
 									{
 										"key": "x-api-version",
-										"type": "text",
-										"value": "whitelist"
+										"value": "whitelist",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -2940,8 +2940,8 @@
 								"header": [
 									{
 										"key": "x-api-version",
-										"type": "text",
-										"value": "2"
+										"value": "2",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -2985,8 +2985,8 @@
 								"header": [
 									{
 										"key": "x-api-version",
-										"type": "text",
-										"value": "expired"
+										"value": "expired",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -3290,8 +3290,8 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"type": "text",
-										"value": "auth_key"
+										"value": "auth_key",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -3389,8 +3389,8 @@
 												"header": [
 													{
 														"key": "Authorization",
-														"type": "text",
-														"value": "missing_key"
+														"value": "missing_key",
+														"type": "text"
 													}
 												],
 												"url": {
@@ -3536,8 +3536,8 @@
 												"header": [
 													{
 														"key": "Authorization",
-														"type": "text",
-														"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
+														"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU",
+														"type": "text"
 													}
 												],
 												"url": {
@@ -3581,8 +3581,8 @@
 												"header": [
 													{
 														"key": "Authorization",
-														"type": "text",
-														"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
+														"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU",
+														"type": "text"
 													}
 												],
 												"url": {
@@ -3598,6 +3598,46 @@
 													]
 												},
 												"description": "This request fails because it attempts to access an endpoint which is not listed in the path-based permissions defined in the Policy. The Gateway responds with a `403 Forbidden`."
+											},
+											"response": []
+										},
+										{
+											"name": "JWT - RSA Public Key",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqd3RfcnNhIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.vYMwXjLv95abjSzUlX73Bcyfp4EKA-3l8L5HMWsHlg9hS2OGI6LFLxm0eXY3v5UaPUJh5ySgtp59p0wX88r9RjlxauffezgEadDOyJ5mnaSMRhPZmxskPVONFi2qrF9I69GLx5hoCvuN5FwLlL8gzHBvqEOX3iV9Nc5SzTq_qh3QvSuDInEBLiRq6WychWKW8QAchfRcIjHTgcNUgOWFyF2vzVU5MqTYuuPfUINkXiDCsPh1W7Hk6AWSD9NLgToRwoSD-oXgMHOWQPwwU2SIqQvE1UHOtEaFW2sA9S6YUHDhX4R5ZknJ1W3eCJMy7_1swCmFb2QSFkELj8jZyl2Ubg",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "http://{{tyk-gateway.host}}/jwt-rsa/get",
+													"protocol": "http",
+													"host": [
+														"{{tyk-gateway.host}}"
+													],
+													"path": [
+														"jwt-rsa",
+														"get"
+													]
+												},
+												"description": "This request demonstrates authentication using a JWT signed by an RSA key pair. The JWT was generated at [https://jwt.io](https://jwt.io) using a public and private key pair.\n\nThe value of the JWT's `sub` property refers to an API key (`jwt_rsa`) that contains the public key of the RSA key pair, as well as the typical access rights for the API.\n\nThe gateway uses the public key to validate the signature of the JWT of the incoming request, and uses the access rights defined in the API key to authorise access ot the requested endpoint."
 											},
 											"response": []
 										}
@@ -4001,6 +4041,51 @@
 													]
 												},
 												"description": "This request uses an OAuth client to generate a token which can be used to access an API protected with OAuth 2.0.\n\nThe request `authorization` header uses basic-style authentication credentials, using a base64 encoded string of the OAuth client id and secret.\n\nThe request body contains the grant type and the OAuth client id and secret.\n\nThe response body provides the bearer token, which can then be used to access the API. The token has a expiry, which defaults to 3600 seconds (1 hour), after which the token is no longer valid for authentication."
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Dynamic Client MTLS",
+									"item": [
+										{
+											"name": "Dynamic Client MTLS - bearer token",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImNkMDhhNzVmNTQ0MWMzOTdhNTg2ZGVkN2Y0NWNlYTI2NmZiNjg0ZWI4MmU0OTY5MTM2MmUyODZmOTBiNzMxM2YiLCJoIjoibXVybXVyNjQifQ==",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "https://{{tyk-gateway-2.host}}/dynamic-client-mtls/get",
+													"protocol": "https",
+													"host": [
+														"{{tyk-gateway-2.host}}"
+													],
+													"path": [
+														"dynamic-client-mtls",
+														"get"
+													]
+												},
+												"description": "This example is just a placeholder for the real dynamic client MTLS example - it is not an example of dynamic client TLS, but it does reference the token , which uses a bash script and `curl` to demonstrate. Run the script from the Tyk Demo repo root as so:\n\n``` bash\n./deployments/tyk/scripts/examples/dynamic-client-mtls.sh\n\n ```\n\nThe `curl` request in the script references the certificate and private key, which the gateway then uses the identify the bearer token (used in the `Authorization` header here). The authorization decision is then based on the access rights defined in the bearer token. The client only needs to provide the certificate, rather than the `Authorization` header, as this request shows."
 											},
 											"response": []
 										}
@@ -4665,8 +4750,8 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"type": "text",
-										"value": "throttle_key"
+										"value": "throttle_key",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -4746,8 +4831,8 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"type": "text",
-										"value": "quota_key"
+										"value": "quota_key",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -5314,8 +5399,8 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"type": "text",
-										"value": "auth_key_analytics_on"
+										"value": "auth_key_analytics_on",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -5761,6 +5846,107 @@
 								"description": "This requests uses the OAS URL rewrite middleware to rewrite the URL sent to the upstream API, such that the last two path elements are swapped - `/url-rewrite/test` becomes `/test/url-rewrite`.\n\nThis can be checked in the `url` field of the API JSON response body."
 							},
 							"response": []
+						}
+					]
+				},
+				{
+					"name": "Streams",
+					"item": [
+						{
+							"name": "HTTP to Websocket",
+							"item": [
+								{
+									"name": "Post message to websocket",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"message\":\"Hello, Tyk Streams!\"}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/streams-http-to-websocket/post",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"streams-http-to-websocket",
+												"post"
+											]
+										},
+										"description": "This example uses the gateway to proxy messages between HTTP and WS protocols.\n\nThe HTTP request sends a message payload that the gateway then relays to clients subscribing via a websocket.\n\nTo see this in action, run the two scripts in the `deployments/tyk/scripts/examples/streams/http-to-ws` directory:\n\n- `http-to-ws-1.sh`: Listens to the websocket for messages.\n    \n- `http-to-ws-2.sh`: Sends messages to the websocket via HTTP.\n    \n\nThis example request is exactly the same as the 2nd script, so can be used for the same purpose. Requests sent from here will appear in the terminal window running the 1st script."
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "HTTP to Redis Pub/Sub",
+							"item": [
+								{
+									"name": "Post message to Redis Pub/Sub",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "Hello, Tyk Streams!",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{tyk-gateway.host}}/streams-http-to-redis-pubsub/post",
+											"protocol": "http",
+											"host": [
+												"{{tyk-gateway.host}}"
+											],
+											"path": [
+												"streams-http-to-redis-pubsub",
+												"post"
+											]
+										},
+										"description": "This example shows how Tyk can proxy messages between HTTP and Redis pub/sub channels.\n\nMessages posted in this example will be sent to the `streams` channel of the Tyk Demo Redis instance.\n\nTo see it in action, run the scripts found in deployments/tyk/scripts/examples/streams/http-to-redis-pubsub:\n\n- `http-to-redis-pubsub-1.sh`: Subscribes to the Redis `streams` channel and waits for messages.\n    \n- `http-to-redis-pubsub-2.sh`: Sends an HTTP POST requests to the gateway that is published into the `streams` channel.\n    \n\nYou can also send the message via this example request - it does the same thing as the 2nd script above."
+									},
+									"response": []
+								}
+							]
 						}
 					]
 				}
@@ -6479,10 +6665,11 @@
 									"if (pm.response.code != 200) {",
 									"    console.warn(\"Unable to get Ngrok data, skipping geolocation tests\")",
 									"    // if we can't get the Ngrok data then we need to skip the geolocation request, and move to the 'safe' post-request placeholder instead",
-									"    postman.setNextRequest(\"Geolocation - post-request placeholder\")",
+									"    pm.execution.setNextRequest(\"Geolocation - post-request placeholder\")",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -8501,7 +8688,7 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"var requestBody = JSON.parse(request.data);",
+													"var requestBody = JSON.parse(pm.request.body);",
 													"",
 													"pm.test(\"Status code is 200\", function () {",
 													"    pm.response.to.have.status(200);",
@@ -8538,7 +8725,8 @@
 													"    pm",
 													");"
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										},
 										{
@@ -8552,7 +8740,8 @@
 													"pm.variables.set(\"api-id\", \"fa0b0268b4124faa70e151a879d3e92c\")",
 													"pm.variables.set(\"policy-id\", \"615d2e528bf3980001c7c6c2\")"
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										}
 									],
