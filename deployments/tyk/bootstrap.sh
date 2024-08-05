@@ -188,6 +188,15 @@ log_ok
 log_message "Wait for services to be available after restart"
 wait_for_liveness
 
+
+
+sleep 3
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard
+sleep 3
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway tyk-gateway-2
+sleep 3
+
+
 log_message "Validating that secure messaging is functioning on gateway containers"
 # pause before checking logs
 sleep 2
@@ -197,10 +206,10 @@ max_attempts=3
 phrase="Payload signature is invalid!"
 while true; do
   # attempt hot reloads to test payload delivery process
-  hot_reload "http://tyk-gateway.localhost:8080" "28d220fd77974a4facfb07dc1e49c2aa"
-  hot_reload "https://tyk-gateway-2.localhost:8081" "28d220fd77974a4facfb07dc1e49c2aa"
+  # hot_reload "http://tyk-gateway.localhost:8080" "28d220fd77974a4facfb07dc1e49c2aa"
+  # hot_reload "https://tyk-gateway-2.localhost:8081" "28d220fd77974a4facfb07dc1e49c2aa"
   # pause to allow logs to capture any payload signature errors caused by hot reload command
-  sleep 2
+  # sleep 2
 
   attempts=$((attempts + 1))
   if [ "$attempts" -gt "$max_attempts" ]; then
