@@ -133,8 +133,8 @@ fi
 log_ok
 bootstrap_progress
 wait_for_file_local "deployments/tyk/volumes/tyk-dashboard/certs/private-key.pem"
-# sleep 2
-# wait_for_file "/opt/tyk-dashboard/certs/private-key.pem" "tyk-demo-tyk-dashboard-1"
+echo "dash private:"
+cat deployments/tyk/volumes/tyk-dashboard/certs/private-key.pem
 
 log_message "Copying public-key.pem to gateway volume mount"
 docker cp $OPENSSL_CONTAINER_NAME:/tmp/public-key.pem deployments/tyk/volumes/tyk-gateway/certs >>logs/bootstrap.log
@@ -145,9 +145,8 @@ fi
 log_ok
 bootstrap_progress
 wait_for_file_local "deployments/tyk/volumes/tyk-gateway/certs/public-key.pem"
-# sleep 2
-# wait_for_file "/opt/tyk-gateway/certs/public-key.pem" "tyk-demo-tyk-gateway-1"
-# wait_for_file "/opt/tyk-gateway/certs/public-key.pem" "tyk-demo-tyk-gateway-2-1"
+echo "gateway public:"
+cat deployments/tyk/volumes/tyk-gateway/certs/public-key.pem
 
 log_message "Copying tls-certificate.pem to gateway volume mount"
 docker cp $OPENSSL_CONTAINER_NAME:/tmp/tls-certificate.pem deployments/tyk/volumes/tyk-gateway/certs >>logs/bootstrap.log
@@ -158,6 +157,8 @@ fi
 log_ok
 bootstrap_progress
 wait_for_file_local "deployments/tyk/volumes/tyk-gateway/certs/tls-certificate.pem"
+echo "gateway tls:"
+cat deployments/tyk/volumes/tyk-gateway/certs/tls-certificate.pem
 
 log_message "Copying tls-private-key.pem to gateway volume mount"
 docker cp $OPENSSL_CONTAINER_NAME:/tmp/tls-private-key.pem deployments/tyk/volumes/tyk-gateway/certs >>logs/bootstrap.log
@@ -168,9 +169,8 @@ fi
 log_ok
 bootstrap_progress
 wait_for_file_local "deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.pem"
-# sleep 2
-# wait_for_file "/opt/tyk-gateway/certs/tls-private-key.pem" "tyk-demo-tyk-gateway-1"
-# wait_for_file "/opt/tyk-gateway/certs/tls-private-key.pem" "tyk-demo-tyk-gateway-2-1"
+echo "gateway tls private:"
+cat deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.pem
 
 log_message "Removing temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
 docker rm -f $OPENSSL_CONTAINER_NAME
@@ -190,11 +190,11 @@ wait_for_liveness
 
 
 
-sleep 3
-eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard
-sleep 3
-eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway tyk-gateway-2
-sleep 3
+# sleep 3
+# eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard
+# sleep 3
+# eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway tyk-gateway-2
+# sleep 3
 
 
 log_message "Validating that secure messaging is functioning on gateway containers"
