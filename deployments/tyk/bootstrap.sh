@@ -185,7 +185,12 @@ log_message "Recreating containers to load new certificates"
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
 log_ok
 
+log_message "Wait for services to be available after restart"
+wait_for_liveness
+
 log_message "Validating that secure messaging is functioning on gateway containers"
+# pause before checking logs
+sleep 2
 gateway_service_names=("tyk-gateway" "tyk-gateway-2")
 attempts=0
 max_attempts=3
@@ -224,8 +229,7 @@ done
 log_ok
 bootstrap_progress
 
-log_message "Wait for services to be available after restart"
-wait_for_liveness
+
 
 # Kafka
 
