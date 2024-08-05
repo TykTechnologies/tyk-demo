@@ -6665,10 +6665,11 @@
 									"if (pm.response.code != 200) {",
 									"    console.warn(\"Unable to get Ngrok data, skipping geolocation tests\")",
 									"    // if we can't get the Ngrok data then we need to skip the geolocation request, and move to the 'safe' post-request placeholder instead",
-									"    postman.setNextRequest(\"Geolocation - post-request placeholder\")",
+									"    pm.execution.setNextRequest(\"Geolocation - post-request placeholder\")",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
