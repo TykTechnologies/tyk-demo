@@ -980,7 +980,7 @@ wait_for_api_loaded () {
 }
 
 wait_for_liveness () {
-  local status_endpoint="${1:-http:\/\/tyk-gateway.localhost:8080/hello}"
+  local status_endpoint="${1:-http://tyk-gateway.localhost:8080/hello}"
   local attempt_count=0
   local pass="pass"
 

@@ -12,7 +12,7 @@ log_message "Restarting Tyk 2 services to use newly created certificates"
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk2-dashboard tyk2-gateway
 log_ok
 
-wait_for_liveness "http:\/\/localhost:8085/hello"
+wait_for_liveness "http://localhost:8085/hello"
 
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
 
