@@ -8,7 +8,7 @@ if [ "$1" == "" ]; then
     -d \
     -P \
     -v $(pwd)/deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf \
-    -v $(pwd)/deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs \
+    -v tyk-demo_tyk-gateway-certs:/opt/tyk-gateway/certs \
     -v $(pwd)/deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware \
     -v $(pwd)/deployments/tyk/volumes/tyk-gateway/plugins:/opt/tyk-gateway/plugins \
     -v $(pwd)/deployments/tyk/volumes/tyk-gateway/templates/error_401.json:/opt/tyk-gateway/templates/error_401.json \
@@ -21,7 +21,7 @@ else
     -d \
     -P \
     -v $(pwd)/deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf \
-    -v $(pwd)/deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs \
+    -v tyk-demo_tyk-gateway-certs:/opt/tyk-gateway/certs \
     -v $(pwd)/deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware \
     -v $(pwd)/deployments/tyk/volumes/tyk-gateway/plugins:/opt/tyk-gateway/plugins \
     -v $(pwd)/deployments/tyk/volumes/tyk-gateway/templates/error_401.json:/opt/tyk-gateway/templates/error_401.json \
