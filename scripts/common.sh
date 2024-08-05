@@ -980,21 +980,20 @@ wait_for_api_loaded () {
 }
 
 wait_for_liveness () {
-
-  attempt_count=0
-  pass="pass"
+  local status_endpoint="${1:-http:\/\/tyk-gateway.localhost:8080/hello}"
+  local attempt_count=0
+  local pass="pass"
 
   log_message "Waiting for Gateway, Dashboard and Redis to be up and running"
 
-  while true
-  do
+  while true; do
     attempt_count=$((attempt_count+1))
 
     #Check Gateway, Redis and Dashboard status
-    local hello=$(curl http://tyk-gateway.localhost:8080/hello -s)
-    local gw_status=$(echo "$hello" | jq -r '.status')
-    local dash_status=$(echo "$hello" | jq -r '.details.dashboard.status')
-    local redis_status=$(echo "$hello" | jq -r '.details.redis.status')
+    local status_response=$(curl $status_endpoint -s)
+    local gw_status=$(echo "$status_response" | jq -r '.status')
+    local dash_status=$(echo "$status_response" | jq -r '.details.dashboard.status')
+    local redis_status=$(echo "$status_response" | jq -r '.details.redis.status')
 
     if [[ "$gw_status" = "pass" ]] && [[ "$dash_status" = "pass" ]] && [[ "$redis_status" = "pass" ]]
     then
@@ -1005,7 +1004,6 @@ wait_for_liveness () {
     fi
 
     sleep 2
-
   done
 }
 
