@@ -182,7 +182,11 @@ log_ok
 bootstrap_progress
 
 log_message "Recreating containers to load new certificates"
-eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard tyk-gateway tyk-gateway-2
+sleep 3
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard
+sleep 3
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway tyk-gateway-2
+sleep 3
 log_ok
 
 log_message "Wait for services to be available after restart"
