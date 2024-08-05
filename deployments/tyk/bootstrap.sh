@@ -67,16 +67,19 @@ fi
 bootstrap_progress
 
 log_message "Creating temporary container $OPENSSL_CONTAINER_NAME for OpenSSL usage"
-docker run -d --name $OPENSSL_CONTAINER_NAME alpine:3.20.1 tail -f /dev/null > /dev/null 2>&1
+docker run -d --name $OPENSSL_CONTAINER_NAME \
+  -v tyk-demo_tyk-gateway-certs:/tyk-gateway-certs \
+  -v tyk-demo_tyk-dashboard-certs:/tyk-dashboard-certs \
+  alpine:3.20.1 tail -f /dev/null >/dev/null 2>&1
 log_ok
 bootstrap_progress
 
 log_message "Install OpenSSL into container $OPENSSL_CONTAINER_NAME"
-docker exec -d $OPENSSL_CONTAINER_NAME apk add --no-cache openssl
+docker exec $OPENSSL_CONTAINER_NAME apk add --no-cache openssl >/dev/null 2>>logs/bootstrap.log
 # Wait for the installation to complete
 while true; do
     # Check if OpenSSL is installed by trying to get its version
-    if docker exec $OPENSSL_CONTAINER_NAME openssl version > /dev/null 2>&1; then
+    if docker exec $OPENSSL_CONTAINER_NAME openssl version >/dev/null 2>&1; then
         log_message "  OpenSSL has been successfully installed"
         break
     else
@@ -87,93 +90,53 @@ done
 
 log_message "OpenSSL version used for generating certs: $(docker exec $OPENSSL_CONTAINER_NAME openssl version)"
 
-log_message "Removing any pre-existing certs"
-rm deployments/tyk/volumes/tyk-dashboard/certs/*.pem > /dev/null 2>&1
-rm deployments/tyk/volumes/tyk-gateway/certs/*.pem > /dev/null 2>&1
-log_ok
-bootstrap_progress
-
-# sleeps have been added after the cert commands in this section to prevent race conditions
 log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
-docker exec -d $OPENSSL_CONTAINER_NAME sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tyk-gateway-2.localhost\" -keyout /tmp/tls-private-key.pem -out /tmp/tls-certificate.pem -days 365 -nodes" >>logs/bootstrap.log
+docker exec $OPENSSL_CONTAINER_NAME sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tyk-gateway-2.localhost\" -keyout /tyk-gateway-certs/tls-private-key.pem -out /tyk-gateway-certs/tls-certificate.pem -days 365 -nodes" >/dev/null 2>&1
 if [ "$?" -ne "0" ]; then
   echo "ERROR: Could not generate self-signed certificate"
   exit 1
 fi
 log_ok
 bootstrap_progress
-wait_for_file "/tmp/tls-certificate.pem" "$OPENSSL_CONTAINER_NAME"
+wait_for_file "/tyk-gateway-certs/tls-certificate.pem" "$OPENSSL_CONTAINER_NAME"
+wait_for_file "/tyk-gateway-certs/tls-private-key.pem" "$OPENSSL_CONTAINER_NAME"
 
 log_message "Generating private key for secure messaging and signing"
-docker exec -d $OPENSSL_CONTAINER_NAME sh -c "openssl genrsa -out /tmp/private-key.pem 2048" >>logs/bootstrap.log
+docker exec $OPENSSL_CONTAINER_NAME sh -c "openssl genrsa -out /tyk-dashboard-certs/private-key.pem 2048" >/dev/null 2>>logs/bootstrap.log
 if [ "$?" -ne "0" ]; then
   echo "ERROR: Could not generate private key"
   exit 1
 fi
 log_ok
 bootstrap_progress
-wait_for_file "/tmp/private-key.pem" "$OPENSSL_CONTAINER_NAME"
+wait_for_file "/tyk-dashboard-certs/private-key.pem" "$OPENSSL_CONTAINER_NAME"
 
 log_message "Generating public key for secure messaging and signing"
-docker exec -d $OPENSSL_CONTAINER_NAME sh -c "openssl rsa -in /tmp/private-key.pem -pubout -out /tmp/public-key.pem" >>logs/bootstrap.log
+docker exec $OPENSSL_CONTAINER_NAME sh -c "openssl rsa -in /tyk-dashboard-certs/private-key.pem -pubout -out /tyk-gateway-certs/public-key.pem" >/dev/null 2>>logs/bootstrap.log
 if [ "$?" -ne "0" ]; then
   echo "ERROR: Could not generate public key"
   exit 1
 fi
 log_ok
 bootstrap_progress
-wait_for_file "/tmp/public-key.pem" "$OPENSSL_CONTAINER_NAME"
+wait_for_file "/tyk-gateway-certs/public-key.pem" "$OPENSSL_CONTAINER_NAME"
 
-log_message "Copying private-key.pem to dashboard volume mount"
-docker cp $OPENSSL_CONTAINER_NAME:/tmp/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs >>logs/bootstrap.log
+log_message "Setting read permissions on certificate volumes"
+docker exec $OPENSSL_CONTAINER_NAME chmod -R a+r /tyk-gateway-certs >/dev/null 2>>logs/bootstrap.log
 if [ "$?" != "0" ]; then
-  echo "ERROR: Could not copy private-key.pem to dashboard volume mount"
+  echo "ERROR: Could not set read permissions on /tyk-gateway-certs volume"
+  exit 1
+fi
+docker exec $OPENSSL_CONTAINER_NAME chmod -R a+r /tyk-dashboard-certs >/dev/null 2>>logs/bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not set read permissions on /tyk-dashboard-certs volume"
   exit 1
 fi
 log_ok
 bootstrap_progress
-wait_for_file_local "deployments/tyk/volumes/tyk-dashboard/certs/private-key.pem"
-echo "dash private:"
-cat deployments/tyk/volumes/tyk-dashboard/certs/private-key.pem
-
-log_message "Copying public-key.pem to gateway volume mount"
-docker cp $OPENSSL_CONTAINER_NAME:/tmp/public-key.pem deployments/tyk/volumes/tyk-gateway/certs >>logs/bootstrap.log
-if [ "$?" != "0" ]; then
-  echo "ERROR: Could not copy public-key.pem to gateway volume mount"
-  exit 1
-fi
-log_ok
-bootstrap_progress
-wait_for_file_local "deployments/tyk/volumes/tyk-gateway/certs/public-key.pem"
-echo "gateway public:"
-cat deployments/tyk/volumes/tyk-gateway/certs/public-key.pem
-
-log_message "Copying tls-certificate.pem to gateway volume mount"
-docker cp $OPENSSL_CONTAINER_NAME:/tmp/tls-certificate.pem deployments/tyk/volumes/tyk-gateway/certs >>logs/bootstrap.log
-if [ "$?" != "0" ]; then
-  echo "ERROR: Could not copy tls-certificate.pem to gateway volume mount"
-  exit 1
-fi
-log_ok
-bootstrap_progress
-wait_for_file_local "deployments/tyk/volumes/tyk-gateway/certs/tls-certificate.pem"
-echo "gateway tls:"
-cat deployments/tyk/volumes/tyk-gateway/certs/tls-certificate.pem
-
-log_message "Copying tls-private-key.pem to gateway volume mount"
-docker cp $OPENSSL_CONTAINER_NAME:/tmp/tls-private-key.pem deployments/tyk/volumes/tyk-gateway/certs >>logs/bootstrap.log
-if [ "$?" != "0" ]; then
-  echo "ERROR: Could not copy tls-private-key.pem to gateway volume mount"
-  exit 1
-fi
-log_ok
-bootstrap_progress
-wait_for_file_local "deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.pem"
-echo "gateway tls private:"
-cat deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.pem
 
 log_message "Removing temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
-docker rm -f $OPENSSL_CONTAINER_NAME
+docker rm -f $OPENSSL_CONTAINER_NAME >/dev/null 2>>logs/bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not remove temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
   exit 1
@@ -182,72 +145,23 @@ log_ok
 bootstrap_progress
 
 log_message "Recreating containers to load new certificates"
-sleep 3
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard
-sleep 3
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway tyk-gateway-2
-sleep 3
 log_ok
 
 log_message "Wait for services to be available after restart"
 wait_for_liveness
 
-
-
-# sleep 3
-# eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard
-# sleep 3
-# eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway tyk-gateway-2
-# sleep 3
-
-
-log_message "Validating that secure messaging is functioning on gateway containers"
-# pause before checking logs
-sleep 2
-gateway_service_names=("tyk-gateway" "tyk-gateway-2")
-attempts=0
-max_attempts=3
-phrase="Payload signature is invalid!"
-while true; do
-  # attempt hot reloads to test payload delivery process
-  # hot_reload "http://tyk-gateway.localhost:8080" "28d220fd77974a4facfb07dc1e49c2aa"
-  # hot_reload "https://tyk-gateway-2.localhost:8081" "28d220fd77974a4facfb07dc1e49c2aa"
-  # pause to allow logs to capture any payload signature errors caused by hot reload command
-  # sleep 2
-
-  attempts=$((attempts + 1))
-  if [ "$attempts" -gt "$max_attempts" ]; then
-    echo "ERROR: Unable to clear '$phrase' from logs"
-    exit 1
-  fi
-
-  all_clear=true
-  for gateway_service in "${gateway_service_names[@]}"; do
-    # check service log for presence of error message
-    if $(generate_docker_compose_command) logs "$gateway_service" 2>&1 | grep -q "$phrase"; then
-      log_message "  Attempt $attempts: '$phrase' detected in the logs of service '$gateway_service' - recreating"
-      # payload issue is resolved by recreating the service
-      $(generate_docker_compose_command) up -d --no-deps --force-recreate $gateway_service
-      all_clear=false
-      # allow restarted service to initialise
-      sleep 2
-    fi
-  done
-
-  if [ "$all_clear" = true ]; then
-    log_message "  '$phrase' is not present in any container logs"
-    break
-  fi
-done
-log_ok
-bootstrap_progress
-
-
-
 # Kafka
 
 log_message "Creating Kafka topic"
-docker exec tyk-demo-kafka-1 sh -c "/opt/kafka/bin/kafka-topics.sh --create --topic quickstart-events --bootstrap-server localhost:9092"
+docker exec tyk-demo-kafka-1 sh -c "/opt/kafka/bin/kafka-topics.sh --create --topic quickstart-events --bootstrap-server localhost:9092" >/dev/null 2>>logs/bootstrap.log
+if [ "$?" -ne "0" ]; then
+  echo "ERROR: Could not create kafka topic"
+  exit 1
+fi
+log_ok
+bootstrap_progress
 
 # Go plugins
 
