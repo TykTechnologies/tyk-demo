@@ -186,6 +186,30 @@ wait_for_file () {
   done
 }
 
+wait_for_file_local() {
+  local file_path="$1"
+  local try_max=10
+  local try_count=0
+  log_message "Waiting for $file_path to be present"
+  while true; do
+    ((try_count++))
+    if [ "$try_count" -gt "$try_max" ]; then
+      echo "ERROR: Maximum retry count reached for file $file_path"
+      exit 1
+    fi
+
+    if [ -s $file_path ]; then
+      log_ok
+      bootstrap_progress
+      return 0
+    else
+      log_message "  File not present, waiting... $try_count/$try_max"
+      bootstrap_progress
+      sleep 2
+    fi
+  done
+}
+
 hot_reload () {
   gateway_host="$1"
   gateway_secret="$2"
