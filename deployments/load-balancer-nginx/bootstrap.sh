@@ -6,13 +6,13 @@ deployment="Load Balancer"
 log_start_deployment
 bootstrap_progress
 
-# log_message "Restart Gateways to load latest certificates"
-# docker restart tyk-demo-tyk-gateway-3-1 tyk-demo-tyk-gateway-4-1 1>/dev/null 2>>logs/bootstrap.log
-# if [ "$?" != 0 ]; then
-#   echo "Error when restart Gateways to load latest certificates"
-#   exit 1
-# fi
-# log_ok
+log_message "Restart Gateways to load latest certificates"
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway-3 tyk-gateway-4 1>/dev/null 2>>logs/bootstrap.log
+if [ "$?" != 0 ]; then
+  echo "Error when restart Gateways to load latest certificates"
+  exit 1
+fi
+log_ok
 
 log_message "Restart nginx to reset load balancer"
 docker restart tyk-demo-nginx-1 1>/dev/null 2>>logs/bootstrap.log
