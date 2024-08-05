@@ -1,7 +1,7 @@
 ---
 services:
   tyk-gateway-3:
-    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.5.0-alpha2}
+    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.5.0-rc2}
     networks:
       - tyk
     environment:
@@ -28,7 +28,7 @@ services:
       - tyk-redis
       - tyk-dashboard
   tyk-gateway-4:
-    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.5.0-alpha2}
+    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.5.0-rc2}
     networks:
       - tyk
     environment:
