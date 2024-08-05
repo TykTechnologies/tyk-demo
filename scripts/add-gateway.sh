@@ -6,6 +6,7 @@
 if [ "$1" == "" ]; then
   docker run \
     -d \
+    --expose 8080 \
     -P \
     -v $(pwd)/deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf \
     -v tyk-demo_tyk-gateway-certs:/opt/tyk-gateway/certs \
@@ -19,6 +20,7 @@ else
   docker run \
     --name $1 \
     -d \
+    --expose 8080 \
     -P \
     -v $(pwd)/deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf \
     -v tyk-demo_tyk-gateway-certs:/opt/tyk-gateway/certs \
