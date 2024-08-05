@@ -4085,7 +4085,7 @@
 														"get"
 													]
 												},
-												"description": "This example is a placeholder for the real dynamic client MTLS example, which uses a bash script and `curl` to demonstrate. Run the script from the Tyk Demo repo root as so:\n\n``` bash\n./deployments/tyk/scripts/examples/dynamic-client-mtls.sh\n\n ```\n\nThe `curl` request in the script references the certificate and private key, which the gateway then uses the identify the bearer token (used in the `Authorization` header here). The authorization decision is then based on the access rights defined in the bearer token. The client only needs to provide the certificate, rather than the `Authorization` header, as this request shows."
+												"description": "This example is just a placeholder for the real dynamic client MTLS example - it is not an example of dynamic client TLS, but it does reference the token , which uses a bash script and `curl` to demonstrate. Run the script from the Tyk Demo repo root as so:\n\n``` bash\n./deployments/tyk/scripts/examples/dynamic-client-mtls.sh\n\n ```\n\nThe `curl` request in the script references the certificate and private key, which the gateway then uses the identify the bearer token (used in the `Authorization` header here). The authorization decision is then based on the access rights defined in the bearer token. The client only needs to provide the certificate, rather than the `Authorization` header, as this request shows."
 											},
 											"response": []
 										}
@@ -8687,7 +8687,7 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"var requestBody = JSON.parse(request.data);",
+													"var requestBody = JSON.parse(pm.request.body);",
 													"",
 													"pm.test(\"Status code is 200\", function () {",
 													"    pm.response.to.have.status(200);",
@@ -8724,7 +8724,8 @@
 													"    pm",
 													");"
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										},
 										{
@@ -8738,7 +8739,8 @@
 													"pm.variables.set(\"api-id\", \"fa0b0268b4124faa70e151a879d3e92c\")",
 													"pm.variables.set(\"policy-id\", \"615d2e528bf3980001c7c6c2\")"
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										}
 									],
