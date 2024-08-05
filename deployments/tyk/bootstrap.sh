@@ -173,8 +173,6 @@ wait_for_file_local "deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.p
 # wait_for_file "/opt/tyk-gateway/certs/tls-private-key.pem" "tyk-demo-tyk-gateway-2-1"
 
 log_message "Removing temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
-# pause before removing container, to allow file copies to complete
-sleep 2
 docker rm -f $OPENSSL_CONTAINER_NAME
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not remove temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
