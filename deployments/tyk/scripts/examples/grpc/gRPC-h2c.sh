@@ -2,7 +2,6 @@
 #!/bin/bash
 
 # This example uses grpcurl to call a gRPC API service proxied by the Tyk gateway using HTTP/2 over TLS (h2c).
-# Run the script from the directory it is located, as it references the hello.proto file that is also stored there.
 
 # Check if grpcurl is installed
 if ! command -v grpcurl &> /dev/null
