@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This example uses grpcurl to call gRPC API services proxied by the Tyk gateway.
+# This example uses grpcurl to call gRPC API services proxied by the Tyk gateway using TCP.
 # Port 9002 proxies to insecure gRPC (note -plaintext flag)
 # Port 9003 proxies to secure gRPC (note -insecure flag, due to self-signed certificate)
 

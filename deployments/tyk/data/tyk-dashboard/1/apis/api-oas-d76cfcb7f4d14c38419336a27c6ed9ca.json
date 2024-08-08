@@ -1,0 +1,43 @@
+{
+  "components": {},
+  "info": {
+    "title": "gRPC H2C",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.3",
+  "paths": {},
+  "servers": [
+    {
+      "url": "http://tyk-gateway.localhost:8080/hello.HelloService/"
+    }
+  ],
+  "x-tyk-api-gateway": {
+    "info": {
+      "dbId": "66b4dec4ec7a380001d0085e",
+      "id": "d76cfcb7f4d14c38419336a27c6ed9ca",
+      "name": "gRPC H2C",
+      "orgId": "5e9d9544a1dcd60001d0ed20",
+      "state": {
+        "active": true
+      }
+    },
+    "middleware": {
+      "global": {
+        "contextVariables": {
+          "enabled": true
+        },
+        "trafficLogs": {
+          "enabled": true
+        }
+      }
+    },
+    "server": {
+      "listenPath": {
+        "value": "/hello.HelloService/"
+      }
+    },
+    "upstream": {
+      "url": "h2c://grpcbin:9000"
+    }
+  }
+}
