@@ -21,7 +21,7 @@ for data_group in "${data_groups[@]}"; do\
       api_id=$(jq -r '.api_definition.id' <<< $api)
       api_file_name="api-$api_id.json"
       echo "  $api_name"
-      # if API is OAS spec, then retrieve use some different values
+      # perform some specification specific actions
       if [[ "$api_is_oas" == "true" ]]; then
         # update api_id to use static id
         api_id=$(jq -r '.api_definition.api_id' <<< $api)
@@ -30,9 +30,14 @@ for data_group in "${data_groups[@]}"; do\
           -H "Authorization:${dashboard_keys[$index]}")
         # update file name to denote that the contents are an OAS-style API definition
         api_file_name="api-oas-$api_id.json"
+        # remove the dbId field, as this changes every time the data is exported, resulting in unneccessary modifications to all files
+        api="$(echo "$api" | jq 'del(.["x-tyk-api-gateway"].info.dbId)')"
+      else
+        # remove the updated_at field, as this changes every time the data is exported, resulting in unneccessary modifications to all files
+        api="$(echo "$api" | jq 'del(.updated_at)')"
       fi
 
-      echo "$api" | jq '.' > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/apis/$api_file_name"
+      echo "$api" > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/apis/$api_file_name"
     fi 
   done <<< "$apis"
 

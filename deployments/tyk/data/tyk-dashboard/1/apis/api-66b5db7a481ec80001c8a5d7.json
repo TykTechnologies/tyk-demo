@@ -1,13 +1,13 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "62a0ec2592faf50001395816",
-    "name": "JSON Placeholder",
-    "slug": "json-placeholder",
-    "listen_port": 0,
-    "protocol": "",
+    "id": "66b5db7a481ec80001c8a5d7",
+    "name": "TCP to Redis",
+    "slug": "temp",
+    "listen_port": 9004,
+    "protocol": "tcp",
     "enable_proxy_protocol": false,
-    "api_id": "546e885199c947147e7f39b7d6e8e984",
+    "api_id": "665e8463fd1e4bbb62d706a93e21420b",
     "org_id": "5e9d9544a1dcd60001d0ed20",
     "use_keyless": false,
     "use_oauth2": false,
@@ -32,7 +32,7 @@
       "use_cookie": false,
       "cookie_name": "",
       "disable_header": false,
-      "auth_header_name": "",
+      "auth_header_name": "Authorization",
       "use_certificate": false,
       "validate_signature": false,
       "signature": {
@@ -54,7 +54,70 @@
         "use_cookie": false,
         "cookie_name": "",
         "disable_header": false,
-        "auth_header_name": "",
+        "auth_header_name": "Authorization",
+        "use_certificate": false,
+        "validate_signature": false,
+        "signature": {
+          "algorithm": "",
+          "header": "",
+          "use_param": false,
+          "param_name": "",
+          "secret": "",
+          "allowed_clock_skew": 0,
+          "error_code": 0,
+          "error_message": ""
+        }
+      },
+      "basic": {
+        "name": "",
+        "use_param": false,
+        "param_name": "",
+        "use_cookie": false,
+        "cookie_name": "",
+        "disable_header": false,
+        "auth_header_name": "Authorization",
+        "use_certificate": false,
+        "validate_signature": false,
+        "signature": {
+          "algorithm": "",
+          "header": "",
+          "use_param": false,
+          "param_name": "",
+          "secret": "",
+          "allowed_clock_skew": 0,
+          "error_code": 0,
+          "error_message": ""
+        }
+      },
+      "coprocess": {
+        "name": "",
+        "use_param": false,
+        "param_name": "",
+        "use_cookie": false,
+        "cookie_name": "",
+        "disable_header": false,
+        "auth_header_name": "Authorization",
+        "use_certificate": false,
+        "validate_signature": false,
+        "signature": {
+          "algorithm": "",
+          "header": "",
+          "use_param": false,
+          "param_name": "",
+          "secret": "",
+          "allowed_clock_skew": 0,
+          "error_code": 0,
+          "error_message": ""
+        }
+      },
+      "hmac": {
+        "name": "",
+        "use_param": false,
+        "param_name": "",
+        "use_cookie": false,
+        "cookie_name": "",
+        "disable_header": false,
+        "auth_header_name": "Authorization",
         "use_certificate": false,
         "validate_signature": false,
         "signature": {
@@ -75,7 +138,49 @@
         "use_cookie": false,
         "cookie_name": "",
         "disable_header": false,
-        "auth_header_name": "",
+        "auth_header_name": "Authorization",
+        "use_certificate": false,
+        "validate_signature": false,
+        "signature": {
+          "algorithm": "",
+          "header": "",
+          "use_param": false,
+          "param_name": "",
+          "secret": "",
+          "allowed_clock_skew": 0,
+          "error_code": 0,
+          "error_message": ""
+        }
+      },
+      "oauth": {
+        "name": "",
+        "use_param": false,
+        "param_name": "",
+        "use_cookie": false,
+        "cookie_name": "",
+        "disable_header": false,
+        "auth_header_name": "Authorization",
+        "use_certificate": false,
+        "validate_signature": false,
+        "signature": {
+          "algorithm": "",
+          "header": "",
+          "use_param": false,
+          "param_name": "",
+          "secret": "",
+          "allowed_clock_skew": 0,
+          "error_code": 0,
+          "error_message": ""
+        }
+      },
+      "oidc": {
+        "name": "",
+        "use_param": false,
+        "param_name": "",
+        "use_cookie": false,
+        "cookie_name": "",
+        "disable_header": false,
+        "auth_header_name": "Authorization",
         "use_certificate": false,
         "validate_signature": false,
         "signature": {
@@ -146,7 +251,7 @@
       "name": "",
       "default": "",
       "location": "header",
-      "key": "version",
+      "key": "x-api-version",
       "strip_path": false,
       "strip_versioning_data": false,
       "fallback_to_default": false,
@@ -156,8 +261,8 @@
       "not_versioned": true,
       "default_version": "",
       "versions": {
-        "1.0.0": {
-          "name": "1.0.0",
+        "Default": {
+          "name": "Default",
           "expires": "",
           "paths": {
             "ignored": [],
@@ -166,78 +271,6 @@
           },
           "use_extended_paths": true,
           "extended_paths": {
-            "track_endpoints": [
-              {
-                "disabled": false,
-                "path": "/posts/{id}/comments",
-                "method": "GET"
-              },
-              {
-                "disabled": false,
-                "path": "/albums/{id}/photos",
-                "method": "GET"
-              },
-              {
-                "disabled": false,
-                "path": "/comments/{id}",
-                "method": "GET"
-              },
-              {
-                "disabled": false,
-                "path": "/photos/{id}",
-                "method": "GET"
-              },
-              {
-                "disabled": false,
-                "path": "/albums/{id}",
-                "method": "GET"
-              },
-              {
-                "disabled": false,
-                "path": "/users/{id}",
-                "method": "GET"
-              },
-              {
-                "disabled": false,
-                "path": "/todos/{id}",
-                "method": "GET"
-              },
-              {
-                "disabled": false,
-                "path": "/posts/{id}",
-                "method": "GET"
-              },
-              {
-                "disabled": false,
-                "path": "/comments",
-                "method": "GET"
-              },
-              {
-                "disabled": false,
-                "path": "/photos",
-                "method": "GET"
-              },
-              {
-                "disabled": false,
-                "path": "/albums",
-                "method": "GET"
-              },
-              {
-                "disabled": false,
-                "path": "/users",
-                "method": "GET"
-              },
-              {
-                "disabled": false,
-                "path": "/todos",
-                "method": "GET"
-              },
-              {
-                "disabled": false,
-                "path": "/posts",
-                "method": "GET"
-              }
-            ],
             "persist_graphql": []
           },
           "global_headers": {},
@@ -274,9 +307,9 @@
     },
     "proxy": {
       "preserve_host_header": false,
-      "listen_path": "/jsonplaceholder",
-      "target_url": "https://jsonplaceholder.typicode.com/",
-      "disable_strip_slash": false,
+      "listen_path": "/tcp-to-redis/",
+      "target_url": "tcp://tyk-redis:6379",
+      "disable_strip_slash": true,
       "strip_listen_path": true,
       "enable_load_balancing": false,
       "target_list": [],
@@ -328,8 +361,8 @@
     "custom_middleware_bundle": "",
     "custom_middleware_bundle_disabled": false,
     "cache_options": {
-      "cache_timeout": 0,
-      "enable_cache": false,
+      "cache_timeout": 60,
+      "enable_cache": true,
       "cache_all_safe_requests": false,
       "cache_response_codes": [],
       "enable_upstream_cache_control": false,
@@ -362,12 +395,24 @@
     "response_processors": [],
     "CORS": {
       "enable": false,
-      "allowed_origins": [],
-      "allowed_methods": [],
-      "allowed_headers": [],
+      "allowed_origins": [
+        "*"
+      ],
+      "allowed_methods": [
+        "GET",
+        "POST",
+        "HEAD"
+      ],
+      "allowed_headers": [
+        "Origin",
+        "Accept",
+        "Content-Type",
+        "X-Requested-With",
+        "Authorization"
+      ],
       "exposed_headers": [],
       "allow_credentials": false,
-      "max_age": 0,
+      "max_age": 24,
       "options_passthrough": false,
       "debug": false
     },
@@ -387,8 +432,8 @@
     "enable_detailed_recording": false,
     "graphql": {
       "enabled": false,
-      "execution_mode": "",
-      "version": "",
+      "execution_mode": "proxyOnly",
+      "version": "2",
       "schema": "",
       "type_field_configurations": [],
       "playground": {
@@ -402,7 +447,7 @@
       },
       "proxy": {
         "features": {
-          "use_immutable_headers": false
+          "use_immutable_headers": true
         },
         "auth_headers": {},
         "request_headers": {},
@@ -433,5 +478,5 @@
   "sort_by": 0,
   "user_group_owners": [],
   "user_owners": [],
-  "created_at": "2022-06-08T18:36:21Z"
+  "created_at": "2024-08-09T09:03:54Z"
 }

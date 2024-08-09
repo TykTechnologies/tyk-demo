@@ -26,7 +26,6 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "6697d8d301e9480001994dbe",
       "id": "6323a6ed7f7d4fb9473f3ecde19e1477",
       "name": "Dynamic Client MTLS",
       "orgId": "5e9d9544a1dcd60001d0ed20",
