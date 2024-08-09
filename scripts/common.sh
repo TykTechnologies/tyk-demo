@@ -676,8 +676,7 @@ create_api () {
 
 create_policy () {
   local policy_data_path="$1"
-  local api_key="$2"
-  local dashboard_api_key="$3"
+  local dashboard_api_key="$2"
   local policy_name=$(jq -r '.name' $policy_data_path)
   local policy_id=$(jq -r '._id' $policy_data_path)
 
@@ -685,35 +684,11 @@ create_policy () {
 
   log_message "  Importing Policy: $policy_name"
 
-  import_request_payload=$(jq --slurpfile new_policy "$policy_data_path" '.Data += $new_policy' deployments/tyk/data/tyk-dashboard/admin-api-policies-import-template.json)
-
-  api_response="$(curl $dashboard_base_url/admin/policies/import -s \
-    -H "admin-auth: $api_key" \
-    -d "$import_request_payload" 2>> logs/bootstrap.log)"
+  api_response="$(curl $dashboard_base_url/api/portal/policies -s \
+    -H "authorization: $dashboard_api_key" \
+    -d @$policy_data_path 2>> logs/bootstrap.log)"
 
   log_json_result "$api_response"
-
-  log_message "  Updating Policy: $policy_name"
-
-  policy_data=$(cat $policy_data_path)
-
-  update_request_payload=$(jq --argjson policy_data "$policy_data" --arg policy_id "$policy_id" '.variables.id = $policy_id | .variables.input = $policy_data' deployments/tyk/data/tyk-dashboard/dashboard-graphql-api-policy-update-template.json)
-
-  api_response="$(curl $dashboard_base_url/graphql -s \
-    -H "Authorization: $dashboard_api_key" \
-    -d "$update_request_payload" 2>> logs/bootstrap.log)"
-
-  # currently custom approach to extracting the graphql response status
-  response_status="$(jq -r '.data.update_policy.status' <<< "$api_response")"
-  
-  # custom validation
-  if [[ "$response_status" == "OK" ]]; then
-    log_ok
-    log_message "    Id: $policy_id"
-  else
-    log_message "ERROR updating policy: $(jq -r '.data.update_policy.message' <<< "$api_response")"
-    exit 1
-  fi
 }
 
 create_basic_key () {

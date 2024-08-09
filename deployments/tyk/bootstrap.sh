@@ -317,7 +317,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     log_message "Creating Policies"
     for file in $data_group_path/policies/*; do
       if [[ -f $file ]]; then
-        create_policy "$file" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+        create_policy "$file" "$dashboard_user_api_key"
         bootstrap_progress
       fi
     done    
