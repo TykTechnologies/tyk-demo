@@ -18,7 +18,7 @@ for data_group in "${data_groups[@]}"; do\
     if [[ "$api" != "" ]]; then
       api_is_oas=$(jq -r '.api_definition.is_oas' <<< $api) 
       api_name=$(jq -r '.api_definition.name' <<< $api)
-      api_id=$(jq -r '.api_definition.id' <<< $api)
+      api_id=$(jq -r '.api_definition.api_id' <<< $api)
       api_file_name="api-$api_id.json"
       echo "  $api_name"
       # perform some specification specific actions
