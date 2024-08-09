@@ -621,6 +621,7 @@ create_api () {
   local api_id=""
   # API data format differs depending on type of API, which we can determine by the file name containing 'oas'
   local api_is_oas=$([[ $api_data_path =~ api-oas-[a-z0-9]+\.json$ ]] && echo true || echo false)
+  local api_endpoint="$dashboard_base_url/api/apis"
 
   check_variables
 
@@ -629,32 +630,18 @@ create_api () {
     # OAS API
     api_name=$(jq -r '.["x-tyk-api-gateway"].info.name' $api_data_path)
     api_id=$(jq -r '.["x-tyk-api-gateway"].info.id' $api_data_path)    
+    # import endpoint differs between classic and OAS APIs
+    api_endpoint="$api_endpoint/oas"
+    log_message "  Importing OAS API: $api_name"
   else
     # Tyk API 
     api_name=$(jq -r '.api_definition.name' $api_data_path)
-    api_id=$(jq -r '.api_definition.id' $api_data_path)
+    api_id=$(jq -r '.api_definition.api_id' $api_data_path)
+    log_message "  Importing Classic API: $api_name"
   fi
+  log_message "    Id: $api_id"
 
-  # importing the API enables us to keep the API's id rather than getting a new random id
-  # this means we can then reference the APIs by these known ids
-  log_message "  Importing API: $api_name"
-  api_response=""
-  if [ "$api_is_oas" == true ]; then
-    # OAS API
-    # we just create OAS APIs, rather than import them, as the API id is maintained through the x-tyk-api-gateway.info.id field
-    api_response="$(curl $dashboard_base_url/api/apis/oas -s \
-      -H "authorization: $dashboard_api_key" \
-      -d "$api_data" 2>> logs/bootstrap.log)"
-  else
-    # Tyk API
-    import_request_payload=$(jq --slurpfile new_api "$api_data_path" '.apis += $new_api' deployments/tyk/data/tyk-dashboard/admin-api-apis-import-template.json)
-    api_response="$(curl $dashboard_base_url/admin/apis/import -s \
-      -H "admin-auth: $admin_api_key" \
-      -d "$import_request_payload" 2>> logs/bootstrap.log)"
-  fi
-  log_json_result "$api_response"
-
-  # Update any webhook references - these need updating because webhooks cannot be imported, so their ids change each time
+  # Update any webhook references - these need updating because webhooks ids are not static
   # TODO: create OAS version for this, when needed
   webhook_reference_count=$(jq '.hook_references | length' $api_data_path)
   if [ "$webhook_reference_count" -gt "0" ]; then
@@ -664,7 +651,7 @@ create_api () {
 
     # loop through each webhook referenced in the API
     while read webhook_name; do
-      log_message "  Updating Webhook Reference: $webhook_name"
+      log_message "    Updating Webhook Reference: $webhook_name"
 
       new_webhook_id=$(jq -r --arg webhook_name "$webhook_name" 'select ( .name == $webhook_name ) .id' <<< "$webhook_data")
       
@@ -675,26 +662,16 @@ create_api () {
       # if more events are added then additional code will be needed to handle them
       api_data=$(jq --arg webhook_id "$new_webhook_id" --arg webhook_name "$webhook_name" '(.api_definition.event_handlers.events.AuthFailure[]? | select(.handler_meta.name == $webhook_name) .handler_meta.id) = $webhook_id' <<< "$api_data")
 
-      log_message "    Id: $new_webhook_id"
+      log_message "      Id: $new_webhook_id"
     done <<< "$(jq -c -r '.hook_references[].hook.name' $api_data_path)"
   fi
 
-  # APIs must be updated once imported, to ensure that all fields from the API data are stored
-  log_message "  Updating API: $api_name"
-  if [ "$api_is_oas" == true ]; then
-    # OAS API
-    # nothing to do - API already created
-    # this might change in the future, if we are able to import an OAS API and maintain its id, we may need to update the API depending on how the import functionality works
-    log_message "    Skipping update for OAS API"
-  else
-    # Tyk API
-    api_response="$(curl $dashboard_base_url/api/apis/$api_id -X PUT -s \
-      -H "Authorization: $dashboard_api_key" \
-      -d "$api_data" 2>> logs/bootstrap.log)"
-  fi
-  log_json_result "$api_response"
+  local api_response=""
+  api_response="$(curl $api_endpoint -s \
+    -H "authorization: $dashboard_api_key" \
+    -d "$api_data" 2>> logs/bootstrap.log)"
 
-  log_message "    Id: $api_id"
+  log_json_result "$api_response"
 }
 
 create_policy () {
