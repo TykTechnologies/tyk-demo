@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b631901046cc0001c46a1f",
     "name": "Ngrok Dashboard API",
     "slug": "ngrok-dashboard-api",
     "listen_port": 0,

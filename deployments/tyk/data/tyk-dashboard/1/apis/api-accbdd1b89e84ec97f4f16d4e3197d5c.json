@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318a1046cc0001c469f9",
     "name": "Basic Protected API",
     "slug": "basic-protected-api",
     "listen_port": 0,

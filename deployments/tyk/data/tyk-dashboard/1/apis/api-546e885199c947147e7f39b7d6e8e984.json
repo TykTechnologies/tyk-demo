@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318f1046cc0001c46a1a",
     "name": "JSON Placeholder",
     "slug": "json-placeholder",
     "listen_port": 0,

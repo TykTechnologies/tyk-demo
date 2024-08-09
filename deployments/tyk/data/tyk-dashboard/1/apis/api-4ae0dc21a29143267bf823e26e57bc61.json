@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318d1046cc0001c46a0b",
     "name": "Go Plugin API (No Auth)",
     "slug": "go-plugin-api-no-auth",
     "listen_port": 0,

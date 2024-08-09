@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318d1046cc0001c46a0f",
     "name": "Versioned Dynamic Looping",
     "slug": "version-test",
     "listen_port": 0,

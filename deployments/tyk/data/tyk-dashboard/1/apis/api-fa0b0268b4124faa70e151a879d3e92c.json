@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318d1046cc0001c46a10",
     "name": "OAuth 2.0 API",
     "slug": "oauth-2.0",
     "listen_port": 0,

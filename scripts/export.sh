@@ -30,12 +30,12 @@ for data_group in "${data_groups[@]}"; do\
           -H "Authorization:${dashboard_keys[$index]}")
         # update file name to denote that the contents are an OAS-style API definition
         api_file_name="api-oas-$api_id.json"
-        # remove the dbId field, as this changes every time the data is exported, resulting in unneccessary modifications to all files
+        # remove the dbId field, as this changes every time the data is exported, resulting in unneccessary modifications
         api="$(echo "$api" | jq 'del(.["x-tyk-api-gateway"].info.dbId)')"
       else
-        # remove the updated_at field, as this changes every time the data is exported, resulting in unneccessary modifications to all files
-        api="$(echo "$api" | jq 'del(.updated_at)')"
-        # use placeholder value for any webhook ids, as these change on import, resulting in unneccessary modifications to files that contain webhooks
+        # remove these fields, as they change every time the data is exported, resulting in unneccessary modifications
+        api="$(echo "$api" | jq 'del(.updated_at, .api_definition.id)')"
+        # use placeholder value for any webhook ids, as these change on import, resulting in unneccessary modifications
         api=$(echo "$api" | jq '.hook_references[].hook.id = "000000000000000000000000"')
         api=$(echo "$api" | jq '.api_definition.event_handlers.events |= with_entries(.value |= map(if .handler_meta.webhook_id then (.handler_meta.webhook_id = "000000000000000000000000"  | .handler_meta.id = "000000000000000000000000") else . end))')
       fi

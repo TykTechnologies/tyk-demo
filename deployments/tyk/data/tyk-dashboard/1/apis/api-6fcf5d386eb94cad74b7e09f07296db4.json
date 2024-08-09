@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318c1046cc0001c46a09",
     "name": "Secret API - Local",
     "slug": "secret-api",
     "listen_port": 0,

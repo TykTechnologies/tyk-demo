@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318a1046cc0001c469fd",
     "name": "Webhook Receiver",
     "slug": "webhook-receiver",
     "listen_port": 0,

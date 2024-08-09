@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318f1046cc0001c46a16",
     "name": "Users Response Transform",
     "slug": "users-response-transform",
     "listen_port": 0,

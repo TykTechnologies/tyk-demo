@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b631961046cc0001c46a30",
     "name": "HTTPbin",
     "slug": "httpbin",
     "listen_port": 0,

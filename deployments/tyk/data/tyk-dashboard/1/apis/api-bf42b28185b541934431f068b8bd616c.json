@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318b1046cc0001c46a02",
     "name": "Uptime Test API",
     "slug": "uptime-test-api",
     "listen_port": 0,

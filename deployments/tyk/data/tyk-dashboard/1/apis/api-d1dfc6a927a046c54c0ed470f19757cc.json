@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b631901046cc0001c46a1d",
     "name": "Rate Limit Proxy API",
     "slug": "rate-limit-proxy-api",
     "listen_port": 0,

@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318e1046cc0001c46a11",
     "name": "Cookie Redirect",
     "slug": "cookie-redirect",
     "listen_port": 0,

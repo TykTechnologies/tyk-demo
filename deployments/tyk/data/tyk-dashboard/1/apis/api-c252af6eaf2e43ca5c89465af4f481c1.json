@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b631901046cc0001c46a1c",
     "name": "Rate Limit Path API 2",
     "slug": "rate-limit-path-api-2",
     "listen_port": 0,

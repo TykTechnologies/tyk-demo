@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b631901046cc0001c46a1e",
     "name": "External HTTPbin",
     "slug": "external-httpbin",
     "listen_port": 0,

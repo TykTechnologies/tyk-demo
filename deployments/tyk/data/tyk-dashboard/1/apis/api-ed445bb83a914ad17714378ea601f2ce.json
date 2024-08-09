@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318d1046cc0001c46a0c",
     "name": "Go Plugin API - JWT Parse",
     "slug": "go-plugin-api-jwt-parse",
     "listen_port": 0,

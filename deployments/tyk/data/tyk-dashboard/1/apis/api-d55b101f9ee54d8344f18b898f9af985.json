@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b631911046cc0001c46a21",
     "name": "gRPC API (TLS)",
     "slug": "temp",
     "listen_port": 9003,

@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318d1046cc0001c46a0e",
     "name": "Version by Path",
     "slug": "version-by-path",
     "listen_port": 0,

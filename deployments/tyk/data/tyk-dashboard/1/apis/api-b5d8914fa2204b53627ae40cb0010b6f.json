@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318c1046cc0001c46a08",
     "name": "Echo Server",
     "slug": "echo-server",
     "listen_port": 0,

@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b631911046cc0001c46a22",
     "name": "TCP to Redis",
     "slug": "temp",
     "listen_port": 9004,

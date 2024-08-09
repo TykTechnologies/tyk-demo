@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318f1046cc0001c46a18",
     "name": "Restified-Posts",
     "slug": "restified-posts",
     "listen_port": 0,

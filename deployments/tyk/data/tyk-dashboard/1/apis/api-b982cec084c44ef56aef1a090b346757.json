@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318c1046cc0001c46a07",
     "name": "Detailed Analytics On",
     "slug": "detailed-analytics-on",
     "listen_port": 0,

@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318c1046cc0001c46a05",
     "name": "GraphQL Countries",
     "slug": "graphql-countries",
     "listen_port": 0,
@@ -423,7 +422,7 @@
       "execution_mode": "proxyOnly",
       "version": "",
       "schema": "type Query {\n country(code: ID!): Country\n}\n\ntype Country {\n code: ID!\n name: String!\n}",
-      "last_schema_update": "2024-08-09T15:11:08.102Z",
+      "last_schema_update": "2024-08-09T15:26:52.743Z",
       "type_field_configurations": [],
       "playground": {
         "enabled": false,

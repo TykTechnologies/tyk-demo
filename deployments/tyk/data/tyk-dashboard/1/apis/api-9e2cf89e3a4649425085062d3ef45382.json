@@ -1,7 +1,6 @@
 {
   "api_model": {},
   "api_definition": {
-    "id": "66b6318b1046cc0001c46a01",
     "name": "Load Balanced API",
     "slug": "uptime",
     "listen_port": 0,
