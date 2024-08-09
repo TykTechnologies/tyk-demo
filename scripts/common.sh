@@ -614,8 +614,7 @@ read_api () {
 
 create_api () {
   local api_data_path="$1"
-  local admin_api_key="$2"
-  local dashboard_api_key="$3"
+  local dashboard_api_key="$2"
   local api_data="$(cat $api_data_path)"
   local api_name=""
   local api_id=""

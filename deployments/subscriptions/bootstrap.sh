@@ -16,7 +16,7 @@ dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_
 dashboard_user_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
 
 # Create APIs
-create_api "deployments/subscriptions/data/apis-chatapp.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+create_api "deployments/subscriptions/data/apis-chatapp.json" "$dashboard_user_api_key"
 bootstrap_progress
 
 log_end_deployment

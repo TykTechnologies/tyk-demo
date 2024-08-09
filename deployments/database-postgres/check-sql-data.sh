@@ -9,7 +9,7 @@ test_api_name=$(cat deployments/database-postgres/data/test-api.json | jq -r .ap
 
 echo "Importing an API Definition called \"$test_api_name\" into the Dashboard"
 
-create_api "deployments/database-postgres/data/test-api.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+create_api "deployments/database-postgres/data/test-api.json" "$dashboard_user_api_key"
 
 echo "Querying PostgreSQL for an API called \"$test_api_name\" - expecting result to show 1 row"
 
