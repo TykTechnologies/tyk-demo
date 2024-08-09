@@ -302,13 +302,13 @@
               "api_model": {},
               "event_timeout": 60,
               "header_map": {},
-              "id": "automatically-set-during-import",
+              "id": "111111111111111111111111",
               "method": "POST",
               "name": "Webhook Receiver Post",
               "org_id": "5e9d9544a1dcd60001d0ed20",
               "target_path": "http://localhost:8080/webhook-receiver/post",
               "template_path": "",
-              "webhook_id": "automatically-set-during-import"
+              "webhook_id": "111111111111111111111111"
             }
           }
         ]
@@ -396,7 +396,7 @@
       "event_timeout": 60,
       "hook": {
         "api_model": {},
-        "id": "automatically-set-during-import",
+        "id": "111111111111111111111111",
         "org_id": "5e9d9544a1dcd60001d0ed20",
         "name": "Webhook Receiver Post",
         "method": "POST",

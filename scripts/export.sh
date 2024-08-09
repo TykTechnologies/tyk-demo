@@ -35,9 +35,9 @@ for data_group in "${data_groups[@]}"; do\
       else
         # remove the updated_at field, as this changes every time the data is exported, resulting in unneccessary modifications to all files
         api="$(echo "$api" | jq 'del(.updated_at)')"
-        # reset any webhook ids, as these change on import, resulting in unneccessary modifications to files that contain webhooks
-        api=$(echo "$api" | jq '.hook_references[].hook.id = "automatically-set-during-import"')
-        api=$(echo "$api" | jq '.api_definition.event_handlers.events |= with_entries(.value |= map(if .handler_meta.webhook_id then (.handler_meta.webhook_id = "automatically-set-during-import"  | .handler_meta.id = "automatically-set-during-import") else . end))')
+        # use placeholder value for any webhook ids, as these change on import, resulting in unneccessary modifications to files that contain webhooks
+        api=$(echo "$api" | jq '.hook_references[].hook.id = "111111111111111111111111"')
+        api=$(echo "$api" | jq '.api_definition.event_handlers.events |= with_entries(.value |= map(if .handler_meta.webhook_id then (.handler_meta.webhook_id = "111111111111111111111111"  | .handler_meta.id = "111111111111111111111111") else . end))')
       fi
 
       echo "$api" > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/apis/$api_file_name"
