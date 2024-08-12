@@ -19,18 +19,18 @@ jobs:
       - name: Extract Docker image tag
         id: get-gateway-tag
         run: |
-          TAG=$(grep -m 1 'tykio/tyk-gateway:' deployments/tyk/docker-compose.yml | awk -F':' '{print $NF}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/\${GATEWAY_VERSION:-\(.*\)}/\1/' -e 's/^-//' -e 's/}$//')
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          GATEWAY_TAG=$(grep -m 1 'tykio/tyk-gateway:' deployments/tyk/docker-compose.yml | awk -F':' '{print $NF}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/\${GATEWAY_VERSION:-\(.*\)}/\1/' -e 's/^-//' -e 's/}$//')
+          echo "gateway_tag=$GATEWAY_TAG" >> $GITHUB_OUTPUT
       - name: Echo tag
         run: |
-          echo "Extracted tag: ${{ steps.get-gateway-tag.outputs.tag }}"
+          echo "Extracted tag: ${{ steps.get-gateway-tag.outputs.gateway_tag }}"
       - name: Restore cache
         uses: actions/cache@v3
         with:
-          path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.tag }}
-          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.tag }}-${{ hashFiles('.bootstrap/plugin-cache/**/*') }}
+          path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.gateway_tag }}
+          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway_tag }}-${{ hashFiles('.bootstrap/plugin-cache/**/*') }}
           restore-keys: |
-            ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.tag }}-
+            ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway_tag }}-
             ${{ runner.os }}-plugin-cache-
       - name: Create Environment File
         run: |
@@ -44,8 +44,8 @@ jobs:
         uses: actions/cache@v3
         if: always()
         with:
-          path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.tag }}
-          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.tag }}-${{
+          path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.gateway_tag }}
+          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway_tag }}-${{
             hashFiles('.bootstrap/plugin-cache/**/*') }}
       - name: Store Logs
         if: always()
