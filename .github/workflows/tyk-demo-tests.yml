@@ -1,30 +1,39 @@
 ---
 name: Tyk Demo API Tests
-on: # yamllint disable-line rule:truthy
+on:
   - push
-
 jobs:
   Tyk-Demo-Api-Tests:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }}
+          event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by
+          GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository
+          is ${{ github.repository }}."
       - name: Check Out Repository Code
         uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - name: Extract Tyk Gateway Docker image tag 
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the
+          runner."
+      - name: Extract Tyk Gateway Docker image tag
         id: get-gateway-tag
-        run: |
-          TAG=$(grep -oP "tykio/tyk-gateway:\K[^\s]+" deployments/tyk/docker-compose.yml | sed 's/\${GATEWAY_VERSION:-\(.*\)}/\1/')
+        run: >
+          TAG=$(grep -oP "tykio/tyk-gateway:\K[^\s]+"
+          deployments/tyk/docker-compose.yml | sed
+          's/\${GATEWAY_VERSION:-\(.*\)}/\1/')
+
           echo "tag=$TAG" >> $GITHUB_OUTPUT
       - name: Restore cache
         uses: actions/cache@v3
         with:
           path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.tag }}
-          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.tag }}-${{ hashFiles('.bootstrap/plugin-cache/**/*') }}
-          restore-keys: |
-            ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.tag }}-
+          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.tag }}-${{
+            hashFiles('.bootstrap/plugin-cache/**/*') }}
+          restore-keys: >
+            ${{ runner.os }}-plugin-cache-${{
+            steps.get-gateway-tag.outputs.tag }}-
+
             ${{ runner.os }}-plugin-cache-
       - name: Create Environment File
         run: |
@@ -39,7 +48,8 @@ jobs:
         if: always()
         with:
           path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.tag }}
-          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.tag }}-${{ hashFiles('.bootstrap/plugin-cache/**/*') }}
+          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.tag }}-${{
+            hashFiles('.bootstrap/plugin-cache/**/*') }}
       - name: Store Logs
         if: always()
         uses: actions/upload-artifact@v4
