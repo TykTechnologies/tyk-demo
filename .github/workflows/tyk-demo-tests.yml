@@ -21,7 +21,7 @@ jobs:
         run: |
           GATEWAY_TAG=$(grep -m 1 'tykio/tyk-gateway:' deployments/tyk/docker-compose.yml | awk -F':' '{print $NF}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/\${GATEWAY_VERSION:-\(.*\)}/\1/' -e 's/^-//' -e 's/}$//')
           echo "gateway-tag=$GATEWAY_TAG" >> $GITHUB_OUTPUT
-          echo "Extracted tag: ${{ steps.get-gateway-tag.outputs.gateway-tag }}"
+          echo "Extracted gateway tag: $GATEWAY_TAG"
       - name: Restore cache
         id: restore-cache
         uses: actions/cache/restore@v4
