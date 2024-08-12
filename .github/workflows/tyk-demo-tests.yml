@@ -13,6 +13,19 @@ jobs:
       - name: Check Out Repository Code
         uses: actions/checkout@v4
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - name: Extract Tyk Gateway Docker image tag 
+        id: get-tag
+        run: |
+          TAG=$(grep -oP "tykio/tyk-gateway:\K[^\s]+" deployments/tyk/docker-compose.yml | sed 's/\${GATEWAY_VERSION:-\(.*\)}/\1/')
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+      - name: Cache plugin directory
+        uses: actions/cache@v3
+        with:
+          path: .bootstrap/plugin-cache/${{ steps.get-tag.outputs.tag }}
+          key: ${{ runner.os }}-plugin-cache-${{ steps.get-tag.outputs.tag }}-${{ hashFiles('.bootstrap/plugin-cache/**/*') }}
+          restore-keys: |
+            ${{ runner.os }}-plugin-cache-${{ steps.get-tag.outputs.tag }}-
+            ${{ runner.os }}-plugin-cache-
       - name: Create Environment File
         run: |
           echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
