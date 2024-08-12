@@ -16,14 +16,13 @@ jobs:
         uses: actions/checkout@v4
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the
           runner."
-      - name: Extract Docker image tag
+      - name: Extract Docker Image Tag
         id: get-gateway-tag
         run: |
           GATEWAY_TAG=$(grep -m 1 'tykio/tyk-gateway:' deployments/tyk/docker-compose.yml | awk -F':' '{print $NF}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/\${GATEWAY_VERSION:-\(.*\)}/\1/' -e 's/^-//' -e 's/}$//')
           echo "gateway-tag=$GATEWAY_TAG" >> $GITHUB_OUTPUT
           echo "Extracted gateway tag: $GATEWAY_TAG"
-      - name: Cache plugins
-        id: cache-plugins
+      - name: Cache Go Plugins
         uses: actions/cache@v4
         with:
           path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.gateway-tag }}
