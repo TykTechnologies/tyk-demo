@@ -20,18 +20,16 @@ jobs:
         id: get-gateway-tag
         run: |
           GATEWAY_TAG=$(grep -m 1 'tykio/tyk-gateway:' deployments/tyk/docker-compose.yml | awk -F':' '{print $NF}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/\${GATEWAY_VERSION:-\(.*\)}/\1/' -e 's/^-//' -e 's/}$//')
-          echo "gateway_tag=$GATEWAY_TAG" >> $GITHUB_OUTPUT
+          echo "gateway-tag=$GATEWAY_TAG" >> $GITHUB_OUTPUT
       - name: Echo tag
         run: |
-          echo "Extracted tag: ${{ steps.get-gateway-tag.outputs.gateway_tag }}"
+          echo "Extracted tag: ${{ steps.get-gateway-tag.outputs.gateway-tag }}"
       - name: Restore cache
-        uses: actions/cache@v3
+        id: restore-cache
+        uses: actions/cache/restore@v4
         with:
-          path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.gateway_tag }}
-          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway_tag }}-${{ hashFiles('.bootstrap/plugin-cache/**/*') }}
-          restore-keys: |
-            ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway_tag }}-
-            ${{ runner.os }}-plugin-cache-
+          path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.gateway-tag }}
+          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway-tag }}-${{ hashFiles('.bootstrap/plugin-cache/**/*') }}
       - name: Create Environment File
         run: |
           echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
@@ -41,12 +39,11 @@ jobs:
       - name: Bootstrap and Test All Eligible Deployments
         run: sudo ./scripts/test-all.sh
       - name: Save cache
-        uses: actions/cache@v3
+        uses: actions/cache/save@v4
         if: always()
         with:
           path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.gateway_tag }}
-          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway_tag }}-${{
-            hashFiles('.bootstrap/plugin-cache/**/*') }}
+          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
       - name: Store Logs
         if: always()
         uses: actions/upload-artifact@v4
