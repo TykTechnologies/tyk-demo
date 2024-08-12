@@ -27,7 +27,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.gateway-tag }}
-          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway-tag }}-${{ hashFiles('.bootstrap/plugin-cache/**/*') }}
+          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
       - name: Create Environment File
         run: |
           echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
