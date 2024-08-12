@@ -44,7 +44,7 @@ log_http_result () {
 
 log_json_result () {
   # the API returns variation of case for the status field and value, so we have to check them all
-  status=$(echo "$1" | jq 'if (.Status == "OK" or .Status == "Ok" or .Status == "ok" or .status == "OK" or .status == "Ok" or .status == "ok") then true else false end')
+  local status=$(echo "$1" | jq 'if (.Status == "OK" or .Status == "Ok" or .Status == "ok" or .status == "OK" or .status == "Ok" or .status == "ok") then true else false end')
 
   if [ "$status" == "true" ]; then
     log_ok
@@ -79,8 +79,8 @@ log_end_teardown () {
 }
 
 set_docker_environment_value () {
-  setting_current_value=$(grep "$1" .env)
-  setting_desired_value="$1=$2"
+  local setting_current_value=$(grep "$1" .env)
+  local setting_desired_value="$1=$2"
   if [ "$setting_current_value" == "" ]
   then
     # make sure .env file has an empty line before adding docker env var
@@ -101,20 +101,20 @@ set_docker_environment_value () {
 }
 
 delete_docker_environment_value () {
-  setting_key="$1"
+  local setting_key="$1"
   # don't include the "=" in the setting_key, it is automatically added
   sed -i.bak '/^'"$setting_key"'=/d' .env
   rm .env.bak
 }
 
 wait_for_response () {
-  url="$1"
-  status=""
-  desired_status="$2"
-  header="$3"
-  attempt_max="$4"
-  attempt_count=0
-  http_method="GET"
+  local url="$1"
+  local status=""
+  local desired_status="$2"
+  local header="$3"
+  local attempt_max="$4"
+  local attempt_count=0
+  local http_method="GET"
 
   if [ "$5" != "" ]
   then
@@ -160,10 +160,10 @@ wait_for_response () {
 }
 
 hot_reload () {
-  gateway_host="$1"
-  gateway_secret="$2"
-  group="$3"
-  result=""
+  local gateway_host="$1"
+  local gateway_secret="$2"
+  local group="$3"
+  local result=""
 
   if [ "$group" = "group" ]
   then
@@ -215,7 +215,7 @@ get_service_image_tag () {
 
 generate_docker_compose_command () {
   # create the docker compose command
-  command_docker_compose="docker compose --env-file `pwd`/.env"
+  local command_docker_compose="docker compose --env-file `pwd`/.env"
   while read deployment; do
     command_docker_compose="$command_docker_compose -f deployments/$deployment/docker-compose.yml"
   done < .bootstrap/bootstrapped_deployments
@@ -226,23 +226,23 @@ generate_docker_compose_command () {
 
 get_licence_payload () {
   # read licence line from .env file
-  licence_line=$(grep "$1=" .env)
+  local licence_line=$(grep "$1=" .env)
   # extract licence JWT
-  encoded_licence_jwt=$(echo $licence_line | sed -E 's/^[A-Z_]+=(.+)$/\1/')
+  local encoded_licence_jwt=$(echo $licence_line | sed -E 's/^[A-Z_]+=(.+)$/\1/')
   # decode licence payload
-  decoded_licence_payload=$(decode_jwt $encoded_licence_jwt)
+  local decoded_licence_payload=$(decode_jwt $encoded_licence_jwt)
 
   echo $decoded_licence_payload
 }
 
 check_licence_expiry () {
-  licence_payload=$(get_licence_payload $1)
+  local licence_payload=$(get_licence_payload $1)
   # read licence expiry
-  licence_expiry=$(echo $licence_payload | jq -r '.exp')
+  local licence_expiry=$(echo $licence_payload | jq -r '.exp')
   # calculate the number of seconds remaining for the licence
-  licence_seconds_remaining=$(expr $licence_expiry - $(date '+%s'))
+  local licence_seconds_remaining=$(expr $licence_expiry - $(date '+%s'))
   # calculate the number of days remaining for the licence (this sets a global variable, allowing the value to be used elsewhere)
-  licence_days_remaining=$(expr $licence_seconds_remaining / 86400)
+  local licence_days_remaining=$(expr $licence_seconds_remaining / 86400)
   
   # check if licence time remaining (in seconds) is less or equal to 0
   if [ "$licence_seconds_remaining" -le "0" ]; then
@@ -270,14 +270,14 @@ _decode_base64_url () {
 decode_jwt () { _decode_base64_url $(echo -n $1 | cut -d "." -f ${2:-2}) | jq .; }
 
 build_go_plugin () {
-  gateway_image_tag=$(get_service_image_tag "tyk-gateway")
-  go_plugin_filename=$1
+  local gateway_image_tag=$(get_service_image_tag "tyk-gateway")
+  local go_plugin_filename=$1
   # each plugin must be in its own directory
-  go_plugin_directory="$PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/$2"
-  go_plugin_path="$go_plugin_directory/$go_plugin_filename"
-  go_plugin_cache_directory="$PWD/.bootstrap/plugin-cache"
-  go_plugin_cache_version_directory="$go_plugin_cache_directory/$gateway_image_tag"
-  go_plugin_cache_file_path="$go_plugin_cache_version_directory/$go_plugin_filename"
+  local go_plugin_directory="$PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/$2"
+  local go_plugin_path="$go_plugin_directory/$go_plugin_filename"
+  local go_plugin_cache_directory="$PWD/.bootstrap/plugin-cache"
+  local go_plugin_cache_version_directory="$go_plugin_cache_directory/$gateway_image_tag"
+  local go_plugin_cache_file_path="$go_plugin_cache_version_directory/$go_plugin_filename"
 
   # create cache directories if missing
   if [ ! -d "$go_plugin_cache_directory" ]; then
@@ -292,17 +292,17 @@ build_go_plugin () {
   if [ ! -f $go_plugin_cache_file_path ]; then
     log_message "  Not found. Building Go plugin $go_plugin_path using tag $gateway_image_tag"
     # default Go build targets
-    goarch="amd64"
-    goos="linux"
+    local goarch="amd64"
+    local goos="linux"
     # get the current platform
-    platform=$(uname -m)
+    local platform=$(uname -m)
     log_message "  Current hardware platform: $platform"
     if [ "$platform" == 'arm64' ]; then
       goarch=$platform
     fi
     log_message "  Target Go Platform: $goos/$goarch"
     docker run --rm -v $go_plugin_directory:/plugin-source -e GOOS=$goos -e GOARCH=$goarch --platform linux/amd64 tykio/tyk-plugin-compiler:$gateway_image_tag $go_plugin_filename
-    plugin_container_exit_code="$?"
+    local plugin_container_exit_code="$?"
     if [[ "$plugin_container_exit_code" -ne "0" ]]; then
       log_message "  ERROR: Tyk Plugin Compiler container returned error code: $plugin_container_exit_code"
       exit 1
@@ -315,8 +315,8 @@ build_go_plugin () {
     cp $go_plugin_directory/*.so $go_plugin_cache_version_directory
 
     # limit the number of plugin caches to prevent uncontrolled growth
-    PLUGIN_CACHE_MAX_SIZE=3
-    plugin_cache_count=$(find "$go_plugin_cache_directory" -maxdepth 1 -type d -not -path "$go_plugin_cache_directory" | wc -l)
+    local PLUGIN_CACHE_MAX_SIZE=3
+    local plugin_cache_count=$(find "$go_plugin_cache_directory" -maxdepth 1 -type d -not -path "$go_plugin_cache_directory" | wc -l)
     if [ "$plugin_cache_count" -gt "$PLUGIN_CACHE_MAX_SIZE" ]; then
       oldest_plugin_cache_path=$(find "$go_plugin_cache_directory" -type d -not -path "$go_plugin_cache_directory" -exec ls -ld -ltr {} + | head -n 1 | awk '{print $9}')
       if [ -n "$oldest_plugin_cache_path" ]; then
@@ -562,8 +562,8 @@ create_portal_documentation () {
 
   log_message "  Creating Documentation: $documentation_title"
 
-  encoded_documentation=$(cat $documentation_data_path | base64)
-  documentation_payload=$(jq --arg documentation "$encoded_documentation" '.documentation = $documentation' deployments/tyk/data/tyk-dashboard/dashboard-api-portal-documentation-create-template.json)
+  local encoded_documentation=$(cat $documentation_data_path | base64)
+  local documentation_payload=$(jq --arg documentation "$encoded_documentation" '.documentation = $documentation' deployments/tyk/data/tyk-dashboard/dashboard-api-portal-documentation-create-template.json)
 
   local api_response=$(curl $dashboard_base_url/api/portal/documentation -s \
     -H "Authorization: $api_key" \
@@ -590,14 +590,14 @@ create_portal_catalogue () {
   log_message "  Adding Catalogue Entry: $catalogue_name"
 
   # get the existing catalogue
-  catalogue="$(curl $dashboard_base_url/api/portal/catalogue -s \
+  local catalogue="$(curl $dashboard_base_url/api/portal/catalogue -s \
     -H "Authorization: $api_key" 2>> logs/bootstrap.log)"
 
   # add documentation id to new catalogue
-  new_catalogue=$(jq --arg documentation_id "$documentation_id" '.documentation = $documentation_id' $catalogue_data_path)
+  local new_catalogue=$(jq --arg documentation_id "$documentation_id" '.documentation = $documentation_id' $catalogue_data_path)
 
   # update the catalogue with the new catalogue entry
-  updated_catalogue=$(jq --argjson new_catalogue "[$new_catalogue]" '.apis += $new_catalogue' <<< "$catalogue")
+  local updated_catalogue=$(jq --argjson new_catalogue "[$new_catalogue]" '.apis += $new_catalogue' <<< "$catalogue")
 
   log_json_result "$(curl $dashboard_base_url/api/portal/catalogue -X 'PUT' -s \
     -H "Authorization: $api_key" \
@@ -607,7 +607,7 @@ create_portal_catalogue () {
 read_api () {
   local api_key="$1"
   local api_id="$2"
-  api_response="$(curl $dashboard_base_url/api/apis/$api_id -s \
+  local api_response="$(curl $dashboard_base_url/api/apis/$api_id -s \
     -H "authorization: $api_key" 2>> logs/bootstrap.log)"
   echo "$api_response"
 }
@@ -642,9 +642,9 @@ create_api () {
 
   # Update any webhook references - these need updating because webhooks ids are not static
   # TODO: create OAS version for this, when needed
-  webhook_reference_count=$(jq '.hook_references | length' $api_data_path)
+  local webhook_reference_count=$(jq '.hook_references | length' $api_data_path)
   if [ "$webhook_reference_count" -gt "0" ]; then
-    webhook_data=$(curl $dashboard_base_url/api/hooks?p=-1 -s \
+    local webhook_data=$(curl $dashboard_base_url/api/hooks?p=-1 -s \
       -H "Authorization: $dashboard_api_key" | \
       jq '.hooks[]')
 
@@ -652,7 +652,7 @@ create_api () {
     while read webhook_name; do
       log_message "    Updating Webhook Reference: $webhook_name"
 
-      new_webhook_id=$(jq -r --arg webhook_name "$webhook_name" 'select ( .name == $webhook_name ) .id' <<< "$webhook_data")
+      local new_webhook_id=$(jq -r --arg webhook_name "$webhook_name" 'select ( .name == $webhook_name ) .id' <<< "$webhook_data")
       
       # update the hook reference id, matching by the webhook name
       api_data=$(jq --arg webhook_id "$new_webhook_id" --arg webhook_name "$webhook_name" '(.hook_references[] | select(.hook.name == $webhook_name) .hook.id) = $webhook_id' <<< "$api_data")
@@ -665,8 +665,7 @@ create_api () {
     done <<< "$(jq -c -r '.hook_references[].hook.name' $api_data_path)"
   fi
 
-  local api_response=""
-  api_response="$(curl $api_endpoint -s \
+  local api_response="$(curl $api_endpoint -s \
     -H "authorization: $dashboard_api_key" \
     -d "$api_data" 2>> logs/bootstrap.log)"
 
@@ -707,7 +706,7 @@ create_basic_key () {
 
   log_message "  Adding Basic Key: $username"
 
-  api_response_status_code="$(curl $dashboard_base_url/api/apis/keys/basic/$username -s -w "%{http_code}" -o /dev/null \
+  local api_response_status_code="$(curl $dashboard_base_url/api/apis/keys/basic/$username -s -w "%{http_code}" -o /dev/null \
     -H "Authorization: $api_key" \
     -d @$basic_key_data_path 2>> logs/bootstrap.log)"
 
@@ -738,11 +737,11 @@ create_bearer_token () {
   log_message "  Adding Bearer Token: $key_name"
 
   # currently hard-coded to target a single gateway "$gateway_base_url"
-  api_response=$(curl $gateway_base_url/tyk/keys/$key_name -s \
+  local api_response=$(curl $gateway_base_url/tyk/keys/$key_name -s \
     -H "x-tyk-authorization: $api_key" \
     -d @$bearer_token_data_path 2>> logs/bootstrap.log)
 
-  response_status="$(jq -r '.status' <<< "$api_response")"
+  local response_status="$(jq -r '.status' <<< "$api_response")"
 
   # custom validation
   if [[ "$response_status" == "ok" ]]; then
@@ -771,7 +770,7 @@ create_bearer_token_dash () {
 
   log_message "  Adding Bearer Token (dash): $key_name"
 
-  api_response=$(curl $dashboard_base_url/api/keys -s \
+  local api_response=$(curl $dashboard_base_url/api/keys -s \
     -H "Authorization: $api_key" \
     -H 'Content-Type: application/json' \
     -d @$bearer_token_data_path 2>> logs/bootstrap.log)
@@ -794,11 +793,11 @@ delete_bearer_token_dash () {
 
   log_message "  Deleting Bearer Token: $key_name"
 
-  api_response=$(curl $dashboard_base_url/api/apis/$api_id/keys/$key_name -s \
+  local api_response=$(curl $dashboard_base_url/api/apis/$api_id/keys/$key_name -s \
     -X DELETE \
     -H "Authorization: $api_key" 2>> logs/bootstrap.log)
 
-  response_status="$(jq -r '.Status' <<< "$api_response")"
+  local response_status="$(jq -r '.Status' <<< "$api_response")"
 
   # custom validation
   if [[ "$response_status" == "OK" ]]; then
@@ -815,11 +814,11 @@ delete_bearer_token() {
 
   log_message "  Deleting Bearer Token: $key_name"
 
-  api_response=$(curl $gateway_base_url/tyk/keys/$key_name -s \
+  local api_response=$(curl $gateway_base_url/tyk/keys/$key_name -s \
     -X DELETE \
     -H "x-tyk-authorization: $api_key" 2>> logs/bootstrap.log)
 
-  response_status="$(jq -r '.status' <<< "$api_response")"
+  local response_status="$(jq -r '.status' <<< "$api_response")"
 
   # custom validation
   if [[ "$response_status" == "ok" ]]; then
@@ -859,11 +858,11 @@ create_oauth_client () {
 }
 
 wait_for_api_loaded () {
-  api_id="$1"
-  gateway_url="$2"
-  gateway_auth="$3"
-  target_api_result=""
-  attempt_count=0
+  local api_id="$1"
+  local gateway_url="$2"
+  local gateway_auth="$3"
+  local target_api_result=""
+  local attempt_count=0
   while [ "$target_api_result" != "200" ]; do
     attempt_count=$((attempt_count+1))
     if [ "$attempt_count" -gt "10"  ]; then
@@ -880,9 +879,8 @@ wait_for_api_loaded () {
 }
 
 wait_for_liveness () {
-
-  attempt_count=0
-  pass="pass"
+  local attempt_count=0
+  local pass="pass"
 
   log_message "Waiting for Gateway, Dashboard and Redis to be up and running"
 
@@ -908,4 +906,3 @@ wait_for_liveness () {
 
   done
 }
-
