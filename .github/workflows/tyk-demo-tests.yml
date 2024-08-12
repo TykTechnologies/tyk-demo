@@ -16,24 +16,21 @@ jobs:
         uses: actions/checkout@v4
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the
           runner."
-      - name: Extract Tyk Gateway Docker image tag
+      - name: Extract Docker image tag
         id: get-gateway-tag
-        run: >
-          TAG=$(grep -oP "tykio/tyk-gateway:\K[^\s]+"
-          deployments/tyk/docker-compose.yml | sed
-          's/\${GATEWAY_VERSION:-\(.*\)}/\1/')
-
+        run: |
+          TAG=$(grep -oE 'tykio/tyk-gateway:[^[:space:]]+' deployments/tyk/docker-compose.yml | cut -d':' -f3 | sed -E 's/\$\{[A-Z_]+:-(.+)\}/\1/')
           echo "tag=$TAG" >> $GITHUB_OUTPUT
+      - name: Echo tag
+        run: |
+          echo "Extracted tag: ${{ steps.get-gateway-tag.outputs.tag }}"
       - name: Restore cache
         uses: actions/cache@v3
         with:
           path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.tag }}
-          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.tag }}-${{
-            hashFiles('.bootstrap/plugin-cache/**/*') }}
-          restore-keys: >
-            ${{ runner.os }}-plugin-cache-${{
-            steps.get-gateway-tag.outputs.tag }}-
-
+          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.tag }}-${{ hashFiles('.bootstrap/plugin-cache/**/*') }}
+          restore-keys: |
+            ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.tag }}-
             ${{ runner.os }}-plugin-cache-
       - name: Create Environment File
         run: |
