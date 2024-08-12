@@ -22,12 +22,12 @@ jobs:
           GATEWAY_TAG=$(grep -m 1 'tykio/tyk-gateway:' deployments/tyk/docker-compose.yml | awk -F':' '{print $NF}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/\${GATEWAY_VERSION:-\(.*\)}/\1/' -e 's/^-//' -e 's/}$//')
           echo "gateway-tag=$GATEWAY_TAG" >> $GITHUB_OUTPUT
           echo "Extracted gateway tag: $GATEWAY_TAG"
-      - name: Restore plugin cache
-        id: restore-plugin-cache
-        uses: actions/cache/restore@v4
+      - name: Cache plugins
+        id: cache-plugins
+        uses: actions/cache@v4
         with:
           path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.gateway-tag }}
-          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
+          key: test-${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
       - name: Create Environment File
         run: |
           echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
@@ -36,12 +36,6 @@ jobs:
         run: sudo ./scripts/update-hosts.sh
       - name: Bootstrap and Test All Eligible Deployments
         run: sudo ./scripts/test-all.sh
-      - name: Save plugin cache
-        uses: actions/cache/save@v4
-        if: always()
-        with:
-          path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.gateway_tag }}
-          key: ${{ steps.restore-plugin-cache.outputs.cache-primary-key }}
       - name: Store Logs
         if: always()
         uses: actions/upload-artifact@v4
