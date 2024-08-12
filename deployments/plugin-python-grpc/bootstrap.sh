@@ -14,7 +14,7 @@ dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_
 dashboard_user_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
 
 # Create custom-auth API for Python gRPC
-create_api "deployments/plugin-python-grpc/data/apis-python_grpc.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+create_api "deployments/plugin-python-grpc/data/apis-python_grpc.json" "$dashboard_user_api_key"
 bootstrap_progress
 
 # Check that the API has loaded

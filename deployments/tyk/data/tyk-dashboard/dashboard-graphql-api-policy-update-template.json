@@ -1,8 +1,0 @@
-{
-    "operationName": "updatePolicy",
-    "variables": {
-        "id": "",
-        "input": {}
-    },
-    "query": "mutation updatePolicy($id: String!, $input: PolicyInput!) {\n  update_policy(id: $id, policy: $input) {\n    message\n    status\n    __typename\n  }\n}\n"
-}

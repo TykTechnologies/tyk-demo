@@ -42,39 +42,12 @@ log_message "initial_access_token: $initial_access_token"
 log_ok
 bootstrap_progress
 
-
-log_message "Importing DCR API"
-log_json_result "$(curl $dashboard_base_url/admin/apis/import -s \
-  -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "$(cat deployments/keycloak-dcr/data/tyk-dashboard/apis.json)")"
+log_message "Creating DCR API"
+create_api "deployments/keycloak-dcr/data/tyk-dashboard/apis.json" "$dashboard_user_api_key"
 bootstrap_progress
 
-
-#log_message "Create DCR Policy"
-#api_response="$(curl $dashboard_base_url/api/portal/policies -s \
-#    -H "Authorization: $dashboard_user_api_key" \
-#    -d "$(cat deployments/keycloak-dcr/data/tyk-dashboard/policy.json)")"
-#log_json_result $api_response
-#policy_id=$(echo $api_response | jq -r '.Message')
-#bootstrap_progress
-
-
-log_message "Importing DCR Policy"
-import_request_payload=$(jq --slurpfile policy "deployments/keycloak-dcr/data/tyk-dashboard/policy.json" '.Data += $policy' deployments/tyk/data/tyk-dashboard/admin-api-policies-import-template.json)
-log_json_result "$(curl $dashboard_base_url/admin/policies/import -s \
-  -H "admin-auth: $dashboard_admin_api_credentials" \
-  -d "$import_request_payload")"
-bootstrap_progress
-
-
-#ACL is missing when importing Policy using Dash Admin API, so do a PUT using the normal Dashboard API
-log_message "Updating DCR Policy"
-policy_id=$(cat deployments/keycloak-dcr/data/tyk-dashboard/policy.json | jq -r .id)
-
-log_json_result "$(curl -X 'PUT' $dashboard_base_url/api/portal/policies/$policy_id -s \
-    -H "Authorization: $dashboard_user_api_key" \
-    -d "$(cat deployments/keycloak-dcr/data/tyk-dashboard/policy.json)")"
-
+log_message "Creating DCR Policy"
+create_policy "deployments/keycloak-dcr/data/tyk-dashboard/policy.json" "$dashboard_user_api_key"
 bootstrap_progress
 
 log_message "Importing DCR Portal Catalog"

@@ -26,7 +26,6 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "668d3e5bb3930900014c7fb1",
       "id": "92c06a4330904cae6860c39bac57262b",
       "name": "JWT-RSA",
       "orgId": "5e9d9544a1dcd60001d0ed20",

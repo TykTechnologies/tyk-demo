@@ -11,10 +11,10 @@ dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_
 dashboard_user_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
 
 # Create APIs for SLO Demo
-create_api "deployments/slo-prometheus-grafana/data/apis/httpstatus.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+create_api "deployments/slo-prometheus-grafana/data/apis/httpstatus.json" "$dashboard_user_api_key"
 bootstrap_progress
 
-create_api "deployments/slo-prometheus-grafana/data/apis/httpbin.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+create_api "deployments/slo-prometheus-grafana/data/apis/httpbin.json" "$dashboard_user_api_key"
 bootstrap_progress
 
 # Stopping tyk-pump service

@@ -13,7 +13,6 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "66b4dec4ec7a380001d0085e",
       "id": "d76cfcb7f4d14c38419336a27c6ed9ca",
       "name": "gRPC H2C",
       "orgId": "5e9d9544a1dcd60001d0ed20",
