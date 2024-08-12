@@ -19,8 +19,9 @@ jobs:
       - name: Extract Docker image tag
         id: get-gateway-tag
         run: |
-          TAG=$(grep 'tykio/tyk-gateway:' deployments/tyk/docker-compose.yml | awk -F':' '{print $NF}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/\${GATEWAY_VERSION:-\(.*\)}/\1/' -e 's/^-//' -e 's/}$//')
-          echo "tag=\"$TAG\"" >> $GITHUB_OUTPUT
+          # TAG=$(grep 'tykio/tyk-gateway:' deployments/tyk/docker-compose.yml | awk -F':' '{print $NF}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/\${GATEWAY_VERSION:-\(.*\)}/\1/' -e 's/^-//' -e 's/}$//')
+          TAG="v1.2.3"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
       - name: Echo tag
         run: |
           echo "Extracted tag: ${{ steps.get-gateway-tag.outputs.tag }}"
