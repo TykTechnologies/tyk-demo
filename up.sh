@@ -2,6 +2,8 @@
 
 source scripts/common.sh
 
+up_start_time=$(date +%s)
+
 # persistence of log files is disabled by default, meaning the files are recreated between each bootstrap to prevent them from growing too large
 # to enable persistence, use argument "persist-log" when running this script
 persist_log=false
@@ -164,6 +166,16 @@ for deployment in "${deployments_to_create[@]}"; do
     exit 1
   fi
 done
+
+up_end_time=$(date +%s)
+up_elapsed_time=$((up_end_time - up_start_time))
+up_minutes=$((up_elapsed_time / 60))
+up_seconds=$((up_elapsed_time % 60))
+if [ $up_minutes -gt 0 ]; then
+    log_message "Elapsed time: $up_minutes minutes $up_seconds seconds"
+else
+    log_message "Elapsed time: $up_seconds seconds"
+fi
 
 # Confirm initialisation process is complete
 printf "\nTyk Demo initialisation process completed"
