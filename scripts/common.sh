@@ -682,12 +682,12 @@ create_api () {
     api_id=$(jq -r '.["x-tyk-api-gateway"].info.id' $api_data_path)    
     # import endpoint differs between classic and OAS APIs
     api_endpoint="$api_endpoint/oas"
-    log_message "  Importing OAS API: $api_name"
+    log_message "  Creating OAS API: $api_name"
   else
     # Tyk API 
     api_name=$(jq -r '.api_definition.name' $api_data_path)
     api_id=$(jq -r '.api_definition.api_id' $api_data_path)
-    log_message "  Importing Classic API: $api_name"
+    log_message "  Creating Classic API: $api_name"
   fi
   log_message "    Id: $api_id"
 
@@ -731,7 +731,7 @@ create_policy () {
 
   check_variables
 
-  log_message "  Importing Policy: $policy_name"
+  log_message "  Creating Policy: $policy_name"
 
   api_response="$(curl $dashboard_base_url/api/portal/policies -s \
     -H "authorization: $dashboard_api_key" \
