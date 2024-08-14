@@ -366,8 +366,10 @@ build_go_plugin () {
     cp $go_plugin_directory/*.so $go_plugin_cache_version_directory
 
     # limit the number of plugin caches to prevent uncontrolled growth
-    local PLUGIN_CACHE_MAX_SIZE=3
-    local plugin_cache_count=$(find "$go_plugin_cache_directory" -maxdepth 1 -type d -not -path "$go_plugin_cache_directory" | wc -l)
+    local PLUGIN_CACHE_MAX_SIZE=$(grep -E '^PLUGIN_CACHE_MAX_SIZE=[0-9]+' .env | cut -d '=' -f2)
+    PLUGIN_CACHE_MAX_SIZE=${PLUGIN_CACHE_MAX_SIZE:-3}
+    local plugin_cache_count=$(find "$go_plugin_cache_directory" -maxdepth 1 -type d -not -path "$go_plugin_cache_directory" | wc -l | xargs)
+    log_message "  Plugin cache used/max: $plugin_cache_count/$PLUGIN_CACHE_MAX_SIZE"
     if [ "$plugin_cache_count" -gt "$PLUGIN_CACHE_MAX_SIZE" ]; then
       oldest_plugin_cache_path=$(find "$go_plugin_cache_directory" -type d -not -path "$go_plugin_cache_directory" -exec ls -ld -ltr {} + | head -n 1 | awk '{print $9}')
       if [ -n "$oldest_plugin_cache_path" ]; then
