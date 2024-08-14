@@ -1,7 +1,7 @@
 ---
 services:
   tyk-gateway-3:
-    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.4.0}
+    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.5.0}
     networks:
       - tyk
     environment:
@@ -19,7 +19,7 @@ services:
       - .env
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
-      - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
+      - tyk-gateway-certs:/opt/tyk-gateway/certs
       - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
       - ./deployments/tyk/volumes/tyk-gateway/plugins:/opt/tyk-gateway/plugins
       - ./deployments/tyk/volumes/tyk-gateway/templates/error_401.json:/opt/tyk-gateway/templates/error_401.json
@@ -28,7 +28,7 @@ services:
       - tyk-redis
       - tyk-dashboard
   tyk-gateway-4:
-    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.4.0}
+    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.5.0}
     networks:
       - tyk
     environment:
@@ -46,7 +46,7 @@ services:
       - .env
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
-      - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
+      - tyk-gateway-certs:/opt/tyk-gateway/certs
       - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
       - ./deployments/tyk/volumes/tyk-gateway/plugins:/opt/tyk-gateway/plugins
       - ./deployments/tyk/volumes/tyk-gateway/templates/error_401.json:/opt/tyk-gateway/templates/error_401.json

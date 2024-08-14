@@ -159,6 +159,57 @@ wait_for_response () {
   done
 }
 
+# TODO: make function here for this, and then check all certs etc exist in bootstrap
+wait_for_file () {
+  local file_path="$1"
+  local container_name="$2"
+  local try_max=10
+  local try_count=0
+  log_message "Waiting for $file_path to be present in $container_name"
+  while true; do
+    ((try_count++))
+    if [ "$try_count" -gt "$try_max" ]; then
+      echo "ERROR: Maximum retry count reached for file $file_path in container $container_name"
+      exit 1
+    fi
+
+    docker exec $container_name sh -c "[ -s $file_path ]"
+    if [ $? -eq 0 ]; then
+      log_ok
+      bootstrap_progress
+      return 0
+    else
+      log_message "  File not present, waiting... $try_count/$try_max"
+      bootstrap_progress
+      sleep 2
+    fi
+  done
+}
+
+wait_for_file_local() {
+  local file_path="$1"
+  local try_max=10
+  local try_count=0
+  log_message "Waiting for $file_path to be present"
+  while true; do
+    ((try_count++))
+    if [ "$try_count" -gt "$try_max" ]; then
+      echo "ERROR: Maximum retry count reached for file $file_path"
+      exit 1
+    fi
+
+    if [ -s $file_path ]; then
+      log_ok
+      bootstrap_progress
+      return 0
+    else
+      log_message "  File not present, waiting... $try_count/$try_max"
+      bootstrap_progress
+      sleep 2
+    fi
+  done
+}
+
 hot_reload () {
   local gateway_host="$1"
   local gateway_secret="$2"
@@ -879,20 +930,20 @@ wait_for_api_loaded () {
 }
 
 wait_for_liveness () {
+  local status_endpoint="${1:-http://tyk-gateway.localhost:8080/hello}"
   local attempt_count=0
   local pass="pass"
 
   log_message "Waiting for Gateway, Dashboard and Redis to be up and running"
 
-  while true
-  do
+  while true; do
     attempt_count=$((attempt_count+1))
 
     #Check Gateway, Redis and Dashboard status
-    local hello=$(curl http://tyk-gateway.localhost:8080/hello -s)
-    local gw_status=$(echo "$hello" | jq -r '.status')
-    local dash_status=$(echo "$hello" | jq -r '.details.dashboard.status')
-    local redis_status=$(echo "$hello" | jq -r '.details.redis.status')
+    local status_response=$(curl $status_endpoint -s)
+    local gw_status=$(echo "$status_response" | jq -r '.status')
+    local dash_status=$(echo "$status_response" | jq -r '.details.dashboard.status')
+    local redis_status=$(echo "$status_response" | jq -r '.details.redis.status')
 
     if [[ "$gw_status" = "pass" ]] && [[ "$dash_status" = "pass" ]] && [[ "$redis_status" = "pass" ]]
     then
@@ -903,6 +954,5 @@ wait_for_liveness () {
     fi
 
     sleep 2
-
   done
 }

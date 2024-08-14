@@ -1,7 +1,7 @@
 ---
 services:
   tyk-slo-pump:
-    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.10.0}
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.11.0}
     ports:
       - 8091:8083
       - 8092:8092
