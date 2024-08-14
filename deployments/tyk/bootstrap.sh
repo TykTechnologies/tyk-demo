@@ -53,9 +53,6 @@ bootstrap_progress
 
 # Certificates
 
-log_message "Wait for services to be ready before beginning to bootstrap"
-wait_for_liveness
-
 log_message "Checking for existing OpenSSL container"
 OPENSSL_CONTAINER_NAME="tyk-demo-openssl"
 if [ "$(docker ps -a --format '{{.Names}}' | grep -w "$OPENSSL_CONTAINER_NAME" | wc -l)" -gt 0 ]; then
