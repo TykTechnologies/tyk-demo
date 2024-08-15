@@ -159,6 +159,57 @@ wait_for_response () {
   done
 }
 
+# TODO: make function here for this, and then check all certs etc exist in bootstrap
+wait_for_file () {
+  local file_path="$1"
+  local container_name="$2"
+  local try_max=10
+  local try_count=0
+  log_message "Waiting for $file_path to be present in $container_name"
+  while true; do
+    ((try_count++))
+    if [ "$try_count" -gt "$try_max" ]; then
+      echo "ERROR: Maximum retry count reached for file $file_path in container $container_name"
+      exit 1
+    fi
+
+    docker exec $container_name sh -c "[ -s $file_path ]"
+    if [ $? -eq 0 ]; then
+      log_ok
+      bootstrap_progress
+      return 0
+    else
+      log_message "  File not present, waiting... $try_count/$try_max"
+      bootstrap_progress
+      sleep 2
+    fi
+  done
+}
+
+wait_for_file_local() {
+  local file_path="$1"
+  local try_max=10
+  local try_count=0
+  log_message "Waiting for $file_path to be present"
+  while true; do
+    ((try_count++))
+    if [ "$try_count" -gt "$try_max" ]; then
+      echo "ERROR: Maximum retry count reached for file $file_path"
+      exit 1
+    fi
+
+    if [ -s $file_path ]; then
+      log_ok
+      bootstrap_progress
+      return 0
+    else
+      log_message "  File not present, waiting... $try_count/$try_max"
+      bootstrap_progress
+      sleep 2
+    fi
+  done
+}
+
 hot_reload () {
   local gateway_host="$1"
   local gateway_secret="$2"
@@ -315,8 +366,10 @@ build_go_plugin () {
     cp $go_plugin_directory/*.so $go_plugin_cache_version_directory
 
     # limit the number of plugin caches to prevent uncontrolled growth
-    local PLUGIN_CACHE_MAX_SIZE=3
-    local plugin_cache_count=$(find "$go_plugin_cache_directory" -maxdepth 1 -type d -not -path "$go_plugin_cache_directory" | wc -l)
+    local PLUGIN_CACHE_MAX_SIZE=$(grep -E '^PLUGIN_CACHE_MAX_SIZE=[0-9]+' .env | cut -d '=' -f2)
+    PLUGIN_CACHE_MAX_SIZE=${PLUGIN_CACHE_MAX_SIZE:-3}
+    local plugin_cache_count=$(find "$go_plugin_cache_directory" -maxdepth 1 -type d -not -path "$go_plugin_cache_directory" | wc -l | xargs)
+    log_message "  Plugin cache used/max: $plugin_cache_count/$PLUGIN_CACHE_MAX_SIZE"
     if [ "$plugin_cache_count" -gt "$PLUGIN_CACHE_MAX_SIZE" ]; then
       oldest_plugin_cache_path=$(find "$go_plugin_cache_directory" -type d -not -path "$go_plugin_cache_directory" -exec ls -ld -ltr {} + | head -n 1 | awk '{print $9}')
       if [ -n "$oldest_plugin_cache_path" ]; then
@@ -631,12 +684,12 @@ create_api () {
     api_id=$(jq -r '.["x-tyk-api-gateway"].info.id' $api_data_path)    
     # import endpoint differs between classic and OAS APIs
     api_endpoint="$api_endpoint/oas"
-    log_message "  Importing OAS API: $api_name"
+    log_message "  Creating OAS API: $api_name"
   else
     # Tyk API 
     api_name=$(jq -r '.api_definition.name' $api_data_path)
     api_id=$(jq -r '.api_definition.api_id' $api_data_path)
-    log_message "  Importing Classic API: $api_name"
+    log_message "  Creating Classic API: $api_name"
   fi
   log_message "    Id: $api_id"
 
@@ -680,7 +733,7 @@ create_policy () {
 
   check_variables
 
-  log_message "  Importing Policy: $policy_name"
+  log_message "  Creating Policy: $policy_name"
 
   api_response="$(curl $dashboard_base_url/api/portal/policies -s \
     -H "authorization: $dashboard_api_key" \
@@ -879,20 +932,19 @@ wait_for_api_loaded () {
 }
 
 wait_for_liveness () {
+  local status_endpoint="${1:-http://tyk-gateway.localhost:8080/hello}"
   local attempt_count=0
-  local pass="pass"
 
   log_message "Waiting for Gateway, Dashboard and Redis to be up and running"
 
-  while true
-  do
+  while true; do
     attempt_count=$((attempt_count+1))
 
     #Check Gateway, Redis and Dashboard status
-    local hello=$(curl http://tyk-gateway.localhost:8080/hello -s)
-    local gw_status=$(echo "$hello" | jq -r '.status')
-    local dash_status=$(echo "$hello" | jq -r '.details.dashboard.status')
-    local redis_status=$(echo "$hello" | jq -r '.details.redis.status')
+    local status_response=$(curl $status_endpoint -s)
+    local gw_status=$(echo "$status_response" | jq -r '.status')
+    local dash_status=$(echo "$status_response" | jq -r '.details.dashboard.status')
+    local redis_status=$(echo "$status_response" | jq -r '.details.redis.status')
 
     if [[ "$gw_status" = "pass" ]] && [[ "$dash_status" = "pass" ]] && [[ "$redis_status" = "pass" ]]
     then
@@ -903,6 +955,5 @@ wait_for_liveness () {
     fi
 
     sleep 2
-
   done
 }

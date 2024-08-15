@@ -1,14 +1,14 @@
 ---
 services:
   tyk-dashboard-sso:
-    image: tykio/tyk-dashboard:${DASHBOARD_SSO_VERSION:-v5.4.0}
+    image: tykio/tyk-dashboard:${DASHBOARD_SSO_VERSION:-v5.5.0}
     ports:
       - 3001:3000
     networks:
       - tyk
     volumes:
       - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
-      - ./deployments/tyk/volumes/tyk-dashboard/private-key.pem:/opt/tyk-dashboard/private-key.pem
+      - tyk-dashboard-certs:/opt/tyk-dashboard/certs
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Please set DASHBOARD_LICENCE in .env}
       - TYK_DB_SSOCUSTOMLOGINURL=http://localhost:3010/auth/tyk-dashboard/openid-connect

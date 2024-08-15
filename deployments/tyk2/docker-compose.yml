@@ -1,14 +1,14 @@
 ---
 services:
   tyk2-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.4.0}
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.5.0}
     ports:
       - 3002:3000
     networks:
       - tyk
     volumes:
       - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
-      - ./deployments/tyk/volumes/tyk-dashboard/certs:/opt/tyk-dashboard/certs
+      - tyk-dashboard-certs:/opt/tyk-dashboard/certs
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Please set DASHBOARD_LICENCE in .env}
       - TYK_DB_MONGOURL=mongodb://tyk2-mongo:27017/tyk_analytics
@@ -20,7 +20,7 @@ services:
       - tyk2-redis
       - tyk2-mongo
   tyk2-gateway:
-    image: tykio/tyk-gateway:${TYK2_GATEWAY_VERSION:-v5.4.0}
+    image: tykio/tyk-gateway:${TYK2_GATEWAY_VERSION:-v5.5.0}
     ports:
       - 8085:8080
     networks:
@@ -28,7 +28,7 @@ services:
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
-      - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
+      - tyk-gateway-certs:/opt/tyk-gateway/certs
     environment:
       - TYK_GW_POLICIES_POLICYCONNECTIONSTRING=http://tyk2-dashboard:3000
       - TYK_GW_DBAPPCONFOPTIONS_CONNECTIONSTRING=http://tyk2-dashboard:3000
@@ -37,7 +37,7 @@ services:
     depends_on:
       - tyk2-redis
   tyk2-pump:
-    image: tykio/tyk-pump-docker-pub:${TYK2_PUMP_VERSION:-v1.10.0}
+    image: tykio/tyk-pump-docker-pub:${TYK2_PUMP_VERSION:-v1.11.0}
     networks:
       - tyk
     volumes:
