@@ -148,6 +148,7 @@
       "key": "x-api-version",
       "strip_path": false,
       "strip_versioning_data": false,
+      "url_versioning_pattern": "",
       "fallback_to_default": false,
       "versions": {}
     },
@@ -165,7 +166,8 @@
           },
           "use_extended_paths": true,
           "extended_paths": {
-            "persist_graphql": []
+            "persist_graphql": [],
+            "rate_limit": []
           },
           "global_headers": {},
           "global_headers_remove": [],
@@ -453,7 +455,8 @@
                 "error_response_code": 422
               }
             ],
-            "persist_graphql": []
+            "persist_graphql": [],
+            "rate_limit": []
           },
           "global_headers": {
             "global-add": "global-value"
@@ -479,7 +482,8 @@
           },
           "use_extended_paths": true,
           "extended_paths": {
-            "persist_graphql": []
+            "persist_graphql": [],
+            "rate_limit": []
           },
           "global_headers": {},
           "global_headers_remove": [],
@@ -517,7 +521,8 @@
                 }
               }
             ],
-            "persist_graphql": []
+            "persist_graphql": [],
+            "rate_limit": []
           },
           "global_headers": {},
           "global_headers_remove": [],

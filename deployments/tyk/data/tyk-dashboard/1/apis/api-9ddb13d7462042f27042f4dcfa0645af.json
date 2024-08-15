@@ -253,6 +253,7 @@
       "key": "x-api-version",
       "strip_path": false,
       "strip_versioning_data": false,
+      "url_versioning_pattern": "",
       "fallback_to_default": false,
       "versions": {}
     },
@@ -303,7 +304,8 @@
                 "to_method": "POST"
               }
             ],
-            "persist_graphql": []
+            "persist_graphql": [],
+            "rate_limit": []
           },
           "global_headers": {},
           "global_headers_remove": [],
