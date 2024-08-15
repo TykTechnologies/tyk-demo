@@ -23,8 +23,6 @@ for data_group in "${data_groups[@]}"; do\
       echo "  $api_name"
       # perform some specification specific actions
       if [[ "$api_is_oas" == "true" ]]; then
-        # update api_id to use static id
-        api_id=$(jq -r '.api_definition.api_id' <<< $api)
         # update API specification document to use OAS-style API definition
         api=$(curl $dashboard_base_url/api/apis/oas/$api_id -s \
           -H "Authorization:${dashboard_keys[$index]}")
