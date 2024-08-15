@@ -422,7 +422,6 @@
       "execution_mode": "proxyOnly",
       "version": "",
       "schema": "type Query {\n country(code: ID!): Country\n}\n\ntype Country {\n code: ID!\n name: String!\n}",
-      "last_schema_update": "2024-08-09T15:26:52.743Z",
       "type_field_configurations": [],
       "playground": {
         "enabled": false,

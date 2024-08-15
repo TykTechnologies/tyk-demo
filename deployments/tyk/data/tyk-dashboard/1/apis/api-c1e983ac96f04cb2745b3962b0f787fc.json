@@ -434,7 +434,6 @@
       "execution_mode": "executionEngine",
       "version": "2",
       "schema": "type Country {\n  code: ID!\n  name: String!\n  pop: Int!\n}\n\ntype Query {\n  country(code: ID!): Country\n}\n",
-      "last_schema_update": "2024-08-09T15:26:54.432Z",
       "type_field_configurations": [],
       "playground": {
         "enabled": false,
