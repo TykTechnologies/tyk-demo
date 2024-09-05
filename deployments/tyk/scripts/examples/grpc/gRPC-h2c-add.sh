@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # This example uses grpcurl to call a gRPC API service proxied by the Tyk gateway using HTTP/2 over TLS (h2c).
