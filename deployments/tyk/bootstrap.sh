@@ -98,28 +98,6 @@ bootstrap_progress
 wait_for_file "/tyk-gateway-certs/tls-certificate.pem" "$OPENSSL_CONTAINER_NAME"
 wait_for_file "/tyk-gateway-certs/tls-private-key.pem" "$OPENSSL_CONTAINER_NAME"
 
-log_message "Generating self-signed certificate for TLS connections to tls-multiplex-1.localhost"
-docker exec $OPENSSL_CONTAINER_NAME sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tls-multiplex-1.localhost\" -keyout /tyk-gateway-certs/tls-multiplex-1-private-key.pem -out /tyk-gateway-certs/tls-multiplex-1-certificate.pem -days 365 -nodes" >/dev/null 2>&1
-if [ "$?" -ne "0" ]; then
-  echo "ERROR: Could not generate self-signed certificate"
-  exit 1
-fi
-log_ok
-bootstrap_progress
-wait_for_file "/tyk-gateway-certs/tls-multiplex-1-certificate.pem" "$OPENSSL_CONTAINER_NAME"
-wait_for_file "/tyk-gateway-certs/tls-multiplex-1-private-key.pem" "$OPENSSL_CONTAINER_NAME"
-
-log_message "Generating self-signed certificate for TLS connections to tls-multiplex-2.localhost"
-docker exec $OPENSSL_CONTAINER_NAME sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tls-multiplex-2.localhost\" -keyout /tyk-gateway-certs/tls-multiplex-2-private-key.pem -out /tyk-gateway-certs/tls-multiplex-2-certificate.pem -days 365 -nodes" >/dev/null 2>&1
-if [ "$?" -ne "0" ]; then
-  echo "ERROR: Could not generate self-signed certificate"
-  exit 1
-fi
-log_ok
-bootstrap_progress
-wait_for_file "/tyk-gateway-certs/tls-multiplex-2-certificate.pem" "$OPENSSL_CONTAINER_NAME"
-wait_for_file "/tyk-gateway-certs/tls-multiplex-2-private-key.pem" "$OPENSSL_CONTAINER_NAME"
-
 log_message "Generating private key for secure messaging and signing"
 docker exec $OPENSSL_CONTAINER_NAME sh -c "openssl genrsa -out /tyk-dashboard-certs/private-key.pem 2048" >/dev/null 2>>logs/bootstrap.log
 if [ "$?" -ne "0" ]; then
