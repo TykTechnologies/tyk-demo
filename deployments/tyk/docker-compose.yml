@@ -61,6 +61,7 @@ services:
     image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v5.5.0}
     ports:
       - 8081:8080
+      - 9005:9005
     networks:
       - tyk
     environment:

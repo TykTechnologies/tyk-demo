@@ -148,6 +148,7 @@
       "key": "version",
       "strip_path": false,
       "strip_versioning_data": false,
+      "url_versioning_pattern": "",
       "fallback_to_default": false,
       "versions": {}
     },
@@ -237,7 +238,8 @@
                 "method": "GET"
               }
             ],
-            "persist_graphql": []
+            "persist_graphql": [],
+            "rate_limit": []
           },
           "global_headers": {},
           "global_headers_remove": [],

@@ -23,8 +23,6 @@ for data_group in "${data_groups[@]}"; do\
       echo "  $api_name"
       # perform some specification specific actions
       if [[ "$api_is_oas" == "true" ]]; then
-        # update api_id to use static id
-        api_id=$(jq -r '.api_definition.api_id' <<< $api)
         # update API specification document to use OAS-style API definition
         api=$(curl $dashboard_base_url/api/apis/oas/$api_id -s \
           -H "Authorization:${dashboard_keys[$index]}")
@@ -34,7 +32,7 @@ for data_group in "${data_groups[@]}"; do\
         api="$(echo "$api" | jq 'del(.["x-tyk-api-gateway"].info.dbId)')"
       else
         # remove these fields, as they change every time the data is exported, resulting in unneccessary modifications
-        api="$(echo "$api" | jq 'del(.updated_at, .api_definition.id)')"
+        api="$(echo "$api" | jq 'del(.updated_at, .api_definition.id, .api_definition.graphql.last_schema_update)')"
         # use placeholder value for any webhook ids, as these change on import, resulting in unneccessary modifications
         api=$(echo "$api" | jq '.hook_references[].hook.id = "000000000000000000000000"')
         api=$(echo "$api" | jq '.api_definition.event_handlers.events |= with_entries(.value |= map(if .handler_meta.webhook_id then (.handler_meta.webhook_id = "000000000000000000000000"  | .handler_meta.id = "000000000000000000000000") else . end))')
