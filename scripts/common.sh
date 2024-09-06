@@ -957,3 +957,13 @@ wait_for_liveness () {
     sleep 2
   done
 }
+
+check_for_grpcurl () {
+  # Check if grpcurl is installed
+  if ! command -v grpcurl &> /dev/null
+  then
+      echo "grpcurl is not installed. Please install grpcurl to proceed:"
+      echo "brew install grpcurl"
+      exit 1
+  fi
+}
