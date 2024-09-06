@@ -1,7 +1,7 @@
 {
   "api_model": {},
   "api_definition": {
-    "name": "TLS Multiplex 2",
+    "name": "TLS Multiplex 2 (bad target URL)",
     "slug": "tls-multiplex-2",
     "listen_port": 9005,
     "protocol": "tls",
@@ -288,7 +288,7 @@
     "proxy": {
       "preserve_host_header": false,
       "listen_path": "/",
-      "target_url": "tcp://grpcbin:9000",
+      "target_url": "tcp://bad-target-url:1234",
       "disable_strip_slash": true,
       "strip_listen_path": true,
       "enable_load_balancing": false,
