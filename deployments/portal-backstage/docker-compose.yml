@@ -1,0 +1,11 @@
+services:
+  backstage:
+    build: ./deployments/portal-backstage
+    ports:
+      - 3003:3000
+    volumes:
+      - ./deployments/portal-backstage/volumes/backstage/app-config.yaml:/backstage/app-config.yaml
+    networks:
+      - tyk
+    env_file:
+      - .env
