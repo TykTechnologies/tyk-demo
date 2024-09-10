@@ -9,6 +9,7 @@ services:
       - 7007:7007
     volumes:
       - ./deployments/portal-backstage/volumes/backstage/app-config.yaml:/backstage/app-config.yaml
+      - ./deployments/portal-backstage/volumes/backstage/tyk-catalog.yaml:/backstage/tyk-catalog.yaml
     networks:
       - tyk
     environment:

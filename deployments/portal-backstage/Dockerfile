@@ -25,8 +25,6 @@ RUN yarn --cwd packages/backend add @tyk-technologies/plugin-catalog-backend-mod
 # Copy amended backend plugin source, that initialises the Tyk Entity Provider plugin
 COPY data/backstage/packages/backend/src/index.ts /backstage/packages/backend/src/index.ts
 
-COPY data/backstage/tyk-catalog.yaml /backstage/tyk-catalog.yaml
-
 # USER node
 
 # Start the Backstage app
