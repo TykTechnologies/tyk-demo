@@ -18,7 +18,7 @@ RUN echo "backstage" | npx @backstage/create-app@0.5.18
 # WARNING: this embeds the NPM access token into the image - be aware of this before you distribute
 RUN npm config set //registry.npmjs.org/:_authToken $BACKSTAGE_NPM_TOKEN
 
-#
+# set the working directory to the Backstage root directory
 WORKDIR /backstage
 
 # Install Tyk entity provider plugin
