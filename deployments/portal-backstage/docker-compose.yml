@@ -2,7 +2,8 @@ services:
   backstage:
     build: ./deployments/portal-backstage
     ports:
-      - 3003:3000
+      - 3003:3003
+      - 7007:7007
     volumes:
       - ./deployments/portal-backstage/volumes/backstage/app-config.yaml:/backstage/app-config.yaml
     networks:

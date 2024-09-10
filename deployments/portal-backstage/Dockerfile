@@ -1,6 +1,6 @@
-FROM node:20-slim
+FROM node:18.18-slim
 
-ARG NPM_ACCESS_TOKEN
+# ARG NPM_ACCESS_TOKEN
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
@@ -11,11 +11,9 @@ RUN apt-get update && apt-get install -y \
 RUN npm install -g @backstage/create-app@0.5.18
 
 # Install Backstage using npx
-RUN echo "backstage" | npx @backstage/create-app@0.5.18 --skip-install
+RUN echo "backstage" | npx @backstage/create-app@0.5.18
 
-RUN cd backstage && yarn install
-
-RUN npm config set //registry.npmjs.org/:_authToken $NPM_ACCESS_TOKEN
+# RUN npm config set //registry.npmjs.org/:_authToken $NPM_ACCESS_TOKEN
 
 # RUN yarn --cwd packages/backend add @tyk-technologies/plugin-catalog-backend-module-tyk
 
@@ -33,7 +31,7 @@ WORKDIR /backstage
 # # Build the Backstage app
 # RUN npm run build
 
-USER node
+# USER node
 
 # Start the Backstage app
 CMD ["yarn", "dev"]
