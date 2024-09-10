@@ -1,6 +1,9 @@
 services:
   backstage:
-    build: ./deployments/portal-backstage
+    build:
+      context: ./deployments/portal-backstage
+      args:
+        - BACKSTAGE_NPM_TOKEN=${BACKSTAGE_NPM_TOKEN}
     ports:
       - 3003:3003
       - 7007:7007
@@ -8,5 +11,5 @@ services:
       - ./deployments/portal-backstage/volumes/backstage/app-config.yaml:/backstage/app-config.yaml
     networks:
       - tyk
-    env_file:
-      - .env
+    environment:
+      - TYK_DASHBOARD_API_TOKEN=${TYK_DASHBOARD_API_ACCESS_CREDENTIALS:-set_by_bootstrap_script}
