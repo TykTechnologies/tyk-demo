@@ -26,7 +26,7 @@ To use this deployment, run the `up.sh` script with the `portal-backstage` param
 ./up.sh portal-backstage
 ```
 
-The first time the bootstrap is run, it will build the Backstage container image. This process can take several minutes, but the resulting image will be cached and reused for future deployments.
+The first time the bootstrap is run, it will build the Backstage container image. This process can take many minutes, but the resulting image will be cached and reused for future deployments. 
 
 ## Configuration
 

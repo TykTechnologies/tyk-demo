@@ -28,6 +28,7 @@ set_docker_environment_value "TYK_DASHBOARD_API_ACCESS_CREDENTIALS" "$dashboard_
 log_ok
 
 log_message "Restarting Backstage container to use new access token env var value"
+# The backstage container will show error messages prior to this restart, as it will have been using an invalid token
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate backstage 2> /dev/null
 log_ok
 
