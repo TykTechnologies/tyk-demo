@@ -5,6 +5,13 @@ source scripts/common.sh
 deployment="Backstage"
 log_start_deployment
 
+log_message "Checking NPM access token exists"
+if ! grep -q "BACKSTAGE_NPM_TOKEN=" .env; then
+  echo "ERROR: NPM access token (BACKSTAGE_NPM_TOKEN) missing from Docker environment file (.env)."
+  exit 1
+fi
+log_ok
+
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 dashboard_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret 2>> logs/bootstrap.log)
