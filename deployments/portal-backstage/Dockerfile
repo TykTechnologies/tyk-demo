@@ -1,6 +1,6 @@
 FROM node:18.18-slim
 
-# ARG NPM_ACCESS_TOKEN
+ARG BACKSTAGE_NPM_TOKEN
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
@@ -8,28 +8,24 @@ RUN apt-get update && apt-get install -y \
     curl \
     build-essential
 
+# Install the create-app package first
 RUN npm install -g @backstage/create-app@0.5.18
 
 # Install Backstage using npx
 RUN echo "backstage" | npx @backstage/create-app@0.5.18
 
-# RUN npm config set //registry.npmjs.org/:_authToken $NPM_ACCESS_TOKEN
-
-# RUN yarn --cwd packages/backend add @tyk-technologies/plugin-catalog-backend-module-tyk
-
-
-# # From here on we use the least-privileged `node` user to run the backend.
+# WARNING: this embeds the NPM access token into the image - be aware of this before you distribu
+RUN npm config set //registry.npmjs.org/:_authToken $BACKSTAGE_NPM_TOKEN
 
 WORKDIR /backstage
 
-# # Install Backstage plugins
-# WORKDIR /backstage-app
-# RUN npm install @backstage/plugin-user-settings \
-#                 @backstage/plugin-catalog \
-#                 @backstage/plugin-api-docs
+# Install Tyk entity provider plugin
+RUN yarn --cwd packages/backend add @tyk-technologies/plugin-catalog-backend-module-tyk
 
-# # Build the Backstage app
-# RUN npm run build
+# Copy amended backend plugin source, that initialises the Tyk Entity Provider plugin
+COPY data/backstage/packages/backend/src/index.ts /backstage/packages/backend/src/index.ts
+
+COPY data/backstage/tyk-catalog.yaml /backstage/tyk-catalog.yaml
 
 # USER node
 

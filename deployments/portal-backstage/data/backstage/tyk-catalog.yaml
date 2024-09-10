@@ -1,0 +1,90 @@
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-system
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: tyk
+  description: Tyk API Management
+spec:
+  owner: guests
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-component
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: tyk-pump-development
+  title: Tyk Pump
+spec:
+  type: service
+  lifecycle: development
+  owner: guests
+  system: tyk
+  subcomponentOf: tyk-dashboard-development
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-api
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: tyk-dashboard-api-development
+  title: Tyk Dashboard API
+spec:
+  type: http
+  lifecycle: development
+  owner: guests
+  system: tyk
+  definition: |
+    openapi: "3.0.0"
+    info:
+      version: 1.0.0
+      title: Tyk Dashboard API
+    servers:
+      - url: http://tyk-dashboard.localhost:3000/api
+    paths:
+      /apis:
+        get:
+          summary: List all APIs
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-api
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: tyk-dashboard-admin-api-development
+  title: Tyk Dashboard Admin API
+spec:
+  type: http
+  lifecycle: development
+  owner: guests
+  system: tyk
+  definition: |
+    openapi: "3.0.0"
+    info:
+      version: 1.0.0
+      title: Tyk Dashboard Admin API
+    servers:
+      - url: http://tyk-dashboard.localhost:3000/admin
+    paths:
+      /organisations:
+        get:
+          summary: List all Organisations
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-api
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: tyk-dashboard-system-api-development
+  title: Tyk Dashboard System API
+spec:
+  type: http
+  lifecycle: development
+  owner: guests
+  system: tyk
+  definition: |
+    openapi: "3.0.0"
+    info:
+      version: 1.0.0
+      title: Tyk Dashboard System API
+    servers:
+      - url: http://tyk-dashboard.localhost:3000/system
+    paths:
+      /node:
+        delete:
+          summary: Deregister a node

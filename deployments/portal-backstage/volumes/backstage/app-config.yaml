@@ -98,6 +98,10 @@ catalog:
       rules:
         - allow: [User, Group]
 
+    # Basic Tyk catalog items that do not come from the import process, including the 'tyk' system
+    - type: file
+      target: ../../tyk-catalog.yaml
+
     ## Uncomment these lines to add more example data
     # - type: url
     #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
@@ -115,3 +119,20 @@ kubernetes:
 permission:
   # setting this to `false` will disable permissions
   enabled: true
+
+tyk:
+  globalOptions:
+    router:
+      enabled: true
+    scheduler:
+      enabled: true
+      frequency: 5
+    importCategoriesAsTags: true
+  dashboards:
+    - host: http://tyk-dashboard:3000
+      token: ${TYK_DASHBOARD_API_TOKEN}
+      name: development
+      defaults:
+        owner: group:default/guests
+        system: system:default/tyk
+        lifecycle: development
