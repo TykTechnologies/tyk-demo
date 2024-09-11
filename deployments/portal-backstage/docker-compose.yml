@@ -3,7 +3,7 @@ services:
     build:
       context: ./deployments/portal-backstage
       args:
-        - BACKSTAGE_NPM_TOKEN=${BACKSTAGE_NPM_TOKEN}
+        - BACKSTAGE_NPM_TOKEN=${BACKSTAGE_NPM_TOKEN:?NPM access token is missing from Docker environment file .env - see deployment README.md}
     ports:
       - 3003:3003
       - 7007:7007
