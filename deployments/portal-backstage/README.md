@@ -14,9 +14,7 @@ An access token is required to access the [Tyk entity provider NPM package](http
 BACKSTAGE_NPM_TOKEN=my-access-token
 ```
 
-**NOTE**: This token get embedded into the built Backstage image - do not distribute the image.
-
-The bootstrap process will fail if an NPM access token is not present - speak with your Tyk representitive to obtain a token.
+**Note**: The bootstrap process will fail if an NPM access token is not present - speak with your Tyk representitive to obtain a token.
 
 ### Bootstrap
 
@@ -26,7 +24,7 @@ To use this deployment, run the `up.sh` script with the `portal-backstage` param
 ./up.sh portal-backstage
 ```
 
-The first time the bootstrap is run, it will build the Backstage container image. This process can take many minutes, but the resulting image will be cached and reused for future deployments. 
+**Note**: The first time the bootstrap is run, it will build the Backstage container image. This process can take a while (~5 minutes on a 2020 MacBook Pro), but the resulting image will be cached and reused for future deployments.
 
 ## Configuration
 
@@ -59,4 +57,4 @@ Synchronisation takes place when the entity provider plugin is initialised, so y
 
 ### Catalog Configuration
 
-There is a ['base' Tyk catalog file](deployments/portal-backstage/volumes/backstage/tyk-catalog.yaml) that's used to provide some entities that cannot be imported from Tyk itself. These include the `tyk` system entity, to which all other imported entities are connected.
+There is a ['base' Tyk catalog file](deployments/portal-backstage/volumes/backstage/tyk-catalog.yaml) that's used to define entities that aren't generated through the entity provider. This includes the `tyk` system entity, which is connected to all Tyk entities.
