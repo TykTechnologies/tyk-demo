@@ -14,17 +14,15 @@ RUN npm install -g @backstage/create-app@0.5.18
 # Install Backstage using npx
 RUN echo "backstage" | npx @backstage/create-app@0.5.18
 
-# Set the auth token needed to access the entity provider NPM package
-# WARNING: this embeds the NPM access token into the image - be aware of this before you distribute
-RUN npm config set //registry.npmjs.org/:_authToken $BACKSTAGE_NPM_TOKEN
-
 # set the working directory to the Backstage root directory
 WORKDIR /backstage
 
-# Install Tyk entity provider plugin
-RUN yarn --cwd packages/backend add @tyk-technologies/plugin-catalog-backend-module-tyk
+# Set the auth token needed to access the entity provider NPM package, install Tyk entity provider plugin, then delete the npm config to not leave the token in the image
+RUN echo "//registry.npmjs.org/:_authToken=${BACKSTAGE_NPM_TOKEN}" > .npmrc && \
+    yarn --cwd packages/backend add @tyk-technologies/plugin-catalog-backend-module-tyk && \
+    rm .npmrc
 
-# Copy amended backend plugin source, that initialises the Tyk Entity Provider plugin
+# Copy amended backend plugin source, which includes initialisation for the Tyk Entity Provider plugin
 COPY data/backstage/packages/backend/src/index.ts /backstage/packages/backend/src/index.ts
 
 # Start both Backstage back and front ends
