@@ -14,7 +14,7 @@ An access token is required to access the [Tyk entity provider NPM package](http
 BACKSTAGE_NPM_TOKEN=my-access-token
 ```
 
-**Note**: The bootstrap process will fail if an NPM access token is not present - speak with your Tyk representitive to obtain a token.
+**Note**: The bootstrap process will fail if an NPM access token is not present - speak with your Tyk representitive to obtain a token. Using an incorrect token will result in an NPM error message `An unexpected error occurred: "https://registry.yarnpkg.com/@tyk-technologies%2fplugin-catalog-backend-module-tyk: Not found"`.
 
 ### Bootstrap
 
