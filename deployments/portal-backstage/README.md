@@ -10,7 +10,7 @@ The Backstage dashboard can be accessed here:
 ### NPM Access Token
 An access token is required to access the [Tyk entity provider NPM package](https://www.npmjs.com/package/@tyk-technologies/plugin-catalog-backend-module-tyk). The token value must be provided in the `.env` file as `BACKSTAGE_NPM_TOKEN`, for example:
 
-```
+```conf
 BACKSTAGE_NPM_TOKEN=my-access-token
 ```
 
@@ -20,7 +20,7 @@ BACKSTAGE_NPM_TOKEN=my-access-token
 
 To use this deployment, run the `up.sh` script with the `portal-backstage` parameter:
 
-```
+```sh
 ./up.sh portal-backstage
 ```
 
