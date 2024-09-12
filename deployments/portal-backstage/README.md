@@ -24,7 +24,7 @@ To use this deployment, run the `up.sh` script with the `portal-backstage` param
 ./up.sh portal-backstage
 ```
 
-**Note**: The first time the bootstrap is run, it will build the Backstage container image. This process can take a while (~5 minutes on a 2020 MacBook Pro), but this is a one-time process as the resulting image is cached and reused for future deployments.
+**Note**: The first time the bootstrap is run, it will build the Backstage container image. This process can take a while (~5 minutes on a 2020 MacBook Pro), but it's a one-time process, as the resulting image is cached and reused for subsequent deployments.
 
 ## Configuration
 
