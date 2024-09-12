@@ -1,5 +1,6 @@
 services:
   backstage:
+    image: tyk-demo-backstage:1.0
     build:
       context: ./deployments/portal-backstage
       args:
