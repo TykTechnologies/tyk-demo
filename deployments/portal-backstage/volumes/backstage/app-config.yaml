@@ -23,12 +23,12 @@ backend:
     # Uncomment the following host directive to bind to specific interfaces
     # host: 0.0.0.0
   csp:
-    connect-src: ["'self'", 'http:', 'https:']
+    connect-src: [ "'self'", 'http:', 'https:' ]
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
     # Default Helmet Content-Security-Policy values can be removed by setting the key to false
   cors:
     origin: http://localhost:3003
-    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    methods: [ GET, HEAD, PATCH, POST, PUT, DELETE ]
     credentials: true
   # This is for local development only, it is not recommended to use this in production
   # The production database configuration is stored in app-config.production.yaml
@@ -81,7 +81,7 @@ catalog:
     entityFilename: catalog-info.yaml
     pullRequestBranchName: backstage-integration
   rules:
-    - allow: [Component, System, API, Resource, Location]
+    - allow: [ Component, System, API, Resource, Location ]
   locations:
     # Local example data, file locations are relative to the backend process, typically `packages/backend`
     - type: file
@@ -91,13 +91,13 @@ catalog:
     - type: file
       target: ../../examples/template/template.yaml
       rules:
-        - allow: [Template]
+        - allow: [ Template ]
 
     # Local example organizational data
     - type: file
       target: ../../examples/org.yaml
       rules:
-        - allow: [User, Group]
+        - allow: [ User, Group ]
 
     # Basic Tyk catalog items that do not come from the import process, including the 'tyk' system
     - type: file
