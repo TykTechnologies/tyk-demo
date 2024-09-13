@@ -1,3 +1,4 @@
+---
 services:
   backstage:
     image: tyk-demo-backstage:1.0

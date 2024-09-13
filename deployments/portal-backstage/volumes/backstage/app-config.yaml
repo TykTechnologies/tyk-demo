@@ -1,3 +1,4 @@
+---
 app:
   title: Tyk Demo - Backstage Entity Provider Example
   baseUrl: http://localhost:3003
