@@ -30,4 +30,5 @@ log_end_deployment
 echo -e "\033[2K
 ▼ Portal - Backstage
   ▽ Backstage
-          Dashboard URL : http://localhost:3003"
+          Dashboard URL : http://localhost:3003
+   Entity Provider Sync : http://localhost:7007/api/catalog/tyk/development/sync"
