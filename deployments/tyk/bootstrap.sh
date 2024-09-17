@@ -542,6 +542,7 @@ ngrok_available=false
 if ! grep -q "NGROK_AUTHTOKEN=" .env; then
   log_message "Ngrok auth token is not set, so Ngrok will not be available"
   log_message "To enable Ngrok, set the NGROK_AUTHTOKEN value in the Tyk Demo .env file"
+  ngrok_public_url="not configured"
 else
   log_message "Getting Ngrok public URL for Tyk Gateway"
   ngrok_dashboard_url="http://localhost:4040"
