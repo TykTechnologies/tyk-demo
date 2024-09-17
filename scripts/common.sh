@@ -292,8 +292,9 @@ check_licence_expiry () {
   local licence_expiry=$(echo $licence_payload | jq -r '.exp')
   # calculate the number of seconds remaining for the licence
   local licence_seconds_remaining=$(expr $licence_expiry - $(date '+%s'))
-  # calculate the number of days remaining for the licence (this sets a global variable, allowing the value to be used elsewhere)
-  local licence_days_remaining=$(expr $licence_seconds_remaining / 86400)
+  # calculate the number of days remaining for the licence
+  # do not make licence_days_remaining a local variable - this sets a global variable, allowing the value to be used elsewhere
+  licence_days_remaining=$(expr $licence_seconds_remaining / 86400)
   
   # check if licence time remaining (in seconds) is less or equal to 0
   if [ "$licence_seconds_remaining" -le "0" ]; then
