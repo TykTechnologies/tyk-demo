@@ -1,1 +1,0 @@
-- dynamically create image for backstage so it doesn't have to be run separately? (as per approach taken by the `subscriptions` deployment, using a Dockerfile)
