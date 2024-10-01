@@ -6,7 +6,8 @@ ARG BACKSTAGE_NPM_TOKEN
 RUN apt-get update && apt-get install -y \
     git \
     curl \
-    build-essential
+    build-essential \
+    python3
 
 # Install the create-app package first
 RUN npm install -g @backstage/create-app@0.5.18
