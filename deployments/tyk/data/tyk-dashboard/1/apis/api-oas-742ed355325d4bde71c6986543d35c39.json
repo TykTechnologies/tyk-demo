@@ -13,7 +13,7 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "66a1194158bbbd000191b178",
+      "dbId": "66fd5a6cfae68a0001d50e89",
       "id": "742ed355325d4bde71c6986543d35c39",
       "name": "Streams - HTTP to Kafka",
       "orgId": "5e9d9544a1dcd60001d0ed20",
@@ -70,7 +70,7 @@
             "partitioner": "fnv1a_hash",
             "static_headers": {},
             "target_version": "3.7.1",
-            "topic": "quickstart-events"
+            "topic": "tyk-streams-example"
           },
           "label": "kafka_output"
         }
