@@ -1,5 +1,3 @@
-#!/bin/bash
-
 echo "Streams - HTTP to Redis Pub/Sub"
 echo "Part 1: Listening to a Redis Channel"
 echo "Once connected, run part two of this example in a different terminal. The messages sent will appear here."
