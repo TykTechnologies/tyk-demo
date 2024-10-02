@@ -155,11 +155,13 @@ wait_for_liveness
 # Kafka
 
 log_message "Creating Kafka topic"
-docker exec tyk-demo-kafka-1 sh -c "/opt/kafka/bin/kafka-topics.sh --create --topic quickstart-events --bootstrap-server localhost:9092" >/dev/null 2>>logs/bootstrap.log
+kafka_topic_name="tyk-streams-example"
+docker exec tyk-demo-kafka-1 sh -c "/opt/kafka/bin/kafka-topics.sh --create --topic $kafka_topic_name --bootstrap-server localhost:9092" >/dev/null 2>>logs/bootstrap.log
 if [ "$?" -ne "0" ]; then
   echo "ERROR: Could not create kafka topic"
   exit 1
 fi
+log_message "  Created topic: $kafka_topic_name"
 log_ok
 bootstrap_progress
 
