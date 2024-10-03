@@ -299,7 +299,7 @@
 												"relative-path-examples",
 												"single",
 												"wildcard",
-												""
+												"abc"
 											]
 										},
 										"description": "Uses relative path expression `single/wildcard/{1}` to match against relative paths which start with `single/wildcard/`.\n\nThis example works because empty wildcards are valid."
