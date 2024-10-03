@@ -290,7 +290,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/single/wildcard/",
+											"raw": "http://{{tyk-gateway.host}}/relative-path-examples/single/wildcard/abc",
 											"protocol": "http",
 											"host": [
 												"{{tyk-gateway.host}}"
