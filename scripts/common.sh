@@ -1007,3 +1007,12 @@ wait_for_liveness () {
   done
 }
 
+check_for_wscat () {
+  # Check if wscat is installed
+  if ! command -v wscat &> /dev/null
+  then
+      echo "wscat is not installed. Please install wscat to proceed:"
+      echo "npm install -g wscat"
+      exit 1
+  fi
+}
