@@ -24,9 +24,6 @@
       "global": {
         "contextVariables": {
           "enabled": true
-        },
-        "trafficLogs": {
-          "enabled": true
         }
       }
     },
