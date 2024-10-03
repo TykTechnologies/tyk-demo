@@ -1011,7 +1011,7 @@ check_for_wscat () {
   # Check if wscat is installed
   if ! command -v wscat &> /dev/null
   then
-      echo "wscat is not installed. Please install wscat to proceed:"
+      echo "wscat is not installed. Please install wscat via NPM to proceed:"
       echo "npm install -g wscat"
       exit 1
   fi
