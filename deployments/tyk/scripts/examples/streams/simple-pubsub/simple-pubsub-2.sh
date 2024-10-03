@@ -1,0 +1,1 @@
+wscat -c ws://tyk-gateway.localhost:8080/streams-simple-pubsub/ws

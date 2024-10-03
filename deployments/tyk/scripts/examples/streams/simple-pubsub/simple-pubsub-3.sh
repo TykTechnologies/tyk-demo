@@ -1,0 +1,1 @@
+curl http://tyk-gateway.localhost:8080/streams-simple-pubsub/pub -d 'Hello, Tyk streams!'
