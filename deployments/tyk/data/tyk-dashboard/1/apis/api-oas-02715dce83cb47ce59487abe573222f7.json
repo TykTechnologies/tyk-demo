@@ -13,7 +13,7 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "66fe500b1da0b00001da209c",
+      "dbId": "66ffabd12a4a5100016d007e",
       "id": "02715dce83cb47ce59487abe573222f7",
       "name": "Streams - Simple PubSub",
       "orgId": "5e9d9544a1dcd60001d0ed20",
@@ -58,6 +58,44 @@
             "stream_path": "/sse",
             "ws_path": "/ws"
           }
+        }
+      },
+      "Validated Pub": {
+        "input": {
+          "http_server": {
+            "allowed_verbs": [
+              "POST"
+            ],
+            "path": "/validated-pub",
+            "timeout": "5s"
+          }
+        },
+        "output": {
+          "http_server": {
+            "stream_path": "/validated-sse"
+          }
+        },
+        "pipeline": {
+          "processors": [
+            {
+              "json_schema": {
+                "schema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"minLength\": 5\n    },\n    \"age\": {\n      \"type\": \"integer\",\n      \"minimum\": 19\n    }\n  },\n  \"required\": [\"name\", \"age\"],\n  \"additionalProperties\": false\n\n}\n"
+              }
+            },
+            {
+              "catch": [
+                {
+                  "log": {
+                    "level": "ERROR",
+                    "message": "JSON schema validated failed due to: ${!error()}"
+                  }
+                },
+                {
+                  "mapping": "root = deleted()"
+                }
+              ]
+            }
+          ]
         }
       }
     }
