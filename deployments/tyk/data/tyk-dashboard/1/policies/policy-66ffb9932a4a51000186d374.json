@@ -1,0 +1,67 @@
+{
+  "auth_type": "jwt",
+  "auth_types": [
+    "jwt"
+  ],
+  "state": "active",
+  "access_rights_array": [
+    {
+      "api_name": "Streams - Authenticated PubSub",
+      "api_id": "6ea3dc4459d34602661f57ce8510db8e",
+      "versions": [
+        ""
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "allowed_types": [],
+      "disable_introspection": false,
+      "limit": null,
+      "field_access_rights": [],
+      "allowance_scope": ""
+    }
+  ],
+  "graphql_enabled": false,
+  "_id": "66ffb9932a4a51000186d374",
+  "id": "",
+  "name": "Streams - Authenticated PubSub Policy",
+  "org_id": "5e9d9544a1dcd60001d0ed20",
+  "rate": 1000,
+  "per": 60,
+  "quota_max": -1,
+  "quota_renewal_rate": -1,
+  "throttle_interval": -1,
+  "throttle_retry_limit": -1,
+  "max_query_depth": -1,
+  "access_rights": {
+    "6ea3dc4459d34602661f57ce8510db8e": {
+      "api_name": "Streams - Authenticated PubSub",
+      "api_id": "6ea3dc4459d34602661f57ce8510db8e",
+      "versions": [
+        ""
+      ],
+      "allowed_urls": [],
+      "restricted_types": [],
+      "allowed_types": [],
+      "disable_introspection": false,
+      "limit": null,
+      "field_access_rights": [],
+      "allowance_scope": ""
+    }
+  },
+  "hmac_enabled": false,
+  "active": true,
+  "is_inactive": false,
+  "date_created": "2024-10-04T09:46:59.688Z",
+  "tags": [],
+  "key_expires_in": 0,
+  "partitions": {
+    "quota": true,
+    "rate_limit": true,
+    "complexity": false,
+    "acl": true,
+    "per_api": false
+  },
+  "last_updated": "1728035219",
+  "meta_data": {},
+  "smoothing": null
+}
