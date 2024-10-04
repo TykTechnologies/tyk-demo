@@ -79,7 +79,7 @@
           "processors": [
             {
               "json_schema": {
-                "schema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"minLength\": 5\n    },\n    \"age\": {\n      \"type\": \"integer\",\n      \"minimum\": 19\n    }\n  },\n  \"required\": [\"name\", \"age\"],\n  \"additionalProperties\": false\n\n}\n"
+                "schema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\"\n    },\n    \"age\": {\n      \"type\": \"integer\",\n      \"minimum\": 0\n    }\n  },\n  \"required\": [\"name\", \"age\"]\n}\n"
               }
             },
             {
