@@ -13,7 +13,7 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "66fd5a6cfae68a0001d50e89",
+      "dbId": "6703acbbdbc78f00010ff085",
       "id": "742ed355325d4bde71c6986543d35c39",
       "name": "Streams - HTTP to Kafka",
       "orgId": "5e9d9544a1dcd60001d0ed20",
@@ -43,7 +43,28 @@
   },
   "x-tyk-streaming": {
     "streams": {
-      "HTTP to Kafka": {
+      "HTTP to Kafka - Consumer": {
+        "input": {
+          "kafka": {
+            "addresses": [
+              "kafka:9092"
+            ],
+            "checkpoint_limit": 1,
+            "client_id": "my-client-id",
+            "consumer_group": "my-consumer-group",
+            "target_version": "3.8.0",
+            "topics": [
+              "tyk-streams-example"
+            ]
+          }
+        },
+        "output": {
+          "http_server": {
+            "stream_path": "/sub"
+          }
+        }
+      },
+      "HTTP to Kafka - Publisher": {
         "input": {
           "http_server": {
             "path": "/post"
@@ -55,21 +76,7 @@
             "addresses": [
               "kafka:9092"
             ],
-            "batching": {
-              "byte_size": 0,
-              "check": "",
-              "count": 0,
-              "period": ""
-            },
-            "compression": "none",
-            "key": "",
-            "max_in_flight": 64,
-            "metadata": {
-              "exclude_prefixes": []
-            },
-            "partitioner": "fnv1a_hash",
-            "static_headers": {},
-            "target_version": "3.7.1",
+            "target_version": "3.8.0",
             "topic": "tyk-streams-example"
           },
           "label": "kafka_output"
