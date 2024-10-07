@@ -1,5 +1,5 @@
 echo "Streams - Authenticated PubSub"
-echo "Part 3: Authenticate as a publisher"
+echo "Part 2: Authenticate as a publisher"
 echo "This script sends messages to the clients connected in script 1 - check its terminal to see the messages received."
 
 curl http://tyk-gateway.localhost:8080/streams-authenticated-pubsub/pub \
