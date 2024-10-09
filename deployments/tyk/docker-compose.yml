@@ -55,7 +55,7 @@ services:
       - tyk-redis
       - tyk-dashboard
   tyk-gateway-2:
-    image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v5.5.0-rc2}
+    image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v5.8.0-alpha1}
     ports:
       - 8081:8080
     networks:
