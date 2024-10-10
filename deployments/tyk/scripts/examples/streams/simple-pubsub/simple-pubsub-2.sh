@@ -1,12 +1,14 @@
-#!/bin/bash
+echo "NOT WORKING FOR 5.8.0 alpha1"
 
-source scripts/common.sh
+# #!/bin/bash
 
-check_for_wscat
+# source scripts/common.sh
 
-echo "Streams - Simple PubSub"
-echo "Part 2: Using websockets"
-echo "This script connects to a websocket endpoint, and waits to receive messages."
-echo "Use script 3 to send messages."
+# check_for_wscat
 
-wscat -c ws://tyk-gateway.localhost:8080/streams-simple-pubsub/ws
+# echo "Streams - Simple PubSub"
+# echo "Part 2: Using websockets"
+# echo "This script connects to a websocket endpoint, and waits to receive messages."
+# echo "Use script 3 to send messages."
+
+# wscat -c ws://tyk-gateway.localhost:8080/streams-simple-pubsub/ws
