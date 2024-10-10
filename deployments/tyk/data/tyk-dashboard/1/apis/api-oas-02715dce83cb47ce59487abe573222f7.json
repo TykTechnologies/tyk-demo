@@ -13,7 +13,7 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "66ffabd12a4a5100016d007e",
+      "dbId": "6707bf82b0949c0001cf9028",
       "id": "02715dce83cb47ce59487abe573222f7",
       "name": "Streams - Simple PubSub",
       "orgId": "5e9d9544a1dcd60001d0ed20",
@@ -49,8 +49,7 @@
             "allowed_verbs": [
               "POST"
             ],
-            "path": "/pub",
-            "timeout": "5s"
+            "path": "/post"
           }
         },
         "output": {
@@ -66,8 +65,7 @@
             "allowed_verbs": [
               "POST"
             ],
-            "path": "/validated-pub",
-            "timeout": "5s"
+            "path": "/validated-pub"
           }
         },
         "output": {
