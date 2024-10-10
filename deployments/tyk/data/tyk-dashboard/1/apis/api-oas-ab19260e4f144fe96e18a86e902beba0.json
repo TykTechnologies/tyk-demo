@@ -13,7 +13,7 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "6707e8c09b29dc00019b63dd",
+      "dbId": "6707f30a455b670001e48f40",
       "id": "ab19260e4f144fe96e18a86e902beba0",
       "name": "Streams - Bidirectional",
       "orgId": "5e9d9544a1dcd60001d0ed20",
@@ -115,7 +115,7 @@
         "pipeline": {
           "processors": [
             {
-              "mapping": "root = this.merge){ \"result\": \"bar\" })\n"
+              "mapping": "root = this.merge({ \"result\": \"bar\" })\n"
             }
           ]
         }
