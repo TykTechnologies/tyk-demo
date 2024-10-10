@@ -26,7 +26,7 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "66ffac5a2a4a51000186d373",
+      "dbId": "6707bf82b0949c0001cf902b",
       "id": "6ea3dc4459d34602661f57ce8510db8e",
       "name": "Streams - Authenticated PubSub",
       "orgId": "5e9d9544a1dcd60001d0ed20",
@@ -78,8 +78,7 @@
             "allowed_verbs": [
               "POST"
             ],
-            "path": "/pub",
-            "timeout": "5s"
+            "path": "/post"
           }
         },
         "output": {
