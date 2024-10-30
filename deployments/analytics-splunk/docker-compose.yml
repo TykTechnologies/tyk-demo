@@ -1,7 +1,8 @@
 ---
 services:
   tyk-splunk:
-    image: splunk/splunk:latest
+    image: splunk/splunk:9.3
+    platform: linux/amd64 # force amd64 arch to enable usage with rosetta on mac
     ports:
       - 8000:8000
       - 8088:8088
