@@ -6686,8 +6686,13 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 404\", function () {",
-									"    pm.response.to.have.status(404);",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Contains expected JSON data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.path).to.eql(\"match\");",
 									"});"
 								],
 								"type": "text/javascript",
@@ -6699,15 +6704,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{tyk-gateway.host}}/basic-open-api/path-matching/suffix-fail",
+							"raw": "http://{{tyk-gateway.host}}/basic-open-api/path-matching",
 							"protocol": "http",
 							"host": [
 								"{{tyk-gateway.host}}"
 							],
 							"path": [
 								"basic-open-api",
-								"path-matching",
-								"suffix-fail"
+								"path-matching"
 							]
 						},
 						"description": "This example does not demonstrate the path matching feature, but rather shows what happens when no prefix or suffix matching is attempted. It provides the expected response of a 200 and \"path match\" JSON data.\n\nSee the other path matching examples for a demonstration of how path matching works."
