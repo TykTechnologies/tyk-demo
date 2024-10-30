@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "02a77c7c-11f8-4447-b52e-2e94deec4215",
+		"_postman_id": "7e71a9d3-54a4-4dce-9207-2aa450b04c00",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "6131676"
@@ -6676,6 +6676,111 @@
 							]
 						},
 						"description": "This request serves as a placeholder, as the point to which the test runner is redirected to if ngrok data cannot be found."
+					},
+					"response": []
+				},
+				{
+					"name": "Path Matching - None",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/basic-open-api/path-matching/suffix-fail",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"basic-open-api",
+								"path-matching",
+								"suffix-fail"
+							]
+						},
+						"description": "This example does not demonstrate the path matching feature, but rather shows what happens when no prefix or suffix matching is attempted. It provides the expected response of a 200 and \"path match\" JSON data.\n\nSee the other path matching examples for a demonstration of how path matching works."
+					},
+					"response": []
+				},
+				{
+					"name": "Path Matching - Prefix",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/basic-open-api/prefix-fail/path-matching",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"basic-open-api",
+								"prefix-fail",
+								"path-matching"
+							]
+						},
+						"description": "Validates that Tyk prefex matching is operational. This feature strictly matches the endpoints defined in the API Definition, so the gateway will not match requested paths that contain additional elements **before** the defined path.\n\nIn this case, the path `/path-matching/` is used, and the request attempts to prefix `prefix-fail` before the endpoint path. Tyk prefix matching causes this to not match the path, resulting in a 404 response.\n\nIf the prefix matching was not activated, then this request would return a 200 response."
+					},
+					"response": []
+				},
+				{
+					"name": "Path Matching - Suffix",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/basic-open-api/path-matching/suffix-fail",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"basic-open-api",
+								"path-matching",
+								"suffix-fail"
+							]
+						},
+						"description": "Validates that Tyk suffix matching is operational. This feature strictly matches the endpoints defined in the API Definition, so the gateway will not match requested paths that contain additional elements **after** the defined path.\n\nIn this case, the path `/path-matching/` is used, and the request attempts to append `suffix-fail` after the endpoint path. Tyk suffix matching causes this to not match the path, resulting in a 404 response.\n\nIf the suffix matching was not activated, then this request would return a 200 response."
 					},
 					"response": []
 				}
