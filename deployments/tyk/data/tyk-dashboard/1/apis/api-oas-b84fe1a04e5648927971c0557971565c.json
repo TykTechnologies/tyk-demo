@@ -88,17 +88,6 @@
         "summary": "Transforms headers in upstream API response"
       }
     },
-    "/anything/url-rewrite": {
-      "get": {
-        "operationId": "anything/url-rewriteget",
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "Rewrites the URL sent to upstream API"
-      }
-    },
     "/anything/validate-request": {
       "post": {
         "operationId": "anything/validate-requestpost",
@@ -136,6 +125,27 @@
         },
         "summary": "Validate request body against JSON schema"
       }
+    },
+    "/url-rewrite/{1}": {
+      "get": {
+        "operationId": "url-rewrite/{1}get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "1",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Rewrites the URL sent to upstream API"
+      }
     }
   },
   "servers": [
@@ -155,10 +165,13 @@
     "middleware": {
       "global": {
         "cache": {
-          "enabled": true,
+          "enabled": false,
           "timeout": 60
         },
         "contextVariables": {
+          "enabled": true
+        },
+        "trafficLogs": {
           "enabled": true
         }
       },
@@ -221,22 +234,28 @@
             ]
           }
         },
-        "anything/url-rewriteget": {
-          "urlRewrite": {
-            "enabled": true,
-            "pattern": "anything\\/([^/]+)\\/([^/]+)",
-            "rewriteTo": "anything/$2/$1"
-          }
-        },
         "anything/validate-requestpost": {
           "validateRequest": {
             "enabled": true,
             "errorResponseCode": 422
           }
+        },
+        "url-rewrite/{1}get": {
+          "urlRewrite": {
+            "enabled": true,
+            "pattern": "/([^/]+)/([^/]+)/([^/]+)",
+            "rewriteTo": "/anything?1=$1&2=$2&3=$3"
+          }
         }
       }
     },
     "server": {
+      "detailedActivityLogs": {
+        "enabled": true
+      },
+      "detailedTracing": {
+        "enabled": true
+      },
       "listenPath": {
         "strip": true,
         "value": "/oas-httpbin/"
