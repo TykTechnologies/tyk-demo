@@ -23,6 +23,7 @@ services:
       - ./deployments/analytics-splunk/volumes/tyk-pump/splunk-pump.conf:/opt/tyk-pump/pump.conf
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
+      - TYK_PMP_PUMPS_SPLUNK_META_COLLECTORTOKEN=${PMP_SPLUNK_META_COLLECTORTOKEN:-0}
     depends_on:
       - tyk-splunk
       - tyk-redis
