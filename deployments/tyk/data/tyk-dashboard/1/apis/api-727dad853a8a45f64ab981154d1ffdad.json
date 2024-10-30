@@ -166,6 +166,22 @@
           },
           "use_extended_paths": true,
           "extended_paths": {
+            "ignored": [
+              {
+                "disabled": false,
+                "path": "/path-matching",
+                "method": "",
+                "ignore_case": false,
+                "method_actions": {
+                  "GET": {
+                    "action": "reply",
+                    "code": 200,
+                    "data": "{ \"path\": \"match\" }",
+                    "headers": {}
+                  }
+                }
+              }
+            ],
             "persist_graphql": [],
             "rate_limit": []
           },
