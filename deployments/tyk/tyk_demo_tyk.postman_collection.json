@@ -6787,6 +6787,73 @@
 						"description": "Validates that Tyk suffix matching is operational. This feature strictly matches the endpoints defined in the API Definition, so the gateway will not match requested paths that contain additional elements **after** the defined path.\n\nIn this case, the path `/path-matching/` is used, and the request attempts to append `suffix-fail` after the endpoint path. Tyk suffix matching causes this to not match the path, resulting in a 404 response.\n\nIf the suffix matching was not activated, then this request would return a 200 response."
 					},
 					"response": []
+				},
+				{
+					"name": "Strict Routes - Pass",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/strict-routes/get",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"strict-routes",
+								"get"
+							]
+						},
+						"description": "This examples does not demonstrate strict routes enforcement, but instead provides a 'working' version of the request where the listen path is correctly provided i.e. `/strict-routes/get` and not `/strict-routesget` as per the 'fail' example."
+					},
+					"response": []
+				},
+				{
+					"name": "Strict Routes - Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/strict-routesget",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"strict-routesget"
+							]
+						},
+						"description": "This example shows how strict routes are enforced.\n\nIn this case, the requested path `/strict-routesget` fails to match the listen path `/strict-routes`, so a 404 is returned. If strict routes was not enabled then this would match and return a 200."
+					},
+					"response": []
 				}
 			]
 		},
