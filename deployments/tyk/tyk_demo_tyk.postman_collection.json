@@ -274,15 +274,12 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"Body is correct\", function () {",
-													"    pm.response.to.have.body(\"single wildcard\");",
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
 													"});"
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										}
 									],
@@ -302,7 +299,7 @@
 												""
 											]
 										},
-										"description": "Uses relative path expression `single/wildcard/{1}` to match against relative paths which start with `single/wildcard/`.\n\nThis example works because empty wildcards are valid."
+										"description": "Uses relative path expression `single/wildcard/{1}` to match against relative paths which start with `single/wildcard/`.\n\nThis example fails because strict suffix matching causes empty wildcards to be invalid."
 									},
 									"response": []
 								},
@@ -387,15 +384,12 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"Body is correct\", function () {",
-													"    pm.response.to.have.body(\"multiple wildcards\");",
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
 													"});"
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										}
 									],
@@ -417,7 +411,7 @@
 												"baz"
 											]
 										},
-										"description": "Uses relative path expression `multiple/wildcards/{1}/{2}` to match against relative paths which start with `multiple/wildcards/` then contain two more path elements.\n\nThis example works because it has `foo` and `bar` as the wildcards. The additional `baz` path element is accepted as the relative path expression does not use the `$` character to specify that the path must end after the second wildcard."
+										"description": "Uses relative path expression `multiple/wildcards/{1}/{2}` to match against relative paths which start with `multiple/wildcards/` then contain two more path elements.\n\nThis example fails because it has `foo` and `bar` as the wildcards. The additional `baz` path element causes the rejection as the gateway is configured with strict path matching, preventing additional path elements from being accepted."
 									},
 									"response": []
 								},
@@ -912,15 +906,12 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"Body is correct\", function () {",
-													"    pm.response.to.have.body(\"zero or more\");",
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
 													"});"
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										}
 									],
@@ -941,7 +932,7 @@
 												"foo"
 											]
 										},
-										"description": "Uses relative path expression `zero/or/more/a*` to match against relative paths which start with `zero/or/more/`, then contain zero or more `a` characters.\n\nThis example works because the `a*` syntax allows zero `a` characters, so using `foo` makes no difference."
+										"description": "Uses relative path expression `zero/or/more/a\\*` to match against relative paths which start with `zero/or/more/`, then contain zero or more `a` characters.\n\nThis example fails because the gateway is configured to use suffix matching, which expects the path to end after zero or more 'a' characters."
 									},
 									"response": []
 								},
@@ -5819,7 +5810,9 @@
 											"",
 											"pm.test('URL was rewritten', function () {",
 											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.url).to.be.equal('http://httpbin/anything/test/url-rewrite');",
+											"    pm.expect(jsonData.args[\"1\"]).to.be.equal('oas-httpbin');",
+											"    pm.expect(jsonData.args[\"2\"]).to.be.equal('url-rewrite');",
+											"    pm.expect(jsonData.args[\"3\"]).to.be.equal('test');",
 											"});"
 										],
 										"type": "text/javascript",
@@ -5831,14 +5824,13 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/url-rewrite/test",
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/url-rewrite/test",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
 									],
 									"path": [
 										"oas-httpbin",
-										"anything",
 										"url-rewrite",
 										"test"
 									]

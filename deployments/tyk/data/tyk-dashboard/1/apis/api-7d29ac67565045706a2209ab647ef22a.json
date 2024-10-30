@@ -316,6 +316,20 @@
               },
               {
                 "disabled": false,
+                "path": "zero/or/more/a*$",
+                "method": "",
+                "ignore_case": false,
+                "method_actions": {
+                  "GET": {
+                    "action": "reply",
+                    "code": 200,
+                    "data": "zero or more",
+                    "headers": {}
+                  }
+                }
+              },
+              {
+                "disabled": false,
                 "path": "multiple/wildcards/{1}/{2}",
                 "method": "",
                 "ignore_case": false,
@@ -324,6 +338,20 @@
                     "action": "reply",
                     "code": 200,
                     "data": "multiple wildcards",
+                    "headers": {}
+                  }
+                }
+              },
+              {
+                "disabled": false,
+                "path": "zero/or/one/a?",
+                "method": "",
+                "ignore_case": false,
+                "method_actions": {
+                  "GET": {
+                    "action": "reply",
+                    "code": 200,
+                    "data": "zero or one",
                     "headers": {}
                   }
                 }
@@ -372,34 +400,6 @@
               },
               {
                 "disabled": false,
-                "path": "zero/or/one/a?$",
-                "method": "",
-                "ignore_case": false,
-                "method_actions": {
-                  "GET": {
-                    "action": "reply",
-                    "code": 200,
-                    "data": "zero or one",
-                    "headers": {}
-                  }
-                }
-              },
-              {
-                "disabled": false,
-                "path": "single/wildcard/{1}",
-                "method": "",
-                "ignore_case": false,
-                "method_actions": {
-                  "GET": {
-                    "action": "reply",
-                    "code": 200,
-                    "data": "single wildcard",
-                    "headers": {}
-                  }
-                }
-              },
-              {
-                "disabled": false,
                 "path": "end/of/path$",
                 "method": "",
                 "ignore_case": false,
@@ -414,14 +414,14 @@
               },
               {
                 "disabled": false,
-                "path": "zero/or/more/a*",
+                "path": "^/single/wildcard/{1}$",
                 "method": "",
                 "ignore_case": false,
                 "method_actions": {
                   "GET": {
                     "action": "reply",
                     "code": 200,
-                    "data": "zero or more",
+                    "data": "single wildcard",
                     "headers": {}
                   }
                 }
