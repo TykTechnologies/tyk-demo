@@ -24,6 +24,27 @@
       "allowed_authorize_types": [],
       "auth_login_redirect": ""
     },
+    "auth": {
+      "name": "",
+      "use_param": false,
+      "param_name": "",
+      "use_cookie": false,
+      "cookie_name": "",
+      "disable_header": false,
+      "auth_header_name": "Authorization",
+      "use_certificate": false,
+      "validate_signature": false,
+      "signature": {
+        "algorithm": "",
+        "header": "",
+        "use_param": false,
+        "param_name": "",
+        "secret": "",
+        "allowed_clock_skew": 0,
+        "error_code": 0,
+        "error_message": ""
+      }
+    },
     "auth_configs": {
       "authToken": {
         "name": "",
@@ -455,5 +476,10 @@
     ],
     "detailed_tracing": false
   },
+  "hook_references": [],
+  "is_site": false,
+  "sort_by": 0,
+  "user_group_owners": [],
+  "user_owners": [],
   "created_at": "2024-09-05T14:05:24Z"
 }
