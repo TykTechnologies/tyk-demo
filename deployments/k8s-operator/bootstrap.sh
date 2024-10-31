@@ -5,12 +5,24 @@ deployment="Kubernetes Operator"
 
 log_start_deployment
 
-tyk_operator_install_version="0.18.0"
+tyk_operator_install_version="1.0.0"
 
-log_message "Checking Kubernetes requirements"
+log_message "Checking kubectl exists"
 if ! command -v kubectl >/dev/null; then
   log_message "ERROR: kubectl not found - please install Kubernetes v1.19 or later"
+  exit 1
 fi
+log_ok
+bootstrap_progress
+
+log_message "Checking K8s status"
+if ! kubectl version &> /dev/null; then
+  log_message "ERROR: kubectl command failed - check that K8s is available"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
 k8s_version=$(kubectl version 2>/dev/null | grep 'Client Version:' | awk '{print $3}')
 log_message "  Found kubectl $k8s_version"
 if [[ $k8s_version =~ ^v([0-9]+)\.([0-9]+)\. ]]; then
@@ -50,6 +62,7 @@ cert_manager_pod_count=$(kubectl get pods -l app=cert-manager --field-selector s
 if [ "$cert_manager_pod_count" == "0" ]; then
   log_message "ERROR: Could not find any running pods for 'cert-manager' app"
   log_message "  Please ensure that Cert Manager is installed before making this deployment"
+  log_message "  This deployment contains a script that installs the Cert Manager, see the deployment readme for details"
   exit 1
 fi
 log_ok
@@ -108,6 +121,8 @@ log_message "Creating Tyk Operator configuration"
 api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
 organisation_id=$(get_context_data "1" "organisation" "1" "id")
 dashboard_host="http://host.docker.internal:3000"
+operator_licensekey=$(awk -F '=' '/^DASHBOARD_LICENCE/ {print $2}' .env)
+
 if [ "${TYK_DEMO_DASHBOARD_HOST}" ]; then
   log_message "  Env var override found for dashboard host"
   dashboard_host="${TYK_DEMO_DASHBOARD_HOST}"
@@ -122,6 +137,7 @@ eval ./deployments/k8s-operator/scripts/setup-operator-config.sh \
   -n $tyk_operator_namespace \
   -u $dashboard_host \
   -s tyk-operator-conf \
+  -l $operator_licensekey \
   >>logs/bootstrap.log
 if [ "$?" != 0 ]; then
   log_message "ERROR: Unable to create Tyk Operator configuration"
