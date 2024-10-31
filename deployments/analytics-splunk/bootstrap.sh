@@ -20,18 +20,14 @@ log_http_result "$(curl -k $splunk_base_mgmt_url/servicesNS/admin/splunk_httpinp
   -d output_mode=json 2>> logs/bootstrap.log)"
 bootstrap_progress
 
-# set Splunk token and restart the Splunk Pump container
 log_message "Setting Splunk HTTP Event Collector Token"
 splunk_token=$(cat .context-data/splunk-http-collector | jq -r '.entry[0] .content .token')
 set_docker_environment_value "PMP_SPLUNK_META_COLLECTORTOKEN" "$splunk_token"
 log_ok
 bootstrap_progress
 
-# Configure splunk token in splunk-pump.conf
-log_message "Adding updated splunk token in splunk-pump.conf"
-jq --arg a "$splunk_token" '.pumps.splunk.meta.collector_token = $a' ./deployments/analytics-splunk/volumes/tyk-pump/splunk-pump.conf > ./deployments/analytics-splunk/volumes/tyk-pump/splunk-pump.conf.tmp && mv ./deployments/analytics-splunk/volumes/tyk-pump/splunk-pump.conf.tmp ./deployments/analytics-splunk/volumes/tyk-pump/splunk-pump.conf
-log_message "Restarting tyk-splunk-pump"
-$(generate_docker_compose_command) restart tyk-splunk-pump 2>/dev/null
+log_message "Recreating tyk-splunk-pump to utilise collector token"
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-splunk-pump 1>/dev/null 2>>logs/bootstrap.log
 log_ok
 bootstrap_progress
 
