@@ -13,7 +13,7 @@
   ],
   "x-tyk-api-gateway": {
     "info": {
-      "dbId": "672501127b739c0001da9136",
+      "dbId": "672505a3ff36fd0001e106f3",
       "id": "03ae3ee395d946fb4fa7fb808f24af26",
       "name": "Streams - HTTP to AMQP",
       "orgId": "5e9d9544a1dcd60001d0ed20",
@@ -43,7 +43,7 @@
   },
   "x-tyk-streaming": {
     "streams": {
-      "rabbit-mq": {
+      "rabbit-mq-output": {
         "input": {
           "http_server": {
             "path": "/post"
@@ -57,6 +57,24 @@
             "urls": [
               "amqp://user:password@rabbitmq:5672/"
             ]
+          }
+        }
+      },
+      "rabbitmq-input": {
+        "input": {
+          "amqp_0_9": {
+            "consumer_tag": "tyk_streams_consumer",
+            "prefetch_count": 10,
+            "queue": "my_queue",
+            "urls": [
+              "amqp://user:password@rabbitmq:5672/"
+            ]
+          }
+        },
+        "output": {
+          "http_server": {
+            "stream_path": "/sse",
+            "ws_path": "/ws"
           }
         }
       }

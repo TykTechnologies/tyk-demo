@@ -1,0 +1,1 @@
+curl -X POST http://tyk-gateway.localhost:8080/streams-http-to-amqp/post -d '{"message": "Hello, Tyk Streams!"}' -H "Content-Type: application/json"
