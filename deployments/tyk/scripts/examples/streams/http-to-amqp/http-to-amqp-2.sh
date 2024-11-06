@@ -1,1 +1,6 @@
+echo "Streams - HTTP to AMQP"
+echo "Part 2: Send a message"
+echo "Each time this script is run, the message 'Hello, Tyk Streams!' is sent via the message broker, RabbitMQ."
+echo "Tyk converts the HTTP POST request into AMQP, which results in the message be placed on the RabbitMQ message queue."
+echo "Check part 1 to see that the message is received."
 curl -X POST http://tyk-gateway.localhost:8080/streams-http-to-amqp/post -d '{"message": "Hello, Tyk Streams!"}' -H "Content-Type: application/json"
