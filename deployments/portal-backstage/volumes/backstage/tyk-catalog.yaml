@@ -89,3 +89,69 @@ spec:
       /node:
         delete:
           summary: Deregister a node
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-component
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: tyk-gateway-development
+  title: Tyk Gateway (management)
+spec:
+  type: service
+  lifecycle: development
+  owner: guests
+  system: tyk
+  providesApis:
+    - tyk-gateway-api-development
+  consumesApis:
+    - default/tyk-dashboard-system-api-development
+  dependsOn:
+    - component:default/tyk-dashboard-development
+    - resource:default/tyk-gateway-storage-development
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-api
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: tyk-gateway-api-development
+  title: Tyk Gateway (management) API
+spec:
+  type: http
+  lifecycle: development
+  owner: guests
+  system: tyk
+  definition: |
+    openapi: "3.0.0"
+    info:
+      version: 1.0.0
+      title: Tyk Gateway API
+    servers:
+      - url: http://tyk-gateway.localhost:8080/tyk
+    paths:
+      /keys:
+        get:
+          summary: List all keys
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format/#kind-resource
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: tyk-gateway-storage-development
+  title: Tyk Gateway Redis
+  description: Tyk Gateway data storage and pub/sub communication
+spec:
+  type: database
+  owner: guests
+  system: tyk-example
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format/#kind-resource
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: tyk-dashboard-storage-development
+  title: Tyk Dashboard MongoDB
+  description: Tyk Dashboard data storage
+spec:
+  type: database
+  owner: guests
+  system: tyk-example
