@@ -9,7 +9,6 @@ bootstrap_progress
 log_message "Reset the logfile"
 > ./deployments/portal/volumes/portal.log
 
-
 # Grab the Dashboard License line from ENV file
 licence_line=$(grep "DASHBOARD_LICENCE=" .env)
 # Parse out the DASHBOARD_LICENSE= bit
