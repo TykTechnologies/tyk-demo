@@ -22,3 +22,4 @@ deployments/tyk/volumes/tyk-dashboard/certs/private-key.pem
 deployments/portal/volumes/portal.log
 ## Portal Deployment
 deployments/portal/volumes/database/portal.db
+deployments/portal/volumes/portal.log

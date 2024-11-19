@@ -6,8 +6,8 @@ deployment="Portal"
 log_start_deployment
 bootstrap_progress
 
-log_message "Overwriting old portal log with empty logfile."
-cp ./deployments/portal/volumes/portal.log.example ./deployments/portal/volumes/portal.log
+log_message "Reset the logfile"
+> ./deployments/portal/volumes/portal.log
 
 
 # Grab the Dashboard License line from ENV file
