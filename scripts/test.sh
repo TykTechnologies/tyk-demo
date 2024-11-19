@@ -33,15 +33,31 @@ while IFS= read -r deployment; do
 
     echo "Running tests for $deployment deployment"
 
-    # Provide the 'test' environment variables, so newman can target the correct hosts from within the docker network
+    # Set up the test command
+    # --environment provides the 'test' environment variables, so newman can target the correct hosts from within the docker network
     # --insecure option is used due to self-signed certificates
-    docker run -t --rm \
-        --network tyk-demo_tyk \
-        -v $collection_path:/etc/postman/tyk_demo.postman_collection.json \
-        -v $(pwd)/test.postman_environment.json:/etc/postman/test.postman_environment.json \
-        postman/newman:alpine \
-        run "/etc/postman/tyk_demo.postman_collection.json" \
-        --environment /etc/postman/test.postman_environment.json \
-        --env-var "a=b" \
+    test_cmd=(
+        docker run -t --rm
+        --network tyk-demo_tyk
+        -v "$collection_path:/etc/postman/tyk_demo.postman_collection.json"
+        -v "$(pwd)/test.postman_environment.json:/etc/postman/test.postman_environment.json"
+        postman/newman:alpine
+        run "/etc/postman/tyk_demo.postman_collection.json"
+        --environment /etc/postman/test.postman_environment.json
         --insecure
+    )
+
+    # add dynamic env vars to the test command, if any exist
+    dynamic_env_var_path="$(pwd)/deployments/$deployment/dynamic-test-vars.env"
+    if [ -s "$dynamic_env_var_path" ]; then
+        while IFS= read -r var; do
+            test_cmd+=(--env-var "$var")
+            echo "  Using dynamic env var: $var"
+        done < "$dynamic_env_var_path"
+    else 
+        echo "  No dynamic environment variables found for $deployment deployment"
+    fi
+
+    # run the tests
+    "${test_cmd[@]}"
 done < .bootstrap/bootstrapped_deployments

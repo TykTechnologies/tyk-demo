@@ -257,7 +257,8 @@ done
 log_ok
 bootstrap_progress
 
-
+# Store API token in env var file, for use by test scripts
+echo "jwt=$portal_admin_api_token" > deployments/portal/dynamic-test-vars.env
 
 log_end_deployment
 # Echo credentials for Admin, Example Developer and Example Consumer
