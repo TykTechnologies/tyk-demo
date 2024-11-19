@@ -118,14 +118,14 @@ do
     )
 
     # add dynamic env vars to the test command, if any exist
-    dynamic_env_var_path="$(pwd)/deployments/$deployment/dynamic-test-vars.env"
+    dynamic_env_var_path="$deployment_dir/dynamic-test-vars.env"
     if [ -s "$dynamic_env_var_path" ]; then
         while IFS= read -r var; do
             test_cmd+=(--env-var "$var")
             echo "  Using dynamic env var: $var"
         done < "$dynamic_env_var_path"
     else 
-        echo "  No dynamic environment variables found for $deployment deployment"
+        echo "  No dynamic environment variables found for $deployment_name deployment"
     fi
 
     # run the tests
