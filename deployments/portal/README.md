@@ -5,7 +5,6 @@ This deployment spins up the Enterprise Developer Portal (formerly Raava).
 The portal can be accessed here:
 - [Developer Portal](http://localhost:3100)
 
-
 ## Setup
 
 ### License
@@ -17,7 +16,7 @@ The bootstrap process will fail if the licence is not present.
 
 To use this deployment, run the `up.sh` script with the `portal` parameter:
 
-```
+```shell
 ./up.sh portal
 ```
 
@@ -26,11 +25,12 @@ The Portal will spin up a Postgres database containing portal configurations as 
 There is an exposed logfile in the directory `./deployments/portal/volumes/portal.log` for debugging purposes.
 
 ### Testing
-In order to test the endpoints of this deployment, run newman tests against the postman collection:
+In order to test the endpoints of this deployment, run the standard test script:
+
 ```shell
-# Navigate to the root directory of this repository at tyk-demo/
-# Export the non-deterministic portal admin api key
-# Execute Newman tests using api key
-portal_api_key=$(cat .context-data/1-enterprise-portal-admin-1-api-key) 
-newman run ./deployments/portal/tyk_demo_portal.postman_collection.json --env-var "jwt=$portal_api_key" --bail
+./scripts/test.sh
 ```
+
+Make sure that the deployment is bootstrapped first.
+
+The tests will run for both the standard `tyk` deployment and also the `portal` deployment.
