@@ -1,6 +1,13 @@
 #!/bin/bash
 
-# runs the postman collection tests for deployments that a currently deployed
+# Runs the postman collection tests for deployments that are currently deployed
+# Note: To test all deployments without having to bootstrap them first, use the test-all.sh script
+
+if [ ! -s ".bootstrap/bootstrapped_deployments" ]; then
+  echo "ERROR: No bootstrapped deployments found"
+  echo "To run tests, first bootstrap a deployment, then run this script"
+  exit 1
+fi
 
 # Stop on first error
 set -e;
@@ -35,5 +42,6 @@ while IFS= read -r deployment; do
         postman/newman:alpine \
         run "/etc/postman/tyk_demo.postman_collection.json" \
         --environment /etc/postman/test.postman_environment.json \
+        --env-var "a=b" \
         --insecure
 done < .bootstrap/bootstrapped_deployments
