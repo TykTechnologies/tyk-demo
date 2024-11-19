@@ -1,15 +1,14 @@
 ---
-version: '3.8'
 services:
   tyk-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.3.0}
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.6.1}
     ports:
       - 3000:3000
     networks:
       - tyk
     volumes:
       - ./deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf:/opt/tyk-dashboard/tyk_analytics.conf
-      - ./deployments/tyk/volumes/tyk-dashboard/certs:/opt/tyk-dashboard/certs
+      - tyk-dashboard-certs:/opt/tyk-dashboard/certs
       - ./deployments/tyk/volumes/tyk-dashboard/catalogue.html:/opt/tyk-dashboard/portal/templates/catalogue.html
       - ./deployments/tyk/volumes/tyk-dashboard/navigation.html:/opt/tyk-dashboard/portal/templates/navigation.html
       - ./deployments/tyk/volumes/tyk-dashboard/audit:/opt/tyk-dashboard/audit
@@ -23,10 +22,13 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-gateway:
-    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.3.0}
+    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.6.1}
     ports:
       - 8080:8080
       - 8086:8086
+      - 9002:9002
+      - 9003:9003
+      - 9004:9004
     networks:
       tyk:
         aliases:
@@ -47,7 +49,7 @@ services:
       - .env
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
-      - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
+      - tyk-gateway-certs:/opt/tyk-gateway/certs
       - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
       - ./deployments/tyk/volumes/tyk-gateway/plugins:/opt/tyk-gateway/plugins
       - ./deployments/tyk/volumes/tyk-gateway/templates/error_401.json:/opt/tyk-gateway/templates/error_401.json
@@ -56,9 +58,10 @@ services:
       - tyk-redis
       - tyk-dashboard
   tyk-gateway-2:
-    image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v5.3.0}
+    image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v5.6.1}
     ports:
       - 8081:8080
+      - 9005:9005
     networks:
       - tyk
     environment:
@@ -69,14 +72,14 @@ services:
       - .env
     volumes:
       - ./deployments/tyk/volumes/tyk-gateway/tyk-2.conf:/opt/tyk-gateway/tyk.conf
-      - ./deployments/tyk/volumes/tyk-gateway/certs:/opt/tyk-gateway/certs
+      - tyk-gateway-certs:/opt/tyk-gateway/certs
       - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
     depends_on:
       - tyk-redis
       - tyk-gateway
       - tyk-dashboard
   tyk-pump:
-    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.9.0}
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.11.0}
     ports:
       - 8083:8083
     networks:
@@ -92,7 +95,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-redis:
-    image: redis:6.0.4
+    image: redis:7.2.0
     ports:
       - "6379:6379"
     volumes:
@@ -100,8 +103,7 @@ services:
     networks:
       - tyk
   tyk-mongo:
-    image: mongo:4.0
-    command: [ "mongod", "--smallfiles" ]
+    image: mongo:7.0.9
     ports:
       - "27017:27017"
     volumes:
@@ -125,20 +127,12 @@ services:
     image: svenwal/jsonplaceholder:1.1
     networks:
       - tyk
-  http-server:
-    image: httpd:2.4.46-alpine
-    networks:
-      - tyk
-    volumes:
-      - ./deployments/tyk/volumes/http-server:/usr/local/apache2/htdocs
-    ports:
-      - "8888:80"
   echo-server:
     image: jmalloc/echo-server:0.3.1
     networks:
       - tyk
   www-ngrok:
-    image: ngrok/ngrok:3.3.0-alpine
+    image: ngrok/ngrok:3.12.0-alpine
     networks:
       - tyk
     command:
@@ -152,10 +146,20 @@ services:
       - 4040:4040
     environment:
       - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN-}
+  grpcbin:
+    image: moul/grpcbin:renovate_all
+    networks:
+      - tyk
+    ports:
+      - 9000:9000
+      - 9001:9001
 
 volumes:
   tyk-redis-data:
   tyk-mongo-data:
+  tyk-kafka-data:
+  tyk-gateway-certs:
+  tyk-dashboard-certs:
 
 networks:
   tyk:

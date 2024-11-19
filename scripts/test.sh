@@ -41,7 +41,7 @@ while IFS= read -r deployment; do
         --network tyk-demo_tyk
         -v "$collection_path:/etc/postman/tyk_demo.postman_collection.json"
         -v "$(pwd)/test.postman_environment.json:/etc/postman/test.postman_environment.json"
-        postman/newman:alpine
+        postman/newman:6.1.3-alpine \
         run "/etc/postman/tyk_demo.postman_collection.json"
         --environment /etc/postman/test.postman_environment.json
         --insecure

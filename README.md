@@ -10,7 +10,7 @@ Postman collections are included for some deployments. These are pre-configured 
 
 See the [Contributor Guide](CONTRIBUTING.md) for information on how to contribute to and extend this repository.
 
-> :warning: Please note that this repo has been created on Mac OS X with Docker Desktop for Mac. You may experience issues if using a different operating system or approach.
+> :warning: Please note that this repo has been created on MacOS with Docker Desktop for Mac. You may experience issues if using a different operating system or approach.
 
 If you encounter a problem using this repository, please try to fix it yourself and create a pull request so that others can benefit.
 
@@ -66,6 +66,7 @@ All of the directories contain `docker-compose.yml`, `bootstrap.sh` and `README.
 * [MQTT](deployments/mqtt/README.md)
 * [OpenTelemetry with Jaeger](deployments/otel-jaeger/README.md)
 * [Portal](deployments/portal/README.md)
+* [Python gRPC server](deployments/plugin-grpc-python/README.md)
 * [SLIs and SLOs with Prometheus and Grafana](deployments/slo-prometheus-grafana/README.md)
 * [SSO](deployments/sso/README.md)
 * [WAF](deployments/waf/README.md)

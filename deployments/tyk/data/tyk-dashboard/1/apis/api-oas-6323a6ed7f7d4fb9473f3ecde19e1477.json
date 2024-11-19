@@ -1,0 +1,71 @@
+{
+  "components": {
+    "securitySchemes": {
+      "authToken": {
+        "in": "header",
+        "name": "Authorization",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "title": "Dynamic Client MTLS",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.3",
+  "paths": {},
+  "security": [
+    {
+      "authToken": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://tyk-gateway.localhost:8080/dynamic-client-mtls/"
+    }
+  ],
+  "x-tyk-api-gateway": {
+    "info": {
+      "id": "6323a6ed7f7d4fb9473f3ecde19e1477",
+      "name": "Dynamic Client MTLS",
+      "orgId": "5e9d9544a1dcd60001d0ed20",
+      "state": {
+        "active": true
+      }
+    },
+    "middleware": {
+      "global": {
+        "contextVariables": {
+          "enabled": true
+        },
+        "trafficLogs": {
+          "enabled": true
+        }
+      }
+    },
+    "server": {
+      "authentication": {
+        "enabled": true,
+        "securitySchemes": {
+          "authToken": {
+            "enableClientCertificate": true,
+            "enabled": true
+          }
+        }
+      },
+      "gatewayTags": {
+        "enabled": true,
+        "tags": [
+          "tyk-gateway-2"
+        ]
+      },
+      "listenPath": {
+        "strip": true,
+        "value": "/dynamic-client-mtls/"
+      }
+    },
+    "upstream": {
+      "url": "http://httpbin/"
+    }
+  }
+}

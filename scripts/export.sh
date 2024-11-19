@@ -18,16 +18,27 @@ for data_group in "${data_groups[@]}"; do\
     if [[ "$api" != "" ]]; then
       api_is_oas=$(jq -r '.api_definition.is_oas' <<< $api) 
       api_name=$(jq -r '.api_definition.name' <<< $api)
-      api_id=$(jq -r '.api_definition.id' <<< $api)
+      api_id=$(jq -r '.api_definition.api_id' <<< $api)
       api_file_name="api-$api_id.json"
       echo "  $api_name"
-      # if API is OAS spec, then retrieve the OAS document and use a different file name
+      # perform some specification specific actions
       if [[ "$api_is_oas" == "true" ]]; then
+        # update API specification document to use OAS-style API definition
         api=$(curl $dashboard_base_url/api/apis/oas/$api_id -s \
           -H "Authorization:${dashboard_keys[$index]}")
+        # update file name to denote that the contents are an OAS-style API definition
         api_file_name="api-oas-$api_id.json"
+        # remove the dbId field, as this changes every time the data is exported, resulting in unneccessary modifications
+        api="$(echo "$api" | jq 'del(.["x-tyk-api-gateway"].info.dbId)')"
+      else
+        # remove these fields, as they change every time the data is exported, resulting in unneccessary modifications
+        api="$(echo "$api" | jq 'del(.updated_at, .api_definition.id, .api_definition.graphql.last_schema_update)')"
+        # use placeholder value for any webhook ids, as these change on import, resulting in unneccessary modifications
+        api=$(echo "$api" | jq '.hook_references[].hook.id = "000000000000000000000000"')
+        api=$(echo "$api" | jq '.api_definition.event_handlers.events |= with_entries(.value |= map(if .handler_meta.webhook_id then (.handler_meta.webhook_id = "000000000000000000000000"  | .handler_meta.id = "000000000000000000000000") else . end))')
       fi
-      echo "$api" | jq '.' > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/apis/$api_file_name"
+
+      echo "$api" > "deployments/tyk/data/tyk-dashboard/${data_groups[$index]}/apis/$api_file_name"
     fi 
   done <<< "$apis"
 

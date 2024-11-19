@@ -62,5 +62,6 @@
     "per_api": false
   },
   "last_updated": "1654713027",
-  "meta_data": {}
+  "meta_data": {},
+  "smoothing": null
 }

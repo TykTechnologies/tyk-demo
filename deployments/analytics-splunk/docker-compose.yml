@@ -1,8 +1,8 @@
 ---
-version: '3.3'
 services:
   tyk-splunk:
-    image: splunk/splunk:latest
+    image: splunk/splunk:9.3
+    platform: linux/amd64 # force amd64 arch to enable usage with rosetta on mac
     ports:
       - 8000:8000
       - 8088:8088
@@ -16,13 +16,14 @@ services:
       - splunk-data:/opt/splunk/var
       - splunk-data:/opt/splunk/etc
   tyk-splunk-pump:
-    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.9.0}
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.11.0}
     networks:
       - tyk
     volumes:
       - ./deployments/analytics-splunk/volumes/tyk-pump/splunk-pump.conf:/opt/tyk-pump/pump.conf
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
+      - TYK_PMP_PUMPS_SPLUNK_META_COLLECTORTOKEN=${PMP_SPLUNK_META_COLLECTORTOKEN:-0}
     depends_on:
       - tyk-splunk
       - tyk-redis

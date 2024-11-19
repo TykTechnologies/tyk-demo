@@ -1,5 +1,4 @@
 ---
-version: '3.9'
 services:
   tyk-postgres:
     image: postgres:13.3-alpine
