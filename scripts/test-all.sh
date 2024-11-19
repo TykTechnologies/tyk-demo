@@ -40,7 +40,7 @@ fi
 mkdir logs 1>/dev/null 2>&1 # create logs directory before clearing files
 echo -n > logs/test.log
 echo -n > logs/bootstrap.log
-rm logs/containers-*.log 1>/dev/null # there can be multiple container logs
+rm -f logs/containers-*.log 1>/dev/null # there can be multiple container logs
 
 declare -a result_names
 declare -a result_codes
@@ -105,7 +105,7 @@ do
     # Provide the 'test' environment variables, so newman can target the correct hosts from within the docker network
     # --insecure option is used due to self-signed certificates
     # pipefail option is set so that failure of docker command can be detected
-    (
+    test_cmd=(
         set -o pipefail  
         docker run -t --rm \
             --network tyk-demo_tyk \
@@ -115,10 +115,23 @@ do
             run "/etc/postman/tyk_demo.postman_collection.json" \
             --environment /etc/postman/test.postman_environment.json \
             --insecure \
-            | tee -a logs/test.log
     )
-    # output of above command is captured in logs/test.log file
+
+    # add dynamic env vars to the test command, if any exist
+    dynamic_env_var_path="$(pwd)/deployments/$deployment/dynamic-test-vars.env"
+    if [ -s "$dynamic_env_var_path" ]; then
+        while IFS= read -r var; do
+            test_cmd+=(--env-var "$var")
+            echo "  Using dynamic env var: $var"
+        done < "$dynamic_env_var_path"
+    else 
+        echo "  No dynamic environment variables found for $deployment deployment"
+    fi
+
+    # run the tests
+    # capture test command output in logs/test.log file
     # file will contain control characters, so is advised to use command "less -r logs/test.log", or similar, to view it
+    "${test_cmd[@]}" 2>&1 | tee -a logs/test.log
 
     if [ "$?" != "0" ]; then
         echo_and_log "Tests ${RED}failed${NOCOLOUR} for $deployment_name deployment"
