@@ -601,7 +601,7 @@ echo -e "\033[2K
     ▾ Multi-Organisation User
                Username : $(get_context_data "1" "dashboard-user" "2" "email")
                Password : $(get_context_data "1" "dashboard-user" "2" "password")
-  ▽ Portal ($(get_service_image_tag "tyk-dashboard"))
+  ▽ Classic Portal ($(get_service_image_tag "tyk-dashboard"))
     ▾ $(get_context_data "1" "organisation" "1" "name") Organisation
                     URL : http://$(get_context_data "1" "portal" "1" "hostname")$portal_root_path
                Username : $(get_context_data "1" "portal-developer" "1" "email")

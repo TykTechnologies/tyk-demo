@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source scripts/common.sh
-deployment="Portal"
+deployment="Enterprise Portal"
 
 log_start_deployment
 bootstrap_progress
