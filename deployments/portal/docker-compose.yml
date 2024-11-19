@@ -4,11 +4,24 @@ services:
     image: tykio/portal:${PORTAL_VERSION:-v1.11.0}
     networks:
       - tyk
+    environment:
+      - PORTAL_AUDIT_LOG_PATH=/opt/portal/
     env_file:
       - .env
     ports:
       - 3100:3001
     entrypoint: /opt/portal/dev-portal
     volumes:
+      - ./deployments/portal/volumes/portal.log:/opt/portal/portal.log
       - ./deployments/portal/volumes/database/portal.db:/opt/portal/portal.db
       - ./deployments/portal/volumes/assets/:/opt/portal/public/system/products/
+  tyk-portal-postgres:
+    image: postgres:16-alpine
+    networks:
+      - tyk
+    volumes:
+      - ./deployments/portal/volumes/database/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - .env
+    ports:
+      - 5432:5432

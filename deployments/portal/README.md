@@ -5,7 +5,6 @@ This deployment spins up the Enterprise Developer Portal (formerly Raava).
 The portal can be accessed here:
 - [Developer Portal](http://localhost:3100)
 
-
 ## Setup
 
 ### License
@@ -17,13 +16,21 @@ The bootstrap process will fail if the licence is not present.
 
 To use this deployment, run the `up.sh` script with the `portal` parameter:
 
-```
+```shell
 ./up.sh portal
 ```
 
 This install comes bootstrapped with an admin user, an external api consumer user and an internal api developer user. 
-Initially the portal comes bootstrapped with a default admin user but becomes overwritten with a SQLite database containing users, organizations, and image assets. 
-The SQLite database file is located within deployments/portal/volumes/database/portal.db.
+The Portal will spin up a Postgres database containing portal configurations as well as assets. 
+There is an exposed logfile in the directory `./deployments/portal/volumes/portal.log` for debugging purposes.
 
-### Dependencies
-<li> SQLite </li>
+### Testing
+In order to test the endpoints of this deployment, run the standard test script:
+
+```shell
+./scripts/test.sh
+```
+
+Make sure that the deployment is bootstrapped first.
+
+The tests will run for both the standard `tyk` deployment and also the `portal` deployment.

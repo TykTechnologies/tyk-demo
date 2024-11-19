@@ -96,7 +96,7 @@ for argument in "$@"; do
   # check if argument refers to a deployment
   if [ -d "deployments/$argument" ]; then
     # skip existing deployments, to avoid rebootstrapping
-    [ ! -z $(grep "$argument" ".bootstrap/bootstrapped_deployments") ] && break
+    [ -f ".bootstrap/bootstrapped_deployments" ] && [ ! -z $(grep "$argument" ".bootstrap/bootstrapped_deployments") ] && break
     # otherwise, queue deployment to be created
     deployments_to_create+=("$argument")
   else
