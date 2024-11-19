@@ -1,5 +1,4 @@
 ---
-version: '3.9'
 services:
   users-subgraph:
     image: zalbiraw/go-api-test-service:v2.0.0

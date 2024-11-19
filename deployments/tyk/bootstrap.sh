@@ -53,118 +53,101 @@ bootstrap_progress
 
 # Certificates
 
-log_message "Wait for services to be ready before beginning to bootstrap"
-wait_for_liveness
+log_message "Checking for existing OpenSSL container"
+OPENSSL_CONTAINER_NAME="tyk-demo-openssl"
+if [ "$(docker ps -a --format '{{.Names}}' | grep -w "$OPENSSL_CONTAINER_NAME" | wc -l)" -gt 0 ]; then
+  log_message "Removing existing OpenSSL container $OPENSSL_CONTAINER_NAME"
+  docker rm -f $OPENSSL_CONTAINER_NAME > /dev/null
+else
+  log_ok
+fi
+bootstrap_progress
 
-log_message "OpenSSL version used for generating certs: $(docker exec $(get_service_container_id tyk-gateway) sh -c "openssl version")"
-
-log_message "Removing any pre-existing certs"
-rm deployments/tyk/volumes/tyk-dashboard/certs/*.pem 1> /dev/null 2>> logs/bootstrap.log
-rm deployments/tyk/volumes/tyk-gateway/certs/*.pem 1> /dev/null 2>> logs/bootstrap.log
+log_message "Creating temporary container $OPENSSL_CONTAINER_NAME for OpenSSL usage"
+docker run -d --name $OPENSSL_CONTAINER_NAME \
+  -v tyk-demo_tyk-gateway-certs:/tyk-gateway-certs \
+  -v tyk-demo_tyk-dashboard-certs:/tyk-dashboard-certs \
+  alpine:3.20.1 tail -f /dev/null >/dev/null 2>&1
 log_ok
+bootstrap_progress
+
+log_message "Install OpenSSL into container $OPENSSL_CONTAINER_NAME"
+docker exec $OPENSSL_CONTAINER_NAME apk add --no-cache openssl >/dev/null 2>>logs/bootstrap.log
+# Wait for the installation to complete
+while true; do
+    # Check if OpenSSL is installed by trying to get its version
+    if docker exec $OPENSSL_CONTAINER_NAME openssl version >/dev/null 2>&1; then
+        log_message "  OpenSSL has been successfully installed"
+        break
+    else
+        log_message "  Waiting for OpenSSL to be installed..."
+        sleep 2
+    fi
+done
+
+log_message "OpenSSL version used for generating certs: $(docker exec $OPENSSL_CONTAINER_NAME openssl version)"
 
 log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
-docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tyk-gateway-2.localhost\" -keyout certs/tls-private-key.pem -out certs/tls-certificate.pem -days 365 -nodes" >>logs/bootstrap.log
-if [ "$?" != "0" ]; then
+docker exec $OPENSSL_CONTAINER_NAME sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tyk-gateway-2.localhost\" -keyout /tyk-gateway-certs/tls-private-key.pem -out /tyk-gateway-certs/tls-certificate.pem -days 365 -nodes" >/dev/null 2>&1
+if [ "$?" -ne "0" ]; then
   echo "ERROR: Could not generate self-signed certificate"
   exit 1
 fi
 log_ok
 bootstrap_progress
+wait_for_file "/tyk-gateway-certs/tls-certificate.pem" "$OPENSSL_CONTAINER_NAME"
+wait_for_file "/tyk-gateway-certs/tls-private-key.pem" "$OPENSSL_CONTAINER_NAME"
 
 log_message "Generating private key for secure messaging and signing"
-docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl genrsa -out certs/private-key.pem 2048" >>logs/bootstrap.log
-if [ "$?" != "0" ]; then
+docker exec $OPENSSL_CONTAINER_NAME sh -c "openssl genrsa -out /tyk-dashboard-certs/private-key.pem 2048" >/dev/null 2>>logs/bootstrap.log
+if [ "$?" -ne "0" ]; then
   echo "ERROR: Could not generate private key"
   exit 1
 fi
 log_ok
 bootstrap_progress
-
-log_message "Checking that certificate is ready"
-while [ ! -f deployments/tyk/volumes/tyk-gateway/certs/private-key.pem ]; do
-  log_message "  Not ready, waiting..."
-  bootstrap_progress
-  sleep 2
-done
-log_ok
-bootstrap_progress
-
-log_message "Copying private key to the Dashboard"
-cert_check=""
-begin_cert="-----BEGIN PRIVATE KEY-----"
-while [ "$cert_check" != "$begin_cert" ]; do
-  docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/certs/private-key.pem deployments/tyk/volumes/tyk-dashboard/certs >>logs/bootstrap.log
-  if [ "$?" != "0" ]; then
-    echo "ERROR: Could not copy private key"
-    exit 1
-  fi
-  cert_check=$(head -n 1 deployments/tyk/volumes/tyk-dashboard/certs/private-key.pem)
-  if [ "$cert_check" != "$begin_cert" ]; then
-    log_message "  Could not find private key data, retrying copy"
-    bootstrap_progress
-    sleep 1
-  fi
-done
-log_ok
-bootstrap_progress
+wait_for_file "/tyk-dashboard-certs/private-key.pem" "$OPENSSL_CONTAINER_NAME"
 
 log_message "Generating public key for secure messaging and signing"
-docker exec -d $(get_service_container_id tyk-gateway) sh -c "openssl rsa -in certs/private-key.pem -pubout -out certs/public-key.pem" >>logs/bootstrap.log
-if [ "$?" != "0" ]; then
+docker exec $OPENSSL_CONTAINER_NAME sh -c "openssl rsa -in /tyk-dashboard-certs/private-key.pem -pubout -out /tyk-gateway-certs/public-key.pem" >/dev/null 2>>logs/bootstrap.log
+if [ "$?" -ne "0" ]; then
   echo "ERROR: Could not generate public key"
   exit 1
 fi
 log_ok
 bootstrap_progress
+wait_for_file "/tyk-gateway-certs/public-key.pem" "$OPENSSL_CONTAINER_NAME"
 
-log_message "Recreating containers to ensure new certificates are loaded (tyk-gateway, tyk-gateway-2, tyk-dashboard)"
-eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway tyk-gateway-2 tyk-dashboard
-# if there are gateways from other deployments connecting to this deployment 
-# (such as MDCB), then they must be recreated to. The MDCB deployment already 
-# handles recreation.
+log_message "Setting read permissions on certificate volumes"
+docker exec $OPENSSL_CONTAINER_NAME chmod -R a+r /tyk-gateway-certs >/dev/null 2>>logs/bootstrap.log
 if [ "$?" != "0" ]; then
-  echo "ERROR: Could not recreate containers"
+  echo "ERROR: Could not set read permissions on /tyk-gateway-certs volume"
+  exit 1
+fi
+docker exec $OPENSSL_CONTAINER_NAME chmod -R a+r /tyk-dashboard-certs >/dev/null 2>>logs/bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not set read permissions on /tyk-dashboard-certs volume"
   exit 1
 fi
 log_ok
 bootstrap_progress
 
+log_message "Removing temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
+docker rm -f $OPENSSL_CONTAINER_NAME >/dev/null 2>>logs/bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not remove temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Recreating containers to load new certificates"
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway tyk-gateway-2
+log_ok
+
 log_message "Wait for services to be available after restart"
 wait_for_liveness
-
-# Python plugin
-
-#### Python plugin build temporarily removed due to Python not being bundled with v5.3 gateway release. 
-#### This will be reinstated once there is an established process.
-
-# log_message "Building Python plugin bundle"
-# docker exec -d $(get_service_container_id tyk-gateway) sh -c "cd /opt/tyk-gateway/middleware/python/basic-example; /opt/tyk-gateway/tyk bundle build -k /opt/tyk-gateway/certs/private-key.pem" 1> /dev/null 2>> logs/bootstrap.log
-# if [ "$?" != 0 ]; then
-#   echo "Error occurred when building Python plugin bundle"
-#   exit 1
-# fi
-# log_ok
-# bootstrap_progress
-
-# log_message "Copying Python bundle to http-server"
-# # we don't use a 'docker compose' command here as docker compose version 1 does not support 'cp'
-# docker cp $(get_service_container_id tyk-gateway):/opt/tyk-gateway/middleware/python/basic-example/bundle.zip deployments/tyk/volumes/http-server/python-basic-example.zip 2>> logs/bootstrap.log
-# if [ "$?" != 0 ]; then
-#   echo "Error occurred when copying Python bundle to http-server"
-#   exit 1
-# fi
-# log_ok
-# bootstrap_progress
-
-# log_message "Removing Python bundle intermediate assets"
-# rm -r deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example/bundle.zip
-# if [ "$?" != 0 ]; then
-#   echo "Error occurred when removing Python bundle intermediate assets"
-#   exit 1
-# fi
-# log_ok
-# bootstrap_progress
 
 # Go plugins
 
@@ -245,11 +228,20 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
       fi
     done
 
+    # Certificates
+    log_message "Creating Certificates"
+    for file in $data_group_path/certs/*; do
+      if [[ -f $file ]]; then
+        create_cert "$file" "$dashboard_user_api_key"
+        bootstrap_progress
+      fi
+    done
+
     # APIs
     log_message "Creating APIs"
     for file in $data_group_path/apis/*; do
       if [[ -f $file ]]; then
-        create_api "$file" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+        create_api "$file" "$dashboard_user_api_key"
         bootstrap_progress
       fi
     done
@@ -264,7 +256,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     log_message "Creating Policies"
     for file in $data_group_path/policies/*; do
       if [[ -f $file ]]; then
-        create_policy "$file" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+        create_policy "$file" "$dashboard_user_api_key"
         bootstrap_progress
       fi
     done    
@@ -352,6 +344,15 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     for file in $data_group_path/keys/basic/*; do
       if [[ -f $file ]]; then
         create_basic_key "$file" "$dashboard_user_api_key"
+        bootstrap_progress        
+      fi
+    done
+
+    # Keys - Bearer token
+    log_message "Creating Bearer Token Keys"
+    for file in $data_group_path/keys/bearer-token/*; do
+      if [[ -f $file ]]; then
+        create_bearer_token_dash "$file" "$dashboard_user_api_key"
         bootstrap_progress        
       fi
     done
@@ -459,32 +460,6 @@ do
 done
 log_ok
 
-#### Python check temporarily removed due to Python not being bundled with v5.3 gateway release. 
-#### This will be reinstated once there is an established process.
-
-# log_message "Checking Gateway - Python middleware"
-# result=""
-# reload_attempt=0
-# while [ "$result" != "0" ]
-# do
-#   wait_for_response "$gateway_base_url/python-middleware-api/get" "200" "" 3
-#   result="$?"
-#   if [ "$result" != "0" ]
-#   then
-#     reload_attempt=$((reload_attempt+1))
-#     if [ "$reload_attempt" -lt "3"  ]; then
-#       log_message "  Gateway not returning desired response, attempting hot reload"
-#       hot_reload "$gateway_base_url" "$gateway_api_credentials"
-#       sleep 2
-#     else
-#       log_message "  Maximum reload attempt reached"
-#       exit 1
-#     fi
-#   fi
-#   bootstrap_progress
-# done
-# log_ok
-
 log_message "Checking Gateway - Go plugin"
 result=""
 reload_attempt=0
@@ -567,6 +542,7 @@ ngrok_available=false
 if ! grep -q "NGROK_AUTHTOKEN=" .env; then
   log_message "Ngrok auth token is not set, so Ngrok will not be available"
   log_message "To enable Ngrok, set the NGROK_AUTHTOKEN value in the Tyk Demo .env file"
+  ngrok_public_url="not configured"
 else
   log_message "Getting Ngrok public URL for Tyk Gateway"
   ngrok_dashboard_url="http://localhost:4040"

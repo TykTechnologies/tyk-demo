@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "02a77c7c-11f8-4447-b52e-2e94deec4215",
+		"_postman_id": "7e71a9d3-54a4-4dce-9207-2aa450b04c00",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "6131676"
@@ -98,56 +98,6 @@
 									]
 								},
 								"description": "Calls the `JavaScript Middleware API`, which executes two JavaScript middleware functions at the `pre` and `post` hooks.\n\nThe `pre` function does the following:\n- Writes to the API Gateway application log\n- Adds `User-Agent` header\n- Deletes `Deleted` header\n- Adds `added` URL parameter\n- Deletes `deleted` URL parameter\n- Changes the request body - see `data` property of response object\n- Changes the requested URL - see `url` property of response object\n\nThe `post` function does the following:\n- Writes to the API Gateway application log\n- Adds `config-data` header using value taken from API definition `config data`\n- Makes a separate HTTP request and writes the resulting response code and body to the API Gateway application log"
-							},
-							"response": []
-						},
-						{
-							"name": "Middleware - Python",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"// #### Python tests temporarily removed due to Python not being bundled with v5.3 gateway release. ",
-											"// #### This will be reinstated once there is an established process.",
-											"",
-											"// pm.test(\"Status code is 200\", function () {",
-											"//     pm.response.to.have.status(200);",
-											"// });",
-											"",
-											"// pm.test(\"Python middleware pre hook header is present\", function () {",
-											"//     var jsonData = pm.response.json();",
-											"//     pm.expect(jsonData.headers[\"Python-Plugin-Pre-Hook\"]).to.eql(\"Pre Hook\");",
-											"// });",
-											"",
-											"// pm.test(\"Python middleware post hook header is present\", function () {",
-											"//     var jsonData = pm.response.json();",
-											"//     pm.expect(jsonData.headers[\"Python-Plugin-Post-Hook\"]).to.eql(\"Post Hook\");",
-											"// });",
-											"",
-											"// pm.test(\"Python middleware response hook header is present\", function () {",
-											"//     pm.response.to.have.header(\"Python-Plugin-Response-Hook\");",
-											"// });"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://{{tyk-gateway.host}}/python-middleware-api/get",
-									"protocol": "http",
-									"host": [
-										"{{tyk-gateway.host}}"
-									],
-									"path": [
-										"python-middleware-api",
-										"get"
-									]
-								},
-								"description": "This request calls the Python Middleware API, which uses Python to inject a custom header into the request as it is processed by the Gateway.\n\nThis middleware is configured to be activated at the `pre`, `post` and `response` hooks.\n\nThe request goes the `/get` endpoint. The server adds the headers it received into the response body - the custom headers are shown as `\"Python-Plugin-Pre-Hook\": \"Pre Hook\"` and `\"Python-Plugin-Post-Hook\": \"Post Hook\"`.\n\nThe plugin response hook adds a custom header to the response, called `Python-Plugin-Response-Hook`. It also logs the response status code to the Gateway application log. Check the Gateway's application log for entries prefixed with `Python plugin:`.\n\nThe plugin is bundled using the Gateway CLI, which outputs a signed compressed archive. This signature is then verified by the Gateway when it loads the Python plugin."
 							},
 							"response": []
 						},
@@ -324,15 +274,12 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"Body is correct\", function () {",
-													"    pm.response.to.have.body(\"single wildcard\");",
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
 													"});"
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										}
 									],
@@ -352,7 +299,7 @@
 												""
 											]
 										},
-										"description": "Uses relative path expression `single/wildcard/{1}` to match against relative paths which start with `single/wildcard/`.\n\nThis example works because empty wildcards are valid."
+										"description": "Uses relative path expression `single/wildcard/{1}` to match against relative paths which start with `single/wildcard/`.\n\nThis example fails because strict suffix matching causes empty wildcards to be invalid."
 									},
 									"response": []
 								},
@@ -437,15 +384,12 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"Body is correct\", function () {",
-													"    pm.response.to.have.body(\"multiple wildcards\");",
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
 													"});"
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										}
 									],
@@ -467,7 +411,7 @@
 												"baz"
 											]
 										},
-										"description": "Uses relative path expression `multiple/wildcards/{1}/{2}` to match against relative paths which start with `multiple/wildcards/` then contain two more path elements.\n\nThis example works because it has `foo` and `bar` as the wildcards. The additional `baz` path element is accepted as the relative path expression does not use the `$` character to specify that the path must end after the second wildcard."
+										"description": "Uses relative path expression `multiple/wildcards/{1}/{2}` to match against relative paths which start with `multiple/wildcards/` then contain two more path elements.\n\nThis example fails because it has `foo` and `bar` as the wildcards. The additional `baz` path element causes the rejection as the gateway is configured with strict path matching, preventing additional path elements from being accepted."
 									},
 									"response": []
 								},
@@ -962,15 +906,12 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"pm.test(\"Body is correct\", function () {",
-													"    pm.response.to.have.body(\"zero or more\");",
+													"pm.test(\"Status code is 403\", function () {",
+													"    pm.response.to.have.status(403);",
 													"});"
 												],
-												"type": "text/javascript"
+												"type": "text/javascript",
+												"packages": {}
 											}
 										}
 									],
@@ -991,7 +932,7 @@
 												"foo"
 											]
 										},
-										"description": "Uses relative path expression `zero/or/more/a*` to match against relative paths which start with `zero/or/more/`, then contain zero or more `a` characters.\n\nThis example works because the `a*` syntax allows zero `a` characters, so using `foo` makes no difference."
+										"description": "Uses relative path expression `zero/or/more/a\\*` to match against relative paths which start with `zero/or/more/`, then contain zero or more `a` characters.\n\nThis example fails because the gateway is configured to use suffix matching, which expects the path to end after zero or more 'a' characters."
 									},
 									"response": []
 								},
@@ -2317,8 +2258,8 @@
 								"header": [
 									{
 										"key": "x-api-version",
-										"type": "text",
-										"value": "Default"
+										"value": "Default",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -2383,8 +2324,8 @@
 								"header": [
 									{
 										"key": "x-api-version",
-										"type": "text",
-										"value": "Default"
+										"value": "Default",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -2870,8 +2811,8 @@
 								"header": [
 									{
 										"key": "x-api-version",
-										"type": "text",
-										"value": "whitelist"
+										"value": "whitelist",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -2990,8 +2931,8 @@
 								"header": [
 									{
 										"key": "x-api-version",
-										"type": "text",
-										"value": "2"
+										"value": "2",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -3035,8 +2976,8 @@
 								"header": [
 									{
 										"key": "x-api-version",
-										"type": "text",
-										"value": "expired"
+										"value": "expired",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -3340,8 +3281,8 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"type": "text",
-										"value": "auth_key"
+										"value": "auth_key",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -3439,8 +3380,8 @@
 												"header": [
 													{
 														"key": "Authorization",
-														"type": "text",
-														"value": "missing_key"
+														"value": "missing_key",
+														"type": "text"
 													}
 												],
 												"url": {
@@ -3586,8 +3527,8 @@
 												"header": [
 													{
 														"key": "Authorization",
-														"type": "text",
-														"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
+														"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU",
+														"type": "text"
 													}
 												],
 												"url": {
@@ -3631,8 +3572,8 @@
 												"header": [
 													{
 														"key": "Authorization",
-														"type": "text",
-														"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU"
+														"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicG9saWN5X2NsYWltIjoicmVzdHJpY3RlZCJ9.nqQNDkB6--bOY48D2G8PZQSwvZduAqVWUUWTpyA1dDU",
+														"type": "text"
 													}
 												],
 												"url": {
@@ -3648,6 +3589,46 @@
 													]
 												},
 												"description": "This request fails because it attempts to access an endpoint which is not listed in the path-based permissions defined in the Policy. The Gateway responds with a `403 Forbidden`."
+											},
+											"response": []
+										},
+										{
+											"name": "JWT - RSA Public Key",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqd3RfcnNhIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.vYMwXjLv95abjSzUlX73Bcyfp4EKA-3l8L5HMWsHlg9hS2OGI6LFLxm0eXY3v5UaPUJh5ySgtp59p0wX88r9RjlxauffezgEadDOyJ5mnaSMRhPZmxskPVONFi2qrF9I69GLx5hoCvuN5FwLlL8gzHBvqEOX3iV9Nc5SzTq_qh3QvSuDInEBLiRq6WychWKW8QAchfRcIjHTgcNUgOWFyF2vzVU5MqTYuuPfUINkXiDCsPh1W7Hk6AWSD9NLgToRwoSD-oXgMHOWQPwwU2SIqQvE1UHOtEaFW2sA9S6YUHDhX4R5ZknJ1W3eCJMy7_1swCmFb2QSFkELj8jZyl2Ubg",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "http://{{tyk-gateway.host}}/jwt-rsa/get",
+													"protocol": "http",
+													"host": [
+														"{{tyk-gateway.host}}"
+													],
+													"path": [
+														"jwt-rsa",
+														"get"
+													]
+												},
+												"description": "This request demonstrates authentication using a JWT signed by an RSA key pair. The JWT was generated at [https://jwt.io](https://jwt.io) using a public and private key pair.\n\nThe value of the JWT's `sub` property refers to an API key (`jwt_rsa`) that contains the public key of the RSA key pair, as well as the typical access rights for the API.\n\nThe gateway uses the public key to validate the signature of the JWT of the incoming request, and uses the access rights defined in the API key to authorise access ot the requested endpoint."
 											},
 											"response": []
 										}
@@ -4051,6 +4032,51 @@
 													]
 												},
 												"description": "This request uses an OAuth client to generate a token which can be used to access an API protected with OAuth 2.0.\n\nThe request `authorization` header uses basic-style authentication credentials, using a base64 encoded string of the OAuth client id and secret.\n\nThe request body contains the grant type and the OAuth client id and secret.\n\nThe response body provides the bearer token, which can then be used to access the API. The token has a expiry, which defaults to 3600 seconds (1 hour), after which the token is no longer valid for authentication."
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Dynamic Client MTLS",
+									"item": [
+										{
+											"name": "Dynamic Client MTLS - bearer token",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImNkMDhhNzVmNTQ0MWMzOTdhNTg2ZGVkN2Y0NWNlYTI2NmZiNjg0ZWI4MmU0OTY5MTM2MmUyODZmOTBiNzMxM2YiLCJoIjoibXVybXVyNjQifQ==",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "https://{{tyk-gateway-2.host}}/dynamic-client-mtls/get",
+													"protocol": "https",
+													"host": [
+														"{{tyk-gateway-2.host}}"
+													],
+													"path": [
+														"dynamic-client-mtls",
+														"get"
+													]
+												},
+												"description": "This example is a placeholder for the real dynamic client MTLS example, which uses a bash script and `curl` to demonstrate. Run the script from the Tyk Demo repo root as so:\n\n``` bash\n./deployments/tyk/scripts/examples/dynamic-client-mtls.sh\n\n ```\n\nThe `curl` request in the script references the certificate and private key, which the gateway then uses the identify the bearer token (used in the `Authorization` header here). The authorization decision is then based on the access rights defined in the bearer token. The client only needs to provide the certificate, rather than the `Authorization` header, as this request shows."
 											},
 											"response": []
 										}
@@ -4715,8 +4741,8 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"type": "text",
-										"value": "throttle_key"
+										"value": "throttle_key",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -4796,8 +4822,8 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"type": "text",
-										"value": "quota_key"
+										"value": "quota_key",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -5364,8 +5390,8 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"type": "text",
-										"value": "auth_key_analytics_on"
+										"value": "auth_key_analytics_on",
+										"type": "text"
 									}
 								],
 								"url": {
@@ -5389,7 +5415,7 @@
 					"name": "OAS",
 					"item": [
 						{
-							"name": "OAS - JSON Validation part 1",
+							"name": "OAS - Validate Request - JSON part 1",
 							"event": [
 								{
 									"listen": "test",
@@ -5406,7 +5432,8 @@
 											"    pm.expect(jsonData.json.age).to.eql(46);",
 											"});"
 										],
-										"type": "text/javascript"
+										"type": "text/javascript",
+										"packages": {}
 									}
 								}
 							],
@@ -5423,7 +5450,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request-body",
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
@@ -5431,7 +5458,7 @@
 									"path": [
 										"oas-httpbin",
 										"anything",
-										"validate-request-body"
+										"validate-request"
 									]
 								},
 								"description": "Example of JSON schema validation using an OAS API definition.\n\nThis request succeeds as it contains the two required fields (firstName, lastName), and the age provided is an integer."
@@ -5439,7 +5466,7 @@
 							"response": []
 						},
 						{
-							"name": "OAS - JSON Validation part 2",
+							"name": "OAS - Validate Request - JSON part 2",
 							"event": [
 								{
 									"listen": "test",
@@ -5449,7 +5476,8 @@
 											"    pm.response.to.have.status(422);",
 											"});"
 										],
-										"type": "text/javascript"
+										"type": "text/javascript",
+										"packages": {}
 									}
 								}
 							],
@@ -5466,7 +5494,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request-body",
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/validate-request",
 									"protocol": "http",
 									"host": [
 										"{{tyk-gateway.host}}"
@@ -5474,10 +5502,340 @@
 									"path": [
 										"oas-httpbin",
 										"anything",
-										"validate-request-body"
+										"validate-request"
 									]
 								},
 								"description": "Example of JSON schema validation using an OAS API definition.\n\nThe validation of this request fails, as it is missing the \"lastName\" field in the body data."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Mock Response",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Body JSON contains 'hello world body'\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.mockBody).to.eql(\"hello world body\");",
+											"});",
+											"",
+											"pm.test(\"Headers contiain 'hello world header'\", function () {",
+											"    pm.response.to.be.header(\"Mock-Header\", \"hello world header\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/mock-response",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"mock-response"
+									]
+								},
+								"description": "This request calls a mock endpoint on an OAS-based API.\n\nIt returns a mock response that contains a mock body JSON object and mock header (`Mock-Header`)."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Method Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('Method was changed', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.method).to.be.equal('POST');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/method-transform",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"method-transform"
+									]
+								},
+								"description": "This request uses the OAS method transform middleware to change the HTTP method from `PUT` to `POST`."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Request Header Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('Header was added', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Added-Header']).to.be.equal('foo');",
+											"});",
+											"",
+											"pm.test('Header was removed', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.headers['Deleted-Header']).to.be.undefined;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Deleted-Header",
+										"value": "bar",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/request-header-transform",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"request-header-transform"
+									]
+								},
+								"description": "This request uses the OAS request header transform middleware to add a header (\\`Added-Header\\`) and delete a header (\\`Deleted-Header\\`).\n\nThe presence of these headers can be verified in the API response, which lists the headers it received in the `headers` part of the JSON body."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Request Body Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Request data has been transformed\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.json.reqHeader).to.eql(\"bar\");",
+											"    pm.expect(jsonData.json.reqParam).to.eql(\"[foo]\");",
+											"    pm.expect(jsonData.json.value1).to.eql(\"value 2\");",
+											"    pm.expect(jsonData.json.value2).to.eql(\"value 1\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Header",
+										"value": "bar",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"value1\":\"value 1\",\n    \"value2\":\"value 2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/request-body-transform?param=foo",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"request-body-transform"
+									],
+									"query": [
+										{
+											"key": "param",
+											"value": "foo"
+										}
+									]
+								},
+								"description": "This request uses the OAS body transform middleware to alter the request body before it is proxied to the upstream server.\n\nThe transformation swaps the values of the `value1` and `value2` body fields, and creates two new fields that are populated with data from the a request header and a URL parameter."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Response Body Transform (file based)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"})",
+											"",
+											"pm.test('Response body contains template data', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.hello).to.be.equal('world');",
+											"})",
+											"",
+											"pm.test('Response body contains upstream response data', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.responseData.method).to.be.equal('GET');",
+											"    pm.expect(jsonData.responseData.origin).to.not.be.undefined;",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/response-body-transform",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"response-body-transform"
+									]
+								},
+								"description": "This request uses a body transform middleware based on a template file - `deployments/tyk/volumes/tyk-gateway/middleware/response-body-transform/response-body-transform-template.tmpl`.\n\nThe template transforms the response from the upstream API before returning it to the client."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - Response Header Transform",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"})",
+											"",
+											"pm.test('Header was added', function () {",
+											"    pm.response.to.be.header('Hello', 'world');",
+											"})",
+											"",
+											"pm.test('Header was removed', function () {",
+											"    pm.response.to.not.have.header('Server');",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/anything/response-header-transform",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"anything",
+										"response-header-transform"
+									]
+								},
+								"description": "This request uses the OAS method transform middleware to change the HTTP method from `PUT` to `POST`."
+							},
+							"response": []
+						},
+						{
+							"name": "OAS - URL Rewrite",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Status code is 200', function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('URL was rewritten', function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.args[\"1\"]).to.be.equal('oas-httpbin');",
+											"    pm.expect(jsonData.args[\"2\"]).to.be.equal('url-rewrite');",
+											"    pm.expect(jsonData.args[\"3\"]).to.be.equal('test');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/oas-httpbin/url-rewrite/test",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"oas-httpbin",
+										"url-rewrite",
+										"test"
+									]
+								},
+								"description": "This requests uses the OAS URL rewrite middleware to rewrite the URL sent to the upstream API, such that the last two path elements are swapped - `/url-rewrite/test` becomes `/test/url-rewrite`.\n\nThis can be checked in the `url` field of the API JSON response body."
 							},
 							"response": []
 						}
@@ -6310,6 +6668,182 @@
 							]
 						},
 						"description": "This request serves as a placeholder, as the point to which the test runner is redirected to if ngrok data cannot be found."
+					},
+					"response": []
+				},
+				{
+					"name": "Path Matching - None",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Contains expected JSON data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.path).to.eql(\"match\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/basic-open-api/path-matching",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"basic-open-api",
+								"path-matching"
+							]
+						},
+						"description": "This example does not demonstrate the path matching feature, but rather shows what happens when no prefix or suffix matching is attempted. It provides the expected response of a 200 and \"path match\" JSON data.\n\nSee the other path matching examples for a demonstration of how path matching works."
+					},
+					"response": []
+				},
+				{
+					"name": "Path Matching - Prefix",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/basic-open-api/prefix-fail/path-matching",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"basic-open-api",
+								"prefix-fail",
+								"path-matching"
+							]
+						},
+						"description": "Validates that Tyk prefex matching is operational. This feature strictly matches the endpoints defined in the API Definition, so the gateway will not match requested paths that contain additional elements **before** the defined path.\n\nIn this case, the path `/path-matching/` is used, and the request attempts to prefix `prefix-fail` before the endpoint path. Tyk prefix matching causes this to not match the path, resulting in a 404 response.\n\nIf the prefix matching was not activated, then this request would return a 200 response."
+					},
+					"response": []
+				},
+				{
+					"name": "Path Matching - Suffix",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/basic-open-api/path-matching/suffix-fail",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"basic-open-api",
+								"path-matching",
+								"suffix-fail"
+							]
+						},
+						"description": "Validates that Tyk suffix matching is operational. This feature strictly matches the endpoints defined in the API Definition, so the gateway will not match requested paths that contain additional elements **after** the defined path.\n\nIn this case, the path `/path-matching/` is used, and the request attempts to append `suffix-fail` after the endpoint path. Tyk suffix matching causes this to not match the path, resulting in a 404 response.\n\nIf the suffix matching was not activated, then this request would return a 200 response."
+					},
+					"response": []
+				},
+				{
+					"name": "Strict Routes - Pass",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/strict-routes/get",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"strict-routes",
+								"get"
+							]
+						},
+						"description": "This examples does not demonstrate strict routes enforcement, but instead provides a 'working' version of the request where the listen path is correctly provided i.e. `/strict-routes/get` and not `/strict-routesget` as per the 'fail' example."
+					},
+					"response": []
+				},
+				{
+					"name": "Strict Routes - Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{tyk-gateway.host}}/strict-routesget",
+							"protocol": "http",
+							"host": [
+								"{{tyk-gateway.host}}"
+							],
+							"path": [
+								"strict-routesget"
+							]
+						},
+						"description": "This example shows how strict routes are enforced.\n\nIn this case, the requested path `/strict-routesget` fails to match the listen path `/strict-routes`, so a 404 is returned. If strict routes was not enabled then this would match and return a 200."
 					},
 					"response": []
 				}

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/buger/jsonparser"
@@ -166,6 +167,14 @@ func Authenticate(rw http.ResponseWriter, r *http.Request) {
 // AddHelloWorldHeader adds custom "Hello: World" header to the request
 func AddHelloWorldHeader(rw http.ResponseWriter, r *http.Request) {
 	r.Header.Add("Hello", "World")
+}
+
+// adds hostname of gateway to request header
+func AddGatewayHostHeader(rw http.ResponseWriter, r *http.Request) {
+	hostname, err := os.Hostname()
+	if err == nil {
+		r.Header.Add("Gateway-Host", hostname)
+	}
 }
 
 // Writes a string data to the context, which can then be read later

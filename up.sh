@@ -2,6 +2,8 @@
 
 source scripts/common.sh
 
+up_start_time=$(date +%s)
+
 # persistence of log files is disabled by default, meaning the files are recreated between each bootstrap to prevent them from growing too large
 # to enable persistence, use argument "persist-log" when running this script
 persist_log=false
@@ -38,9 +40,6 @@ mkdir -p .bootstrap 1> /dev/null
 
 # make the logs directory
 mkdir -p logs 1> /dev/null
-
-# check if docker compose version is v1.x
-check_docker_compose_version
 
 # ensure Docker environment variables are correctly set before creating containers
 # these allow for specialised deployments to be easily used, without having to manually set the environment variables
@@ -145,8 +144,11 @@ if [ "$persist_log" = false ]; then
   # test.log file is not cleared, as it is responsibilty of the test scripts
 fi
 
+# log docker compose version
+log_message "$(docker compose version)"
+
 # bring the containers up
-command_docker_compose="$(generate_docker_compose_command) up --remove-orphans -d"
+command_docker_compose="$(generate_docker_compose_command) up --quiet-pull --remove-orphans -d"
 echo "Running docker compose command: $command_docker_compose"
 eval $command_docker_compose
 if [ "$?" != 0 ]; then
@@ -164,6 +166,16 @@ for deployment in "${deployments_to_create[@]}"; do
     exit 1
   fi
 done
+
+up_end_time=$(date +%s)
+up_elapsed_time=$((up_end_time - up_start_time))
+up_minutes=$((up_elapsed_time / 60))
+up_seconds=$((up_elapsed_time % 60))
+if [ $up_minutes -gt 0 ]; then
+    log_message "Elapsed time: $up_minutes minutes $up_seconds seconds"
+else
+    log_message "Elapsed time: $up_seconds seconds"
+fi
 
 # Confirm initialisation process is complete
 printf "\nTyk Demo initialisation process completed"

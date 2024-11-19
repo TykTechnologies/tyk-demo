@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "tyk-python-grpc-example"
+version = "0.1.0"
+description = "PoC for Tyk Python GRPC Server"
+readme = "README.md"
+authors = [
+    "Simon Pears <simon@tyk.io>",
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+grpcio = "^1.60.1"
+grpcio-reflection = "^1.60.1"
+protobuf = "^4.25.3"
+
+[tool.poetry.group.dev.dependencies]
+grpcio-tools = "^1.60.1"
+black = "^24.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

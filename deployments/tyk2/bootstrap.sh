@@ -8,9 +8,13 @@ bootstrap_progress
 dashboard_base_url="http://localhost:3002"
 gateway2_base_url="http://localhost:8085"
 
-log_message "Waiting for Tyk 2 Dashboard to respond ok"
+log_message "Restarting Tyk 2 services to use newly created certificates"
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk2-dashboard tyk2-gateway
+log_ok
+
+wait_for_liveness "http://localhost:8085/hello"
+
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
-wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
 
 log_message "Importing organisation"
 log_json_result "$(curl $dashboard_base_url/admin/organisations/import -s \
@@ -46,7 +50,7 @@ bootstrap_progress
 
 log_message "Creating basic example API"
 # this API is used for testing that the deployment is functioning correctly
-create_api "deployments/tyk/data/tyk-dashboard/1/apis/api-5ead711f5759610001818679.json" "$dashboard_admin_api_credentials" "$dashboard2_user_api_credentials"
+create_api "deployments/tyk/data/tyk-dashboard/1/apis/api-727dad853a8a45f64ab981154d1ffdad.json" "$dashboard2_user_api_credentials"
 bootstrap_progress
 
 log_end_deployment

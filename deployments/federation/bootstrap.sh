@@ -12,16 +12,16 @@ dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_
 dashboard_user_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
 
 # Create APIs for Subgraphs and Federation
-create_api "deployments/federation/data/apis-users.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+create_api "deployments/federation/data/apis-users.json" "$dashboard_user_api_key"
 bootstrap_progress
 
-create_api "deployments/federation/data/apis-posts.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+create_api "deployments/federation/data/apis-posts.json" "$dashboard_user_api_key"
 bootstrap_progress
 
-create_api "deployments/federation/data/apis-notifications.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+create_api "deployments/federation/data/apis-notifications.json" "$dashboard_user_api_key"
 bootstrap_progress
 
-create_api "deployments/federation/data/apis-supergraph.json" "$dashboard_admin_api_credentials" "$dashboard_user_api_key"
+create_api "deployments/federation/data/apis-supergraph.json" "$dashboard_user_api_key"
 bootstrap_progress
 
 log_message "Waiting for API availability"

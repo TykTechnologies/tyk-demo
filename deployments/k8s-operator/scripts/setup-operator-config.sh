@@ -7,11 +7,12 @@ tyk_auth="" # Token used for authentication with Tyk Dashboard at $tyk_url. No d
 tyk_org="5e9d9544a1dcd60001d0ed20" # Target organisation. Default is the org id used in the standard Tyk Demo deployment.
 tyk_url="http://host.docker.internal:3000" # URL for target Tyk Dashboard. Default is the URL to the Tyk Dashboard port mapped to the host in the standard Tyk Demo deployment.
 tyk_mode="pro" # Mode of use, either "pro" (Dashboard) or "ce" (Gateway). Default is "pro", as Tyk Demo uses a Dashboard.
+tyk_operator_licensekey="" # Tyk Operator licence
 secret_namespace="tyk-demo" # Target namespace to store the secret. Default is "tyk-demo", as this script is used in the context of a Tyk Demo deployment.
 secret_name="tyk-operator-conf" # Name of the secret used to store operator configuration. Default is "tyk-operator-conf", as this is used in the Operator documentation.
 
 # enable override with command line arguments
-while getopts ":a:o:m:n:u:s:" o; do
+while getopts ":a:o:m:n:u:s:l:" o; do
     case "${o}" in
         a)
             # mandatory 
@@ -32,6 +33,9 @@ while getopts ":a:o:m:n:u:s:" o; do
         s)
             secret_name=${OPTARG}
             ;;
+        l)
+            tyk_operator_licensekey=${OPTARG}
+            ;;
         *)
             echo "ERROR: unknown argument -$OPTARG"
             exit 1
@@ -45,6 +49,11 @@ if [ -z $tyk_auth ]; then
     exit 1
 fi
 
+if [ -z $tyk_operator_licensekey ]; then
+    echo "WARNING: no tyk_operator_licensekey value provided, use -l argument to specify"
+fi
+
+# don't echo the licence key
 echo -e "Input data\n  tyk_auth: $tyk_auth\n  tyk_org: $tyk_org\n  tyk_mode: $tyk_mode\n  secret_namespace: $secret_namespace\n  tyk_url: $tyk_url\n  secret_name: $secret_name"
 
 # exit if namespace does not exist
@@ -73,6 +82,7 @@ kubectl create secret -n $secret_namespace generic $secret_name \
   --from-literal "TYK_ORG=$tyk_org" \
   --from-literal "TYK_MODE=$tyk_mode" \
   --from-literal "TYK_URL=$tyk_url" \
+  --from-literal "TYK_OPERATOR_LICENSEKEY=$tyk_operator_licensekey" \
   --from-literal "TYK_TLS_INSECURE_SKIP_VERIFY=true" # hardcoded to true for use in Tyk Demo context
 
-kubectl get secret/$secret_name -n $secret_namespace -o json | jq '.'
+kubectl get secret/$secret_name -n $secret_namespace -o json | jq '.data.TYK_OPERATOR_LICENSEKEY = "<hidden>"'

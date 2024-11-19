@@ -1,18 +1,32 @@
 ---
 name: Tyk Demo API Tests
-on: # yamllint disable-line rule:truthy
+on:
   - push
-
 jobs:
   Tyk-Demo-Api-Tests:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }}
+          event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by
+          GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository
+          is ${{ github.repository }}."
       - name: Check Out Repository Code
         uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the
+          runner."
+      - name: Extract Docker Image Tag
+        id: get-gateway-tag
+        run: |
+          GATEWAY_TAG=$(grep -m 1 'tykio/tyk-gateway:' deployments/tyk/docker-compose.yml | awk -F':' '{print $NF}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/\${GATEWAY_VERSION:-\(.*\)}/\1/' -e 's/^-//' -e 's/}$//')
+          echo "gateway-tag=$GATEWAY_TAG" >> $GITHUB_OUTPUT
+          echo "Extracted gateway tag: $GATEWAY_TAG"
+      - name: Cache Go Plugins
+        uses: actions/cache@v4
+        with:
+          path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.gateway-tag }}
+          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
       - name: Create Environment File
         run: |
           echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env

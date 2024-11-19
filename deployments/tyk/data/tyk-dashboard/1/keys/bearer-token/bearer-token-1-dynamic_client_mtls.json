@@ -1,0 +1,77 @@
+{
+    "last_check": 0,
+    "allowance": 1000,
+    "rate": 1000,
+    "per": 60,
+    "throttle_interval": -1,
+    "throttle_retry_limit": -1,
+    "max_query_depth": -1,
+    "expires": 0,
+    "quota_max": -1,
+    "quota_renews": 1721289474,
+    "quota_remaining": 0,
+    "quota_renewal_rate": -1,
+    "access_rights": {
+        "6323a6ed7f7d4fb9473f3ecde19e1477": {
+            "api_name": "Dynamic Client MTLS",
+            "api_id": "6323a6ed7f7d4fb9473f3ecde19e1477",
+            "versions": [
+                ""
+            ],
+            "allowed_urls": null,
+            "restricted_types": [],
+            "allowed_types": [],
+            "limit": {
+                "rate": 0,
+                "per": 0,
+                "throttle_interval": 0,
+                "throttle_retry_limit": 0,
+                "max_query_depth": 0,
+                "quota_max": 0,
+                "quota_renews": 0,
+                "quota_remaining": 0,
+                "quota_renewal_rate": 0,
+                "smoothing": null
+            },
+            "field_access_rights": [],
+            "disable_introspection": false,
+            "allowance_scope": ""
+        }
+    },
+    "org_id": "5e9d9544a1dcd60001d0ed20",
+    "oauth_client_id": "",
+    "oauth_keys": null,
+    "certificate": "5e9d9544a1dcd60001d0ed20cd08a75f5441c397a586ded7f45cea266fb684eb82e49691362e286f90b7313f",
+    "basic_auth_data": {
+        "password": "",
+        "hash_type": ""
+    },
+    "jwt_data": {
+        "secret": ""
+    },
+    "hmac_enabled": false,
+    "enable_http_signature_validation": false,
+    "hmac_string": "",
+    "rsa_certificate_id": "",
+    "is_inactive": false,
+    "apply_policy_id": "",
+    "apply_policies": null,
+    "data_expires": 0,
+    "monitor": {
+        "trigger_limits": null
+    },
+    "enable_detail_recording": false,
+    "enable_detailed_recording": false,
+    "meta_data": {},
+    "tags": [],
+    "alias": "Dynamic Client MTLS",
+    "id_extractor_deadline": 0,
+    "session_lifetime": 0,
+    "smoothing": {
+        "enabled": false,
+        "threshold": 500,
+        "trigger": 0.8,
+        "step": 100,
+        "delay": 30
+    }
+}
