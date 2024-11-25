@@ -4,3 +4,6 @@ tunnels:
   tyk-gateway:
     proto: http
     addr: tyk-gateway:8080
+  tyk-mdcb:
+    proto: tcp
+    addr: tyk-mdcb:9091

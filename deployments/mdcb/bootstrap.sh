@@ -52,9 +52,13 @@ set_docker_environment_value "MDCB_USER_API_CREDENTIALS" "$dashboard_mdcb_user_a
 log_ok
 bootstrap_progress
 
-# recreate containers to use updated MDCB credentials
-log_message "Recreating MDCB deployment containers, so that they use updated MDCB user API credentials (tyk-mdcb, tyk-worker-gateway)"
-eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway 2> /dev/null
+log_message "Setting Docker environment variable for Ngrok MDCB proxy URL"
+ngrok_mdcb_url=$(curl http://localhost:4040/api/tunnels/tyk-mdcb -s | jq -r '.public_url | split("/")[2]')
+set_docker_environment_value "NGROK_MDCB_PROXY_URL" "$ngrok_mdcb_url"
+
+# recreate containers to use updated environment variables
+log_message "Recreating MDCB deployment containers, so that they use updated MDCB user API credentials (tyk-mdcb, tyk-worker-gateway tyk-worker-gateway-ngrok)"
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway tyk-worker-gateway-ngrok 2> /dev/null
 if [ "$?" != "0" ]; then
   echo "Error occurred when recreating MDCB deployment containers"
   exit 1
@@ -92,7 +96,7 @@ while [ "$result" != "0" ]; do
     sleep 2
   fi
 done
-log_ok
+log_ok  
 bootstrap_progress
 
 log_end_deployment
@@ -102,7 +106,12 @@ echo -e "\033[2K
   ▽ Multi Data Centre Bridge ($(get_service_image_tag "tyk-mdcb"))
                 Licence : $mdcb_licence_days_remaining days remaining
      Dashboard Auth Key : $dashboard_mdcb_user_api_credentials
+              Ngrok URL : $ngrok_mdcb_url
   ▽ Worker Gateway ($(get_service_image_tag "tyk-worker-gateway"))
                     URL : $worker_gateway_base_url
+        Gateway API Key : $worker_gateway_api_credentials
+     Gateway API Header : x-tyk-authorization
+  ▽ Worker Gateway Ngrok ($(get_service_image_tag "tyk-worker-gateway-ngrok"))
+                    URL : http://tyk-worker-gateway.localhost:8093
         Gateway API Key : $worker_gateway_api_credentials
      Gateway API Header : x-tyk-authorization"
