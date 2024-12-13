@@ -17,7 +17,7 @@ services:
       - "3200:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=abc123
     volumes:
       - grafana-data:/var/lib/grafana
     networks:
