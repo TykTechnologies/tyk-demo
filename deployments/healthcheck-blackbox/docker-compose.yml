@@ -4,6 +4,7 @@ services:
     image: prom/prometheus:v3.0.1
     volumes:
       - ./deployments/healthcheck-blackbox/volumes/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ./deployments/healthcheck-blackbox/volumes/prometheus/alert.rules:/etc/prometheus/alert.rules
     ports:
       - "9090:9090"
     command:

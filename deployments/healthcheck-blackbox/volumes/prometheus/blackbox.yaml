@@ -1,5 +1,5 @@
 modules:
-  http_2xx_json:
+  http_200_json_status_pass:
     prober: http
     timeout: 5s
     http:
@@ -9,3 +9,13 @@ modules:
       valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
       fail_if_body_not_matches_regexp:
         - '{"status":"pass".*}'
+      tls_config:
+        insecure_skip_verify: true  # Disables certificate validation
+  http_200:
+    prober: http
+    timeout: 5s
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_status_codes: [200]
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]

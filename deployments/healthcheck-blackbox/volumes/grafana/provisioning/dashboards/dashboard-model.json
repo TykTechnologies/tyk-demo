@@ -25,7 +25,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -1044,7 +1044,10 @@
               "Time 9": true,
               "Value": true,
               "Value #A": false,
+              "Value #B": true,
+              "Value #C": true,
               "Value #F": true,
+              "Value #H": true,
               "Value #I": true,
               "Value #J": false,
               "__name__": true,
@@ -1060,6 +1063,7 @@
               "__name__ 9": true,
               "fingerprint_sha256": true,
               "instance": false,
+              "issuer": true,
               "job": true,
               "job 1": true,
               "job 10": true,
@@ -1082,8 +1086,10 @@
               "phase 4": true,
               "phase 5": true,
               "subject": true,
-              "subjectalternative": true
+              "subjectalternative": true,
+              "version": true
             },
+            "includeByName": {},
             "indexByName": {
               "Time 1": 15,
               "Time 10": 43,
@@ -2056,6 +2062,6 @@
   "timezone": "",
   "title": "Tyk System Health",
   "uid": "tyk-system-health",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
