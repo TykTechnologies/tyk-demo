@@ -3,9 +3,9 @@ groups:
     rules:
       - alert: BlackboxProbeFailed
         expr: probe_success == 0
-        for: 30s
+        for: 1m
         labels:
           severity: critical
         annotations:
           summary: "Probe failure for {{ $labels.instance }}"
-          description: "The Blackbox probe for {{ $labels.instance }} has failed for over 2 minutes."
+          description: "The Blackbox probe for {{ $labels.instance }} has failed for over 1 minute."
