@@ -9,12 +9,13 @@ scrape_configs:
   - job_name: 'gateway_status'
     metrics_path: /probe
     params:
-      module: [http_200_json_status_pass]
+      module: [http_200_json_status]
     static_configs:
       - targets:
         - http://tyk-gateway:8080/hello
         - https://tyk-gateway-2:8080/hello
         - http://tyk-worker-gateway:8080/hello
+        - http://tyk-dashboard:3000/hello
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -25,7 +26,7 @@ scrape_configs:
   - job_name: 'mdcb_status'
     metrics_path: /probe
     params:
-      module: [http_200_json_status_pass]
+      module: [http_200_json_status]
     static_configs:
       - targets:
         - http://tyk-mdcb:8181/readiness
