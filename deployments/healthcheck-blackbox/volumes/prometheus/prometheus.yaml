@@ -10,6 +10,7 @@ scrape_configs:
     static_configs:
       - targets:
         - http://tyk-gateway:8080/hello
+        - http://tyk-mdcb:8181/readiness
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
