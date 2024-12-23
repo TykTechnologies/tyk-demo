@@ -1,7 +1,7 @@
 ---
 services:
   tyk-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.6.1}
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.3.9-rc1}
     ports:
       - 3000:3000
     networks:
@@ -22,7 +22,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-gateway:
-    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.6.1}
+    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.3.9-rc1}
     ports:
       - 8080:8080
       - 8086:8086
@@ -58,7 +58,7 @@ services:
       - tyk-redis
       - tyk-dashboard
   tyk-gateway-2:
-    image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v5.6.1}
+    image: tykio/tyk-gateway:${GATEWAY2_VERSION:-v5.3.9-rc1}
     ports:
       - 8081:8080
       - 9005:9005
@@ -97,7 +97,7 @@ services:
   tyk-redis:
     image: redis:7.2.0
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - tyk-redis-data:/data
     networks:
@@ -105,7 +105,7 @@ services:
   tyk-mongo:
     image: mongo:7.0.9
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - tyk-mongo-data:/data/db
     networks:
@@ -136,10 +136,10 @@ services:
     networks:
       - tyk
     command:
-      - "start"
-      - "--all"
-      - "--config"
-      - "/etc/ngrok.yml"
+      - 'start'
+      - '--all'
+      - '--config'
+      - '/etc/ngrok.yml'
     volumes:
       - ./deployments/tyk/volumes/ngrok/ngrok.yml:/etc/ngrok.yml
     ports:
