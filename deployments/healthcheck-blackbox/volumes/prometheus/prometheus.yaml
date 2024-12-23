@@ -6,7 +6,7 @@ rule_files:
   - /etc/prometheus/alert.rules
 
 scrape_configs:
-  - job_name: 'gateway_status'
+  - job_name: 'tyk_component_status'
     metrics_path: /probe
     params:
       module: [http_200_json_status]
@@ -16,19 +16,6 @@ scrape_configs:
         - https://tyk-gateway-2:8080/hello
         - http://tyk-worker-gateway:8080/hello
         - http://tyk-dashboard:3000/hello
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: blackbox-exporter:9115
-  - job_name: 'mdcb_status'
-    metrics_path: /probe
-    params:
-      module: [http_200_json_status]
-    static_configs:
-      - targets:
         - http://tyk-mdcb:8181/readiness
     relabel_configs:
       - source_labels: [__address__]
