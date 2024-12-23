@@ -13,13 +13,14 @@ services:
 
   grafana:
     image: grafana/grafana-oss:11.4.0
+    volumes:
+      - ./deployments/healthcheck-blackbox/volumes/grafana/provisioning:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
     ports:
       - "3200:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=abc123
-    volumes:
-      - grafana-data:/var/lib/grafana
     networks:
       - tyk
 

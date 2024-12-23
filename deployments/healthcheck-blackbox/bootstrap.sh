@@ -13,7 +13,7 @@ log_end_deployment
 
 echo -e "\033[2K
 ▼ Health Check - Blackbox Exporter
-  ▽ Prometheus:
+  ▽ Grafana:
                     URL : http://localhost:3200
                Username : admin
                Password : abc123"
