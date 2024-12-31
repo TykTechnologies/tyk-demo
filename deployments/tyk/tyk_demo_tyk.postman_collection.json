@@ -5001,13 +5001,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/multiple-listen-paths/apple/get",
+									"raw": "http://{{tyk-gateway.host}}/multiple-listen-paths/apple/get",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"multiple-listen-paths",
 										"apple",
@@ -5038,13 +5036,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/multiple-listen-paths/banana/get",
+									"raw": "http://{{tyk-gateway.host}}/multiple-listen-paths/banana/get",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"multiple-listen-paths",
 										"banana",
@@ -5075,13 +5071,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://tyk-gateway.localhost:8080/multiple-listen-paths/cherry/get",
+									"raw": "http://{{tyk-gateway.host}}/multiple-listen-paths/cherry/get",
 									"protocol": "http",
 									"host": [
-										"tyk-gateway",
-										"localhost"
+										"{{tyk-gateway.host}}"
 									],
-									"port": "8080",
 									"path": [
 										"multiple-listen-paths",
 										"cherry",
