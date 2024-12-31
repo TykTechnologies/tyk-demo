@@ -4,8 +4,15 @@ source scripts/common.sh
 
 check_for_wscat
 
-echo "Streams - HTTP to Websocket Example"
-echo "Part 1: Listening to a Websocket"
-echo "Once connected, run part two of this example in a different terminal. The messages sent will appear here."
-echo "Connecting to the websocket..."
+cat <<EOF
+$(printf "\033[1mStreams - HTTP to Websocket Example\033[0m")
+
+Part 1: Listening to a Websocket
+
+Once connected, run part two of this example in a different terminal. The messages sent will appear here.
+
+Connecting to the websocket...
+
+EOF
+
 wscat -c ws://tyk-gateway.localhost:8080/streams-http-to-websocket/subscribe
