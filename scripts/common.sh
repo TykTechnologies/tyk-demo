@@ -286,6 +286,31 @@ get_licence_payload () {
   echo $decoded_licence_payload
 }
 
+# This function checks if the provided licence contains any enterprise scope.
+# Parameters:
+#   $1 - The licence key to be checked.
+# Returns:
+#   0 - If the licence contains an enterprise scope.
+#   1 - If the licence does not contain any enterprise scope.
+check_licence_requires_enterprise () {
+  licence_payload=$(get_licence_payload $1)
+  licence_scope=$(echo $licence_payload | jq -r '.scope')
+  
+  # array of enterprise scopes
+  # function returns true if any of these are matched
+  enterprise_scopes=("streams")
+
+  for enterprise_scope in "${enterprise_scopes[@]}"; do
+    if [[ $licence_scope =~ (^|,)$enterprise_scope(,|$) ]]; then
+      # enterprise scope found in licence
+      return 0
+    fi
+  done
+
+  # no enterprise scope found in licence
+  return 1
+}
+
 check_licence_expiry () {
   licence_payload=$(get_licence_payload $1)
   # read licence expiry
