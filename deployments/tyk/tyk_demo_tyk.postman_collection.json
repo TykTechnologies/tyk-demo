@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "02a77c7c-11f8-4447-b52e-2e94deec4215",
+		"_postman_id": "2121f0ca-09ce-43c2-a039-67fd6d8ea5b3",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "6131676"
@@ -5846,107 +5846,6 @@
 								"description": "This requests uses the OAS URL rewrite middleware to rewrite the URL sent to the upstream API, such that the last two path elements are swapped - `/url-rewrite/test` becomes `/test/url-rewrite`.\n\nThis can be checked in the `url` field of the API JSON response body."
 							},
 							"response": []
-						}
-					]
-				},
-				{
-					"name": "Streams",
-					"item": [
-						{
-							"name": "HTTP to Websocket",
-							"item": [
-								{
-									"name": "Post message to websocket",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\"message\":\"Hello, Tyk Streams!\"}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "http://{{tyk-gateway.host}}/streams-http-to-websocket/post",
-											"protocol": "http",
-											"host": [
-												"{{tyk-gateway.host}}"
-											],
-											"path": [
-												"streams-http-to-websocket",
-												"post"
-											]
-										},
-										"description": "This example uses the gateway to proxy messages between HTTP and WS protocols.\n\nThe HTTP request sends a message payload that the gateway then relays to clients subscribing via a websocket.\n\nTo see this in action, run the two scripts in the `deployments/tyk/scripts/examples/streams/http-to-ws` directory:\n\n- `http-to-ws-1.sh`: Listens to the websocket for messages.\n    \n- `http-to-ws-2.sh`: Sends messages to the websocket via HTTP.\n    \n\nThis example request is exactly the same as the 2nd script, so can be used for the same purpose. Requests sent from here will appear in the terminal window running the 1st script."
-									},
-									"response": []
-								}
-							]
-						},
-						{
-							"name": "HTTP to Redis Pub/Sub",
-							"item": [
-								{
-									"name": "Post message to Redis Pub/Sub",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "Hello, Tyk Streams!",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "http://{{tyk-gateway.host}}/streams-http-to-redis-pubsub/post",
-											"protocol": "http",
-											"host": [
-												"{{tyk-gateway.host}}"
-											],
-											"path": [
-												"streams-http-to-redis-pubsub",
-												"post"
-											]
-										},
-										"description": "This example shows how Tyk can proxy messages between HTTP and Redis pub/sub channels.\n\nMessages posted in this example will be sent to the `streams` channel of the Tyk Demo Redis instance.\n\nTo see it in action, run the scripts found in deployments/tyk/scripts/examples/streams/http-to-redis-pubsub:\n\n- `http-to-redis-pubsub-1.sh`: Subscribes to the Redis `streams` channel and waits for messages.\n    \n- `http-to-redis-pubsub-2.sh`: Sends an HTTP POST requests to the gateway that is published into the `streams` channel.\n    \n\nYou can also send the message via this example request - it does the same thing as the 2nd script above."
-									},
-									"response": []
-								}
-							]
 						}
 					]
 				}
