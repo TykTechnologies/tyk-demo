@@ -67,7 +67,7 @@ else
 fi
 
 # set gateway image repo based on licence
-# if the licence requires enterprise, then the enterprise image is used
+# if the licence contains enterprise scopes, then the enterprise image is used
 if check_licence_requires_enterprise "DASHBOARD_LICENCE"; then
   set_docker_environment_value "GATEWAY_IMAGE_REPO" "tyk-gateway-ee"
 else
