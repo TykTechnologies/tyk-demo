@@ -159,7 +159,6 @@ wait_for_response () {
   done
 }
 
-# TODO: make function here for this, and then check all certs etc exist in bootstrap
 wait_for_file () {
   local file_path="$1"
   local container_name="$2"
