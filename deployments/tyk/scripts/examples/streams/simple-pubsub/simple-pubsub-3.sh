@@ -1,4 +1,4 @@
-echo "NOT WORKING FOR 5.8.0 alpha1"
+echo "This functionality is not implemented yet."
 
 # echo "Streams - Simple PubSub"
 # echo "Part 3: Sending messages to connected clients"

@@ -1,10 +1,12 @@
-cat <<EOF
-$(printf "\033[1mStreams - HTTP to Redis Pub/Sub\033[0m")
+echo "This functionality is not implemented yet."
 
-Part 2: Sending a message
+# cat <<EOF
+# $(printf "\033[1mStreams - HTTP to Redis Pub/Sub\033[0m")
 
-Each time this script is run, the message \"Hello, Tyk Streams!\" will be received through the Redis channel in part 1. Check the other terminal to see the messages.
+# Part 2: Sending a message
 
-EOF
+# Each time this script is run, the message \"Hello, Tyk Streams!\" will be received through the Redis channel in part 1. Check the other terminal to see the messages.
 
-curl -d 'Hello, Tyk Streams!' http://tyk-gateway.localhost:8080/streams-http-to-redis-pubsub/post
+# EOF
+
+# curl -d 'Hello, Tyk Streams!' http://tyk-gateway.localhost:8080/streams-http-to-redis-pubsub/post

@@ -1,12 +1,14 @@
-cat <<EOF
-$(printf "\033[1mStreams - HTTP to Redis Pub/Sub\033[0m")
+echo "This functionality is not implemented yet."
 
-Part 1: Listening to a Redis Channel
+# cat <<EOF
+# $(printf "\033[1mStreams - HTTP to Redis Pub/Sub\033[0m")
 
-Once connected, run part two of this example in a different terminal. The messages sent will appear here.
+# Part 1: Listening to a Redis Channel
 
-Connecting to the Redis channel...
+# Once connected, run part two of this example in a different terminal. The messages sent will appear here.
 
-EOF
+# Connecting to the Redis channel...
 
-docker exec tyk-demo-tyk-redis-1 redis-cli SUBSCRIBE streams
+# EOF
+
+# docker exec tyk-demo-tyk-redis-1 redis-cli SUBSCRIBE streams
