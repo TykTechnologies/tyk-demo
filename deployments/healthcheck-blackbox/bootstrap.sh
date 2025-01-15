@@ -6,7 +6,7 @@ deployment="Health Check - Blackbox Exporter"
 
 log_start_deployment
 
-# TODO: ADD ANY NECESSARY BOOTSTRAPPING HERE
+# This deployment does not require any bootstrap steps.
 bootstrap_progress
 
 log_end_deployment
