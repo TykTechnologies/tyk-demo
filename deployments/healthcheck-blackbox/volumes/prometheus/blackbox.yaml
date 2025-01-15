@@ -8,7 +8,9 @@ modules:
       preferred_ip_protocol: ip4
       valid_status_codes:
         - 200
-      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_http_versions:
+        - "HTTP/1.1"
+        - "HTTP/2.0"
       fail_if_body_not_matches_regexp:
         - '"status"\s*:\s*"(ok|pass)"' # Accept "ok" or "pass", so can be used across Gateway, Dashboard and MDCB
       tls_config:
@@ -21,4 +23,6 @@ modules:
       preferred_ip_protocol: ip4
       valid_status_codes:
         - 200
-      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_http_versions:
+        - "HTTP/1.1"
+        - "HTTP/2.0"
