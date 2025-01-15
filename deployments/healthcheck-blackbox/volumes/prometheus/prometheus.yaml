@@ -10,7 +10,8 @@ scrape_configs:
   - job_name: "tyk_component_status"
     metrics_path: /probe
     params:
-      module: [http_200_json_status]
+      module:
+        - http_200_json_status
     static_configs:
       - targets:
           - http://tyk-gateway:8080/hello
@@ -19,23 +20,28 @@ scrape_configs:
           - http://tyk-dashboard:3000/hello
           - http://tyk-mdcb:8181/readiness
     relabel_configs:
-      - source_labels: [__address__]
+      - source_labels:
+          - __address__
         target_label: __param_target
-      - source_labels: [__param_target]
+      - source_labels:
+          - __param_target
         target_label: instance
       - target_label: __address__
         replacement: blackbox-exporter:9115
   - job_name: "api_status"
     metrics_path: /probe
     params:
-      module: [http_200]
+      module:
+        - http_200
     static_configs:
       - targets:
           - http://tyk-gateway:8080/basic-open-api/get
     relabel_configs:
-      - source_labels: [__address__]
+      - source_labels: 
+        - __address__
         target_label: __param_target
-      - source_labels: [__param_target]
+      - source_labels: 
+        - __param_target
         target_label: instance
       - target_label: __address__
         replacement: blackbox-exporter:9115
