@@ -1,3 +1,4 @@
+---
 modules:
   http_200_json_status:
     prober: http
@@ -10,7 +11,7 @@ modules:
       fail_if_body_not_matches_regexp:
         - '"status"\s*:\s*"(ok|pass)"' # Accept "ok" or "pass", so can be used across Gateway, Dashboard and MDCB
       tls_config:
-        insecure_skip_verify: true  # Disables certificate validation for self-signed cert used by Tyk Gateway 2
+        insecure_skip_verify: true # Disables certificate validation for self-signed cert used by Tyk Gateway 2
   http_200:
     prober: http
     timeout: 5s

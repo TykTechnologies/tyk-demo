@@ -34,7 +34,7 @@ services:
     command:
       - "--config.file=/etc/blackbox_exporter/config.yml"
     networks:
-      - tyk 
+      - tyk
 
 volumes:
   grafana-data:
