@@ -16,4 +16,5 @@ echo -e "\033[2K
   ▽ Grafana:
                     URL : http://localhost:3200
                Username : admin
-               Password : abc123"
+               Password : abc123
+   Tyk Health Dashboard : http://localhost:3200/d/tyk-system-health"
