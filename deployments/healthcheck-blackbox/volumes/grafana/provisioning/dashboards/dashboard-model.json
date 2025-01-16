@@ -1415,7 +1415,7 @@
             "y": 12
           },
           "id": 12,
-          "maxDataPoints": 100,
+          "maxDataPoints": 2000,
           "options": {
             "colorMode": "background",
             "graphMode": "none",
@@ -1998,7 +1998,7 @@
     }
   ],
   "preload": false,
-  "refresh": "",
+  "refresh": "10s",
   "schemaVersion": 40,
   "tags": [
     "prometheus",
