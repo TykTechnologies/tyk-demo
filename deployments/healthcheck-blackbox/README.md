@@ -2,7 +2,9 @@
 
 This deployment demonstrates how Tyk’s health check endpoints can be used to monitor the status of Tyk components.
 
-The setup uses Prometheus, Grafana, and the Blackbox Exporter to monitor the following Tyk components:
+The setup uses Prometheus with Blackbox Exporter to monitor the health check endpoints, and Grafana to display the results in a dashboard. 
+
+The following components are monitored:
 - Tyk Dashboard
 - Tyk Gateways (Control Plane and Data Plane)
 - MDCB (Multi-Data Centre Bridge)
@@ -10,7 +12,7 @@ The setup uses Prometheus, Grafana, and the Blackbox Exporter to monitor the fol
 
 A pre-configured [Tyk System Health dashboard](http://localhost:3200/d/tyk-system-health) is available in [Grafana](http://localhost:3200), providing an overview of the health and status of the Tyk components.
 
-For optimal results, it is recommended to deploy the `mdcb` service alongside this setup. However, this is optional. If MDCB is not deployed, the monitoring will report MDCB as unavailable, verifying that the monitoring system is functioning correctly.
+For optimal results, it is recommended to deploy the `mdcb` service alongside this setup. However, this is optional. If MDCB is not deployed, the monitoring will report MDCB-related components as unavailable, verifying that the monitoring system is functioning correctly.
 
 ---
 
