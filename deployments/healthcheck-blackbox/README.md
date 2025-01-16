@@ -41,3 +41,33 @@ After deployment, you can access [Grafana](http://localhost:3200) using the defa
 - **Password**: `abc123`
 
 Navigate to the [Tyk System Health dashboard](http://localhost:3200/d/tyk-system-health) in the [Dashboards section](http://localhost:3200/dashboards) to monitor the status of your Tyk components.
+
+### Simulating Failure and Recovery
+
+This section explains how to simulate a component failure and observe its recovery in the Tyk System Health dashboard.
+
+#### Simulating Failure
+
+1. Stop one of the monitored Tyk components by running the following command:
+
+    ```sh
+    docker stop tyk-demo-tyk-gateway-1
+    ```
+
+    Stopping this container will cause two probes to report a failure:
+    - **Gateway Component Probe**
+    - **Upstream API Probe**
+
+2. Open the Tyk System Health dashboard. Two instances will now be displayed as down.  
+   **Note:** Probes run at 15-second intervals, so there may be a short delay before the changes appear in the dashboard.
+
+#### Simulating Recovery
+
+1. Start the stopped container using the command below:
+
+    ```sh
+    docker start tyk-demo-tyk-gateway-1
+    ```
+
+2. Refresh the dashboard to confirm that the previously down components are now marked as up and operational.
+
