@@ -9,7 +9,17 @@ This directory contains two shell scripts designed to demonstrate HTTP streaming
 
 ## Scripts
 
-### 1. `post_data.sh`
+### 1. `listen_sse.sh`
+This script listens to the SSE stream from the `http://tyk-gateway.localhost:8080/simple-stream/get/stream` endpoint.
+
+#### Usage:
+```bash
+./listen_sse.sh
+```
+
+When you run this script, it will continuously listen for incoming messages from the SSE stream and print them to the console.
+
+### 2. `post_data.sh`
 This script sends data to the `http://tyk-gateway.localhost:8080/simple-stream/post` endpoint.
 
 #### Usage:
@@ -19,13 +29,3 @@ This script sends data to the `http://tyk-gateway.localhost:8080/simple-stream/p
 # Example:
 ./post_data.sh "Hello, SSE!"
 ```
-
-### 2. `listen_sse.sh`
-This script listens to the SSE stream from the `http://tyk-gateway.localhost:8080/simple-stream/get/stream` endpoint.
-
-#### Usage:
-```bash
-./listen_sse.sh
-```
-
-When you run this script, it will continuously listen for incoming messages from the SSE stream and print them to the console.
