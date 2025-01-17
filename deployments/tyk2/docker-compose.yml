@@ -34,6 +34,7 @@ services:
       - TYK_GW_DBAPPCONFOPTIONS_CONNECTIONSTRING=http://tyk2-dashboard:3000
       - TYK_GW_STORAGE_HOST=tyk2-redis
       - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
+      - TYK_DB_STREAMING_ENABLED=true
     depends_on:
       - tyk2-redis
   tyk2-pump:

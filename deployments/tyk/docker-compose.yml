@@ -16,6 +16,7 @@ services:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Dashboard licence missing from Docker environment file .env. Review The Getting Started steps in README.md.}
       - TYK_LOGLEVEL=${DASHBOARD_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
+      - TYK_DB_STREAMING_ENABLED=true
     env_file:
       - .env
     depends_on:
@@ -45,6 +46,7 @@ services:
       - TYK_GW_ANALYTICSCONFIG_GEOIPDBLOCATION=/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
       - TYK_GW_OPENTELEMETRY_ENABLED=${OPENTELEMETRY_ENABLED:-false}
       - TYK_GW_OPENTELEMETRY_ENDPOINT=${OPENTELEMETRY_ENDPOINT:-false}
+      - TYK_GW_STREAMING_ENABLED=true
     env_file:
       - .env
     volumes:
@@ -68,6 +70,7 @@ services:
       - TYK_LOGLEVEL=${GATEWAY2_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-false}
+      - TYK_DB_STREAMING_ENABLED=true
     env_file:
       - .env
     volumes:
