@@ -498,12 +498,46 @@
     },
     "analytics_plugin": {},
     "tags": [],
-    "detailed_tracing": false
+    "detailed_tracing": false,
+    "upstream_auth": {
+      "enabled": false,
+      "basic_auth": {
+        "username": "",
+        "password": "",
+        "header": {
+          "enabled": false,
+          "name": ""
+        }
+      },
+      "oauth": {
+        "enabled": false,
+        "allowed_authorize_types": [],
+        "client_credentials": {
+          "client_id": "",
+          "header": {
+            "enabled": false,
+            "name": ""
+          },
+          "token_url": ""
+        },
+        "password": {
+          "client_id": "",
+          "header": {
+            "enabled": false,
+            "name": ""
+          },
+          "username": "",
+          "password": "",
+          "token_url": ""
+        }
+      }
+    }
   },
   "hook_references": [],
   "is_site": false,
   "sort_by": 0,
   "user_group_owners": [],
   "user_owners": [],
-  "created_at": "2021-09-27T07:42:38Z"
+  "created_at": "2021-09-27T07:42:38Z",
+  "is_streams": false
 }
