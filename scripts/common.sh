@@ -159,7 +159,6 @@ wait_for_response () {
   done
 }
 
-# TODO: make function here for this, and then check all certs etc exist in bootstrap
 wait_for_file () {
   local file_path="$1"
   local container_name="$2"
@@ -284,6 +283,31 @@ get_licence_payload () {
   local decoded_licence_payload=$(decode_jwt $encoded_licence_jwt)
 
   echo $decoded_licence_payload
+}
+
+# This function checks if the provided licence contains any enterprise scope.
+# Parameters:
+#   $1 - The licence key to be checked.
+# Returns:
+#   0 - If the licence contains an enterprise scope.
+#   1 - If the licence does not contain any enterprise scope.
+check_licence_requires_enterprise () {
+  licence_payload=$(get_licence_payload $1)
+  licence_scope=$(echo $licence_payload | jq -r '.scope')
+
+  # array of enterprise scopes
+  # function returns true if any of these are matched
+  enterprise_scopes=("streams")
+
+  for enterprise_scope in "${enterprise_scopes[@]}"; do
+    if [[ $licence_scope =~ (^|,)$enterprise_scope(,|$) ]]; then
+      # enterprise scope found in licence
+      return 0
+    fi
+  done
+
+  # no enterprise scope found in licence
+  return 1
 }
 
 check_licence_expiry () {
@@ -965,6 +989,16 @@ check_for_grpcurl () {
   then
       echo "grpcurl is not installed. Please install grpcurl to proceed:"
       echo "brew install grpcurl"
+      exit 1
+  fi
+}
+
+check_for_wscat () {
+  # Check if wscat is installed
+  if ! command -v wscat &> /dev/null
+  then
+      echo "wscat is not installed. Please install wscat via NPM to proceed:"
+      echo "npm install -g wscat"
       exit 1
   fi
 }

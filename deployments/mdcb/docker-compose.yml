@@ -16,7 +16,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-worker-gateway:
-    image: tykio/tyk-gateway:${GATEWAY_WORKER_VERSION:-v5.7.1}
+    image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY_WORKER_VERSION:-v5.7.1}
     ports:
       - 8090:8080
     networks:
