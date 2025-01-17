@@ -8,7 +8,7 @@
   "paths": {},
   "servers": [
     {
-      "url": "http://tyk-gateway.localhost:8080/simple-stream/"
+      "url": "http://tyk-gateway.localhost:8080/stream-sse/"
     }
   ],
   "x-tyk-api-gateway": {
@@ -41,8 +41,7 @@
             ],
             "path": "/post",
             "rate_limit": "",
-            "timeout": "5s",
-            "ws_path": "/post/ws"
+            "timeout": "5s"
           },
           "label": ""
         },
@@ -52,9 +51,7 @@
             "allowed_verbs": [
               "GET"
             ],
-            "path": "/get",
-            "stream_path": "/get/stream",
-            "ws_path": "/get/ws"
+            "stream_path": "/get/stream"
           },
           "label": ""
         }
