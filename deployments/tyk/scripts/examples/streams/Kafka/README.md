@@ -10,7 +10,7 @@ This directory contains scripts to demonstrate Kafka message streaming with a Ty
 ## Scripts
 
 ### 1. `post_data.sh`
-This script sends a message to a Kafka topic via a POST request.
+This script sends a message to a Kafka topic via a POST request through the Tyk gateway.
 
 #### Usage:
 ```bash
