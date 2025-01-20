@@ -5,7 +5,7 @@ This directory contains scripts to demonstrate WebSocket communication with a Ty
 
 ## Prerequisites
 - Ensure you have `wscat` installed on your system.
-- Tyk Demo is deployed, with the running locally at `http://tyk-gateway.localhost:8080`.
+- Tyk Demo is deployed, with the gateway running locally at `http://tyk-gateway.localhost:8080`.
 
 ## Scripts
 

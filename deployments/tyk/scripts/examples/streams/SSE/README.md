@@ -5,7 +5,7 @@ This directory contains two shell scripts designed to demonstrate HTTP streaming
 
 ## Prerequisites
 - Ensure you have `curl` installed on your system.
-- Tyk Demo is deployed, with the running locally at `http://tyk-gateway.localhost:8080`.
+- Tyk Demo is deployed, with the gateway running locally at `http://tyk-gateway.localhost:8080`.
 
 ## Scripts
 
