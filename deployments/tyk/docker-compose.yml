@@ -177,24 +177,6 @@ services:
       KAFKA_NUM_PARTITIONS: 3
     volumes:
       - tyk-kafka-data:/opt/kafka/data
-  rabbitmq:
-    image: rabbitmq:4.0.3-management
-    networks:
-      - tyk
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: user
-      RABBITMQ_DEFAULT_PASS: password
-      RABBITMQ_DEFAULT_VHOST: /
-    command: >
-      sh -c "rabbitmq-server & 
-      sleep 10 && 
-      rabbitmqadmin --username=user --password=password declare exchange name=my_exchange type=direct &&
-      rabbitmqadmin --username=user --password=password declare queue name=my_queue &&
-      rabbitmqadmin --username=user --password=password declare binding source=my_exchange destination=my_queue routing_key=my_routing_key &&
-      wait"
 
 volumes:
   tyk-redis-data:
