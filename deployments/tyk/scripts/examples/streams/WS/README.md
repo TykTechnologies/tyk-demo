@@ -10,7 +10,7 @@ This directory contains scripts to demonstrate WebSocket communication with a Ty
 ## Scripts
 
 ### 1. `listen_ws.sh`
-This script listens to the WS endpoint at `ws://tyk-gateway.localhost:8080/stream-ws/get/ws`.
+This script listens to the WS endpoint at `ws://tyk-gateway.localhost:8080/streams-ws/get/ws`.
 
 #### Usage:
 ```bash
@@ -20,7 +20,7 @@ This script listens to the WS endpoint at `ws://tyk-gateway.localhost:8080/strea
 When you run this script, it will continuously listen for incoming messages from the SSE stream and print them to the console.
 
 ### 2. `post_data.sh`
-This script sends data to the `http://tyk-gateway.localhost:8080/stream-ws/post` endpoint.
+This script sends data to the `http://tyk-gateway.localhost:8080/streams-ws/post` endpoint.
 
 #### Usage:
 ```bash

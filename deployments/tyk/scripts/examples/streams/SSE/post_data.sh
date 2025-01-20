@@ -11,4 +11,4 @@ DATA=$1
 echo "Posting data: $DATA"
 
 # Send POST request with the provided data
-curl -X POST http://tyk-gateway.localhost:8080/stream-sse/post -H "Content-Type: text/plain" -d "$DATA"
+curl -X POST http://tyk-gateway.localhost:8080/streams-sse/post -H "Content-Type: text/plain" -d "$DATA"

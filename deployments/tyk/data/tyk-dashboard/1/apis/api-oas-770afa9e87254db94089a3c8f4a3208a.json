@@ -8,13 +8,13 @@
   "paths": {},
   "servers": [
     {
-      "url": "http://tyk-gateway.localhost:8080/stream-ws/"
+      "url": "http://tyk-gateway.localhost:8080/streams-ws/"
     }
   ],
   "x-tyk-api-gateway": {
     "info": {
       "id": "770afa9e87254db94089a3c8f4a3208a",
-      "name": "Stream WS",
+      "name": "Streams WS",
       "orgId": "5e9d9544a1dcd60001d0ed20",
       "state": {
         "active": true
@@ -23,7 +23,7 @@
     "server": {
       "listenPath": {
         "strip": true,
-        "value": "/stream-ws/"
+        "value": "/streams-ws/"
       }
     },
     "upstream": {
