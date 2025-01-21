@@ -32,22 +32,6 @@
   },
   "x-tyk-streaming": {
     "streams": {
-      "producer": {
-        "input": {
-          "http_server": {
-            "path": "/post"
-          }
-        },
-        "output": {
-          "kafka": {
-            "addresses": [
-              "kafka:9092"
-            ],
-            "target_version": "3.8.0",
-            "topic": "tyk-streams-example"
-          }
-        }
-      },
       "consumer": {
         "input": {
           "kafka": {
@@ -66,6 +50,22 @@
         "output": {
           "http_server": {
             "stream_path": "/get/stream"
+          }
+        }
+      },
+      "producer": {
+        "input": {
+          "http_server": {
+            "path": "/post"
+          }
+        },
+        "output": {
+          "kafka": {
+            "addresses": [
+              "kafka:9092"
+            ],
+            "target_version": "3.8.0",
+            "topic": "tyk-streams-example"
           }
         }
       }
