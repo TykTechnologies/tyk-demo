@@ -27,14 +27,14 @@ check_postman_collection() {
     local collection_path="$deployment_dir/tyk_demo_${deployment//-/_}.postman_collection.json"
 
     if [ ! -f "$collection_path" ]; then
-        echo "No Postman collection found - skipping"
+        echo "No Postman collection found"
         return 1
     fi
 
     local ignore_flag
     ignore_flag=$(jq '.variable[] | select(.key=="test-runner-ignore").value' --raw-output "$collection_path")
     if [ "$ignore_flag" == "true" ]; then
-        echo "Collection contains ignore flag - skipping"
+        echo "Collection contains ignore flag"
         return 1
     fi
 
@@ -49,7 +49,7 @@ check_test_scripts() {
     test_scripts=( $(find "$deployment_dir" -name "test.sh" -type f) )
 
     if [ ${#test_scripts[@]} -eq 0 ]; then
-        echo "No test scripts found - skipping"
+        echo "No test scripts found"
         return 1
     fi
 
@@ -67,6 +67,7 @@ run_postman_test() {
     echo "═══════════════════════════════════════════"
 
     if ! check_postman_collection "$deployment"; then
+        echo "Skipping Postman tests"
         return 0
     fi
 
@@ -110,6 +111,7 @@ run_test_scripts() {
     echo "═══════════════════════════════════════════"
 
     if ! check_test_scripts "$deployment"; then
+        echo "Skipping custom test scripts"
         return 0
     fi
 
