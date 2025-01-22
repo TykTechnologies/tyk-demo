@@ -26,7 +26,7 @@ i=0
 postman_results=()
 script_results=()
 
-function run_postman_test {
+run_postman_test {
     deployment="$1"
     deployment_dir="$BASE_DIR/deployments/$deployment"
     collection_path="$deployment_dir/tyk_demo_${deployment//-/_}.postman_collection.json"
@@ -77,7 +77,7 @@ function run_postman_test {
     fi
 }
 
-function run_test_scripts {
+run_test_scripts {
     deployment="$1"
     deployment_dir="$BASE_DIR/deployments/$deployment"
     
@@ -114,7 +114,7 @@ function run_test_scripts {
     return $test_scripts_status
 }
 
-function run_tests_for_deployment {
+run_tests_for_deployment {
     deployment="$1"
     local deployment_status=0
 
