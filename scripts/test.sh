@@ -91,12 +91,13 @@ function run_test_scripts {
     local tests_passed=0
 
     for test_script in "${test_scripts[@]}"; do
-        echo "→ Running: $(basename "$test_script")"
+        test_partial_path=${test_script#$deployment_dir/}
+        echo "→ Running: $test_partial_path"
         if bash "$test_script"; then
-            echo "✓ Test passed: $(basename "$test_script")"
+            echo "✓ Test passed: $test_partial_path"
             tests_passed=$((tests_passed+1))
         else
-            echo "✗ Test failed: $(basename "$test_script")"
+            echo "✗ Test failed: $test_partial_path"
             test_scripts_status=1
         fi
         tests_run=$((tests_run+1))
@@ -130,7 +131,7 @@ function run_tests_for_deployment {
         statuses+=("Failed")
         overall_status=1
     fi
-    
+
     i=$((i+1))
 }
 
@@ -141,20 +142,20 @@ done < "$BASE_DIR/.bootstrap/bootstrapped_deployments"
 
 # Output final summary
 echo
-echo "╔═════════════════════════════════════════════════════════════════════════════╗"
-echo "║                               Test Summary                                  ║"
-echo "╠═════════════════╦═══════════╦═══════════════════════════════════════════════╣"
-printf "║ %-15s ║ %-9s ║ %-45s ║\n" "Deployment" "Status" "Details"
-echo "╠═════════════════╬═══════════╬═══════════════════════════════════════════════╣"
+echo "╔═════════════════════════════════════════════════════════════════════════════════════╗"
+echo "║                                   Test Summary                                      ║"
+echo "╠═════════════════════════╦═══════════╦═══════════════════════════════════════════════╣"
+printf "║ %-23s ║ %-9s ║ %-45s ║\n" "Deployment" "Status" "Details"
+echo "╠═════════════════════════╬═══════════╬═══════════════════════════════════════════════╣"
 
 for i in "${!deployments[@]}"; do
     deployment="${deployments[$i]}"
     status="${statuses[$i]}"
     details="Postman: ${postman_results[$i]:-N/A}, Scripts: ${script_results[$i]:-N/A}"
-    printf "║ %-15s ║ %-9s ║ %-45s ║\n" "$deployment" "$status" "$details"
+    printf "║ %-23s ║ %-9s ║ %-45s ║\n" "$deployment" "$status" "$details"
 done
 
-echo "╚═════════════════╩═══════════╩═══════════════════════════════════════════════╝"
+echo "╚═════════════════════════╩═══════════╩═══════════════════════════════════════════════╝"
 
 # Exit with overall status
 if [ "$overall_status" -eq 1 ]; then
@@ -164,3 +165,4 @@ else
     echo "✓ All deployments passed"
     exit 0
 fi
+slo-prometheus-grafana
