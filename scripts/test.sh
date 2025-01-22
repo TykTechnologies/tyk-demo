@@ -20,6 +20,42 @@ set -e
 # Arrays to track test results
 declare -a deployments statuses postman_results script_results
 
+# Function to check Postman collection
+check_postman_collection() {
+    local deployment="$1"
+    local deployment_dir="$BASE_DIR/deployments/$deployment"
+    local collection_path="$deployment_dir/tyk_demo_${deployment//-/_}.postman_collection.json"
+
+    if [ ! -f "$collection_path" ]; then
+        echo "No Postman collection found - skipping"
+        return 1
+    fi
+
+    local ignore_flag
+    ignore_flag=$(jq '.variable[] | select(.key=="test-runner-ignore").value' --raw-output "$collection_path")
+    if [ "$ignore_flag" == "true" ]; then
+        echo "Collection contains ignore flag - skipping"
+        return 1
+    fi
+
+    return 0
+}
+
+# Function to check custom test scripts
+check_test_scripts() {
+    local deployment="$1"
+    local deployment_dir="$BASE_DIR/deployments/$deployment"
+    local test_scripts
+    test_scripts=( $(find "$deployment_dir" -name "test.sh" -type f) )
+
+    if [ ${#test_scripts[@]} -eq 0 ]; then
+        echo "No test scripts found - skipping"
+        return 1
+    fi
+
+    return 0
+}
+
 # Function to run Postman tests
 run_postman_test() {
     local deployment="$1"
@@ -30,15 +66,7 @@ run_postman_test() {
     echo "Postman Tests: $deployment"
     echo "═══════════════════════════════════════════"
 
-    if [ ! -f "$collection_path" ]; then
-        echo "No Postman collection found - skipping"
-        return 0
-    fi
-
-    local ignore_flag
-    ignore_flag=$(jq '.variable[] | select(.key=="test-runner-ignore").value' --raw-output "$collection_path")
-    if [ "$ignore_flag" == "true" ]; then
-        echo "Collection contains ignore flag - skipping"
+    if ! check_postman_collection "$deployment"; then
         return 0
     fi
 
@@ -81,16 +109,15 @@ run_test_scripts() {
     echo "Custom Test Scripts: $deployment"
     echo "═══════════════════════════════════════════"
 
+    if ! check_test_scripts "$deployment"; then
+        return 0
+    fi
+
     local test_scripts_status=0
     local tests_run=0
     local tests_passed=0
     local test_scripts
     test_scripts=( $(find "$deployment_dir" -name "test.sh" -type f) )
-
-    if [ ${#test_scripts[@]} -eq 0 ]; then
-        echo "No test scripts found - skipping"
-        return 0
-    fi
 
     for test_script in "${test_scripts[@]}"; do
         local test_partial_path=${test_script#$deployment_dir/}
