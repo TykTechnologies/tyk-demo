@@ -1,25 +1,16 @@
 #!/bin/bash
 
-# Runs the postman collection tests for deployments that are currently deployed
-# Note: To test all deployments without having to bootstrap them first, use the test-all.sh script
+# Runs the postman collection tests and additional test.sh scripts for deployments that are currently deployed.
+# Note: To test all deployments without having to bootstrap them first, use the test-all.sh script.
 
-# Resolve script directory for portability
-resolve_path() {
-  if command -v realpath >/dev/null 2>&1; then
-    realpath "$1"
-  elif command -v readlink >/dev/null 2>&1; then
-    readlink -f "$1"
-  else
-    echo "$1" # Fallback, may not work if symbolic links are involved
-  fi
-}
-
-BASE_DIR=$(resolve_path "$(pwd)")
+BASE_DIR=$(pwd)
 
 if [ ! -s "$BASE_DIR/.bootstrap/bootstrapped_deployments" ]; then
-  echo "ERROR: No bootstrapped deployments found"
-  echo "To run tests, first bootstrap a deployment, then run this script"
-  exit 1
+    echo "╔══════════════════════════════════════════════╗"
+    echo "║ ERROR: No bootstrapped deployments found     ║"
+    echo "║ First bootstrap a deployment, then try again ║"
+    echo "╚══════════════════════════════════════════════╝"
+    exit 1
 fi
 
 # Stop on errors within trap or functions
@@ -29,78 +20,147 @@ set -e
 deployments=()
 statuses=()
 overall_status=0
+i=0
 
-function run_test {
+# Initialize arrays for tracking details
+postman_results=()
+script_results=()
+
+function run_postman_test {
     deployment="$1"
     deployment_dir="$BASE_DIR/deployments/$deployment"
-
     collection_path="$deployment_dir/tyk_demo_${deployment//-/_}.postman_collection.json"
+
+    echo "═══════════════════════════════════════════"
+    echo "Postman Tests: $deployment"
+    echo "═══════════════════════════════════════════"
+
     if [ ! -f "$collection_path" ]; then
-        echo "$deployment deployment does not contain a postman collection"
-        deployments+=("$deployment")
-        statuses+=("Skipped: No collection found")
-        return
+        echo "No Postman collection found - skipping"
+        return 0
     fi
 
-    echo "Running tests for $deployment deployment"
-
-    # Set up the test command
+    # Set up the Postman test command
     test_cmd=(
         docker run -t --rm
         --network tyk-demo_tyk
-        # Mount the Postman collection JSON file
         -v "$collection_path:/etc/postman/tyk_demo.postman_collection.json"
-        # Mount the Postman environment JSON file
         -v "$BASE_DIR/test.postman_environment.json:/etc/postman/test.postman_environment.json"
-        # Use the Newman image to run the collection
         postman/newman:6.1.3-alpine \
-        # Specify the collection to run
         run "/etc/postman/tyk_demo.postman_collection.json"
-        # Specify the environment configuration, so the correct hosts are targetted from within the docker network
         --environment /etc/postman/test.postman_environment.json
-        # Allow insecure SSL connections (for self-signed certs)
         --insecure
     )
 
-    # Add dynamic env vars to the test command, if any exist
+    # Add dynamic environment variables if available
     dynamic_env_var_path="$deployment_dir/dynamic-test-vars.env"
     if [ -s "$dynamic_env_var_path" ]; then
         while IFS= read -r var; do
             test_cmd+=(--env-var "$var")
-            echo "  Using dynamic env var: $var"
+            echo "→ Using env var: $var"
         done < "$dynamic_env_var_path"
-    else
-        echo "  No dynamic environment variables found for $deployment deployment"
     fi
 
-    # Run the test command and capture its status
+    # Run the Postman test command
     if "${test_cmd[@]}"; then
-        deployments+=("$deployment")
+        postman_results[$i]="Passed"
+        return 0
+    else
+        postman_results[$i]="Failed"
+        return 1
+    fi
+}
+
+function run_test_scripts {
+    deployment="$1"
+    deployment_dir="$BASE_DIR/deployments/$deployment"
+    
+    echo "═══════════════════════════════════════════"
+    echo "Custom Test Scripts: $deployment"
+    echo "═══════════════════════════════════════════"
+
+    local test_scripts_status=0
+    test_scripts=( $(find "$deployment_dir" -name "test.sh" -type f) )
+    
+    if [ ${#test_scripts[@]} -eq 0 ]; then
+        echo "No test scripts found - skipping"
+        return 0
+    fi
+
+    local tests_run=0
+    local tests_passed=0
+
+    for test_script in "${test_scripts[@]}"; do
+        echo "→ Running: $(basename "$test_script")"
+        if bash "$test_script"; then
+            echo "✓ Test passed: $(basename "$test_script")"
+            tests_passed=$((tests_passed+1))
+        else
+            echo "✗ Test failed: $(basename "$test_script")"
+            test_scripts_status=1
+        fi
+        tests_run=$((tests_run+1))
+    done
+
+    echo "Summary: $tests_passed/$tests_run tests passed"
+    script_results[$i]="$tests_passed/$tests_run tests passed"
+    return $test_scripts_status
+}
+
+function run_tests_for_deployment {
+    deployment="$1"
+    local deployment_status=0
+
+    echo "═══════════════════════════════════════════"
+    echo "Starting tests for deployment: $deployment"
+    echo "═══════════════════════════════════════════"
+
+    if ! run_postman_test "$deployment"; then
+        deployment_status=1
+    fi
+
+    if ! run_test_scripts "$deployment"; then
+        deployment_status=1
+    fi
+
+    deployments+=("$deployment")
+    if [ "$deployment_status" -eq 0 ]; then
         statuses+=("Passed")
     else
-        deployments+=("$deployment")
         statuses+=("Failed")
         overall_status=1
     fi
+    
+    i=$((i+1))
 }
 
 # Loop through bootstrapped deployments
 while IFS= read -r deployment; do
-    run_test "$deployment"
+    run_tests_for_deployment "$deployment"
 done < "$BASE_DIR/.bootstrap/bootstrapped_deployments"
 
-# Output summary
+# Output final summary
 echo
-echo "Test Summary:"
+echo "╔═════════════════════════════════════════════════════════════════════════════╗"
+echo "║                               Test Summary                                  ║"
+echo "╠═════════════════╦═══════════╦═══════════════════════════════════════════════╣"
+printf "║ %-15s ║ %-9s ║ %-45s ║\n" "Deployment" "Status" "Details"
+echo "╠═════════════════╬═══════════╬═══════════════════════════════════════════════╣"
+
 for i in "${!deployments[@]}"; do
-    echo "  ${deployments[$i]}: ${statuses[$i]}"
+    deployment="${deployments[$i]}"
+    status="${statuses[$i]}"
+    details="Postman: ${postman_results[$i]:-N/A}, Scripts: ${script_results[$i]:-N/A}"
+    printf "║ %-15s ║ %-9s ║ %-45s ║\n" "$deployment" "$status" "$details"
 done
+
+echo "╚═════════════════╩═══════════╩═══════════════════════════════════════════════╝"
 
 # Exit with overall status
 if [ "$overall_status" -eq 1 ]; then
-    echo "One or more deployments failed. Exiting with failure status."
+    echo "✗ One or more deployments failed"
     exit 1
 else
-    echo "All deployments passed. Exiting with success status."
+    echo "✓ All deployments passed"
     exit 0
 fi
