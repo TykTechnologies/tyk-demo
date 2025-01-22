@@ -3,8 +3,9 @@
 # Runs the postman collection tests and additional test.sh scripts for deployments that are currently deployed.
 # Note: To test all deployments without having to bootstrap them first, use the test-all.sh script.
 
-BASE_DIR=$(pwd)
+BASE_DIR=$(dirname "$(dirname "$0")")
 
+# Check if bootstrapped deployments exist
 if [ ! -s "$BASE_DIR/.bootstrap/bootstrapped_deployments" ]; then
     echo "╔══════════════════════════════════════════════╗"
     echo "║ ERROR: No bootstrapped deployments found     ║"
@@ -17,19 +18,13 @@ fi
 set -e
 
 # Arrays to track test results
-deployments=()
-statuses=()
-overall_status=0
-i=0
+declare -a deployments statuses postman_results script_results
 
-# Initialize arrays for tracking details
-postman_results=()
-script_results=()
-
-run_postman_test {
-    deployment="$1"
-    deployment_dir="$BASE_DIR/deployments/$deployment"
-    collection_path="$deployment_dir/tyk_demo_${deployment//-/_}.postman_collection.json"
+# Function to run Postman tests
+run_postman_test() {
+    local deployment="$1"
+    local deployment_dir="$BASE_DIR/deployments/$deployment"
+    local collection_path="$deployment_dir/tyk_demo_${deployment//-/_}.postman_collection.json"
 
     echo "═══════════════════════════════════════════"
     echo "Postman Tests: $deployment"
@@ -40,14 +35,14 @@ run_postman_test {
         return 0
     fi
 
+    local ignore_flag
     ignore_flag=$(jq '.variable[] | select(.key=="test-runner-ignore").value' --raw-output "$collection_path")
     if [ "$ignore_flag" == "true" ]; then
         echo "Collection contains ignore flag - skipping"
         return 0
     fi
 
-    # Set up the Postman test command
-    test_cmd=(
+    local test_cmd=(
         docker run -t --rm
         --network tyk-demo_tyk
         -v "$collection_path:/etc/postman/tyk_demo.postman_collection.json"
@@ -59,7 +54,7 @@ run_postman_test {
     )
 
     # Add dynamic environment variables if available
-    dynamic_env_var_path="$deployment_dir/dynamic-test-vars.env"
+    local dynamic_env_var_path="$deployment_dir/dynamic-test-vars.env"
     if [ -s "$dynamic_env_var_path" ]; then
         while IFS= read -r var; do
             test_cmd+=(--env-var "$var")
@@ -69,35 +64,36 @@ run_postman_test {
 
     # Run the Postman test command
     if "${test_cmd[@]}"; then
-        postman_results[$i]="Passed"
+        postman_results+=("Passed")
         return 0
     else
-        postman_results[$i]="Failed"
+        postman_results+=("Failed")
         return 1
     fi
 }
 
-run_test_scripts {
-    deployment="$1"
-    deployment_dir="$BASE_DIR/deployments/$deployment"
+# Function to run custom test scripts
+run_test_scripts() {
+    local deployment="$1"
+    local deployment_dir="$BASE_DIR/deployments/$deployment"
     
     echo "═══════════════════════════════════════════"
     echo "Custom Test Scripts: $deployment"
     echo "═══════════════════════════════════════════"
 
     local test_scripts_status=0
+    local tests_run=0
+    local tests_passed=0
+    local test_scripts
     test_scripts=( $(find "$deployment_dir" -name "test.sh" -type f) )
-    
+
     if [ ${#test_scripts[@]} -eq 0 ]; then
         echo "No test scripts found - skipping"
         return 0
     fi
 
-    local tests_run=0
-    local tests_passed=0
-
     for test_script in "${test_scripts[@]}"; do
-        test_partial_path=${test_script#$deployment_dir/}
+        local test_partial_path=${test_script#$deployment_dir/}
         echo "→ Running: $test_partial_path"
         if bash "$test_script"; then
             echo "✓ Test passed: $test_partial_path"
@@ -110,12 +106,13 @@ run_test_scripts {
     done
 
     echo "Summary: $tests_passed/$tests_run tests passed"
-    script_results[$i]="$tests_passed/$tests_run passed"
+    script_results+=("$tests_passed/$tests_run passed")
     return $test_scripts_status
 }
 
-run_tests_for_deployment {
-    deployment="$1"
+# Function to run tests for each deployment
+run_tests_for_deployment() {
+    local deployment="$1"
     local deployment_status=0
 
     echo "═══════════════════════════════════════════"
@@ -137,13 +134,14 @@ run_tests_for_deployment {
         statuses+=("Failed")
         overall_status=1
     fi
-
-    i=$((i+1))
 }
 
 # Loop through bootstrapped deployments
+i=0
+overall_status=0
 while IFS= read -r deployment; do
     run_tests_for_deployment "$deployment"
+    i=$((i+1))
 done < "$BASE_DIR/.bootstrap/bootstrapped_deployments"
 
 # Output final summary
