@@ -40,6 +40,12 @@ function run_postman_test {
         return 0
     fi
 
+    ignore_flag=$(jq '.variable[] | select(.key=="test-runner-ignore").value' --raw-output "$collection_path")
+    if [ "$ignore_flag" == "true" ]; then
+        echo "Collection contains ignore flag - skipping"
+        return 0
+    fi
+
     # Set up the Postman test command
     test_cmd=(
         docker run -t --rm
@@ -104,7 +110,7 @@ function run_test_scripts {
     done
 
     echo "Summary: $tests_passed/$tests_run tests passed"
-    script_results[$i]="$tests_passed/$tests_run tests passed"
+    script_results[$i]="$tests_passed/$tests_run passed"
     return $test_scripts_status
 }
 
@@ -142,20 +148,17 @@ done < "$BASE_DIR/.bootstrap/bootstrapped_deployments"
 
 # Output final summary
 echo
-echo "╔═════════════════════════════════════════════════════════════════════════════════════╗"
-echo "║                                   Test Summary                                      ║"
-echo "╠═════════════════════════╦═══════════╦═══════════════════════════════════════════════╣"
-printf "║ %-23s ║ %-9s ║ %-45s ║\n" "Deployment" "Status" "Details"
-echo "╠═════════════════════════╬═══════════╬═══════════════════════════════════════════════╣"
+echo "╔═════════════════════════════════════════════════════════════╗"
+echo "║                        Test Summary                         ║"
+echo "╠═════════════════════════╦═════════╦═════════╦═══════════════╣"
+printf "║ %-23s ║ %-7s ║ %-7s ║ %-13s ║\n" "Deployment" "Overall" "Postman" "Test Scripts"
+echo "╠═════════════════════════╬═════════╬═════════╬═══════════════╣"
 
 for i in "${!deployments[@]}"; do
-    deployment="${deployments[$i]}"
-    status="${statuses[$i]}"
-    details="Postman: ${postman_results[$i]:-N/A}, Scripts: ${script_results[$i]:-N/A}"
-    printf "║ %-23s ║ %-9s ║ %-45s ║\n" "$deployment" "$status" "$details"
+    printf "║ %-23s ║ %-7s ║ %-7s ║ %-13s ║\n" "${deployments[$i]}" "${statuses[$i]}" "${postman_results[$i]:-N/A}" "${script_results[$i]:-N/A}"
 done
 
-echo "╚═════════════════════════╩═══════════╩═══════════════════════════════════════════════╝"
+echo "╚═════════════════════════╩═════════╩═════════╩═══════════════╝"
 
 # Exit with overall status
 if [ "$overall_status" -eq 1 ]; then
@@ -165,4 +168,3 @@ else
     echo "✓ All deployments passed"
     exit 0
 fi
-slo-prometheus-grafana
