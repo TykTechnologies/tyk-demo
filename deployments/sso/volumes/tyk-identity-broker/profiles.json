@@ -1,5 +1,5 @@
-{
-  "ActionType": "GenerateTemporaryAuthToken",
+[{
+  "ActionTy[pe": "GenerateTemporaryAuthToken",
   "ID": "PLACEHOLDER",
   "IdentityHandlerConfig": {
       "DashboardCredential": "",
@@ -19,4 +19,4 @@
   "ProviderName": "",
   "ReturnURL": "",
   "Type": ""
-}
+}]
