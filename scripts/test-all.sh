@@ -3,7 +3,7 @@
 readonly BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$BASE_DIR/scripts/test-common.sh"
 
-# Color constants
+# Colour constants
 readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'
 readonly BLUE='\033[0;34m'
@@ -27,34 +27,19 @@ prepare_logs() {
     rm -f "$BASE_DIR/logs/containers-"*.log 2>/dev/null
 }
 
-# Determine overall deployment status
-determine_deployment_status() {
-    local bootstrap_result="$1"
-    local postman_result="$2"
-    local script_result="$3"
-
-    # Prioritize bootstrap failure
-    [[ "$bootstrap_result" == "Failed" ]] && echo "Failed" && return
-
-    # Check test results
-    [[ "$postman_result" == "Failed" || "$script_result" == "Failed" ]] && echo "Failed" && return
-
-    echo "Passed"
-}
-
-# Log deployment step with optional color
+# Log deployment step with optional colour
 log_deployment_step() {
     local deployment_name="$1"
     local step="$2"
     local status="${3:-}"
-    local color="${4:-}"
+    local colour="${4:-}"
 
     local log_message="$step: $deployment_name"
     
-    if [[ -n "$color" && -n "$status" ]]; then
-        log "${color}$log_message - $status${NOCOLOUR}"
-    elif [[ -n "$color" ]]; then
-        log "${color}$log_message${NOCOLOUR}"
+    if [[ -n "$colour" && -n "$status" ]]; then
+        log "${colour}$log_message - $status${NOCOLOUR}"
+    elif [[ -n "$colour" ]]; then
+        log "${colour}$log_message${NOCOLOUR}"
     else
         log "$log_message"
     fi
@@ -66,8 +51,8 @@ print_summary_row() {
         "$1" "$2" "$3" "$4" "$5"
 }
 
+# Record deployment result
 record_result() {
-    echo "DEBUG - Record result: $1 $2 $3 $4 $5"
     deployments+=("$1")
     statuses+=("$2")
     bootstrap_results+=("$3")
