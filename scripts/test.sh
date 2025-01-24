@@ -3,12 +3,22 @@
 BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$BASE_DIR/scripts/test-common.sh"
 
+# Color and logging functions
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NOCOLOUR='\033[0m'
+
+log() {
+    echo -e "$1" | tee -a "$BASE_DIR/logs/test.log"
+}
+
 # Check if bootstrapped deployments exist
 if [ ! -s "$BASE_DIR/.bootstrap/bootstrapped_deployments" ]; then
-    echo "╔══════════════════════════════════════════════╗"
-    echo "║ ERROR: No bootstrapped deployments found     ║"
-    echo "║ First bootstrap a deployment, then try again ║"
-    echo "╚══════════════════════════════════════════════╝"
+    log "╔══════════════════════════════════════════════╗"
+    log "║ ERROR: No bootstrapped deployments found     ║"
+    log "║ First bootstrap a deployment, then try again ║"
+    log "╚══════════════════════════════════════════════╝"
     exit 1
 fi
 
@@ -18,18 +28,37 @@ set -e
 # Function to run tests for each deployment
 run_tests_for_deployment() {
     local deployment="$1"
+    local deployment_dir="$BASE_DIR/deployments/$deployment"
     local deployment_status=0
 
-    echo "═══════════════════════════════════════════"
-    echo "Starting tests for deployment: $deployment"
-    echo "═══════════════════════════════════════════"
+    log "═══════════════════════════════════════════"
+    log "Starting tests for deployment: $deployment"
+    log "═══════════════════════════════════════════"
 
-    if ! run_postman_test "$deployment"; then
-        deployment_status=1
+    # Check for Postman tests
+    if validate_postman_collection "$deployment" "$deployment_dir"; then
+        log "Running Postman Tests: $deployment"
+        if ! run_postman_test "$deployment" "$deployment_dir"; then
+            log "${RED}Postman tests failed${NOCOLOUR}"
+            deployment_status=1
+        else
+            log "${GREEN}Postman tests passed${NOCOLOUR}"
+        fi
+    else
+        log "${BLUE}No Postman tests found${NOCOLOUR}"
     fi
 
-    if ! run_test_scripts "$deployment"; then
-        deployment_status=1
+    # Check for custom test scripts
+    if validate_test_scripts "$deployment" "$deployment_dir"; then
+        log "Running Custom Tests: $deployment"
+        if ! run_test_scripts "$deployment" "$deployment_dir"; then
+            log "${RED}Custom tests failed${NOCOLOUR}"
+            deployment_status=1
+        else
+            log "${GREEN}Custom tests passed${NOCOLOUR}"
+        fi
+    else
+        log "${BLUE}No custom test scripts found${NOCOLOUR}"
     fi
 
     deployments+=("$deployment")
