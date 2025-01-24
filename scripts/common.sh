@@ -59,7 +59,11 @@ log_ok () {
 }
 
 log_message () {
-  echo "$(date -u) $1" >> logs/bootstrap.log
+  echo "$(date -u) $@" >> logs/bootstrap.log
+}
+
+log_and_echo_message () {
+  echo "$(date -u) $@" | tee -a logs/bootstrap.log
 }
 
 log_start_deployment () {
