@@ -2,6 +2,16 @@
 
 source scripts/common.sh
 deployment="SSO"
+
+cleanup() {
+  local exit_code=$? # Capture the exit code of the script
+  if [[ $exit_code -ne 0 ]]; then
+    log_message "Deployment $deployment bootstrap exited with an error. Exit code: $exit_code"
+  fi
+}
+
+trap cleanup EXIT
+
 log_start_deployment
 bootstrap_progress
 
@@ -16,15 +26,6 @@ log_message "Getting config data from Identity Broker config file"
 identity_broker_api_credentials=$(cat deployments/sso/volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
 log_message "  TIB base URL: $identity_broker_base_url"
 log_message "  TIB API Credentials: $identity_broker_api_credentials"
-log_ok
-bootstrap_progress
-
-log_message "Ensuring that profiles.json file is present in Identity Broker container"
-eval "$(generate_docker_compose_command) exec -d tyk-identity-broker sh -c \"touch /opt/tyk-identity-broker/profiles.json\""
-if [ "$?" != 0 ]; then
-  echo "Error occurred when touching profiles.json"
-  exit 1
-fi
 log_ok
 bootstrap_progress
 
@@ -49,9 +50,6 @@ identity_broker_profile_tyk_dashboard_data=$(cat deployments/sso/data/tyk-identi
   sed 's/DASHBOARD_USER_GROUP_DEFAULT/'"$user_group_default_id"'/' | \
   sed 's/DASHBOARD_USER_GROUP_READONLY/'"$user_group_readonly_id"'/' | \
   sed 's/DASHBOARD_USER_GROUP_ADMIN/'"$user_group_admin_id"'/')
-log_http_result "$(curl $identity_broker_base_url/api/profiles/tyk-dashboard -s -w "%{http_code}" -o /dev/null \
-  -H "Authorization: $identity_broker_api_credentials" \
-  -d "$(echo $identity_broker_profile_tyk_dashboard_data)" 2>> logs/bootstrap.log)"
 bootstrap_progress
 
 log_message "Creating profile for LDAP / Token"
@@ -59,14 +57,23 @@ identity_broker_profile_ldap_token_data=$(cat deployments/sso/data/tyk-identity-
   sed 's/ORGANISATION_ID/'"$organisation_id"'/' | \
   sed 's/DASHBOARD_HOST/'"$dashboard_base_url_escaped"'/' | \
   sed 's/DASHBOARD_USER_API_CREDENTIALS/'"$dashboard_user_api_credentials"'/')
-log_http_result "$(curl $identity_broker_base_url/api/profiles/ldap-token -s -w "%{http_code}" -o /dev/null \
-  -H "Authorization: $identity_broker_api_credentials" \
-  -d "$(echo $identity_broker_profile_ldap_token_data)" 2>> logs/bootstrap.log)"
+bootstrap_progress
+
+log_message "Write profiles to profiles.json file"
+profile_temp=$(cat deployments/sso/volumes/tyk-identity-broker/profiles.json)
+jq -n '[ $profile1, $profile2 ]' \
+  --argjson profile1 "$identity_broker_profile_tyk_dashboard_data" \
+  --argjson profile2 "$identity_broker_profile_ldap_token_data" \
+  > deployments/sso/volumes/tyk-identity-broker/profiles.json
 bootstrap_progress
 
 log_message "Restart TIB to load new profiles"
 eval $(generate_docker_compose_command) restart tyk-identity-broker 1> /dev/null 2>> logs/bootstrap.log
 log_ok
+
+# do this to prevent git from showing changes in the profiles.json file :(
+sleep 2
+echo "$profile_temp" > deployments/sso/volumes/tyk-identity-broker/profiles.json
 
 log_end_deployment
 

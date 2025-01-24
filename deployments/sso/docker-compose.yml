@@ -29,6 +29,7 @@ services:
       - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
     volumes:
       - ./deployments/sso/volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf
+      - ./deployments/sso/volumes/tyk-identity-broker/profiles.json:/opt/tyk-identity-broker/profiles.json
   ldap-server:
     image: dwimberger/ldap-ad-it:latest
     networks:
