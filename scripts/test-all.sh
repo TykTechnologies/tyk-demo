@@ -62,6 +62,17 @@ log_deployment_step() {
 
 # Print summary table row
 print_summary_row() {
+    printf "║ %-23s ║ %-7s ║ %-9s ║ %-7s ║ %-13s ║\n" \
+        "$1" "$2" "$3" "$4" "$5"
+}
+
+record_result() {
+    echo "DEBUG - Record result: $1 $2 $3 $4 $5"
+    deployments+=("$1")
+    statuses+=("$2")
+    bootstrap_results+=("$3")
+    postman_results+=("$4")
+    script_results+=("$5")
 }
 
 # Process deployment
@@ -84,12 +95,7 @@ process_deployment() {
         log_deployment_step "$deployment_name" "Skipping" "No tests available" "$BLUE"
         
         # Directly update global arrays for skipped deployments
-        deployments+=("$deployment_name")
-        statuses+=("Skipped")
-        bootstrap_results+=("N/A")
-        postman_results+=("N/A")
-        script_results+=("N/A")
-        
+        record_result "$deployment_name" "Skipped" "N/A" "N/A" "N/A"
         ((skipped_deployments++))
         return 0
     fi
@@ -97,19 +103,14 @@ process_deployment() {
     # Bootstrap deployment
     log_deployment_step "$deployment_name" "Creating Deployment"
     if output=$("$BASE_DIR/up.sh" "$deployment_name" persist-log hide-progress 2>&1); then
-        log_deployment_step "$deployment_name" "Creation Process" "Created" "$GREEN"
+        log_deployment_step "$deployment_name" "Deployment Creation" "Created" "$GREEN"
         bootstrap_result="Passed"
     else
-        log_deployment_step "$deployment_name" "Creation Process" "Failed" "$RED"
+        log_deployment_step "$deployment_name" "Deployment Creation" "Failed" "$RED"
         log_deployment_step "$deployment_name" "Bootstrap Output" "$output" "$NOCOLOUR"
         
         # Directly update global arrays for failed bootstrap
-        deployments+=("$deployment_name")
-        statuses+=("Failed")
-        bootstrap_results+=("Failed")
-        postman_results+=("N/A")
-        script_results+=("N/A")
-        
+        record_result "$deployment_name" "Failed" "Failed" "N/A" "N/A"
         return 1
     fi
 
@@ -152,12 +153,7 @@ process_deployment() {
         deployment_status="Failed"
     fi
 
-    deployments+=("$deployment_name")
-    statuses+=("$deployment_status")
-    bootstrap_results+=("$bootstrap_result")
-    postman_results+=("$postman_result")
-    script_results+=("$script_result")
-
+    record_result "$deployment_name" "$deployment_status" "$bootstrap_result" "$postman_result" "$script_result"
     return $overall_status
 }
 
@@ -190,21 +186,21 @@ main() {
 
     # Generate summary
     echo
-    echo "╔════════════════════════════════════════════════════════════╗"
-    echo "║                        Test Summary                        ║"
-    echo "╠════════════════════════════════════════════════════════════╣"
+    echo "╔═════════════════════════════════════════════════════════════════════════╗"
+    echo "║                               Test Summary                              ║"
+    echo "╠═════════════════════════╦═════════╦═══════════╦═════════╦═══════════════╣"
     print_summary_row "Deployment" "Status" "Bootstrap" "Postman" "Test Scripts"
-    echo "╠═════════════════════════════════════════════════════════════╣"
+    echo "╠═════════════════════════╬═════════╬═══════════╬═════════╬═══════════════╣"
 
     for i in "${!deployments[@]}"; do
         print_summary_row \
             "${deployments[$i]}" \
             "${statuses[$i]}" \
-            "${bootstrap_results[$i]:-N/A}" \
-            "${postman_results[$i]:-N/A}" \
-            "${script_results[$i]:-N/A}"
+            "${bootstrap_results[$i]}" \
+            "${postman_results[$i]}" \
+            "${script_results[$i]}"
     done
-    echo "╚═════════════════════════════════════════════════════════════╝"
+    echo "╚═════════════════════════╩═════════╩═══════════╩═════════╩═══════════════╝"
 
     # Print additional statistics
     log ""
