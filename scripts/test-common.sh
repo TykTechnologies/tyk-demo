@@ -3,6 +3,10 @@
 # Global arrays for tracking test results
 declare -a deployments statuses postman_results script_results tests_passed tests_run
 
+# Variables to track the number of tests and failures
+TEST_SCRIPT_COUNT=0
+TEST_SCRIPT_PASSES=0
+
 # Reset global test tracking arrays
 reset_test_tracking() {
     deployments=()
@@ -82,23 +86,23 @@ run_postman_test() {
 run_test_scripts() {
     local deployment="$1"
     local deployment_dir="$2"
-    local local_tests_run=0
-    local local_tests_passed=0
     local test_scripts
     test_scripts=( $(find "$deployment_dir" -name "test.sh" -type f) )
+    TEST_SCRIPT_COUNT=0
+    TEST_SCRIPT_PASSES=0
 
     for test_script in "${test_scripts[@]}"; do
+        TEST_SCRIPT_COUNT=$((TEST_SCRIPT_COUNT+1))
+        echo "Running test script: $test_script"
         if bash "$test_script"; then
-            local_tests_passed=$((local_tests_passed+1))
+            TEST_SCRIPT_PASSES=$((TEST_SCRIPT_PASSES+1))
+            echo "✓ Test script passed"
+        else
+            echo "✗ Test script failed"
         fi
-        local_tests_run=$((local_tests_run+1))
     done
 
-    script_results+=("$local_tests_passed/$local_tests_run passed")
-    tests_passed+=("$local_tests_passed")
-    tests_run+=("$local_tests_run")
-
-    [[ $local_tests_run -eq $local_tests_passed ]]
+    [[ $TEST_SCRIPT_COUNT -eq $TEST_SCRIPT_PASSES ]]
 }
 
 # Optional: Reset global test tracking arrays
