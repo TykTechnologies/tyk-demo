@@ -56,13 +56,13 @@ log_deployment_step() {
 get_status_colour() {
     local status="$1"
     case "$status" in
-        "$STATUS_PASSED")
+        *"$STATUS_PASSED"*)
             echo "$GREEN"
             ;;
-        "$STATUS_FAILED")
+        *"$STATUS_FAILED"*)
             echo "$RED"
             ;;
-        "$STATUS_SKIPPED")
+        *"$STATUS_SKIPPED"*)
             echo "$BLUE"
             ;;
         *)
@@ -157,10 +157,10 @@ process_deployment() {
             log_deployment_step "$deployment_name" "Running Custom Tests"
             if run_test_scripts "$deployment_name" "$deployment_dir"; then
                 log_deployment_step "$deployment_name" "Custom Tests" "$STATUS_PASSED"
-                script_result="${TEST_SCRIPT_PASSES}/${TEST_SCRIPT_COUNT} passed"
+                script_result="${TEST_SCRIPT_PASSES}/${TEST_SCRIPT_COUNT}: $STATUS_PASSED"
             else
                 log_deployment_step "$deployment_name" "Custom Tests" "$STATUS_FAILED"
-                script_result="${TEST_SCRIPT_PASSES}/${TEST_SCRIPT_COUNT} failed"
+                script_result="${TEST_SCRIPT_PASSES}/${TEST_SCRIPT_COUNT}: $STATUS_FAILED"
             fi
         fi
     fi
@@ -172,7 +172,7 @@ process_deployment() {
     fi
 
     # Determine overall deployment status
-    if [[ "$bootstrap_result" != "$STATUS_FAILED" && "$postman_result" != "$STATUS_FAILED" && "$script_result" != "$STATUS_FAILED" ]]; then
+    if [[ "$bootstrap_result" != "$STATUS_FAILED" && "$postman_result" != "$STATUS_FAILED" && "$script_result" != *"$STATUS_FAILED"* ]]; then
         log_deployment_step "$deployment_name" "Deployment Status" "$STATUS_PASSED" "$GREEN"
         ((PASSED_DEPLOYMENTS++))
         deployment_status="$STATUS_PASSED"
