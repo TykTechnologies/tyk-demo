@@ -1,21 +1,8 @@
 #!/bin/bash
 
-# Global arrays for tracking test results
-declare -a deployments statuses postman_results script_results tests_passed tests_run
-
 # Variables to track the number of tests and failures
 TEST_SCRIPT_COUNT=0
 TEST_SCRIPT_PASSES=0
-
-# Reset global test tracking arrays
-reset_test_tracking() {
-    deployments=()
-    statuses=()
-    postman_results=()
-    script_results=()
-    tests_passed=()
-    tests_run=()
-}
 
 # Validate Postman collection
 validate_postman_collection() {
@@ -73,13 +60,8 @@ run_postman_test() {
     fi
 
     # Run the Postman test command
-    if "${test_cmd[@]}"; then
-        postman_results+=("Passed")
-        return 0
-    else
-        postman_results+=("Failed")
-        return 1
-    fi
+    "${test_cmd[@]}"
+    return $?
 }
 
 # Run custom test scripts without logging
@@ -103,14 +85,4 @@ run_test_scripts() {
     done
 
     [[ $TEST_SCRIPT_COUNT -eq $TEST_SCRIPT_PASSES ]]
-}
-
-# Optional: Reset global test tracking arrays
-reset_test_tracking() {
-    deployments=()
-    statuses=()
-    postman_results=()
-    script_results=()
-    tests_passed=()
-    tests_run=()
 }

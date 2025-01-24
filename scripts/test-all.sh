@@ -10,8 +10,8 @@ readonly BLUE='\033[0;34m'
 readonly NOCOLOUR='\033[0m'
 
 # Global tracking variables
-declare -a deployments statuses bootstrap_results postman_results script_results
-declare -i skipped_deployments=0 passed_deployments=0 failed_deployments=0
+declare -a DEPLOYMENTS STATUSES BOOTSTRAP_RESULTS POSTMAN_RESULTS SCRIPT_RESULTS
+declare -i SKIPPED_DEPLOYMENTS=0 PASSED_DEPLOYMENTS=0 FAILED_DEPLOYMENTS=0
 
 # Enhanced logging function
 log() {
@@ -55,11 +55,11 @@ print_summary_row() {
 
 # Record deployment result
 record_result() {
-    deployments+=("$1")
-    statuses+=("$2")
-    bootstrap_results+=("$3")
-    postman_results+=("$4")
-    script_results+=("$5")
+    DEPLOYMENTS+=("$1")
+    STATUSES+=("$2")
+    BOOTSTRAP_RESULTS+=("$3")
+    POSTMAN_RESULTS+=("$4")
+    SCRIPT_RESULTS+=("$5")
 }
 
 # Process deployment
@@ -82,7 +82,7 @@ process_deployment() {
         log_deployment_step "$deployment_name" "Test Validation" "No tests found"
         log_deployment_step "$deployment_name" "Deployment Status" "Skipped" "$BLUE"
         record_result "$deployment_name" "Skipped" "N/A" "N/A" "N/A"
-        ((skipped_deployments++))
+        ((SKIPPED_DEPLOYMENTS++))
         return 0
     fi
 
@@ -129,14 +129,14 @@ process_deployment() {
         log_deployment_step "$deployment_name" "Removal Failed" "$output"
     fi
 
-    # Determine overall status and update global arrays
-    if [[ "$overall_status" -eq 0 ]]; then
+    # Determine overall deployment status
+    if [[ "$bootstrap_result" != "Failed" && "$postman_result" != "Failed" && "$script_result" != "Failed" ]]; then
         log_deployment_step "$deployment_name" "Deployment Status" "Passed" "$GREEN"
-        ((passed_deployments_deployments++))
+        ((PASSED_DEPLOYMENTS++))
         deployment_status="Passed"
     else
         log_deployment_step "$deployment_name" "Deployment Status" "Failed" "$RED"
-        ((failed_deployments++))
+        ((FAILED_DEPLOYMENTS++))
     fi
 
     record_result "$deployment_name" "$deployment_status" "$bootstrap_result" "$postman_result" "$script_result"
@@ -145,7 +145,6 @@ process_deployment() {
 # Main script execution
 main() {
     # Prepare for testing
-    reset_test_tracking
     prepare_logs
 
     # Check for and remove existing deployments
@@ -174,26 +173,26 @@ main() {
     print_summary_row "Deployment" "Status" "Bootstrap" "Postman" "Test Scripts"
     echo "╠═════════════════════════╬═════════╬═══════════╬═════════╬═══════════════╣"
 
-    for i in "${!deployments[@]}"; do
+    for i in "${!DEPLOYMENTS[@]}"; do
         print_summary_row \
-            "${deployments[$i]}" \
-            "${statuses[$i]}" \
-            "${bootstrap_results[$i]}" \
-            "${postman_results[$i]}" \
-            "${script_results[$i]}"
+            "${DEPLOYMENTS[$i]}" \
+            "${STATUSES[$i]}" \
+            "${BOOTSTRAP_RESULTS[$i]}" \
+            "${POSTMAN_RESULTS[$i]}" \
+            "${SCRIPT_RESULTS[$i]}"
     done
     echo "╚═════════════════════════╩═════════╩═══════════╩═════════╩═══════════════╝"
 
     # Print additional statistics
     log ""
     log "Test Statistics:"
-    log "Total Deployments: $((skipped_deployments + failed_deployments + passed_deployments))"
-    log "Skipped Deployments: $skipped_deployments"
-    log "Passed Deployments: $passed_deployments"
-    log "Failed Deployments: $failed_deployments"
+    log "Total Deployments: $((SKIPPED_DEPLOYMENTS + FAILED_DEPLOYMENTS + PASSED_DEPLOYMENTS))"
+    log "Skipped Deployments: $SKIPPED_DEPLOYMENTS"
+    log "Passed Deployments: $PASSED_DEPLOYMENTS"
+    log "Failed Deployments: $FAILED_DEPLOYMENTS"
 
     # Exit with overall status
-    if [ $failed_deployments -eq 0 ]; then
+    if [ $FAILED_DEPLOYMENTS -eq 0 ]; then
         log "${GREEN}✓ No deployments failed${NOCOLOUR}"
         exit 0
     else
@@ -201,6 +200,7 @@ main() {
         exit 1
     fi
 }
+
 
 echo "╔════════════════════════════════════════════════════════════╗"
 echo "║               Tyk Demo - Test All Deployments              ║"
