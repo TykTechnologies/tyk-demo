@@ -9,6 +9,11 @@ readonly GREEN='\033[0;32m'
 readonly BLUE='\033[0;34m'
 readonly NOCOLOUR='\033[0m'
 
+# Status constants
+readonly STATUS_SKIPPED="Skipped"
+readonly STATUS_PASSED="Passed"
+readonly STATUS_FAILED="Failed"
+
 # Global tracking variables
 declare -a DEPLOYMENTS STATUSES BOOTSTRAP_RESULTS POSTMAN_RESULTS SCRIPT_RESULTS
 declare -i SKIPPED_DEPLOYMENTS=0 PASSED_DEPLOYMENTS=0 FAILED_DEPLOYMENTS=0
@@ -47,10 +52,47 @@ log_deployment_step() {
     fi
 }
 
+# Function to get colour based on status
+get_status_colour() {
+    local status="$1"
+    case "$status" in
+        "$STATUS_PASSED")
+            echo "$GREEN"
+            ;;
+        "$STATUS_FAILED")
+            echo "$RED"
+            ;;
+        "$STATUS_SKIPPED")
+            echo "$BLUE"
+            ;;
+        *)
+            echo "$NOCOLOUR"
+            ;;
+    esac
+}
+
 # Print summary table row
 print_summary_row() {
-    printf "║ %-23s ║ %-7s ║ %-9s ║ %-7s ║ %-13s ║\n" \
-        "$1" "$2" "$3" "$4" "$5"
+    local deployment="$1"
+    local status="$2"
+    local bootstrap="$3"
+    local postman="$4"
+    local scripts="$5"
+
+    # Get colours for each column
+    local deployment_colour="$NOCOLOUR"
+    local status_colour=$(get_status_colour "$status")
+    local bootstrap_colour=$(get_status_colour "$bootstrap")
+    local postman_colour=$(get_status_colour "$postman")
+    local scripts_colour=$(get_status_colour "$scripts")
+
+    # Print coloured summary row
+    printf "║ ${deployment_colour}%-23s${NOCOLOUR} ║ ${status_colour}%-7s${NOCOLOUR} ║ ${bootstrap_colour}%-9s${NOCOLOUR} ║ ${postman_colour}%-7s${NOCOLOUR} ║ ${scripts_colour}%-13s${NOCOLOUR} ║\n" \
+        "$deployment" \
+        "$status" \
+        "$bootstrap" \
+        "$postman" \
+        "$scripts"
 }
 
 # Record deployment result
@@ -66,8 +108,8 @@ record_result() {
 process_deployment() {
     local deployment_name="$1"
     local deployment_dir="$2"
-    local deployment_status="Failed"
-    local bootstrap_result="Failed"
+    local deployment_status="$STATUS_FAILED"
+    local bootstrap_result="$STATUS_FAILED"
     local postman_result="N/A"
     local script_result="N/A"
 
@@ -80,8 +122,8 @@ process_deployment() {
         log_deployment_step "$deployment_name" "Test Validation" "Tests found"
     else
         log_deployment_step "$deployment_name" "Test Validation" "No tests found"
-        log_deployment_step "$deployment_name" "Deployment Status" "Skipped" "$BLUE"
-        record_result "$deployment_name" "Skipped" "N/A" "N/A" "N/A"
+        log_deployment_step "$deployment_name" "Deployment Status" "$STATUS_SKIPPED" "$BLUE"
+        record_result "$deployment_name" "$STATUS_SKIPPED" "N/A" "N/A" "N/A"
         ((SKIPPED_DEPLOYMENTS++))
         return 0
     fi
@@ -89,24 +131,24 @@ process_deployment() {
     # Bootstrap deployment
     log_deployment_step "$deployment_name" "Creating Deployment"
     if output=$("$BASE_DIR/up.sh" "$deployment_name" persist-log hide-progress 2>&1); then
-        log_deployment_step "$deployment_name" "Deployment Creation" "Passed"
-        bootstrap_result="Passed"
+        log_deployment_step "$deployment_name" "Deployment Creation" "$STATUS_PASSED"
+        bootstrap_result="$STATUS_PASSED"
     else
-        log_deployment_step "$deployment_name" "Deployment Creation" "Failed"
+        log_deployment_step "$deployment_name" "Deployment Creation" "$STATUS_FAILED"
         log_deployment_step "$deployment_name" "Bootstrap Output" "$output"
     fi
 
     # Only run tests if bootstrap was successful
-    if [ "$bootstrap_result" == "Passed" ]; then
+    if [ "$bootstrap_result" == "$STATUS_PASSED" ]; then
         # Run Postman tests
         if validate_postman_collection "$deployment_name" "$deployment_dir"; then
             log_deployment_step "$deployment_name" "Running Postman Tests"
             if run_postman_test "$deployment_name" "$deployment_dir"; then
-                log_deployment_step "$deployment_name" "Postman Tests" "Passed"
-                postman_result="Passed"
+                log_deployment_step "$deployment_name" "Postman Tests" "$STATUS_PASSED"
+                postman_result="$STATUS_PASSED"
             else
-                log_deployment_step "$deployment_name" "Postman Tests" "Failed"
-                postman_result="Failed"
+                log_deployment_step "$deployment_name" "Postman Tests" "$STATUS_FAILED"
+                postman_result="$STATUS_FAILED"
             fi
         fi
 
@@ -114,10 +156,10 @@ process_deployment() {
         if validate_test_scripts "$deployment_name" "$deployment_dir"; then
             log_deployment_step "$deployment_name" "Running Custom Tests"
             if run_test_scripts "$deployment_name" "$deployment_dir"; then
-                log_deployment_step "$deployment_name" "Custom Tests" "Passed"
+                log_deployment_step "$deployment_name" "Custom Tests" "$STATUS_PASSED"
                 script_result="${TEST_SCRIPT_PASSES}/${TEST_SCRIPT_COUNT} passed"
             else
-                log_deployment_step "$deployment_name" "Custom Tests" "Failed"
+                log_deployment_step "$deployment_name" "Custom Tests" "$STATUS_FAILED"
                 script_result="${TEST_SCRIPT_PASSES}/${TEST_SCRIPT_COUNT} failed"
             fi
         fi
@@ -130,12 +172,12 @@ process_deployment() {
     fi
 
     # Determine overall deployment status
-    if [[ "$bootstrap_result" != "Failed" && "$postman_result" != "Failed" && "$script_result" != "Failed" ]]; then
-        log_deployment_step "$deployment_name" "Deployment Status" "Passed" "$GREEN"
+    if [[ "$bootstrap_result" != "$STATUS_FAILED" && "$postman_result" != "$STATUS_FAILED" && "$script_result" != "$STATUS_FAILED" ]]; then
+        log_deployment_step "$deployment_name" "Deployment Status" "$STATUS_PASSED" "$GREEN"
         ((PASSED_DEPLOYMENTS++))
-        deployment_status="Passed"
+        deployment_status="$STATUS_PASSED"
     else
-        log_deployment_step "$deployment_name" "Deployment Status" "Failed" "$RED"
+        log_deployment_step "$deployment_name" "Deployment Status" "$STATUS_FAILED" "$RED"
         ((FAILED_DEPLOYMENTS++))
     fi
 
@@ -159,7 +201,7 @@ main() {
         deployment_dir=${dir%*/}
         deployment_name=${deployment_dir##*/}
         
-        ((total_deployments++))
+        ((TOTAL_DEPLOYMENTS++))
 
         # Process deployment
         process_deployment "$deployment_name" "$deployment_dir"
