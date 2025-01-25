@@ -1,202 +1,252 @@
 #!/bin/bash
 
-# This script run tests from all Tyk Demo deployments
-# Deployments are processed consecutively in alphabetical order
-# Expect the script to take a while to complete, as each deployment has to be created, tested and removed
-# For a deployment to be tested, three criteria must be met:
-#   1. The deployment must contain a correctly-named Postman collection: e.g. for development directory "foo-bar", the postman collection should be called "tyk_demo_foo_bar.postman_collection.json"
-#   2. The Postman collection must not contain a variable called "test-runner-ignore" with the value "true"
-#   3. The Postman collection must contain at least one test
-#   4. The deployment must be successfully created
-# Deployments which don't meet the criteria are skipped
-# A test is considered successful if a deployment can be created, tested and removed without error
-# The scope of testing is limited to the tests defined within the Postman collection
-# If no tests fail then this script will exit with a 0, otherwise it will be a non-zero value
-# Tests may fail due to environmental reasons, so if you experience a failure it's worth checking that it wasn't caused by an environmental error, such as lack of resources
-# The script must be run from the repository root i.e. ./scripts/test-all.sh
+readonly BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$BASE_DIR/scripts/test-common.sh"
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-NOCOLOUR='\033[0m'
+# Colour constants
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly BLUE='\033[0;34m'
+readonly NOCOLOUR='\033[0m'
 
-echo_and_log () {
-  echo -e $1 | tee -a logs/test.log
+# Status constants
+readonly STATUS_SKIPPED="Skipped"
+readonly STATUS_PASSED="Passed"
+readonly STATUS_FAILED="Failed"
+
+# Global tracking variables
+declare -a DEPLOYMENTS STATUSES BOOTSTRAP_RESULTS POSTMAN_RESULTS SCRIPT_RESULTS
+declare -i SKIPPED_DEPLOYMENTS=0 PASSED_DEPLOYMENTS=0 FAILED_DEPLOYMENTS=0
+
+# Enhanced logging function
+log() {
+    local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+    echo -e "[${timestamp}] $1" | tee -a "$BASE_DIR/logs/test.log"
 }
 
-echo "Checking for active deployments"
-if [ ! -s .bootstrap/bootstrapped_deployments ]; then
-   echo "  No active deployments found - proceeding with tests"
-else
-    echo "  Active deployments found"
-    echo "  WARNING: Continuing this script will remove all existing Tyk Demo deployments, including any unsaved data"
+# Prepare log directory and files
+prepare_logs() {
+    mkdir -p "$BASE_DIR/logs"
+    : > "$BASE_DIR/logs/test.log"
+    : > "$BASE_DIR/logs/bootstrap.log"
+    rm -f "$BASE_DIR/logs/containers-"*.log 2>/dev/null
+}
+
+# Log deployment step with optional colour
+log_deployment_step() {
+    local deployment_name="$1"
+    local step="$2"
+    local status="${3:-}"
+    local colour="${4:-}"
+
+    local log_message="$step: $deployment_name"
     
-    read -p "  Press enter to continue, or CTRL-C to exit"
-    echo "Removing active deployments..."
-    ./down.sh
-fi
-
-# clear log files
-mkdir logs 1>/dev/null 2>&1 # create logs directory before clearing files
-echo -n > logs/test.log
-echo -n > logs/bootstrap.log
-rm -f logs/containers-*.log 1>/dev/null # there can be multiple container logs
-
-declare -a result_names
-declare -a result_codes
-
-for dir in deployments/*/     
-do
-    deployment_dir=${dir%*/}      # remove the trailing slash
-    deployment_name=${deployment_dir##*/}
-    result_names[${#result_names[@]}]=$deployment_name
-
-    echo_and_log "Processing deployment: $deployment_name"
-
-    # Script assumes postman file name is based on deployment name, but with underscores instead of hyphens
-    postman_collection_file_name="tyk_demo_${deployment_name//-/_}.postman_collection.json"
-    postman_collection_path="$deployment_dir/$postman_collection_file_name"
-
-    # If the deployment doesn't have a postman collection then there are no tests to perform, so the deployment can be skipped
-    echo_and_log "Validating deployment's Postman collection ($postman_collection_file_name)"
-
-    if [ -z "$(ls -A $postman_collection_path 2>/dev/null)" ]; then
-        echo_and_log "  Collection not found. ${BLUE}Skipping${NOCOLOUR} to next deployment."
-        result_codes[${#result_codes[@]}]=2
-        continue
+    if [[ -n "$status" && -n "$colour" ]]; then
+        log "${colour}$log_message - $status${NOCOLOUR}"
+    elif [[ -n "$colour" ]]; then
+        log "${colour}$log_message${NOCOLOUR}"
+    elif [[ -n "$status" ]]; then
+        log "$log_message - $status"
     else
-        echo_and_log "  Collection found."
+        log "$log_message"
     fi
+}
 
-    # If the postman collection contains a variable "test-runner-ignore" with value "true" then skip to next deployment
-    ignore_flag=$(jq '.variable[] | select(.key=="test-runner-ignore").value' --raw-output $postman_collection_path)
-    if [ "$ignore_flag" == "true" ]; then
-        echo_and_log "  Collection contains ignore flag. ${BLUE}Skipping${NOCOLOUR} to next deployment."
-        result_codes[${#result_codes[@]}]=3
-        continue
-    else
-        echo_and_log "  Collection does not contain ignore flag."
-    fi
-
-    # If the collection doesn't contain any tests then the deployment can be skipped
-    # The jq command finds "listen" fields which have the value "test", if none are returned then the collection doesn't contain any tests
-    postman_collection_tests=$(jq '..|.listen?|select(.=="test")' $postman_collection_path)
-    if [[ "$postman_collection_tests" == "" ]]; then
-        echo_and_log "  Collection does not contain any tests. ${BLUE}Skipping${NOCOLOUR} to next deployment."
-        result_codes[${#result_codes[@]}]=3
-        continue
-    else
-        echo_and_log "  Collection contains tests. ${GREEN}Proceeding${NOCOLOUR} with deployment tests."
-    fi
-
-    echo_and_log "Creating deployment: $deployment_name"
-    ./up.sh $deployment_name persist-log hide-progress
-    if [ "$?" != "0" ]; then
-        echo_and_log "  ${RED}Failed${NOCOLOUR} to create $deployment_name deployment"
-        result_codes[${#result_codes[@]}]=4
-        echo_and_log "Removing deployment: $deployment_name"
-        ./down.sh
-        continue
-    else
-        echo_and_log "  Successfully created $deployment_name deployment"
-    fi
-
-    echo_and_log "Testing deployment: $deployment_name "
-    # Provide the 'test' environment variables, so newman can target the correct hosts from within the docker network
-    # --insecure option is used due to self-signed certificates
-    # pipefail option is set so that failure of docker command can be detected
-    test_cmd=(
-        set -o pipefail  
-        docker run -t --rm \
-            --network tyk-demo_tyk \
-            -v $(pwd)/$postman_collection_path:/etc/postman/tyk_demo.postman_collection.json \
-            -v $(pwd)/test.postman_environment.json:/etc/postman/test.postman_environment.json \
-            postman/newman:6.1.3-alpine \
-            run "/etc/postman/tyk_demo.postman_collection.json" \
-            --environment /etc/postman/test.postman_environment.json \
-            --insecure \
-    )
-
-    # add dynamic env vars to the test command, if any exist
-    dynamic_env_var_path="$deployment_dir/dynamic-test-vars.env"
-    if [ -s "$dynamic_env_var_path" ]; then
-        while IFS= read -r var; do
-            test_cmd+=(--env-var "$var")
-            echo "  Using dynamic env var: $var"
-        done < "$dynamic_env_var_path"
-    else 
-        echo "  No dynamic environment variables found for $deployment_name deployment"
-    fi
-
-    # run the tests
-    # capture test command output in logs/test.log file
-    # file will contain control characters, so is advised to use command "less -r logs/test.log", or similar, to view it
-    "${test_cmd[@]}" 2>&1 | tee -a logs/test.log
-
-    if [ "$?" != "0" ]; then
-        echo_and_log "Tests ${RED}failed${NOCOLOUR} for $deployment_name deployment"
-        result_codes[${#result_codes[@]}]=1
-    else
-        echo_and_log "Tests ${GREEN}passed${NOCOLOUR} for $deployment_name deployment"
-        result_codes[${#result_codes[@]}]=0
-    fi
-
-    echo_and_log "Removing deployment: $deployment_name"
-    ./down.sh
-
-    if [ "$?" != "0" ]; then
-        echo_and_log "  ${RED}Failed${NOCOLOUR} to remove $deployment_name deployment"
-        result_codes[${#result_codes[@]}]=5
-        # failing to remove a deployment may negatively affect subsequent deployments and tests
-        continue
-    else
-        echo_and_log "  Successfully removed $deployment_name deployment"
-    fi
-done
-
-echo_and_log "\nTesting complete"
-
-echo_and_log "\nTest Results:"
-test_pass_count=0
-test_fail_count=0
-test_skip_count=0
-for i in "${!result_codes[@]}"
-do 
-  case ${result_codes[$i]} in
-    0)
-        echo_and_log "${GREEN}Pass${NOCOLOUR} ${result_names[$i]} - Tests passed"
-        test_pass_count=$((test_pass_count+1));;
-    1) 
-        echo_and_log "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Tests failed"
-        test_fail_count=$((test_fail_count+1));;
-    2) 
-        echo_and_log "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No collection"
-        test_skip_count=$((test_skip_count+1));;
-    3) 
-        echo_and_log "${BLUE}Skip${NOCOLOUR} ${result_names[$i]} - No tests"
-        test_skip_count=$((test_skip_count+1));;
-    4) 
-        echo_and_log "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Create failed"
-        test_fail_count=$((test_fail_count+1));;
-    5) 
-        echo_and_log "${RED}Fail${NOCOLOUR} ${result_names[$i]} - Remove failed"
-        test_fail_count=$((test_fail_count+1));;
-    *) 
-        echo_and_log "ERROR: Unexpected result code. Exiting."
-        exit 2;;
+# Function to get colour based on status
+get_status_colour() {
+    local status="$1"
+    case "$status" in
+        *"$STATUS_PASSED"*)
+            echo "$GREEN"
+            ;;
+        *"$STATUS_FAILED"*)
+            echo "$RED"
+            ;;
+        *"$STATUS_SKIPPED"*)
+            echo "$BLUE"
+            ;;
+        *)
+            echo "$NOCOLOUR"
+            ;;
     esac
-done
+}
 
-echo_and_log "\nTest Result Totals:"
-echo_and_log "${GREEN}Pass${NOCOLOUR}:$test_pass_count"
-echo_and_log "${RED}Fail${NOCOLOUR}:$test_fail_count"
-echo_and_log "${BLUE}Skip${NOCOLOUR}:$test_skip_count"
+# Print summary table row
+print_summary_row() {
+    local deployment="$1"
+    local status="$2"
+    local bootstrap="$3"
+    local postman="$4"
+    local scripts="$5"
 
-echo_and_log "\nExit Status:"
-if [ $test_fail_count = 0 ]; then
-    echo_and_log "No failures detected, exiting with code 0"
-    exit 0
-else
-    echo_and_log "Failures detected, exiting with code 1"
-    exit 1
-fi
+    # Get colours for each column
+    local deployment_colour="$NOCOLOUR"
+    local status_colour=$(get_status_colour "$status")
+    local bootstrap_colour=$(get_status_colour "$bootstrap")
+    local postman_colour=$(get_status_colour "$postman")
+    local scripts_colour=$(get_status_colour "$scripts")
+
+    # Print coloured summary row
+    printf "║ ${deployment_colour}%-23s${NOCOLOUR} ║ ${status_colour}%-7s${NOCOLOUR} ║ ${bootstrap_colour}%-9s${NOCOLOUR} ║ ${postman_colour}%-7s${NOCOLOUR} ║ ${scripts_colour}%-13s${NOCOLOUR} ║\n" \
+        "$deployment" \
+        "$status" \
+        "$bootstrap" \
+        "$postman" \
+        "$scripts"
+}
+
+# Record deployment result
+record_result() {
+    DEPLOYMENTS+=("$1")
+    STATUSES+=("$2")
+    BOOTSTRAP_RESULTS+=("$3")
+    POSTMAN_RESULTS+=("$4")
+    SCRIPT_RESULTS+=("$5")
+}
+
+# Process deployment
+process_deployment() {
+    local deployment_name="$1"
+    local deployment_dir="$2"
+    local deployment_status="$STATUS_FAILED"
+    local bootstrap_result="$STATUS_FAILED"
+    local postman_result="N/A"
+    local script_result="N/A"
+
+    log_deployment_step "$deployment_name" "Processing Deployment"
+
+    # Skip deployments without tests
+    log_deployment_step "$deployment_name" "Validating Tests"
+    if (validate_postman_collection "$deployment_name" "$deployment_dir" || 
+          validate_test_scripts "$deployment_name" "$deployment_dir"); then
+        log_deployment_step "$deployment_name" "Test Validation" "Tests found"
+    else
+        log_deployment_step "$deployment_name" "Test Validation" "No tests found"
+        log_deployment_step "$deployment_name" "Deployment Status" "$STATUS_SKIPPED" "$BLUE"
+        record_result "$deployment_name" "$STATUS_SKIPPED" "N/A" "N/A" "N/A"
+        ((SKIPPED_DEPLOYMENTS++))
+        return 0
+    fi
+
+    # Bootstrap deployment
+    log_deployment_step "$deployment_name" "Creating Deployment"
+    if output=$("$BASE_DIR/up.sh" "$deployment_name" persist-log hide-progress 2>&1); then
+        log_deployment_step "$deployment_name" "Deployment Creation" "$STATUS_PASSED"
+        bootstrap_result="$STATUS_PASSED"
+    else
+        log_deployment_step "$deployment_name" "Deployment Creation" "$STATUS_FAILED"
+        log_deployment_step "$deployment_name" "Bootstrap Output" "$output"
+    fi
+
+    # Only run tests if bootstrap was successful
+    if [ "$bootstrap_result" == "$STATUS_PASSED" ]; then
+        # Run Postman tests
+        if validate_postman_collection "$deployment_name" "$deployment_dir"; then
+            log_deployment_step "$deployment_name" "Running Postman Tests"
+            if run_postman_test "$deployment_name" "$deployment_dir"; then
+                log_deployment_step "$deployment_name" "Postman Tests" "$STATUS_PASSED"
+                postman_result="$STATUS_PASSED"
+            else
+                log_deployment_step "$deployment_name" "Postman Tests" "$STATUS_FAILED"
+                postman_result="$STATUS_FAILED"
+            fi
+        fi
+
+        # Run custom test scripts
+        if validate_test_scripts "$deployment_name" "$deployment_dir"; then
+            log_deployment_step "$deployment_name" "Running Custom Tests"
+            if run_test_scripts "$deployment_name" "$deployment_dir"; then
+                log_deployment_step "$deployment_name" "Custom Tests" "$STATUS_PASSED"
+                script_result="${TEST_SCRIPT_PASSES}/${TEST_SCRIPT_COUNT}: $STATUS_PASSED"
+            else
+                log_deployment_step "$deployment_name" "Custom Tests" "$STATUS_FAILED"
+                script_result="${TEST_SCRIPT_PASSES}/${TEST_SCRIPT_COUNT}: $STATUS_FAILED"
+            fi
+        fi
+    fi
+
+    # Remove deployment
+    log_deployment_step "$deployment_name" "Removing Deployment"
+    if ! output=$("$BASE_DIR/down.sh" 2>&1); then
+        log_deployment_step "$deployment_name" "Removal Failed" "$output"
+    fi
+
+    # Determine overall deployment status
+    if [[ "$bootstrap_result" != "$STATUS_FAILED" && "$postman_result" != "$STATUS_FAILED" && "$script_result" != *"$STATUS_FAILED"* ]]; then
+        log_deployment_step "$deployment_name" "Deployment Status" "$STATUS_PASSED" "$GREEN"
+        ((PASSED_DEPLOYMENTS++))
+        deployment_status="$STATUS_PASSED"
+    else
+        log_deployment_step "$deployment_name" "Deployment Status" "$STATUS_FAILED" "$RED"
+        ((FAILED_DEPLOYMENTS++))
+    fi
+
+    record_result "$deployment_name" "$deployment_status" "$bootstrap_result" "$postman_result" "$script_result"
+}
+
+# Main script execution
+main() {
+    # Prepare for testing
+    prepare_logs
+
+    # Check for and remove existing deployments
+    if [ -s "$BASE_DIR/.bootstrap/bootstrapped_deployments" ]; then
+        log "Active deployments found. Removing existing deployments..."
+        read -p "Press enter to continue, or CTRL-C to exit"
+        "$BASE_DIR/down.sh"
+    fi
+
+    # Loop through deployment directories
+    for dir in "$BASE_DIR/deployments"/*/; do
+        deployment_dir=${dir%*/}
+        deployment_name=${deployment_dir##*/}
+        
+        ((TOTAL_DEPLOYMENTS++))
+
+        # Process deployment
+        process_deployment "$deployment_name" "$deployment_dir"
+    done
+
+    # Generate summary
+    echo
+    echo "╔═════════════════════════════════════════════════════════════════════════╗"
+    echo "║                               Test Summary                              ║"
+    echo "╠═════════════════════════╦═════════╦═══════════╦═════════╦═══════════════╣"
+    print_summary_row "Deployment" "Status" "Bootstrap" "Postman" "Test Scripts"
+    echo "╠═════════════════════════╬═════════╬═══════════╬═════════╬═══════════════╣"
+
+    for i in "${!DEPLOYMENTS[@]}"; do
+        print_summary_row \
+            "${DEPLOYMENTS[$i]}" \
+            "${STATUSES[$i]}" \
+            "${BOOTSTRAP_RESULTS[$i]}" \
+            "${POSTMAN_RESULTS[$i]}" \
+            "${SCRIPT_RESULTS[$i]}"
+    done
+    echo "╚═════════════════════════╩═════════╩═══════════╩═════════╩═══════════════╝"
+
+    # Print additional statistics
+    log ""
+    log "Test Statistics:"
+    log "Total Deployments: $((SKIPPED_DEPLOYMENTS + FAILED_DEPLOYMENTS + PASSED_DEPLOYMENTS))"
+    log "Skipped Deployments: $SKIPPED_DEPLOYMENTS"
+    log "Passed Deployments: $PASSED_DEPLOYMENTS"
+    log "Failed Deployments: $FAILED_DEPLOYMENTS"
+
+    # Exit with overall status
+    if [ $FAILED_DEPLOYMENTS -eq 0 ]; then
+        log "${GREEN}✓ No deployments failed${NOCOLOUR}"
+        exit 0
+    else
+        log "${RED}✗ One or more deployments failed${NOCOLOUR}"
+        exit 1
+    fi
+}
+
+
+echo "╔════════════════════════════════════════════════════════════╗"
+echo "║               Tyk Demo - Test All Deployments              ║"
+echo "╚════════════════════════════════════════════════════════════╝"
+
+# Execute main function
+main

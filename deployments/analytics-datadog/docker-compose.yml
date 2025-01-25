@@ -16,7 +16,7 @@ services:
       - .env
 
   tyk-pump-datadog:
-    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.11.0}
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.11.1}
     networks:
       - tyk
     volumes:

@@ -6,6 +6,6 @@ RUN apt-get update && \
     curl -O https://packagecloud.io/install/repositories/tyk/tyk-sync/script.deb.sh && \
     chmod +x script.deb.sh && \
     ./script.deb.sh && \
-    apt-get install -y tyk-sync=1.5.1
+    apt-get install -y tyk-sync=2.0.1
 
 USER jenkins

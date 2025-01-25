@@ -1,7 +1,7 @@
 ---
 services:
   tyk-mdcb:
-    image: tykio/tyk-mdcb-docker:${MDCB_VERSION:-v2.7.1}
+    image: tykio/tyk-mdcb-docker:${MDCB_VERSION:-v2.7.2}
     ports:
       - 9091:9091
       - 8181:8181
@@ -16,7 +16,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-worker-gateway:
-    image: tykio/tyk-gateway:${GATEWAY_WORKER_VERSION:-v5.6.1}
+    image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY_WORKER_VERSION:-v5.7.1}
     ports:
       - 8090:8080
     networks:
@@ -27,6 +27,7 @@ services:
       - TYK_GW_SLAVEOPTIONS_APIKEY=${MDCB_USER_API_CREDENTIALS:-placeholder}
       - TYK_GW_OPENTELEMETRY_ENABLED=${OPENTELEMETRY_ENABLED:-false}
       - TYK_GW_OPENTELEMETRY_ENDPOINT=${OPENTELEMETRY_ENDPOINT:-false}
+      - TYK_DB_STREAMING_ENABLED=true
     volumes:
       - ./deployments/mdcb/volumes/tyk-worker-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - tyk-gateway-certs:/opt/tyk-gateway/certs
