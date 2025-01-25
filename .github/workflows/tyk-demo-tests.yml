@@ -15,8 +15,8 @@ jobs:
       - name: Install websocat (binary method)
         run: |
           wget https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl
-          chmod +x websocat_amd64
-          sudo mv websocat_amd64 /usr/local/bin/websocat
+          chmod +x websocat.x86_64-unknown-linux-musl
+          sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat
       - name: Check Out Repository Code
         uses: actions/checkout@v4
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the
