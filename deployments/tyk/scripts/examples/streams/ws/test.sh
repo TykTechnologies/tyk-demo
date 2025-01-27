@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Variables
-POST_URL="http://tyk-gateway.localhost:8080/streams-ws/post"
-WS_URL="ws://tyk-gateway.localhost:8080/streams-ws/get/ws"
+POST_URL="http://tyk-gateway.localhost:8080/streams-sse/post"
+GET_URL="http://tyk-gateway.localhost:8080/streams-sse/get/stream"
 DATA="test-message-$(date +%s)"
 TIMEOUT=10
 RESPONSE_FILE=$(mktemp)
@@ -16,27 +16,19 @@ fi
 # Function to clean up background listener
 cleanup() {
     if [[ -n "$listener_pid" ]]; then
-        kill "$listener_pid" 2>/dev/null
-        wait "$listener_pid" 2>/dev/null || true  # Wait for process to fully exit
+        kill "$listener_pid" 2>/dev/null || true
+        disown "$listener_pid" 2>/dev/null || true # Suppress shell termination messages
     fi
     rm -f "$RESPONSE_FILE"
 }
 trap cleanup EXIT
 
-# Function to start websocat and return the PID
-start_websocat() {
-    websocat -Un "$WS_URL" > "$RESPONSE_FILE" &
-    listener_pid=$!  # Capture the PID
-}
+# Start listening for the message in the background
+curl -N "$GET_URL" > "$RESPONSE_FILE" 2>&1 & listener_pid=$!
 
-# Start websocat in the background and get the PID
-start_websocat
-
-# Allow some time for the WebSocket connection to establish
-sleep 2
-# Send the message using curl
+# Send the message
 if ! curl -s -X POST "$POST_URL" -H "Content-Type: text/plain" -d "$DATA" >/dev/null; then
-    echo "Error: Failed to send message."
+    echo "Failed to send message."
     exit 1
 fi
 
@@ -50,5 +42,5 @@ while [[ $SECONDS -lt $end_time ]]; do
     sleep 1
 done
 
-echo "Error: Message not received within timeout period."
+echo "Message not received within timeout period."
 exit 1
