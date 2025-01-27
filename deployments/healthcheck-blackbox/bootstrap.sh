@@ -6,7 +6,8 @@ deployment="Health Check - Blackbox Exporter"
 
 log_start_deployment
 
-# This deployment does not require any bootstrap steps.
+log_message "Wait for services to be ready, as tests as based on health checks"
+wait_for_liveness
 bootstrap_progress
 
 log_end_deployment
