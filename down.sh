@@ -38,7 +38,7 @@ while read deployment; do
   fi
 done < .bootstrap/bootstrapped_deployments
 
-echo "All containers were stopped and removed"
+echo "All deployment resources were removed"
 
 # clear the bootstraped deployments
 echo -n > .bootstrap/bootstrapped_deployments

@@ -1,0 +1,40 @@
+---
+services:
+  prometheus:
+    image: prom/prometheus:v3.0.1
+    volumes:
+      - ./deployments/healthcheck-blackbox/volumes/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ./deployments/healthcheck-blackbox/volumes/prometheus/alert.rules:/etc/prometheus/alert.rules
+    ports:
+      - "9090:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - tyk
+
+  grafana:
+    image: grafana/grafana-oss:11.4.0
+    volumes:
+      - ./deployments/healthcheck-blackbox/volumes/grafana/provisioning:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3200:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=abc123
+    networks:
+      - tyk
+
+  blackbox-exporter:
+    image: prom/blackbox-exporter:v0.25.0
+    ports:
+      - "9115:9115"
+    volumes:
+      - ./deployments/healthcheck-blackbox/volumes/prometheus/blackbox.yaml:/etc/blackbox_exporter/config.yml
+    command:
+      - "--config.file=/etc/blackbox_exporter/config.yml"
+    networks:
+      - tyk
+
+volumes:
+  grafana-data:

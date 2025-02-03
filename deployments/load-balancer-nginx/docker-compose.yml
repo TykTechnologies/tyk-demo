@@ -1,7 +1,7 @@
 ---
 services:
   tyk-gateway-3:
-    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.6.1}
+    image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY_VERSION:-v5.7.1}
     networks:
       - tyk
     environment:
@@ -15,6 +15,7 @@ services:
       - TYK_GW_ANALYTICSCONFIG_GEOIPDBLOCATION=/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
       - TYK_GW_OPENTELEMETRY_ENABLED=${OPENTELEMETRY_ENABLED:-false}
       - TYK_GW_OPENTELEMETRY_ENDPOINT=${OPENTELEMETRY_ENDPOINT:-false}
+      - TYK_DB_STREAMING_ENABLED=true
     env_file:
       - .env
     volumes:
@@ -28,7 +29,7 @@ services:
       - tyk-redis
       - tyk-dashboard
   tyk-gateway-4:
-    image: tykio/tyk-gateway:${GATEWAY_VERSION:-v5.6.1}
+    image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY_VERSION:-v5.7.1}
     networks:
       - tyk
     environment:
@@ -42,6 +43,7 @@ services:
       - TYK_GW_ANALYTICSCONFIG_GEOIPDBLOCATION=/opt/tyk-gateway/databases/GeoLite2-Country.mmdb
       - TYK_GW_OPENTELEMETRY_ENABLED=${OPENTELEMETRY_ENABLED:-false}
       - TYK_GW_OPENTELEMETRY_ENDPOINT=${OPENTELEMETRY_ENDPOINT:-false}
+      - TYK_DB_STREAMING_ENABLED=true
     env_file:
       - .env
     volumes:

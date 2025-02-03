@@ -1,63 +1,107 @@
 #!/bin/bash
 
-# Runs the postman collection tests for deployments that are currently deployed
-# Note: To test all deployments without having to bootstrap them first, use the test-all.sh script
+readonly BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$BASE_DIR/scripts/test-common.sh"
 
-if [ ! -s ".bootstrap/bootstrapped_deployments" ]; then
-  echo "ERROR: No bootstrapped deployments found"
-  echo "To run tests, first bootstrap a deployment, then run this script"
-  exit 1
+# Color and logging functions
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly BLUE='\033[0;34m'
+readonly NOCOLOUR='\033[0m'
+
+log() {
+    echo -e "$1" | tee -a "$BASE_DIR/logs/test.log"
+}
+
+# Check if bootstrapped deployments exist
+if [ ! -s "$BASE_DIR/.bootstrap/bootstrapped_deployments" ]; then
+    log "╔══════════════════════════════════════════════╗"
+    log "║ ERROR: No bootstrapped deployments found     ║"
+    log "║ First bootstrap a deployment, then try again ║"
+    log "╚══════════════════════════════════════════════╝"
+    exit 1
 fi
 
-# Stop on first error
-set -e;
+# Stop on errors within trap or functions
+set -e
 
-function onExit {
-    if [ "$?" != "0" ]; then
-        echo "Tests failed";
-        exit 1;
+# Function to run tests for each deployment
+run_tests_for_deployment() {
+    local deployment="$1"
+    local deployment_dir="$BASE_DIR/deployments/$deployment"
+    local deployment_status=0
+    local postman_result="N/A"
+    local script_result="N/A"
+
+    log "═══════════════════════════════════════════"
+    log "Starting tests for deployment: $deployment"
+    log "═══════════════════════════════════════════"
+
+    # Check for Postman tests
+    if validate_postman_collection "$deployment" "$deployment_dir"; then
+        log "Running Postman Tests: $deployment"
+        if run_postman_test "$deployment" "$deployment_dir"; then
+            log "${GREEN}Postman tests passed${NOCOLOUR}"
+            postman_result="Passed"
+        else
+            log "${RED}Postman tests failed${NOCOLOUR}"
+            postman_result="Failed"
+            deployment_status=1
+        fi
     else
-        echo "Tests passed";
+        log "${BLUE}No Postman tests found${NOCOLOUR}"
+    fi
+
+    # Check for custom test scripts
+    if validate_test_scripts "$deployment" "$deployment_dir"; then
+        log "Running Custom Tests: $deployment"
+        if run_test_scripts "$deployment" "$deployment_dir"; then
+            log "${GREEN}Custom tests passed (${TEST_SCRIPT_PASSES}/${TEST_SCRIPT_COUNT})${NOCOLOUR}"
+        else
+            log "${RED}Custom tests failed (${TEST_SCRIPT_PASSES}/${TEST_SCRIPT_COUNT})${NOCOLOUR}"
+            deployment_status=1
+        fi
+        script_results+="${TEST_SCRIPT_PASSES}/${TEST_SCRIPT_COUNT} passed"
+    else
+        log "${BLUE}No custom test scripts found${NOCOLOUR}"
+    fi
+
+    deployments+=("$deployment")
+    if [ "$deployment_status" -eq 0 ]; then
+        statuses+=("Passed")
+    else
+        statuses+=("Failed")
+        overall_status=1
     fi
 }
 
-trap onExit EXIT;
-
-# loop through bootstrapped deployments
+# Loop through bootstrapped deployments
+i=0
+overall_status=0
 while IFS= read -r deployment; do
-    collection_path="$(pwd)/deployments/$deployment/tyk_demo_${deployment//-/_}.postman_collection.json"
-    if [ ! -f $collection_path ]; then
-        echo "$deployment deployment does not contain a postman collection"
-        continue
-    fi
+    run_tests_for_deployment "$deployment"
+    i=$((i+1))
+done < "$BASE_DIR/.bootstrap/bootstrapped_deployments"
 
-    echo "Running tests for $deployment deployment"
+# Output final summary
+echo
+echo "╔════════════════════════════════════════════════════════════╗"
+echo "║                        Test Summary                        ║"
+echo "╠═════════════════════════╦════════╦═════════╦═══════════════╣"
+printf "║ %-23s ║ %-6s ║ %-7s ║ %-13s ║\n" "Deployment" "Status" "Postman" "Test Scripts"
+echo "╠═════════════════════════╬════════╬═════════╬═══════════════╣"
 
-    # Set up the test command
-    # --environment provides the 'test' environment variables, so newman can target the correct hosts from within the docker network
-    # --insecure option is used due to self-signed certificates
-    test_cmd=(
-        docker run -t --rm
-        --network tyk-demo_tyk
-        -v "$collection_path:/etc/postman/tyk_demo.postman_collection.json"
-        -v "$(pwd)/test.postman_environment.json:/etc/postman/test.postman_environment.json"
-        postman/newman:6.1.3-alpine \
-        run "/etc/postman/tyk_demo.postman_collection.json"
-        --environment /etc/postman/test.postman_environment.json
-        --insecure
-    )
+for i in "${!deployments[@]}"; do
+    printf "║ %-23s ║ %-6s ║ %-7s ║ %-13s ║\n" "${deployments[$i]}" "${statuses[$i]}" "${postman_results[$i]:-N/A}" "${script_results[$i]:-N/A}"
+done
 
-    # add dynamic env vars to the test command, if any exist
-    dynamic_env_var_path="$(pwd)/deployments/$deployment/dynamic-test-vars.env"
-    if [ -s "$dynamic_env_var_path" ]; then
-        while IFS= read -r var; do
-            test_cmd+=(--env-var "$var")
-            echo "  Using dynamic env var: $var"
-        done < "$dynamic_env_var_path"
-    else 
-        echo "  No dynamic environment variables found for $deployment deployment"
-    fi
+echo "╚═════════════════════════╩════════╩═════════╩═══════════════╝"
 
-    # run the tests
-    "${test_cmd[@]}"
-done < .bootstrap/bootstrapped_deployments
+# Exit with overall status
+if [ "$overall_status" -eq 0 ]; then
+    log "${GREEN}✓ All deployments passed${NOCOLOUR}"
+    exit 0
+else
+    log "${RED}✗ One or more deployments failed${NOCOLOUR}"
+    exit 1
+fi

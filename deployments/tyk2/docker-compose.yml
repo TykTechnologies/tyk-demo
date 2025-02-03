@@ -1,7 +1,7 @@
 ---
 services:
   tyk2-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.6.1}
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.7.1}
     ports:
       - 3002:3000
     networks:
@@ -20,7 +20,7 @@ services:
       - tyk2-redis
       - tyk2-mongo
   tyk2-gateway:
-    image: tykio/tyk-gateway:${TYK2_GATEWAY_VERSION:-v5.6.1}
+    image: tykio/${GATEWAY_IMAGE_REPO}:${TYK2_GATEWAY_VERSION:-v5.7.1}
     ports:
       - 8085:8080
     networks:
@@ -34,10 +34,11 @@ services:
       - TYK_GW_DBAPPCONFOPTIONS_CONNECTIONSTRING=http://tyk2-dashboard:3000
       - TYK_GW_STORAGE_HOST=tyk2-redis
       - TYK_LOGLEVEL=${TYK_LOGLEVEL:-info}
+      - TYK_DB_STREAMING_ENABLED=true
     depends_on:
       - tyk2-redis
   tyk2-pump:
-    image: tykio/tyk-pump-docker-pub:${TYK2_PUMP_VERSION:-v1.11.0}
+    image: tykio/tyk-pump-docker-pub:${TYK2_PUMP_VERSION:-v1.11.1}
     networks:
       - tyk
     volumes:

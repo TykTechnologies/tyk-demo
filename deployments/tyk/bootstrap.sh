@@ -149,6 +149,21 @@ log_ok
 log_message "Wait for services to be available after restart"
 wait_for_liveness
 
+# Kafka
+
+log_message "Creating Kafka topics"
+kafka_topics=("tyk-streams-example" "jobs" "completed")
+for kafka_topic_name in "${kafka_topics[@]}"; do
+  docker exec tyk-demo-kafka-1 sh -c "/opt/kafka/bin/kafka-topics.sh --create --topic $kafka_topic_name --bootstrap-server localhost:9092" >/dev/null 2>>logs/bootstrap.log
+  if [ "$?" -ne "0" ]; then
+    echo "ERROR: Could not create kafka topic: $kafka_topic_name"
+    exit 1
+  fi
+  log_message "  Created topic: $kafka_topic_name"
+done
+log_ok
+bootstrap_progress
+
 # Go plugins
 
 build_go_plugin "example-go-plugin.so" "example"

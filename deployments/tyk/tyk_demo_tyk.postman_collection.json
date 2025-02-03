@@ -4980,6 +4980,111 @@
 								"description": "This request is uses a custom hostname to demonstrate the **Custom Domain** functionality. This enables API Defintions to be mapped against the hostname and the path of the request. In this instance, there is an API Definition which is configured to use Custom Domain `custom-domain.localhost` and path `/`. This allows the path for the upstream API to be the only element in the request path i.e. `/get`, since the Gateway no longer has to rely on the path as the only means to identify the API being requested."
 							},
 							"response": []
+						},
+						{
+							"name": "Listen Path - Regex (part 1)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/multiple-listen-paths/apple/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"multiple-listen-paths",
+										"apple",
+										"get"
+									]
+								},
+								"description": "This request calls an API that uses a regular expression in the listen path that allows it to match against multiple paths - in this case `/multiple-listen-paths/apple/` and `/multiple-listen-paths/banana/`. Calls to other paths, such as `multiple-listen-paths/cherry/` will not match.\n\nThis example uses `apple`, so returns a 200."
+							},
+							"response": []
+						},
+						{
+							"name": "Listen Path - Regex (part 2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/multiple-listen-paths/banana/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"multiple-listen-paths",
+										"banana",
+										"get"
+									]
+								},
+								"description": "This request calls an API that uses a regular expression in the listen path that allows it to match against multiple paths - in this case `/multiple-listen-paths/apple/` and `/multiple-listen-paths/banana/`. Calls to other paths, such as `multiple-listen-paths/cherry/` will not match.\n\nThis example uses `banana`, so returns a 200."
+							},
+							"response": []
+						},
+						{
+							"name": "Listen Path - Regex (part 3)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{tyk-gateway.host}}/multiple-listen-paths/cherry/get",
+									"protocol": "http",
+									"host": [
+										"{{tyk-gateway.host}}"
+									],
+									"path": [
+										"multiple-listen-paths",
+										"cherry",
+										"get"
+									]
+								},
+								"description": "This request calls an API that uses a regular expression in the listen path that allows it to match against multiple paths - in this case `/multiple-listen-paths/apple/` and `/multiple-listen-paths/banana/`. Calls to other paths, such as `multiple-listen-paths/cherry/` will not match.\n\nThis example uses `cherry`, so returns a 404."
+							},
+							"response": []
 						}
 					]
 				},

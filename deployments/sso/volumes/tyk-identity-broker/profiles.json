@@ -1,0 +1,22 @@
+[{
+  "ActionTy[pe": "GenerateTemporaryAuthToken",
+  "ID": "PLACEHOLDER",
+  "IdentityHandlerConfig": {
+      "DashboardCredential": "",
+      "TokenAuth": {
+          "BaseAPIID": ""
+      }
+  },
+  "MatchedPolicyID": "",
+  "OrgID": "",
+  "ProviderConfig": {
+      "FailureRedirect": "",
+      "LDAPAttributes": [],
+      "LDAPPort": "",
+      "LDAPServer": "",
+      "LDAPUserDN": ""
+  },
+  "ProviderName": "",
+  "ReturnURL": "",
+  "Type": ""
+}]
