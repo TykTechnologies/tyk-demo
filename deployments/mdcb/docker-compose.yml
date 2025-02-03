@@ -49,7 +49,7 @@ services:
       - TYK_GW_SLAVEOPTIONS_APIKEY=${MDCB_USER_API_CREDENTIALS:-placeholder}
       - TYK_GW_OPENTELEMETRY_ENABLED=${OPENTELEMETRY_ENABLED:-false}
       - TYK_GW_OPENTELEMETRY_ENDPOINT=${OPENTELEMETRY_ENDPOINT:-false}
-      - TYK_GW_SLAVEOPTIONS_CONNECTIONSTRING=${NGROK_MDCB_PROXY_URL:-placeholder}
+      - TYK_GW_SLAVEOPTIONS_CONNECTIONSTRING=${NGROK_MDCB_TUNNEL_URL:-placeholder}
     volumes:
       - ./deployments/mdcb/volumes/tyk-worker-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - tyk-gateway-certs:/opt/tyk-gateway/certs

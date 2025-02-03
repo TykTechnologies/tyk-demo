@@ -52,9 +52,16 @@ set_docker_environment_value "MDCB_USER_API_CREDENTIALS" "$dashboard_mdcb_user_a
 log_ok
 bootstrap_progress
 
-log_message "Setting Docker environment variable for Ngrok MDCB proxy URL"
-ngrok_mdcb_url=$(curl http://localhost:4040/api/tunnels/tyk-mdcb -s | jq -r '.public_url | split("/")[2]')
-set_docker_environment_value "NGROK_MDCB_PROXY_URL" "$ngrok_mdcb_url"
+log_message "Setting Docker environment variable for Ngrok tunnel MDCB URL"
+ngrok_mdcb_tunnel_url=$(get_context_data "1" "ngrok" "1" "mdcb-url")
+if [ "$ngrok_mdcb_tunnel_url" == "" ]; then
+  log_message "  Ngrok tunnel URL for MDCB not found. Skipping."
+  ngrok_mdcb_tunnel_url="N/A"
+else
+  ngrok_mdcb_tunnel_url=$(echo "$ngrok_mdcb_tunnel_url" | cut -d'/' -f3)
+  log_message "  Using: $ngrok_mdcb_tunnel_url"
+  set_docker_environment_value "NGROK_MDCB_TUNNEL_URL" "$ngrok_mdcb_tunnel_url"
+fi
 
 # recreate containers to use updated environment variables
 log_message "Recreating MDCB deployment containers, so that they use updated MDCB user API credentials (tyk-mdcb, tyk-worker-gateway tyk-worker-gateway-ngrok)"
@@ -106,7 +113,7 @@ echo -e "\033[2K
   ▽ Multi Data Centre Bridge ($(get_service_image_tag "tyk-mdcb"))
                 Licence : $mdcb_licence_days_remaining days remaining
      Dashboard Auth Key : $dashboard_mdcb_user_api_credentials
-              Ngrok URL : $ngrok_mdcb_url
+       Ngrok tunnel URL : $ngrok_mdcb_tunnel_url
   ▽ Worker Gateway ($(get_service_image_tag "tyk-worker-gateway"))
                     URL : $worker_gateway_base_url
         Gateway API Key : $worker_gateway_api_credentials
