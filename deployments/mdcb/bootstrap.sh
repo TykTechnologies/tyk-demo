@@ -49,16 +49,16 @@ bootstrap_progress
 # set MDCB credentials and recreate the MDCB container
 log_message "Setting Docker environment variable for MDCB user API credentials"
 set_docker_environment_value "MDCB_USER_API_CREDENTIALS" "$dashboard_mdcb_user_api_credentials"
+set_context_data "1" "dashboard-user" "mdcb" "api-key" "$dashboard_mdcb_user_api_credentials"
 log_ok
 bootstrap_progress
 
 log_message "Setting Docker environment variable for Ngrok tunnel MDCB URL"
-ngrok_mdcb_tunnel_url=$(get_context_data "1" "ngrok" "1" "mdcb-url")
+ngrok_mdcb_tunnel_url=$(get_context_data "1" "ngrok" "mdcb" "url")
 if [ "$ngrok_mdcb_tunnel_url" == "" ]; then
   log_message "  Ngrok tunnel URL for MDCB not found. Skipping."
   ngrok_mdcb_tunnel_url="N/A"
 else
-  ngrok_mdcb_tunnel_url=$(echo "$ngrok_mdcb_tunnel_url" | cut -d'/' -f3)
   log_message "  Using: $ngrok_mdcb_tunnel_url"
   set_docker_environment_value "NGROK_MDCB_TUNNEL_URL" "$ngrok_mdcb_tunnel_url"
 fi

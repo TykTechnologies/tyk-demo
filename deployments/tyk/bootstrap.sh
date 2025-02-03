@@ -588,7 +588,8 @@ else
     else
       log_message "  Ngrok MDCB URL: $ngrok_mdcb_tunnel_url"
       ngrok_available=true
-      set_context_data "1" "ngrok" "1" "mdcb-url" "$ngrok_mdcb_tunnel_url"
+      ngrok_mdcb_url=$(echo "$ngrok_mdcb_tunnel_url" | cut -d'/' -f3)
+      set_context_data "1" "ngrok" "mdcb" "url" "$ngrok_mdcb_url"
       log_ok  
     fi
   fi
