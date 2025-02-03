@@ -245,11 +245,11 @@ capture_container_logs () {
 }
 
 set_context_data () {
-  echo $5 > .context-data/$1-$2-$3-$4
+  echo $5 > .context-data/$1_$2_$3_$4
 }
 
 get_context_data () {
-  echo $(cat .context-data/$1-$2-$3-$4)
+  echo $(cat .context-data/$1_$2_$3_$4)
 }
 
 get_service_container_id () {
@@ -276,6 +276,16 @@ generate_docker_compose_command () {
   command_docker_compose="$command_docker_compose -p tyk-demo --project-directory `pwd`"
 
   echo "$command_docker_compose"
+}
+
+deployment_is_bootstrapped () {
+  local deployment=$1
+  # Check if deployment is listed in bootstrapped_deployments file
+  if grep -Fxq "$deployment" .bootstrap/bootstrapped_deployments; then
+    return 0
+  else
+    return 1
+  fi
 }
 
 get_licence_payload () {

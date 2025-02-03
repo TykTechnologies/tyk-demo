@@ -1,0 +1,26 @@
+no_prompt: false
+no_parallel: false
+no_emojis: true
+no_check_updates: false
+no_color: false
+no_warn_sudo: false
+editor: ""
+git_protocol: https
+pager: cat
+runtime_dir: /Users/davidgarvey/.local/share/kraftkit/runtime
+default_plat: ""
+default_arch: ""
+events_pidfile: /Users/davidgarvey/.local/share/kraftkit/runtime/events.pid
+buildkit_host: ""
+paths:
+    plugins: /Users/davidgarvey/.local/share/kraftkit/plugins
+    manifests: /Users/davidgarvey/.local/share/kraftkit/manifests
+    sources: /Users/davidgarvey/.local/share/kraftkit/sources
+log:
+    level: info
+    timestamps: false
+    type: fancy
+unikraft:
+    mirrors: []
+    manifests: []
+aliases: {}
