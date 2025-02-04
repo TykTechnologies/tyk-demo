@@ -2,7 +2,7 @@ name: tyk
 
 services:
 
-  tyk:
+  gateway:
     build: .
     ports:
       - 443:8080
