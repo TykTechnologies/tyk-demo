@@ -4,6 +4,9 @@ source scripts/common.sh
 
 deployment="Unikernel Unikraft"
 
+dashboard_base_url="http://tyk-dashboard.localhost:$(jq -r '.listen_port' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
+dashboard_user_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
+
 run_kraft_cloud() {
   local command=$1
   kraft cloud --metro "$UKC_METRO" --token "$UKC_TOKEN" $command
@@ -34,11 +37,23 @@ deployment_env_file="deployments/unikernel-unikraft/unikraft/.env"
 log_ok
 bootstrap_progress
 
-log_message "Writing MDCB config to local deployment .env file"
-mdcb_apikey=$(get_context_data "1" "dashboard-user" "mdcb" "api-key")
+log_message "Getting MDCB config"
 mdcb_url=$(get_context_data "1" "ngrok" "mdcb" "url")
+mdcb_apikey=$(get_context_data "1" "dashboard-user" "mdcb" "api-key")
+if [[ -z "$mdcb_url" ]]; then
+  echo "ERROR: MDCB Ngrok URL not found. Ensure that Tyk Demo is configured to use Ngrok."
+  exit 1
+fi
 log_message "  MDCB URL: $mdcb_url"
+if [[ -z "$mdcb_apikey" ]]; then
+  echo "ERROR: MDCB API Key not found. Ensure that Tyk Demo deployment includes MDCB."
+  exit 1
+fi
 log_message "  MDCB API key: $mdcb_apikey"
+log_ok
+bootstrap_progress
+
+log_message "Writing MDCB config to local deployment .env file"
 echo "MDCB_URL=$mdcb_url" >> "$deployment_env_file"
 echo "MDCB_KEY=$mdcb_apikey" >> "$deployment_env_file"
 log_ok
@@ -61,6 +76,12 @@ log_message "  UKC_TOKEN: $obfuscated_token"
 log_ok
 bootstrap_progress
 
+log_message "Importing example API"
+unikraft_api_file="deployments/unikernel-unikraft/data/apis/api-oas-a06c702ac2a74b594ba95709a35e7823.json"
+create_api "$unikraft_api_file" "$dashboard_user_api_key"
+log_ok
+bootstrap_progress
+
 log_message "Starting Unikraft deployment (may take a few minutes on first run, to generate build assets)"
 kraft_output=$(
   cd deployments/unikernel-unikraft/unikraft && 
@@ -78,4 +99,5 @@ log_end_deployment
 echo -e "\033[2K
 ▼ Unikernel - Unikraft
   ▽ Unikraft Cloud
-            Gateway URL : https://$unikraft_gateway_url"
+            Gateway URL : https://$unikraft_gateway_url
+        Example API URL : https://$unikraft_gateway_url/unikraft/get"
