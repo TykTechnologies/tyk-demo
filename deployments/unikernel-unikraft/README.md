@@ -78,7 +78,14 @@ This triggers the `teardown.sh` script, which cleans up the Unikraft Cloud resou
 
 This deployment includes a sample API defintion configured to proxy requests to http://httpbin.org. The API and gateway are tagged with `unikraft`, ensuring only this API is loaded by the gateway.
 
-Unikraft Cloud assigns a dynamic hostname to the gateway (e.g., `red-firefly-y3wdmb5a.fra0.kraft.host`). This hostname is displayed in the deployment output.
+Unikraft Cloud assigns a dynamic hostname to the gateway (e.g., `red-firefly-y3wdmb5a.fra0.kraft.host`). This hostname is displayed in the deployment bootstrap script output e.g. 
+
+```shell
+▼ Unikernel - Unikraft
+  ▽ Unikraft Cloud
+            Gateway URL : https://red-firefly-y3wdmb5a.fra0.kraft.host
+        Example API URL : https://red-firefly-y3wdmb5a.fra0.kraft.host/unikraft/get
+```
 
 To test the API, use:
 
