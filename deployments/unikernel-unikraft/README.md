@@ -62,7 +62,7 @@ Run the following script to start the deployment:
 ./up.sh mdcb unikernel-unikraft
 ```
 
-Note: The `mdcb` deployment is required for the deployment to function correctly.
+Note: The `mdcb` deployment is required for this deployment to function correctly.
 
 ### Stopping and Removing the Deployment
 
