@@ -121,7 +121,7 @@ labels:
   cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 5000 # time to wait until setting gateway to standby
 ```
 
-### Service Definitions
+### Service Definitions
 
 A [Docker Compose file](unikraft/compose.yml) defines the services deployed on Unikraft Cloud. This deployment includes a Tyk Gateway and Redis instance, with MDCB configuration automatically injected via environment variables.
 
