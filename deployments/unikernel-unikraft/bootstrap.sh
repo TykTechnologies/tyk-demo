@@ -4,6 +4,11 @@ source scripts/common.sh
 
 deployment="Unikernel Unikraft"
 
+run_kraft_cloud() {
+  local command=$1
+  kraft cloud --metro "$UKC_METRO" --token "$UKC_TOKEN" $command
+}
+
 log_start_deployment
 
 log_message "Checking for Unikraft CLI (kraft)"
@@ -23,13 +28,13 @@ fi
 log_ok
 bootstrap_progress
 
-log_message "Creating/resetting .env file"
+log_message "Resetting local deployment .env file"
 deployment_env_file="deployments/unikernel-unikraft/unikraft/.env"
 > "$deployment_env_file"
 log_ok
 bootstrap_progress
 
-log_message "Writing deployment environtment variables"
+log_message "Writing MDCB config to local deployment .env file"
 mdcb_apikey=$(get_context_data "1" "dashboard-user" "mdcb" "api-key")
 mdcb_url=$(get_context_data "1" "ngrok" "mdcb" "url")
 log_message "  MDCB URL: $mdcb_url"
@@ -56,10 +61,21 @@ log_message "  UKC_TOKEN: $obfuscated_token"
 log_ok
 bootstrap_progress
 
-log_message "Starting Unikraft deployment"
-(
-  cd /Users/davidgarvey/git/tyk-demo/deployments/unikernel-unikraft/unikraft && 
-  kraft cloud --metro "$UKC_METRO" --token "$UKC_TOKEN" compose up --detach --env-file .env
+log_message "Starting Unikraft deployment (may take a few minutes on first run, to generate build assets)"
+kraft_output=$(
+  cd deployments/unikernel-unikraft/unikraft && 
+  run_kraft_cloud "compose up --detach --env-file .env"
 )
+log_message "$kraft_output"
 log_ok
 bootstrap_progress
+
+gateway_json_config=$(run_kraft_cloud "instance get tyk-gateway -o json")
+unikraft_gateway_url=$(echo "$gateway_json_config" | jq -r '.[].fqdn')
+
+log_end_deployment
+
+echo -e "\033[2K
+▼ Unikernel - Unikraft
+  ▽ Unikraft Cloud
+            Gateway URL : https://$unikraft_gateway_url"
