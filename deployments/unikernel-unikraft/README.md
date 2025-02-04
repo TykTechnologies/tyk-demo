@@ -97,7 +97,7 @@ Note that HTTPS is used. If successful, you will receive a JSON response.
 
 ## Unikraft
 
-This section details how the Tyk Gateway unikernel is built, deployed, and configured on Unikraft Cloud. It covers the build process, cloud settings, and service definitions.
+This section explains how the Tyk Gateway unikernel is built, configured, and deployed on Unikraft Cloud. It covers the build process, cloud configuration, and service definitions, along with boot performance observations.
 
 ### Building the Tyk Gateway Unikernel
 
@@ -120,6 +120,12 @@ labels:
   cloud.unikraft.v1.instances/scale_to_zero.stateful: "true" # instance state is restored when scaling from zero
   cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 5000 # time to wait until setting gateway to standby
 ```
+
+### Boot Performance Observations
+
+With the configuration defined in this deployment, the Tyk Gateway typically boots in ~100ms on first startup. It then takes a short time to load API definitions from MDCB before it is ready to proxy requests.
+
+When scaling up from zero, the boot time is significantly reduced to ~10ms, benefiting from Unikraft's stateful scaling functionality, which restores the previous state.
 
 ### Service Definitions
 
