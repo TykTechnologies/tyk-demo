@@ -10,6 +10,8 @@ The deployment sets up Tyk Gateway as a data plane gateway, which connects to a 
 
 ## Prerequisites
 
+Before using this deployment, ensure you have the necessary licences, tools, and access credentials. This section covers the required Tyk and MDCB licences, Unikraft Cloud access, and dependencies like the Unikraft CLI and Ngrok.
+
 ### 1. Tyk Licences
 
 Ensure that your Tyk and MDCB licences are set in the Tyk Demo `.env` file:
