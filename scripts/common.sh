@@ -1036,3 +1036,9 @@ licence_has_scope () {
 
   return $?
 }
+
+licence_allowed_nodes () {
+  local licence_payload=$(get_licence_payload $1)
+  # Extract the 'allowed_nodes' value and split by commas to count the elements
+  echo "$licence_payload" | jq -r '.allowed_nodes' | tr ',' '\n' | wc -l
+}
