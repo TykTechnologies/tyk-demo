@@ -2,11 +2,13 @@
 
 # Uses the Dashboard API to export API and Policy definitions, overwriting data used to bootstrap the base Tyk deployment
 
+source scripts/common.sh
+
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 
 declare -a data_groups=("1" "2")
-declare -a organisation_names=("$(cat .context-data/1-organisation-1-name)" "$(cat .context-data/2-organisation-1-name)")
-declare -a dashboard_keys=("$(cat .context-data/1-dashboard-user-1-api-key)" "$(cat .context-data/2-dashboard-user-1-api-key)")
+declare -a organisation_names=("$(get_context_data "1" "organisation" "1" "name")" "$(get_context_data "2" "organisation" "1" "name")")
+declare -a dashboard_keys=("$(get_context_data "1" "dashboard-user" "1" "api-key")" "$(get_context_data "2" "dashboard-user" "1" "api-key")")
 
 index=0
 for data_group in "${data_groups[@]}"; do\

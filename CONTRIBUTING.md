@@ -106,7 +106,7 @@ For more examples, check the `bootstrap.sh` files in other deployments.
 
 The `.context-data` directory is used to store data generated during bootstrap scripts so that other scripts can access and use that data. This is particularly important for dynamic data, such as the ids of data added via the Dashboard API. The `scripts/common.sh` script contains functions to read (`get_context_data`) and write (`set_context_data`) this data.
 
-For example, the base Tyk deployment bootstrap script (`deployments/tyk/bootstrap.sh`) writes the Dashboard API credentials to `.context-data/dashboard-user-api-credentials`, which can then be read by other scripts. When the SSO deployment is used, its bootstrap script (`deployments/sso/bootstrap.sh`) reads the content of the file so that it can access the Dashboard API.
+For example, the base Tyk deployment bootstrap script (`deployments/tyk/bootstrap.sh`) writes the Dashboard API credentials to `.context-data/1_dashboard-user_1_api-key`, which can then be read by other scripts. When the SSO deployment is used, its bootstrap script (`deployments/sso/bootstrap.sh`) reads the content of the file so that it can access the Dashboard API.
 
 ## Readme
 

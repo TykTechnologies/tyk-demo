@@ -147,7 +147,7 @@ log_ok
 bootstrap_progress
 
 log_message "Checking Tyk Environment 2 Dashboard API is accessible"
-dashboard2_user_api_credentials=$(cat .context-data/dashboard2-user-api-credentials)
+dashboard2_user_api_credentials=$(get_context_data "tyk2" "dashboard-user" "1" "api-key")
 result=""
 while [ "$result" != "200" ]; do
   result=$(curl $dashboard2_base_url/api/apis -s -o /dev/null -w "%{http_code}" -H "authorization: $dashboard2_user_api_credentials" 2>> logs/bootstrap.log)

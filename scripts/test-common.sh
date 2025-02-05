@@ -34,7 +34,7 @@ validate_test_scripts() {
     return 0
 }
 
-# Run Postman tests without logging
+# Run Postman tests
 run_postman_test() {
     local deployment="$1"
     local deployment_dir="$2"
@@ -60,11 +60,11 @@ run_postman_test() {
     fi
 
     # Run the Postman test command
-    "${test_cmd[@]}"
+    "${test_cmd[@]}" | tee -a "logs/postman.log"
     return $?
 }
 
-# Run custom test scripts without logging
+# Run custom test scripts
 run_test_scripts() {
     local deployment="$1"
     local deployment_dir="$2"
@@ -75,12 +75,12 @@ run_test_scripts() {
 
     for test_script in "${test_scripts[@]}"; do
         TEST_SCRIPT_COUNT=$((TEST_SCRIPT_COUNT+1))
-        echo "Running test script: $test_script"
-        if bash "$test_script"; then
+        echo "Running test script: $test_script" | tee -a "logs/custom_scripts.log"
+        if bash "$test_script" | tee -a "logs/custom_scripts.log"; then
             TEST_SCRIPT_PASSES=$((TEST_SCRIPT_PASSES+1))
-            echo "✓ Test script passed"
+            echo "✓ Test script passed" | tee -a "logs/custom_scripts.log"
         else
-            echo "✗ Test script failed"
+            echo "✗ Test script failed" | tee -a "logs/custom_scripts.log"
         fi
     done
 

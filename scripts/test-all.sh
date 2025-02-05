@@ -20,7 +20,7 @@ declare -i SKIPPED_DEPLOYMENTS=0 PASSED_DEPLOYMENTS=0 FAILED_DEPLOYMENTS=0
 
 # Enhanced logging function
 log() {
-    local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+    local timestamp=$(date -u "+%Y-%m-%d %H:%M:%S UTC")
     echo -e "[${timestamp}] $1" | tee -a "$BASE_DIR/logs/test.log"
 }
 
@@ -29,6 +29,8 @@ prepare_logs() {
     mkdir -p "$BASE_DIR/logs"
     : > "$BASE_DIR/logs/test.log"
     : > "$BASE_DIR/logs/bootstrap.log"
+    : > "$BASE_DIR/logs/postman.log"
+    : > "$BASE_DIR/logs/custom_scripts.log"
     rm -f "$BASE_DIR/logs/containers-"*.log 2>/dev/null
 }
 
@@ -122,7 +124,7 @@ process_deployment() {
         log_deployment_step "$deployment_name" "Test Validation" "Tests found"
     else
         log_deployment_step "$deployment_name" "Test Validation" "No tests found"
-        log_deployment_step "$deployment_name" "Deployment Status" "$STATUS_SKIPPED" "$BLUE"
+        log_deployment_step "$deployment_name" "Deployment Result" "$STATUS_SKIPPED" "$BLUE"
         record_result "$deployment_name" "$STATUS_SKIPPED" "N/A" "N/A" "N/A"
         ((SKIPPED_DEPLOYMENTS++))
         return 0
@@ -173,11 +175,11 @@ process_deployment() {
 
     # Determine overall deployment status
     if [[ "$bootstrap_result" != "$STATUS_FAILED" && "$postman_result" != "$STATUS_FAILED" && "$script_result" != *"$STATUS_FAILED"* ]]; then
-        log_deployment_step "$deployment_name" "Deployment Status" "$STATUS_PASSED" "$GREEN"
+        log_deployment_step "$deployment_name" "Deployment Result" "$STATUS_PASSED" "$GREEN"
         ((PASSED_DEPLOYMENTS++))
         deployment_status="$STATUS_PASSED"
     else
-        log_deployment_step "$deployment_name" "Deployment Status" "$STATUS_FAILED" "$RED"
+        log_deployment_step "$deployment_name" "Deployment Result" "$STATUS_FAILED" "$RED"
         ((FAILED_DEPLOYMENTS++))
     fi
 
@@ -212,7 +214,7 @@ main() {
     echo "╔═════════════════════════════════════════════════════════════════════════╗"
     echo "║                               Test Summary                              ║"
     echo "╠═════════════════════════╦═════════╦═══════════╦═════════╦═══════════════╣"
-    print_summary_row "Deployment" "Status" "Bootstrap" "Postman" "Test Scripts"
+    print_summary_row "Deployment" "Result" "Bootstrap" "Postman" "Test Scripts"
     echo "╠═════════════════════════╬═════════╬═══════════╬═════════╬═══════════════╣"
 
     for i in "${!DEPLOYMENTS[@]}"; do

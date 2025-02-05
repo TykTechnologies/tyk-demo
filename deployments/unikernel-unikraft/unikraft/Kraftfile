@@ -1,0 +1,12 @@
+spec: v0.6
+
+runtime: base:latest
+
+labels:
+  cloud.unikraft.v1.instances/scale_to_zero.policy: "idle" # idle instances will be scaled to zero
+  cloud.unikraft.v1.instances/scale_to_zero.stateful: "true" # instance state is restored when scaling from zero
+  cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 5000 # time to wait until setting gateway to standby
+
+rootfs: ./Dockerfile
+
+cmd: ["/usr/bin/tyk", "start", "--conf", "/etc/tyk.conf"]

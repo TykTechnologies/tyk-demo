@@ -88,7 +88,7 @@ echo
 echo "╔════════════════════════════════════════════════════════════╗"
 echo "║                        Test Summary                        ║"
 echo "╠═════════════════════════╦════════╦═════════╦═══════════════╣"
-printf "║ %-23s ║ %-6s ║ %-7s ║ %-13s ║\n" "Deployment" "Status" "Postman" "Test Scripts"
+printf "║ %-23s ║ %-6s ║ %-7s ║ %-13s ║\n" "Deployment" "Result" "Postman" "Test Scripts"
 echo "╠═════════════════════════╬════════╬═════════╬═══════════════╣"
 
 for i in "${!deployments[@]}"; do

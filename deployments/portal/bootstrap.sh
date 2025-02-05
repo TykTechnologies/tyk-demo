@@ -15,12 +15,12 @@ licence_line=$(grep "DASHBOARD_LICENCE=" .env)
 encoded_licence_jwt=$(echo $licence_line | sed -E 's/^[A-Z_]+=(.+)$/\1/')
 
 # Get Tyk Dashboard API Access Credentials
-dashboard_user_api_credentials=$(cat .context-data/1-dashboard-user-1-api-key)
-dashboard_user_org_id=$(cat .context-data/1-organisation-1-id)
+dashboard_user_api_credentials=$(get_context_data "1" "dashboard-user" "1" "api-key")
+dashboard_user_org_id=$(get_context_data "1" "organisation" "1" "id")
 # Export to envs for docker
 log_message "Exporting Docker Environment Variables for Enterprise Portal in .env"
-set_docker_environment_value "ADMIN_EMAIL" $(cat .context-data/1-dashboard-user-1-email)
-set_docker_environment_value "ADMIN_PASSWORD" $(cat .context-data/1-dashboard-user-1-password)
+set_docker_environment_value "ADMIN_EMAIL" $(get_context_data "1" "dashboard-user" "1" "email")
+set_docker_environment_value "ADMIN_PASSWORD" $(get_context_data "1" "dashboard-user" "1" "password")
 set_docker_environment_value "ADMIN_ORG_ID" $dashboard_user_org_id
 set_docker_environment_value "TYK_DASHBOARD_API_ACCESS_CREDENTIALS" $dashboard_user_api_credentials
 
@@ -83,8 +83,8 @@ $(generate_docker_compose_command) up -d tyk-portal 2>/dev/null
 bootstrap_progress
 log_ok
 
-portal_admin_user_email=$(cat .context-data/1-dashboard-user-1-email)
-portal_admin_user_password=$(cat .context-data/1-dashboard-user-1-password)
+portal_admin_user_email=$(get_context_data "1" "dashboard-user" "1" "email")
+portal_admin_user_password=$(get_context_data "1" "dashboard-user" "1" "password")
 
 log_message "Waiting for Tyk-Portal container to come online ..."
 wait_for_response "http://tyk-portal.localhost:3100/ready" "200"

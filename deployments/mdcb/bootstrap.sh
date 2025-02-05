@@ -49,12 +49,23 @@ bootstrap_progress
 # set MDCB credentials and recreate the MDCB container
 log_message "Setting Docker environment variable for MDCB user API credentials"
 set_docker_environment_value "MDCB_USER_API_CREDENTIALS" "$dashboard_mdcb_user_api_credentials"
+set_context_data "1" "dashboard-user" "mdcb" "api-key" "$dashboard_mdcb_user_api_credentials"
 log_ok
 bootstrap_progress
 
-# recreate containers to use updated MDCB credentials
-log_message "Recreating MDCB deployment containers, so that they use updated MDCB user API credentials (tyk-mdcb, tyk-worker-gateway)"
-eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway 2> /dev/null
+log_message "Setting Docker environment variable for Ngrok tunnel MDCB URL"
+ngrok_mdcb_tunnel_url=$(get_context_data "1" "ngrok" "mdcb" "url")
+if [ "$ngrok_mdcb_tunnel_url" == "" ]; then
+  log_message "  Ngrok tunnel URL for MDCB not found. Skipping."
+  ngrok_mdcb_tunnel_url="N/A"
+else
+  log_message "  Using: $ngrok_mdcb_tunnel_url"
+  set_docker_environment_value "NGROK_MDCB_TUNNEL_URL" "$ngrok_mdcb_tunnel_url"
+fi
+
+# recreate containers to use updated environment variables
+log_message "Recreating MDCB deployment containers, so that they use updated MDCB user API credentials (tyk-mdcb, tyk-worker-gateway tyk-worker-gateway-ngrok)"
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway tyk-worker-gateway-ngrok 2> /dev/null
 if [ "$?" != "0" ]; then
   echo "Error occurred when recreating MDCB deployment containers"
   exit 1
@@ -92,7 +103,7 @@ while [ "$result" != "0" ]; do
     sleep 2
   fi
 done
-log_ok
+log_ok  
 bootstrap_progress
 
 log_end_deployment
@@ -102,7 +113,12 @@ echo -e "\033[2K
   ▽ Multi Data Centre Bridge ($(get_service_image_tag "tyk-mdcb"))
                 Licence : $mdcb_licence_days_remaining days remaining
      Dashboard Auth Key : $dashboard_mdcb_user_api_credentials
+       Ngrok tunnel URL : $ngrok_mdcb_tunnel_url
   ▽ Worker Gateway ($(get_service_image_tag "tyk-worker-gateway"))
                     URL : $worker_gateway_base_url
+        Gateway API Key : $worker_gateway_api_credentials
+     Gateway API Header : x-tyk-authorization
+  ▽ Worker Gateway Ngrok ($(get_service_image_tag "tyk-worker-gateway-ngrok"))
+                    URL : http://tyk-worker-gateway.localhost:8093
         Gateway API Key : $worker_gateway_api_credentials
      Gateway API Header : x-tyk-authorization"

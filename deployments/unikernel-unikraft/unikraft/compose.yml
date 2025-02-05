@@ -1,0 +1,17 @@
+---
+name: tyk
+
+services:
+
+  gateway:
+    build: .
+    ports:
+      - 443:8080
+    environment:
+      - TYK_GW_SLAVEOPTIONS_CONNECTIONSTRING=${MDCB_URL}
+      - TYK_GW_SLAVEOPTIONS_APIKEY=${MDCB_KEY}
+    mem_reservation: 1024M
+
+  redis:
+    image: redis:latest
+    mem_reservation: 512M
