@@ -256,6 +256,10 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     log_message "Creating APIs"
     for file in $data_group_path/apis/*; do
       if [[ -f $file ]]; then
+        if api_has_section "$file" "x-tyk-streaming" && ! licence_has_scope "streams"; then
+          log_message "  Warning: API $file has Tyk Streaming enabled, but the licence does not have the required scope. Skipping import."
+          continue
+        fi
         create_api "$file" "$dashboard_user_api_key"
         bootstrap_progress
       fi

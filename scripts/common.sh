@@ -1016,3 +1016,23 @@ check_for_wscat () {
       exit 1
   fi
 }
+
+api_has_section () {
+  local json_file="$1"
+  local section="$2"
+  
+  if jq -e 'has("'"$section"'")' "$json_file" >/dev/null 2>&1; then
+      return 0
+  else
+      return 1
+  fi
+}
+
+licence_has_scope () {
+  local licence_payload=$(get_licence_payload $1)
+  local scope="$1"
+
+  echo "$licence_payload" | jq -e ".scope | contains(\"$scope\")" > /dev/null 2>&1
+
+  return $?
+}
