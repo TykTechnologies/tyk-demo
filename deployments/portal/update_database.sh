@@ -2,7 +2,7 @@
 source scripts/common.sh
 
 # Get Tyk Dashboard API Access Credentials
-dashboard_user_api_credentials=$(cat .context-data/1-dashboard-user-1-api-key)
+dashboard_user_api_credentials=$(get_context_data "1" "dashboard-user" "1" "api-key")
 
 DB='deployments/portal/volumes/database/portal.db'
 

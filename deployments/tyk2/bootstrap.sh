@@ -35,7 +35,7 @@ log_message "  Tyk 2 Dashboard User API Credentials = $dashboard2_user_api_crede
 bootstrap_progress
 
 log_message "Recording Dashboard user API credentials"
-echo $dashboard2_user_api_credentials > .context-data/dashboard2-user-api-credentials
+set_context_data "tyk2" "dashboard-user" "1" "api-key" "$dashboard2_user_api_credentials"
 log_ok
 bootstrap_progress
 
