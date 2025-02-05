@@ -20,7 +20,7 @@ declare -i SKIPPED_DEPLOYMENTS=0 PASSED_DEPLOYMENTS=0 FAILED_DEPLOYMENTS=0
 
 # Enhanced logging function
 log() {
-    local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+    local timestamp=$(date -u "+%Y-%m-%d %H:%M:%S UTC")
     echo -e "[${timestamp}] $1" | tee -a "$BASE_DIR/logs/test.log"
 }
 
