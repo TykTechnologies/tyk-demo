@@ -9,6 +9,8 @@ readonly GREEN='\033[0;32m'
 readonly BLUE='\033[0;34m'
 readonly NOCOLOUR='\033[0m'
 
+declare -a postman_results script_results statuses deployments
+
 log() {
     echo -e "$1" | tee -a "$BASE_DIR/logs/test.log"
 }
@@ -48,6 +50,7 @@ run_tests_for_deployment() {
             postman_result="Failed"
             deployment_status=1
         fi
+        postman_results+=("$postman_result")
     else
         log "${BLUE}No Postman tests found${NOCOLOUR}"
     fi

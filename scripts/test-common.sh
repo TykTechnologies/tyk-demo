@@ -60,8 +60,13 @@ run_postman_test() {
     fi
 
     # Run the Postman test command
-    "${test_cmd[@]}" | tee -a "logs/postman.log"
-    return $?
+    local output
+    output=$("${test_cmd[@]}" 2>&1)
+    local exit_status=$?
+    
+    echo "$output" | tee -a "logs/postman.log"
+    
+    return $exit_status
 }
 
 # Run custom test scripts
@@ -76,7 +81,14 @@ run_test_scripts() {
     for test_script in "${test_scripts[@]}"; do
         TEST_SCRIPT_COUNT=$((TEST_SCRIPT_COUNT+1))
         echo "Running test script: $test_script" | tee -a "logs/custom_scripts.log"
-        if bash "$test_script" | tee -a "logs/custom_scripts.log"; then
+
+        local output
+        output=$(bash "$test_script" 2>&1)
+        local exit_status=$?
+
+        echo "$output" >> "logs/custom_scripts.log"
+
+        if [[ $exit_status -eq 0 ]]; then
             TEST_SCRIPT_PASSES=$((TEST_SCRIPT_PASSES+1))
             echo "✓ Test script passed" | tee -a "logs/custom_scripts.log"
         else
