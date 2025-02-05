@@ -59,12 +59,9 @@ run_postman_test() {
         done < "$dynamic_env_var_path"
     fi
 
-    # Run the Postman test command
-    local output
-    output=$("${test_cmd[@]}" 2>&1)
-    local exit_status=$?
-    
-    echo "$output" | tee -a "logs/postman.log"
+    # Run command and tee output, capturing exit status
+    { "${test_cmd[@]}" 2>&1 | tee -a "logs/postman.log"; }
+    local exit_status=${PIPESTATUS[0]}
     
     return $exit_status
 }
@@ -82,11 +79,8 @@ run_test_scripts() {
         TEST_SCRIPT_COUNT=$((TEST_SCRIPT_COUNT+1))
         echo "Running test script: $test_script" | tee -a "logs/custom_scripts.log"
 
-        local output
-        output=$(bash "$test_script" 2>&1)
-        local exit_status=$?
-
-        echo "$output" >> "logs/custom_scripts.log"
+        { bash "$test_script" 2>&1 | tee -a "logs/custom_scripts.log"; }
+        local exit_status=${PIPESTATUS[0]}
 
         if [[ $exit_status -eq 0 ]]; then
             TEST_SCRIPT_PASSES=$((TEST_SCRIPT_PASSES+1))
