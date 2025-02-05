@@ -503,27 +503,31 @@ done
 log_ok
 
 log_message "Checking Gateway 2 - Anonymous API access"
-result=""
-reload_attempt=0
-while [ "$result" != "0" ]
-do
-  wait_for_response "$gateway2_base_url/basic-open-api/get" "200" "" 3
-  result="$?"
-  if [ "$result" != "0" ]
-  then
-    reload_attempt=$((reload_attempt+1))
-    if [ "$reload_attempt" -lt "3"  ]; then
-      log_message "  Gateway 2 not returning desired response, attempting hot reload"
-      hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
-      sleep 2
-    else
-      log_message "  Maximum reload attempt reached"
-      exit 1
+if licence_allowed_nodes = 1; then
+  log_message "  Skipping Gateway 2 check as licence only allows one node"
+else
+  result=""
+  reload_attempt=0
+  while [ "$result" != "0" ]
+  do
+    wait_for_response "$gateway2_base_url/basic-open-api/get" "200" "" 3
+    result="$?"
+    if [ "$result" != "0" ]
+    then
+      reload_attempt=$((reload_attempt+1))
+      if [ "$reload_attempt" -lt "3"  ]; then
+        log_message "  Gateway 2 not returning desired response, attempting hot reload"
+        hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
+        sleep 2
+      else
+        log_message "  Maximum reload attempt reached"
+        exit 1
+      fi
     fi
-  fi
-  bootstrap_progress
-done
-log_ok
+    bootstrap_progress
+  done
+  log_ok
+fi
 
 log_message "Sending API requests to generate analytics data"
 # global analytics off
