@@ -256,8 +256,8 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     log_message "Creating APIs"
     for file in $data_group_path/apis/*; do
       if [[ -f $file ]]; then
-        if api_has_section "$file" "x-tyk-streaming" && ! licence_has_scope "streams"; then
-          log_message "  Warning: API $file has Tyk Streaming enabled, but the licence does not have the required scope. Skipping import."
+        if api_has_section "$file" "x-tyk-streaming" && ! licence_has_scope "DASHBOARD_LICENCE" "streams"; then
+          log_message "  Warning: API $file has Tyk Streaming enabled, but the licence does not have the 'streams' scope. Skipping import."
           continue
         fi
         create_api "$file" "$dashboard_user_api_key"
@@ -503,8 +503,8 @@ done
 log_ok
 
 log_message "Checking Gateway 2 - Anonymous API access"
-if licence_allowed_nodes = 1; then
-  log_message "  Skipping Gateway 2 check as licence only allows one node"
+if [ "$(licence_allowed_nodes "DASHBOARD_LICENCE")" -lt 2 ]; then
+  log_message "  Skipping Gateway 2 check as licence does not allow 2 or more nodes, so gateway 2 cannot register with the Dashboard"
 else
   result=""
   reload_attempt=0

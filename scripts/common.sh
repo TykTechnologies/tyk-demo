@@ -1020,25 +1020,30 @@ check_for_wscat () {
 api_has_section () {
   local json_file="$1"
   local section="$2"
-  
   if jq -e 'has("'"$section"'")' "$json_file" >/dev/null 2>&1; then
-      return 0
+    return 0
   else
-      return 1
+    return 1
   fi
 }
 
 licence_has_scope () {
-  local licence_payload=$(get_licence_payload $1)
-  local scope="$1"
+  local licence_payload scope scopes search_term
+  
+  licence_name="$1"
+  search_term="$2"
+  licence_payload=$(get_licence_payload "$licence_name") || return 2
+  
+  # Check if jq command succeeds
+  scopes=$(echo "$licence_payload" | jq -r '.scope') || return 2
 
-  echo "$licence_payload" | jq -e ".scope | contains(\"$scope\")" > /dev/null 2>&1
-
-  return $?
+  # Direct return of grep status
+  echo "$scopes" | tr ',' '\n' | grep -Fx "$search_term" > /dev/null
 }
 
 licence_allowed_nodes () {
-  local licence_payload=$(get_licence_payload $1)
+  local licence_name="$1"
+  local licence_payload=$(get_licence_payload $licence_name)
   # Extract the 'allowed_nodes' value and split by commas to count the elements
   echo "$licence_payload" | jq -r '.allowed_nodes' | tr ',' '\n' | wc -l
 }
