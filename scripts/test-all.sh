@@ -132,7 +132,7 @@ process_deployment() {
 
     # Bootstrap deployment
     log_deployment_step "$deployment_name" "Creating Deployment"
-    if output=$("$BASE_DIR/up.sh" "$deployment_name" persist-log hide-progress 2>&1); then
+    if output=$("$BASE_DIR/up.sh" "$deployment_name" --persist-log --hide-progress 2>&1); then
         log_deployment_step "$deployment_name" "Deployment Creation" "$STATUS_PASSED"
         bootstrap_result="$STATUS_PASSED"
     else
