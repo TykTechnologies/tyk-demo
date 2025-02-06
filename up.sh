@@ -11,8 +11,8 @@ persist_log=false
 # Reset bootstrap flags
 # Remove hide_progress file to ensure bootstrap progress is displayed by default
 rm .bootstrap/hide_progress 1>/dev/null 2>&1
-# Remove skip_plugins file to ensure plugins are built by default
-rm .bootstrap/skip_plugins 1>/dev/null 2>&1
+# Remove skip_plugin_build file to ensure plugins are built by default
+rm .bootstrap/skip_plugin_build 1>/dev/null 2>&1
 
 echo "Bringing Tyk Demo deployment UP"
 
