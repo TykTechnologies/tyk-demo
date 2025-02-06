@@ -256,6 +256,10 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     log_message "Creating APIs"
     for file in $data_group_path/apis/*; do
       if [[ -f $file ]]; then
+        if api_has_section "$file" "x-tyk-streaming" && ! licence_has_scope "DASHBOARD_LICENCE" "streams"; then
+          log_message "  Warning: API $file has Tyk Streaming enabled, but the licence does not have the 'streams' scope. Skipping import."
+          continue
+        fi
         create_api "$file" "$dashboard_user_api_key"
         bootstrap_progress
       fi
@@ -499,27 +503,31 @@ done
 log_ok
 
 log_message "Checking Gateway 2 - Anonymous API access"
-result=""
-reload_attempt=0
-while [ "$result" != "0" ]
-do
-  wait_for_response "$gateway2_base_url/basic-open-api/get" "200" "" 3
-  result="$?"
-  if [ "$result" != "0" ]
-  then
-    reload_attempt=$((reload_attempt+1))
-    if [ "$reload_attempt" -lt "3"  ]; then
-      log_message "  Gateway 2 not returning desired response, attempting hot reload"
-      hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
-      sleep 2
-    else
-      log_message "  Maximum reload attempt reached"
-      exit 1
+if [ "$(licence_allowed_nodes "DASHBOARD_LICENCE")" -lt 2 ]; then
+  log_message "  Skipping Gateway 2 check as licence does not allow 2 or more nodes, so gateway 2 cannot register with the Dashboard"
+else
+  result=""
+  reload_attempt=0
+  while [ "$result" != "0" ]
+  do
+    wait_for_response "$gateway2_base_url/basic-open-api/get" "200" "" 3
+    result="$?"
+    if [ "$result" != "0" ]
+    then
+      reload_attempt=$((reload_attempt+1))
+      if [ "$reload_attempt" -lt "3"  ]; then
+        log_message "  Gateway 2 not returning desired response, attempting hot reload"
+        hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
+        sleep 2
+      else
+        log_message "  Maximum reload attempt reached"
+        exit 1
+      fi
     fi
-  fi
-  bootstrap_progress
-done
-log_ok
+    bootstrap_progress
+  done
+  log_ok
+fi
 
 log_message "Sending API requests to generate analytics data"
 # global analytics off
