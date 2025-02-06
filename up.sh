@@ -2,16 +2,51 @@
 
 source scripts/common.sh
 
+# Function to display help information
+display_help() {
+    echo "Usage: ./up.sh [OPTIONS] [DEPLOYMENTS]"
+    echo
+    echo "Brings up Tyk Demo deployment with optional configurations."
+    echo
+    echo "Deployments:"
+    # Dynamically list available deployments - except tyk, as it is handled automatically
+    for deployment in deployments/*; do
+      if [ -d "$deployment" ]; then
+        deployment_name=$(basename "$deployment")
+        echo "  $deployment_name"
+      fi
+    done
+    echo
+    echo "Options:"
+    echo "  --help                Display this help message"
+    echo "  --persist-log         Persist log files between bootstraps"
+    echo "  --hide-progress       Hide deployment progress meter"
+    echo "  --skip-plugin-build   Skip building Go plugins (can also use --spb)"
+    echo
+    echo "Examples:"
+    echo "  ./up.sh                     # Bring up default Tyk deployment"
+    echo "  ./up.sh analytics-kibana    # Bring up Tyk deployment with Kibana analytics"
+    echo "  ./up.sh --help              # Show this help message"
+    echo "  ./up.sh --persist-log       # Persist logs"
+}
+
+# Check for help flag
+if [[ "$1" == "--help" ]]; then
+    display_help
+    exit 0
+fi
+
 up_start_time=$(date +%s)
 
 # persistence of log files is disabled by default, meaning the files are recreated between each bootstrap to prevent them from growing too large
 # to enable persistence, use argument "persist-log" when running this script
 persist_log=false
 
-# the hide_progress file determines whether the bootstrap_progress function creates output
-# this is preferable in CICD tests as it prevent pollution of the logs with these messages which are user focussed
-# use the "hide-progress" flag to enable this
+# Reset bootstrap flags
+# Remove hide_progress file to ensure bootstrap progress is displayed by default
 rm .bootstrap/hide_progress 1>/dev/null 2>&1
+# Remove skip_plugin_build file to ensure plugins are built by default
+rm .bootstrap/skip_plugin_build 1>/dev/null 2>&1
 
 echo "Bringing Tyk Demo deployment UP"
 
@@ -109,7 +144,7 @@ for argument in "$@"; do
     deployments_to_create+=("$argument")
   else
     commands_to_process+=("$argument")
-  fi  
+  fi
 done
 
 # display deployments to bootstrap
@@ -128,16 +163,22 @@ echo "Commands to process:"
 if (( ${#commands_to_process[@]} != 0 )); then
   for command in "${commands_to_process[@]}"; do    
     case $command in
-      "persist-log")
+      "--persist-log")
         echo "  persist-log: Logs will be persisted"
         persist_log=true
         ;;
-      "hide-progress")
+      "--hide-progress")
         echo "  hide-progress: Deployment progress meter will not be shown"
         touch .bootstrap/hide_progress
         ;;
+      "--skip-plugin-build" | "--spb")
+        echo "  skip-plugin-build: Go plugins will not be built"
+        touch .bootstrap/skip_plugin_build
+        ;;
       *) 
-        echo "Command \"$command\" is unknown, ignoring."
+        echo "Invalid argument: $command"
+        display_help
+        exit 1
         ;; 
     esac
   done
