@@ -166,14 +166,18 @@ bootstrap_progress
 
 # Go plugins
 
-build_go_plugin "example-go-plugin.so" "example"
-bootstrap_progress
+if [ -f .bootstrap/skip_plugin_build ]; then
+  log_message "Skipping Go plugin build - skip_plugin_build flag is set"
+else
+  build_go_plugin "example-go-plugin.so" "example"
+  bootstrap_progress
 
-build_go_plugin "jwt-go-plugin.so" "jwt"
-bootstrap_progress
+  build_go_plugin "jwt-go-plugin.so" "jwt"
+  bootstrap_progress
 
-build_go_plugin "ip-rate-limit.so" "ipratelimit"
-bootstrap_progress
+  build_go_plugin "ip-rate-limit.so" "ipratelimit"
+  bootstrap_progress
+fi
 
 # Dashboard Data
 

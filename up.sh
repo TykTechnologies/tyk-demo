@@ -8,10 +8,11 @@ up_start_time=$(date +%s)
 # to enable persistence, use argument "persist-log" when running this script
 persist_log=false
 
-# the hide_progress file determines whether the bootstrap_progress function creates output
-# this is preferable in CICD tests as it prevent pollution of the logs with these messages which are user focussed
-# use the "hide-progress" flag to enable this
+# Reset bootstrap flags
+# Remove hide_progress file to ensure bootstrap progress is displayed by default
 rm .bootstrap/hide_progress 1>/dev/null 2>&1
+# Remove skip_plugins file to ensure plugins are built by default
+rm .bootstrap/skip_plugins 1>/dev/null 2>&1
 
 echo "Bringing Tyk Demo deployment UP"
 
@@ -135,6 +136,10 @@ if (( ${#commands_to_process[@]} != 0 )); then
       "hide-progress")
         echo "  hide-progress: Deployment progress meter will not be shown"
         touch .bootstrap/hide_progress
+        ;;
+      "skip-plugin-build" | "spb")
+        echo "  skip-plugin-build: Go plugins will not be built"
+        touch .bootstrap/skip_plugin_build
         ;;
       *) 
         echo "Command \"$command\" is unknown, ignoring."
