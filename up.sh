@@ -28,12 +28,12 @@ display_help() {
     echo "  ./up.sh analytics-kibana    # Bring up Tyk deployment with Kibana analytics"
     echo "  ./up.sh --help              # Show this help message"
     echo "  ./up.sh --persist-log       # Persist logs"
-    exit 0
 }
 
 # Check for help flag
 if [[ "$1" == "--help" ]]; then
     display_help
+    exit 0
 fi
 
 up_start_time=$(date +%s)
@@ -136,13 +136,13 @@ for argument in "$@"; do
   # "tyk" deployment is handled automatically, so ignore it and continue to the next argument
   [ "$argument" == "tyk" ] && continue
 
-    # check if argument refers to a deployment
-    if [ -d "deployments/$argument" ]; then
-      # skip existing deployments, to avoid rebootstrapping
-      [ -f ".bootstrap/bootstrapped_deployments" ] && [ ! -z $(grep "$argument" ".bootstrap/bootstrapped_deployments") ] && break
-      # otherwise, queue deployment to be created
-      deployments_to_create+=("$argument")
-    else
+  # check if argument refers to a deployment
+  if [ -d "deployments/$argument" ]; then
+    # skip existing deployments, to avoid rebootstrapping
+    [ -f ".bootstrap/bootstrapped_deployments" ] && [ ! -z $(grep "$argument" ".bootstrap/bootstrapped_deployments") ] && break
+    # otherwise, queue deployment to be created
+    deployments_to_create+=("$argument")
+  else
     commands_to_process+=("$argument")
   fi
 done
@@ -176,7 +176,9 @@ if (( ${#commands_to_process[@]} != 0 )); then
         touch .bootstrap/skip_plugin_build
         ;;
       *) 
-        echo "Command \"$command\" is unknown, ignoring."
+        echo "Invalid argument: $command"
+        display_help
+        exit 1
         ;; 
     esac
   done
