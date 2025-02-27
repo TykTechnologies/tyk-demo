@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "7e71a9d3-54a4-4dce-9207-2aa450b04c00",
+		"_postman_id": "fe126e49-fb77-4124-b977-2f9acb3bd5a5",
 		"name": "Tyk Demo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "6131676"
@@ -9299,6 +9299,198 @@
 							""
 						]
 					}
+				}
+			]
+		},
+		{
+			"name": "Dashboard Functionality",
+			"item": [
+				{
+					"name": "Security",
+					"item": [
+						{
+							"name": "Forbid Access Token Read",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"tyk.dashboardApi.tools.apiKey.create(pm);",
+											"",
+											"pm.variables.set(\"user-first-name\", pm.variables.replaceIn(\"{{$randomFirstName}}\"));",
+											"pm.variables.set(\"user-last-name\", pm.variables.replaceIn(\"{{$randomLastName}}\"));",
+											"pm.variables.set(\"user-email-address\", pm.variables.replaceIn(\"{{$randomExampleEmail}}\"));",
+											"",
+											"// create a temporary user so that at we can get it",
+											"tyk.dashboardAdminApi.users.create(",
+											"    JSON.stringify({",
+											"        first_name: pm.variables.get(\"user-first-name\"),",
+											"        last_name: pm.variables.get(\"user-last-name\"),",
+											"        email_address: pm.variables.get(\"user-email-address\"),",
+											"        org_id: \"5e9d9544a1dcd60001d0ed20\",",
+											"        active: true,",
+											"        password: \"3LEsHO1jv1dt9Xgf\",",
+											"        user_permissions: {",
+											"            IsAdmin: \"admin\",",
+											"            ResetPassword: \"admin\"",
+											"        }",
+											"    }),",
+											"    (error, response) => { ",
+											"        pm.expect(response.code).to.eql(200);",
+											"        // user id needed for request, and to delete after tests",
+											"        pm.variables.set(\"user-id\", response.json().Meta.id);",
+											"        pm.variables.set(\"user-api-key\", response.json().Meta.access_key);",
+											"    },",
+											"    pm",
+											");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// check that the access token is not set",
+											"pm.test(\"Access key is empty\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.access_key).to.eql(\"\");",
+											"});",
+											"",
+											"// tidy up",
+											"tyk.dashboardApi.users.delete(",
+											"    pm.variables.get(\"user-id\"), ",
+											"    (error, response) => {",
+											"        pm.expect(response).to.have.property('code').that.equals(200);",
+											"        tyk.dashboardApi.tools.apiKey.delete(pm);",
+											"    },",
+											"    pm",
+											");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tyk-dashboard.api-key}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-dashboard.host}}/api/users/{{user-id}}",
+									"protocol": "http",
+									"host": [
+										"{{tyk-dashboard.host}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"{{user-id}}"
+									]
+								},
+								"description": "This request tests that a user with admin rights is unable to see the access tokens of other users - this is to prevent them from impersonating others users through usage of their tokens.\n\nTyk Demo is configured to use this security setting, defined by the `security.forbid_admin_view_access_token` field in the Dashboard's `tyk_analytics.conf` file. To enable, the setting must be set to `true`."
+							},
+							"response": []
+						},
+						{
+							"name": "Forbid Access Token Reset",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"tyk.dashboardApi.tools.apiKey.create(pm);",
+											"",
+											"pm.variables.set(\"user-first-name\", pm.variables.replaceIn(\"{{$randomFirstName}}\"));",
+											"pm.variables.set(\"user-last-name\", pm.variables.replaceIn(\"{{$randomLastName}}\"));",
+											"pm.variables.set(\"user-email-address\", pm.variables.replaceIn(\"{{$randomExampleEmail}}\"));",
+											"",
+											"// create a temporary user so that at we can get it",
+											"tyk.dashboardAdminApi.users.create(",
+											"    JSON.stringify({",
+											"        first_name: pm.variables.get(\"user-first-name\"),",
+											"        last_name: pm.variables.get(\"user-last-name\"),",
+											"        email_address: pm.variables.get(\"user-email-address\"),",
+											"        org_id: \"5e9d9544a1dcd60001d0ed20\",",
+											"        active: true,",
+											"        password: \"3LEsHO1jv1dt9Xgf\",",
+											"        user_permissions: {",
+											"            IsAdmin: \"admin\",",
+											"            ResetPassword: \"admin\"",
+											"        }",
+											"    }),",
+											"    (error, response) => { ",
+											"        pm.expect(response.code).to.eql(200);",
+											"        // user id needed for request, and to delete after tests",
+											"        pm.variables.set(\"user-id\", response.json().Meta.id);",
+											"        pm.variables.set(\"user-api-key\", response.json().Meta.access_key);",
+											"    },",
+											"    pm",
+											");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// check that the attempt failed",
+											"pm.test(\"Attempt to reset token fails\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"// tidy up",
+											"tyk.dashboardApi.users.delete(",
+											"    pm.variables.get(\"user-id\"), ",
+											"    (error, response) => {",
+											"        pm.expect(response).to.have.property('code').that.equals(200);",
+											"        tyk.dashboardApi.tools.apiKey.delete(pm);",
+											"    },",
+											"    pm",
+											");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{tyk-dashboard.api-key}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://{{tyk-dashboard.host}}/api/users/{{user-id}}/actions/key/reset",
+									"protocol": "http",
+									"host": [
+										"{{tyk-dashboard.host}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"{{user-id}}",
+										"actions",
+										"key",
+										"reset"
+									]
+								},
+								"description": "This request tests that a user with admin rights is unable to reset the access tokens of other users - this is to prevent them from removing API-access of other users.\n\nTyk Demo is configured to use this security setting, defined by the `security.forbid_admin_reset_access_token` field in the Dashboard's `tyk_analytics.conf` file. To enable, the setting must be set to `true`."
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}
