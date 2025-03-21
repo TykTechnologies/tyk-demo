@@ -340,7 +340,21 @@
 
             <div class="text-center mt-4 mb-5">
               {{ if $request.Products }}
-                <button type="submit" class="btn btn-primary">Submit request</button>
+                <div class="form-check mb-3">
+                  <input class="form-check-input" type="checkbox" id="acceptTerms" required onchange="toggleSubmitButton()">
+                  <label class="form-check-label" for="acceptTerms">
+                    I accept the <a href="/portal/terms-and-conditions" target="_blank">Terms and Conditions</a>
+                  </label>
+                </div>
+                <button type="submit" id="submitRequestBtn" class="btn btn-primary" disabled>Submit request</button>
+                
+                <script>
+                  function toggleSubmitButton() {
+                    const checkbox = document.getElementById('acceptTerms');
+                    const submitBtn = document.getElementById('submitRequestBtn');
+                    submitBtn.disabled = !checkbox.checked;
+                  }
+                </script>
               {{ end}}
             </div>
           </form>
