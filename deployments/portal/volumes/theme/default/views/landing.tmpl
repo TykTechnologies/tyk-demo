@@ -1,0 +1,173 @@
+<!-- Template used for the Landing page -->
+
+<div class="landing-page-wrapper">
+  <!-- Hero Section -->
+  <header class="hero-section dark-to-light-bg">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="text-container">
+            <h1>{{.page.Title}}</h1>
+            <p>
+            {{if .blocks.HeroDescription.MarkdownEnabled}}
+              {{safe_md .blocks.HeroDescription.MarkdownContent}}
+            {{else}}
+              {{safe .blocks.HeroDescription.Content}}
+            {{end}}
+            </p>
+            <div class="hero-buttons">
+              <a href="{{.blocks.PrimaryButtonLink.Content}}" class="btn btn-primary">{{safe .blocks.PrimaryButtonLabel.Content}}</a>
+              {{if .blocks.SecondaryButtonLabel.Content}}
+                <a href="{{.blocks.SecondaryButtonLink.Content}}" class="btn btn-secondary-outline on-dark ml-3">{{safe .blocks.SecondaryButtonLabel.Content}}</a>
+              {{end}}
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 image-container" style="background: url('{{.blocks.HeroImage.Image.URL}}') no-repeat center center; background-size: contain;">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2>{{safe .blocks.FeaturesTitle.Content}}</h2>
+        <p class="section-description">
+          {{if .blocks.FeaturesDescription.MarkdownEnabled}}
+            {{safe_md .blocks.FeaturesDescription.MarkdownContent}}
+          {{else}}
+            {{safe .blocks.FeaturesDescription.Content}}
+          {{end}}
+        </p>
+      </div>
+      
+      <div class="row features-row">
+        <!-- Feature 1 -->
+        <div class="col-md-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img src="{{.blocks.Feature1Icon.Image.URL}}" alt="Feature 1">
+            </div>
+            <h3>{{safe .blocks.Feature1Title.Content}}</h3>
+            <p>{{safe .blocks.Feature1Description.Content}}</p>
+          </div>
+        </div>
+        
+        <!-- Feature 2 -->
+        <div class="col-md-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img src="{{.blocks.Feature2Icon.Image.URL}}" alt="Feature 2">
+            </div>
+            <h3>{{safe .blocks.Feature2Title.Content}}</h3>
+            <p>{{safe .blocks.Feature2Description.Content}}</p>
+          </div>
+        </div>
+        
+        <!-- Feature 3 -->
+        <div class="col-md-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <img src="{{.blocks.Feature3Icon.Image.URL}}" alt="Feature 3">
+            </div>
+            <h3>{{safe .blocks.Feature3Title.Content}}</h3>
+            <p>{{safe .blocks.Feature3Description.Content}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products Section -->
+  <section class="featured-products-section light-to-dark-bg">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2>{{safe .blocks.FeaturedProductsTitle.Content}}</h2>
+        <p class="section-description">
+          {{if .blocks.FeaturedProductsDescription.MarkdownEnabled}}
+            {{safe_md .blocks.FeaturedProductsDescription.MarkdownContent}}
+          {{else}}
+            {{safe .blocks.FeaturedProductsDescription.Content}}
+          {{end}}
+        </p>
+      </div>
+
+      <div class="text-center mt-5">
+        <a href="{{.blocks.FeaturedProductsLink.Content}}" class="btn btn-secondary-outline on-dark">{{ safe .blocks.FeaturedProductsLinkLabel.Content}}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Getting Started Section -->
+  <section class="getting-started-section">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="getting-started-content">
+            <h2>{{safe .blocks.GettingStartedTitle.Content}}</h2>
+            <p>
+              {{if .blocks.GettingStartedDescription.MarkdownEnabled}}
+                {{safe_md .blocks.GettingStartedDescription.MarkdownContent}}
+              {{else}}
+                {{safe .blocks.GettingStartedDescription.Content}}
+              {{end}}
+            </p>
+            <div class="steps">
+              <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <h4>{{safe .blocks.Step1Title.Content}}</h4>
+                  <p>{{safe .blocks.Step1Description.Content}}</p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <h4>{{safe .blocks.Step2Title.Content}}</h4>
+                  <p>{{safe .blocks.Step2Description.Content}}</p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <h4>{{safe .blocks.Step3Title.Content}}</h4>
+                  <p>{{safe .blocks.Step3Description.Content}}</p>
+                </div>
+              </div>
+            </div>
+            <a href="{{.blocks.GettingStartedButtonLink.Content}}" class="btn btn-primary mt-4">{{safe .blocks.GettingStartedButtonLabel.Content}}</a>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="getting-started-image">
+            <img src="{{.blocks.GettingStartedImage.Image.URL}}" alt="Getting Started" class="img-fluid">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section dark-to-light-bg">
+    <div class="container">
+      <div class="cta-content text-center">
+        <h2>{{safe .blocks.CTATitle.Content}}</h2>
+        <p>
+          {{if .blocks.CTADescription.MarkdownEnabled}}
+            {{safe_md .blocks.CTADescription.MarkdownContent}}
+          {{else}}
+            {{safe .blocks.CTADescription.Content}}
+          {{end}}
+        </p>
+        <div class="cta-buttons">
+          <a href="{{.blocks.CTAButtonLink.Content}}" class="btn btn-primary">{{safe .blocks.CTAButtonLabel.Content}}</a>
+          {{if .blocks.CTASecondaryButtonLabel.Content}}
+            <a href="{{.blocks.CTASecondaryButtonLink.Content}}" class="btn btn-secondary-outline on-dark ml-3">{{safe .blocks.CTASecondaryButtonLabel.Content}}</a>
+          {{end}}
+        </div>
+      </div>
+    </div>
+  </section>
+</div> 

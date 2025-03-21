@@ -1,0 +1,35 @@
+<div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 login-page-wrapper" style="background: url('/assets/images/login.svg') center center no-repeat, linear-gradient(93.59deg, #36364C 19.75%, #505071 81.94%);">
+  <div class="login-form-wrapper p-4">
+    <h2 class="mb-5 text-center">Reset password</h2>
+    <form action="/auth/password/recover?token={{.code}}" method="post" class="mb-5">
+        {{ if .error }}
+        <div class="alert alert-danger" role="alert">
+          <i class="tyk-icon tykon tykon-warning "></i>
+          <div class="alert__content">{{ .error }}</div>
+        </div>
+        {{ end }}
+
+        {{ if .done }}
+        <div class="alert alert-success" role="alert">
+          <i class="tyk-icon tykon tykon-check "></i>
+          <div class="alert__content">Your password has been reset.</div>
+        </div>
+        <p class="text-center mt-4">
+          <a class="btn btn-primary" href="/auth/password/login">Login again</a>
+        </p>
+        {{ else }}
+        <div class="form-group">
+            <label class="form-label">Your new password</label>
+            <input type="password" name="password1" class="form-control content-field" placeholder="Password" value="" required autocomplete="off" />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Re-enter password</label>
+            <input type="password" name="password2" class="form-control content-field" placeholder="Confirm Password" value="" required autocomplete="off" />
+        </div>
+        <div class="form-group text-center">
+            <input type="submit" name="submit" class="btn btn-primary" value="Reset" />
+        </div>
+        {{ end }}
+    </form>
+  </div>
+</div>

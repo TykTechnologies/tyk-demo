@@ -1,0 +1,22 @@
+{
+    "name": "default",
+    "version": "0.0.1",
+    "author": "Tyk Technologies Ltd. <hello@tyk.io>",
+    "templates": [
+        {
+            "name": "Flip Flop",
+            "template": "flip_flop",
+            "layout": "portal_layout"
+        },
+        {
+            "name": "Home",
+            "template": "home",
+            "layout": "portal_layout"
+        },
+        {
+            "name": "Catalogue",
+            "template": "catalogue",
+            "layout": "portal_layout"
+        }
+    ]
+}

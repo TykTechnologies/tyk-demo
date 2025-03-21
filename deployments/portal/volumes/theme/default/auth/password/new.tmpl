@@ -1,0 +1,30 @@
+<div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 login-page-wrapper">
+  <a href="/" class="logo d-flex">
+    <img src="/assets/images/new-logo.svg" alt="Tyk Logo" />
+  </a>
+  <div class="login-form-wrapper">
+    <label class="title-inter login-form-title mt-5">Forgot your password?</label>
+      {{$flashes := .Flashes}}
+      {{if $flashes}}
+        <ul>
+          {{range $flash := $flashes}}
+            <li class="login-form-label login-form-info text-center">{{$flash.Message}}</li>
+          {{end}}
+        </ul>
+      {{end}}
+      {{$url := AuthURL "password/recover"}}
+    <form action={{$url}} method="post" class="mb-5">
+      <div class="form-group">
+        <label class="form-label login-form-label mb-1">Email address</label>
+        <input type="email" name="email" class="form-control login-form-input" value="" required />
+        <input type="hidden" name="origin" value="form">
+      </div>
+      <div class="form-group mt-5 text-center">
+        <input type="submit" name="submit" class="btn portal-primary" value="Reset password" />
+      </div>
+      <div class="form-group text-center">
+        <a href="{{AuthURL "password/login"}}" class="brand-link login-form-label">Return to Log in</a>
+      </div>
+    </form>
+  </div>
+</div> 

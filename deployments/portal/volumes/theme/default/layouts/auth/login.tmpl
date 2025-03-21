@@ -1,0 +1,28 @@
+{{$error := .error}}
+<div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 login-page-wrapper" style="background: url('/assets/images/login.svg') center center no-repeat, linear-gradient(93.59deg, #36364C 19.75%, #505071 81.94%);">
+  <div class="login-form-wrapper p-4">
+    <h2 class="mb-5 text-center">Login to Developer Portal</h2>
+    {{ if $error }}
+    <div class="alert alert-danger" role="alert">
+      <i class="tyk-icon tykon tykon-warning "></i>
+      <div class="alert__content">{{ .error }}</div>
+    </div>
+    {{ end }}
+    <form action="login" method="post" class="mb-5">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="login" class="form-control" placeholder="Your Email *" value="" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" placeholder="Your Password *" value="" required autocomplete="off" />
+      </div>
+      <div class="form-group mt-4 text-center">
+        <input type="submit" name="submit" class="btn btn-primary" value="Login" />
+      </div>
+      <div class="form-group mt-4 text-center">
+        <a href="/auth/password/update" class="forgot-password breadcrumb-link">Forgot Password?</a>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,94 @@
+.cart-wrapper {
+	padding-block: 56px;
+}
+.cart-card {
+	padding: 30px;
+}
+.cart-wrapper__card-section,
+.cart-error,
+.provisioned-credentials-wrapper,
+.empty-cart-wrapper,
+.profile-wrapper__card-section,
+.apps-wrapper__card-section {
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 30px;
+}
+.user-wrapper__card-section{
+	width: 100%;
+	margin-bottom: 30px;
+	padding-left: 50px;
+}
+.card-number {
+	font-size: 20px;
+	background: var(--tdp-light-gray);
+	color: var(--tdp-text-color);
+	margin-left: -49px;
+	margin-right: 7px;
+	border-radius: 25px;
+	text-align: center;
+	padding-block: 3px;
+	padding-inline: 10px;
+}
+
+.cart-wrapper__card-section .product-name {
+	color: var(--tdp-light-purple);
+	font-size: var(--tdp-size-md);
+}
+
+.cart-wrapper__card-section .product-remove-cta {
+	color: var(--tdp-text-color);
+	margin-left: auto;
+	float: right;
+}
+
+.cart-wrapper__card-section ul li {
+	border: none;
+	padding-left: 0;
+}
+
+.heading-toggle {
+  cursor: pointer;
+}
+
+.cart-wrapper .form-check-label {
+  cursor: pointer;
+}
+
+#remove-icon:hover {
+	cursor: pointer;
+}
+
+input[type="radio"] {
+	opacity: 0;
+}
+
+input[type="radio"] + label {
+	position: relative;
+	padding-left: 30px; 
+	cursor: pointer;
+}
+
+  input[type="radio"] + label::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 22px; 
+	height: 22px;
+	border: 2px solid var(--tdp-secondary-dark); 
+	border-radius: 50%;
+	z-index: 1;
+}
+
+input[type="radio"]:checked + label::after {
+	content: "";
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	width: 12px;
+	height: 12px;
+	background-color: var(--tdp-link-color);
+	border-radius: 50%;
+	z-index: 2;
+}

@@ -1,0 +1,104 @@
+<!-- Template used for the 'My Apps' section of an API consumer profile -->
+
+{{ $clients := Clients req }}
+<div class="private-portal-wrapper">
+  <div class="container">
+    <div class="row">
+      <div>
+      <div class="row">
+        <div class="col-md-9 page-title-wrapper">
+          <h2 class="title-bold">My Apps</h2>
+          <p>Here you can view and edit your apps. If you need help getting started, take a look at our documentation.</p>
+        </div>
+        <div class="col-2 align-self-center">
+          <a class="btn btn-primary" href="apps">
+            <i class="tyk-icon tykon tykon-plus "></i>
+            <span>Create new App</span>
+          </a>
+        </div>
+      </div>
+        <form class="mb-4 mt-4">
+          <div class="search-form-wrapper d-flex flex-row">
+            <div class="pr-2 input-group search-container w-100">
+              <input type="text" placeholder="Search" class="form-control search-input" id="search" name="search">
+              <div class="input-group-append">
+                <label class="search__label">
+                  <i class="tyk-icon tykon tykon-search"></i>
+                </label>
+              </div>
+            </div>
+            <div class="pr-2 align-self-center ml-auto">
+              <button type="submit" class="btn btn-secondary-outline w-100">Search</button>
+            </div>
+          </div>
+        </form>
+        <div class="mb-5">
+          {{ if $clients }}
+          <div class="table-wrapper">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Date Created</th>
+                  <th class="actions-cell">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+              {{ range $i, $c := $clients }}
+              {{ $order := .GetFirstAccessRequest }}
+                    <tr>
+                        <td>
+                          <a class="breadcrumb-link" href="apps/{{ $c.ID }}">{{$c.Name}}</a>
+                        </td>
+                        <td> {{ if .Description }} {{ .Description}} {{else}} <i>No description set</i> {{end}}</td>
+                        <td>{{.CreatedAt | date "2 Jan, 2006 15:04" }}</td>
+                        <td>
+                          <div class="dropdown text-center">
+                            <button class="btn p-0" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <img src="/assets/images/icons/dots.svg">
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                              <a class="dropdown-item" href="apps/{{ $c.ID }}">Edit</a>
+                            </div>
+                          </div>
+                        </td>
+                    </tr>
+              {{ end }}
+              </tbody>
+            </table>
+          </div>
+          {{ else }}
+          <div class="alert alert-info" role="alert">
+            <i class="tyk-icon tykon tykon-warning "></i>
+            <div class="alert__content">No apps to be shown.</div>
+          </div>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<form method="post" action="/app">
+  <div class="modal fade" id="deleteAppModal" tabindex="-1" role="dialog" aria-labelledby="deleteAppModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Are you sure you want to delete this app ?</h4>
+        </div>
+        <div class="modal-body">
+          <p>This operation cannot be undone. You will also delete following:
+            <ul>
+              <li>Your access credentials</li>
+              <li>App details</li>
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary-outline" data-dismiss="modal">Cancel</button>
+          <input id="set-id" type="hidden" value="">
+          <input type="submit" class="btn btn-danger" value="Delete App"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,147 @@
+.users-main-title{
+    font-family: 'Smoolthan-Bold';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 24px;
+}
+
+.users-secondary-title{
+    font-family: 'Smoolthan-Bold';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 24px;
+}
+
+.user-invite-wrapper__title-section {
+    width: 80%;
+    margin-bottom: 30px;
+}
+
+.user-list-wrapper__title-section {
+    width: 80%;
+    margin-bottom: 30px;
+}
+
+.user-list-title-wrapper {
+    margin-top: 80px;
+}
+
+.user-invite-title-wrapper {
+    margin-bottom: 30px;
+    margin-top: 60px;
+}
+
+.first-user-title{
+    font-family: Smoolthan-Regular;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 24px;
+    letter-spacing: 0em;
+    text-align: center;
+}
+
+.first-user-paragraph{
+    text-align: center;
+}
+
+.learn-text{
+    osition: absolute;
+    left: 1031px;
+    right: 799px;
+    top: 409px;
+    bottom: 936px;
+
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 18px;
+
+    /* identical to box height, or 112% */
+    text-decoration-line: underline;
+
+    color: #505071;
+}
+
+.learn-icon{
+    color: var(--tdp-primary);
+    font-weight: bold;
+}
+
+.first-invite-card{
+    max-width: 70%;
+    text-align: center;
+    margin-top: 100px;
+    margin-left: 15%;
+    line-height: 50px;
+}
+
+.pending-clock{
+    color: #D6B218;
+}
+
+.check-active{
+    color: var(--tdp-primary);
+}
+
+.dashed-border {
+    border: 2px dashed #C3C3E5;
+    border-radius: 18px;
+    padding: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
+.role-caption {
+ padding: 20px;
+}
+
+.caption-item{
+    margin-right: 15px;
+}
+.mt-98{
+    margin-top: 98px;
+}
+
+/* move this to button.css at some point */
+.org-btn-primary {
+    background-color: var(--tdp-light-gray);
+    color: var(--tdp-secondary-btn-border);
+}
+
+.org-btn-primary:focus,
+.org-btn-primary:hover,
+.org-btn-primary:not(:disabled):not(.disabled).active,
+.org-btn-primary:not(:disabled):not(.disabled):active,
+.show > .btn-primary.dropdown-toggle {
+    background-color: var(--tdp-secondary-dark);
+    color: var(--tdp-light-gray);
+}
+
+.org-btn:hover.org-btn-primary-link:hover {
+    color: var(--tdp-light-gray);
+    text-decoration: underline;
+}
+
+/* move this to card.css at some point */
+.org-card{
+    padding-top: 0;
+    border-radius: var(--tdp-card-border-radius);
+}
+
+.org-card .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.org-card-body {
+    padding-top: 20px;
+}
+
+.org-card-footer {
+    margin-top: 30px;
+    padding: 30px 0 20px 0;
+}

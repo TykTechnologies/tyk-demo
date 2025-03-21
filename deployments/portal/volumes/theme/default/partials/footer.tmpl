@@ -1,0 +1,44 @@
+<!-- Main footer menu used across the app -->
+
+<footer>
+    <div class="d-flex justify-content-center py-5">
+        <div class="col-12 pl-5">
+            <div class="row">
+                <div class="col-xl-6">
+                    <img src="/assets/images/dev-portal-logo.svg">
+                    <h4 class="mt-3">Powered by © Tyk Technologies</h4>
+                </div>
+                {{ if GetMenus.Footer }}
+                    {{ range GetMenus.Footer.Children }}
+                        {{ $length := len GetMenus.Footer.Children }}
+                        <div class="{{ if eq $length 0 }}col-xl-6
+                            {{ else if eq $length 1 }}col-xl-6
+                            {{ else if eq $length 2 }}col-xl-3
+                            {{ else if eq $length 3 }}col-xl-2
+                            {{ else }}col-xl-1
+                            {{ end }}">
+                            <h6 class="mb-3 mb-lg-4 footer-menu">
+                                <a class="bold-text footer-menu__link" href="{{.Path}}">{{.Tag}}</a>
+                            </h6>
+                            <ul class="list-unstyled">
+                                {{ range .Children }}
+                                    <li>
+                                        <a href="{{.Path}}">{{.Tag}}</a>
+                                    </li>
+                                {{ end }}
+                            </ul>
+                        </div>
+                    {{ end }}
+                {{ end }}
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Load 3rd party Javascript assets -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+<!-- Load Tyk Javascript assets -->
+<script type="module" src="/assets/javascripts/main.js{{.previewId}}"></script>

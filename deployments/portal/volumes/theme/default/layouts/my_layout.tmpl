@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+ <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+   <title>{{ if .page}} {{.page.Title}} {{else}} Developer Portal {{end}}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/system/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/stylesheets/fonts.css" rel="stylesheet">
+    <link href="/assets/stylesheets/main.css" rel="stylesheet">
+
+ </head>
+
+ <body>
+    {{ render "top_nav" . }}
+    <div class="page-wrapper">
+      <!-- Page Content -->
+      {{ yield }}
+   </div>
+
+
+   {{ render "footer" . }}
+
+ </body>
+
+</html>

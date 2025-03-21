@@ -1,0 +1,153 @@
+@import './components/select.css';
+@import './components/buttons.css';
+@import './components/card.css';
+@import './components/input.css';
+@import './components/table.css';
+@import './components/alert.css';
+@import './components/modal.css';
+@import './components/tooltip.css';
+
+@import './pages/catalogue.css';
+@import './pages/login.css';
+@import './pages/landing.css';
+@import './pages/home.css';
+@import './pages/api-product.css';
+@import './pages/cart.css';
+@import './pages/flip-flop.css';
+@import './pages/blog.css';
+@import './pages/app.css';
+@import './pages/users.css';
+@import './pages/analytics.css';
+
+@import './common/form.css';
+@import './common/navigation.css';
+@import './common/typography.css';
+@import './common/tyk-icons.css';
+@import './common/texts.css';
+@import './common/layout.css';
+
+/*
+  Global Variables
+*/
+
+:root {
+  --tdp-primary: #00D9BA;
+  --tdp-primary-dark: #A2A2CC;
+  --tdp-primary-light: #C3C3E5;
+  --tdp-primary-success-light: #CEFFF6;
+  --tdp-secondary: #7A79A1;
+  --tdp-secondary-dark: #505071;
+  --tdp-light-blue: #82BBC6;
+  --tdp-light-gray: #EDEDF9;
+  --tdp-light-purple: #0C95CF;
+  --tdp-primary-danger-light: #F5CCD1;
+  --tdp-danger-light : #FF6C7D;
+  --tdp-danger-dark : #E44766;
+  --tdp-primary-warning-light: #FFE885;
+  --tdp-warning-light : #D6B218;
+  --tdp-warning-dark : #C58C11;
+  --tdp-light-border: 1px solid #C3C3E5;
+  --tdp-extra-dark: #36364C;
+  --tdp-dark: #43435B;
+  --tdp-text-on-red-background: #EA4766;
+  --tdp-size-xs: 12px;
+  --tdp-size-sm: 14px;
+  --tdp-size-md: 16px;
+  --tdp-size-lg: 18px;
+  --tdp-size-xl: 24px;
+  /*
+    Extra variables to ease customisation
+  */
+  /* Background colors */
+  --tdp-nav-bg-color: #36364C;
+  --tdp-body-bg-color: white;
+  --tdp-tab-active: #EBEDF4;
+  --tdp-light-green: #D7F8F3;
+  --tdp-light-red: #FFD1CE;
+  --tdp-login-form: #F0F0F3D9;
+  /* Text colors */
+  --tdp-text-color: #505071;
+  --tdp-link-color: #00D9BA;
+  --tdp-nav-link-color: white;
+  --tdb-text-color-dark: #31394D;
+  --tdp-text-color-extra-dark: #03031C;
+  --tdb-text-color-gray: #808080;
+  --tbd-text-colot-gray-mid: #4D4D4D;
+  --tdb-text-color-gray-lighter: #868686;
+  /* Borders */
+  --tdp-card-border-radius: 10px;
+  --tdp-border-color-on-error: #FF6C7D;
+  --tdp-table-border-color: #C3C3E5;
+  --tdp-border-radius: 20px;
+  --tdp-login-form-border-radius: 8px;
+  --tdp-primary-border: 1px solid #03031C;
+  --tdp-form-element-border: 2px solid #C3C3E5;
+  --tpd-gray-200-border: 1px solid #DDDDDD;
+  --tdp-border-graph: 2px solid #EFEEEB;
+  --tdp-analytics-select-border: 2px solid #505071;
+  --tdp-border-green: #2CA597;
+  /* Buttons */
+  --tdp-primary-btn-color: #00D9BA;
+  --tdp-primary-btn-border: 2px solid #00D9BA;
+  --tdp-secondary-btn-color: #7A79A1;
+  --tdp-secondary-btn-border: 2px solid #7A79A1;
+  --tdp-danger-btn-color: #FF6C7D;
+  --tdp-danger-btn-border: 2px solid #FF6C7D;
+  --tdp-danger-outline-btn-border: 2px solid #E44766;
+  --tdp-warning-btn-color: #D6B218;
+  --tdp-warning-btn-border: 2px solid #C58C11;
+  --tdp-warning-outline-btn-border: 2px solid #D6B218;
+  --action-brand-default: #335FFD;
+  --border-brand-default: #2A4DD0;
+  --border-brand-hover: #223EAC;
+  --link-default: #00A6ED;
+  /* Alert boxes */
+  --tdp-alert-success-bg-color: #CEFFF6;
+  --tdp-alert-success-border-color: #3ECCBB;
+  --tdp-alert-success-text-color: #27887D;
+  --tdp-alert-info-bg-color: #EDEDF9;
+  --tdp-alert-info-border-color: #7A79A1;
+  --tdp-alert-info-text-color: #505071;
+  --tdp-alert-warning-bg-color: #FFF5CC;
+  --tdp-alert-warning-border-color: #D6B218;
+  --tdp-alert-warning-text-color: #996900;
+  --tdp-alert-danger-bg-color: #FFE7EA;
+  --tdp-alert-danger-border-color: #FF7787;
+  --tdp-alert-danger-text-color: #AD465A;
+  /* Icons */
+  --tdp-icon-success-dark: #00B798;
+  --default-border-radius: 18px;
+}
+
+html {
+  scroll-padding-top: 70px;
+}
+
+body {
+  padding-top: 55px;
+  height: 100vh;
+  color: var(--tdp-text-color);
+  background-color: var(--tdp-body-bg-color);
+}
+
+.page-wrapper {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Gradient backgrounds */
+.dark-to-light-bg {
+  background: linear-gradient(93.59deg, #36364C 19.75%, #505071 81.94%);
+  color: white;
+}
+
+.light-to-dark-bg {
+  background: linear-gradient(93.59deg, #505071 19.75%, #36364C 81.94%);
+  color: white;
+}
+
+.container {
+  max-width: 1230px;
+}

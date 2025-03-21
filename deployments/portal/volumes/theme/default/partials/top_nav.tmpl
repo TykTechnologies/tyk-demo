@@ -1,0 +1,89 @@
+<!-- Main top navigation menu used across the app -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="/">DEVELOPER PORTAL</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav align-items-center justify-content-between">
+        <div class="d-flex navbar-menu-items">
+          {{ if GetMenus.Primary }}
+            {{ range GetMenus.Primary.Children }}
+              <li class="nav-item {{ if .Children }}dropdown{{end}} mr-2">
+                <a class="nav-link {{ if .Children }}dropdown-toggle{{end}}" href="{{.Path}}">{{.Tag}}</a>
+                {{ if .Children }}
+                  <ul class="dropdown-menu submenu" aria-labelledby="navbarDropdownMenuLink">
+                    {{ range .Children }}
+                      <li class="nav-item">
+                        <a class="dropdown-item" href="{{.Path}}">{{.Tag}}</a>
+                      </li>
+                    {{ end }}
+                  </ul>
+                {{ end }}
+              </li>
+            {{ end }}
+          {{ end }}
+        </div>
+
+        <div class="d-flex navbar-cta align-items-center">
+          {{if CanCreateOrganisation req }}
+            <div>
+                <a id="create-org-btn" class="btn org-btn-primary" href="/portal/private/organisation">Create an Organisation</a>
+            </div>
+          {{end}}
+          {{ $user := CurrentUser req }}
+          {{ if $user }}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="{{.Path}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="tyk-icon tykon tykon-profile "></i>
+                {{ $user.DisplayName }}
+              </a>
+              <ul class="dropdown-menu submenu" aria-labelledby="navbarDropdownMenuLink">
+                {{ if ne $user.Role "provider-admin"}}
+                  <li class="nav-item">
+                    <a class="dropdown-item" href="/portal/private/dashboard">My Dashboard</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="dropdown-item" href="/portal/private/profile">Profile</a>
+                  </li>
+                {{ end }}
+                <li class="nav-item">
+                  <a class="dropdown-item" href="/auth/logout">Log out</a>
+                </li>
+              </ul>
+            </li>
+            {{if and (not $user.ResetPassword) (eq $user.Role "provider-admin")}}
+              <li class="nav-item">
+                <a class="nav-link admin-dash" href="/admin">Go to Admin App ></a>
+              </li>
+            {{end}}
+            {{ $cart := GetCart $user.ID }}
+            {{ if ne $user.Role "provider-admin" }}
+              <li class="nav-item cart">
+                <a class="nav-link cart__link" href="/portal/private/cart/provision">
+                  {{if $cart}}
+                    <img src="/assets/images/icons/cart.svg">
+                  {{else}}
+                    <img src="/assets/images/icons/full-cart.svg">
+                  {{end}}
+                  <span class="badge cart__item-count">{{if $cart}} {{ len $cart }} {{end}}</span>
+                </a>
+              </li>
+            {{ end }}
+          {{ else }}
+            <li class="nav-item">
+              <a class="btn btn-primary btn-login" href="/auth/password/login">Log in</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-secondary" href="/auth/password/register">Register</a>
+            </li>
+          </div>
+        {{ end }}
+      </ul>
+    </div>
+  </div>
+    {{if .previewId}}
+        <a href="?deactivate-preview=true" class="btn btn-primary" id="deactivate-preview-btn">QUIT PREVIEW </a>
+    {{end}}
+</nav>

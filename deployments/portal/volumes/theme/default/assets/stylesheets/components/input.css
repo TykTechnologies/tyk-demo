@@ -1,0 +1,58 @@
+.form-control,
+.input-group > .form-control:not(:last-child) {
+	background-color: white;
+	box-shadow: none;
+	border-radius: var(--tdp-border-radius);
+	border: var(--tdp-form-element-border);
+	font-size: var(--tdp-size-sm);
+  color: var(--tdp-text-color);
+}
+
+.form-control::placeholder {
+	color: var(--tdp-primary-light);
+}
+
+.form-control.search-input:focus,
+.form-control:focus {
+	border: var(--tdp-primary-border);
+	color: var(--tdp-text-color);
+	box-shadow: none;
+}
+
+.has-error {
+  border-color: var(--tdp-border-color-on-error);
+}
+
+.help-text {
+  color: var(--tdp-text-color) !important;
+  padding-left: 15px;
+  font-size: 12px;
+  line-height: 16px;
+  margin: 5px 0 0 0;
+}
+
+input.input-as-span {
+  border: none;
+  background: transparent;
+  padding-right: 10px;
+}
+
+input.input-as-span[type="text"] {
+  text-overflow: ellipsis;
+}
+
+input.input-as-span + .password-icon {
+  top: -5px;
+  right: 40px;
+}
+
+.search__label {
+  background-color: var(--tdp-light-gray);
+  padding: 6px;
+  border-radius: 20px;
+}
+
+.form-control:disabled,
+.form-control[readonly] {
+  background-color: var(--tdp-light-gray);
+}

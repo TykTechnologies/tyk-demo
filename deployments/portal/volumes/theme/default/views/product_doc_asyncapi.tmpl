@@ -1,0 +1,42 @@
+<div class="docs-container">
+  <div class="card mt-4">
+    <div class="card-body" style="padding: 20px;">
+      <h3 class="card-title">
+        <a href="/portal/catalogue-products/{{.Path}}">{{.Name}}</a>
+      </h3>
+      <p class="card-text">
+        {{.Description}}
+      </p>
+    </div>
+  </div>
+  <div>
+    <div id="asyncapi"></div>
+
+    <script>
+      AsyncApiStandalone.render({
+        schema: {
+          url: '{{.Url}}',
+          options: { method: "GET", mode: "cors" },
+        },
+        config: {
+          "show": {
+            "sidebar": true,
+            "info": true,
+            "operations": true,
+            "servers": true,
+            "messages": true,
+            "schemas": true,
+            "errors": true
+          },
+          "expand": {
+            "messageExamples": false
+          },
+          "sidebar": {
+            "showServers": "byDefault",
+            "showOperations": "byDefault"
+          }
+        },
+      }, document.getElementById('asyncapi'));
+    </script>
+  </div>
+</div>
