@@ -395,15 +395,17 @@
     "expire_analytics_after": 0,
     "response_processors": [],
     "CORS": {
-      "enable": false,
-      "allowed_origins": [],
-      "allowed_methods": [],
-      "allowed_headers": [],
-      "exposed_headers": [],
-      "allow_credentials": false,
+      "enable": true,
       "max_age": 24,
-      "options_passthrough": false,
-      "debug": false
+      "allow_credentials": true,
+      "exposed_headers": [],
+      "allowed_headers": [],
+      "options_passthrough": true,
+      "debug": false,
+      "allowed_origins": [
+        "http://localhost:3100"
+      ],
+      "allowed_methods": []
     },
     "domain": "",
     "certificates": [],
