@@ -26,10 +26,15 @@
     {{ end }}
     {{ if .provisioned }}
       <div class="provisioned-credentials-wrapper text-center">
-        <h2 class="my-4">Your request has been sent.</h2>
-        <p>You can view the App status in 'My Apps'.</p>
-        <p>
-          <a class="btn btn-primary" href="/portal/private/dashboard">go to My Apps</a>
+        <h2 class="my-4">Your request has been submitted.</h2>
+        <p>To complete the process, please proceed to payment.</p>
+        
+        <!-- Loading indicator -->
+        <div class="spinner" id="stripeLoadingSpinner"></div>
+        <div class="loading-text" id="stripeLoadingText">Preparing payment gateway...</div>
+        
+        <p class="mt-4">
+          <button id="proceedToStripeBtn" class="btn btn-primary">Proceed to Payment</button>
         </p>
       </div>
     {{ else }}
@@ -57,7 +62,7 @@
         {{$authType = $request.AuthType}}
         {{ if $request.Products }}
           {{ $templatesLength := len $request.AppTemplates }}
-          <form method="POST" enctype="multipart/form-data" id="{{ if gt $catalogueCount 1 }}request-{{$index}}{{end}}" class="{{ if gt $catalogueCount 1 }}collapse multi-collapse{{end}}">
+          <form id="cart-form" method="POST" enctype="multipart/form-data" onsubmit="handlePaymentRedirect(event)">
             <input type="hidden" name="catalogue-id" value="{{ .Catalogue.ID }}" />
             <div class="cart-wrapper__card-section">
               <div class="card cart-card">
@@ -338,6 +343,7 @@
               </div>
             {{ end }}
 
+
             <div class="text-center mt-4 mb-5">
               {{ if $request.Products }}
                 <div class="form-check mb-3">
@@ -346,15 +352,12 @@
                     I accept the <a href="/portal/terms-and-conditions" target="_blank">Terms and Conditions</a>
                   </label>
                 </div>
-                <button type="submit" id="submitRequestBtn" class="btn btn-primary" disabled>Submit request</button>
                 
-                <script>
-                  function toggleSubmitButton() {
-                    const checkbox = document.getElementById('acceptTerms');
-                    const submitBtn = document.getElementById('submitRequestBtn');
-                    submitBtn.disabled = !checkbox.checked;
-                  }
-                </script>
+                <!-- Loading indicator -->
+                <div class="spinner" id="loadingSpinner"></div>
+                <div class="loading-text" id="loadingText">Processing payment request...</div>
+                
+                <button type="submit" id="submitRequestBtn" class="btn btn-primary" disabled>Submit request</button>
               {{ end}}
             </div>
           </form>
@@ -362,3 +365,131 @@
     {{ end }}
   {{ end }}
 </div>
+
+<style>
+  .spinner {
+    display: none;
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .loading-text {
+    display: none;
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+</style>
+
+<script>
+  function toggleSubmitButton() {
+    var checkbox = document.getElementById('acceptTerms');
+    var submitBtn = document.getElementById('submitRequestBtn');
+    submitBtn.disabled = !checkbox.checked;
+  }
+
+  function showLoading() {
+    var submitBtn = document.getElementById('submitRequestBtn');
+    var spinner = document.getElementById('loadingSpinner');
+    var loadingText = document.getElementById('loadingText');
+    
+    // Disable button and show loading indicators
+    submitBtn.disabled = true;
+    spinner.style.display = 'block';
+    loadingText.style.display = 'block';
+    submitBtn.innerHTML = 'Processing...';
+  }
+  
+  function hideLoading() {
+    var submitBtn = document.getElementById('submitRequestBtn');
+    var spinner = document.getElementById('loadingSpinner');
+    var loadingText = document.getElementById('loadingText');
+    var checkbox = document.getElementById('acceptTerms');
+    
+    // Hide loading indicators
+    spinner.style.display = 'none';
+    loadingText.style.display = 'none';
+    
+    // Restore button state
+    submitBtn.innerHTML = 'Submit request';
+    submitBtn.disabled = !checkbox.checked;
+  }
+
+  function handlePaymentRedirect(event) {
+    event.preventDefault();
+    
+    // Show loading indicators
+    showLoading();
+    
+    document.getElementById('cart-form').submit();
+  }
+  
+  // New function to handle the Stripe redirect from provisioned page
+  document.addEventListener('DOMContentLoaded', function() {
+    var stripeBtn = document.getElementById('proceedToStripeBtn');
+    if (stripeBtn) {
+      stripeBtn.addEventListener('click', function() {
+        // Show loading indicators
+        var spinner = document.getElementById('stripeLoadingSpinner');
+        var loadingText = document.getElementById('stripeLoadingText');
+        spinner.style.display = 'block';
+        loadingText.style.display = 'block';
+        stripeBtn.disabled = true;
+        stripeBtn.innerHTML = 'Processing...';
+        
+        // Call Stripe endpoint
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://visible-baobab-gw.aws-use1.cloud-ara.tyk.io/virtual-endpoints/stripe-checkout', true);
+        
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              var data = JSON.parse(xhr.responseText);
+              console.log("Received checkout URL:", data.url);
+              
+              // Redirect to Stripe Checkout
+              window.location.href = data.url;
+            } else {
+              // Hide loading on error
+              spinner.style.display = 'none';
+              loadingText.style.display = 'none';
+              stripeBtn.disabled = false;
+              stripeBtn.innerHTML = 'Proceed to Payment';
+              console.error('Error creating checkout session:', xhr.status);
+              alert('Could not create payment session. Please try again.');
+            }
+          }
+        };
+        
+        xhr.timeout = 10000; // 10 seconds
+        xhr.ontimeout = function() {
+          spinner.style.display = 'none';
+          loadingText.style.display = 'none';
+          stripeBtn.disabled = false;
+          stripeBtn.innerHTML = 'Proceed to Payment';
+          alert('Request timed out. Please try again.');
+        };
+        
+        xhr.onerror = function() {
+          spinner.style.display = 'none';
+          loadingText.style.display = 'none';
+          stripeBtn.disabled = false;
+          stripeBtn.innerHTML = 'Proceed to Payment';
+          alert('Network error occurred. Please check your connection and try again.');
+        };
+        
+        xhr.send();
+      });
+    }
+  });
+</script>

@@ -17,6 +17,16 @@
             "name": "Catalogue",
             "template": "catalogue",
             "layout": "portal_layout"
+        },
+        {
+            "name": "GraphQL Playground",
+            "template": "graphql-playground",
+            "layout": "portal_layout"
+        },
+        {
+            "name": "GraphQL Get Started",
+            "template": "graphql-getstarted",
+            "layout": "portal_layout"
         }
     ]
 }

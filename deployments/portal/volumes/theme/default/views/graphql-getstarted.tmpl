@@ -1,0 +1,80 @@
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-9 page-title-wrapper">
+      <h1>GraphQL API</h1>
+    </div>
+    <div class="col-md-3 d-flex align-items-center justify-content-end">
+      <a href="/portal/catalogue-products" class="btn btn-primary">REST APIs</a>
+    </div>
+  </div>
+
+  <div class="row mt-2 mb-4">
+    <div class="col-12 mb-4">
+        <div class="mb-4">
+            <a href="/graphql-playground" class="btn btn-primary">Try GraphQL Explorer</a>
+            <a href="/portal/private/dashboard" class="btn btn-primary ml-2">My Apps</a>
+            <a href="/portal/graphql/docs" class="btn btn-secondary ml-2">View Documentation</a>
+        </div>
+
+          <h2>Overview</h2>
+          <p>
+            GraphQL queries can improve performance and reduce development time by letting you request exactly the data you need. 
+            GraphQL can be especially beneficial for resource-constrained mobile applications and in modern frontend development.
+          </p>
+          
+          <h2 class="mt-4">Key Features</h2>
+          <ul>
+            <li>A standards compliant endpoint serving multiple graphs</li>
+            <li>One GraphQL query can retrieve data that requires multiple API calls</li>
+            <li>Support for OAuth access management</li>
+            <li>A statically typed schema that enables developer tooling</li>
+          </ul>
+
+          <h2 class="mt-4">How to Access GraphQL</h2>
+          <p>
+            You can send GraphQL queries to our endpoint:
+          </p>
+          <pre><code>https://api.example.com/graphql</code></pre>
+
+          <h2 class="mt-4">Example Query</h2>
+          <p>
+            Unlike REST API requests, a GraphQL query specifies the exact data to return:
+          </p>
+          <pre><code>{
+  customers(
+    filter: {
+      merchantId: { equalToAnyOf: ["MERCHANT_ID"] }
+    }
+  ) {
+    nodes {
+      givenName
+      familyName
+      emailAddress
+    }
+  }
+}</code></pre>
+
+          <h2 class="mt-4">Getting Started</h2>
+          <ul>
+            <li>Explore our GraphQL schema in the GraphQL Explorer</li>
+            <li>Read about concepts, patterns, and other GraphQL basics</li>
+            <li>Check out query examples for common scenarios</li>
+            <li>Try our sample applications</li>
+          </ul>
+
+          <h2 class="mt-4">Authorization</h2>
+          <p>
+            GraphQL queries require a bearer token in the <code>Authorization</code> header, just like REST API requests.
+            The access token you provide determines the data that you have permissions to view.
+          </p>
+
+          <div class="mt-4">
+            <a href="/graphql-playground" class="btn btn-primary">GraphQL Explorer</a>
+            <a href="/portal/private/dashboard" class="btn btn-primary ml-2">My Apps</a>
+            <a href="/portal/graphql/docs" class="btn btn-secondary ml-2">View Documentation</a>
+          </div>
+        </div>  
+
+  </div>
+</div>
