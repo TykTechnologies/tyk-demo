@@ -1,0 +1,8 @@
+{{ $u := user }}
+Hi, <strong>{{ $u.DisplayName }}</strong><br/>
+
+<p>Someone is inviting you to join {{ if $u.IsAdmin }}as an Administrator{{ else }}the {{ team }} team{{end }}. You can do this through the link below.</p>
+
+<p>{{ invite_url }}</p>
+
+<p>If you didn't request this, please ignore this email.</p>

@@ -1,0 +1,67 @@
+<div class="blog-detail-page-wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <p> {{ .post.CreatedAt | date "2 Jan, 2006" }} - <!-- /* Commented until it gets implemented */ {{ .Author }} --> </p>
+        <h1>{{.post.Title}}</h1>
+        <p class="lead">
+          {{.post.Lede}}
+        </p>
+        <!-- Preview Image -->
+        {{ if .post.HeaderImage.URL }}
+          <img class="card-image-border-card-view mt-4 w-100" src='{{ .post.HeaderImage.URL }}'/>
+        {{ else }}
+          <hr>
+        {{ end }}
+        <!-- Post Content -->
+        {{if .post.MarkdownEnabled}}
+          <div id="set-markdown-content-blog" class="blog-content mt-4">
+            {{ safe_md .post.MarkdownContent }}
+          </div>
+        {{else}}
+          <div class="blog-content mt-4">
+            {{ safe .post.Content }}
+          </div>
+        {{end}}
+        <hr>
+      </div>
+    </div>
+
+    <div class="mt-4 mb-4">
+      <h2>Recent Posts</h2>
+        <div class="row mt-4">
+          {{ range $i, $val := .latest_posts }}
+            {{if lt $i 3}}
+              <div class="col-lg-4 card-container">
+                <div class="card blog h-100 {{ if eq $val.HeaderImage.URL "" }}dark-background{{ end }}">
+                  {{/* Commented until it gets implemented {{if $val.Video.URL }}
+                    <span class="video-tag"><img src="/assets/images/icons/video.svg"></span>
+                  {{ end }} */}}
+                  {{ if $val.HeaderImage.URL }}
+                    <img class="card-image-border-card-view" src='{{$val.HeaderImage.URL "preview"}}'/>
+                  {{ end }}
+                  <div class="card-body text-center d-flex flex-column align-content-center justify-content-center p-4">
+                    <h2 class="card-title d-flex flex-column justify-content-end mt-3">{{ $val.Title }}</h2>
+                    <p class="text-uppercase">
+                      {{ $val.Lede }}</p>
+                  </div>
+                  <p class="card-text blog__category align-self-center">
+                    <span>
+                      {{ range $idx, $category := $val.Categories }}
+                        {{ $category.Name }}{{ if and (gt (len $val.Categories) 1) (lt $idx (add (len $val.Categories) -1)) }},{{end}}
+                      {{ end }}
+                    </span>
+                  </p>
+                  <div class="card-cta align-self-center">
+                    <a href="{{$val.URL}}" class="btn {{ if eq $val.HeaderImage.URL "" }}on-dark{{ end }} btn-secondary-outline">keep reading</a>
+                  </div>
+                </div>
+              </div>
+            {{ end }}
+          {{ end }}
+        </div>
+    </div>
+  </div>
+</div>
+
+

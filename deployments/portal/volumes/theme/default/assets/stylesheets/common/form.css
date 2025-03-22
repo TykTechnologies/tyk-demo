@@ -1,0 +1,34 @@
+.form-label {
+	font-family: Inter-Bold, sans-serif;
+}
+
+.form-group {
+  color: var(--tdp-text-color);
+  position: relative;
+}
+
+.cta-btns-wrapper i {
+  pointer-events: none;
+}
+
+[aria-expanded="true"].heading-toggle .tyk-icon:before {
+  content: "\64";
+}
+
+[aria-expanded="false"].heading-toggle .tyk-icon:before {
+  content: "\61";
+}
+
+.profile-wrapper-user{
+  width: 80%;
+  margin-left: 10%;
+  margin-top: 100px;
+}
+.profile-wrapper {
+  width: 60%;
+  margin-left: 25%;
+}
+.error-wrapper{
+  width: 80%;
+  margin-left: 20%;
+}

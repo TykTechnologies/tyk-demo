@@ -1,0 +1,35 @@
+{{$error := .error}}
+<div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 login-page-wrapper">
+  <a href="/" class="logo d-flex mb-4">
+    <img src="/assets/images/new-logo.svg" alt="Tyk Logo" />
+  </a>
+  <div class="login-form-wrapper shadow-sm rounded p-4 p-md-5">
+    <h2 class="title-inter login-form-title text-center mb-4">Log in to your Developer Portal account</h2>
+    {{ if $error }}
+    <div class="alert alert-danger d-flex align-items-center" role="alert">
+      <i class="tyk-icon tykon tykon-warning me-2"></i>
+      <div class="alert__content">{{ .error }}</div>
+    </div>
+    {{ end }}
+    <form action="login" method="post" class="mb-4">
+      <div class="form-group mb-3">
+        <label class="form-label login-form-label mb-2">Email address</label>
+        <input type="email" name="login" class="form-control login-form-input" value="" required placeholder="your@email.com" />
+      </div>
+      <div class="form-group mb-3">
+        <label class="form-label login-form-label mb-2">Password</label>
+        <input type="password" name="password" class="form-control login-form-input" value="" required autocomplete="off" placeholder="••••••••" />
+      </div>
+      <div class="form-group mb-4 text-end">
+        <a href="/auth/password/new" class="brand-link login-form-label text-decoration-none">Forgot Password?</a>
+      </div>
+      <div class="form-group mb-3">
+        <button type="submit" name="submit" class="btn portal-primary w-100 py-2">Log in</button>
+      </div>
+      <div class="form-group text-center">
+        <span class="login-form-label login-form-info">Don't have an account?</span>
+        <a href="/auth/password/register" class="brand-link login-form-label ms-1 text-decoration-none fw-bold">Sign up</a>
+      </div>
+    </form>
+  </div>
+</div>

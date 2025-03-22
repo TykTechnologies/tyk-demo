@@ -1,0 +1,31 @@
+.tooltip {
+  background-color: transparent;
+  opacity: 1 !important;
+}
+
+.tooltip .tooltip-inner {
+  background-color: var(--tdp-secondary-dark);
+  border-radius: var(--default-border-radius);
+  color: white;
+  align-items: center;
+  font-family: "OpenSans-Regular";
+  font-size: 14px;
+  line-height: 19px;
+  padding: 16px;
+}
+
+.bs-tooltip-top .arrow::before, .bs-tooltip-auto[x-placement^="top"] .arrow::before {
+  border-top-color: var(--tdp-secondary-dark);
+}
+
+.bs-tooltip-right .arrow::before, .bs-tooltip-auto[x-placement^="right"] .arrow::before {
+  border-right-color: var(--tdp-secondary-dark);
+}
+
+.bs-tooltip-bottom .arrow::before, .bs-tooltip-auto[x-placement^="bottom"] .arrow::before {
+  border-bottom-color: var(--tdp-secondary-dark);
+}
+
+.bs-tooltip-left .arrow::before, .bs-tooltip-auto[x-placement^="left"] .arrow::before {
+  border-left-color: var(--tdp-secondary-dark);
+}

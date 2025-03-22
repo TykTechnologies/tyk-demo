@@ -1,0 +1,77 @@
+
+<div class="private-portal-wrapper">
+  <div class="container">
+    <p class="mb-3">
+      <a href="/portal/private/users" class="breadcrumb-link">
+        Back to user list
+      </a>
+    </p>
+
+    {{ if .errors }}
+      {{ range $key, $errs := .errors }}
+        <div class="alert alert-warning cart-error" role="alert">
+          <i class="tyk-icon tykon tykon-warning "></i>
+          <div class="alert__content">
+            <strong>{{$key}}</strong>
+            <ul>
+              {{ range $errs }}
+                <li>{{.}}</li>
+              {{ end }}
+            </ul>
+          </div>
+        </div>
+      {{ end }}
+    {{ end }}
+
+    <form action="edit" method="post" id="user-edit">
+      {{ if .error }}
+        <div class="alert alert-danger" role="alert">
+          <i class="tyk-icon tykon tykon-warning "></i>
+          <div class="alert__content">{{ .error }}</div>
+        </div>
+      {{ end }}
+      <div class="user-invite-title-wrapper">
+        <div class="col-md-10">
+          <h2 class="users-main-title">Developer details</h2>
+        </div>
+
+        <div class="card">
+          <div class="form-group text-right row mt-4">
+            <div class="col-lg-12">
+              <a id="user_invite_cancel" class="btn btn-secondary-outline" href="/portal/private/users">Cancel</a>
+              <input type="submit" name="submit" class="btn btn-primary" value="save changes" />
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-6">
+              <label class="form-label">Name:</label>
+              <input type="text" class="form-control" name="first"  value="{{.user.First}}" placeholder="Name" required autofocus />
+            </div>
+            <div class="col-6">
+              <label class="form-label">Last name:</label>
+              <input type="text" class="form-control" name="last" value="{{.user.Last}}" placeholder="Last name" required autofocus/>
+            </div>
+          </div>
+          <div class="row mb-4">
+            <div class="col-6">
+              <label class="form-label">Email:</label>
+              <input class="form-control" name="email" value="{{.user.Email}}" placeholder="Email" required disabled/>
+            </div>
+            <div class="col-6 selection">
+              {{ if .roles }}
+                <label class="form-label">Role:</label>
+                <select class="form-control" id="selectRolesId" name="role" required>
+                  {{ range $role := .roles }}
+                      <option value="{{ $role.ID }}">{{ $role.DisplayName }}</option>
+                  {{ end }}
+                </select>
+              {{ end }}
+            </div>
+          </div>
+          {{ render "role_detail" . }}
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

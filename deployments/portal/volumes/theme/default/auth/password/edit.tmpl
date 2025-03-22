@@ -1,0 +1,30 @@
+<div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 login-page-wrapper">
+  <a href="/" class="logo d-flex">
+    <img src="/assets/images/new-logo.svg" alt="Tyk Logo" />
+  </a>
+  <div class="login-form-wrapper">
+    <label class="title-inter login-form-title mt-5">Password reset</label>
+      {{$flashes := .Flashes}}
+      {{if $flashes}}
+        <ul>
+          {{range $flash := $flashes}}
+            <li class="login-form-label login-form-info text-center">{{$flash.Message}}</li>
+          {{end}}
+        </ul>
+      {{end}}
+    <form action="{{AuthURL "password/update"}}" method="post" class="mb-5">
+        <input type="hidden" name="reset_password_token" value="{{.reset_password_token}}">
+        <div class="form-group">
+            <label class="form-label login-form-label mb-1">Your new password</label>
+            <input type="password" name="new_password" class="form-control login-form-input" value="" required autocomplete="off"/>
+        </div>
+        <div class="form-group">
+            <label class="form-label login-form-label mb-1">Re-enter password</label>
+            <input type="password" name="confirm_password" class="form-control login-form-input" value="" required autocomplete="off"/>
+        </div>
+        <div class="form-group text-center mt-5">
+            <input type="submit" name="submit" class="btn portal-primary" value="Reset password" />
+        </div>
+    </form>
+  </div>
+</div>

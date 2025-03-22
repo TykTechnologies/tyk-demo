@@ -25,19 +25,8 @@ set_docker_environment_value "ADMIN_ORG_ID" $dashboard_user_org_id
 set_docker_environment_value "TYK_DASHBOARD_API_ACCESS_CREDENTIALS" $dashboard_user_api_credentials
 
 # Postgres Env configuration for tyk portal
-set_docker_environment_value "PORTAL_HOST_PORT" 3001
-set_docker_environment_value "PORTAL_DATABASE_DIALECT" postgres
-set_docker_environment_value "POSTGRES_PASSWORD" secr3t
 set_docker_environment_value "PORTAL_DATABASE_CONNECTIONSTRING" "host=tyk-portal-postgres port=5432 dbname=portal user=admin password=$(grep "POSTGRES_PASSWORD=" .env | sed -E 's/^[A-Z_]+=(.+)$/\1/') sslmode=disable"
-set_docker_environment_value "PORTAL_DATABASE_ENABLELOGS" true
-set_docker_environment_value "PORTAL_THEMING_THEME" default
-set_docker_environment_value "PORTAL_THEMING_PATH" ./themes
 set_docker_environment_value "PORTAL_LICENSEKEY" $encoded_licence_jwt
-set_docker_environment_value "PORTAL_DOCRENDERER" stoplight
-set_docker_environment_value "PORTAL_REFRESHINTERVAL" 10
-set_docker_environment_value "PORTAL_LOG_LEVEL" debug
-set_docker_environment_value "PORTAL_LOG_FORMAT" dev
-set_docker_environment_value "PORTAL_AUDIT_LOG_ENABLE" true
 
 
 
@@ -161,6 +150,36 @@ api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/orga
 }')
 external_developers_org_id=$(echo $api_response | jq -r .ID)
 log_message "Enternal Developers Org ID: $external_developers_org_id"
+
+# Create GQL Pages
+api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/pages' \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/json' \
+--header "Authorization: $portal_admin_api_token" \
+--data '{
+  "AllowFormSubmission": false,
+  "Path": "graphql",
+  "Status": "active",
+  "Template": "graphql-getstarted",
+  "Title": "GraphQL"
+}')
+log_message "api_response: $(echo $api_response | jq -r .message)"
+log_ok
+bootstrap_progress
+api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/pages' \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/json' \
+--header "Authorization: $portal_admin_api_token" \
+--data '{
+  "AllowFormSubmission": false,
+  "Path": "graphql-playground",
+  "Status": "active",
+  "Template": "graphql-playground",
+  "Title": "GraphQL Playground"
+}')
+log_message "api_response: $(echo $api_response | jq -r .message)"
+log_ok
+bootstrap_progress
 
 # Create Users
 api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/users' -s \

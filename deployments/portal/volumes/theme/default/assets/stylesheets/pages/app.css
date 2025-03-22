@@ -1,0 +1,94 @@
+
+.user-home-wrapper{
+  width: 50%;
+  margin-left: 30%;
+}
+.requests-row-section {
+  border-bottom: 1px solid var(--tdp-primary-light);
+}
+
+.requests-row-section__info > div {
+  flex: 1;
+}
+
+.app-how-to ol li,
+.app-how-to a,
+.requests-row-section__info strong {
+  font-size: var(--tdp-size-sm);
+}
+
+.app-how-to {
+  border: 2px dashed var(--tdp-primary-light);
+  border-radius: var(--tdp-border-radius);
+}
+
+.requests-row-section__info .password-icon {
+  position: initial;
+}
+.apps-wrapper{
+  width: 100%;
+}
+
+.apps-wrapper .nav-tabs {
+  border: none;
+}
+
+.apps-wrapper .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link {
+  color: var(--tdp-text-color);
+  border: none;
+}
+
+.apps-wrapper .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+  border-bottom: 3px solid var(--tdp-primary);
+  color: var(--tdp-text-color);
+}
+
+.date-requested {
+  font-family: 'OpenSans-Semibold';
+  font-size: 14px;
+}
+
+table.client-type-info-table-layout {
+  table-layout: fixed;
+}
+
+td.client-type-info-first-column {
+  width: 50%
+}
+
+td.client-type-info-second-column {
+  width: 50%
+}
+
+td.client-type-info-first-row {
+  padding-top: 35px;
+}
+
+td.client-type-info-inner {
+  padding-top: 25px;
+}
+
+td.client-type-info-row {
+  vertical-align: top;
+  padding-left: 10px;
+  padding-right: 20px;
+  overflow-wrap: break-word;
+}
+
+.client-type-tick {
+  top: -1px;
+  left: 10px;
+}
+
+.client-type-info-arrow-spacing {
+  margin-right:12px;
+}
+
+.private-portal-wrapper{
+  width: 83%;
+}
+@media (max-width: 990px) {
+  .private-portal-wrapper{
+    width: 75%;
+  }
+}

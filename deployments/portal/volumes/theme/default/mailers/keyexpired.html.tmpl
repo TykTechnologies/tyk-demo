@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credential Expiring Soon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 20px;
+        }
+        .header {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .content {
+            margin-bottom: 20px;
+        }
+        .footer {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Credential Expired
+        </div>
+        <div class="content">
+            <p>Hi <strong>{{.user.First}}</strong>,</p>
+            <p>Your credential <strong>{{.credential.CredentialHash}}</strong> is expired.</p>
+        </div>
+        <div class="footer">
+            <p>Regards,</p>
+            <p>The Team</p>
+        </div>
+    </div>
+</body>
+</html>

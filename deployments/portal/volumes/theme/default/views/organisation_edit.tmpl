@@ -1,0 +1,57 @@
+<div class="private-portal-wrapper">
+    <div class="container">
+        <p class="mb-3">
+            <a href="/portal/private/users" class="breadcrumb-link">
+                Back to user list
+            </a>
+        </p>
+
+        {{ if .errors }}
+            {{ range $key, $errs := .errors }}
+                <div class="alert alert-warning cart-error" role="alert">
+                    <i class="tyk-icon tykon tykon-warning "></i>
+                    <div class="alert__content">
+                        <strong>{{$key}}</strong>
+                        <ul>
+                            {{ range $errs }}
+                                <li>{{.}}</li>
+                            {{ end }}
+                        </ul>
+                    </div>
+                </div>
+            {{ end }}
+        {{ end }}
+
+        <form method="post" id="org-create">
+            {{ if .error }}
+                <div class="alert alert-danger" role="alert">
+                    <i class="tyk-icon tykon tykon-warning "></i>
+                    <div class="alert__content">{{ .error }}</div>
+                </div>
+            {{ end }}
+            <div class="org-card">
+                <div class="user-invite-title-wrapper">
+                    <div class="col-md-10">
+                        <h2 class="users-main-title">Create an Organisation</h2>
+                        <p>With an organisation admin account you will be able to invite external users to collaborate with.</p>
+                    </div>
+                </div>
+
+                <div class="org-card-body row mb-4">
+                    <div class="col-12">
+                        <label class="form-label">Organisation Name:</label>
+                        <input type="text" class="form-control" name="name"  value="{{.name}}" placeholder="Name" required autofocus />
+                    </div>
+                </div>
+
+                <div class="org-card-footer form-group text-right row mt-4">
+                    <div class="col-lg-12">
+                        <a id="org_cancel" class="btn btn-secondary-outline" href="/portal/private/users">Cancel</a>
+                        <input type="submit" name="submit" class="btn btn-primary" value="Create Organisation" />
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

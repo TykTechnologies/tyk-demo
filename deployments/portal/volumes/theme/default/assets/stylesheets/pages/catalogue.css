@@ -1,0 +1,104 @@
+.catalogue-page-wrapper .card {
+  margin: 5px;
+}
+
+.catalogue-page-wrapper .card .card-body,
+.catalogue-page-wrapper .card .card-cta {
+  padding: 20px;
+}
+
+.sorting-container button {
+  border: none;
+  background-color: white;
+}
+
+.search-container {
+  width: 61%;
+}
+
+.filter-container {
+  width: 30%;
+}
+
+.search-container .input-group-append {
+  position: absolute;
+  right: 15px;
+  height: 35px;
+  background: transparent;
+  top: 4px;
+}
+
+.search-container .input-group-append .input-group-text {
+  background: transparent;
+  border: none;
+  padding-top: 0px;
+}
+.catalog-apis-container .card-text {
+  padding: 0;
+}
+
+.card.d-flex.flex-row .dropdown,
+.card.d-flex.flex-row .dropdown .dropdown-toggle {
+  width: 100%;
+}
+
+.active#view-as-list,
+.active#view-as-cards {
+  background-color: var(--tdp-link-color);
+  color: #EAEAEA;
+}
+
+#view-as-list,
+#view-as-cards {
+  padding: 7px;
+  background-color: #EAEAEA;
+}
+
+#view-as-list:focus,
+#view-as-cards:focus {
+  outline: none;
+}
+
+#view-as-list {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  padding-left: 20px;
+}
+
+#view-as-cards { 
+  padding-right: 20px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+#grid-svg,
+#list-svg {
+  fill: #505071;
+}
+
+.active#grid-svg,
+.active#list-svg {
+  fill: white;
+}
+
+@media (max-width: 767px) {
+  .sorting-container,
+  .search-container .input-group-append {
+
+    display: none;
+  }
+
+  .search-form-wrapper {
+    flex-direction: column;
+  }
+
+  .search-form-wrapper div,
+  .search-form-wrapper .btn {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+}
+
+.catalogue-input-radio{
+  opacity: 1 !important;
+}

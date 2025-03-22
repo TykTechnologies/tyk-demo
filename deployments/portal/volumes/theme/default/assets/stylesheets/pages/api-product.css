@@ -1,0 +1,450 @@
+.api-product-page-wrapper {
+  padding-top: 56px;
+  margin-top: 50px;
+  margin-bottom: 100px;
+}
+
+.api-product-page-wrapper a:not(.btn) {
+  color: var(--tdp-text-color);
+  font-family: 'OpenSans-Semibold';
+}
+
+.api-product-page__info-description a {
+  text-decoration: underline;
+}
+
+.api-product-page-wrapper .alert.alert-success a:not(.btn) {
+  color: var(--tdp-alert-success-text-color);
+  text-decoration: underline;
+}
+
+.api-product-page-wrapper .card,
+.api-product-page-wrapper .card img {
+  border: none;
+  border-radius: 5px 5px 0px 0px; 
+}
+
+.api-product-page-wrapper .card a.docs-link {
+  font-size: initial;
+  color: var(--tdp-link-color);
+}
+
+.api-product-page-wrapper .card a.docs-link i {
+  font-size: 11px;
+}
+
+.api-product-page-wrapper .card img {
+  width: 600px !important;
+  height: 100%;
+}
+
+.api-product-page__header .card .card-body {
+  flex-direction: row;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+}
+
+.api-product-page__header .card .pill-container {
+  margin-left: 10px;
+}
+
+.api-product-page__info {
+  padding-block: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.api-product-page_spec {
+  margin-top: 34px;
+  margin-bottom: 30px;
+}
+.api-product-page_spec p {
+  margin-bottom: 1px;
+  font-size: 14px;
+}
+.api-product-page__info-title {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.api-product-page__info-description {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  width: 100%;
+  text-align: center;
+}
+
+.more-info-text p {
+  margin: 0%;
+  font-family: "OpenSans-Regular";
+	font-size: 14px;
+	line-height: 19px;
+  color: var(--tdp-dark);
+  max-width: 823px;
+  align-self: center;
+}
+
+.api-product-page__info-description__catalogue-info {
+  flex: 50%;
+}
+
+.api-product-page__info-description__base-url {
+  padding: 20px;
+  background: var(--tdp-light-gray);
+  border-radius: var(--tdp-border-radius);
+}
+
+.table-plans-limits {
+  margin-bottom: 0;
+}
+
+.table-plans-limits:first-child {
+  margin-bottom: 1rem;
+}
+
+.view-docs-dropdown .docs-link {
+  border-bottom: 1px solid var(--tdp-primary-light);
+  margin: 0;
+  padding: 10px 10px 10px 20px;
+}
+.view-docs-dropdown a,
+.view-docs-dropdown a:hover {
+  color: var(--tdp-text-color);
+}
+
+
+.view-docs-dropdown .docs-link:last-child {
+  border-bottom: 0;
+}
+
+.labeled-card {
+  border: var(--tdp-light-border);
+  border-radius: 10px;
+  min-width: 274px;
+  min-height: 166px;
+  max-width: 274px;
+  max-height: 166px;
+  cursor: pointer;
+}
+.labeled-card:hover {
+  background: var(--tdp-light-gray);
+  border: 1px solid var(--tdp-secondary);
+}
+
+.labeled-card-plan {
+  border: var(--tdp-light-border);
+  border-radius: 10px;
+  min-width: 274px;
+  min-height: 217px;
+  max-width: 274px;
+  max-height: 217px;
+  cursor: pointer;
+}
+
+.cart-wrapper .labeled-card {
+  height: auto;
+  flex: 0 1 48%;
+}
+
+.labeled-card__docs-link a,
+.api-product-page-wrapper .labeled-card__docs-link a,
+.api-product-page-wrapper .labeled-card__docs-link .tykon-link {
+  color: var(--tdp-link-color);
+}
+
+.labeled-card__title h3 {
+  font-family: "OpenSans-Bold";
+  font-size: 18px;
+  line-height: 24.51px;
+}
+
+.labeled-card__title {
+  background-color: var(--tdp-primary-dark);
+  color: white;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  text-align: center;
+  align-self: center;
+  text-transform: uppercase;
+  padding: 7px 17px;
+  padding-inline: 7px;
+  max-width: 240px;
+}
+
+.left-side-card-body {
+  color: var(--tdp-nav-link-color);
+  max-width: 509px;
+}
+
+.tabs-wrapper {
+  margin-top: 60px;
+  border-bottom: var(--tpd-gray-200-border);
+}
+.tabs-wrapper .step.active {
+  background: var(--tdp-dark);
+  color: var(--tdp-nav-link-color);
+}
+
+.tabs-wrapper .tab{
+  width: 171px;
+  height: 39px;
+  background: var(--tdp-light-gray);
+  border-radius: 15px 15px 0px 0px;
+  text-align: center;
+  padding-top: 10px;
+  margin-right: 10px;
+  font-size: 14px;
+  font-weight: 900;
+  font-family: 'OpenSans-Bold';
+}
+
+.tabs-wrapper .tab:hover{
+  background: var(--tdp-dark);
+  color: var(--tdp-nav-link-color);
+  cursor: pointer;
+}
+
+.access-with-plan {
+  margin-bottom: 20px;
+  background: var(--tdp-secondary-dark);
+  border: 1px solid var(--tdp-secondary-dark);
+  border-radius: 100px;
+  padding: 10px 25px;
+  color: var(--tdp-nav-link-color);
+  font-family: "OpenSans-Bold";
+  font-size: 14px;
+  line-height: 19px;
+}
+
+#add-to-cart-form-b {
+  color: var(--tdp-text-color);
+}
+
+.download-oas-button {
+  border-radius: 100px;
+  border: 2px solid var(--tdp-secondary);
+  background: var(--tdp-secondary);
+  color: var(--tdp-body-bg-color);
+  font-weight: bolder;
+  padding: 10px 25px;
+  font-size: 16px;
+}
+
+
+#oas-display-stoplight .TopNav--mosaic{
+  position: absolute;
+}
+
+#OasApiSelect {
+  width: 273px;
+  height: 39px;
+}
+.maxh-268{
+  max-height: 268px;
+}
+.minh-268{
+  min-height: 268px;
+}
+.mt-35{
+  margin-top: 35px;
+}
+.mt-12{
+  margin-top: 12px;
+}
+.mr-35{
+  margin-right: 35px;
+}
+.mt-43{
+  margin-top: 43px;
+}
+.mt-60{
+  margin-top: 60px;
+}
+.minh-95{
+	min-height: 95px;
+}
+.maxh-95{
+	max-height: 95px;
+}
+.rate-limit-and-quota{
+  max-height: 38px;
+}
+.api-detail-background-color{
+  background-color: var(--tdp-dark);
+}
+.mb-45{
+  margin-bottom: 45px;
+}
+.listen-path-text{
+  min-width: 260px;
+  max-width: 260px;
+  max-height: 20px;
+  min-height: 20px;
+  margin-bottom: 0%;
+}
+.api-description-text{
+  min-width: 255px;
+  max-width: 255px;
+  overflow-x: hidden;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.step-wrapper-api-docs{
+  min-width: 166px;
+  color: var(--tdp-secondary-dark);
+}
+.step-wrapper-api-docs .step {
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.step-wrapper-api-docs .step.active{
+  border-bottom: 1px solid var(--tdp-dark);
+  font-family: "OpenSans-Bold";
+  width: fit-content;
+}
+.content-wrapper__content-api-docs{
+  width: 814px;
+}
+.ml-110{
+  margin-left: 110px;
+}
+.mb-50 {
+  margin-bottom: 50px;
+}
+.api-docs-text{
+  color: var(--tbd-text-colot-gray-mid);
+}
+.api-docs-text strong {
+  font-family: "OpenSans-Semibold";
+  font-size: 17px;
+  line-height: 23px;
+}
+
+.api-docs-text p {
+  font-family: "OpenSans-Regular";
+	font-size: 14px;
+	line-height: 19px;
+  margin-top: 35px;
+}
+
+.api-docs-text ul {
+  list-style: disc;
+}
+.api-docs-text ol {
+  list-style: decimal;
+}
+.product-category{
+    color: var(--tdp-primary);
+}
+
+.labeled-card-post {
+    border-radius: 30px;
+    min-width: 274px;
+    min-height: 340px;
+    max-width: 274px;
+    max-height: 340px;
+    cursor: pointer;
+}
+
+.labeled-card-post-title {
+    margin-top: 20px;
+}
+
+.product-post-header{
+    padding-top: 50px;
+}
+
+.keep-reading-btn {
+    margin-bottom: 20px;
+    background: var(--tdp-secondary-btn-color);
+    border: 1px solid var(--tdp-secondary-btn-color);
+    border-radius: 100px;
+    padding: 10px 25px;
+    color: var(--tdp-nav-link-color);
+    font-family: "OpenSans-Bold";
+    font-size: 14px;
+    line-height: 19px;
+}
+
+.keep-reading-btn:hover {
+    color: white;
+    background-color: var(--tdp-secondary-dark);
+}
+
+.keep-reading {
+    bottom: 0px;
+    margin-bottom: 15px;
+    position: absolute;
+    margin-left: 42px;    
+}
+
+.product-doc-side-menu{
+    width: 181px;
+    right: auto;
+    min-height: 100%;
+    overflow-y: auto;
+    white-space: nowrap;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    overflow: hidden;
+}
+
+.product-doc-content{
+    padding-left: 100px;
+}
+
+.product-doc-nav li{
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  gap: 16px;
+  width: fit-content;
+  height: 40px;
+  border-radius: 50px;
+  padding: 8px 12px;
+  margin-bottom: 15px;
+}
+
+.product-doc-navo a:link{
+  text-decoration: none;
+}
+
+.product-doc-nav a:hover{
+  color: #43435B;
+}
+
+.product-doc-nav li:target{
+  background-color: #EBEDF4;
+}
+
+.product-doc-nav li:focus{
+  background-color: #EBEDF4;
+}
+
+.product-doc-nav i{
+  margin-bottom: 5px;
+}
+
+.product-doc-menu-active {
+  text-decoration: underline!important;
+  font-family: 'OpenSans-Semibold'!important;
+}
+
+.product-doc-menu {
+  color: var(--tdp-text-color);
+  font-family: 'OpenSans-Regular'!important;
+}
+#redoc-wrapper{
+  position: absolute;
+  width: 100%;
+}

@@ -1,0 +1,20 @@
+<!-- Template used to render the API Product documentation -->
+
+<div class="docs-container">
+  <div class="card mt-4">
+    <div class="card-body">
+      <h3 class="card-title"><a href="/portal/catalogue-products/{{.Path}}">{{.Name}}</a></h3>
+      <p class="card-text">
+        {{.Description}}
+      </p>
+    </div>
+  </div>
+  <div>
+    {{ if gt (.Url | length) 0}}
+    <redoc spec-url='{{.Url}}' scroll-y-offset='.navbar'></redoc>
+    {{ else }}
+    <h1>No swagger doc set for this API</h1>
+    {{ end }}
+  </div>
+</div>
+

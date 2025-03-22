@@ -1,11 +1,19 @@
 ---
 services:
   tyk-portal:
-    image: tykio/portal:${PORTAL_VERSION:-v1.12.0}
+    image: tykio/portal:${PORTAL_VERSION:-v1.13.0}
     networks:
       - tyk
     environment:
-      - PORTAL_AUDIT_LOG_PATH=/opt/portal/
+      - PORTAL_AUDIT_LOG_PATH=/opt/portal/portal.log
+      - PORTAL_LOG_LEVEL=info
+      - PORTAL_DATABASE_ENABLELOGS=true
+      - PORTAL_HOSTPORT=3001
+      - PORTAL_DATABASE_DIALECT=postgres
+      - POSTGRES_PASSWORD=secr3t
+      - PORTAL_THEMING_THEME=default
+      - PORTAL_THEMING_PATH=/opt/portal/themes
+      - PORTAL_STORAGE=fs
     env_file:
       - .env
     ports:
@@ -15,6 +23,7 @@ services:
       - ./deployments/portal/volumes/portal.log:/opt/portal/portal.log
       - ./deployments/portal/volumes/database/portal.db:/opt/portal/portal.db
       - ./deployments/portal/volumes/assets/:/opt/portal/public/system/products/
+      - ./deployments/portal/volumes/theme/:/opt/portal/themes
   tyk-portal-postgres:
     image: postgres:16-alpine
     networks:

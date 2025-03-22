@@ -1,0 +1,255 @@
+.tykon:before {
+	font-family: "tykon" !important;
+	font-style: normal !important;
+	font-weight: normal !important;
+	font-variant: normal !important;
+	text-transform: none !important;
+	speak: none;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.tykon-arrowdown:before {
+	content: "\61";
+}
+.tykon-arrowleft:before {
+	content: "\62";
+}
+.tykon-arrowright:before {
+	content: "\63";
+}
+.tykon-arrowup:before {
+	content: "\64";
+}
+.tykon-doublearrowdown:before {
+	content: "\65";
+}
+.tykon-filter:before {
+	content: "\66";
+}
+.tykon-graph1:before {
+	content: "\67";
+}
+.tykon-graph2:before {
+	content: "\68";
+}
+.tykon-label:before {
+	content: "\69";
+}
+.tykon-reload:before {
+	content: "\6a";
+}
+.tykon-select:before {
+	content: "\6b";
+}
+.tykon-target:before {
+	content: "\6c";
+}
+.tykon-undo:before {
+	content: "\6d";
+}
+.tykon-deployment:before {
+	content: "\6e";
+}
+.tykon-team:before {
+	content: "\6f";
+}
+.tykon-overview:before {
+	content: "\70";
+}
+.tykon-loadout:before {
+	content: "\71";
+}
+.tykon-entitlement:before {
+	content: "\72";
+}
+.tykon-users:before {
+	content: "\73";
+}
+.tykon-doublearrowdown:before {
+	content: "\65";
+}
+.tykon-arrowsort:before {
+	content: "\57";
+}
+.tykon-check:before {
+	content: "\56";
+}
+.tykon-copy:before {
+	content: "\43";
+}
+.tykon-delete:before {
+	content: "\55";
+}
+.tykon-download:before {
+	content: "\4c";
+}
+.tykon-draft:before {
+	content: "\44";
+}
+.tykon-edit:before {
+	content: "\45";
+}
+.tykon-filter:before {
+	content: "\66";
+}
+.tykon-graphq2:before {
+	content: "\68";
+}
+.tykon-help:before {
+	content: "\3f";
+}
+.tykon-label:before {
+	content: "\69";
+}
+.tykon-link:before {
+	content: "\52";
+}
+.tykon-lock1:before {
+	content: "\59";
+}
+.tykon-lock2:before {
+	content: "\5A";
+}
+.tykon-notifications:before {
+	content: "\4E";
+}
+.tykon-plus:before {
+	content: "\2B";
+}
+.tykon-profile:before {
+	content: "\50";
+}
+.tykon-reload:before {
+	content: "\6A";
+}
+.tykon-search:before {
+	content: "\4F";
+}
+.tykon-select:before {
+	content: "\6B";
+}
+.tykon-settings:before {
+	content: "\53";
+}
+.tykon-target:before {
+	content: "\6C";
+}
+.tykon-undo:before {
+	content: "\6D";
+}
+.tykon-warning:before {
+	content: "\21";
+}
+.tykon-x:before {
+	content: "\58";
+}
+.tykon-waiting:before {
+	content: "\54";
+}
+.tykon-fullscreen:before {
+	content: "\e000";
+}
+.tykon-fullscreen-exit:before {
+	content: "\e001";
+}
+.tykon-time:before {
+	content: "\74";
+}
+
+.with-info-icon,
+.invalid-feedback {
+  font-family: "OpenSans-regular";
+  font-size: 12px;
+  line-height: 16px;
+  margin-top: 5px;
+  padding: 5px 0 0 13px;
+  position: relative;
+}
+
+.with-info-icon:before {
+  content: '!';
+  background: var(--tdp-primary-light);
+  color: white;
+  font-family: "OpenSans-Bold";
+  border-radius: 8px;
+  display: inline-block;
+  margin-right: 5px;
+  padding: 0px 7px;
+}
+
+.invalid-feedback {
+  padding-left: 10px;
+  color: var(--tdp-text-color)
+}
+
+.invalid-feedback::before {
+  content: '!';
+  background: #FF6C7D;
+  color: white;
+  font-family: "OpenSans-Bold";
+  border-radius: 8px;
+  display: inline-block;
+  margin-right: 5px;
+  padding: 0px 7px;
+}
+
+.password-icon {
+  position: absolute;
+  right: 10px;
+  top: 35px;
+}
+
+/* Align icon withi a button */
+.btn i {
+  vertical-align: middle;
+}
+
+.status-registered {
+	margin-right: 10px;
+	color: var(--tdp-icon-success-dark);
+	margin-bottom: 5px;
+	font-size: 15px;
+}
+
+.edit-details-icon{
+	color: var(--tdp-text-color);
+	font-size: 16px;
+}
+
+.status-pending {
+	margin-right: 10px;
+	color: var(--tdp-warning-light);
+	margin-bottom: 5px;
+	font-size: 15px;
+}
+
+.question-icon {
+	color: var(--tdp-primary-light);
+	font-size: 10px;
+	margin-bottom: 2px;
+	cursor: pointer;
+}
+.help-icon {
+	margin-top: -6px;
+	cursor: pointer;
+}
+
+.calendar-icon{
+	font-size: 16px;
+	color: var(--tdp-extra-dark);
+	margin-top: -4px;
+}
+.download-icon{
+	font-size: 20px;
+	font-weight: bolder;
+	margin-right: 8px;
+	margin-top: -5px;
+}
+.x-icon{
+	font-size: 20px;
+	cursor: pointer;
+	-webkit-text-stroke: 1px;
+	height: 25px;
+}

@@ -1,0 +1,162 @@
+@import './components/select.css';
+@import './components/buttons.css';
+@import './components/card.css';
+@import './components/input.css';
+@import './components/table.css';
+@import './components/alert.css';
+@import './components/modal.css';
+@import './components/tooltip.css';
+
+@import './pages/catalogue.css';
+@import './pages/login.css';
+@import './pages/landing.css';
+@import './pages/home.css';
+@import './pages/api-product.css';
+@import './pages/cart.css';
+@import './pages/flip-flop.css';
+@import './pages/blog.css';
+@import './pages/app.css';
+@import './pages/users.css';
+@import './pages/analytics.css';
+
+@import './common/form.css';
+@import './common/navigation.css';
+@import './common/typography.css';
+@import './common/tyk-icons.css';
+@import './common/texts.css';
+@import './common/layout.css';
+
+/*
+  Global Variables
+*/
+
+:root {
+  /* Modern color palette */
+  --tdp-primary: #3498db;           /* Bright blue instead of teal */
+  --tdp-primary-dark: #2980b9;      /* Darker blue */
+  --tdp-primary-light: #a9cce3;     /* Light blue */
+  --tdp-primary-success-light: #d5f5e3; /* Light mint green */
+  --tdp-secondary: #6c7a89;         /* Modern slate gray */
+  --tdp-secondary-dark: #4a5568;    /* Darker slate */
+  --tdp-light-blue: #5dade2;        /* Refreshed light blue */
+  --tdp-light-gray: #f5f7fa;        /* Cleaner light gray */
+  --tdp-light-purple: #9b59b6;      /* Modern purple */
+  --tdp-primary-danger-light: #fadbd8; /* Light red */
+  --tdp-danger-light: #e74c3c;      /* Modern red */
+  --tdp-danger-dark: #c0392b;       /* Darker red */
+  --tdp-primary-warning-light: #fef9e7; /* Light yellow */
+  --tdp-warning-light: #f39c12;     /* Modern orange */
+  --tdp-warning-dark: #d35400;      /* Darker orange */
+  --tdp-light-border: 1px solid #dfe4ea; /* Subtle border */
+  --tdp-extra-dark: #2c3e50;        /* Modern dark blue-gray */
+  --tdp-dark: #34495e;              /* Slightly lighter dark blue-gray */
+  --tdp-text-on-red-background: #ffffff; /* White text on red */
+  
+  /* Font sizes - keeping the same */
+  --tdp-size-xs: 12px;
+  --tdp-size-sm: 14px;
+  --tdp-size-md: 16px;
+  --tdp-size-lg: 18px;
+  --tdp-size-xl: 24px;
+  
+  /*
+    Extra variables to ease customisation
+  */
+  /* Background colors */
+  --tdp-nav-bg-color: #2c3e50;      /* Modern dark blue-gray */
+  --tdp-body-bg-color: #ffffff;     /* Clean white */
+  --tdp-tab-active: #f1f2f6;        /* Subtle gray for active tabs */
+  --tdp-light-green: #d5f5e3;       /* Light mint green */
+  --tdp-light-red: #fadbd8;         /* Light red */
+  --tdp-login-form: rgba(241, 242, 246, 0.9); /* Semi-transparent light gray */
+  
+  /* Text colors */
+  --tdp-text-color: #4a5568;        /* Modern dark gray for text */
+  --tdp-link-color: #3498db;        /* Bright blue for links */
+  --tdp-nav-link-color: #ffffff;    /* White for nav links */
+  --tdb-text-color-dark: #2d3436;   /* Very dark gray, almost black */
+  --tdp-text-color-extra-dark: #1e272e; /* Even darker for emphasis */
+  --tdb-text-color-gray: #7f8c8d;   /* Medium gray */
+  --tbd-text-colot-gray-mid: #636e72; /* Slightly darker gray */
+  --tdb-text-color-gray-lighter: #95a5a6; /* Lighter gray */
+  
+  /* Borders */
+  --tdp-card-border-radius: 8px;    /* Slightly smaller, more modern radius */
+  --tdp-border-color-on-error: #e74c3c; /* Modern red */
+  --tdp-table-border-color: #dfe4ea; /* Subtle table borders */
+  --tdp-border-radius: 8px;         /* More modern, smaller radius */
+  --tdp-login-form-border-radius: 8px; /* Consistent radius */
+  --tdp-primary-border: 1px solid #2d3436; /* Dark border */
+  --tdp-form-element-border: 1px solid #dfe4ea; /* Thinner, more subtle border */
+  --tpd-gray-200-border: 1px solid #dfe4ea; /* Consistent subtle border */
+  --tdp-border-graph: 1px solid #f1f2f6; /* Subtle graph border */
+  --tdp-analytics-select-border: 1px solid #4a5568; /* Thinner border */
+  --tdp-border-green: #27ae60;      /* Modern green */
+  
+  /* Buttons */
+  --tdp-primary-btn-color: #3498db; /* Bright blue */
+  --tdp-primary-btn-border: 1px solid #3498db; /* Thinner border */
+  --tdp-secondary-btn-color: #6c7a89; /* Modern slate */
+  --tdp-secondary-btn-border: 1px solid #6c7a89; /* Thinner border */
+  --tdp-danger-btn-color: #e74c3c;  /* Modern red */
+  --tdp-danger-btn-border: 1px solid #e74c3c; /* Thinner border */
+  --tdp-danger-outline-btn-border: 1px solid #c0392b; /* Thinner border */
+  --tdp-warning-btn-color: #f39c12; /* Modern orange */
+  --tdp-warning-btn-border: 1px solid #f39c12; /* Thinner border */
+  --tdp-warning-outline-btn-border: 1px solid #d35400; /* Thinner border */
+  --action-brand-default: #3498db;  /* Consistent blue */
+  --border-brand-default: #2980b9;  /* Darker blue */
+  --border-brand-hover: #1c6ca1;    /* Even darker blue for hover */
+  --link-default: #3498db;          /* Consistent blue for links */
+  
+  /* Alert boxes */
+  --tdp-alert-success-bg-color: #d5f5e3; /* Light green */
+  --tdp-alert-success-border-color: #27ae60; /* Modern green */
+  --tdp-alert-success-text-color: #27ae60; /* Green text */
+  --tdp-alert-info-bg-color: #ebf5fb;    /* Light blue */
+  --tdp-alert-info-border-color: #3498db; /* Blue */
+  --tdp-alert-info-text-color: #2980b9;  /* Darker blue text */
+  --tdp-alert-warning-bg-color: #fef9e7;  /* Light yellow */
+  --tdp-alert-warning-border-color: #f39c12; /* Orange */
+  --tdp-alert-warning-text-color: #d35400; /* Darker orange text */
+  --tdp-alert-danger-bg-color: #fadbd8;   /* Light red */
+  --tdp-alert-danger-border-color: #e74c3c; /* Red */
+  --tdp-alert-danger-text-color: #c0392b;  /* Darker red text */
+  
+  /* Icons */
+  --tdp-icon-success-dark: #27ae60; /* Modern green */
+  --default-border-radius: 8px;     /* More modern, smaller radius */
+}
+
+html {
+  scroll-padding-top: 70px;
+}
+
+body {
+  padding-top: 55px;
+  height: 100vh;
+  color: var(--tdp-text-color);
+  background-color: var(--tdp-body-bg-color);
+}
+
+.page-wrapper {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Gradient backgrounds */
+.dark-to-light-bg {
+  background: linear-gradient(93.59deg, #36364C 19.75%, #505071 81.94%);
+  color: white;
+}
+
+.light-to-dark-bg {
+  background: linear-gradient(93.59deg, #505071 19.75%, #36364C 81.94%);
+  color: white;
+}
+
+.container {
+  max-width: 1230px;
+}

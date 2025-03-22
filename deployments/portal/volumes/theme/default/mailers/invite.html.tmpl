@@ -1,0 +1,8 @@
+Hi, <strong>{{.name}}</strong><br/>
+
+{{ if .is_admin }}
+Join the portal as an Administrator, click here:
+{{ else }}
+Join the {{.team}} team, click here:
+{{ end }}
+http://{{.site}}/auth/password/register?token={{.code}}

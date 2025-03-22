@@ -1,0 +1,193 @@
+<!-- Template used to view & edit the API consumer profile -->
+
+{{ $user := CurrentUser req }}
+{{ $userEmail := $user.Email}}
+<div class="private-portal-wrapper">
+  <div class="container">
+    {{ if .errors }}
+      {{ range $key, $errs := .errors }}
+        <div class="alert alert-warning cart-error" role="alert">
+          <i class="tyk-icon tykon tykon-warning "></i>
+          <div class="alert__content">
+            <strong>{{$key}}</strong>
+            <ul>
+              {{ range $errs }}
+                <li>{{.}}</li>
+              {{ end }}
+            </ul>
+          </div>
+        </div>
+      {{ end }}
+    {{ end }}
+    <form method="post">
+      <h2 class="mb-5 text-center">Profile settings </h2>
+      <div class="profile-wrapper__card-section">
+        {{ if .error }}
+          <div class="alert alert-danger" role="alert">
+            <i class="tyk-icon tykon tykon-warning "></i>
+            <div class="alert__content">{{ .error }}</div>
+          </div>
+        {{ end }}
+        {{ if .done }}
+          <div class="alert alert-success" role="alert">
+            <i class="tyk-icon tykon tykon-check "></i>
+            <div class="alert__content">An email to reset password has been sent. Check your inbox.</div>
+          </div>
+        {{ end }}
+      </div>
+      <div class="profile-wrapper__card-section">
+        <div class="d-flex flex-row justify-content-between pb-2 align-items-center">
+          <h2 class="card-title">Personal Details</h2>
+          <div class="cta-btns-wrapper">
+            <button type="button" class="btn btn-secondary-link text-uppercase enable-editing d-block" data-action="edit">
+              Edit details
+            </button>
+            <div class="edit-cta d-none disable-editing">
+              <button type="button" class="btn btn-secondary-outline" data-action="cancel">
+                Cancel
+              </button>
+              <input type="hidden" name="mode" value="update" />
+              <input type="hidden" value="{{ $user.ID}}">
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </div>
+        </div>
+        <div class="card cart-card">
+          <div class="card-footer__static-data d-block">
+            <div class="row mb-4">
+              <div class="col-lg-4">
+                <strong class="mr-4 text-uppercase">Name:</strong>
+              </div>
+              <div class="col-lg-8 private-portal-user-details">
+                {{ $user.DisplayName }}
+              </div>
+            </div>
+            <div class="row mb-4">
+              <div class="col-lg-4">
+                <strong class="mr-4 text-uppercase">Email:</strong>
+              </div>
+              <div class="col-lg-8 private-portal-user-details">
+                {{ $user.Email }}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-4">
+                <strong class="mr-4 text-uppercase">Password:</strong>
+              </div>
+              <div class="col-lg-8">
+                <p>*************</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer__dynamic-data d-none">
+            <div class="mb-4">
+              <label class="form-label">First name:</label>
+              <input type="text" name="first" class="form-control" placeholder="First *" value="{{$user.First}}" />
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Last name:</label>
+              <input type="text" name="last" class="form-control" placeholder="Last *" value="{{$user.Last}}" />
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Email:</label>
+              <input type="email" name="email" class="form-control" placeholder="Your Email *" value="{{$user.Email}}" readonly />
+            </div>
+            {{if $user.IsPasswordProvider}}
+              <div class="mb-4">
+                <label class="form-label">Current password:</label>
+                <input autocomplete="new-password" type="password" name="current_password" class="form-control" placeholder="Your current Password *" value=""/>
+              </div>
+              <div class="mb-4">
+                <label class="form-label">New password:</label>
+                <input autocomplete="new-password" type="password" name="password1" class="form-control" placeholder="Your Password *" value=""/>
+              </div>
+              <div class="mb-4">
+                <label class="form-label">Confirm new password:</label>
+                <input autocomplete="new-password" type="password" name="password2" class="form-control" placeholder="Your Password *" value=""/>
+              </div>
+            {{end}}
+          </div>
+        </div>
+      </div>
+      <div class="profile-wrapper__card-section mb-5">
+        <div class="card cart-card mb-4">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-lg-4">
+                <strong class="text-uppercase">Member since:</strong>
+              </div>
+              <div class="col-lg-8">
+                {{ $user.CreatedAt | date "2 Jan, 2006 15:04" }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="profile-wrapper__card-section">
+        <div class="card cart-card mb-4">
+          <div class="card-body d-flex flex-row justify-content-between flex-wrap">
+            <div class="d-flex flex-column flex-wrap">
+              <div class="d-flex flex-row mb-4">
+                <strong class="text-uppercase mr-4">
+                  Delete this profile
+                </strong>
+              </div>
+              <div class="d-flex flex-row">
+                Delete all your apps and credentials
+              </div>
+            </div>
+            <div class="cta-btns-wrapper align-self-center">
+              <button type="button" class="btn btn-danger-outline" data-toggle="modal" data-target="#deleteProfileModal">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      </form>
+      <form method="post">
+        <div class="modal fade" id="deleteProfileModal" tabindex="-1" role="dialog" aria-labelledby="deleteProfileModalTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title">Are you sure you want to delete this account ?</h4>
+              </div>
+              <div class="modal-body">
+                Your account will be deleted inmediately!
+                <p>Please note that this action is irreversible.</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary-outline" data-dismiss="modal">Cancel</button>
+                <input type="hidden" value="{{ $user.ID }}">
+                <input type="hidden" name="mode" value="delete" />
+                <input type="submit" class="btn btn-danger" value="Delete"/>
+              </div>
+            </div>
+          </div>
+        </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete profile modal -->
+<form method="post" action="/profile">
+  <div class="modal fade" id="deleteProfileModal" tabindex="-1" role="dialog" aria-labelledby="deleteProfileModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Are you sure you want to delete this account ?</h4>
+        </div>
+        <div class="modal-body">
+          Your account will be deleted in X days.
+          <p>Please note that this action is irreversible.</p>
+        </div>
+        <div class="modal-footer">
+          <input type="hidden" value="{{ $user.ID}}">
+          <input type="hidden" name="mode" value="delete" />
+          <button type="button" class="btn btn-secondary-outline" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,20 @@
+<!-- Configure from the BE to render this layout with your custom message -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mb-5 mt-4">
+            <h2>{{ .title }}</h2>
+            <hr>
+            {{ if .messages }}
+                {{ $isError := .error }}
+                {{ range $field, $msgs := .messages }}
+                    {{ range $msgs }}
+                        <div class="alert {{ if $isError }}alert-danger{{ else }}alert-info{{ end }}" role="alert">
+                          <i class="tyk-icon tykon tykon-warning "></i>
+                          <div class="alert__content">{{.}}</div>
+                        </div>
+                    {{ end }}
+                {{ end }}
+            {{ end }}
+        </div>
+    </div>
+</div>

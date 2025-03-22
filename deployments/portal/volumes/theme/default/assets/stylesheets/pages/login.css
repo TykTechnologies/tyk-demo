@@ -1,0 +1,55 @@
+.login-page-wrapper {
+  background: url('/assets/images/login-background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  width: 100%;
+  height:100%;
+}
+
+
+.login-form-wrapper {
+  background: var(--tdp-login-form);
+  border-radius: var(--tdp-login-form-border-radius);
+  width: 40%;
+  padding: 40px;
+}
+
+.logo {
+  margin-bottom: 3%;
+  text-align: center;
+  height: 60px;
+  width: 40%;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo img {
+  max-height: 100%;
+  width: auto;
+  max-width: 100%;
+  padding-left: 1%;
+  padding-right: 1%;
+  display: block;
+}
+
+.login-form-title {
+  color: var(--tdp-text-color-extra-dark);
+  text-align: center;
+  margin-bottom: 5%;
+  width: 100%;
+}
+
+.login-form-input {
+  height: 39px;
+  border: none;
+  border-radius: 8px;
+}
+
+.login-form-label {
+  color: var(--tdp-text-color-extra-dark);
+}
+
+.login-form-info {
+  font-family: Inter-Regular, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+}

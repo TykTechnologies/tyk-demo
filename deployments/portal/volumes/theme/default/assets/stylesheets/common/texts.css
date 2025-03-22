@@ -1,0 +1,44 @@
+.text-info {
+  color: var(--tdp-primary-light)
+}
+.text-success {
+  color: var(--tdp-primary)
+}
+.text-warning {
+  color: var(--tdp-warning-dark)
+}
+.text-danger {
+  color: var(--tdp-danger-dark)
+}
+
+a {
+  color: var(--tdp-link-color);
+}
+
+a:hover {
+  color: var(--tdp-primary);
+  text-decoration: underline;
+}
+
+a.breadcrumb-link,
+a.breadcrumb-link:hover {
+  color: var(--tdp-dark);
+  text-decoration: underline;
+  font-family: 'OpenSans-Semibold';
+}
+
+a.brand-link,
+a.beand-link:hover {
+  color: var(--link-default);
+  font-family: Inter-Medium, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.opensans-semibold {
+  font-family: 'OpenSans-Semibold';
+}
+
+.opensans-regular {
+  font-family: 'OpenSans-regular';
+}

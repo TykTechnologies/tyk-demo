@@ -1,0 +1,25 @@
+.form-select,
+select {
+	color: var(--tdp-text-color);
+	border-radius: var(--tdp-border-radius);
+	font-size: 14px;
+	line-height: 19px;
+	border: var(--tdp-form-element-border);
+	display: block;
+	height: 35px;
+	padding-inline: 15px;
+	transition: all 0.2s linear;
+	width: 100%;
+	background: white url(../../images/icons/arrow.svg) no-repeat;
+	background-position: calc(100% - 10px) 50%;
+	background-size: 10px 10px;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}
+
+.form-select:active,
+.form-select:focus {
+	border-radius: var(--tdp-border-radius);
+	border: var(--tdp-primary-border);
+	outline: none;
+}
