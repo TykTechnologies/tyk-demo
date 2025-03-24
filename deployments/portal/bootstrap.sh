@@ -9,26 +9,9 @@ bootstrap_progress
 log_message "Remove pre-existing log files"
 rm -rf ./deployments/portal/volumes/logs/* > /dev/null 2>&1
 
-# Grab the Dashboard License line from ENV file
-licence_line=$(grep "DASHBOARD_LICENCE=" .env)
-# Parse out the DASHBOARD_LICENSE= bit
-encoded_licence_jwt=$(echo $licence_line | sed -E 's/^[A-Z_]+=(.+)$/\1/')
-
 # Get Tyk Dashboard API Access Credentials
 dashboard_user_api_credentials=$(get_context_data "1" "dashboard-user" "1" "api-key")
 dashboard_user_org_id=$(get_context_data "1" "organisation" "1" "id")
-# Export to envs for docker
-log_message "Exporting Docker Environment Variables for Enterprise Portal in .env"
-set_docker_environment_value "ADMIN_EMAIL" $(get_context_data "1" "dashboard-user" "1" "email")
-set_docker_environment_value "ADMIN_PASSWORD" $(get_context_data "1" "dashboard-user" "1" "password")
-set_docker_environment_value "ADMIN_ORG_ID" $dashboard_user_org_id
-set_docker_environment_value "TYK_DASHBOARD_API_ACCESS_CREDENTIALS" $dashboard_user_api_credentials
-
-# Postgres Env configuration for tyk portal
-set_docker_environment_value "PORTAL_DATABASE_CONNECTIONSTRING" "host=tyk-portal-postgres port=5432 dbname=portal user=admin password=$(grep "POSTGRES_PASSWORD=" .env | sed -E 's/^[A-Z_]+=(.+)$/\1/') sslmode=disable"
-set_docker_environment_value "PORTAL_LICENSEKEY" $encoded_licence_jwt
-
-
 
 # Create Plans and Policies for NEW Developer Portal
 log_message "Creating Enterprise Portal Plans"
@@ -72,12 +55,11 @@ portal_admin_user_password=$(get_context_data "1" "dashboard-user" "1" "password
 log_message "Waiting for Tyk-Portal container to come online ..."
 wait_for_status "http://tyk-portal.localhost:3100/ready" "200" ".message" "Success" "10"
 if [ $? -ne 0 ]; then
-  log_message "Error: Tyk-Portal container failed to come online."
+  echo "ERROR: Tyk-Portal container failed to come online."
   exit 1
 fi
 
 log_message "Bootstrapping the Portal Admin ..."
-# Need to loop this to wait for portal to come online
 api_response=$(curl 'http://tyk-portal.localhost:3100/portal-api/bootstrap' -s \
   -H 'Content-Type: application/json' \
   --data-raw '{
@@ -91,7 +73,6 @@ log_ok
 bootstrap_progress
 
 portal_admin_api_token=$(echo $api_response | jq -r .data.api_token)
-set_docker_environment_value "PORTAL_ADMIN_API_TOKEN" $portal_admin_api_token
 
 # Set Context Data for Portal User
 set_context_data "1" "enterprise-portal-admin" "1" "api-key" "$portal_admin_api_token"
@@ -160,7 +141,7 @@ api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/page
   "Template": "graphql-getstarted",
   "Title": "GraphQL"
 }')
-log_message "api_response: $(echo $api_response | jq -r .message)"
+log_message "api_response: $api_response"
 log_ok
 bootstrap_progress
 api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/pages' \
@@ -174,7 +155,7 @@ api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/page
   "Template": "graphql-playground",
   "Title": "GraphQL Playground"
 }')
-log_message "api_response: $(echo $api_response | jq -r .message)"
+log_message "api_response: $api_response"
 log_ok
 bootstrap_progress
 
