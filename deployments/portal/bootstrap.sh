@@ -129,7 +129,7 @@ external_developers_org_id=$(echo $api_response | jq -r .ID)
 log_message "Enternal Developers Org ID: $external_developers_org_id"
 
 # Create GQL Pages
-api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/pages' \
+api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/pages' -s \
 --header 'Content-Type: application/json' \
 --header 'Accept: application/json' \
 --header "Authorization: $portal_admin_api_token" \
@@ -139,11 +139,11 @@ api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/page
   "Status": "active",
   "Template": "graphql-getstarted",
   "Title": "GraphQL"
-}' 2>&1)
+}')
 log_message "api_response: $api_response"
 log_ok
 bootstrap_progress
-api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/pages' \
+api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/pages' -s \
 --header 'Content-Type: application/json' \
 --header 'Accept: application/json' \
 --header "Authorization: $portal_admin_api_token" \
@@ -153,7 +153,7 @@ api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/page
   "Status": "active",
   "Template": "graphql-playground",
   "Title": "GraphQL Playground"
-}' 2>&1)
+}')
 log_message "api_response: $api_response"
 log_ok
 bootstrap_progress
