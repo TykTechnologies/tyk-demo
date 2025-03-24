@@ -23,7 +23,7 @@ deployments/**/dynamic-test-vars.env
 
 ## Portal Deployment
 deployments/portal/volumes/database/portal.db
-deployments/portal/volumes/portal.log
+deployments/portal/volumes/logs
 
 # Unikraft
 .unikraft

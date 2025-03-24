@@ -6,8 +6,8 @@ deployment="Enterprise Portal"
 log_start_deployment
 bootstrap_progress
 
-log_message "Reset the logfile"
-> ./deployments/portal/volumes/portal.log
+log_message "Remove pre-existing log files"
+rm -rf ./deployments/portal/volumes/logs/* > /dev/null 2>&1
 
 # Grab the Dashboard License line from ENV file
 licence_line=$(grep "DASHBOARD_LICENCE=" .env)

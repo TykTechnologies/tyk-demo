@@ -5,7 +5,8 @@ services:
     networks:
       - tyk
     environment:
-      - PORTAL_AUDIT_LOG_PATH=/opt/portal/portal.log
+      - PORTAL_AUDIT_LOG_ENABLE=true
+      - PORTAL_AUDIT_LOG_PATH=/opt/portal/logs
       - PORTAL_LOG_LEVEL=info
       - PORTAL_DATABASE_ENABLELOGS=true
       - PORTAL_HOSTPORT=3001
@@ -20,7 +21,7 @@ services:
       - 3100:3001
     entrypoint: /opt/portal/dev-portal
     volumes:
-      - ./deployments/portal/volumes/portal.log:/opt/portal/portal.log
+      - ./deployments/portal/volumes/logs:/opt/portal/logs
       - ./deployments/portal/volumes/database/portal.db:/opt/portal/portal.db
       - ./deployments/portal/volumes/assets/:/opt/portal/public/system/products/
       - ./deployments/portal/volumes/theme/:/opt/portal/themes
