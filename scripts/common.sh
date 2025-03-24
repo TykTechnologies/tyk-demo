@@ -126,29 +126,28 @@ wait_for_response () {
   do
     attempt_count=$((attempt_count+1))
 
-    # header can be provided if auth is needed
-    if [ "$header" != "" ]
-    then
-      status=$(curl -k -I -s -m5 $url -H "$header" 2>> logs/bootstrap.log | head -n 1 | cut -d$' ' -f2)
-    else
-      status=$(curl -k -I -s -m5 -X $http_method $url 2>> logs/bootstrap.log | head -n 1 | cut -d$' ' -f2)
+    # Build the curl command dynamically
+    curl_command="curl -k -I -s -m5 -X $http_method $url"
+    if [ -n "$header" ]; then
+      curl_command="$curl_command -H \"$header\""
     fi
+
+    # Execute the curl command and extract the status
+    status=$(eval $curl_command 2>> logs/bootstrap.log | head -n 1 | cut -d$' ' -f2)
 
     if [ "$status" == "$desired_status" ]
     then
       log_message "    Attempt $attempt_count succeeded, received '$status'"
       return 0
     else
-      if [ "$attempt_max" != "" ]
-      then
+      if [ -n "$attempt_max" ]; then
         log_message "    Attempt $attempt_count of $attempt_max unsuccessful, received '$status'"
       else
         log_message "    Attempt $attempt_count unsuccessful, received '$status'"
       fi
 
       # if max attempts reached, then exit with non-zero result
-      if [ "$attempt_count" = "$attempt_max" ]
-      then
+      if [ "$attempt_count" -eq "$attempt_max" ]; then
         log_message "    Maximum retry count reached. Aborting."
         return 1
       fi
