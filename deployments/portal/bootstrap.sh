@@ -61,14 +61,8 @@ for file in deployments/portal/data/products/*; do
 done
 log_ok
 
-log_message "Recreating tyk-portal-postgres for new env vars"
-$(generate_docker_compose_command) rm -f -s tyk-portal-postgres 1>/dev/null 2>&1
-$(generate_docker_compose_command) up -d tyk-portal-postgres 2>/dev/null
-bootstrap_progress log_ok
-
-log_message "Recreating tyk-portal for new env vars"
-$(generate_docker_compose_command) rm -f -s tyk-portal 1>/dev/null 2>&1
-$(generate_docker_compose_command) up -d tyk-portal 2>/dev/null
+log_message "Recreating tyk-portal-postgres and tyk-portal for new env vars"
+$(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-portal-postgres tyk-portal 1>/dev/null 2>>logs/bootstrap.log
 bootstrap_progress
 log_ok
 
@@ -76,8 +70,11 @@ portal_admin_user_email=$(get_context_data "1" "dashboard-user" "1" "email")
 portal_admin_user_password=$(get_context_data "1" "dashboard-user" "1" "password")
 
 log_message "Waiting for Tyk-Portal container to come online ..."
-wait_for_response "http://tyk-portal.localhost:3100/ready" "200"
-sleep 5 #TODO: Deprecate this when advanced ready endpoint is available
+wait_for_status "http://tyk-portal.localhost:3100/ready" "200" ".message" "Success" "10"
+if [ $? -ne 0 ]; then
+  log_message "Error: Tyk-Portal container failed to come online."
+  exit 1
+fi
 
 log_message "Bootstrapping the Portal Admin ..."
 # Need to loop this to wait for portal to come online

@@ -997,6 +997,61 @@ wait_for_liveness () {
   done
 }
 
+wait_for_status() {
+  local url="$1"
+  local expected_status="$2"
+  local json_path="$3"
+  local expected_value="$4"
+  local max_retries="${5:-5}"
+  local delay="${6:-1}"
+  local attempt=0
+  local response
+  local http_status
+
+  if [[ -z "$url" || -z "$expected_status" ]]; then
+    echo "Usage: wait_for_status <url> <expected_status> [json_path] [expected_value] [max_retries] [delay]"
+    exit 1
+  fi
+
+  log_message "Checking status for URL: $url with expected HTTP status: $expected_status"
+  if [[ -n "$json_path" && -n "$expected_value" ]]; then
+    log_message "Validating JSON path: $json_path with expected value: $expected_value"
+  fi
+  
+  while (( attempt < max_retries )); do
+    # Perform the curl request
+    response=$(curl -s -w "\n%{http_code}" "$url")
+    http_status=$(echo "$response" | tail -n1)
+    body=$(echo "$response" | sed '$ d')
+
+    # Check HTTP status
+    if [[ "$http_status" == "$expected_status" ]]; then
+      # Optional body validation
+      if [[ -n "$json_path" && -n "$expected_value" ]]; then
+        actual_value=$(echo "$body" | jq -r "$json_path" 2>/dev/null)
+        if [[ "$actual_value" == "$expected_value" ]]; then
+          log_message "  PASS: Status check passed."
+          return 0
+        else
+          log_message "  Got JSON value: $actual_value"
+        fi
+      else
+        log_message "  PASS: Status check passed."
+        return 0
+      fi
+    else
+      log_message "  Get HTTP status: $http_status"
+    fi
+
+    log_message "  Attempt $((attempt + 1))/$max_retries failed. Retrying in $delay seconds..."
+    sleep "$delay"
+    ((attempt++))
+  done
+
+  log_message "  FAIL: Status check failed after $max_retries attempts."
+  return 1
+}
+
 check_for_grpcurl () {
   # Check if grpcurl is installed
   if ! command -v grpcurl &> /dev/null
