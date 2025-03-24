@@ -118,12 +118,7 @@ wait_for_response () {
   local header="$3"
   local attempt_max="$4"
   local attempt_count=0
-  local http_method="GET"
-
-  if [ "$5" != "" ]
-  then
-    http_method="$5"
-  fi
+  local http_method="${5:-GET}"
 
   log_message "  Expecting $2 response from $1"
 
