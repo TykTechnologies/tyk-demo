@@ -1040,7 +1040,7 @@ wait_for_status() {
         return 0
       fi
     else
-      log_message "  Get HTTP status: $http_status"
+      log_message "  Got HTTP status: $http_status"
     fi
 
     log_message "  Attempt $((attempt + 1))/$max_retries failed. Retrying in $delay seconds..."
