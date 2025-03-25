@@ -18,7 +18,7 @@ Think of it as infrastructure as code for your APIs, giving you a robust and aut
 
 Kubernetes:
 - Version 1.19 or later
-- Active Cert Manager deployment
+- Active cert-manager deployment
 
 Helm:
 - Version 3 or later
@@ -44,15 +44,17 @@ This script automates the deployment process using `kubectl` and `helm`. It sets
 
 ### Kubernetes Cert Manager
 
-This deployment requires the [Kubernetes Cert Manager](https://cert-manager.io/). If it's already installed in your Kubenetes cluster, great, no further action is needed. However, if you don't have it installed, installation is outside the scope of the bootstrap script, but you have two options:
-- **Manual Installation**: Follow the official installation documentation (https://cert-manager.io/docs/installation/) for detailed instructions. This approach offers maximum flexibility and control.
-- **Simplified Installation**: Run the provided `install-cert-manager.sh` script, which follows the Helm chart method described in the official documentation. This script provides a simple, quick setup.
+This deployment requires the [Kubernetes Cert Manager](https://cert-manager.io/). If it's already installed in your Kubenetes cluster, great, no further action is needed. However, if you don't have it installed, installation is outside the scope of the bootstrap script.
 
-Running the script:
+The official installation documentation (https://cert-manager.io/docs/installation/) contains detailed instructions. This approach offers maximum flexibility and control.
+
+It recommends to run the following `kubectl` command, which is the default static method.
 
 ```
-./deployments/k8s-operator/scripts/install-cert-manager.sh
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.3/cert-manager.yaml
 ```
+
+This command installs `v1.16.3`, which is the latest at time of writing.
 
 ## Removal
 
@@ -66,7 +68,7 @@ This script automates the removal process:
 - **Docker Containers**: Removes all Docker containers, volumes and networks spun up from the standard docker-compose bootstrap process
 - **Kubernetes Resources**: Removes the `tyk-demo` namespace from Kubernetes, along with all the resources provisioned within it during the *Kubernetes Operator* deployment bootstrap
 
-**Important Note**: The Kubernetes Cert Manager is not removed by the `down.sh` script. The Cert Manager functions as a central resource within your Kubernetes cluster, potentially managing certificates for various applications. Deleting it could disrupt other services that rely on it. If you wish to remove it, please do so manually.
+**Important Note**: The Kubernetes Cert Manager is not removed by the `down.sh` script. The Cert Manager functions as a central resource within your Kubernetes cluster, potentially managing certificates for various applications. Deleting it could disrupt other services that rely on it. If you wish to remove it, please do so manually, using the same approach as installation - see the official documentation for more details.
 
 ## Configuration
 
