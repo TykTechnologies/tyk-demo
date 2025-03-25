@@ -118,7 +118,7 @@ wait_for_response () {
   local header="$3"
   local attempt_max="$4"
   local attempt_count=0
-  local http_method="${5:-GET}"
+  local http_method="${5:-GET}" # default to GET method
 
   log_message "  Expecting $2 response from $1"
 
@@ -142,16 +142,14 @@ wait_for_response () {
     else
       if [ -n "$attempt_max" ]; then
         log_message "    Attempt $attempt_count of $attempt_max unsuccessful, received '$status'"
+        # if max attempts reached, then exit with non-zero result
+        if [ "$attempt_count" -eq "$attempt_max" ]; then
+          log_message "    Maximum retry count reached. Aborting."
+          return 1
+        fi
       else
         log_message "    Attempt $attempt_count unsuccessful, received '$status'"
       fi
-
-      # if max attempts reached, then exit with non-zero result
-      if [ "$attempt_count" -eq "$attempt_max" ]; then
-        log_message "    Maximum retry count reached. Aborting."
-        return 1
-      fi
-
       sleep 2
     fi
   done
@@ -1095,4 +1093,103 @@ licence_allowed_nodes () {
   local licence_payload=$(get_licence_payload $licence_name)
   # Extract the 'allowed_nodes' value and split by commas to count the elements
   echo "$licence_payload" | jq -r '.allowed_nodes' | tr ',' '\n' | wc -l
+}
+
+create_enterprise_portal_page () {
+  local page_data_dir_path="$1"
+  local api_key="$2"
+
+  if [ -z "$portal_base_url" ]; then
+    log_message "ERROR: portal_base_url is not set. Please ensure that the sourcing script defines it before calling this function."
+    return 1
+  fi
+
+  if [ -z "$api_key" ]; then
+    log_message "ERROR: api_key is not set. Please ensure it is provided before calling this function."
+    return 1
+  fi
+
+  log_message "Creating portal page from path: $page_data_dir_path"
+  if [[ ! -d "$page_data_dir_path" ]]; then
+    log_message "ERROR: Path must be a directory"
+    return 1
+  fi
+
+  page_data_path="$page_data_dir_path/page.json"
+
+  if [[ ! -f $page_data_path ]]; then
+    log_message "ERROR: Missing portal page file $page_data_path"
+    return 1 # can't continue without page.json
+  fi
+
+  log_message "  Processing portal page: $page_data_path"
+
+  local page_title=$(jq -r '.Title' "$page_data_path")
+  local page_path=$(jq -r '.Path' "$page_data_path")
+
+  if [[ -z "$page_title" || -z "$page_path" ]]; then
+    log_message "ERROR: Failed to extract Title or Path from $page_data_path"
+    return 1
+  fi
+
+  log_message "    Title: $page_title"
+  log_message "    URL path: $page_path"
+
+  local api_response=$(curl "$portal_base_url/portal-api/pages" -s -w "\n%{http_code}" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: $api_key" \
+    -d @$page_data_path 2>> logs/bootstrap.log)
+
+  local api_response_body=$(echo "$api_response" | sed '$d')       # Body is all lines except the last
+  local api_response_status=$(echo "$api_response" | tail -n1)     # Last line is the status code
+
+  # Look for 201 - Created
+  if [[ "$api_response_status" == "201" ]]; then 
+    local page_id=$(echo "$api_response_body" | jq -r '.ID')
+    log_message "  Page created with ID: $page_id"
+  else
+    log_message "ERROR: Could not create portal page. API response status $api_response_status, body: $api_response_body"
+    return 1
+  fi
+
+  for content_block_data_path in $page_data_dir_path/content-block-*.json; do
+    if [[ -f "$content_block_data_path" ]]; then
+      log_message "  Processing content block: $content_block_data_path"
+      local content_block_name=$(jq -r '.Name' "$content_block_data_path")
+      local content_block_id=""
+
+      api_response=$(curl "$portal_base_url/portal-api/pages/$page_id/content-blocks" -s \
+        -H "Authorization: $api_key" 2>> logs/bootstrap.log)
+
+      # Page templates come with pre-existing content blocks. So we must check if the block already exists either update or create.
+      if echo "$api_response" | jq -e --arg block_name "$content_block_name" '.[] | select(.Name == $block_name)' > /dev/null; then
+        content_block_id=$(echo "$api_response" | jq -r --arg block_name "$content_block_name" '.[] | select(.Name == $block_name) | .ID')
+        log_message "    Content block '$content_block_name' already exists with ID '$content_block_id', updating"
+
+        api_response=$(curl "$portal_base_url/portal-api/pages/$page_id/content-blocks/$content_block_id" -X PUT -s -w "\n%{http_code}" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: $api_key" \
+          -d @$content_block_data_path 2>> logs/bootstrap.log)
+      else
+        log_message "    Content block '$content_block_name' does not exist, creating"
+
+        api_response=$(curl "$portal_base_url/portal-api/pages/$page_id/content-blocks" -s -w "\n%{http_code}" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: $api_key" \
+          -d @$content_block_data_path 2>> logs/bootstrap.log)
+
+        content_block_id=$(echo "$api_response" | jq -r '.ID')
+      fi
+
+      api_response_body=$(echo "$api_response" | sed '$d')
+      api_response_status=$(echo "$api_response" | tail -n1)
+
+      if [[ "$api_response_status" == "200" || "$api_response_status" == "201" ]]; then
+        log_message "    Upserted content block '$content_block_name', with ID '$content_block_id'"
+      else
+        log_message "ERROR: Could not upsert content block '$content_block_name'. API response status $api_response_status, body: $api_response_body"
+        return 1
+      fi
+    fi
+  done
 }
