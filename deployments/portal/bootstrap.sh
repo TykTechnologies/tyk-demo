@@ -227,6 +227,7 @@ log_ok
 bootstrap_progress
 
 # Create Portal Pages
+log_message "Creating portal pages"
 for page_data_dir_path in deployments/portal/data/pages/*; do
   if [[ -d "$page_data_dir_path" ]]; then
     create_enterprise_portal_page $page_data_dir_path $portal_admin_api_token
