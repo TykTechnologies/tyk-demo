@@ -131,36 +131,6 @@ api_response=$(curl --location "$portal_base_url/portal-api/organisations" -s \
 external_developers_org_id=$(echo $api_response | jq -r .ID)
 log_message "Enternal Developers Org ID: $external_developers_org_id"
 
-# Create GQL Pages
-api_response=$(curl --location "$portal_base_url/portal-api/pages" -s \
---header 'Content-Type: application/json' \
---header 'Accept: application/json' \
---header "Authorization: $portal_admin_api_token" \
---data '{
-  "AllowFormSubmission": false,
-  "Path": "graphql",
-  "Status": "active",
-  "Template": "graphql-getstarted",
-  "Title": "GraphQL"
-}')
-log_message "api_response: $api_response"
-log_ok
-bootstrap_progress
-api_response=$(curl --location "$portal_base_url/portal-api/pages" -s \
---header 'Content-Type: application/json' \
---header 'Accept: application/json' \
---header "Authorization: $portal_admin_api_token" \
---data '{
-  "AllowFormSubmission": false,
-  "Path": "graphql-playground",
-  "Status": "active",
-  "Template": "graphql-playground",
-  "Title": "GraphQL Playground"
-}')
-log_message "api_response: $api_response"
-log_ok
-bootstrap_progress
-
 # Create Users
 api_response=$(curl --location "$portal_base_url/portal-api/users" -s \
 --header 'Content-Type: application/json' \
