@@ -704,7 +704,7 @@ read_api () {
   echo "$api_response"
 }
 
-create_api () {
+create_api2 () {
   local api_data_path="$1"
   local dashboard_api_key="$2"
   local api_data="$(cat $api_data_path)"
@@ -760,6 +760,99 @@ create_api () {
   local api_response="$(curl $api_endpoint -s \
     -H "authorization: $dashboard_api_key" \
     -d "$api_data" 2>> logs/bootstrap.log)"
+
+  log_json_result "$api_response"
+}
+
+create_api() {
+  local api_data_path="$1"
+  local dashboard_api_key="$2"
+
+  if [[ -z "$api_data_path" || -z "$dashboard_api_key" ]]; then
+    log_message "ERROR: Missing required parameters. Usage: create_api <api_data_path> <dashboard_api_key>"
+    return 1
+  fi
+
+  if [[ ! -f "$api_data_path" ]]; then
+    log_message "ERROR: File not found: $api_data_path"
+    return 1
+  fi
+
+  # check that required variables are set
+  check_variables
+
+  local api_name=""
+  local api_id=""
+  local api_type=""
+  local api_endpoint="$dashboard_base_url/api/apis"
+  local extra_headers=()
+
+  # Read JSON data once
+  local api_data=$(cat "$api_data_path")
+
+  # Determine API type based on JSON structure
+  if jq -e 'has("x-tyk-api-gateway")' <<< "$api_data" > /dev/null; then
+    api_name=$(jq -r '."x-tyk-api-gateway".info.name' <<< "$api_data")
+    api_id=$(jq -r '."x-tyk-api-gateway".info.id' <<< "$api_data")
+
+    if jq -e 'has("x-tyk-streaming")' <<< "$api_data" > /dev/null; then
+      api_type="Streams"
+      api_endpoint="$api_endpoint/streams"
+      extra_headers=("-H" "Content-Type: application/vnd.tyk.streams.oas")
+    else
+      api_type="OAS"
+      api_endpoint="$api_endpoint/oas"
+    fi
+  elif jq -e 'has("api_definition")' <<< "$api_data" > /dev/null; then
+    api_type="Classic"
+    api_name=$(jq -r '.api_definition.name' <<< "$api_data")
+    api_id=$(jq -r '.api_definition.api_id' <<< "$api_data")
+  else
+    log_message "ERROR: Unable to determine API type: $api_data_path"
+    return 1
+  fi
+
+  log_message "  Creating API: $api_name"
+  log_message "    Type: $api_type"
+  log_message "    ID: $api_id"
+
+  # Handle webhook references
+  local webhook_reference_count=$(jq '.hook_references | length // 0' <<< "$api_data")
+  if [[ "$webhook_reference_count" -gt 0 ]]; then
+    local webhook_data=$(curl -s "$dashboard_base_url/api/hooks?p=-1" \
+      -H "Authorization: $dashboard_api_key" | jq '.hooks[]')
+
+    while read -r webhook_name; do
+      log_message "  Updating Webhook Reference: $webhook_name"
+      local new_webhook_id=$(jq -r --arg webhook_name "$webhook_name" 'select(.name == $webhook_name) .id' <<< "$webhook_data")
+
+      if [[ -z "$new_webhook_id" ]]; then
+        log_message "ERROR: Webhook not found: $webhook_name"
+        continue
+      fi
+
+      api_data=$(jq --arg webhook_id "$new_webhook_id" --arg webhook_name "$webhook_name" \
+        '(.hook_references[] | select(.hook.name == $webhook_name) .hook.id) = $webhook_id' <<< "$api_data")
+
+      if [[ "$api_type" == "Classic" ]]; then
+        api_data=$(jq --arg webhook_id "$new_webhook_id" --arg webhook_name "$webhook_name" \
+          '(.api_definition.event_handlers.events.AuthFailure[]? | select(.handler_meta.name == $webhook_name) .handler_meta.id) = $webhook_id' <<< "$api_data")
+      fi
+
+      log_message "    ID: $new_webhook_id"
+    done < <(jq -c -r '.hook_references[].hook.name' <<< "$api_data")
+  fi
+
+  # Send API creation request
+  local api_response=$(curl -s "$api_endpoint" \
+    -H "Authorization: $dashboard_api_key" \
+    "${extra_headers[@]}" \
+    -d "$api_data" 2>> logs/bootstrap.log)
+
+  if [[ -z "$api_response" ]]; then
+    log_message "ERROR: Empty response from API."
+    return 1
+  fi
 
   log_json_result "$api_response"
 }
