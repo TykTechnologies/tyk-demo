@@ -7,8 +7,13 @@ source scripts/common.sh
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 
 declare -a data_groups=("1" "2")
-declare -a organisation_names=("$(get_context_data "1" "organisation" "1" "name")" "$(get_context_data "2" "organisation" "1" "name")")
-declare -a dashboard_keys=("$(get_context_data "1" "dashboard-user" "1" "api-key")" "$(get_context_data "2" "dashboard-user" "1" "api-key")")
+declare -a organisation_names=()
+declare -a dashboard_keys=()
+
+for group in "${data_groups[@]}"; do
+  organisation_names+=("$(get_context_data "$group" "organisation" "1" "name")")
+  dashboard_keys+=("$(get_context_data "$group" "dashboard-user" "1" "api-key")")
+done
 
 index=0
 for data_group in "${data_groups[@]}"; do\
@@ -28,8 +33,6 @@ for data_group in "${data_groups[@]}"; do\
         # update API specification document to use OAS-style API definition
         api=$(curl $dashboard_base_url/api/apis/oas/$api_id -s \
           -H "Authorization:${dashboard_keys[$index]}")
-        # update file name to denote that the contents are an OAS-style API definition
-        api_file_name="api-oas-$api_id.json"
         # remove the dbId field, as this changes every time the data is exported, resulting in unneccessary modifications
         api="$(echo "$api" | jq 'del(.["x-tyk-api-gateway"].info.dbId)')"
       else
