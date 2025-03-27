@@ -12,7 +12,7 @@
     "ProviderConfig": {
         "FailureRedirect": "DASHBOARD_HOST/failure",
         "LDAPAttributes": [],
-        "LDAPPort": "10389",
+        "LDAPPort": "389",
         "LDAPServer": "ldap-server",
         "LDAPUserDN": "uid=*USERNAME*,ou=users,dc=tyk,dc=io"
     },

@@ -1,0 +1,8 @@
+dn: uid=test,ou=users,dc=tyk,dc=io
+objectClass: inetOrgPerson
+uid: test
+sn: Test
+givenName: Test
+cn: Test User
+displayName: Test User
+userPassword: secret

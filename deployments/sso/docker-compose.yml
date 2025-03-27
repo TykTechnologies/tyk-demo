@@ -31,8 +31,12 @@ services:
       - ./deployments/sso/volumes/tyk-identity-broker/tib.conf:/opt/tyk-identity-broker/tib.conf
       - ./deployments/sso/volumes/tyk-identity-broker/profiles.json:/opt/tyk-identity-broker/profiles.json
   ldap-server:
-    image: dwimberger/ldap-ad-it:latest
+    image: osixia/openldap:1.5.0
     networks:
       - tyk
+    environment:
+      - LDAP_ORGANISATION=Tyk Technologies
+      - LDAP_DOMAIN=tyk.io
+      - LDAP_ADMIN_PASSWORD=admin
     volumes:
-      - ./deployments/sso/volumes/ldap-server/users.ldif:/ldap/users.ldif
+      - ./deployments/sso/volumes/ldap-server/ldif:/ldap
