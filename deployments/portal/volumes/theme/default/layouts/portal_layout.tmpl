@@ -1,0 +1,80 @@
+<!-- Main layout used to render all content pages -->
+
+{{ $pageTitle := PageTitle req }}
+{{ $isAuth := IsAuthPath req}}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{{ if $pageTitle}} {{ $pageTitle}} {{else}} {{ if .page}} {{.page.Title}} {{else}} Developer Portal {{end}} {{end}}</title>
+    <!-- Google Tag Manager -->
+    {{if IsFullstoryEnabled}}
+      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-NGN82WCD');</script>
+    {{end}}
+    <!-- End Google Tag Manager -->
+    <!-- stoplight.io -->
+    <script>
+      function loadFallbackScript(src) {
+        let script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        document.head.appendChild(script);
+      }
+    </script>
+    <script src="https://unpkg.com/@stoplight/elements/web-components.min.js" onerror="loadFallbackScript('/assets/vendor/stoplight/elements/web-components.min.js')" async></script>
+    <link rel="preload" href="https://unpkg.com/@stoplight/elements/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" onerror="this.onerror=null;this.href='/assets/vendor/stoplight/elements/styles.min.css'">
+    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"> </script>
+
+	<script src="https://unpkg.com/@asyncapi/react-component@latest/browser/standalone/index.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@latest/styles/default.min.css">
+
+    <!-- Load style assets -->
+    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link href="/assets/stylesheets/fonts.css{{.previewId}}" rel="stylesheet">
+    <link href="/assets/stylesheets/main.css{{.previewId}}" rel="stylesheet">
+
+    <script>
+      window.addEventListener('pageshow', (event) => {
+        if (event.persisted && !document.cookie.match(/_session/)) {
+          // the page should reload when the user is logged out
+          location.reload();
+        }
+      });
+    </script>
+</head>
+
+  <body {{if $isAuth}}style="margin-top:0;padding:0;"{{end}}>
+      <!-- Render top navigation menu -->
+
+      {{if not $isAuth}}
+        {{ render "top_nav" . }}
+      {{end}}
+
+      <!-- Render main page content -->
+      {{ if $isAuth }}
+        {{ yield }}
+      {{else}}
+        <div class="page-wrapper">
+          {{ yield }}
+        </div>
+      {{end}}
+      <!-- Render footer menu -->
+      {{if not $isAuth}}
+        {{ render "footer" . }}
+      {{end}}
+
+  </body>
+
+</html>

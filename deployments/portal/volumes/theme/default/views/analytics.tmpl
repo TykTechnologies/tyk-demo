@@ -1,0 +1,334 @@
+{{ $user := CurrentUser req }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<div class="private-portal-wrapper">
+  <div class="dashboard-container">
+    <h1 class="title-h1-bold dark">Dashboard</h1>
+    <p class="text-regular-14 dark mb-0">Hi {{$user.First}}, welcome back!</p>
+    {{ if .errors }}
+      <div class="alert alert-danger" role="alert">
+          {{ range $category, $messages := .errors }}
+          {{$category}}
+          <i class="tyk-icon tykon tykon-warning "></i>
+          {{ range $i, $message := $messages }}
+          <br/>
+          <div class="alert__content">{{ $message }}</div>
+          {{ end }}
+      </div>
+	        {{end}}
+    {{ end }}
+    <div class="d-flex flex-row justify-content-end">
+      <div id="analytics-date-picker" class="date-picker d-flex flex-row justify-content-around">
+        <i class="bi bi-calendar-minus calendar-icon"></i>
+        <p id="analytics-date-picker-selected-range" class="text-open-sans-semibold dark">This week</p>
+      </div>
+    </div>
+    <div class="dashboard-tabs-wrapper step-wrapper d-flex d-row mt-14">
+      <div class="step active analytics-tab mr-10">
+        <div class="tab-text">
+          <p class="m-0 text-open-sans-semibold gray">Perfomance</p>
+          <h1 class="m-0 title-h1-bold dark">Overview</h1>
+        </div>
+      </div>
+      <div id="traffic-chart-tab" class="step analytics-tab mr-14">
+        <div class="tab-text">
+          <p class="m-0 text-open-sans-semibold gray">Total API Calls</p>
+          <h1 id="total-api-calls" class="m-0 title-h1-bold dark"></h1>
+          <div id="traffic-vs-last-week" class="d-flex flex-row align-items-end mt-1">
+            <span id="traffic-vs-last-week-dafault" class="text-regular-14 gray-lighter d-none">-</span>
+            <span class="text-regular-12 gray-lighter ml-3">vs last week</span>
+          </div>
+        </div>
+      </div>
+      <div id="error-rate-chart-tab" class="step analytics-tab mr-10">
+        <div class="tab-text">
+          <p class="m-0 text-open-sans-semibold gray">Error rate (average)</p>
+          <h1 id="error-rate-average" class="m-0 title-h1-bold dark"></h1>
+          <div id="error-rate-vs-last-week" class="d-flex flex-row align-items-end mt-1">
+            <span id="error-rate-vs-last-week-dafault" class="text-regular-14 gray-lighter d-none">-</span>
+            <span class="text-regular-12 gray-lighter ml-3">vs last week</span>
+          </div>
+        </div>
+      </div>
+      <div id="latency-chart-tab" class="step analytics-tab">
+        <div class="tab-text">
+          <p class="m-0 text-open-sans-semibold gray">Latency (average)</p>
+          <h1 id="latency-average" class="m-0 title-h1-bold dark"></h1>
+          <div id="latency-vs-last-week" class="d-flex flex-row align-items-end mt-1">
+            <span id="latency-vs-last-week-dafault" class="text-regular-14 gray-lighter d-none">-</span>
+            <span class="text-regular-12 gray-lighter ml-3">vs last week</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content-wrapper">
+      <div class="content-wrapper__content d-block">
+        <div class="analytics-content d-flex flex-column align-items-center">
+          <div class="api-calls-wrapper flex-column d-flex">
+            <div class="d-flex flex-row">
+              <div class="top-row-content ml-27">
+                <p class="m-0 text-open-sans-semibold gray">Total API Calls</p>
+                <h1 id="usageTabTotalAPICalls" class="m-0 title-h1-bold dark">0</h1>
+              </div>
+              <div class="top-row-content">
+                <p class="m-0 text-open-sans-semibold gray">Success</p>
+                <h1 id="usageTabSuccess" class="m-0 title-h1-bold dark">0</h1>
+              </div>
+              <div class="top-row-content">
+                <p class="m-0 text-open-sans-semibold gray">Errors</p>
+                <h1 id="usageTabErrors" class="m-0 title-h1-bold dark">0</h1>
+              </div>
+              <select id="analytics-overview-select-apps" class="analytics-select-overview">
+                <option value="0" selected>All apps</option>
+                {{ range $app := .apps}}
+                  <option value="{{$app.ID}}">
+                      {{$app.Name}}
+                  </option>
+                {{end}}
+              </select>
+            </div>
+
+            <div class="d-flex flex-row">
+              <canvas id="hits-vs-errors-chart" class="d-flex flex-row" style="margin: 20px 20px auto; max-height: 350px;"> </canvas>
+            </div>
+            <div id="hits-vs-errors-chart-csv" class="d-flex flex-row-reverse mt-20 mr-20 export-wrapper">
+              <span class="text-open-sans-bold export">EXPORT TO CSV</span>
+              <i class="bi bi-download download-icon"></i>
+            </div>
+          </div>
+          <div class="d-flex flex-row justify-content-between align-items-center row-graph-wrapper">
+            <div class="errors-graph-wrapper">
+              <div class="d-flex flex-row ml-20 mt-20">
+                <h3 class="text-os-bold-17 dark">
+                  Top 5 highest error rates by API
+                </h3>
+              </div>
+              <div class="d-flex flex-row">
+                <canvas id="error-rates-chart" class="d-flex flex-row" style="margin: 20px 10px auto; min-height:280px;max-height: 280px"> </canvas>
+              </div>
+              <div id="error-rates-chart-csv" class="d-flex flex-row ml-315 mt-20 export-wrapper">
+                <i class="bi bi-download download-icon"></i>
+                <span class="text-open-sans-bold export">EXPORT TO CSV</span>
+              </div>
+            </div>
+            <div class="errors-graph-wrapper">
+              <div class="d-flex flex-row ml-20 mt-20">
+                <h3 class="text-os-bold-17 dark">
+                  Error breakdown
+                </h3>
+              </div>
+              <div class="d-flex flex-row">
+                <canvas id="error-breakdown-chart" class="d-flex flex-row" style="margin: 20px 10px auto; max-height: 280px"> </canvas>
+              </div>
+              <div id="error-breakdown-chart-csv" class="d-flex flex-row ml-315 mt-20 export-wrapper">
+                <i class="bi bi-download download-icon"></i>
+                <span class="text-open-sans-bold export">EXPORT TO CSV</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content-wrapper__content d-none">
+        <div class="analytics-content h-2 d-flex flex-column align-items-center">
+            <div class="filter-data-by">
+              <h4 class="text-os-semibold-16 default-base mt-14 ml-18">Filter data by</h4>
+              <div class="d-flex flex-row mt-14 ml-20">
+                <div class="d-flex flex-column w-465">
+                  <div id="apps-filter-traffic-chart" class="select-tags-wrapper-apps select-tags-wrapper mt-30 d-flex flex-row ml-2">
+                      <div class="tag-item">
+                      All apps
+                      <i class="bi bi-x x-icon"></i>
+                      </div>
+                  </div>
+                  <p class="text-open-sans-semibold dark mb-1">Apps</p>
+                  <select class="analytics-select-many analytics-select-many-apps">
+                      <option selected value="All apps">
+                      All apps
+                      </option>
+                      {{ range $app := .apps}}
+                          <option id="{{$app.Name}}" data-appID="{{$app.ID}}" value="{{$app.Name}}">
+                              {{$app.Name}}
+                          </option>
+                      {{end}}
+                  </select>
+                </div>
+                <div class="d-flex flex-column w-465">
+                  <div class="d-flex flex-row align-items-center">
+                    <p class="text-open-sans-semibold dark mb-1">Response codes</p>
+                      <span class="help-icon ml-1" data-bs-toggle="tooltip" title="Type in a response code and press 'Enter' to apply the filter. You can filter by multiple response codes at the same time">
+                        <img src="/assets/images/help.svg" tabindex="0">
+                      </span>
+                  </div>
+                  <div id="codes-filter-traffic-chart" class="analytics-select-many-input d-flex flex-row">
+                    <input placeholder="All response codes" class="ml-2" id="response-codes-traffic-chart">
+                    </input>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <div class="total-api-calls-wrapper">
+            <div class="d-flex flex-row mt-29 ml-27 align-items-end">
+              <div class="d-flex flex-column w-185">
+                <p class="text-open-sans-semibold dark mb-1">Statistics</p>
+                <select class="analytics-select-2">
+                  <option value="Total API Calls" selected>Total API Calls</option>
+                </select>
+              </div>
+              <div class="d-flex flex-column w-185">
+                <p class="text-open-sans-semibold dark mb-1">Time units</p>
+                <select id="traffic-time-unit" class="analytics-select-2">
+                  <option value="day" selected>Daily</option>
+                  <option value="hour">Hourly</option>
+                </select>
+              </div>
+              <div class="d-flex flex-column w-185">
+                <p class="text-open-sans-semibold dark mb-1">Split by</p>
+                <select class="analytics-select-2">
+                  <option value="APIs" selected>APIs</option>
+                </select>
+              </div>
+              <div id="traffic-chart-csv" class="d-flex flex-row ml-140 mb-2 export-wrapper">
+                <i class="bi bi-download download-icon"></i>
+                <span class="text-open-sans-bold export">EXPORT API CALLS TO CSV</span>
+              </div>
+            </div>
+            <div class="m-4 mt-5">
+              <canvas id="traffic-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content-wrapper__content d-none">
+        <div class="analytics-content h-2 d-flex flex-column align-items-center">
+          <div class="filter-data-by">
+              <h4 class="text-os-semibold-16 default-base mt-14 ml-18">Filter data by</h4>
+              <div class="d-flex flex-row mt-14 ml-20">
+                <div class="d-flex flex-column w-465">
+                  <div id="apps-filter-error-rate-chart" class="select-tags-wrapper-apps select-tags-wrapper mt-30 d-flex flex-row ml-2">
+                      <div class="tag-item">
+                      All apps
+                      <i class="bi bi-x x-icon"></i>
+                      </div>
+                  </div>
+                  <p class="text-open-sans-semibold dark mb-1">Apps</p>
+                  <select class="analytics-select-many-apps analytics-select-many">
+                      <option selected value="All apps">
+                      All apps
+                      </option>
+                      {{ range $app := .apps}}
+                          <option id="{{$app.Name}}" data-appID="{{$app.ID}}" value="{{$app.Name}}">
+                              {{$app.Name}}
+                          </option>
+                      {{end}}
+                  </select>
+                </div>
+                <div class="d-flex flex-column w-465">
+                  <div class="d-flex flex-row align-items-center">
+                    <p class="text-open-sans-semibold dark mb-1">Response codes</p>
+                      <span class="help-icon ml-1" data-bs-toggle="tooltip" title="Type in a response code and press 'Enter' to apply the filter. You can filter by multiple response codes at the same time">
+                        <img src="/assets/images/help.svg" tabindex="0">
+                      </span>
+                  </div>
+                  <div id="codes-filter-error-rate-chart" class="analytics-select-many-input d-flex flex-row">
+                    <input placeholder="All response codes" class="ml-2" id="response-codes-error-rate-chart">
+                    </input>
+                  </div>
+                </div>
+              </div>
+          </div>
+          <div class="total-api-calls-wrapper">
+            <div class="d-flex flex-row mt-29 ml-27 align-items-end">
+              <div class="d-flex flex-column w-185">
+                <p class="text-open-sans-semibold dark mb-1">Statistics</p>
+                <select id="error-rate-statistics" class="analytics-select-2">
+                  <option value="error-rate" selected>Error rate</option>
+                  <option value="total-errors">Total errors</option>
+                </select>
+              </div>
+              <div class="d-flex flex-column w-185">
+                <p class="text-open-sans-semibold dark mb-1">Time units</p>
+                <select id="error-rate-time-unit" class="analytics-select-2">
+                  <option value="hour" selected>Hourly</option>
+                  <option value="day">Daily</option>
+                </select>
+              </div>
+              <div class="d-flex flex-column w-185">
+                <p class="text-open-sans-semibold dark mb-1">Split by</p>
+                <select class="analytics-select-2">
+                  <option value="APIs" selected>APIs</option>
+                </select>
+              </div>
+              <div id="error-rate-chart-csv" class="d-flex flex-row ml-140 mb-2 export-wrapper">
+                <i class="bi bi-download download-icon"></i>
+                <span class="text-open-sans-bold export">EXPORT ERRORS TO CSV</span>
+              </div>
+            </div>
+            <div class="m-4 mt-5">
+              <canvas id="error-rate-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content-wrapper__content d-none">
+        <div class="analytics-content h-2 d-flex flex-column align-items-center">
+          <div class="filter-data-by">
+            <h4 class="text-os-semibold-16 default-base mt-14 ml-18">Filter data by</h4>
+            <div class="d-flex flex-row mt-14 ml-20">
+                <div class="d-flex flex-column w-465">
+                <div id="apps-filter-latency-chart" class="select-tags-wrapper-apps select-tags-wrapper mt-30 d-flex flex-row ml-2">
+                    <div class="tag-item">
+                    All apps
+                    <i class="bi bi-x x-icon"></i>
+                    </div>
+                </div>
+                <p class="text-open-sans-semibold dark mb-1">Apps</p>
+                <select class="analytics-select-many-apps analytics-select-many apps-latency">
+                    <option selected value="All apps">
+                    All apps
+                    </option>
+                    {{ range $app := .apps}}
+                        <option id="{{$app.Name}}" data-appID="{{$app.ID}}" value="{{$app.Name}}">
+                            {{$app.Name}}
+                        </option>
+                    {{end}}
+                </select>
+                </div>
+            </div>
+          </div>
+          <div class="total-api-calls-wrapper">
+            <div class="d-flex flex-row mt-29 ml-27 align-items-end">
+              <div class="d-flex flex-column w-185">
+                <p class="text-open-sans-semibold dark mb-1">Statistics</p>
+                <select class="analytics-select-2">
+                  <option selected value="Average latency">Average latency</option>
+                </select>
+              </div>
+              <div class="d-flex flex-column w-185">
+                <p class="text-open-sans-semibold dark mb-1">Time units</p>
+                <select id="latency-time-unit" class="analytics-select-2">
+                  <option value="hour" selected>Hourly</option>
+                  <option value="day">Daily</option>
+                </select>
+              </div>
+              <div class="d-flex flex-column w-185">
+                <p class="text-open-sans-semibold dark mb-1">Split by</p>
+                <select class="analytics-select-2">
+                  <option value="APIs" selected>APIs</option>
+                </select>
+              </div>
+              <div id="latency-chart-csv" class="d-flex flex-row ml-140 mb-2 export-wrapper">
+                <i class="bi bi-download download-icon"></i>
+                <span class="text-open-sans-bold export">EXPORT LATENCY TO CSV</span>
+              </div>
+            </div>
+            <div class="m-4 mt-5">
+              <canvas id="latency-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-autocolors"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.2.3/flatpickr.js"></script>

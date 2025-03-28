@@ -6,40 +6,14 @@ deployment="Enterprise Portal"
 log_start_deployment
 bootstrap_progress
 
-log_message "Reset the logfile"
-> ./deployments/portal/volumes/portal.log
+log_message "Remove pre-existing log files"
+rm -rf ./deployments/portal/volumes/logs/* > /dev/null 2>&1
 
-# Grab the Dashboard License line from ENV file
-licence_line=$(grep "DASHBOARD_LICENCE=" .env)
-# Parse out the DASHBOARD_LICENSE= bit
-encoded_licence_jwt=$(echo $licence_line | sed -E 's/^[A-Z_]+=(.+)$/\1/')
+portal_base_url="http://tyk-portal.localhost:3100"
 
 # Get Tyk Dashboard API Access Credentials
 dashboard_user_api_credentials=$(get_context_data "1" "dashboard-user" "1" "api-key")
 dashboard_user_org_id=$(get_context_data "1" "organisation" "1" "id")
-# Export to envs for docker
-log_message "Exporting Docker Environment Variables for Enterprise Portal in .env"
-set_docker_environment_value "ADMIN_EMAIL" $(get_context_data "1" "dashboard-user" "1" "email")
-set_docker_environment_value "ADMIN_PASSWORD" $(get_context_data "1" "dashboard-user" "1" "password")
-set_docker_environment_value "ADMIN_ORG_ID" $dashboard_user_org_id
-set_docker_environment_value "TYK_DASHBOARD_API_ACCESS_CREDENTIALS" $dashboard_user_api_credentials
-
-# Postgres Env configuration for tyk portal
-set_docker_environment_value "PORTAL_HOST_PORT" 3001
-set_docker_environment_value "PORTAL_DATABASE_DIALECT" postgres
-set_docker_environment_value "POSTGRES_PASSWORD" secr3t
-set_docker_environment_value "PORTAL_DATABASE_CONNECTIONSTRING" "host=tyk-portal-postgres port=5432 dbname=portal user=admin password=$(grep "POSTGRES_PASSWORD=" .env | sed -E 's/^[A-Z_]+=(.+)$/\1/') sslmode=disable"
-set_docker_environment_value "PORTAL_DATABASE_ENABLELOGS" true
-set_docker_environment_value "PORTAL_THEMING_THEME" default
-set_docker_environment_value "PORTAL_THEMING_PATH" ./themes
-set_docker_environment_value "PORTAL_LICENSEKEY" $encoded_licence_jwt
-set_docker_environment_value "PORTAL_DOCRENDERER" stoplight
-set_docker_environment_value "PORTAL_REFRESHINTERVAL" 10
-set_docker_environment_value "PORTAL_LOG_LEVEL" debug
-set_docker_environment_value "PORTAL_LOG_FORMAT" dev
-set_docker_environment_value "PORTAL_AUDIT_LOG_ENABLE" true
-
-
 
 # Create Plans and Policies for NEW Developer Portal
 log_message "Creating Enterprise Portal Plans"
@@ -72,14 +46,8 @@ for file in deployments/portal/data/products/*; do
 done
 log_ok
 
-log_message "Recreating tyk-portal-postgres for new env vars"
-$(generate_docker_compose_command) rm -f -s tyk-portal-postgres 1>/dev/null 2>&1
-$(generate_docker_compose_command) up -d tyk-portal-postgres 2>/dev/null
-bootstrap_progress log_ok
-
-log_message "Recreating tyk-portal for new env vars"
-$(generate_docker_compose_command) rm -f -s tyk-portal 1>/dev/null 2>&1
-$(generate_docker_compose_command) up -d tyk-portal 2>/dev/null
+log_message "Recreating tyk-portal-postgres and tyk-portal for new env vars"
+$(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-portal-postgres tyk-portal 1>/dev/null 2>>logs/bootstrap.log
 bootstrap_progress
 log_ok
 
@@ -87,12 +55,14 @@ portal_admin_user_email=$(get_context_data "1" "dashboard-user" "1" "email")
 portal_admin_user_password=$(get_context_data "1" "dashboard-user" "1" "password")
 
 log_message "Waiting for Tyk-Portal container to come online ..."
-wait_for_response "http://tyk-portal.localhost:3100/ready" "200"
-sleep 5 #TODO: Deprecate this when advanced ready endpoint is available
+wait_for_status "$portal_base_url/ready" "200" ".message" "Success" "10"
+if [ $? -ne 0 ]; then
+  echo "ERROR: Tyk-Portal container failed to come online."
+  exit 1
+fi
 
 log_message "Bootstrapping the Portal Admin ..."
-# Need to loop this to wait for portal to come online
-api_response=$(curl 'http://tyk-portal.localhost:3100/portal-api/bootstrap' -s \
+api_response=$(curl "$portal_base_url/portal-api/bootstrap" -s \
   -H 'Content-Type: application/json' \
   --data-raw '{
     "username":"'$portal_admin_user_email'",
@@ -105,17 +75,17 @@ log_ok
 bootstrap_progress
 
 portal_admin_api_token=$(echo $api_response | jq -r .data.api_token)
-set_docker_environment_value "PORTAL_ADMIN_API_TOKEN" $portal_admin_api_token
 
 # Set Context Data for Portal User
 set_context_data "1" "enterprise-portal-admin" "1" "api-key" "$portal_admin_api_token"
 
 log_message "Waiting for the bootstrap to complete ..."
-sleep 5 #TODO: Deprecate this when advanced ready endpoint is available
+# wait for API to return 200 to this request
+wait_for_response "$portal_base_url/portal-api/providers" "200" "Authorization: $portal_admin_api_token" "10"
 
 # Configure Provider settings for Tyk-Dashboard
 log_message "Creating the Provider ..."
-api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/providers' -s \
+api_response=$(curl --location "$portal_base_url/portal-api/providers" -s \
 --header 'Content-Type: application/json' \
 --header 'Accept: application/json' \
 --header "Authorization: $portal_admin_api_token" \
@@ -131,7 +101,7 @@ log_ok
 bootstrap_progress
 
 log_message "Synchronizing the Provider with ID: $provider_id"
-api_response=$(curl --location --request PUT "http://tyk-portal.localhost:3100/portal-api/providers/$provider_id/synchronize" -s \
+api_response=$(curl --location --request PUT "$portal_base_url/portal-api/providers/$provider_id/synchronize" -s \
 --header "Accept: application/json" \
 --header "Authorization: $portal_admin_api_token")
 log_message "api_response: $(echo $api_response | jq -r .message)"
@@ -141,7 +111,7 @@ bootstrap_progress
 
 # Create Organizations
 log_message "Creating the Portal Organizations"
-api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/organisations' -s \
+api_response=$(curl --location "$portal_base_url/portal-api/organisations" -s \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/json' \
   --header "Authorization: $portal_admin_api_token" \
@@ -151,8 +121,7 @@ api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/orga
 internal_developers_org_id=$(echo $api_response | jq -r .ID)
 log_message "Internal Developers Org ID: $internal_developers_org_id"
 
-
-api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/organisations' -s \
+api_response=$(curl --location "$portal_base_url/portal-api/organisations" -s \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/json' \
   --header "Authorization: $portal_admin_api_token" \
@@ -163,7 +132,7 @@ external_developers_org_id=$(echo $api_response | jq -r .ID)
 log_message "Enternal Developers Org ID: $external_developers_org_id"
 
 # Create Users
-api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/users' -s \
+api_response=$(curl --location "$portal_base_url/portal-api/users" -s \
 --header 'Content-Type: application/json' \
 --header 'Accept: application/json' \
 --header "Authorization: $portal_admin_api_token" \
@@ -180,7 +149,7 @@ api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/user
   "Password": "password"
 }')
 
-api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/users' -s \
+api_response=$(curl --location "$portal_base_url/portal-api/users" -s \
 --header 'Content-Type: application/json' \
 --header 'Accept: application/json' \
 --header "Authorization: $portal_admin_api_token" \
@@ -198,7 +167,7 @@ api_response=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/user
 }')
 
 # Construct the Payload for Updating the Internal API Products
-internal_products=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/products/1' -s \
+internal_products=$(curl --location "$portal_base_url/portal-api/products/1" -s \
 --header 'Accept: application/json' \
 --header "Authorization: $portal_admin_api_token")
 
@@ -206,14 +175,14 @@ internal_products=$(echo $internal_products | jq -r '.Description = "Internal AP
 internal_products=$(echo $internal_products | jq -r '.Catalogues = [2]')
 internal_products=$(echo $internal_products | jq -r '.APIDetails[0].OASUrl = "https://httpbin.org/spec.json"')
 
-api_response=$(curl --location --request PUT 'http://tyk-portal.localhost:3100/portal-api/products/1' -s \
+api_response=$(curl --location --request PUT "$portal_base_url/portal-api/products/1" -s \
 --header 'Content-Type: application/json' \
 --header 'Accept: application/json' \
 --header "Authorization: $portal_admin_api_token" \
 --data "$internal_products")
 
 # Construct the Payload for Updating the External API Products
-external_products=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/products/2' -s \
+external_products=$(curl --location "$portal_base_url/portal-api/products/2" -s \
 --header 'Accept: application/json' \
 --header "Authorization: $portal_admin_api_token")
 
@@ -228,7 +197,7 @@ api_response=$(curl --location --request PUT 'http://tyk-portal.localhost:3100/p
 --data "$external_products")
 
 log_message "Updating Plans for correct listing in Catalogues"
-all_plans=$(curl --location 'http://tyk-portal.localhost:3100/portal-api/plans' -s \
+all_plans=$(curl --location "$portal_base_url/portal-api/plans" -s \
 --header 'Accept: application/json' \
 --header "Authorization: $portal_admin_api_token")
 
@@ -238,7 +207,7 @@ plans=($(echo $all_plans | jq -r '.[].ID'))
 # For each Plan, update where it belongs
 for plan in "${plans[@]}"; do
   sleep 0.75
-  plan_response=$(curl --location "http://tyk-portal.localhost:3100/portal-api/plans/$plan" -s \
+  plan_response=$(curl --location "$portal_base_url/portal-api/plans/$plan" -s \
   --header 'Accept: application/json' \
   --header "Authorization: $portal_admin_api_token")
   plan_response=$(echo $plan_response | jq -r '.Catalogues = [1]')
@@ -247,7 +216,7 @@ for plan in "${plans[@]}"; do
   then
     plan_response=$(echo $plan_response | jq -r '.Catalogues = [1, 2]')
   fi
-  api_response=$(curl --location --request PUT "http://tyk-portal.localhost:3100/portal-api/plans/$plan" -s \
+  api_response=$(curl --location --request PUT "$portal_base_url/portal-api/plans/$plan" -s \
   --header 'Content-Type: application/json' \
   --header 'Accept: application/json' \
   --header "Authorization: $portal_admin_api_token" \
@@ -256,6 +225,21 @@ for plan in "${plans[@]}"; do
 done
 log_ok
 bootstrap_progress
+
+# Create Portal Pages
+log_message "Creating portal pages"
+for page_data_dir_path in deployments/portal/data/pages/*; do
+  if [[ -d "$page_data_dir_path" ]]; then
+    create_enterprise_portal_page $page_data_dir_path $portal_admin_api_token
+    if [ $? -ne 0 ]; then
+      echo "ERROR: Failed to create Portal Page $page_data_dir_path"
+      exit 1
+    else 
+      log_ok
+    fi
+    bootstrap_progress
+  fi
+done
 
 # Store API token in env var file, for use by test scripts
 echo "jwt=$portal_admin_api_token" > deployments/portal/dynamic-test-vars.env

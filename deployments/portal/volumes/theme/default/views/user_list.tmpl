@@ -1,0 +1,96 @@
+{{ $user := CurrentUser req }}
+<div class="private-portal-wrapper">
+  <div class="container">
+
+    {{ render "messages" . }}
+
+    <div class="row">
+      <div>
+        <div class="row">
+          <div class="col-md-10 user-list-title-wrapper">
+            <h2 class="users-main-title">Users</h2>
+            <p>Here’s a list of all the members that are part of this organisation.</p>
+          </div>
+          {{ if eq $user.Role "consumer-admin" }}
+          <div class="col-2 align-self-center">
+            <a class="btn btn-primary" href="users/invite">
+              <i class="tyk-icon tykon tykon-plus "></i>
+              <span>Invite new user</span>
+            </a>
+          </div>
+          {{ end }}
+        </div>
+        <hr/>
+        <form class="mb-4 mt-4">
+          <div class="search-form-wrapper d-flex flex-row">
+            <div class="pr-2 input-group search-container w-100">
+              <input type="text" placeholder="Search" class="form-control search-input" id="search" name="search">
+              <div class="input-group-append">
+                <label class="search__label">
+                  <i class="tyk-icon tykon tykon-search"></i>
+                </label>
+              </div>
+            </div>
+            <div class="pr-2 align-self-center ml-auto">
+              <button type="submit" class="btn btn-secondary-outline w-100">Search</button>
+            </div>
+          </div>
+        </form>
+        <div class="mb-5">
+          {{ $userInvites := FilterUserInvites req}}
+          {{ if $userInvites }}
+            <div class="table-wrapper">
+              <table class="table">
+                <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Member Since</th>
+                  <th>Status</th>
+                  <th class="actions-cell">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{ $roles := .roles }}
+                {{ range $i, $userInvite := $userInvites }}
+                  <tr>
+                    <td>
+                      <a class="breadcrumb-link private-portal-user-details" href="users/{{ $userInvite.ID }}">{{ $userInvite.First }} {{ $userInvite.Last }}</a>
+                    </td>
+                    <td class="private-portal-user-details"> {{ $userInvite.Email }} </td>
+                    <td> {{ index $roles $userInvite.Role }} </td>
+                    <td> {{ $userInvite.CreatedAt | date "2 Jan, 2006 15:04" }}</td>
+                    {{ if $userInvite.Uactive }}
+                        <td> <i class="bi bi-check-circle-fill check-active"></i> Registered </td>
+                    {{ else if $userInvite.Joined }}
+                      <td><i class="bi bi-clock-fill check-active"></i> Registered </td>
+                    {{ else }}
+                      <td> <i class="bi bi-check-circle-fill pending-clock"></i> Pending </td>
+                    {{ end }}
+                    <td>
+                      <div class="dropdown text-center">
+                        <button class="btn p-0" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <img src="/assets/images/icons/dots.svg">
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                          <a class="dropdown-item" href="users/{{ $userInvite.ID }}/edit">Edit</a>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                {{ end }}
+                </tbody>
+              </table>
+            </div>
+          {{ else }}
+            <div class="alert alert-info" role="alert">
+              <i class="tyk-icon tykon tykon-warning "></i>
+              <div class="alert__content">No user to be shown.</div>
+            </div>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

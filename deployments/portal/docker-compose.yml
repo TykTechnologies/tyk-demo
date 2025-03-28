@@ -1,27 +1,41 @@
 ---
 services:
   tyk-portal:
-    image: tykio/portal:${PORTAL_VERSION:-v1.12.0}
+    image: tykio/portal:${PORTAL_VERSION:-v1.13.0}
     networks:
       - tyk
     environment:
-      - PORTAL_AUDIT_LOG_PATH=/opt/portal/
+      - PORTAL_HOSTPORT=3001
+      - PORTAL_REFRESHINTERVAL=10
+      - PORTAL_AUDIT_LOG_ENABLE=true
+      - PORTAL_AUDIT_LOG_PATH=/opt/portal/logs
+      - PORTAL_LOG_LEVEL=debug
+      - PORTAL_LOG_FORMAT=dev
+      - PORTAL_DATABASE_DIALECT=postgres
+      - PORTAL_DATABASE_CONNECTIONSTRING=host=tyk-portal-postgres port=5432 dbname=portal user=admin password=secr3t sslmode=disable
+      - PORTAL_DATABASE_MAXRETRIES=5
+      - PORTAL_DATABASE_RETRYDELAY=5000
+      - PORTAL_THEMING_THEME=default
+      - PORTAL_THEMING_PATH=/opt/portal/themes
+      - PORTAL_STORAGE=fs
+      - PORTAL_LICENSEKEY=${DASHBOARD_LICENCE:?Licence missing from Docker environment file .env.}
+      - PORTAL_DOCRENDERER=stoplight
     env_file:
       - .env
     ports:
       - 3100:3001
     entrypoint: /opt/portal/dev-portal
     volumes:
-      - ./deployments/portal/volumes/portal.log:/opt/portal/portal.log
-      - ./deployments/portal/volumes/database/portal.db:/opt/portal/portal.db
+      - ./deployments/portal/volumes/logs:/opt/portal/logs
       - ./deployments/portal/volumes/assets/:/opt/portal/public/system/products/
+      - ./deployments/portal/volumes/theme/:/opt/portal/themes
   tyk-portal-postgres:
     image: postgres:16-alpine
     networks:
       - tyk
-    volumes:
-      - ./deployments/portal/volumes/database/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
-    env_file:
-      - .env
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=secr3t
+      - POSTGRES_DB=portal
     ports:
       - 5432:5432

@@ -118,12 +118,7 @@ wait_for_response () {
   local header="$3"
   local attempt_max="$4"
   local attempt_count=0
-  local http_method="GET"
-
-  if [ "$5" != "" ]
-  then
-    http_method="$5"
-  fi
+  local http_method="${5:-GET}" # default to GET method
 
   log_message "  Expecting $2 response from $1"
 
@@ -131,33 +126,30 @@ wait_for_response () {
   do
     attempt_count=$((attempt_count+1))
 
-    # header can be provided if auth is needed
-    if [ "$header" != "" ]
-    then
-      status=$(curl -k -I -s -m5 $url -H "$header" 2>> logs/bootstrap.log | head -n 1 | cut -d$' ' -f2)
-    else
-      status=$(curl -k -I -s -m5 -X $http_method $url 2>> logs/bootstrap.log | head -n 1 | cut -d$' ' -f2)
+    # Build the curl command dynamically
+    curl_command="curl -k -I -s -m5 -X $http_method $url"
+    if [ -n "$header" ]; then
+      curl_command="$curl_command -H \"$header\""
     fi
+
+    # Execute the curl command and extract the status
+    status=$(eval $curl_command 2>> logs/bootstrap.log | head -n 1 | cut -d$' ' -f2)
 
     if [ "$status" == "$desired_status" ]
     then
       log_message "    Attempt $attempt_count succeeded, received '$status'"
       return 0
     else
-      if [ "$attempt_max" != "" ]
-      then
+      if [ -n "$attempt_max" ]; then
         log_message "    Attempt $attempt_count of $attempt_max unsuccessful, received '$status'"
+        # if max attempts reached, then exit with non-zero result
+        if [ "$attempt_count" -eq "$attempt_max" ]; then
+          log_message "    Maximum retry count reached. Aborting."
+          return 1
+        fi
       else
         log_message "    Attempt $attempt_count unsuccessful, received '$status'"
       fi
-
-      # if max attempts reached, then exit with non-zero result
-      if [ "$attempt_count" = "$attempt_max" ]
-      then
-        log_message "    Maximum retry count reached. Aborting."
-        return 1
-      fi
-
       sleep 2
     fi
   done
@@ -1090,6 +1082,61 @@ wait_for_liveness () {
   done
 }
 
+wait_for_status() {
+  local url="$1"
+  local expected_status="$2"
+  local json_path="$3"
+  local expected_value="$4"
+  local max_retries="${5:-5}"
+  local delay="${6:-1}"
+  local attempt=0
+  local response
+  local http_status
+
+  if [[ -z "$url" || -z "$expected_status" ]]; then
+    echo "Usage: wait_for_status <url> <expected_status> [json_path] [expected_value] [max_retries] [delay]"
+    exit 1
+  fi
+
+  log_message "Checking status for URL: $url with expected HTTP status: $expected_status"
+  if [[ -n "$json_path" && -n "$expected_value" ]]; then
+    log_message "Validating JSON path: $json_path with expected value: $expected_value"
+  fi
+  
+  while (( attempt < max_retries )); do
+    # Perform the curl request
+    response=$(curl -s -w "\n%{http_code}" "$url")
+    http_status=$(echo "$response" | tail -n1)
+    body=$(echo "$response" | sed '$ d')
+
+    # Check HTTP status
+    if [[ "$http_status" == "$expected_status" ]]; then
+      # Optional body validation
+      if [[ -n "$json_path" && -n "$expected_value" ]]; then
+        actual_value=$(echo "$body" | jq -r "$json_path" 2>/dev/null)
+        if [[ "$actual_value" == "$expected_value" ]]; then
+          log_message "  PASS: Status check passed."
+          return 0
+        else
+          log_message "  Got JSON value: $actual_value"
+        fi
+      else
+        log_message "  PASS: Status check passed."
+        return 0
+      fi
+    else
+      log_message "  Got HTTP status: $http_status"
+    fi
+
+    log_message "  Attempt $((attempt + 1))/$max_retries failed. Retrying in $delay seconds..."
+    sleep "$delay"
+    ((attempt++))
+  done
+
+  log_message "  FAIL: Status check failed after $max_retries attempts."
+  return 1
+}
+
 check_for_grpcurl () {
   # Check if grpcurl is installed
   if ! command -v grpcurl &> /dev/null
@@ -1139,4 +1186,103 @@ licence_allowed_nodes () {
   local licence_payload=$(get_licence_payload $licence_name)
   # Extract the 'allowed_nodes' value and split by commas to count the elements
   echo "$licence_payload" | jq -r '.allowed_nodes' | tr ',' '\n' | wc -l
+}
+
+create_enterprise_portal_page () {
+  local page_data_dir_path="$1"
+  local api_key="$2"
+
+  if [ -z "$portal_base_url" ]; then
+    log_message "ERROR: portal_base_url is not set. Please ensure that the sourcing script defines it before calling this function."
+    return 1
+  fi
+
+  if [ -z "$api_key" ]; then
+    log_message "ERROR: api_key is not set. Please ensure it is provided before calling this function."
+    return 1
+  fi
+
+  log_message "Creating portal page from path: $page_data_dir_path"
+  if [[ ! -d "$page_data_dir_path" ]]; then
+    log_message "ERROR: Path must be a directory"
+    return 1
+  fi
+
+  page_data_path="$page_data_dir_path/page.json"
+
+  if [[ ! -f $page_data_path ]]; then
+    log_message "ERROR: Missing portal page file $page_data_path"
+    return 1 # can't continue without page.json
+  fi
+
+  log_message "  Processing portal page: $page_data_path"
+
+  local page_title=$(jq -r '.Title' "$page_data_path")
+  local page_path=$(jq -r '.Path' "$page_data_path")
+
+  if [[ -z "$page_title" || -z "$page_path" ]]; then
+    log_message "ERROR: Failed to extract Title or Path from $page_data_path"
+    return 1
+  fi
+
+  log_message "    Title: $page_title"
+  log_message "    URL path: $page_path"
+
+  local api_response=$(curl "$portal_base_url/portal-api/pages" -s -w "\n%{http_code}" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: $api_key" \
+    -d @$page_data_path 2>> logs/bootstrap.log)
+
+  local api_response_body=$(echo "$api_response" | sed '$d')       # Body is all lines except the last
+  local api_response_status=$(echo "$api_response" | tail -n1)     # Last line is the status code
+
+  # Look for 201 - Created
+  if [[ "$api_response_status" == "201" ]]; then 
+    local page_id=$(echo "$api_response_body" | jq -r '.ID')
+    log_message "  Page created with ID: $page_id"
+  else
+    log_message "ERROR: Could not create portal page. API response status $api_response_status, body: $api_response_body"
+    return 1
+  fi
+
+  for content_block_data_path in $page_data_dir_path/content-block-*.json; do
+    if [[ -f "$content_block_data_path" ]]; then
+      log_message "  Processing content block: $content_block_data_path"
+      local content_block_name=$(jq -r '.Name' "$content_block_data_path")
+      local content_block_id=""
+
+      api_response=$(curl "$portal_base_url/portal-api/pages/$page_id/content-blocks" -s \
+        -H "Authorization: $api_key" 2>> logs/bootstrap.log)
+
+      # Page templates come with pre-existing content blocks. So we must check if the block already exists either update or create.
+      if echo "$api_response" | jq -e --arg block_name "$content_block_name" '.[] | select(.Name == $block_name)' > /dev/null; then
+        content_block_id=$(echo "$api_response" | jq -r --arg block_name "$content_block_name" '.[] | select(.Name == $block_name) | .ID')
+        log_message "    Content block '$content_block_name' already exists with ID '$content_block_id', updating"
+
+        api_response=$(curl "$portal_base_url/portal-api/pages/$page_id/content-blocks/$content_block_id" -X PUT -s -w "\n%{http_code}" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: $api_key" \
+          -d @$content_block_data_path 2>> logs/bootstrap.log)
+      else
+        log_message "    Content block '$content_block_name' does not exist, creating"
+
+        api_response=$(curl "$portal_base_url/portal-api/pages/$page_id/content-blocks" -s -w "\n%{http_code}" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: $api_key" \
+          -d @$content_block_data_path 2>> logs/bootstrap.log)
+
+        content_block_id=$(echo "$api_response" | jq -r '.ID')
+      fi
+
+      api_response_body=$(echo "$api_response" | sed '$d')
+      api_response_status=$(echo "$api_response" | tail -n1)
+
+      if [[ "$api_response_status" == "200" || "$api_response_status" == "201" ]]; then
+        log_message "    Upserted content block '$content_block_name', with ID '$content_block_id'"
+      else
+        log_message "ERROR: Could not upsert content block '$content_block_name'. API response status $api_response_status, body: $api_response_body"
+        return 1
+      fi
+    fi
+  done
 }

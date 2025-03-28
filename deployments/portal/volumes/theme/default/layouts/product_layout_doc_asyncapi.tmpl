@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{{.product.Name}}: {{.api.Name}} Documentation</title>
+
+    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/stylesheets/fonts.css" rel="stylesheet">
+    <link href="/assets/stylesheets/main.css" rel="stylesheet">
+
+    <!-- stoplight.io -->
+    <script src="https://unpkg.com/@asyncapi/react-component@latest/browser/standalone/index.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@latest/styles/default.min.css">
+
+    <!-- <link rel="stylesheet" href=""> -->
+
+</head>
+<body>
+
+{{ render "top_nav" . }}
+<!-- Page Content -->
+    {{ yield }}
+{{ render "footer" . }}
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+.table-wrapper {
+	overflow: visible;
+	width: 100%;
+	border: 2px solid var(--tdp-table-border-color);
+	border-radius: var(--tdp-border-radius);
+}
+
+.table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	background-color: white;
+	border-radius: 18px;
+	width: 100%;
+	margin-bottom: 0;
+	color: var(--tdp-text-color);
+}
+
+.table > thead > tr > th {
+	text-transform: uppercase;
+	font-family: "OpenSans-Bold";
+}
+
+.table td,
+.table th {
+	padding: 20px;
+	border: 1px solid var(--tdp-table-border-color);
+}
+
+.table.availability-table > tbody > tr > th,
+.table.availability-table > tbody > tr > td:first-of-type {
+	text-align: center;
+	vertical-align: middle;
+}
+
+.table > tbody > tr > th,
+.table > tbody > tr > td:first-of-type {
+  border-left: none;
+}
+
+.table > thead > tr > th {
+	border-left: none;
+	border-top: none;
+	border-bottom: none;
+}
+.table > thead > tr > th:last-of-type {
+	border: none;
+}
+
+.table > tbody > tr:last-child > th:first-of-type {
+	border-bottom: none;
+	border-left: none;
+}
+
+.table > tbody > tr > td {
+	border-bottom: none;
+	border-right: none;
+}
+
+.actions-cell {
+  width: 120px;
+  text-align: center;
+}
+
+.table .dropdown-menu {
+  border-radius: var(--tdp-border-radius);
+  color: var(--tdp-dark);
+  font-size: 13px;
+}
+.table .dropdown-menu a:hover,
+.table .dropdown-menu button:hover {
+  background: transparent;
+  color: var(--tdp-dark);
+  font-size: 13px;
+  text-decoration: underline;
+}
+
+.table .pill-container {
+  margin: 0;
+}
+
+.table > tbody > tr > td img {
+  margin-right: 10px;
+}
+
+.table td, .table th {
+  vertical-align: middle;
+}

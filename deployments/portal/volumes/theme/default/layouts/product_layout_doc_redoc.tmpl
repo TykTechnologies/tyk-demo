@@ -1,0 +1,37 @@
+<!-- Layout used to render the API Product documentation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{{.product.Name}}: {{.api.Name}} Documentation</title>
+
+    <!-- Load style assets -->
+    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/stylesheets/fonts.css{{.previewId}}" rel="stylesheet">
+    <link href="/assets/stylesheets/main.css{{.previewId}}" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <!-- Render top navigation menu -->
+    {{ render "top_nav" . }}
+
+    <!-- Render main page content -->
+    {{ yield }}
+
+    <!-- Render footer menu -->
+    {{ render "footer" . }}
+
+    <!-- Render custom documentation generator script -->
+    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"> </script>
+    
+</body>
+
+</html>

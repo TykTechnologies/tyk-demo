@@ -1,0 +1,677 @@
+<!-- Template used for viewing & managing an App and its Credentials -->
+{{ $app := .app }}
+{{ $hasPending := false }}
+{{ $hasApproved := false }}
+{{ $approvedReqsLength := len $app.Credentials }}
+{{$appCerts := .appCerts}}
+{{$allCerts := .allCerts}}
+{{ if gt $approvedReqsLength 0 }}
+  {{ $hasApproved = true }}
+{{end}}
+{{ $authType := .authType }}
+<div class="apps-wrapper container">
+		<p class="mb-3 mt-3">
+			<a href="/portal/private/dashboard" class="breadcrumb-link">
+				< Back to Apps overview </a>
+    </p>
+    {{ if .errors }}
+      {{ range $key, $errs := .errors }}
+        <div class="alert alert-warning cart-error" role="alert">
+          <i class="tyk-icon tykon tykon-warning "></i>
+          <div class="alert__content">
+            <strong>{{$key}}</strong>
+            <ul>
+              {{ range $errs }}
+                <li>{{.}}</li>
+              {{ end }}
+            </ul>
+          </div>
+        </div>
+      {{ end }}
+    {{ end }}
+    {{ if $app }}
+      {{ if .error }}
+      <div class="alert alert-danger" role="alert">
+        <i class="tyk-icon tykon tykon-warning "></i>
+        <div class="alert__content">{{ .error }}</div>
+      </div>
+      {{ end }}
+      <div class="apps-wrapper__card-section mt-5">
+        <form method="post" id="app-form">
+          <div class="d-flex flex-row justify-content-between pb-2 align-items-center w-100">
+              <div class="card p-0 mb-4 w-100">
+                <div class="d-flex flex-row justify-content-between flex-wrap w-100">
+                    <div class="col-lg-12 requests-row-section">
+                      <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3">
+                        <h2 class="m-0 title-bold">App details</h2>
+                        <div class="cta-btns-wrapper">
+                          <button type="button" class="btn btn-secondary-link text-uppercase enable-editing d-block" data-action="edit">
+                            Edit details
+                          </button>
+                          <div class="edit-cta d-none disable-editing">
+                            <button type="button" class="btn btn-secondary-outline" data-action="cancel">
+                              Cancel
+                            </button>
+                            <button type="submit" name="submit" class="btn btn-primary" value="Update" data-action="save" data-submit-mode="update">Save</button>
+                            <input type="hidden" name="mode" value="update">
+                            <input type="hidden" value="{{ $app.ID}}">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer__static-data d-block no-border w-100">
+                      <div class="col-lg-12 requests-row-section">
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <strong class="mr-4 text-uppercase mb-1">APP ID:</strong>
+                            <span>This is your app's internal unique ID</span>
+                          </div>
+                          <div>
+                            {{$app.ID}}
+                            <i class="tyk-icon tykon tykon-copy ml-2" data-copy-value="{{$app.ID}}"></i>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-12 requests-row-section">
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <strong class="mr-4 text-uppercase">name:</strong>
+                          </div>
+                          <div>
+                            {{ $app.Name }}
+                          </div>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <strong class="mr-4 text-uppercase">description:</strong>
+                          </div>
+                          <div>
+                            {{if $app.Description }} {{ $app.Description }} {{else}} <i>No description set</i> {{end}}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer__dynamic-data d-none w-100 p-3">
+                      <div class="mb-4">
+                        <label class="form-label">App name:</label>
+                        <input type="text" name="name" class="form-control" placeholder="App Name" autofocus value="{{ $app.Name}}">
+                      </div>
+                      <div class="mb-4">
+                        <label class="form-label">Description:</label>
+                        <textarea rows="3" name="description" class="form-control" placeholder="App Description">{{ $app.Description}}</textarea>
+                      </div>
+                    </div>
+                </div>
+              </div>
+          </div>
+        </form>
+        {{ if or $app.AccessRequests $app.Credentials}}
+          {{ if $app.AccessRequests}}
+            {{ range $app.AccessRequests }}
+              {{ if eq .Status "pending" }}
+                {{ $hasPending = true }}
+              {{ end }}
+            {{ end }}
+          {{ end }}
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item px-2">
+              <a class="nav-link px-0 pb-0 {{ if $hasApproved }}active{{end}}" id="approved-tab" data-toggle="tab" href="#approved" role="tab" aria-controls="approved" aria-selected="{{ if $hasApproved }}true{{end}}">
+                <h2 class="title-bold">Approved access</h2>
+              </a>
+            </li>
+            <li class="nav-item px-2">
+              <a class="nav-link px-0 pb-0 {{ if not $hasApproved }}active{{end}}" id="pending-tab" data-toggle="tab" href="#pending" role="tab" aria-controls="pending" aria-selected="{{ if $hasApproved }}false{{end}}">
+                <h2 class="title-bold">Pending access</h2>
+              </a>
+            </li>
+          </ul>
+          <div class="tab-content mt-4">
+            <div class="tab-pane fade {{ if $hasApproved }}show active{{end}}" id="approved" role="tabpanel" aria-labelledby="approved-tab">
+              {{ if lt $approvedReqsLength 1 }}
+                <div class="alert alert-info" role="alert">
+                  <i class="tyk-icon tykon tykon-warning "></i>
+                  <div class="alert__content">There are no approved requests yet</div>
+                </div>
+              {{end}}
+              {{ range $app.Credentials }}
+                {{ if eq .CredentialType "CREDENTIAL_TYPE_CUSTOM" }}
+                  <div class="card p-0 mb-4">
+                    <div class="card-body d-flex flex-row justify-content-between flex-wrap">
+                      <div class="row">
+                      <div class="col-lg-12 requests-row-section">
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3">
+                            <h3 class="m-0">Access and Credentials info</h3>
+                          </div>
+                        </div>
+                      </div>
+                       <div class="col-lg-12 requests-row-section">
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <strong class="mr-4 text-uppercase mb-1">Key</strong>
+                            <span>A unique ID used to identify the application.</span>
+                          </div>
+                          <div class="d-flex flex-row justify-content-around">
+                            <input type="password" class="input-as-span content-field" value="{{.CredentialKey}}" disabled>
+                            <i class="tyk-icon tykon tykon-copy" data-copy-value="{{.CredentialKey}}"></i>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-12 requests-row-section">
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <strong class="mr-4 text-uppercase mb-1">Secret</strong>
+                            <span>This is the unique password for the app and auth server, do not share this information.</span>
+                          </div>
+                          <div class="d-flex flex-row justify-content-around">
+                            <input type="password" class="input-as-span content-field" value="{{.CredentialSecret}}" disabled>
+                            <i class="tyk-icon tykon tykon-copy" data-copy-value="{{.CredentialSecret}}"></i>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-12 requests-row-section">
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <strong class="mr-4 text-uppercase">Expires:</strong>
+                          </div>
+                          <div>
+                            {{ .ExpiresAsString }}
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                {{ else }} 
+                <div class="card p-0 mb-4">
+                  <div class="card-body d-flex flex-row justify-content-between flex-wrap">
+                    <div class="row">
+                      <div class="col-lg-12 requests-row-section">
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3">
+                          <h3 class="m-0">Access and Credentials info</h3>
+                          <div class="cta-btns-wrapper d-flex flex-row">
+                            {{ if .Credential }}
+                              <button type="submit" class="btn btn-secondary-outline mr-3" data-toggle="modal" data-target="#rotate-{{.ID}}">Rotate</button>
+                              <!-- Rotate credentials modal -->
+                              <form action="/portal/private/credentials" method="POST">
+                                <div class="modal fade" id="rotate-{{.ID}}" tabindex="-1" role="dialog" aria-hidden="true">
+                                  <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+                                    <div class="modal-content p-2">
+                                      <div class="modal-header justify-content-center">
+                                        <h2 class="modal-title">Rotate Credentials</h2>
+                                      </div>
+                                      <div class="modal-body">
+                                        <p>By rotating the credentials, you will receive a new set of credentials and the old ones won’t apply anymore.</p>
+                                        <p>Do you wish to continue?</p>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <div class="pt-2">
+                                          <button type="button" class="btn btn-secondary-outline" data-dismiss="modal">Cancel</button>
+                                          <button type="submit" class="btn btn-primary" name="rollSubmit" value="Rotate" data-submit-mode="roll">rotate credentials</button>
+                                          <input type="hidden" name="mode" value="roll">
+                                          <input type="hidden" name="cred_id" value="{{.ID}}">
+                                          <input type="hidden" name="client_id" value="{{$app.ID}}">
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </form>
+                            {{end}}
+                            <button type="submit" class="btn btn-danger-outline" data-toggle="modal" data-target="#revoke-{{.ID}}">Revoke</button>
+                            <!-- Revoke credentials modal -->
+                            <form action="/portal/private/credentials" method="POST">
+                              <div class="modal fade" id="revoke-{{.ID}}" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+                                  <div class="modal-content p-2">
+                                    <div class="modal-header justify-content-center">
+                                      <h2 class="modal-title">Revoke credentials?</h2>
+                                    </div>
+                                    <div class="modal-body">
+                                      <p>Revoking the credentials means it will no longer grant access to the given API product(s) and plan.</p>
+                                      <p>Do you wish to continue?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <div class="pt-2">
+                                        <button type="button" class="btn btn-secondary-outline" data-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-danger" value="Revoke" name="Revoke" data-submit-mode="delete">revoke credentials</button>
+                                        <input type="hidden" name="mode" value="delete">
+                                        <input type="hidden" name="cred_id" value="{{.ID}}">
+                                        <input type="hidden" name="client_id" value="{{$app.ID}}">
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-12 requests-row-section">
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <strong class="mr-4 text-uppercase mb-1">{{ if .Credential }}Token{{else}}Client ID{{end}}</strong>
+                            <span>A unique ID used to identify the application.</span>
+                          </div>
+                          <div class="d-flex flex-row justify-content-around">
+                            <input type="password" class="input-as-span content-field" value="{{if .CustomKeyID}}{{.CustomKeyID}}{{ else if .Credential }}{{.Credential}}{{else}}{{.OAuthClientID}}{{end}}" disabled>
+                            <i class="tyk-icon tykon tykon-copy" data-copy-value="{{ if .Credential }}{{.Credential}}{{else}}{{.OAuthClientID}}{{end}}"></i>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-12 requests-row-section">
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <strong class="mr-4 text-uppercase mb-1">{{ if .Credential }}Token Hash{{else}}Secret{{end}}</strong>
+                            <span>This is the unique password for the app and auth server, do not share this information.</span>
+                          </div>
+                          <div class="d-flex flex-row justify-content-around">
+                            <input type="password" class="input-as-span content-field" value="{{ if .Credential }}{{.CredentialHash}}{{else}}{{.OAuthClientSecret}}{{end}}" disabled>
+                            <i class="tyk-icon tykon tykon-copy" data-copy-value="{{ if .Credential }}{{.CredentialHash}}{{else}}{{.OAuthClientSecret}}{{end}}"></i>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-12 requests-row-section">
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <strong class="mr-4 text-uppercase">Expires:</strong>
+                          </div>
+                          <div>
+                            {{ .ExpiresAsString }}
+                          </div>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <strong class="mr-4 text-uppercase">Auth Method:</strong>
+                          </div>
+                          <div>
+                            <span class="pill"> {{ TypeOfCredential . }} </span>
+                          </div>
+                        </div>
+                        {{ if eq (TypeOfCredential . ) "oAuth2.0" }}
+                          <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3 requests-row-section__info">
+                            <div class="d-flex flex-column pr-3">
+                              <strong class="mr-4 text-uppercase">Redirect URLs</strong>
+                            </div>
+                            <div>
+                              <span>{{ .RedirectURI }}</span>
+                            </div>
+                          </div>
+                        {{ end }}
+                        {{ if eq (TypeOfCredential . ) "oAuth2.0" }}
+                          <div class="col-lg-12 mt-4 mb-4">
+                            <div class="d-flex flex-column p-3 app-how-to">
+                              <h4 class="mb-4">
+                              <span><img src="/assets/images/icons/how-to.svg" class="mr-2"></span>
+                                How to access the API Product(s)
+                              </h4>
+                              <div class="pl-3">
+                                <ol>
+                                  <li class="mb-2">Copy paste the client secret and ID in a POST request to the identity provider.</li>
+                                  <li class="mb-2">Receive an access token issued by the identity provider.</li>
+                                  <li class="mb-2">Use the access token to gain access to the API product.</li>
+                                </ol>
+                              </div>
+                              <div class="pl-4">
+                                <a class="pl-3" href="/docs" target="_blank">
+                                  Learn more
+                                  <i class="tyk-icon tykon tykon-link" aria-hidden="true"></i>
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        {{ end }}
+                      </div>
+                    </div>
+                  </div>
+                  {{ if .AccessRequest }}
+                    <div class="col-lg-12 requests-row-section p-3">
+                      <h3 class="m-0">Accessing</h3>
+                      <div class="row mt-3">
+                        <div class="col-lg-6 pl-0">
+                          <strong class="text-uppercase">API Products:</strong>
+                          {{ range .AccessRequest.Products }}
+                            {{ $productPath := .Path }}
+                            <p class="mt-4">
+                              <a href="/portal/catalogue-products/{{ $productPath }}" class="product-name">{{ .Name }}</a>
+                            </p>
+                          {{ end }}
+                        </div>
+                        <div class="col-lg-6">
+                          <div class="row">
+                            <div class="row">
+                              <strong class="text-uppercase mr-3">Plan:</strong>
+                              <div class="card-footer__plan">
+                                <h4 class="card-footer__plan-title mt-2 pl-3 pr-3 pt-2 pb-2">{{ .AccessRequest.Plan.Name }}</h4>
+                                <div class="card-footer__plan-details mt-2 pl-3 pr-3 pt-2 pb-2">
+                                  <p><strong>Quota: </strong> {{ .AccessRequest.Plan.FormatQuota }} </p>
+                                  <p><strong>Rate limit:</strong> {{ .AccessRequest.Plan.FormatRateLimit }}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {{if eq .AccessRequest.AuthType "multiAuth"}}
+                      {{$accReq := .AccessRequest}}
+                      <div class="apps-wrapper__card-section-certs">
+                        <form method="POST" id="app-form-cert-update" action="{{ $app.ID }}/cert/{{ $accReq.CertificateID }}" class="col-lg-12 requests-row-section">
+                          <div class="d-flex flex-row justify-content-between align-items-start flex-wrap requests-row-section__info p-3">
+                            {{ if eq (len $allCerts) 0 }}
+                              <div class="mt-2 d-flex flex-column">
+                                <strong class="mr-4 text-uppercase mb-1">current mutual tls certificate</strong>
+                                <i class="pt-3 mb-1">You haven’t uploaded any certificates yet.</i>
+                                <span class="mb-3">To add and manage certificates please go to <a class="breadcrumb-link" href="">Certificates</a> on your dashboard.</span>
+                              </div>
+                            {{else}}
+                              {{ with index $appCerts $accReq.ID}}
+                                <div class="card-footer__static-data d-block mt-2 mb-3">
+                                  <strong class="mr-4 text-uppercase mb-1">current mutual tls certificate</strong>
+                                  <h4 class="pt-3">Certificate name: <span class="text-open-sans-regular">{{.Name}}</span></h4>
+                                  <div class="d-flex flex-row align-items-center text-os-semibold-16">
+                                    {{if .IsValid}}
+                                      <i class="bi bi-check-circle-fill status-registered"></i>
+                                      Your certificate is valid
+                                    {{else}}
+                                      <i class="bi bi-x-circle-fill text-danger mb-1 mr-2"></i>
+                                      Your certificate is expired
+                                    {{end}}
+                                  </div>
+                                  <div class="toggle-collapsible d-flex flex-row align-items-center mt-3" data-toggle="collapse" href="#type-details-1" role="button" aria-expanded="false" aria-controls="type-details-1">
+                                    <span class="arrow-up-tyk d-inline"><img src="/assets/images/icons/arrow-up.svg"></span>
+                                    <span class="arrow-down-tyk d-none"><img src="/assets/images/icons/arrow-down.svg"></span>
+                                    <span class="text-os-bold-17 ml-3">View certificate info</span>
+                                  </div>
+                                  <div class="collapse" id="type-details-1">
+                                    <div class="mt-3 ml-4">
+                                      <h4 class="mb-1">File name: <span class="text-open-sans-regular">{{.Name}}</span></h4>
+                                      <h4 class="mb-1">Signature Algorithm: <span class="text-open-sans-regular">{{.SignatureAlgorithm}}</span></h4>
+                                      <h4 class="mb-1">Issuer: <span class="text-open-sans-regular">{{.Issuer}}</span></h4>
+                                      <h4 class="mb-1">Expiration: <span class="text-open-sans-regular">{{if .IsValid}}your certificate is valid{{else}}your certificate is expired{{end}}</span></h4>
+                                      <h4 class="mb-1">Validity: </h4>
+                                      <ul class="ml-4 card-ul mb-1">
+                                        <li class="mb-1">Not Before: {{.ValidNotBefore}}</li>
+                                        <li>Not After: {{.ValidNotAfter}}</li>
+                                      </ul>
+                                      <h4>Subject: <span class="text-open-sans-regular">{{.Subject}}</span></h4>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="card-footer__dynamic-data d-none mt-2 mb-3 col-8 p-0">
+                                  <strong class="mr-4 text-uppercase mb-1">replace mutual tls certificate</strong>
+                                  <select class="form-control w-100 mt-5 mb-3" name="selected-cert">
+                                    <option disabled selected value="">Select a certificate</option>
+                                    {{ range $key, $cert := $allCerts }}
+                                      {{ if ne $key (printf "%d" $accReq.ID)}}
+                                        <option value="{{$cert.ID}}">{{$cert.Name}}</option>
+                                      {{end}}
+                                    {{end}}
+                                  </select>
+                                </div>
+                                <div class="d-flex justify-content-end mt-4 cta-btns-wrapper col-4 p-0">
+                                  <button type="button" class="btn btn-danger-outline ml-2 enable-editing d-block" data-toggle="modal" data-target="#detachCertificateModal">Detach Certificate</button>
+                                  <button type="button" class="btn btn-secondary-outline d-block" data-action="edit">Replace Certificate</button>
+                                  <div class="edit-cta d-none disable-editing">
+                                    <button type="button" class="btn btn-secondary-outline" data-action="cancel">
+                                      Cancel
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                    <input type="hidden" name="access-request" value="{{ $accReq.ID }}">
+                                    <input type="hidden" name="provider" value="{{ $accReq.ProviderID }}">
+                                    <input type="hidden" name="cert-mode" value="update">  
+                                  </div>
+                                </div>
+                              {{else}}
+                                <div class="mt-2 mb-3 col-8 p-0">
+                                  <strong class="mr-4 text-uppercase mb-1">attach mutual tls certificate</strong>
+                                  <select class="form-control w-100 mt-5 mb-3" name="selected-cert">
+                                    <option disabled selected value="">Select a certificate</option>
+                                    {{ range $key, $cert := $allCerts }}
+                                      {{ if ne $key (printf "%d" $accReq.ID)}}
+                                        <option value="{{$cert.ID}}">{{$cert.Name}}</option>
+                                      {{end}}
+                                    {{end}}
+                                  </select>
+                                </div>
+                                <div class="d-flex justify-content-end mt-4 col-4 p-0">
+                                  <button type="submit" class="btn btn-primary">Save</button>
+                                  <input type="hidden" name="access-request" value="{{ $accReq.ID }}">
+                                  <input type="hidden" name="provider" value="{{ $accReq.ProviderID }}">
+                                  <input type="hidden" name="cert-mode" value="update">  
+                                </div>
+                              {{end}}
+                            {{end}}
+                          </div>
+                        </form>
+                      </div>
+                    {{end}}
+                    {{ if eq (TypeOfCredential . ) "oAuth2.0" }}
+                        <div class="col-lg-12 requests-row-section p-4">
+                          <div>
+                            <div class="toggle-collapsible d-flex flex-row align-items-center mt-1" data-toggle="collapse" href="#type-details-0" role="button" aria-expanded="false" aria-controls="type-details-0">
+                              <span class="arrow-up-tyk d-inline"><img src="/assets/images/icons/arrow-up.svg"></span>
+                              <span class="arrow-down-tyk d-none"><img src="/assets/images/icons/arrow-down.svg"></span>
+                              <span class="text-os-bold-17 ml-3">View client type info</span>
+                            </div>
+                            <div class="collapse" id="type-details-0">
+                              <table class="client-type-info-table-layout">
+                                <tbody>
+                                <tr>
+                                <td class="client-type-info-first-column">
+                                  <table>
+                                    <tr>
+                                      <td class="client-type-info-row client-type-info-first-row"><strong class="text-uppercase">Client type name</strong></td>
+                                      {{ if not (eq (GetClientName .ID) "" )}}
+                                        <td class="client-type-info-row client-type-info-first-row"> {{ GetClientName .ID}}</td>
+                                      {{ else }}
+                                        <td class="client-type-info-row client-type-info-first-row">Not defined</td>
+                                      {{ end }}
+                                    </tr>
+                                    <tr>
+                                      <td class="client-type-info-row client-type-info-inner"><strong class="text-uppercase">Client type description</strong></td>
+                                      {{ if not (eq (GetClientDescription .ID) "" )}}
+                                        <td class="client-type-info-row client-type-info-first-row"> {{ GetClientDescription .ID}}</td>
+                                      {{ else }}
+                                        <td class="client-type-info-row client-type-info-first-row">Not defined</td>
+                                      {{ end }}
+                                    </tr>
+                                    <tr>
+                                      <td class="client-type-info-row client-type-info-inner"><strong class="text-uppercase">Grant types</strong></td>
+                                      <td class="client-type-info-row client-type-info-inner">
+                                        {{ if not (eq .GrantType "") }}
+                                          {{ range SplitStrings .GrantType "," }}
+                                            <div>
+                                              <span class="client-type-tick"><img src="/assets/images/icons/tick.svg"></span>
+                                              <span>{{ . }}</span>
+                                            </div>
+                                          {{ end }}
+                                        {{ else }}
+                                          <span>Not defined</span>
+                                        {{ end }}
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td class="client-type-info-row client-type-info-inner"><strong class="text-uppercase">Response types</strong></td>
+                                      <td class="client-type-info-row client-type-info-inner">
+                                        {{ if not (eq .ResponseType "") }}
+                                          {{ range SplitStrings .ResponseType "," }}
+                                            <div>
+                                              <span class="client-type-tick"><img src="/assets/images/icons/tick.svg"></span>
+                                              <span>{{ . }}</span>
+                                            </div>
+                                          {{ end }}
+                                        {{ else }}
+                                          <span>Not defined</span>
+                                        {{ end }}
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td class="client-type-info-row client-type-info-inner"><strong class="text-uppercase">Token endpoint auth method</strong></td>
+                                      {{ if not (eq .TokenEndpoints "" )}}
+                                        <td class="client-type-info-row client-type-info-inner"> {{ .TokenEndpoints }} </td>
+                                      {{ else }}
+                                        <td class="client-type-info-row client-type-info-inner">Not defined</td>
+                                      {{ end }}
+                                    </tr>
+                                  </table>
+                                </td>
+                                  <td class="client-type-info-row client-type-info-first-row client-type-info-second-column">
+                                    <table>
+                                      <tr>
+                                        <td class="client-type-info-row"><strong class="text-uppercase">Scope permission</strong></td>
+                                        <td class="client-type-info-row">
+                                          {{ if not (eq .Scope "") }}
+                                            {{ range SplitStrings .Scope " " }}
+                                              <div>
+                                                <span class="client-type-tick"><img src="/assets/images/icons/tick.svg"></span>
+                                                <span>{{ . }}</span>
+                                              </div>
+                                            {{ end }}
+                                          {{ else }}
+                                            <span>Not defined</span>
+                                          {{ end }}
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      {{ end }}
+                  {{ end }}
+                </div>
+                <!-- Detach certificate modal -->
+                <form method="POST" id="app-form-cert-delete" action="{{ $app.ID }}/cert/{{ .AccessRequest.CertificateID }}">
+                  <div class="modal fade" id="detachCertificateModal" tabindex="-1" role="dialog" aria-labelledby="deleteProfileModalTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered flex-column justify-content-center align-items-center" role="document">
+                      <div class="modal-top-border">
+                          <i class="tyk-icon tykon tykon-delete"></i>
+                      </div>
+                      <div class="modal-content">
+                          <div class="top-border">
+                          </div>
+                          <div class="modal-body">
+                              <h3 class="modal-h3">Detach certificate?</h3>
+                              <p>Detaching the certificate will result in losing access to the APIs.</p>
+                              <p>If you detach the certificate, it is advised to promptly replace with a new one to maintain access to the API Product(s).</p>
+                              <p>Do you wish to continue?</p>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary-outline" data-dismiss="modal">Cancel</button>
+                            <input type="hidden" name="cert-mode" value="delete">
+                            <input type="hidden" name="access-request" value="{{ .AccessRequest.ID }}">
+                            <input type="hidden" name="provider" value="{{ .AccessRequest.ProviderID }}">
+                            <input type="submit" class="btn btn-danger" value="Remove certificate">
+                          </div>
+                      </div>
+                  </div>
+                  </div>
+                </form>
+                {{end}}
+              {{end}}
+            </div>
+            <div class="tab-pane fade {{ if not $hasApproved }}show active{{end}}" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+              {{ if not $hasPending }}
+                <div class="alert alert-info" role="alert">
+                  <i class="tyk-icon tykon tykon-warning "></i>
+                  <div class="alert__content">There are no pending requests yet</div>
+                </div>
+              {{ else }}
+                {{ range $app.AccessRequests }}
+                  {{ if eq .Status "pending" }}
+                    <div class="card p-0 mb-4">
+                      <div class="card-body d-flex flex-row justify-content-between flex-wrap">
+                          <div class="col-lg-12 requests-row-section">
+                            <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3">
+                              <h2 class="m-0 title-bold">Access and Credentials info</h2>
+                              <span class="date-requested">Date requested: {{.CreatedAt | date "2 Jan, 2006" }}</span>
+                            </div>
+                          </div>
+                      </div>
+                        <div class="card-footer m-0 p-4 d-flex flex-column w-100">
+                          <h2 class="m-0 pl-3">Accessing</h2>
+                          <div class="row mt-3">
+                            <div class="col-lg-6">
+                              <strong class="text-uppercase">API Products:</strong>
+                              {{ range .Products }}
+                                {{ $productPath := .Path }}
+                                <p class="mt-4">
+                                  <a href="/portal/catalogue-products/{{ $productPath }}" class="product-name">{{ .Name }}</a>
+                                </p>
+                              {{ end }}
+                            </div>
+                            <div class="col-lg-6">
+                              <div class="row">
+                                <div class="row">
+                                  <strong class="text-uppercase mr-5">Plan:</strong>
+                                  <div class="card-footer__plan">
+                                    <h4 class="card-footer__plan-title mt-2 pl-3 pr-3 pt-2 pb-2">{{ .Plan.Name }}</h4>
+                                    <div class="card-footer__plan-details mt-2 pl-3 pr-3 pt-2 pb-2">
+                                      <p><strong>Quota: </strong> {{ .Plan.FormatQuota }} </p>
+                                      <p><strong>Rate limit:</strong> {{ .Plan.FormatRateLimit }}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                  {{ end }}
+                {{ end }}
+              {{ end }}
+            </div>
+          </div>
+        {{end}}
+      <div class="card p-0 mb-4">
+        <div class="card-body d-flex flex-row">
+            <div class="col-lg-12 requests-row-section">
+              <div class="d-flex flex-row p-3">
+                <h3 class="m-0">Advanced Settings</h3>
+              </div>
+            </div>
+        </div>
+        <div class="card-footer m-0 p-4 d-flex flex-row w-100 justify-content-between">
+          <div>
+            <strong>DELETE THIS APP</strong>
+            <p class="mt-3">Deleting this app means all access credentials will also be deleted. </p>
+          </div>
+          <div>
+            <button type="button" class="btn btn-danger-outline pass-id" data-toggle="modal" data-target="#deleteAppModal" data-app-id="{{$app.ID}}">Delete this app</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {{ end }}
+  </div>
+  <div class="d-none" id="success-msg">Value has been copied successfully</div>
+</div>
+
+<!-- Modal form actions -->
+
+<!-- Delete App modal -->
+<form method="post">
+    <div class="modal fade" id="deleteAppModal" tabindex="-1" role="dialog" aria-labelledby="deleteProfileModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered flex-column justify-content-center align-items-center" role="document">
+        <div class="modal-top-border">
+            <i class="tyk-icon tykon tykon-delete"></i>
+        </div>
+        <div class="modal-content">
+            <div class="top-border">
+            </div>
+            <div class="modal-body">
+                <h3 class="modal-h3">Delete  app ?</h3>
+                <p class="text-open-sans-regular">If deleting this app, all the access credentials will also be revoked. This action cannot be undone.</p>
+                <p class="text-open-sans-regular">Do you wish to continue?</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary-outline" data-dismiss="modal">Cancel</button>
+              <input type="hidden" value="{{ $app.ID }}">
+              <input type="hidden" name="mode" value="delete">
+              <input type="submit" class="btn btn-danger" value="Delete">
+            </div>
+        </div>
+    </div>
+    </div>
+</form>

@@ -1,0 +1,495 @@
+<!-- Template used for the product cart/checkout page -->
+
+{{ $apps := .apps}}
+{{ $catalogueCount := .catalogue_count}}
+{{ $templates := .templates}}
+{{ $certs := .certs}}
+{{ $authType := ""}}
+
+<div class="cart-wrapper">
+  <div class="container mt-5">
+    <p> <a href="/portal/catalogue-products" class="breadcrumb-link">< Back to catalogue overview</a></p>
+    {{ if .errors }}
+      {{ range $key, $errs := .errors }}
+        <div class="alert alert-warning cart-error" role="alert">
+          <i class="tyk-icon tykon tykon-warning "></i>
+          <div class="alert__content">
+            <strong>{{$key}}</strong>
+            <ul>
+              {{ range $errs }}
+                <li>{{.}}</li>
+              {{ end }}
+            </ul>
+          </div>
+        </div>
+      {{ end }}
+    {{ end }}
+    {{ if .provisioned }}
+      <div class="provisioned-credentials-wrapper text-center">
+        <h2 class="my-4">Your request has been submitted.</h2>
+        <p>To complete the process, please proceed to payment.</p>
+        
+        <!-- Loading indicator -->
+        <div class="spinner" id="stripeLoadingSpinner"></div>
+        <div class="loading-text" id="stripeLoadingText">Preparing payment gateway...</div>
+        
+        <p class="mt-4">
+          <button id="proceedToStripeBtn" class="btn btn-primary">Proceed to Payment</button>
+        </p>
+      </div>
+    {{ else }}
+      {{if eq $catalogueCount 0}}
+        <div class="empty-cart-wrapper text-center">
+          <h2>Your cart is empty</h2>
+          <p>
+            Go the <a href="/portal/catalogue-products">catalogues</a> and browse API products.
+          </p>
+        </div>
+      {{else}}
+        <h1 class="mb-4 title-h1-bold text-center">Cart - submit an access request</h1>
+      {{end}}
+      {{ if gt $catalogueCount 1 }}
+        <div class="cart-wrapper__card-section">
+          <div class="alert alert-info" role="alert">
+            <i class="tyk-icon tykon tykon-warning "></i>
+            <div class="alert__content">
+              Your cart is containing API products from different catalogues, you will need to submit 2 or more requests separately.
+            </div>
+          </div>
+        </div>
+      {{ end }}
+      {{ range $index, $request := .cart }}
+        {{$authType = $request.AuthType}}
+        {{ if $request.Products }}
+          {{ $templatesLength := len $request.AppTemplates }}
+          <form id="cart-form" method="POST" enctype="multipart/form-data" onsubmit="handlePaymentRedirect(event)">
+            <input type="hidden" name="catalogue-id" value="{{ .Catalogue.ID }}" />
+            <div class="cart-wrapper__card-section">
+              <div class="card cart-card">
+                <div class="card-body">
+                  <h2 class="card-title title-bold">
+                    <span class="card-number">1</span>
+                    Selected Products
+                  </h2>
+                  <p class="card-text mt-3">You can add more than one API product to the cart, if you want to request access to more than one product, go to the <a href="/portal/catalogue-products">catalogue</a> and add another product to the cart.</p>
+                </div>
+                <div class="card-footer mt-4">
+                  <ul class="list-group">
+                    {{ range $request.Products }}
+                      <li class="list-group-item">
+                        <span class="product-name">{{.ProductName}}</span>
+                        <a class="product-remove-cta" type="button" href="/portal/private/cart/remove/{{$index}}/{{.ID}}">
+                          <i class="tyk-icon tykon tykon-delete"></i>
+                        </a>
+                      </li>
+                    {{ end }}
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="cart-wrapper__card-section">
+              <div class="card cart-card">
+                <div class="card-body">
+                  <h2 class="card-title title-bold">
+                    <span class="card-number">2</span>
+                    Selected Plan
+                  </h2>
+                  <p class="card-text mt-3">The access request will be created with the following plan</p>
+                </div>
+                <div class="card-footer mt-4">
+                  {{ if $request.Products }}
+                    {{$plan := $request.Plan}}
+                    <input type="hidden" name="plan-for-{{$index}}" value="{{$plan.ID}}"/>
+                    <div class="form-control w-75"> {{$plan.PlanName}} &nbsp;&nbsp;|&nbsp;&nbsp; Quota: {{ $plan.FormatQuota }},  Rate limit: {{ $plan.FormatRateLimit }}</div>
+                  {{ end }}
+                </div>
+              </div>
+            </div>
+            <div class="cart-wrapper__card-section">
+              <div class="card cart-card">
+                <div class="card-body">
+                  <h2 class="card-title title-bold">
+                    <span class="card-number">3</span>
+                    Select an App
+                  </h2>
+                  <p class="card-text mt-3">An app serves as a container for one or multiple sets of credentials and in the future, different apps can have different ownerships. We recommend thinking about the use case when setting up a new app.</p>
+                </div>
+                <div class="card-footer mt-4">
+                  {{ if $apps }}
+                  <div class="form-group">
+                    <div class="step-wrapper">
+                      <div class="form-check-inline mx-n3">
+                        <input id="new-app" class="form-check-input step active dcr-visibility" type="radio" name="app-action" value="create" checked >
+                        <label for="new-app" class="form-check-label">
+                          Create a new app
+                        </label>
+                      </div>
+                      <div class="form-check-inline ml-3">
+                        <input id="existing-app" class="form-check-input step dcr-visibility" type="radio" name="app-action" value="existing">
+                        <label for="existing-app" class="form-check-label">
+                          Existing app
+                        </label>
+                      </div>
+                    </div>
+                    <div class="content-wrapper">
+                      <div class="content-wrapper__content d-block mt-3">
+                         <div class="mb-3">
+                          <label class="form-label">App name</label>
+                          <input type="text" name="client_name" class="form-control" placeholder="App Name"/>
+                          <small id="clientHelp" class="form-text with-info-icon"> Make sure it is a descriptive name</small>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Description</label>
+                          <textarea rows="3" name="description" class="form-control" placeholder="App Description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Redirect URLs(optional)</label>
+                          <input name="redirect_urls" class="form-control" placeholder="Redirect URLs"/>
+                          <small id="redirectHelp" class="form-text with-info-icon">Separate URLs with commas</small>
+                        </div>
+                      </div>
+                      <div class="content-wrapper__content d-none mt-3">
+                       <select class="form-control w-50" id="appsControlSelect" name="selected-app">
+                          {{ if $apps }}
+                            {{ range $apps }}
+                              <option value="{{.ID}}">{{.Name}}</option>
+                            {{ end }}
+                          {{ else }}
+                            <option selected value="">No apps created</option>
+                          {{ end }}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  {{ else }}
+                  <div class="form-group">
+                    <div class="step-wrapper">
+                      <div class="content-wrapper__content d-block mt-3">
+                        <input type="hidden" name="app-action" value="create" />
+                        <label class="form-label">
+                          Create a new app
+                        </label>
+                      </div>
+                    </div>
+                    <div class="content-wrapper">
+                      <div class="content-wrapper__content d-block mt-3">
+                        <div class="mb-3">
+                          <label class="form-label">App name</label>
+                          <input type="text" name="client_name" class="form-control" placeholder="App Name"/>
+                          <small id="clientHelp" class="form-text with-info-icon"> Make sure it is a descriptive name</small>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Description</label>
+                          <textarea rows="3" name="description" class="form-control" placeholder="App Description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Redirect URLs(optional)</label>
+                          <input name="redirect_urls" class="form-control" placeholder="Redirect URLs"/>
+                          <small id="redirectHelp" class="form-text with-info-icon">Separate URLs with commas</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {{ end }}
+                </div>
+              </div>
+            </div>
+            {{if eq $authType "multiAuth"}}
+            <div class="cart-wrapper__card-section">
+              <div class="card cart-card">
+                <div class="card-body">
+                  <h2 class="card-title title-bold">
+                    <span class="card-number">4</span>
+                    Upload a certificate
+                  </h2>
+                  <p class="card-text mt-3">
+                    This product is secured with Mutual TLS. You need to upload a certificate to use it.
+                  </p>
+                </div>
+                <div class="card-footer mt-4">
+                  <div class="step-wrapper">
+                    <div class="form-check-inline mx-n3">
+                      <input id="new-cert" class="form-check-input step active dcr-visibility" type="radio" name="cert-action" value="create" checked >
+                      <label for="new-cert" class="form-check-label">
+                        Upload a new certificate
+                      </label>
+                    </div>
+                    <div class="form-check-inline ml-3">
+                      <input id="existing-cert" class="form-check-input step dcr-visibility" type="radio" name="cert-action" value="existing">
+                      <label for="existing-cert" class="form-check-label">
+                        Existing certificate
+                      </label>
+                    </div>
+                  </div>
+                  <div class="content-wrapper">
+                    <div class="content-wrapper__content d-block mt-3 mb-3">
+                      <div class="mb-3 mt-4">
+                        <label class="form-label">Certificate name</label>
+                        <input type="text" name="certificate_name" class="form-control"/>
+                      </div>
+                      <div class="d-flex flex-row mt-4">
+                        <label for="fileInput" class="btn btn-secondary mb-1" id="upload-cert">UPLOAD CERTIFICATE</label>
+                        <input class="d-none" type="file" id="fileInput" name="certificate_file"/>
+                        <div class="d-flex flex-row ml-3 align-items-center">
+                          <i id="certificate-name">No certificate selected</i>
+                        </div>
+                      </div>
+                      <div class="card-footer mt-3">
+                        <div class="toggle-collapsible d-flex flex-row align-items-center mt-1" data-toggle="collapse" href="#type-details-{{ $templatesLength }}" role="button" aria-expanded="false" aria-controls="type-details-{{ $templatesLength }}">
+                          <span class="arrow-up-tyk d-inline"><img src="/assets/images/icons/arrow-up.svg"></span>
+                          <span class="arrow-down-tyk d-none"><img src="/assets/images/icons/arrow-down.svg"></span>
+                          <span class="opensans-semibold ml-3">View instructions how to create a pem file using SSL</span>
+                        </div>
+                        <div class="collapse" id="type-details-{{ $templatesLength }}">
+                          <div class="mt-4 ml-4 mb-3">
+                            <h6 class="opensans-semibold">Run these commands in Terminal, or use any other service to create a certificate.</h6>
+                            <div class="mt-3"> 
+                              <h6 class="opensans-semibold mb-0">Step 1. Create certificates using OpenSSL</h6>
+                              <span class="courier-new-regular">openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout key.pem -out cert.pem</span>
+                            </div>
+                            <div class="mt-3"> 
+                              <h6 class="opensans-semibold mb-0">Step 2. Combine key.pem and cert.pem into a signle file:</h6>
+                              <span class="courier-new-regular">   cat key.key >> server.pem</span>
+                            </div>
+                            <div class="mt-3"> 
+                              <h6 class="opensans-semibold mb-0">Step 3. Do the same for any third-party certificate chain files, bundles, etc:</h6>
+                              <span class="courier-new-regular">   cat intermediate.crt >> server.pem</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="content-wrapper__content d-none mt-3">
+                      <select class="form-control w-50" id="certsControlSelect" name="certificate_id">
+                        <option value="" disabled selected>Select a certificate</option>
+                        {{ range $cert := $certs}}
+                        <option value="{{$cert.ID}}">
+                          {{$cert.Name}}
+                        </option>
+                        {{end}}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {{end}}
+            {{ if $request.DCREnabled }}
+              <div class="cart-wrapper__card-section dcr-templates">
+                <div class="card cart-card">
+                  <div class="card-body">
+                    <h2 class="card-title title-bold">
+                      <span class="card-number">5</span>
+                      Select a client type
+                    </h2>
+                    <p class="card-text mt-3">To access this product(s) you need to select one of following client types with following pre-configured options.</p>
+                  </div>
+                  <div class="card-footer mt-4">
+                    <div class="d-flex flex-row flex-wrap justify-content-between">
+                      {{ range $index, $t := $request.AppTemplates }}
+                        <div class="labeled-card d-flex flex-column mb-4 pb-2 pl-3">
+                          <div class="labeled-card__title align-self-center mb-4">
+                            <h3 class="mb-0">{{ $t.Name }}</h3>
+                          </div>
+                          {{if not (eq $t.Description "")}}
+                          <div class="client-type-description">
+                            <div class="opensans-semibold">Description:</div>
+                            <div class="opensans-regular">{{ $t.Description }}</div>
+                          </div>
+                          {{end}}
+                          <div class="d-flex flex-row mx-n2">
+                            <input id="client-type-{{$index}}" type="radio" name="app-action-template" value="{{ $t.ID }}" {{if eq $templatesLength 1}}checked{{end}}>
+                            <label for="client-type-{{$index}}" class="form-check-label mr-3">
+                            </label>
+                            <div class="d-flex flex-column">
+                              <div class="toggle-collapsible d-flex flex-row align-items-center mx-n3" data-toggle="collapse" href="#type-details-{{ $index }}" role="button" aria-expanded="false" aria-controls="type-details-{{ $index }}">
+                                <span class="arrow-up-tyk d-inline"><img src="/assets/images/icons/arrow-up.svg"></span>
+                                <span class="arrow-down-tyk d-none"><img src="/assets/images/icons/arrow-down.svg"></span>
+                                <span class="opensans-semibold ml-1">View client type details</span>
+                              </div>
+                              <div class="collapse" id="type-details-{{ $index }}">
+                                <div>
+                                  <span class="opensans-semibold"> Grant types </span>
+                                  <ul>
+                                    {{ range $t.GrantTypes }}
+                                      <li> {{ . }}
+                                    {{ end }}
+                                  </ul>
+                                </div>
+                                <div>
+                                  <span class="opensans-semibold"> Response types</span>
+                                  <ul>
+                                    {{ range $t.ResponseTypes }}
+                                      <li> {{ . }}
+                                    {{ end }}
+                                  </ul>
+                                </div>
+                                <div>
+                                  <span class="opensans-semibold"> Token endpoints auth methods </span>
+                                  <ul>
+                                    {{ range $t.TokenEndpoints }}
+                                      <li> {{ . }}
+                                    {{ end }}
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      {{ end }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {{ end }}
+
+
+            <div class="text-center mt-4 mb-5">
+              {{ if $request.Products }}
+                <div class="form-check mb-3">
+                  <input class="form-check-input" type="checkbox" id="acceptTerms" required onchange="toggleSubmitButton()">
+                  <label class="form-check-label" for="acceptTerms">
+                    I accept the <a href="/terms-and-conditions" target="_blank">Terms and Conditions</a>
+                  </label>
+                </div>
+                
+                <!-- Loading indicator -->
+                <div class="spinner" id="loadingSpinner"></div>
+                <div class="loading-text" id="loadingText">Processing payment request...</div>
+                
+                <button type="submit" id="submitRequestBtn" class="btn btn-primary" disabled>Submit request</button>
+              {{ end}}
+            </div>
+          </form>
+        {{ end }}
+    {{ end }}
+  {{ end }}
+</div>
+
+<style>
+  .spinner {
+    display: none;
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .loading-text {
+    display: none;
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+</style>
+
+<script>
+  function toggleSubmitButton() {
+    var checkbox = document.getElementById('acceptTerms');
+    var submitBtn = document.getElementById('submitRequestBtn');
+    submitBtn.disabled = !checkbox.checked;
+  }
+
+  function showLoading() {
+    var submitBtn = document.getElementById('submitRequestBtn');
+    var spinner = document.getElementById('loadingSpinner');
+    var loadingText = document.getElementById('loadingText');
+    
+    // Disable button and show loading indicators
+    submitBtn.disabled = true;
+    spinner.style.display = 'block';
+    loadingText.style.display = 'block';
+    submitBtn.innerHTML = 'Processing...';
+  }
+  
+  function hideLoading() {
+    var submitBtn = document.getElementById('submitRequestBtn');
+    var spinner = document.getElementById('loadingSpinner');
+    var loadingText = document.getElementById('loadingText');
+    var checkbox = document.getElementById('acceptTerms');
+    
+    // Hide loading indicators
+    spinner.style.display = 'none';
+    loadingText.style.display = 'none';
+    
+    // Restore button state
+    submitBtn.innerHTML = 'Submit request';
+    submitBtn.disabled = !checkbox.checked;
+  }
+
+  function handlePaymentRedirect(event) {
+    event.preventDefault();
+    
+    // Show loading indicators
+    showLoading();
+    
+    document.getElementById('cart-form').submit();
+  }
+  
+  // New function to handle the Stripe redirect from provisioned page
+  document.addEventListener('DOMContentLoaded', function() {
+    var stripeBtn = document.getElementById('proceedToStripeBtn');
+    if (stripeBtn) {
+      stripeBtn.addEventListener('click', function() {
+        // Show loading indicators
+        var spinner = document.getElementById('stripeLoadingSpinner');
+        var loadingText = document.getElementById('stripeLoadingText');
+        spinner.style.display = 'block';
+        loadingText.style.display = 'block';
+        stripeBtn.disabled = true;
+        stripeBtn.innerHTML = 'Processing...';
+        
+        // Call Stripe endpoint
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://visible-baobab-gw.aws-use1.cloud-ara.tyk.io/virtual-endpoints/stripe-checkout', true);
+        
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              var data = JSON.parse(xhr.responseText);
+              console.log("Received checkout URL:", data.url);
+              
+              // Redirect to Stripe Checkout
+              window.location.href = data.url;
+            } else {
+              // Hide loading on error
+              spinner.style.display = 'none';
+              loadingText.style.display = 'none';
+              stripeBtn.disabled = false;
+              stripeBtn.innerHTML = 'Proceed to Payment';
+              console.error('Error creating checkout session:', xhr.status);
+              alert('Could not create payment session. Please try again.');
+            }
+          }
+        };
+        
+        xhr.timeout = 10000; // 10 seconds
+        xhr.ontimeout = function() {
+          spinner.style.display = 'none';
+          loadingText.style.display = 'none';
+          stripeBtn.disabled = false;
+          stripeBtn.innerHTML = 'Proceed to Payment';
+          alert('Request timed out. Please try again.');
+        };
+        
+        xhr.onerror = function() {
+          spinner.style.display = 'none';
+          loadingText.style.display = 'none';
+          stripeBtn.disabled = false;
+          stripeBtn.innerHTML = 'Proceed to Payment';
+          alert('Network error occurred. Please check your connection and try again.');
+        };
+        
+        xhr.send();
+      });
+    }
+  });
+</script>

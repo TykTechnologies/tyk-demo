@@ -1,0 +1,77 @@
+<div class="private-portal-wrapper">
+  <div class="container">
+    <p class="mb-3">
+      <a href="/portal/private/users" class="breadcrumb-link">
+        Back to user list
+      </a>
+    </p>
+
+    {{ if .errors }}
+      {{ range $key, $errs := .errors }}
+        <div class="alert alert-warning cart-error" role="alert">
+          <i class="tyk-icon tykon tykon-warning "></i>
+          <div class="alert__content">
+            <strong>{{$key}}</strong>
+            <ul>
+              {{ range $errs }}
+                <li>{{.}}</li>
+              {{ end }}
+            </ul>
+          </div>
+        </div>
+      {{ end }}
+    {{ end }}
+
+    <form action="invite" method="post" id="user-invite">
+      {{ if .error }}
+        <div class="alert alert-danger" role="alert">
+          <i class="tyk-icon tykon tykon-warning "></i>
+          <div class="alert__content">{{ .error }}</div>
+        </div>
+      {{ end }}
+      <div class="user-invite-title-wrapper">
+        <div class="col-md-10">
+          <h2 class="users-main-title">Invite a new User</h2>
+          <p>Please fill in the details of the new user and assign a role, an invitation email will be sent with a registration link.</p>
+        </div>
+
+        <div class="card">
+          <div class="row mb-4">
+            <div class="col-6">
+              <label class="form-label">Name:</label>
+              <input type="text" class="form-control" name="first"  value="{{.first}}" placeholder="Name" required autofocus />
+            </div>
+            <div class="col-6">
+              <label class="form-label">Last name:</label>
+              <input type="text" class="form-control" name="last" value="{{.last}}" placeholder="Last name" required autofocus/>
+            </div>
+          </div>
+          <div class="row mb-4">
+            <div class="col-6">
+              <label class="form-label">Email:</label>
+              <input class="form-control" name="email" value="{{.email}}" placeholder="Email" required/>
+            </div>
+            <div class="col-6 selection">
+              {{ $roles := GetUserInvitationRoles }}
+              {{ if $roles }}
+                <label class="form-label">Role:</label>
+                <select class="form-control" id="selectRolesId" name="role" required>
+                  {{ range $role := $roles }}
+                    <option value="{{ $role.ID }}">{{ $role.DisplayName }}</option>
+                  {{ end }}
+                </select>
+              {{ end }}
+            </div>
+          </div>
+          {{ render "role_detail" . }}
+        </div>
+        <div class="form-group text-right row mt-4">
+          <div class="col-lg-12">
+            <a id="user_invite_cancel" class="btn btn-secondary-outline" href="/portal/private/users">Cancel</a>
+            <input type="submit" name="submit" class="btn btn-primary" value="send invite" />
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

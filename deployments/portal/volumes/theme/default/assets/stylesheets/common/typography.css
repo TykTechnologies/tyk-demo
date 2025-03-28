@@ -1,0 +1,150 @@
+/* Font family */
+
+h1,
+h2 {
+	font-family: "OpenSans-Bold";
+}
+
+h3,
+h4,
+h5 {
+	font-family: "OpenSans-Bold";
+}
+
+strong {
+	font-family: "OpenSans-Bold";
+}
+
+/* Font sizes */
+
+h1 {
+	font-size: 25px;
+	line-height: 30px;
+}
+h2 {
+	font-size: 20px;
+	line-height: 24px;
+}
+h3 {
+	font-size: 17px;
+	line-height: 23px;
+}
+h4 {
+	font-size: 16px;
+	line-height: 22px;
+}
+h5 {
+	font-size: 15px;
+	line-height: 19px;
+}
+h6 {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body,
+p {
+	font-family: "OpenSans-Regular";
+	font-size: 16px;
+	line-height: 20px;
+}
+.text-open-sans-regular {
+	font-family: "OpenSans-Regular";
+	font-size: 16px;
+	line-height: 22px;
+}
+.text-open-sans-semibold{
+	font-family: "OpenSans-Semibold";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+.text-open-sans-bold{
+	font-family: "OpenSans-Bold";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+.text-italic {
+	font-style: italic;
+}
+
+.title-bold {
+	font-family: 'Smoolthan-Bold';
+	font-size: 20px;
+	line-height: 24px;
+}
+
+.title-h1-bold {
+	font-family: 'Smoolthan-Bold';
+	font-size: 25px;
+	line-height: 30px;
+}
+
+.title-h2-bold {
+    font-family: 'Smoolthan-Bold';
+    font-size: 22px;
+    line-height: 30px;
+}
+
+.title-inter {
+	font-family: Inter-Bold, sans-serif;
+	font-size: 32px;
+	line-height: 36px;
+}
+
+.text-regular-14 {
+    font-family: "OpenSans-Regular";
+    font-size: 14px;
+    line-height: 19px;
+}
+.dark {
+	color: var(--tdb-text-color-dark);
+}
+.gray {
+	color: var(--tdb-text-color-gray);
+}
+.export{
+	color: var(--tdp-secondary);
+}
+.text-regular-12 {
+	font-family: "OpenSans-Regular";
+	font-size: 12px;
+	line-height: 16px;
+}
+.gray-lighter{
+	color: var(--tdb-text-color-gray-lighter);
+}
+.text-os-semibold-16{
+	font-family: "OpenSans-Semibold";
+	font-size: 16px;
+	line-height: 22px;
+}
+.default-base{
+	color: var(--tdp-extra-dark);
+}
+.text-os-bold-17{
+	font-family: "OpenSans-Bold";
+	font-size: 17px;
+	line-height: 23px;
+}
+.underline{
+	text-decoration: underline;
+	cursor: pointer;
+}
+.text-os-semibold-12{
+	font-family: "OpenSans-Semibold";
+	font-size: 12px;
+	line-height: 16px;
+}
+.text-open-sans-bold-20{
+	font-family: "OpenSans-Bold";
+	font-size: 20px;
+	line-height: 27.24px;
+}
+.courier-new-regular {
+	font-family: 'Courier New', Courier, monospace;
+	font-size: 12px;
+	line-height: 16px;
+	color: var(--tdp-text-color);
+}

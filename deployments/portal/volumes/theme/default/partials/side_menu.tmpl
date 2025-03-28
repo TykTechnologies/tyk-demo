@@ -1,0 +1,30 @@
+<!-- Template used for Side Menu -->
+
+{{ $user := CurrentUser req }}
+{{ if $user }}
+    <div class="side-menu-container">
+        <ul class="sidebar-nav">
+            <li id="/portal/private/analytics">
+                <i class="bi bi-ui-checks-grid"></i>
+                <a href="/portal/private/analytics">Dashboard</a>
+            </li>
+            <li id="/portal/private/dashboard">
+                <i class="bi bi-ui-checks-grid"></i>
+                <a href="/portal/private/dashboard">My apps</a>
+            </li>
+            <li id="/portal/private/users">
+                <i class="bi bi-people"></i>
+                <a href="/portal/private/users">Users</a>
+            </li>
+            <hr>
+            <li id="/portal/private/profile">
+                <i class="bi bi-person"></i>
+                <a href="/portal/private/profile">Profile settings</a>
+            </li>
+            <li>
+                <i class="bi bi-box-arrow-right"></i>
+                <a href="/auth/logout">Log Out</a>
+            </li>
+        </ul>
+    </div>
+{{end}}
