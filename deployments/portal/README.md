@@ -34,3 +34,27 @@ In order to test the endpoints of this deployment, run the standard test script:
 Make sure that the deployment is bootstrapped first.
 
 The tests will run for both the standard `tyk` deployment and also the `portal` deployment.
+
+
+## Usage
+
+The Portal's theme is located in the `./volumes/theme` directory, and is mounted directly into the Portal container. 
+
+This means, you can make changes to the custom themes, add new pages and templates, and it changes can be reloaded on refreshes!
+
+There are two examples included
+
+### Embedded GraphQL Portal
+
+The Catalogue has been modified to include a link to a GQL section, which includes an embedded GraphQL Portal available in the Catalogue.
+
+This serves an example as to the kind of customizations we can make to the Dev Portal, using custom HTML, JS, and CSS.
+
+The GQL Schema on the custom page [graphql-playground.tmpl] loads a GQL API hosted by Tyk API Gateway.
+
+
+### Stripe Integration
+
+Another example includes adding a Stripe Checkout flow, by modifying the [portal_checkout.tmpl].  After submitting an access request via the Cart, the user will be presented with a "Buy Now" button which generates a Stripe Checkout session.  After making a [fake payment](https://docs.stripe.com/testing), the user is redirected back to the Portal.
+
+This serves as an example of one kind of Monetization flow.
