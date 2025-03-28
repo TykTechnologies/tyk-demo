@@ -38,7 +38,7 @@ The tests will run for both the standard `tyk` deployment and also the `portal` 
 
 ## Usage
 
-The Portal's theme is located in the `./volumes/theme` directory, and is mounted directly into the Portal container. 
+The Portal's theme is located in the [./volumes/theme](./volumes/theme/) directory, and is mounted directly into the Portal container. 
 
 This means, you can make changes to the custom themes, add new pages and templates, and it changes can be reloaded on refreshes!
 
@@ -50,7 +50,7 @@ The Catalogue has been modified to include a link to a GQL section, which includ
 
 This serves an example as to the kind of customizations we can make to the Dev Portal, using custom HTML, JS, and CSS.
 
-The GQL Schema on the custom page [graphql-playground.tmpl] loads a GQL API hosted by Tyk API Gateway.
+The GQL Schema on the custom page [graphql-playground.tmpl](./volumes/theme/default/views/graphql-playground.tmpl) loads a GQL API hosted by Tyk API Gateway.
 
 
 ### Stripe Integration
