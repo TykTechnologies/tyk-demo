@@ -71,6 +71,57 @@ log_message "Restart TIB to load new profiles"
 eval $(generate_docker_compose_command) restart tyk-identity-broker 1> /dev/null 2>> logs/bootstrap.log
 log_ok
 
+log_message "Waiting for OpenLDAP server to be ready"
+until docker exec -i tyk-demo-ldap-server-1 ldapsearch -x -D "cn=admin,dc=tyk,dc=io" -w admin -b "dc=tyk,dc=io" "(objectClass=*)" &> /dev/null; do
+  log_message "  OpenLDAP server is not ready yet. Retrying in 1 seconds..."
+  bootstrap_progress
+  sleep 1
+done
+log_ok
+bootstrap_progress
+
+log_message "Adding 'Users' OU to OpenLDAP"
+docker exec tyk-demo-ldap-server-1 ldapadd -x -D "cn=admin,dc=tyk,dc=io" -w admin -f "/ldap/ou-users.ldif" > /dev/null 2>> logs/bootstrap.log
+if [[ $? -ne 0 ]]; then
+  log_message "ERROR: Could not add Users OU to OpenLDAP"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Adding 'Test' user to OpenLDAP"
+docker exec  tyk-demo-ldap-server-1 ldapadd -x -D "cn=admin,dc=tyk,dc=io" -w admin -f "/ldap/user-test.ldif" > /dev/null 2>> logs/bootstrap.log
+if [[ $? -ne 0 ]]; then
+  log_message "ERROR: Could not add test user to OpenLDAP"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Allow anonymous queries to OpenLDAP"
+docker exec -i tyk-demo-ldap-server-1 ldapmodify -Y EXTERNAL -H ldapi:/// -f /ldap/anonymous-access.ldif > /dev/null 2>> logs/bootstrap.log
+if [[ $? -ne 0 ]]; then
+  log_message "ERROR: Could not allow anonymous access to OpenLDAP"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Verifying that test user was added to OpenLDAP"
+attempts=0
+max_attempts=5
+until docker exec -i tyk-demo-ldap-server-1 ldapsearch -x -b "dc=tyk,dc=io" "(uid=test)" | grep -q "dn: uid=test,ou=users,dc=tyk,dc=io"; do
+  if [[ $attempts -ge $max_attempts ]]; then
+    log_message "ERROR: User uid=test not found after $max_attempts attempts."
+    exit 1
+  fi
+  log_message "User uid=test not found. Retrying in 1 second... (Attempt $((attempts + 1))/$max_attempts)"
+  attempts=$((attempts + 1))
+  sleep 1
+done
+log_ok
+bootstrap_progress
+
 # do this to prevent git from showing changes in the profiles.json file :(
 sleep 2
 echo "$profile_temp" > deployments/sso/volumes/tyk-identity-broker/profiles.json

@@ -1,5 +1,5 @@
 [{
-  "ActionTy[pe": "GenerateTemporaryAuthToken",
+  "ActionType": "GenerateTemporaryAuthToken",
   "ID": "PLACEHOLDER",
   "IdentityHandlerConfig": {
       "DashboardCredential": "",
