@@ -4740,7 +4740,8 @@
 											"    });",
 											"});"
 										],
-										"type": "text/javascript"
+										"type": "text/javascript",
+										"packages": {}
 									}
 								}
 							],
@@ -4749,7 +4750,7 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "throttle_key",
+										"value": "throttling",
 										"type": "text"
 									}
 								],
