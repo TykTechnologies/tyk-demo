@@ -3628,7 +3628,7 @@
 														"get"
 													]
 												},
-												"description": "This request demonstrates authentication using a JWT signed by an RSA key pair. The JWT was generated at [https://jwt.io](https://jwt.io) using a public and private key pair.\n\nThe value of the JWT's `sub` property refers to an API key (`jwt_rsa`) that contains the public key of the RSA key pair, as well as the typical access rights for the API.\n\nThe gateway uses the public key to validate the signature of the JWT of the incoming request, and uses the access rights defined in the API key to authorise access ot the requested endpoint."
+												"description": "This request demonstrates authentication using a JWT signed by an RSA key pair. The JWT was generated at [https://jwt.io](https://jwt.io) using a public and private key pair.\n\nThe value of the JWT's `sub` property refers to an API key (`jwt_rsa`) that contains the public key of the RSA key pair, as well as the typical access rights for the API.\n\nThe gateway uses the public key to validate the signature of the JWT of the incoming request, and uses the access rights defined in the API key to authorise access to the requested endpoint."
 											},
 											"response": []
 										}
@@ -4653,6 +4653,14 @@
 											"    });",
 											"});"
 										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"packages": {},
 										"type": "text/javascript"
 									}
 								}
@@ -4662,7 +4670,7 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "ratelimit_key",
+										"value": "rate_limit",
 										"type": "text"
 									}
 								],
