@@ -48,7 +48,7 @@ capture_container_logs() {
 
 
     log "Using docker compose to retrieve chronological logs"
-    ./generate_docker_compose_command.sh logs --timestamps --no-color 2>&1 || \
+    ./docker-compose-command.sh logs --timestamps --no-color 2>&1 || \
         echo "Failed to retrieve docker-compose logs" >> "$container_log_file"
     
     log "Chronologically merged container logs saved to $container_log_file"
