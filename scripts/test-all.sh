@@ -34,6 +34,26 @@ prepare_logs() {
     rm -f "$BASE_DIR/logs/containers-"*.log 2>/dev/null
 }
 
+capture_container_logs() {
+    local deployment_name="$1"
+    
+    # Create a log file with timestamp
+    local timestamp=$(date -u "+%Y%m%d_%H%M%S")
+    local container_log_file="$BASE_DIR/logs/containers-${deployment_name}-${timestamp}.log"
+    
+    # Log header
+    echo "Chronologically merged container logs for deployment: $deployment_name" > "$container_log_file"
+    echo "Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$container_log_file"
+    echo "=========================================================" >> "$container_log_file"
+
+
+    log "Using docker compose to retrieve chronological logs"
+    ./generate_docker_compose_command.sh logs --timestamps --no-color 2>&1 || \
+        echo "Failed to retrieve docker-compose logs" >> "$container_log_file"
+    
+    log "Chronologically merged container logs saved to $container_log_file"
+}
+
 # Log deployment step with optional colour
 log_deployment_step() {
     local deployment_name="$1"
@@ -114,6 +134,7 @@ process_deployment() {
     local bootstrap_result="$STATUS_FAILED"
     local postman_result="N/A"
     local script_result="N/A"
+    local has_failure=false
 
     log_deployment_step "$deployment_name" "Processing Deployment"
 
@@ -135,13 +156,9 @@ process_deployment() {
     if output=$("$BASE_DIR/up.sh" "$deployment_name" --persist-log --hide-progress 2>&1); then
         log_deployment_step "$deployment_name" "Deployment Creation" "$STATUS_PASSED"
         bootstrap_result="$STATUS_PASSED"
-    else
-        log_deployment_step "$deployment_name" "Deployment Creation" "$STATUS_FAILED"
-        log_deployment_step "$deployment_name" "Bootstrap Output" "$output"
-    fi
 
-    # Only run tests if bootstrap was successful
-    if [ "$bootstrap_result" == "$STATUS_PASSED" ]; then
+        # Only run tests if bootstrap was successful
+
         # Run Postman tests
         if validate_postman_collection "$deployment_name" "$deployment_dir"; then
             log_deployment_step "$deployment_name" "Running Postman Tests"
@@ -151,6 +168,7 @@ process_deployment() {
             else
                 log_deployment_step "$deployment_name" "Postman Tests" "$STATUS_FAILED"
                 postman_result="$STATUS_FAILED"
+                has_failure=true
             fi
         fi
 
@@ -163,8 +181,19 @@ process_deployment() {
             else
                 log_deployment_step "$deployment_name" "Custom Tests" "$STATUS_FAILED"
                 script_result="${TEST_SCRIPT_PASSES}/${TEST_SCRIPT_COUNT}: $STATUS_FAILED"
+                has_failure=true
             fi
         fi
+    else
+        log_deployment_step "$deployment_name" "Deployment Creation" "$STATUS_FAILED"
+        log_deployment_step "$deployment_name" "Bootstrap Output" "$output"
+        has_failure=true
+    fi
+    
+    # Capture container logs if there was a failure
+    if [[ "$has_failure" == true ]]; then
+        log "Capturing chronologically sorted container logs for failed deployment: $deployment_name"
+        capture_container_logs "$deployment_name"
     fi
 
     # Remove deployment
@@ -174,7 +203,7 @@ process_deployment() {
     fi
 
     # Determine overall deployment status
-    if [[ "$bootstrap_result" != "$STATUS_FAILED" && "$postman_result" != "$STATUS_FAILED" && "$script_result" != *"$STATUS_FAILED"* ]]; then
+    if [[ "$has_failure" == false ]]; then
         log_deployment_step "$deployment_name" "Deployment Result" "$STATUS_PASSED" "$GREEN"
         ((PASSED_DEPLOYMENTS++))
         deployment_status="$STATUS_PASSED"
