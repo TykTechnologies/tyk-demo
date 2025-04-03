@@ -26,12 +26,32 @@ log() {
 
 # Prepare log directory and files
 prepare_logs() {
-    mkdir -p "$BASE_DIR/logs"
-    : > "$BASE_DIR/logs/test.log"
-    : > "$BASE_DIR/logs/bootstrap.log"
-    : > "$BASE_DIR/logs/postman.log"
-    : > "$BASE_DIR/logs/custom_scripts.log"
-    rm -f "$BASE_DIR/logs/containers-"*.log 2>/dev/null
+    local log_directory_path="$BASE_DIR/logs"
+    mkdir -p "$log_directory_path"
+    # remove existing logs
+    rm -f "$log_directory_path"/*.log #2>/dev/null
+    # reset standard logs
+    : > "$log_directory_path/test.log"
+    : > "$log_directory_path/bootstrap.log"
+    : > "$log_directory_path/postman.log"
+    : > "$log_directory_path/custom_scripts.log"
+}
+
+# Preserves log file with deployment name and timestamp
+preserve_log() {
+    local log_file_name="$1"
+    local deployment_name="$2"
+    local log_directory="$BASE_DIR/logs"
+    local log_file_stem=${log_file_name%.log}
+    local log_file_path="$log_directory/$log_file_name"
+    local timestamp=$(date -u "+%Y%m%d_%H%M%S")
+    local new_log_file_name="$log_file_stem-${deployment_name}-${timestamp}.log"
+    local new_log_file_path="$log_directory/$new_log_file_name"
+    
+    cp "$log_file_path" "$new_log_file_path"
+    log "Copied $log_file_name to $new_log_file_name"
+    # Reset log file, ready for use
+    : > "$log_file_path" 
 }
 
 capture_container_logs() {
@@ -48,11 +68,31 @@ capture_container_logs() {
 
 
     log "Using docker compose to retrieve chronological logs"
-    ./docker-compose-command.sh logs --timestamps --no-color 2>&1 || \
-        echo "Failed to retrieve docker-compose logs" >> "$container_log_file"
+    ./docker-compose-command.sh logs --timestamps --no-color >> "$container_log_file"
     
     log "Chronologically merged container logs saved to $container_log_file"
 }
+
+strip_control_chars() {
+    local input_file="$1"
+
+    if [ ! -f "$input_file" ]; then
+        echo "Error: Input file does not exist." >&2
+        return 1
+    fi
+
+    # Create a temporary file
+    local temp_file
+    temp_file="$(mktemp)" || { echo "Error: Failed to create temporary file." >&2; return 1; }
+
+    # Use awk to remove ANSI escape sequences and tr to remove control characters
+    awk '{gsub(/\033\[[0-9;]*[a-zA-Z]/, "")} 1' "$input_file" | \
+    tr -d '\000-\010\013\014\016-\037' > "$temp_file"
+
+    # Overwrite the original file
+    mv "$temp_file" "$input_file"
+}
+
 
 # Log deployment step with optional colour
 log_deployment_step() {
@@ -170,6 +210,8 @@ process_deployment() {
                 postman_result="$STATUS_FAILED"
                 has_failure=true
             fi
+            strip_control_chars "logs/postman.log"
+            preserve_log "postman.log" "$deployment_name"
         fi
 
         # Run custom test scripts
@@ -189,6 +231,8 @@ process_deployment() {
         log_deployment_step "$deployment_name" "Bootstrap Output" "$output"
         has_failure=true
     fi
+
+    preserve_log "bootstrap.log" "$deployment_name"
     
     # Capture container logs if there was a failure
     if [[ "$has_failure" == true ]]; then
