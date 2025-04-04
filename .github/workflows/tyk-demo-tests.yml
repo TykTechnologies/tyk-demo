@@ -40,8 +40,9 @@ jobs:
         run: sudo ./scripts/update-hosts.sh
       - name: Bootstrap and Test All Eligible Deployments
         run: sudo ./scripts/test-all.sh
-      - name: Enable log directory to be read
-        run: chmod -R 644 logs
+      - name: Enable log directory access
+        if: always()
+        run: chmod -R 777 logs
       - name: Store Logs
         if: always()
         uses: actions/upload-artifact@v4
