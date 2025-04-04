@@ -858,6 +858,7 @@ create_policy () {
   check_variables
 
   log_message "  Creating Policy: $policy_name"
+  log_message "    ID: $policy_id"
 
   api_response="$(curl $dashboard_base_url/api/portal/policies -s \
     -H "authorization: $dashboard_api_key" \
