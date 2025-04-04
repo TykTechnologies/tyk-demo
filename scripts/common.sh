@@ -858,11 +858,16 @@ create_policy () {
   check_variables
 
   log_message "  Creating Policy: $policy_name"
-  log_message "    ID: $policy_id"
 
   api_response="$(curl $dashboard_base_url/api/portal/policies -s \
     -H "authorization: $dashboard_api_key" \
     -d @$policy_data_path 2>> logs/bootstrap.log)"
+
+  local result_id=$(jq -r '.Message' <<< "$api_response")
+  local result_status=$(jq -r '.Status' <<< "$api_response")
+
+  log_message "    ID: $result_id"
+  log_message "    Status: $result_status"
 
   log_json_result "$api_response"
 }
