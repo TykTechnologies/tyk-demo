@@ -178,19 +178,18 @@ services:
       KAFKA_NUM_PARTITIONS: 3
     volumes:
       - tyk-kafka-data:/opt/kafka/data
-  countries-api:
-    build:
-      context: ./deployments/tyk/data/countries-api
-      dockerfile: Dockerfile
-    ports:
-      - "4100:4100"
-    volumes:
-      - ./deployments/tyk/volumes/countries-api/index.js:/app/index.js
-      - ./deployments/tyk/volumes/countries-api/data/countries.json:/app/data/countries.json
-    environment:
-      - NODE_ENV=development
+  countries-rest-api:
+    image: davidgarvey/countries-rest-api:latest
     networks:
       - tyk
+    ports:
+      - "4100:4100"
+  countries-graphql-api:
+    image: mangomm/trevorblades-countries:latest
+    networks:
+      - tyk
+    ports:
+      - "4000:4000"
 
 volumes:
   tyk-redis-data:
