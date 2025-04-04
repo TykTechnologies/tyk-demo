@@ -185,8 +185,8 @@ services:
     ports:
       - "4100:4100"
     volumes:
-      - ./deployments/tyk/volumes/countries-api:/app
-      - /app/node_modules
+      - ./deployments/tyk/volumes/countries-api/index.js:/app/index.js
+      - ./deployments/tyk/volumes/countries-api/data/countries.json:/app/data/countries.json
     environment:
       - NODE_ENV=development
     networks:

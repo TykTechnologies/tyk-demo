@@ -26,14 +26,14 @@ app.get('/', (req, res) => {
 });
 
 // Get all countries
-app.get('/v2/all', (req, res) => {
+app.get('/all', (req, res) => {
   res.json(countries);
 });
 
-// Get country by alpha2 code
-app.get('/v2/alpha/:code', (req, res) => {
+// Get country by cca2 code
+app.get('/cca2/:code', (req, res) => {
   const code = req.params.code.toUpperCase();
-  const country = countries.find(c => c.alpha2Code === code);
+  const country = countries.find(c => c.cca2 === code);
   
   if (!country) {
     return res.status(404).json({ message: `Country with code ${code} not found` });
@@ -43,10 +43,10 @@ app.get('/v2/alpha/:code', (req, res) => {
 });
 
 // Get countries by name
-app.get('/v2/name/:name', (req, res) => {
+app.get('/name/:name', (req, res) => {
   const name = req.params.name.toLowerCase();
   const matchedCountries = countries.filter(country => 
-    country.name.toLowerCase().includes(name) || 
+    country.name.common.toLowerCase().includes(name) || 
     (country.altSpellings && country.altSpellings.some(alt => alt.toLowerCase().includes(name)))
   );
   
