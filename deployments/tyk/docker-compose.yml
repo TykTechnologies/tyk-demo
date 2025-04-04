@@ -178,6 +178,19 @@ services:
       KAFKA_NUM_PARTITIONS: 3
     volumes:
       - tyk-kafka-data:/opt/kafka/data
+  countries-api:
+    build:
+      context: ./deployments/tyk/data/countries-api
+      dockerfile: Dockerfile
+    ports:
+      - "4100:4100"
+    volumes:
+      - ./deployments/tyk/volumes/countries-api:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    networks:
+      - tyk
 
 volumes:
   tyk-redis-data:
