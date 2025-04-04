@@ -178,6 +178,18 @@ services:
       KAFKA_NUM_PARTITIONS: 3
     volumes:
       - tyk-kafka-data:/opt/kafka/data
+  countries-rest-api:
+    image: davidgarvey/countries-rest-api:latest
+    networks:
+      - tyk
+    ports:
+      - "4100:4100"
+  countries-graphql-api:
+    image: mangomm/trevorblades-countries:latest
+    networks:
+      - tyk
+    ports:
+      - "4000:4000"
 
 volumes:
   tyk-redis-data:

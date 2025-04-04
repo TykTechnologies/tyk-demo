@@ -36,10 +36,8 @@ jobs:
         run: |
           echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
           echo "MDCB_LICENCE=${{ secrets.MDCB_LICENSE }}" >> .env
-      - name: Update Hosts
-        run: sudo ./scripts/update-hosts.sh
       - name: Bootstrap and Test All Eligible Deployments
-        run: sudo ./scripts/test-all.sh
+        run: ./scripts/test-all.sh
       - name: Store Logs
         if: always()
         uses: actions/upload-artifact@v4

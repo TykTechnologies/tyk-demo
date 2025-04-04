@@ -462,6 +462,25 @@
         ],
         "data_sources": [
           {
+            "kind": "REST",
+            "name": "Rest Countries",
+            "internal": false,
+            "root_fields": [
+              {
+                "type": "Country",
+                "fields": [
+                  "pop"
+                ]
+              }
+            ],
+            "config": {
+              "url": "http://countries-rest-api:4100/cca2/{{.object.code}}",
+              "method": "GET",
+              "body": "",
+              "headers": {}
+            }
+          },
+          {
             "kind": "GraphQL",
             "name": "Tyk GraphQL Countries",
             "internal": true,
@@ -478,26 +497,6 @@
               "method": "POST",
               "headers": {},
               "default_type_name": "Country"
-            }
-          },
-          {
-            "kind": "REST",
-            "name": "Rest Countries",
-            "internal": false,
-            "root_fields": [
-              {
-                "type": "Country",
-                "fields": [
-                  "pop"
-                ]
-              }
-            ],
-            "config": {
-              "url": "https://restcountries.com/v2/alpha/{{.object.code}}",
-              "method": "GET",
-              "body": "",
-              "headers": {},
-              "default_type_name": "Int"
             }
           }
         ],

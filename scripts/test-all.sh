@@ -26,13 +26,73 @@ log() {
 
 # Prepare log directory and files
 prepare_logs() {
-    mkdir -p "$BASE_DIR/logs"
-    : > "$BASE_DIR/logs/test.log"
-    : > "$BASE_DIR/logs/bootstrap.log"
-    : > "$BASE_DIR/logs/postman.log"
-    : > "$BASE_DIR/logs/custom_scripts.log"
-    rm -f "$BASE_DIR/logs/containers-"*.log 2>/dev/null
+    local log_directory_path="$BASE_DIR/logs"
+    mkdir -p "$log_directory_path"
+    # remove existing logs
+    rm -f "$log_directory_path"/*.log #2>/dev/null
+    # reset standard logs
+    : > "$log_directory_path/test.log"
+    : > "$log_directory_path/bootstrap.log"
+    : > "$log_directory_path/postman.log"
+    : > "$log_directory_path/custom_scripts.log"
 }
+
+# Preserves log file with deployment name and timestamp
+preserve_log() {
+    local log_file_name="$1"
+    local deployment_name="$2"
+    local log_directory="$BASE_DIR/logs"
+    local log_file_stem=${log_file_name%.log}
+    local log_file_path="$log_directory/$log_file_name"
+    local timestamp=$(date -u "+%Y%m%d_%H%M%S")
+    local new_log_file_name="$log_file_stem-${deployment_name}-${timestamp}.log"
+    local new_log_file_path="$log_directory/$new_log_file_name"
+    
+    cp "$log_file_path" "$new_log_file_path"
+    log "Copied $log_file_name to $new_log_file_name"
+    # Reset log file, ready for use
+    : > "$log_file_path" 
+}
+
+capture_container_logs() {
+    local deployment_name="$1"
+    
+    # Create a log file with timestamp
+    local timestamp=$(date -u "+%Y%m%d_%H%M%S")
+    local container_log_file="$BASE_DIR/logs/containers-${deployment_name}-${timestamp}.log"
+    
+    # Log header
+    echo "Chronologically merged container logs for deployment: $deployment_name" > "$container_log_file"
+    echo "Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$container_log_file"
+    echo "=========================================================" >> "$container_log_file"
+
+
+    log "Using docker compose to retrieve chronological logs"
+    ./docker-compose-command.sh logs --timestamps --no-color >> "$container_log_file"
+    
+    log "Chronologically merged container logs saved to $container_log_file"
+}
+
+strip_control_chars() {
+    local input_file="$1"
+
+    if [ ! -f "$input_file" ]; then
+        echo "Error: Input file does not exist." >&2
+        return 1
+    fi
+
+    # Create a temporary file
+    local temp_file
+    temp_file="$(mktemp)" || { echo "Error: Failed to create temporary file." >&2; return 1; }
+
+    # Use awk to remove ANSI escape sequences and tr to remove control characters
+    awk '{gsub(/\033\[[0-9;]*[a-zA-Z]/, "")} 1' "$input_file" | \
+    tr -d '\000-\010\013\014\016-\037' > "$temp_file"
+
+    # Overwrite the original file
+    mv "$temp_file" "$input_file"
+}
+
 
 # Log deployment step with optional colour
 log_deployment_step() {
@@ -114,6 +174,7 @@ process_deployment() {
     local bootstrap_result="$STATUS_FAILED"
     local postman_result="N/A"
     local script_result="N/A"
+    local has_failure=false
 
     log_deployment_step "$deployment_name" "Processing Deployment"
 
@@ -132,16 +193,12 @@ process_deployment() {
 
     # Bootstrap deployment
     log_deployment_step "$deployment_name" "Creating Deployment"
-    if output=$("$BASE_DIR/up.sh" "$deployment_name" --persist-log --hide-progress 2>&1); then
+    if output=$("$BASE_DIR/up.sh" "$deployment_name" --persist-log --hide-progress --skip-hostname-check 2>&1); then
         log_deployment_step "$deployment_name" "Deployment Creation" "$STATUS_PASSED"
         bootstrap_result="$STATUS_PASSED"
-    else
-        log_deployment_step "$deployment_name" "Deployment Creation" "$STATUS_FAILED"
-        log_deployment_step "$deployment_name" "Bootstrap Output" "$output"
-    fi
 
-    # Only run tests if bootstrap was successful
-    if [ "$bootstrap_result" == "$STATUS_PASSED" ]; then
+        # Only run tests if bootstrap was successful
+
         # Run Postman tests
         if validate_postman_collection "$deployment_name" "$deployment_dir"; then
             log_deployment_step "$deployment_name" "Running Postman Tests"
@@ -151,7 +208,10 @@ process_deployment() {
             else
                 log_deployment_step "$deployment_name" "Postman Tests" "$STATUS_FAILED"
                 postman_result="$STATUS_FAILED"
+                has_failure=true
             fi
+            strip_control_chars "logs/postman.log"
+            preserve_log "postman.log" "$deployment_name"
         fi
 
         # Run custom test scripts
@@ -163,8 +223,21 @@ process_deployment() {
             else
                 log_deployment_step "$deployment_name" "Custom Tests" "$STATUS_FAILED"
                 script_result="${TEST_SCRIPT_PASSES}/${TEST_SCRIPT_COUNT}: $STATUS_FAILED"
+                has_failure=true
             fi
         fi
+    else
+        log_deployment_step "$deployment_name" "Deployment Creation" "$STATUS_FAILED"
+        log_deployment_step "$deployment_name" "Bootstrap Output" "$output"
+        has_failure=true
+    fi
+
+    preserve_log "bootstrap.log" "$deployment_name"
+    
+    # Capture container logs if there was a failure
+    if [[ "$has_failure" == true ]]; then
+        log "Capturing chronologically sorted container logs for failed deployment: $deployment_name"
+        capture_container_logs "$deployment_name"
     fi
 
     # Remove deployment
@@ -174,7 +247,7 @@ process_deployment() {
     fi
 
     # Determine overall deployment status
-    if [[ "$bootstrap_result" != "$STATUS_FAILED" && "$postman_result" != "$STATUS_FAILED" && "$script_result" != *"$STATUS_FAILED"* ]]; then
+    if [[ "$has_failure" == false ]]; then
         log_deployment_step "$deployment_name" "Deployment Result" "$STATUS_PASSED" "$GREEN"
         ((PASSED_DEPLOYMENTS++))
         deployment_status="$STATUS_PASSED"

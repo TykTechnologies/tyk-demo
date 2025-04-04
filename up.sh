@@ -22,12 +22,14 @@ display_help() {
     echo "  --persist-log         Persist log files between bootstraps"
     echo "  --hide-progress       Hide deployment progress meter"
     echo "  --skip-plugin-build   Skip building Go plugins (can also use --spb)"
+    echo "  --skip-hostname-check Skip validation of hostnames in /etc/hosts"
     echo
     echo "Examples:"
-    echo "  ./up.sh                     # Bring up default Tyk deployment"
-    echo "  ./up.sh analytics-kibana    # Bring up Tyk deployment with Kibana analytics"
-    echo "  ./up.sh --help              # Show this help message"
-    echo "  ./up.sh --persist-log       # Persist logs"
+    echo "  ./up.sh                       # Bring up default Tyk deployment"
+    echo "  ./up.sh analytics-kibana      # Bring up Tyk deployment with Kibana analytics"
+    echo "  ./up.sh --help                # Show this help message"
+    echo "  ./up.sh --persist-log         # Persist logs"
+    echo "  ./up.sh --skip-hostname-check # Skip hostname validation"
 }
 
 # Check for help flag
@@ -42,6 +44,9 @@ up_start_time=$(date +%s)
 # to enable persistence, use argument "persist-log" when running this script
 persist_log=false
 
+# hostname check is enabled by default
+skip_hostname_check=false
+
 # Reset bootstrap flags
 # Remove hide_progress file to ensure bootstrap progress is displayed by default
 rm .bootstrap/hide_progress 1>/dev/null 2>&1
@@ -55,14 +60,6 @@ if [ ! -f .env ]; then
   echo "ERROR: Docker environment file missing. Review 'getting started' steps in README.md."
   exit 1
 fi
-
-# check hostnames exist
-for i in "${tyk_demo_hostnames[@]}"; do
-  if ! grep -q "$i" /etc/hosts; then
-    echo "ERROR: /etc/hosts is missing entry for $i. Run this command to update: sudo ./scripts/update-hosts.sh"
-    exit 1
-  fi
-done
 
 # check that jq is available
 command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: JQ is required, but it's not installed. Review 'getting started' steps in README.md."; exit 1; }
@@ -175,6 +172,10 @@ if (( ${#commands_to_process[@]} != 0 )); then
         echo "  skip-plugin-build: Go plugins will not be built"
         touch .bootstrap/skip_plugin_build
         ;;
+      "--skip-hostname-check")
+        echo "  skip-hostname-check: Hostname validation will be skipped"
+        skip_hostname_check=true
+        ;;
       *) 
         echo "Invalid argument: $command"
         display_help
@@ -184,6 +185,19 @@ if (( ${#commands_to_process[@]} != 0 )); then
   done
 else
   echo "  None"
+fi
+
+# check hostnames exist (unless skipped)
+if [ "$skip_hostname_check" = false ]; then
+  for i in "${tyk_demo_hostnames[@]}"; do
+    if ! grep -q "$i" /etc/hosts; then
+      echo "ERROR: /etc/hosts is missing entry for $i. Run this command to update: sudo ./scripts/update-hosts.sh"
+      echo "Note: You can skip this check by using the --skip-hostname-check option"
+      exit 1
+    fi
+  done
+else
+  echo "Warning: Hostname validation has been skipped. Ensure your hosts are correctly configured."
 fi
 
 # clear logs, if they are not persisted
