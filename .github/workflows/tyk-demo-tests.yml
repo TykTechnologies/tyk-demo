@@ -5,6 +5,8 @@ on:
 jobs:
   Tyk-Demo-Api-Tests:
     runs-on: ubuntu-latest
+    env:
+      DASHBOARD_LOGLEVEL: ${{ vars.DASHBOARD_LOGLEVEL || 'info' }}
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }}
           event."
