@@ -3628,7 +3628,7 @@
 														"get"
 													]
 												},
-												"description": "This request demonstrates authentication using a JWT signed by an RSA key pair. The JWT was generated at [https://jwt.io](https://jwt.io) using a public and private key pair.\n\nThe value of the JWT's `sub` property refers to an API key (`jwt_rsa`) that contains the public key of the RSA key pair, as well as the typical access rights for the API.\n\nThe gateway uses the public key to validate the signature of the JWT of the incoming request, and uses the access rights defined in the API key to authorise access ot the requested endpoint."
+												"description": "This request demonstrates authentication using a JWT signed by an RSA key pair. The JWT was generated at [https://jwt.io](https://jwt.io) using a public and private key pair.\n\nThe value of the JWT's `sub` property refers to an API key (`jwt_rsa`) that contains the public key of the RSA key pair, as well as the typical access rights for the API.\n\nThe gateway uses the public key to validate the signature of the JWT of the incoming request, and uses the access rights defined in the API key to authorise access to the requested endpoint."
 											},
 											"response": []
 										}
@@ -4653,6 +4653,14 @@
 											"    });",
 											"});"
 										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"packages": {},
 										"type": "text/javascript"
 									}
 								}
@@ -4662,7 +4670,7 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "ratelimit_key",
+										"value": "rate_limit",
 										"type": "text"
 									}
 								],
@@ -4732,7 +4740,8 @@
 											"    });",
 											"});"
 										],
-										"type": "text/javascript"
+										"type": "text/javascript",
+										"packages": {}
 									}
 								}
 							],
@@ -4741,7 +4750,7 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "throttle_key",
+										"value": "throttling",
 										"type": "text"
 									}
 								],
@@ -4813,7 +4822,8 @@
 											"    });",
 											"});"
 										],
-										"type": "text/javascript"
+										"type": "text/javascript",
+										"packages": {}
 									}
 								}
 							],
@@ -4822,7 +4832,7 @@
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "quota_key",
+										"value": "quota",
 										"type": "text"
 									}
 								],
@@ -5133,7 +5143,7 @@
 										""
 									]
 								},
-								"description": "This request demonstrates the Gateways ability to proxy GraphQL requests to a target GraphQL API. It calls the **GraphQL Countries** API, which is configured to proxy requests to an external GraphQL API https://countries.trevorblades.com/.\n\nThe body of the request is a GraphQL query, which requests a **country** object which has a **code** equal to **GB**, returning the fields **code** and **name**. The API Definition is set up to only allow these fields, even though the target API contains many additional fields.\n\nThe **Country** data returned in the response matches the code **GB**."
+								"description": "This request demonstrates the Gateways ability to proxy GraphQL requests to a target GraphQL API. It calls the **GraphQL Countries** API, which is configured to proxy requests to a separate GraphQL API http://countries-graphql-api:4000, which is a containerised version of [https://countries.trevorblades.com/](https://countries.trevorblades.com/).\n\nThe body of the request is a GraphQL query, which requests a **country** object which has a **code** equal to **GB**, returning the fields **code** and **name**. The API Definition is set up to only allow these fields, even though the target API contains many additional fields.\n\nThe **Country** data returned in the response matches the code **GB**."
 							},
 							"response": []
 						},
@@ -5281,7 +5291,7 @@
 										""
 									]
 								},
-								"description": "This request is for a composed GraphQL API. This means that the Gateway takes the request and generates the response by calling multiple upstream APIs and combining the responses together.\n\nThe **Universal Data Graph** can target APIs already defined in Tyk and also external APIs. The API Definition for the API called in this example uses **DataSources** to target two APIs. One is another GraphQL API, **GraphQL Countries**, which already exists as an API Definition. The other is a REST API which is not defined as an API Definition, and is defined as a URL which the Universal Data Graph will make a request to.\n\nAll the data is combined in to a single response. The schema in the API Definition defines how this is achieved:\n\n- The Universal Data Graph takes the query contained in the body of the request and provides the **code** property as an **argument** to the GraphQL Countries API. It also uses the code as an argument in the request to the REST API, placing the value in the URL called by the Universal Data Graph.\n- The data returned by the REST API is mapped on the API's schema by using a **field mapping**. This maps the field **population** in the REST API response to the **pop** property in the API's schema. Field mapping enables fields to be renamed to fit with the desired schema."
+								"description": "This request is for a composed GraphQL API. This means that the Gateway takes the request and generates the response by calling multiple upstream APIs and combining the responses together.\n\nThe **Universal Data Graph** can target APIs already defined in Tyk and also external APIs. The API Definition for the API called in this example uses **DataSources** to target two APIs. One is another GraphQL API, **GraphQL Countries**, which already exists as an API Definition. The other is a REST API which is not defined as an API Definition, and is defined as a URL which the Universal Data Graph will make a request to.\n\nAll the data is combined in to a single response. The schema in the API Definition defines how this is achieved:\n\n- The Universal Data Graph takes the query contained in the body of the request and provides the **code** property as an **argument** to the GraphQL Countries API. It also uses the code as an argument in the request to the REST API, placing the value in the URL called by the Universal Data Graph.\n    \n- The data returned by the REST API is mapped on the API's schema by using a **field mapping**. This maps the field **population** in the REST API response to the **pop** property in the API's schema. Field mapping enables fields to be renamed to fit with the desired schema."
 							},
 							"response": []
 						},
