@@ -3,8 +3,13 @@ name: Tyk Demo API Tests
 on:
   workflow_dispatch:
     inputs:
-      debug_enabled:
-        description: 'Enable debug logging'
+      gateway_debug:
+        description: 'Enable Gateway debug logging'
+        required: false
+        type: boolean
+        default: false
+      dashboard_debug:
+        description: 'Enable Dashboard debug logging'
         required: false
         type: boolean
         default: false
@@ -31,17 +36,14 @@ jobs:
       - name: Determine log levels based on workflow input
         id: log_levels
         run: |
-          if ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled == true }}; then
-            echo "gateway_loglevel=debug" >> $GITHUB_OUTPUT
-            echo "dashboard_loglevel=debug" >> $GITHUB_OUTPUT
-          else
-            echo "gateway_loglevel=info" >> $GITHUB_OUTPUT
-            echo "dashboard_loglevel=info" >> $GITHUB_OUTPUT
+          if ${{ github.event_name == 'workflow_dispatch' }}; then
+            if ${{ inputs.gateway_debug == true }}; then
+              echo "GATEWAY_LOGLEVEL=debug" >> .env
+            fi
+            if ${{ inputs.dashboard_debug == true }}; then
+              echo "DASHBOARD_LOGLEVEL=debug" >> .env
+            fi
           fi
-      - name: Write Docker Compose .env file
-        run: |
-          echo "GATEWAY_LOGLEVEL=${{ steps.log_levels.outputs.gateway_loglevel }}" >> .env
-          echo "DASHBOARD_LOGLEVEL=${{ steps.log_levels.outputs.dashboard_loglevel }}" >> .env
       - name: Extract Docker Image Tag
         id: get-gateway-tag
         run: |
