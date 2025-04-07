@@ -1,7 +1,14 @@
 ---
 name: Tyk Demo API Tests
 on:
-  - push
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Enable debug logging'
+        required: false
+        type: boolean
+        default: false
+  push:
 jobs:
   Tyk-Demo-Api-Tests:
     runs-on: ubuntu-latest
@@ -21,18 +28,10 @@ jobs:
         uses: actions/checkout@v4
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the
           runner."
-      - name: Check debug status
-        shell: bash
-        run: |
-          if [ "$ACTIONS_STEP_DEBUG" = "true" ]; then
-            echo "Debug logging is enabled"
-          else
-            echo "Debug logging is disabled"
-          fi
-      - name: Determine log levels based on github action "enable debug logging" status
+      - name: Determine log levels based on workflow input
         id: log_levels
         run: |
-          if [[ "${ACTIONS_STEP_DEBUG}" == "true" ]]; then
+          if ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled == true }}; then
             echo "gateway_loglevel=debug" >> $GITHUB_OUTPUT
             echo "dashboard_loglevel=debug" >> $GITHUB_OUTPUT
           else
