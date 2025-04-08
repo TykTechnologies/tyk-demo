@@ -26,7 +26,8 @@ display_help() {
     echo
     echo "Examples:"
     echo "  ./up.sh                       # Bring up default Tyk deployment"
-    echo "  ./up.sh analytics-kibana      # Bring up Tyk deployment with Kibana analytics"
+    echo "  ./up.sh analytics-kibana      # Bring up Tyk deployment with an additional deployment (analytics-kibana)"
+    echo "  ./up.sh tyk2 cicd             # Bring up Tyk deployment with two additionals deployments (tyk2 and cicd)"
     echo "  ./up.sh --help                # Show this help message"
     echo "  ./up.sh --persist-log         # Persist logs"
     echo "  ./up.sh --skip-hostname-check # Skip hostname validation"
