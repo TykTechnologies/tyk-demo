@@ -61,16 +61,10 @@ capture_container_logs() {
     local timestamp=$(date -u "+%Y%m%d_%H%M%S")
     local container_log_file="$BASE_DIR/logs/containers-${deployment_name}-${timestamp}.log"
     
-    # Log header
-    echo "Chronologically merged container logs for deployment: $deployment_name" > "$container_log_file"
-    echo "Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$container_log_file"
-    echo "=========================================================" >> "$container_log_file"
-
-
-    log "Using docker compose to retrieve chronological logs"
+    log "Using docker compose to retrieve logs with timestamps"
     ./docker-compose-command.sh logs --timestamps --no-color >> "$container_log_file"
     
-    log "Chronologically merged container logs saved to $container_log_file"
+    log "Saved container logs to $container_log_file"
 }
 
 strip_control_chars() {
