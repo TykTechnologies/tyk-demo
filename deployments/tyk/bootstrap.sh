@@ -175,6 +175,11 @@ fi
 log_ok
 bootstrap_progress
 
+log_message "Flushing writes on OpenSSL container $OPENSSL_CONTAINER_NAME"
+docker exec $OPENSSL_CONTAINER_NAME sync
+log_ok
+bootstrap_progress
+
 log_message "Recreating containers to load new certificates"
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway tyk-gateway-2
