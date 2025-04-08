@@ -230,7 +230,7 @@ process_deployment() {
     
     # Capture container logs if there was a failure
     if [[ "$has_failure" == true ]]; then
-        log "Capturing chronologically sorted container logs for failed deployment: $deployment_name"
+        log "Capturing container logs for failed deployment: $deployment_name"
         capture_container_logs "$deployment_name"
     fi
 
