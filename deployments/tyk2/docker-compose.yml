@@ -38,7 +38,7 @@ services:
     depends_on:
       - tyk2-redis
   tyk2-pump:
-    image: tykio/tyk-pump-docker-pub:${TYK2_PUMP_VERSION:-v1.11.1}
+    image: tykio/tyk-pump-docker-pub:${TYK2_PUMP_VERSION:-v1.12.0}
     networks:
       - tyk
     volumes:

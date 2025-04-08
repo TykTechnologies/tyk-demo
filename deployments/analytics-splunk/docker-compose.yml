@@ -16,7 +16,7 @@ services:
       - splunk-data:/opt/splunk/var
       - splunk-data:/opt/splunk/etc
   tyk-splunk-pump:
-    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.11.1}
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.12.0}
     networks:
       - tyk
     volumes:
