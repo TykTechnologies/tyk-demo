@@ -95,8 +95,25 @@ if [ "$?" -ne "0" ]; then
 fi
 log_ok
 bootstrap_progress
-wait_for_file "/tyk-gateway-certs/tls-certificate.pem" "$OPENSSL_CONTAINER_NAME"
-wait_for_file "/tyk-gateway-certs/tls-private-key.pem" "$OPENSSL_CONTAINER_NAME"
+
+log_message "Flushing writes on OpenSSL container $OPENSSL_CONTAINER_NAME"
+docker exec $OPENSSL_CONTAINER_NAME sync
+log_ok
+bootstrap_progress
+
+log_message "Checking TLS assets exist"
+docker exec $OPENSSL_CONTAINER_NAME sh -c "test -r /tyk-gateway-certs/tls-certificate.pem"
+if [ "$?" -ne "0" ]; then
+  echo "ERROR: Could not read /tyk-gateway-certs/tls-certificate.pem"
+  exit 1
+fi
+docker exec $OPENSSL_CONTAINER_NAME sh -c "test -r /tyk-gateway-certs/tls-private-key.pem"
+if [ "$?" -ne "0" ]; then
+  echo "ERROR: Could not read /tyk-gateway-certs/tls-private-key.pem"
+  exit 1
+fi
+log_ok
+bootstrap_progress
 
 log_message "Generating private key for secure messaging and signing"
 docker exec $OPENSSL_CONTAINER_NAME sh -c "openssl genrsa -out /tyk-dashboard-certs/private-key.pem 2048" >/dev/null 2>>logs/bootstrap.log
@@ -106,7 +123,20 @@ if [ "$?" -ne "0" ]; then
 fi
 log_ok
 bootstrap_progress
-wait_for_file "/tyk-dashboard-certs/private-key.pem" "$OPENSSL_CONTAINER_NAME"
+
+log_message "Flushing writes on OpenSSL container $OPENSSL_CONTAINER_NAME"
+docker exec $OPENSSL_CONTAINER_NAME sync
+log_ok
+bootstrap_progress
+
+log_message "Checking private key exists"
+docker exec $OPENSSL_CONTAINER_NAME sh -c "test -r /tyk-dashboard-certs/private-key.pem"
+if [ "$?" -ne "0" ]; then
+  echo "ERROR: Could not read /tyk-dashboard-certs/private-key.pem"
+  exit 1
+fi
+log_ok
+bootstrap_progress
 
 log_message "Generating public key for secure messaging and signing"
 docker exec $OPENSSL_CONTAINER_NAME sh -c "openssl rsa -in /tyk-dashboard-certs/private-key.pem -pubout -out /tyk-gateway-certs/public-key.pem" >/dev/null 2>>logs/bootstrap.log
@@ -116,15 +146,28 @@ if [ "$?" -ne "0" ]; then
 fi
 log_ok
 bootstrap_progress
-wait_for_file "/tyk-gateway-certs/public-key.pem" "$OPENSSL_CONTAINER_NAME"
 
-log_message "Setting read permissions on certificate volumes"
-docker exec $OPENSSL_CONTAINER_NAME chmod -R a+r /tyk-gateway-certs >/dev/null 2>>logs/bootstrap.log
+log_message "Flushing writes on OpenSSL container $OPENSSL_CONTAINER_NAME"
+docker exec $OPENSSL_CONTAINER_NAME sync
+log_ok
+bootstrap_progress
+
+log_message "Checking public key exists"
+docker exec $OPENSSL_CONTAINER_NAME sh -c "test -r /tyk-gateway-certs/public-key.pem"
+if [ "$?" -ne "0" ]; then
+  echo "ERROR: Could not read /tyk-gateway-certs/public-key.pem"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
+log_message "Setting read and execute permissions on certificate volumes"
+docker exec $OPENSSL_CONTAINER_NAME chmod -R a+rX /tyk-gateway-certs >/dev/null 2>>logs/bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not set read permissions on /tyk-gateway-certs volume"
   exit 1
 fi
-docker exec $OPENSSL_CONTAINER_NAME chmod -R a+r /tyk-dashboard-certs >/dev/null 2>>logs/bootstrap.log
+docker exec $OPENSSL_CONTAINER_NAME chmod -R a+rX /tyk-dashboard-certs >/dev/null 2>>logs/bootstrap.log
 if [ "$?" != "0" ]; then
   echo "ERROR: Could not set read permissions on /tyk-dashboard-certs volume"
   exit 1
@@ -132,12 +175,8 @@ fi
 log_ok
 bootstrap_progress
 
-log_message "Removing temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
-docker rm -f $OPENSSL_CONTAINER_NAME >/dev/null 2>>logs/bootstrap.log
-if [ "$?" != "0" ]; then
-  echo "ERROR: Could not remove temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
-  exit 1
-fi
+log_message "Flushing writes on OpenSSL container $OPENSSL_CONTAINER_NAME"
+docker exec $OPENSSL_CONTAINER_NAME sync
 log_ok
 bootstrap_progress
 
@@ -148,6 +187,15 @@ log_ok
 
 log_message "Wait for services to be available after restart"
 wait_for_liveness
+
+log_message "Removing temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
+docker rm -f $OPENSSL_CONTAINER_NAME >/dev/null 2>>logs/bootstrap.log
+if [ "$?" != "0" ]; then
+  echo "ERROR: Could not remove temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
+  exit 1
+fi
+log_ok
+bootstrap_progress
 
 # Kafka
 
