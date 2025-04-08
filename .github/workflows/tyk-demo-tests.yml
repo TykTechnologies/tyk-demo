@@ -43,6 +43,10 @@ jobs:
             if ${{ inputs.dashboard_debug == true }}; then
               echo "DASHBOARD_LOGLEVEL=debug" >> .env
             fi
+          else
+            # Default to debug logging for push events
+            echo "GATEWAY_LOGLEVEL=debug" >> .env
+            echo "DASHBOARD_LOGLEVEL=debug" >> .env
           fi
       - name: Extract Docker Image Tag
         id: get-gateway-tag
