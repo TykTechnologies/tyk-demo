@@ -78,6 +78,9 @@ run_tests_for_deployment() {
     fi
 }
 
+# Prepare logs for testing
+prepare_test_logs
+
 # Loop through bootstrapped deployments
 i=0
 overall_status=0
@@ -99,6 +102,9 @@ for i in "${!deployments[@]}"; do
 done
 
 echo "╚═════════════════════════╩════════╩═════════╩═══════════════╝"
+            
+strip_control_chars "logs/test.log"
+strip_control_chars "logs/postman.log"
 
 # Exit with overall status
 if [ "$overall_status" -eq 0 ]; then

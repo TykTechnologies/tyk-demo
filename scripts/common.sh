@@ -1292,3 +1292,14 @@ create_enterprise_portal_page () {
     fi
   done
 }
+
+# Prepare log directory and bootstrap log files
+prepare_bootstrap_log() {
+  local base_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+  local log_directory_path="$base_dir/logs"
+  mkdir -p "$log_directory_path"
+  # remove existing preserved bootstrap logs
+  rm -f "$log_directory_path"/bootstrap-*.log 2>/dev/null
+  # reset standard logs
+  : > "$log_directory_path/bootstrap.log"
+}
