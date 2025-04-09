@@ -2,7 +2,7 @@
 services:
   jenkins:
     build: ./deployments/cicd
-    image: tyk-demo-jenkins-tyk-sync:v2.0.1
+    image: tyk-demo-jenkins-tyk-sync:v2.1.0
     ports:
       - 8070:8080
     networks:
