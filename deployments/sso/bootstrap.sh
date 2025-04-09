@@ -22,6 +22,12 @@ identity_broker_base_url="http://localhost:3010"
 log_ok
 bootstrap_progress
 
+log_message "Recreating SSO Dashboard to load certificates created during Tyk bootstrap"
+eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-dashboard-sso tyk-gateway
+wait_for_status "$dashboard_sso_base_url/hello" "200" ".status" "ok" # SSO dashboard
+wait_for_liveness "http://localhost:8080/hello" # Gateway used by identity broker for SSO key generation
+log_ok
+
 log_message "Getting config data from Identity Broker config file"
 identity_broker_api_credentials=$(cat deployments/sso/volumes/tyk-identity-broker/tib.conf | jq -r .Secret)
 log_message "  TIB base URL: $identity_broker_base_url"
