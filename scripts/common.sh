@@ -1046,20 +1046,48 @@ wait_for_api_loaded () {
   local gateway_auth="$3"
   local target_api_result=""
   local attempt_count=0
+  log_message "  Waiting for API $api_id to be available on $gateway_url"
   while [ "$target_api_result" != "200" ]; do
     attempt_count=$((attempt_count+1))
     if [ "$attempt_count" -gt "10"  ]; then
-      echo "ERROR: Target API ($target_api_id) not available on Gateway ($gateway_url) - max retry reached"
+      echo "ERROR: Target API ($api_id) not available on Gateway ($gateway_url) - max retry reached"
       exit 1
     fi
-    target_api_result=$(curl "$gateway_url/tyk/apis/$target_api_id" -o /dev/null -s -w "%{http_code}\n" -H "x-tyk-authorization: $gateway_auth")
+    target_api_result=$(curl "$gateway_url/tyk/apis/$api_id" -o /dev/null -s -w "%{http_code}\n" -H "x-tyk-authorization: $gateway_auth")
     if [ "$target_api_result" != "200" ]; then
-      log_message "  Waiting for $api_id to become available on $gateway_url..."
+      log_message "  Waiting for API $api_id to become available on $gateway_url..."
       bootstrap_progress
       sleep 2
+    else
+      log_message "  Found API $api_id on $gateway_url"
     fi
   done
 }
+
+wait_for_policy_loaded () {
+  local policy_id="$1"
+  local gateway_url="$2"
+  local gateway_auth="$3"
+  local target_api_result=""
+  local attempt_count=0
+  log_message "  Waiting for Policy $policy_id to be available on $gateway_url"
+  while [ "$target_api_result" != "200" ]; do
+    attempt_count=$((attempt_count+1))
+    if [ "$attempt_count" -gt "10"  ]; then
+      echo "ERROR: Target Policy ($policy_id) not available on Gateway ($gateway_url) - max retry reached"
+      exit 1
+    fi
+    target_api_result=$(curl "$gateway_url/tyk/policies/$policy_id" -o /dev/null -s -w "%{http_code}\n" -H "x-tyk-authorization: $gateway_auth")
+    if [ "$target_api_result" != "200" ]; then
+      log_message "  Waiting for $policy_id to become available on $gateway_url..."
+      bootstrap_progress
+      sleep 2
+    else
+      log_message "  Found Policy $policy_id on $gateway_url"
+    fi
+  done
+}
+
 
 wait_for_liveness () {
   local status_endpoint="${1:-http://tyk-gateway.localhost:8080/hello}"
