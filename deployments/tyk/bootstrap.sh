@@ -46,11 +46,6 @@ gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq 
 gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
 bootstrap_progress
 
-log_message "Creating new audit log file to prevent uncontrolled growth between deployments"
-echo -n > deployments/tyk/volumes/tyk-dashboard/audit/audit.log
-log_ok
-bootstrap_progress
-
 # Certificates
 
 log_message "Checking for existing OpenSSL container"

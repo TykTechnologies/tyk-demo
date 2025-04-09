@@ -11,7 +11,6 @@ deployments/cicd/volumes/jenkins/plugins/*.jpi
 deployments/tyk/volumes/tyk-gateway/plugins/go/example/vendor
 deployments/tyk/volumes/tyk-gateway/middleware/bundles
 deployments/tyk/volumes/tyk-gateway/plugins/go/jwt/vendor
-deployments/tyk/volumes/tyk-dashboard/audit/audit.log
 deployments/tyk/volumes/tyk-gateway/certs/tls-certificate.pem
 deployments/tyk/volumes/tyk-gateway/certs/tls-private-key.pem
 deployments/tyk/volumes/tyk-gateway/certs/private-key.pem
