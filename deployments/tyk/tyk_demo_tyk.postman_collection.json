@@ -2424,10 +2424,11 @@
 											"",
 											"pm.test(\"Error message is 'firstName: firstName is required'\", function () {",
 											"    var jsonData = pm.response.json();",
-											"    pm.expect(jsonData.error).to.eql(\"firstName: firstName is required\");",
+											"    pm.expect(jsonData.error).to.eql(\"(root): firstName is required\");",
 											"});"
 										],
-										"type": "text/javascript"
+										"type": "text/javascript",
+										"packages": {}
 									}
 								}
 							],
