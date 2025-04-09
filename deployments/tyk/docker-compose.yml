@@ -1,7 +1,7 @@
 ---
 services:
   tyk-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.7.1}
+    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.8.0}
     ports:
       - 3000:3000
     networks:
@@ -11,7 +11,6 @@ services:
       - tyk-dashboard-certs:/opt/tyk-dashboard/certs
       - ./deployments/tyk/volumes/tyk-dashboard/catalogue.html:/opt/tyk-dashboard/portal/templates/catalogue.html
       - ./deployments/tyk/volumes/tyk-dashboard/navigation.html:/opt/tyk-dashboard/portal/templates/navigation.html
-      - ./deployments/tyk/volumes/tyk-dashboard/audit:/opt/tyk-dashboard/audit
     environment:
       - TYK_DB_LICENSEKEY=${DASHBOARD_LICENCE:?Dashboard licence missing from Docker environment file .env. Review The Getting Started steps in README.md.}
       - TYK_LOGLEVEL=${DASHBOARD_LOGLEVEL:-info}
@@ -23,7 +22,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-gateway:
-    image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY_VERSION:-v5.7.1}
+    image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY_VERSION:-v5.8.0}
     ports:
       - 8080:8080
       - 8086:8086
@@ -61,7 +60,7 @@ services:
       - tyk-redis
       - tyk-dashboard
   tyk-gateway-2:
-    image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY2_VERSION:-v5.7.1}
+    image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY2_VERSION:-v5.8.0}
     ports:
       - 8081:8080
       - 9005:9005
@@ -83,7 +82,7 @@ services:
       - tyk-gateway
       - tyk-dashboard
   tyk-pump:
-    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.11.1}
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.12.0}
     ports:
       - 8083:8083
     networks:

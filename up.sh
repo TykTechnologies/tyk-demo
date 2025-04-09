@@ -26,7 +26,8 @@ display_help() {
     echo
     echo "Examples:"
     echo "  ./up.sh                       # Bring up default Tyk deployment"
-    echo "  ./up.sh analytics-kibana      # Bring up Tyk deployment with Kibana analytics"
+    echo "  ./up.sh analytics-kibana      # Bring up Tyk deployment with an additional deployment (analytics-kibana)"
+    echo "  ./up.sh tyk2 cicd             # Bring up Tyk deployment with two additionals deployments (tyk2 and cicd)"
     echo "  ./up.sh --help                # Show this help message"
     echo "  ./up.sh --persist-log         # Persist logs"
     echo "  ./up.sh --skip-hostname-check # Skip hostname validation"
@@ -202,9 +203,7 @@ fi
 
 # clear logs, if they are not persisted
 if [ "$persist_log" = false ]; then
-  echo -n > logs/bootstrap.log
-  rm logs/container-*.log 1>/dev/null 2>&1 # there can be multiple container logs
-  # test.log file is not cleared, as it is responsibilty of the test scripts
+  prepare_bootstrap_log
 fi
 
 # log docker compose version

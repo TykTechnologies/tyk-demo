@@ -46,11 +46,6 @@ gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq 
 gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
 bootstrap_progress
 
-log_message "Creating new audit log file to prevent uncontrolled growth between deployments"
-echo -n > deployments/tyk/volumes/tyk-dashboard/audit/audit.log
-log_ok
-bootstrap_progress
-
 # Certificates
 
 log_message "Checking for existing OpenSSL container"
@@ -330,7 +325,13 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
         create_policy "$file" "$dashboard_user_api_key"
         bootstrap_progress
       fi
-    done    
+    done
+
+    log_message "Waiting for Policy availability"
+    # this policy id is for the 'JWT Policy', and will validate that the Gateway has loaded it after it was added to the Dashboard
+    wait_for_policy_loaded "5ead72955759610001818688" "$gateway_base_url" "$gateway_api_credentials"
+    log_ok
+    bootstrap_progress
 
     # Portal - Initialise
     log_message "Initialising Portal"

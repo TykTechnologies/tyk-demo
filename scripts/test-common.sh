@@ -78,18 +78,51 @@ run_test_scripts() {
 
     for test_script in "${test_scripts[@]}"; do
         TEST_SCRIPT_COUNT=$((TEST_SCRIPT_COUNT+1))
-        echo "Running test script: $test_script" | tee -a "logs/custom_scripts.log"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') Running test script: $test_script" | tee -a "logs/custom_scripts.log"
 
         { bash "$test_script" 2>&1 | tee -a "logs/custom_scripts.log"; }
         local exit_status=${PIPESTATUS[0]}
 
         if [[ $exit_status -eq 0 ]]; then
             TEST_SCRIPT_PASSES=$((TEST_SCRIPT_PASSES+1))
-            echo "✓ Test script passed" | tee -a "logs/custom_scripts.log"
+            echo "$(date '+%Y-%m-%d %H:%M:%S') ✓ Test script passed" | tee -a "logs/custom_scripts.log"
         else
-            echo "✗ Test script failed" | tee -a "logs/custom_scripts.log"
+            echo "$(date '+%Y-%m-%d %H:%M:%S') ✗ Test script failed" | tee -a "logs/custom_scripts.log"
         fi
     done
 
     [[ $TEST_SCRIPT_COUNT -eq $TEST_SCRIPT_PASSES ]]
+}
+
+# Prepare log directory and test log files
+prepare_test_logs() {
+  local base_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+  local log_directory_path="$base_dir/logs"
+  mkdir -p "$log_directory_path"
+  # remove existing preserved test logs
+  rm -f "$log_directory_path"/{containers-,postman-}*.log 2>/dev/null
+  # reset standard test logs
+  : > "$log_directory_path/test.log"
+  : > "$log_directory_path/postman.log"
+  : > "$log_directory_path/custom_scripts.log"
+}
+
+strip_control_chars() {
+    local input_file="$1"
+
+    if [ ! -f "$input_file" ]; then
+        echo "Error: Input file does not exist." >&2
+        return 1
+    fi
+
+    # Create a temporary file
+    local temp_file
+    temp_file="$(mktemp)" || { echo "Error: Failed to create temporary file." >&2; return 1; }
+
+    # Use awk to remove ANSI escape sequences and tr to remove control characters
+    awk '{gsub(/\033\[[0-9;]*[a-zA-Z]/, "")} 1' "$input_file" | \
+    tr -d '\000-\010\013\014\016-\037' > "$temp_file"
+
+    # Overwrite the original file
+    mv "$temp_file" "$input_file"
 }

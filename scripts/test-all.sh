@@ -24,19 +24,6 @@ log() {
     echo -e "[${timestamp}] $1" | tee -a "$BASE_DIR/logs/test.log"
 }
 
-# Prepare log directory and files
-prepare_logs() {
-    local log_directory_path="$BASE_DIR/logs"
-    mkdir -p "$log_directory_path"
-    # remove existing logs
-    rm -f "$log_directory_path"/*.log #2>/dev/null
-    # reset standard logs
-    : > "$log_directory_path/test.log"
-    : > "$log_directory_path/bootstrap.log"
-    : > "$log_directory_path/postman.log"
-    : > "$log_directory_path/custom_scripts.log"
-}
-
 # Preserves log file with deployment name and timestamp
 preserve_log() {
     local log_file_name="$1"
@@ -66,27 +53,6 @@ capture_container_logs() {
     
     log "Saved container logs to $container_log_file"
 }
-
-strip_control_chars() {
-    local input_file="$1"
-
-    if [ ! -f "$input_file" ]; then
-        echo "Error: Input file does not exist." >&2
-        return 1
-    fi
-
-    # Create a temporary file
-    local temp_file
-    temp_file="$(mktemp)" || { echo "Error: Failed to create temporary file." >&2; return 1; }
-
-    # Use awk to remove ANSI escape sequences and tr to remove control characters
-    awk '{gsub(/\033\[[0-9;]*[a-zA-Z]/, "")} 1' "$input_file" | \
-    tr -d '\000-\010\013\014\016-\037' > "$temp_file"
-
-    # Overwrite the original file
-    mv "$temp_file" "$input_file"
-}
-
 
 # Log deployment step with optional colour
 log_deployment_step() {
@@ -256,7 +222,7 @@ process_deployment() {
 # Main script execution
 main() {
     # Prepare for testing
-    prepare_logs
+    prepare_test_logs
 
     # Check for and remove existing deployments
     if [ -s "$BASE_DIR/.bootstrap/bootstrapped_deployments" ]; then

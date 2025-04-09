@@ -8,7 +8,7 @@ bootstrap_progress
 dashboard_base_url="http://localhost:3002"
 gateway2_base_url="http://localhost:8085"
 
-log_message "Restarting Tyk 2 services to use newly created certificates"
+log_message "Restarting Tyk 2 services to use certificates created during Tyk bootstrap"
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk2-dashboard tyk2-gateway
 log_ok
 

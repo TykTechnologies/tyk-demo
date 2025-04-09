@@ -12,7 +12,7 @@ readonly NOCOLOUR='\033[0m'
 declare -a postman_results script_results statuses deployments
 
 log() {
-    echo -e "$1" | tee -a "$BASE_DIR/logs/test.log"
+    echo -e "$1" | tee -a >(while read line; do echo -e "$(date '+%Y-%m-%d %H:%M:%S') $line"; done >> "$BASE_DIR/logs/test.log")
 }
 
 # Check if bootstrapped deployments exist
@@ -78,6 +78,9 @@ run_tests_for_deployment() {
     fi
 }
 
+# Prepare logs for testing
+prepare_test_logs
+
 # Loop through bootstrapped deployments
 i=0
 overall_status=0
@@ -100,11 +103,14 @@ done
 
 echo "╚═════════════════════════╩════════╩═════════╩═══════════════╝"
 
-# Exit with overall status
 if [ "$overall_status" -eq 0 ]; then
     log "${GREEN}✓ All deployments passed${NOCOLOUR}"
-    exit 0
 else
     log "${RED}✗ One or more deployments failed${NOCOLOUR}"
-    exit 1
 fi
+
+strip_control_chars "logs/test.log"
+strip_control_chars "logs/postman.log"
+
+# Exit with overall status
+exit $overall_status

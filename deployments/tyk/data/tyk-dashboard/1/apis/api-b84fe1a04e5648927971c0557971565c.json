@@ -145,7 +145,17 @@
           }
         },
         "summary": "Rewrites the URL sent to upstream API"
-      }
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "1",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
     }
   },
   "servers": [
