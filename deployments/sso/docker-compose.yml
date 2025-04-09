@@ -19,7 +19,7 @@ services:
       - tyk-mongo
       - tyk-redis
   tyk-identity-broker:
-    image: tykio/tyk-identity-broker:${TIB_VERSION:-v1.6.1}
+    image: tykio/tyk-identity-broker:${TIB_VERSION:-v1.7.0}
     networks:
       - tyk
     ports:
