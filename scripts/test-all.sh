@@ -222,7 +222,7 @@ process_deployment() {
 # Main script execution
 main() {
     # Prepare for testing
-    prepare_logs
+    prepare_test_logs
 
     # Check for and remove existing deployments
     if [ -s "$BASE_DIR/.bootstrap/bootstrapped_deployments" ]; then
