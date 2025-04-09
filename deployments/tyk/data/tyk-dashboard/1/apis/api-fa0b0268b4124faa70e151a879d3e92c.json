@@ -290,11 +290,13 @@
           "global_response_headers_disabled": false,
           "ignore_endpoint_case": false,
           "global_size_limit": 0,
+          "global_size_limit_disabled": false,
           "override_target": ""
         }
       }
     },
     "uptime_tests": {
+      "disabled": false,
       "check_list": [],
       "config": {
         "expire_utime_after": 0,
@@ -399,6 +401,7 @@
     "allowed_ips": [],
     "enable_ip_blacklisting": false,
     "blacklisted_ips": [],
+    "ip_access_control_disabled": false,
     "dont_set_quota_on_create": false,
     "expire_analytics_after": 0,
     "response_processors": [],
