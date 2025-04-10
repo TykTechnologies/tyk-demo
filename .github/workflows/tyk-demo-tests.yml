@@ -53,13 +53,24 @@ jobs:
         run: |
           GATEWAY_TAG=$(awk '/tyk-gateway:/ { in_gateway=1 }
                             in_gateway && /image:/ {
-                              if (match($0, /:-v[0-9.]+/)) {
+                              if (match($0, /:-v[0-9]+\.[0-9]+\.[0-9]+([-._a-zA-Z0-9]*)?/)) {
                                 print substr($0, RSTART+2, RLENGTH-2)
                               }
                               in_gateway=0
                             }' deployments/tyk/docker-compose.yml | sort -u | head -n 1)
-          echo "gateway-tag=$GATEWAY_TAG" >> $GITHUB_OUTPUT
-          echo "Extracted gateway tag: $GATEWAY_TAG"
+
+          if [[ -z "$GATEWAY_TAG" ]]; then
+            echo "❌ Error: GATEWAY_TAG is empty"
+            exit 1
+          fi
+
+          if [[ ! "$GATEWAY_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-._a-zA-Z0-9]+)?$ ]]; then
+            echo "❌ Error: GATEWAY_TAG '$GATEWAY_TAG' is not in a valid semver format"
+            exit 1
+          fi
+
+          echo "✅ Extracted gateway tag: $GATEWAY_TAG"
+          echo "gateway-tag=$GATEWAY_TAG" >> "$GITHUB_OUTPUT"
       - name: Cache Go Plugins
         uses: actions/cache@v4
         with:
