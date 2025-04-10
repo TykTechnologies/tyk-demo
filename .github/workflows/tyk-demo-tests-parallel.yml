@@ -257,6 +257,8 @@ jobs:
             "custom_found": "'$CUSTOM_FOUND'",
             "custom_status": "'$CUSTOM_STATUS'"
           }' | jq -c .)
+
+          echo "$RESULT"
           
           echo "results=$RESULT" >> $GITHUB_OUTPUT
 
