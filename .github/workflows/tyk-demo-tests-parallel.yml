@@ -222,8 +222,7 @@ jobs:
           name: logs-${{ matrix.deployment }}
           path: logs/
 
-      - name: Set Results
-        id: set-results
+      - name: Get Result
         if: always()
         run: |
           # Determine deployment status - success, skipped, or failure
@@ -249,32 +248,73 @@ jobs:
           fi
 
           # Create JSON result for this deployment
-          RESULT=$(echo '{
+          echo '{
             "deployment": "${{ matrix.deployment }}",
             "deployment_status": "'$DEPLOYMENT_STATUS'",
             "postman_found": "'$POSTMAN_FOUND'",
             "postman_status": "'$POSTMAN_STATUS'",
             "custom_found": "'$CUSTOM_FOUND'",
             "custom_status": "'$CUSTOM_STATUS'"
-          }' | jq -c .)
+          }' > result.json
 
-          echo "$RESULT" | jq
-          echo "results=$RESULT" >> $GITHUB_OUTPUT
+      - name: Store result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: result-${{ matrix.deployment }}
+          path: result.json        
 
-  # Collect test results and summarise
-  summarise-results:
-    needs: [discover-deployments, test-deployments]
+  process-results:
+    needs: test-deployments
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all results
+        uses: actions/download-artifact@v4
+        with:
+          path: results/
+
+      - name: Initialize results array
+        id: init-results
+        run: |
+          echo "[]" > results.json # Start with an empty array
+
+      - name: Build results array
+        run: |
+          for file in results/**/result.json; do
+            # Extract the content from each result.json file
+            result=$(cat "$file")
+            # Append to results.json as an array element
+            jq ". += [$result]" results.json > temp.json && mv temp.json results.json
+          done
+
+      - name: Set results output
+        id: set-results
+        run: |
+          results_json=$(cat results.json | jq -c '.')
+          echo "results=$results_json" >> $GITHUB_OUTPUT
+
+  display-results:
+    needs: process-results
     runs-on: ubuntu-latest
     if: always()
     steps:
       - name: Summarise test results
         run: |
-          DEPLOYMENTS_JSON='${{ needs.discover-deployments.outputs.deployment-matrix }}'
-          RESULTS_JSON='${{ toJSON(needs.test-deployments.outputs.deployment-results) }}'
+          cat summary.json | jq -c '.[]' | while IFS= read -r result; do
+            # Extract values from the JSON object
+            deployment=$(echo "$result" | jq -r '.deployment')
+            deployment_status=$(echo "$result" | jq -r '.deployment_status')
+            postman_found=$(echo "$result" | jq -r '.postman_found')
+            postman_status=$(echo "$result" | jq -r '.postman_status')
+            custom_found=$(echo "$result" | jq -r '.custom_found')
+            custom_status=$(echo "$result" | jq -r '.custom_status')
 
-          echo "DEPLOYMENTS_JSON: $DEPLOYMENTS_JSON"
-          echo "RESULTS_JSON: $RESULTS_JSON"
-
-          # Parse the JSON strings
-          DEPLOYMENTS=$(echo "$DEPLOYMENTS_JSON" | jq -r '.[]')
-          RESULTS=$(echo "$RESULTS_JSON" | jq -r '.[]')
+            # Output the results in a structured format
+            echo "Deployment: $deployment"
+            echo "Deployment Status: $deployment_status"
+            echo "Postman Found: $postman_found"
+            echo "Postman Status: $postman_status"
+            echo "Custom Found: $custom_found"
+            echo "Custom Status: $custom_status"
+            echo "-----------------------------"
+          done
