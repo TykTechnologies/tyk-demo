@@ -82,8 +82,9 @@ jobs:
       
       - name: Set up environment
         run: |
-          echo "::group::Creating log directory"
-          mkdir -p logs
+          echo "::group::Preparing test logs"
+          source "$(pwd)/scripts/test-common.sh"
+          prepare_test_logs
           echo "::endgroup::"
           
           echo "::group::Defaulting to debug logs for Gateway and Dashboard"
@@ -117,10 +118,6 @@ jobs:
         id: create-deployment
         run: |
           echo "Creating deployment: ${{ matrix.deployment }}"
-
-          # Prepare test environment
-          source "$(pwd)/scripts/test-common.sh"
-          prepare_test_logs
           compose_argument=""
 
           echo "::group::Reading deployment manifest"
