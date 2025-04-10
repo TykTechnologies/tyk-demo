@@ -233,21 +233,21 @@ jobs:
           elif [ "${{ steps.create-deployment.outcome }}" == "success" ]; then
             DEPLOYMENT_STATUS="success"
           fi
-          
+
           # Capture Postman test info
           POSTMAN_FOUND=${{ steps.validate-tests.outputs.postman-tests-found || 'false' }}
           POSTMAN_STATUS="skipped"
           if [ "$POSTMAN_FOUND" == "true" ]; then
             POSTMAN_STATUS=${{ steps.run-postman-tests.outcome }}
           fi
-          
+
           # Capture custom test info
           CUSTOM_FOUND=${{ steps.validate-tests.outputs.custom-tests-found || 'false' }}
           CUSTOM_STATUS="skipped"
           if [ "$CUSTOM_FOUND" == "true" ]; then
             CUSTOM_STATUS=${{ steps.run-custom-tests.outcome }}
           fi
-          
+
           # Create JSON result for this deployment
           RESULT=$(echo '{
             "deployment": "${{ matrix.deployment }}",
@@ -274,22 +274,22 @@ jobs:
           echo "" >> summary.md
           echo "| Deployment | Deployment Status | Postman Tests | Custom Tests | Overall Status |" >> summary.md
           echo "|------------|-------------------|---------------|--------------|----------------|" >> summary.md
-          
+
           # Create a monospaced version for GitHub Actions console
           echo "::group::Test Results Summary"
           echo "╔════════════════╦═══════════════════╦════════════════╦═══════════════╦══════════════════╗"
           echo "║ DEPLOYMENT     ║ DEPLOYMENT STATUS ║ POSTMAN TESTS  ║ CUSTOM TESTS  ║ OVERALL STATUS   ║"
           echo "╠════════════════╬═══════════════════╬════════════════╬═══════════════╬══════════════════╣"
-          
+
           # Process deployment results
           DEPLOYMENTS='${{ needs.discover-deployments.outputs.deployment-matrix }}'
           RESULTS_JSON=$(echo '${{ toJSON(needs.test-deployments.outputs) }}' | jq -r '.["deployment-results"]')
-          
+
           # For each deployment, find its result
           for deployment in $(echo "$DEPLOYMENTS" | jq -r '.[]'); do
             # Find the corresponding result or use default values if not found
             DEPLOYMENT_RESULT="{}"
-            
+
             # Loop through results to find the matching deployment
             while read -r result; do
               if [[ $(echo "$result" | jq -r '.deployment') == "$deployment" ]]; then
@@ -297,14 +297,14 @@ jobs:
                 break
               fi
             done < <(echo "$RESULTS_JSON" | jq -c '.')
-            
+
             # Get the statuses (with defaults)
             DEPLOYMENT_STATUS=$(echo "$DEPLOYMENT_RESULT" | jq -r '.deployment_status // "failure"')
             POSTMAN_FOUND=$(echo "$DEPLOYMENT_RESULT" | jq -r '.postman_found // "false"')
             POSTMAN_STATUS=$(echo "$DEPLOYMENT_RESULT" | jq -r '.postman_status // "failure"')
             CUSTOM_FOUND=$(echo "$DEPLOYMENT_RESULT" | jq -r '.custom_found // "false"')
             CUSTOM_STATUS=$(echo "$DEPLOYMENT_RESULT" | jq -r '.custom_status // "failure"')
-            
+
             # Format deployment status (now handles skipped deployments)
             if [[ "$DEPLOYMENT_STATUS" == "skipped" ]]; then
               DEPLOYMENT_DISPLAY="➖ Skipped"
@@ -316,7 +316,7 @@ jobs:
               DEPLOYMENT_DISPLAY="❌ Failed"
               DEPLOYMENT_CONSOLE="✗ Failed"
             fi
-            
+
             # Format Postman status
             if [[ "$DEPLOYMENT_STATUS" == "skipped" ]]; then
               POSTMAN_DISPLAY="➖ Skipped"
@@ -328,7 +328,7 @@ jobs:
               POSTMAN_DISPLAY="❌ Failed"
               POSTMAN_CONSOLE="✗ Failed"
             fi
-            
+
             # Format Custom tests status
             if [[ "$DEPLOYMENT_STATUS" == "skipped" ]]; then
               CUSTOM_DISPLAY="➖ Skipped"
@@ -340,7 +340,7 @@ jobs:
               CUSTOM_DISPLAY="❌ Failed"
               CUSTOM_CONSOLE="✗ Failed"
             fi
-            
+
             # Determine overall status
             if [[ "$DEPLOYMENT_STATUS" == "skipped" ]]; then
               OVERALL_DISPLAY="➖ Skipped"
@@ -355,24 +355,24 @@ jobs:
               OVERALL_DISPLAY="✅ Passed"
               OVERALL_CONSOLE="✓ Passed"
             fi
-            
+
             # Add to markdown file
             echo "| $deployment | $DEPLOYMENT_DISPLAY | $POSTMAN_DISPLAY | $CUSTOM_DISPLAY | $OVERALL_DISPLAY |" >> summary.md
-            
+
             # Add to console output (pad strings for consistent column width)
             DEPLOY_PAD=$(printf "%-14s" "$deployment")
             DEPLOYMENT_PAD=$(printf "%-17s" "$DEPLOYMENT_CONSOLE")
             POSTMAN_PAD=$(printf "%-14s" "$POSTMAN_CONSOLE")
             CUSTOM_PAD=$(printf "%-13s" "$CUSTOM_CONSOLE")
             OVERALL_PAD=$(printf "%-16s" "$OVERALL_CONSOLE")
-            
+
             echo "║ $DEPLOY_PAD ║ $DEPLOYMENT_PAD ║ $POSTMAN_PAD ║ $CUSTOM_PAD ║ $OVERALL_PAD ║"
           done
-          
+
           # Close the console table
           echo "╚════════════════╩═══════════════════╩════════════════╩═══════════════╩══════════════════╝"
           echo "::endgroup::"
-          
+
           # Print the markdown for visibility
           echo "Markdown summary generated and saved to artifact."
 
