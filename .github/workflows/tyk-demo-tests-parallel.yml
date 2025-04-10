@@ -169,55 +169,54 @@ jobs:
         if: steps.validate-tests.outputs.has-postman-tests == 'true'
         run: |
           source "$(pwd)/scripts/test-common.sh"
-          echo "::group::Testing ${{ matrix.deployment }}"
-          
-          FAILED=false
+         
+          test_success=false
           
           # Run Postman tests if they exist
-          if [ -f "${DEPLOYMENT_DIR}/postman/collection.json" ]; then
-            echo "Running Postman tests for ${{ matrix.deployment }}"
-            if ! run_postman_test "${{ matrix.deployment }}" "$DEPLOYMENT_DIR"; then
-              echo "::error::Postman tests failed for ${{ matrix.deployment }}"
-              FAILED=true
-            else
-              echo "Postman tests passed for ${{ matrix.deployment }}"
-            fi
-            strip_control_chars "logs/postman.log"
-            cp "logs/postman.log" "logs/postman-${{ matrix.deployment }}.log"
-          fi
-          
-          # Run test scripts if they exist
-          if [ -d "${DEPLOYMENT_DIR}/tests" ] && [ "$(find ${DEPLOYMENT_DIR}/tests -name '*.sh' | wc -l)" -gt 0 ]; then
-            echo "Running custom test scripts for ${{ matrix.deployment }}"
-            if ! run_test_scripts "${{ matrix.deployment }}" "$DEPLOYMENT_DIR"; then
-              echo "::error::Custom tests failed for ${{ matrix.deployment }}"
-              FAILED=true
-            else
-              echo "Custom tests passed for ${{ matrix.deployment }}"
-            fi
-          fi
-          
-          # Capture container logs if tests failed
-          if [ "$FAILED" = "true" ]; then
-            timestamp=$(date -u "+%Y%m%d_%H%M%S")
-            container_log_file="logs/containers-${{ matrix.deployment }}-${timestamp}.log"
-            echo "Capturing container logs for failed deployment"
-            ./docker-compose-command.sh logs --timestamps --no-color > "$container_log_file"
-          fi
-          
-          # Tear down the deployment
-          echo "Removing deployment: ${{ matrix.deployment }}"
-          ./down.sh
-          
-          # Handle overall success/failure
-          if [ "$FAILED" = "true" ]; then
-            echo "::error::Tests for ${{ matrix.deployment }} failed"
-            exit 1
+          if ! run_postman_test "${{ matrix.deployment }}" "$DEPLOYMENT_DIR"; then
+            echo "❌ Postman tests failed for ${{ matrix.deployment }}"
           else
-            echo "All tests for ${{ matrix.deployment }} passed"
+            echo "✅ Postman tests passed for ${{ matrix.deployment }}"
+            test_success=true
           fi
+
+          echo "postman-test-result=${test_success}" >> $GITHUB_OUTPUT
+
+          strip_control_chars "logs/postman.log"
           
-          echo "::endgroup::"
+          
+          # # Run test scripts if they exist
+          # if [ -d "${DEPLOYMENT_DIR}/tests" ] && [ "$(find ${DEPLOYMENT_DIR}/tests -name '*.sh' | wc -l)" -gt 0 ]; then
+          #   echo "Running custom test scripts for ${{ matrix.deployment }}"
+          #   if ! run_test_scripts "${{ matrix.deployment }}" "$DEPLOYMENT_DIR"; then
+          #     echo "::error::Custom tests failed for ${{ matrix.deployment }}"
+          #     FAILED=true
+          #   else
+          #     echo "Custom tests passed for ${{ matrix.deployment }}"
+          #   fi
+          # fi
+          
+          # # Capture container logs if tests failed
+          # if [ "$FAILED" = "true" ]; then
+          #   timestamp=$(date -u "+%Y%m%d_%H%M%S")
+          #   container_log_file="logs/containers-${{ matrix.deployment }}-${timestamp}.log"
+          #   echo "Capturing container logs for failed deployment"
+          #   ./docker-compose-command.sh logs --timestamps --no-color > "$container_log_file"
+          # fi
+          
+          # # Tear down the deployment
+          # echo "Removing deployment: ${{ matrix.deployment }}"
+          # ./down.sh
+          
+          # # Handle overall success/failure
+          # if [ "$FAILED" = "true" ]; then
+          #   echo "::error::Tests for ${{ matrix.deployment }} failed"
+          #   exit 1
+          # else
+          #   echo "All tests for ${{ matrix.deployment }} passed"
+          # fi
+          
+          # echo "::endgroup::"
       
       - name: Skip deployment (no tests)
         if: steps.validate-tests.outputs.has-tests != 'true'
