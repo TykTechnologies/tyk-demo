@@ -257,17 +257,14 @@ jobs:
         run: |
           echo "## Test Results Summary" > summary.md
           echo "" >> summary.md
-          echo "| Deployment | Postman Tests | Custom Tests | Overall Status |" >> summary.md
-          echo "|------------|---------------|-------------|----------------|" >> summary.md
+          echo "| Deployment | Creation Status | Postman Tests | Custom Tests | Overall Status |" >> summary.md
+          echo "|------------|----------------|---------------|-------------|----------------|" >> summary.md
           
           # Process deployment results
           DEPLOYMENTS='${{ needs.discover-deployments.outputs.deployment-matrix }}'
           RESULTS_JSON=$(echo '${{ toJSON(needs.test-deployments.outputs) }}' | jq -r '.["deployment-results"]')
           
-          # We need a temp file to store the updated results because the array might be large
-          echo "[]" > all_results.json
-          
-          # For each deployment, find its result and add to our result array
+          # For each deployment, find its result
           for deployment in $(echo "$DEPLOYMENTS" | jq -r '.[]'); do
             # Find the corresponding result or use default values if not found
             DEPLOYMENT_RESULT="{}"
@@ -286,6 +283,13 @@ jobs:
             POSTMAN_STATUS=$(echo "$DEPLOYMENT_RESULT" | jq -r '.postman_status // "failure"')
             CUSTOM_FOUND=$(echo "$DEPLOYMENT_RESULT" | jq -r '.custom_found // "false"')
             CUSTOM_STATUS=$(echo "$DEPLOYMENT_RESULT" | jq -r '.custom_status // "failure"')
+            
+            # Format creation status
+            if [[ "$DEPLOYMENT_STATUS" == "success" ]]; then
+              CREATION_DISPLAY="✅ Success"
+            else
+              CREATION_DISPLAY="❌ Failed"
+            fi
             
             # Format Postman status
             if [[ "$POSTMAN_FOUND" == "true" ]]; then
@@ -318,7 +322,7 @@ jobs:
               OVERALL_STATUS="✅ Passed"
             fi
             
-            echo "| $deployment | $POSTMAN_DISPLAY | $CUSTOM_DISPLAY | $OVERALL_STATUS |" >> summary.md
+            echo "| $deployment | $CREATION_DISPLAY | $POSTMAN_DISPLAY | $CUSTOM_DISPLAY | $OVERALL_STATUS |" >> summary.md
           done
           
           echo "Generated summary:"
