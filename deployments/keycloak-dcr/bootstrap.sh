@@ -10,15 +10,12 @@ dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_
 dashboard_user_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
 gateway_base_url="http://tyk-gateway.localhost:8080"
 gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
-keycloak_base_url="http://keycloak:8180"
+keycloak_base_url="http://keycloak.localhost:8180"
 
 log_message "Waiting for Dashboard API to be ready"
 wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
 
 log_message "Waiting for Keycloak to respond ok"
-curl -v --max-time 10 "$keycloak_base_url/health/ready" || log_message "Curl failed to connect to Keycloak"
-cat /etc/hosts
-curl -v --max-time 10 "http://keycloak.localhost:8180/health/ready" || log_message "Curl failed to connect to Keycloak"
 wait_for_response "$keycloak_base_url/health/ready" "200"
 
 
