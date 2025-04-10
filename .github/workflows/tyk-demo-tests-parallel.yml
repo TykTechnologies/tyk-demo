@@ -271,7 +271,6 @@ jobs:
         run: |
           echo "## Test Results Summary"
           echo ""
-          echo "```"
           echo "╔════════════════╦═══════════════════╦════════════════╦═══════════════╦══════════════════╗"
           echo "║ DEPLOYMENT     ║ DEPLOYMENT STATUS ║ POSTMAN TESTS  ║ CUSTOM TESTS  ║ OVERALL STATUS   ║"
           echo "╠════════════════╬═══════════════════╬════════════════╬═══════════════╬══════════════════╣"
@@ -296,9 +295,9 @@ jobs:
             if [[ "$deployment_status" == "skipped" ]]; then
               deployment_display="- Skipped"
             elif [[ "$deployment_status" == "success" ]]; then
-              deployment_display="✓ Success"
+              deployment_display="Success"
             else
-              deployment_display="✗ Failed"
+              deployment_display="Failed"
             fi
 
             postman_display=""
@@ -332,9 +331,9 @@ jobs:
             if [[ "$deployment_status" == "skipped" ]]; then
               overall_status="Skipped"
             elif [[ "$deployment_status" == "failure" ]]; then
-              overall_status="Failed (deploy)"
+              overall_status="Failed deploy"
             elif [[ "$postman_found" == "true" && "$postman_status" != "success" ]] || [[ "$custom_found" == "true" && "$custom_status" != "success" ]]; then
-              overall_status="Failed (tests)"
+              overall_status="Failed tests"
             else
               overall_status="Passed"
             fi
@@ -350,4 +349,3 @@ jobs:
           done
 
           echo "╚════════════════╩═══════════════════╩════════════════╩═══════════════╩══════════════════╝"
-          echo "```"
