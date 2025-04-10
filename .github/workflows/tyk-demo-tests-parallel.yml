@@ -69,6 +69,8 @@ jobs:
       fail-fast: false  # Continue with other tests even if one fails
       matrix:
         deployment: ${{ fromJson(needs.discover-deployments.outputs.deployment-matrix) }}
+    env:
+      DEPLOYMENT_DIR: "deployments/${{ matrix.deployment }}"
     
     steps:
       - name: Check Out Repository Code
@@ -121,7 +123,6 @@ jobs:
           compose_argument=""
 
           echo "::group::Reading deployment manifest"
-          DEPLOYMENT_DIR="deployments/${{ matrix.deployment }}"
           if [ -f "${DEPLOYMENT_DIR}/deployment.json" ]; then
             compose_argument=$(jq -r '.composeArgument // empty' "${DEPLOYMENT_DIR}/deployment.json")
             echo "Compose argument set to: $compose_argument"
@@ -141,7 +142,6 @@ jobs:
       - name: Check if deployment has tests
         id: validate-tests
         run: |
-          DEPLOYMENT_DIR="deployments/${{ matrix.deployment }}"
           HAS_TESTS=false
           
           # Check for Postman collection
@@ -179,7 +179,6 @@ jobs:
             exit 1
           fi
           
-          DEPLOYMENT_DIR="deployments/${{ matrix.deployment }}"
           FAILED=false
           
           # Run Postman tests if they exist
