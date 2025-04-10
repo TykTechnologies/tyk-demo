@@ -263,12 +263,12 @@ jobs:
           echo "results=$RESULT" >> $GITHUB_OUTPUT
 
   # Collect test results and summarize
-  summarize-results:
+  summarise-results:
     needs: [discover-deployments, test-deployments]
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Summarize test results
+      - name: Summarise test results
         run: |
           # Create a markdown version for artifact
           echo "## Test Results Summary" > summary.md
