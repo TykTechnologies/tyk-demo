@@ -306,6 +306,9 @@ jobs:
     needs: collect-results
     runs-on: ubuntu-latest
     if: always()
+    env:
+      TERM: xterm-256color
+      FORCE_COLOR: 1
     steps:
       - name: Download combined results
         uses: actions/download-artifact@v4
@@ -315,49 +318,49 @@ jobs:
       - name: Summarise test results
         run: |
           cat results.json | jq -c '.[]' | while IFS= read -r result; do
-          # Extract values from the JSON object
-          deployment=$(echo "$result" | jq -r '.deployment')
-          deployment_status=$(echo "$result" | jq -r '.deployment_status')
-          postman_found=$(echo "$result" | jq -r '.postman_found')
-          postman_status=$(echo "$result" | jq -r '.postman_status')
-          custom_found=$(echo "$result" | jq -r '.custom_found')
-          custom_status=$(echo "$result" | jq -r '.custom_status')
+            # Extract values from the JSON object
+            deployment=$(echo "$result" | jq -r '.deployment')
+            deployment_status=$(echo "$result" | jq -r '.deployment_status')
+            postman_found=$(echo "$result" | jq -r '.postman_found')
+            postman_status=$(echo "$result" | jq -r '.postman_status')
+            custom_found=$(echo "$result" | jq -r '.custom_found')
+            custom_status=$(echo "$result" | jq -r '.custom_status')
 
-          # Define colors
-          GREEN="\033[32m"
-          RED="\033[31m"
-          BLUE="\033[34m"
-          RESET="\033[0m"
+            # Define colors
+            GREEN="\033[32m"
+            RED="\033[31m"
+            BLUE="\033[34m"
+            RESET="\033[0m"
 
-          # Format statuses with colors
-          if [ "$deployment_status" == "success" ]; then
-            deployment_status="${GREEN}PASS${RESET}"
-          elif [ "$deployment_status" == "failure" ]; then
-            deployment_status="${RED}FAIL${RESET}"
-          else
-            deployment_status="${BLUE}SKIP${RESET}"
-          fi
+            # Format statuses with colors
+            if [ "$deployment_status" == "success" ]; then
+              deployment_status="${GREEN}PASS${RESET}"
+            elif [ "$deployment_status" == "failure" ]; then
+              deployment_status="${RED}FAIL${RESET}"
+            else
+              deployment_status="${BLUE}SKIP${RESET}"
+            fi
 
-          if [ "$postman_status" == "success" ]; then
-            postman_status="${GREEN}PASS${RESET}"
-          elif [ "$postman_status" == "failure" ]; then
-            postman_status="${RED}FAIL${RESET}"
-          else
-            postman_status="${BLUE}SKIP${RESET}"
-          fi
+            if [ "$postman_status" == "success" ]; then
+              postman_status="${GREEN}PASS${RESET}"
+            elif [ "$postman_status" == "failure" ]; then
+              postman_status="${RED}FAIL${RESET}"
+            else
+              postman_status="${BLUE}SKIP${RESET}"
+            fi
 
-          if [ "$custom_status" == "success" ]; then
-            custom_status="${GREEN}PASS${RESET}"
-          elif [ "$custom_status" == "failure" ]; then
-            custom_status="${RED}FAIL${RESET}"
-          else
-            custom_status="${BLUE}SKIP${RESET}"
-          fi
+            if [ "$custom_status" == "success" ]; then
+              custom_status="${GREEN}PASS${RESET}"
+            elif [ "$custom_status" == "failure" ]; then
+              custom_status="${RED}FAIL${RESET}"
+            else
+              custom_status="${BLUE}SKIP${RESET}"
+            fi
 
-          # Print results in a monospaced table format
-          printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s\n" "Deployment" "Deploy" "Postman" "Postman" "Custom" "Custom"
-          printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s\n" "Name" "Status" "Found" "Status" "Found" "Status"
-          printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s\n" "--------------------" "----------" "----------" "----------" "----------" "----------"
-          printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s\n" "$deployment" "$deployment_status" "$postman_found" "$postman_status" "$custom_found" "$custom_status"
-          echo "--------------------------------------------------------------------------------"
+            # Print results in a monospaced table format
+            printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s\n" "Deployment" "Deploy" "Postman" "Postman" "Custom" "Custom"
+            printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s\n" "Name" "Status" "Found" "Status" "Found" "Status"
+            printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s\n" "--------------------" "----------" "----------" "----------" "----------" "----------"
+            printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s\n" "$deployment" "$deployment_status" "$postman_found" "$postman_status" "$custom_found" "$custom_status"
+            echo "--------------------------------------------------------------------------------"
           done
