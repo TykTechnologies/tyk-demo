@@ -258,8 +258,7 @@ jobs:
             "custom_status": "'$CUSTOM_STATUS'"
           }' | jq -c .)
 
-          echo "$RESULT"
-          
+          echo "$RESULT" | jq
           echo "results=$RESULT" >> $GITHUB_OUTPUT
 
   # Collect test results and summarize
