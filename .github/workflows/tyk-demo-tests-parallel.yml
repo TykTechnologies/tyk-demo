@@ -139,7 +139,7 @@ jobs:
           echo "✅ Deployment ${{ matrix.deployment }} created successfully"
           echo "::endgroup::"
 
-      - name: Validate Postman Tests
+      - name: Validate Tests
         id: validate-tests
         run: |
           source "$(pwd)/scripts/test-common.sh"
@@ -150,20 +150,21 @@ jobs:
             echo "✅ Found postman tests"
             has_postman_tests=true
           else
-            echo "No postman test found"
+            echo "❌ No postman test found"
           fi
           echo "has-postman-tests=${has_postman_tests}" >> $GITHUB_OUTPUT
           echo "::endgroup::"
 
-          echo "::group::Checking for custom test"
+          echo "::group::Checking for custom tests"
           has_custom_tests=false
           if (validate_test_scripts "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"); then
             echo "✅ Found custom tests"
             has_custom_tests=true
           else
-            echo "No custom tests found"
+            echo "❌ No custom tests found"
           fi
-          echo "has-custom-tests=${has_custom_tests}" >> $GITHUB_OUTPUT      
+          echo "has-custom-tests=${has_custom_tests}" >> $GITHUB_OUTPUT
+          echo "::endgroup::"
       - name: Test deployment
         if: steps.validate-tests.outputs.has-postman-tests == 'true'
         run: |
