@@ -57,7 +57,20 @@ jobs:
           key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
       - name: Add licences to environment
         run: |
+          if [ -z "${{ secrets.DASH_LICENSE }}" ]; then
+            echo "❌ Error: DASH_LICENSE secret is not set or is empty." >&2
+            exit 1
+          fi
+
+          if [ -z "${{ secrets.MDCB_LICENSE }}" ]; then
+            echo "❌ Error: MDCB_LICENSE secret is not set or is empty." >&2
+            exit 1
+          fi
+
+          echo "✅ DASHBOARD_LICENCE added to .env"
           echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
+
+          echo "✅ MDCB_LICENCE added to .env"
           echo "MDCB_LICENCE=${{ secrets.MDCB_LICENSE }}" >> .env
       - name: Bootstrap and Test All Eligible Deployments
         run: ./scripts/test-all.sh
