@@ -75,7 +75,6 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Set global env vars
-        id: set-global-env-vars
         run: |
           echo "DEPLOYMENT_DIR=$(pwd)/deployments/${{ matrix.deployment }}" >> $GITHUB_ENV
           echo "BASE_DIR=$(pwd)" >> $GITHUB_ENV
@@ -170,36 +169,48 @@ jobs:
           echo "has-custom-tests=${has_custom_tests}" >> $GITHUB_OUTPUT
           echo "::endgroup::"
 
-      - name: Test deployment
+      - name: Run Postman Tests
+        id: run-postman-tests
         if: steps.validate-tests.outputs.has-postman-tests == 'true'
         run: |
           source "$(pwd)/scripts/test-common.sh"
          
           test_success=false
           
-          # Run Postman tests if they exist
+          # Run Postman tests
           if run_postman_test "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
-            echo "✅ Postman tests passed for ${{ matrix.deployment }}"
+            echo "✅ Postman tests passed"
             test_success=true
           else
-            echo "❌ Postman tests failed for ${{ matrix.deployment }}"
+            echo "❌ Postman tests failed"
           fi
 
           echo "postman-test-result=${test_success}" >> $GITHUB_OUTPUT
 
           strip_control_chars "logs/postman.log"
+
+      - name: Run Custom Tests
+        id: run-custom-tests
+        if: steps.validate-tests.outputs.has-custom-tests == 'true'
+        run: |
+          source "$(pwd)/scripts/test-common.sh"
+         
+          test_success=false
           
-          
-          # # Run test scripts if they exist
-          # if [ -d "${DEPLOYMENT_DIR}/tests" ] && [ "$(find ${DEPLOYMENT_DIR}/tests -name '*.sh' | wc -l)" -gt 0 ]; then
-          #   echo "Running custom test scripts for ${{ matrix.deployment }}"
-          #   if ! run_test_scripts "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
-          #     echo "::error::Custom tests failed for ${{ matrix.deployment }}"
-          #     FAILED=true
-          #   else
-          #     echo "Custom tests passed for ${{ matrix.deployment }}"
-          #   fi
-          # fi
+          # Run custom tests
+          if run_test_scripts "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
+            echo "✅ Custom tests passed"
+            test_success=true
+          else
+            echo "❌ Custom tests failed"
+          fi
+
+          echo "custom-test-result=${test_success}" >> $GITHUB_OUTPUT
+
+      - name: Capture Container Logs
+        run: |
+      
+
           
           # # Capture container logs if tests failed
           # if [ "$FAILED" = "true" ]; then
