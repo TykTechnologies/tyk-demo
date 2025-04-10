@@ -154,7 +154,6 @@ jobs:
             echo "postman-tests-found=true" >> $GITHUB_OUTPUT
           else
             echo "❌ No Postman tests found"
-            echo "postman-tests-found=false" >> $GITHUB_OUTPUT
           fi
           echo "::endgroup::"
 
@@ -164,13 +163,12 @@ jobs:
             echo "custom-tests-found=true" >> $GITHUB_OUTPUT
           else
             echo "❌ No custom tests found"
-            echo "custom-tests-found=false" >> $GITHUB_OUTPUT
           fi
           echo "::endgroup::"
 
       - name: Run Postman Tests
         id: run-postman-tests
-        if: steps.validate-tests.outputs.has-postman-tests == 'true'
+        if: steps.validate-tests.outputs.postman-tests-found == 'true'
         continue-on-error: true
         run: |
           source "$(pwd)/scripts/test-common.sh"
@@ -185,7 +183,7 @@ jobs:
 
       - name: Run Custom Tests
         id: run-custom-tests
-        if: steps.validate-tests.outputs.has-custom-tests == 'true'
+        if: steps.validate-tests.outputs.custom-tests-found == 'true'
         continue-on-error: true
         run: |
           source "$(pwd)/scripts/test-common.sh"
