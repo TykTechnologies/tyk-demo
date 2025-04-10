@@ -292,6 +292,7 @@ jobs:
 
             # Loop through results to find the matching deployment
             while read -r result; do
+              echo "$result" | jq
               if [[ $(echo "$result" | jq -r '.deployment') == "$deployment" ]]; then
                 DEPLOYMENT_RESULT="$result"
                 break
