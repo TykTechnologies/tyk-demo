@@ -97,25 +97,18 @@ jobs:
             echo "Deployment manifest not found in ${DEPLOYMENT_DIR}"
           fi
 
-          echo "skip_deployment=$skip_deployment" >> $GITHUB_OUTPUT
-          echo "compose_argument=$compose_argument" >> $GITHUB_OUTPUT
-
-      - name: Check for skipped deployment
-        run: |
-          SKIP_DEPLOYMENT="${{ steps.read-manifest.outputs.skip_deployment }}"
-
-          if [ "$SKIP_DEPLOYMENT" == "true" ]; then
-            echo "Deployment manifest contains skip flag. Exiting."
-            exit 0
-          fi
+          echo "skip-deployment=$skip_deployment" >> $GITHUB_OUTPUT
+          echo "compose-argument=$compose_argument" >> $GITHUB_OUTPUT
 
       - name: Install websocat for tests
+        if: steps.read-manifest.outputs.skip-deployment != 'true'
         run: |
           wget https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl
           chmod +x websocat.x86_64-unknown-linux-musl
           sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat
 
       - name: Set up environment
+        if: steps.read-manifest.outputs.skip-deployment != 'true'
         run: |
           echo "::group::Preparing test logs"
           source "$(pwd)/scripts/test-common.sh"
@@ -144,12 +137,14 @@ jobs:
           echo "::endgroup::"
 
       - name: Cache Go Plugins
+        if: steps.read-manifest.outputs.skip-deployment != 'true'
         uses: actions/cache@v4
         with:
           path: .bootstrap/plugin-cache/${{ needs.discover-deployments.outputs.gateway-tag }}
           key: ${{ runner.os }}-plugin-cache-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
 
       - name: Create deployment
+        if: steps.read-manifest.outputs.skip-deployment != 'true'
         id: create-deployment
         run: |
           COMPOSE_ARG="${{ steps.read-manifest.outputs.compose_argument }}"
@@ -162,6 +157,7 @@ jobs:
           fi
 
       - name: Validate Tests
+        if: steps.create-deployment.outcome == 'success'     
         id: validate-tests
         run: |
           source "$(pwd)/scripts/test-common.sh"
@@ -234,7 +230,7 @@ jobs:
         run: |
           # Determine deployment status - success, skipped, or failure
           DEPLOYMENT_STATUS="failure"
-          if [ "${{ steps.read-manifest.outputs.skip_deployment }}" == "true" ]; then
+          if [ "${{ steps.read-manifest.outputs.skip-deployment }}" == "true" ]; then
             DEPLOYMENT_STATUS="skipped"
           elif [ "${{ steps.create-deployment.outcome }}" == "success" ]; then
             DEPLOYMENT_STATUS="success"
