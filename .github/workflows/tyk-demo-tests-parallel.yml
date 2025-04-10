@@ -273,6 +273,7 @@ jobs:
   process-results:
     needs: test-deployments
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Download all results
         uses: actions/download-artifact@v4
