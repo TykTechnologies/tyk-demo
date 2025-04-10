@@ -173,7 +173,7 @@ jobs:
           test_success=false
           
           # Run Postman tests if they exist
-          if ! run_postman_test "${{ matrix.deployment }}" "$DEPLOYMENT_DIR"; then
+          if ! run_postman_test "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
             echo "❌ Postman tests failed for ${{ matrix.deployment }}"
           else
             echo "✅ Postman tests passed for ${{ matrix.deployment }}"
@@ -188,7 +188,7 @@ jobs:
           # # Run test scripts if they exist
           # if [ -d "${DEPLOYMENT_DIR}/tests" ] && [ "$(find ${DEPLOYMENT_DIR}/tests -name '*.sh' | wc -l)" -gt 0 ]; then
           #   echo "Running custom test scripts for ${{ matrix.deployment }}"
-          #   if ! run_test_scripts "${{ matrix.deployment }}" "$DEPLOYMENT_DIR"; then
+          #   if ! run_test_scripts "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
           #     echo "::error::Custom tests failed for ${{ matrix.deployment }}"
           #     FAILED=true
           #   else
