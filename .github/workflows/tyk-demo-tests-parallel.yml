@@ -31,7 +31,7 @@ jobs:
           DEPLOYMENTS=$(find deployments -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | jq -R -s -c 'split("\n") | map(select(length > 0)) | sort')
 
           if [ "${#DEPLOYMENTS[@]}" -eq 0 ]; then
-            echo "❌ No deployments found. Exiting workflow." >&2
+            echo "::error::No deployments found. Exiting workflow." >&2
             exit 1
           fi
       
@@ -49,12 +49,12 @@ jobs:
                             }' deployments/tyk/docker-compose.yml | sort -u | head -n 1)
 
           if [[ -z "$GATEWAY_TAG" ]]; then
-            echo "❌ Error: GATEWAY_TAG is empty"
+            echo "::error::GATEWAY_TAG is empty"
             exit 1
           fi
 
           if [[ ! "$GATEWAY_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-._a-zA-Z0-9]+)?$ ]]; then
-            echo "❌ Error: GATEWAY_TAG '$GATEWAY_TAG' is not in a valid semver format"
+            echo "::error::GATEWAY_TAG '$GATEWAY_TAG' is not in a valid semver format"
             exit 1
           fi
 
@@ -82,34 +82,65 @@ jobs:
       
       - name: Set up environment
         run: |
-          # Create logs directory
+          echo "::group::Creating log directory"
           mkdir -p logs
+          echo "::endgroup::"
           
-          # Debug logging
+          echo "::group::Defaulting to debug logs for Gateway and Dashboard"
           echo "GATEWAY_LOGLEVEL=debug" >> .env
           echo "DASHBOARD_LOGLEVEL=debug" >> .env
           echo "✅ Gateway and Dashboard log levels set to debug 🐛"
+          echo "::endgroup::"
 
-          # Licences
+          echo "::group::Setting licences"
           if [ -z "${{ secrets.DASH_LICENSE }}" ]; then
-            echo "❌ Error: DASH_LICENSE secret is not set or is empty." >&2
+            echo "::error::DASH_LICENSE secret is not set or is empty." >&2
             exit 1
           fi
           if [ -z "${{ secrets.MDCB_LICENSE }}" ]; then
-            echo "❌ Error: MDCB_LICENSE secret is not set or is empty." >&2
+            echo "::error::MDCB_LICENSE secret is not set or is empty." >&2
             exit 1
           fi
           echo "✅ DASHBOARD_LICENCE added to .env"
           echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
           echo "✅ MDCB_LICENCE added to .env"
           echo "MDCB_LICENCE=${{ secrets.MDCB_LICENSE }}" >> .env
-          
+          echo "::endgroup::"
+
       - name: Cache Go Plugins
         uses: actions/cache@v4
         with:
           path: .bootstrap/plugin-cache/${{ needs.discover-deployments.outputs.gateway-tag }}
           key: ${{ runner.os }}-plugin-cache-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
       
+      - name: Create deployment
+        id: create-deployment
+        run: |
+          echo "Creating deployment: ${{ matrix.deployment }}"
+
+          # Prepare test environment
+          source "$(pwd)/scripts/test-common.sh"
+          prepare_test_logs
+          compose_argument=""
+
+          echo "::group::Reading deployment manifest"
+          DEPLOYMENT_DIR="deployments/${{ matrix.deployment }}"
+          if [ ! -f "${DEPLOYMENT_DIR}/deployment.json" ]; then
+            compose_argument=$(jq -r '.composeArgument // empty' "${DEPLOYMENT_DIR}/deployment.json")
+            echo "Compose argument set to: $compose_argument"
+          else
+            echo "No deployment manifest found"
+          fi
+          echo "::endgroup::"
+          
+          echo "::group::Bringing deployment up"
+          if ! ./up.sh "${compose_argument:-${{ matrix.deployment }}}" --hide-progress --skip-hostname-check; then
+            echo "::error::Deployment creation failed for ${{ matrix.deployment }}"
+            exit 1
+          fi
+          echo "✅ Deployment ${{ matrix.deployment }} created successfully"
+          echo "::endgroup::"
+
       - name: Check if deployment has tests
         id: validate-tests
         run: |
