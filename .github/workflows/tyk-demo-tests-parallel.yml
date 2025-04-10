@@ -124,6 +124,7 @@ jobs:
 
           if [ -f "${DEPLOYMENT_DIR}/deployment.json" ]; then
             echo "Deployment manifest found in ${DEPLOYMENT_DIR}"
+            jq '.' "${DEPLOYMENT_DIR}/deployment.json"
             skip_deployment=$(jq -r '.github.skipDeployment // "false"' "${DEPLOYMENT_DIR}/deployment.json")
             compose_argument=$(jq -r '.composeArgument // empty' "${DEPLOYMENT_DIR}/deployment.json")
           else
