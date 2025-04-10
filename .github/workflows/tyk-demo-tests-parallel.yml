@@ -136,11 +136,12 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Bringing deployment up"
-          if ! ./up.sh "${compose_argument:-${{ matrix.deployment }}}" --hide-progress --skip-hostname-check; then
+          if ./up.sh "${compose_argument:-${{ matrix.deployment }}}" --hide-progress --skip-hostname-check; then
+            echo "✅ Deployment created successfully"
+          else
             echo "::error::Deployment creation failed for ${{ matrix.deployment }}"
             exit 1
           fi
-          echo "✅ Deployment ${{ matrix.deployment }} created successfully"
           echo "::endgroup::"
 
       - name: Validate Tests
@@ -154,6 +155,7 @@ jobs:
             echo "postman-tests-found=true" >> $GITHUB_OUTPUT
           else
             echo "❌ No Postman tests found"
+            echo "postman-tests-found=false" >> $GITHUB_OUTPUT
           fi
           echo "::endgroup::"
 
@@ -163,6 +165,7 @@ jobs:
             echo "custom-tests-found=true" >> $GITHUB_OUTPUT
           else
             echo "❌ No custom tests found"
+            echo "custom-tests-found=false" >> $GITHUB_OUTPUT
           fi
           echo "::endgroup::"
 
@@ -196,7 +199,7 @@ jobs:
           fi
 
       - name: Capture Container Logs
-        if: failure()  # This ensures the step runs only if any previous step fails
+        if: always()
         run: |
           source "$(pwd)/scripts/test-common.sh"
 
@@ -218,38 +221,34 @@ jobs:
       - name: Check Out Repository Code
         uses: actions/checkout@v4
 
-      - name: Download all logs
-        uses: actions/download-artifact@v4
-        with:
-          path: all-logs
-
       - name: Summarize test results
         run: |
           echo "## Test Results Summary" > summary.md
           echo "" >> summary.md
-          echo "| Deployment | Status |" >> summary.md
-          echo "|------------|--------|" >> summary.md
+          echo "| Deployment | Postman Test Status | Custom Test Status | Deployment Status |" >> summary.md
+          echo "|------------|--------------------|-------------------|-------------------|" >> summary.md
 
-          # Analyze artifact directories to determine test outcomes
-          for deployment_logs in all-logs/logs-*; do
-            deployment=$(echo "$deployment_logs" | sed 's|all-logs/logs-||')
-
-            # Check if this is a valid deployment directory
-            if [ -d "$deployment_logs" ]; then
-              # Look for error indicators in logs
-              if grep -q "::error::" "$deployment_logs"/*.log 2>/dev/null; then
-                status="❌ Failed"
-              else
-                # Check if it was skipped
-                if [ -z "$(find "$deployment_logs" -name "postman-*.log" 2>/dev/null)" ]; then
-                  status="⏭️ Skipped (no tests)"
-                else
-                  status="✅ Passed"
-                fi
-              fi
-
-              echo "| $deployment | $status |" >> summary.md
+          for deployment in ${{ fromJson(needs.test-deployments.outputs.deployment-matrix) }}; do
+            # Extract the status of the deployment
+            deployment_status="❌ Deployment creation failed"
+            if [[ "${{ needs.test-deployments.outputs.create-deployment-${deployment}-outcome }}" == "success" ]]; then
+              deployment_status="✅ Deployment created successfully"
             fi
+
+            # Check if Postman tests were found and passed
+            postman_status="❌ Postman tests failed"
+            if [[ "${{ needs.test-deployments.outputs.postman-tests-found-${deployment} }}" == "true" ]]; then
+              postman_status="✅ Postman tests passed"
+            fi
+
+            # Check if custom tests were found and passed
+            custom_tests_status="❌ Custom tests failed"
+            if [[ "${{ needs.test-deployments.outputs.custom-tests-found-${deployment} }}" == "true" ]]; then
+              custom_tests_status="✅ Custom tests passed"
+            fi
+
+            # Write the results for the current deployment
+            echo "| $deployment | $postman_status | $custom_tests_status | $deployment_status |" >> summary.md
           done
 
           cat summary.md
