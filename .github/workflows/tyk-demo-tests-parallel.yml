@@ -1,0 +1,240 @@
+name: Tyk Demo API Tests (Parallel)
+on:
+  workflow_dispatch:
+    inputs:
+      gateway_debug:
+        description: 'Enable Gateway debug logging'
+        required: false
+        type: boolean
+        default: false
+      dashboard_debug:
+        description: 'Enable Dashboard debug logging'
+        required: false
+        type: boolean
+        default: false
+  push:
+
+jobs:
+  # First job to collect all the deployments to test
+  discover-deployments:
+    runs-on: ubuntu-latest
+    outputs:
+      deployment-matrix: ${{ steps.set-matrix.outputs.deployment-matrix }}
+      gateway-tag: ${{ steps.get-gateway-tag.outputs.gateway-tag }}
+    steps:
+      - name: Check Out Repository Code
+        uses: actions/checkout@v4
+      
+      - name: Find All Deployments
+        id: set-matrix
+        run: |
+          DEPLOYMENTS=$(find deployments -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "deployment-matrix=${DEPLOYMENTS}" >> $GITHUB_OUTPUT
+          echo "Found deployments: ${DEPLOYMENTS}"
+      
+      - name: Extract Docker Image Tag
+        id: get-gateway-tag
+        run: |
+          GATEWAY_TAG=$(grep -m 1 'tykio/tyk-gateway-ee:' deployments/tyk/docker-compose.yml | awk -F':' '{print $NF}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/\${GATEWAY_VERSION:-\(.*\)}/\1/' -e 's/^-//' -e 's/}$//')
+          echo "gateway-tag=$GATEWAY_TAG" >> $GITHUB_OUTPUT
+          echo "Extracted gateway tag: $GATEWAY_TAG"
+
+  # Run each deployment test in parallel
+  test-deployments:
+    needs: discover-deployments
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # Continue with other tests even if one fails
+      matrix:
+        deployment: ${{ fromJson(needs.discover-deployments.outputs.deployment-matrix) }}
+    
+    steps:
+      - name: Check Out Repository Code
+        uses: actions/checkout@v4
+      
+      - name: Install websocat for tests
+        run: |
+          wget https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl
+          chmod +x websocat.x86_64-unknown-linux-musl
+          sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat
+      
+      - name: Set up environment
+        run: |
+          # Create logs directory
+          mkdir -p logs
+          
+          # Configure logging based on inputs
+          if ${{ github.event_name == 'workflow_dispatch' }}; then
+            if ${{ inputs.gateway_debug == true }}; then
+              echo "GATEWAY_LOGLEVEL=debug" >> .env
+            fi
+            if ${{ inputs.dashboard_debug == true }}; then
+              echo "DASHBOARD_LOGLEVEL=debug" >> .env
+            fi
+          else
+            echo "GATEWAY_LOGLEVEL=debug" >> .env
+            echo "DASHBOARD_LOGLEVEL=debug" >> .env
+          fi
+          
+          # Add licenses to environment
+          echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
+          echo "MDCB_LICENCE=${{ secrets.MDCB_LICENSE }}" >> .env
+      
+      - name: Cache Go Plugins
+        uses: actions/cache@v4
+        with:
+          path: .bootstrap/plugin-cache/${{ needs.discover-deployments.outputs.gateway-tag }}
+          key: ${{ runner.os }}-plugin-cache-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
+      
+      - name: Check if deployment has tests
+        id: validate-tests
+        run: |
+          DEPLOYMENT_DIR="deployments/${{ matrix.deployment }}"
+          HAS_TESTS=false
+          
+          # Check for Postman collection
+          if [ -f "${DEPLOYMENT_DIR}/postman/collection.json" ]; then
+            HAS_TESTS=true
+          fi
+          
+          # Check for test scripts
+          if [ -d "${DEPLOYMENT_DIR}/tests" ] && [ "$(find ${DEPLOYMENT_DIR}/tests -name '*.sh' | wc -l)" -gt 0 ]; then
+            HAS_TESTS=true
+          fi
+          
+          # Set output for next steps
+          echo "has-tests=${HAS_TESTS}" >> $GITHUB_OUTPUT
+          
+          if [ "$HAS_TESTS" = "true" ]; then
+            echo "Deployment ${{ matrix.deployment }} has tests. Proceeding with testing."
+          else
+            echo "Deployment ${{ matrix.deployment }} has no tests. Will skip."
+          fi
+      
+      - name: Test deployment
+        if: steps.validate-tests.outputs.has-tests == 'true'
+        run: |
+          echo "::group::Testing ${{ matrix.deployment }}"
+          
+          # Prepare test environment
+          source "$(pwd)/scripts/test-common.sh"
+          prepare_test_logs
+          
+          # Create the deployment
+          echo "Creating deployment: ${{ matrix.deployment }}"
+          if ! ./up.sh "${{ matrix.deployment }}" --persist-log --hide-progress --skip-hostname-check; then
+            echo "::error::Deployment creation failed for ${{ matrix.deployment }}"
+            exit 1
+          fi
+          
+          DEPLOYMENT_DIR="deployments/${{ matrix.deployment }}"
+          FAILED=false
+          
+          # Run Postman tests if they exist
+          if [ -f "${DEPLOYMENT_DIR}/postman/collection.json" ]; then
+            echo "Running Postman tests for ${{ matrix.deployment }}"
+            if ! run_postman_test "${{ matrix.deployment }}" "$DEPLOYMENT_DIR"; then
+              echo "::error::Postman tests failed for ${{ matrix.deployment }}"
+              FAILED=true
+            else
+              echo "Postman tests passed for ${{ matrix.deployment }}"
+            fi
+            strip_control_chars "logs/postman.log"
+            cp "logs/postman.log" "logs/postman-${{ matrix.deployment }}.log"
+          fi
+          
+          # Run test scripts if they exist
+          if [ -d "${DEPLOYMENT_DIR}/tests" ] && [ "$(find ${DEPLOYMENT_DIR}/tests -name '*.sh' | wc -l)" -gt 0 ]; then
+            echo "Running custom test scripts for ${{ matrix.deployment }}"
+            if ! run_test_scripts "${{ matrix.deployment }}" "$DEPLOYMENT_DIR"; then
+              echo "::error::Custom tests failed for ${{ matrix.deployment }}"
+              FAILED=true
+            else
+              echo "Custom tests passed for ${{ matrix.deployment }}"
+            fi
+          fi
+          
+          # Capture container logs if tests failed
+          if [ "$FAILED" = "true" ]; then
+            timestamp=$(date -u "+%Y%m%d_%H%M%S")
+            container_log_file="logs/containers-${{ matrix.deployment }}-${timestamp}.log"
+            echo "Capturing container logs for failed deployment"
+            ./docker-compose-command.sh logs --timestamps --no-color > "$container_log_file"
+          fi
+          
+          # Tear down the deployment
+          echo "Removing deployment: ${{ matrix.deployment }}"
+          ./down.sh
+          
+          # Handle overall success/failure
+          if [ "$FAILED" = "true" ]; then
+            echo "::error::Tests for ${{ matrix.deployment }} failed"
+            exit 1
+          else
+            echo "All tests for ${{ matrix.deployment }} passed"
+          fi
+          
+          echo "::endgroup::"
+      
+      - name: Skip deployment (no tests)
+        if: steps.validate-tests.outputs.has-tests != 'true'
+        run: |
+          echo "Skipping deployment ${{ matrix.deployment }} as it has no tests"
+      
+      - name: Upload Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.deployment }}
+          path: logs/
+
+  # Collect test results and summarize
+  summarize-results:
+    needs: [test-deployments]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check Out Repository Code
+        uses: actions/checkout@v4
+      
+      - name: Download all logs
+        uses: actions/download-artifact@v4
+        with:
+          path: all-logs
+      
+      - name: Summarize test results
+        run: |
+          echo "## Test Results Summary" > summary.md
+          echo "" >> summary.md
+          echo "| Deployment | Status |" >> summary.md
+          echo "|------------|--------|" >> summary.md
+          
+          # Analyze artifact directories to determine test outcomes
+          for deployment_logs in all-logs/logs-*; do
+            deployment=$(echo "$deployment_logs" | sed 's|all-logs/logs-||')
+            
+            # Check if this is a valid deployment directory
+            if [ -d "$deployment_logs" ]; then
+              # Look for error indicators in logs
+              if grep -q "::error::" "$deployment_logs"/*.log 2>/dev/null; then
+                status="❌ Failed"
+              else
+                # Check if it was skipped
+                if [ -z "$(find "$deployment_logs" -name "postman-*.log" 2>/dev/null)" ]; then
+                  status="⏭️ Skipped (no tests)"
+                else
+                  status="✅ Passed"
+                fi
+              fi
+              
+              echo "| $deployment | $status |" >> summary.md
+            fi
+          done
+          
+          cat summary.md
+      
+      - name: Upload Summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-summary
+          path: summary.md
