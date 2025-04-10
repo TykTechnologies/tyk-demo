@@ -306,9 +306,6 @@ jobs:
     needs: collect-results
     runs-on: ubuntu-latest
     if: always()
-    env:
-      TERM: xterm-256color
-      FORCE_COLOR: 1
     steps:
       - name: Download combined results
         uses: actions/download-artifact@v4
@@ -316,6 +313,9 @@ jobs:
           name: combined-results
           
       - name: Summarise test results
+        env:
+          TERM: xterm-256color
+          FORCE_COLOR: 1
         run: |
           cat results.json | jq -c '.[]' | while IFS= read -r result; do
             # Extract values from the JSON object
