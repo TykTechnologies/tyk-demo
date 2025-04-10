@@ -139,45 +139,36 @@ jobs:
           echo "✅ Deployment ${{ matrix.deployment }} created successfully"
           echo "::endgroup::"
 
-      - name: Check if deployment has tests
+      - name: Validate Postman Tests
         id: validate-tests
         run: |
-          HAS_TESTS=false
-          
-          # Check for Postman collection
-          if [ -f "${DEPLOYMENT_DIR}/postman/collection.json" ]; then
-            HAS_TESTS=true
-          fi
-          
-          # Check for test scripts
-          if [ -d "${DEPLOYMENT_DIR}/tests" ] && [ "$(find ${DEPLOYMENT_DIR}/tests -name '*.sh' | wc -l)" -gt 0 ]; then
-            HAS_TESTS=true
-          fi
-          
-          # Set output for next steps
-          echo "has-tests=${HAS_TESTS}" >> $GITHUB_OUTPUT
-          
-          if [ "$HAS_TESTS" = "true" ]; then
-            echo "Deployment ${{ matrix.deployment }} has tests. Proceeding with testing."
-          else
-            echo "Deployment ${{ matrix.deployment }} has no tests. Will skip."
-          fi
-      
-      - name: Test deployment
-        if: steps.validate-tests.outputs.has-tests == 'true'
-        run: |
-          echo "::group::Testing ${{ matrix.deployment }}"
-          
-          # Prepare test environment
           source "$(pwd)/scripts/test-common.sh"
-          prepare_test_logs
-          
-          # Create the deployment
-          echo "Creating deployment: ${{ matrix.deployment }}"
-          if ! ./up.sh "${{ matrix.deployment }}" --persist-log --hide-progress --skip-hostname-check; then
-            echo "::error::Deployment creation failed for ${{ matrix.deployment }}"
-            exit 1
+
+          echo "::group::Checking for Postman tests"
+          has_postman_tests=false
+          if (validate_postman_collection "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"); then
+            echo "✅ Found postman tests"
+            has_postman_tests=true
+          else
+            echo "No postman test found"
           fi
+          echo "has-postman-tests=${has_postman_tests}" >> $GITHUB_OUTPUT
+          echo "::endgroup::"
+
+          echo "::group::Checking for custom test"
+          has_custom_tests=false
+          if (validate_test_scripts "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"); then
+            echo "✅ Found custom tests"
+            has_custom_tests=true
+          else
+            echo "No custom tests found"
+          fi
+          echo "has-custom-tests=${has_custom_tests}" >> $GITHUB_OUTPUT      
+      - name: Test deployment
+        if: steps.validate-tests.outputs.has-postman-tests == 'true'
+        run: |
+          source "$(pwd)/scripts/test-common.sh"
+          echo "::group::Testing ${{ matrix.deployment }}"
           
           FAILED=false
           
