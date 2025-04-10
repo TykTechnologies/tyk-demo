@@ -212,14 +212,14 @@ jobs:
           fi
 
       - name: Capture Container Logs
-        if: always()
+        if: steps.read-manifest.outputs.skip-deployment != 'true'
         run: |
           source "$(pwd)/scripts/test-common.sh"
 
           capture_container_logs ${{ matrix.deployment }}
 
       - name: Upload Logs
-        if: always()
+        if: steps.read-manifest.outputs.skip-deployment != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: logs-${{ matrix.deployment }}
@@ -259,6 +259,9 @@ jobs:
             "custom_found": "'$CUSTOM_FOUND'",
             "custom_status": "'$CUSTOM_STATUS'"
           }' > result.json
+
+          # Print the result to the console
+          cat result.json
 
       - name: Store result
         if: always()
