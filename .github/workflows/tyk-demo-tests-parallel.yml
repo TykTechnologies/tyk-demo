@@ -269,83 +269,12 @@ jobs:
     steps:
       - name: Summarise test results
         run: |
-          echo "## Test Results Summary"
-          echo ""
-          echo "╔════════════════╦═══════════════════╦════════════════╦═══════════════╦══════════════════╗"
-          echo "║ DEPLOYMENT     ║ DEPLOYMENT STATUS ║ POSTMAN TESTS  ║ CUSTOM TESTS  ║ OVERALL STATUS   ║"
-          echo "╠════════════════╬═══════════════════╬════════════════╬═══════════════╬══════════════════╣"
-
           DEPLOYMENTS_JSON='${{ needs.discover-deployments.outputs.deployment-matrix }}'
           RESULTS_JSON='${{ toJSON(needs.test-deployments.outputs.deployment-results) }}'
+
+          echo "DEPLOYMENTS_JSON: $DEPLOYMENTS_JSON"
+          echo "RESULTS_JSON: $RESULTS_JSON"
 
           # Parse the JSON strings
           DEPLOYMENTS=$(echo "$DEPLOYMENTS_JSON" | jq -r '.[]')
           RESULTS=$(echo "$RESULTS_JSON" | jq -r '.[]')
-
-          for deployment in $DEPLOYMENTS; do
-            result=$(echo "$RESULTS" | jq -r ".[] | select(.deployment == \"$deployment\")")
-
-            deployment_status=$(echo "$result" | jq -r '.deployment_status // "failure"')
-            postman_found=$(echo "$result" | jq -r '.postman_found // "false"')
-            postman_status=$(echo "$result" | jq -r '.postman_status // "skipped"')
-            custom_found=$(echo "$result" | jq -r '.custom_found // "false"')
-            custom_status=$(echo "$result" | jq -r '.custom_status // "skipped"')
-
-            deployment_display=""
-            if [[ "$deployment_status" == "skipped" ]]; then
-              deployment_display="- Skipped"
-            elif [[ "$deployment_status" == "success" ]]; then
-              deployment_display="Success"
-            else
-              deployment_display="Failed"
-            fi
-
-            postman_display=""
-            if [[ "$deployment_status" == "skipped" ]]; then
-              postman_display="- Skipped"
-            elif [[ "$postman_found" == "true" ]]; then
-              if [[ "$postman_status" == "success" ]]; then
-                postman_display="Passed"
-              else
-                postman_display="Failed"
-              fi
-            else
-              postman_display="N/A"
-            fi
-
-            custom_display=""
-            if [[ "$deployment_status" == "skipped" ]]; then
-              custom_display="- Skipped"
-            elif [[ "$custom_found" == "true" ]]; then
-              if [[ "$custom_status" == "success" ]]; then
-                custom_display="Passed"
-              else
-                custom_display="Failed"
-              fi
-            else
-              custom_display="N/A"
-            fi
-
-            # Determine overall status
-            overall_status=""
-            if [[ "$deployment_status" == "skipped" ]]; then
-              overall_status="Skipped"
-            elif [[ "$deployment_status" == "failure" ]]; then
-              overall_status="Failed deploy"
-            elif [[ "$postman_found" == "true" && "$postman_status" != "success" ]] || [[ "$custom_found" == "true" && "$custom_status" != "success" ]]; then
-              overall_status="Failed tests"
-            else
-              overall_status="Passed"
-            fi
-
-            # Pad strings for consistent column width
-            DEPLOY_PAD=$(printf "%-14s" "$deployment")
-            DEPLOYMENT_PAD=$(printf "%-17s" "$deployment_display")
-            POSTMAN_PAD=$(printf "%-14s" "$postman_display")
-            CUSTOM_PAD=$(printf "%-13s" "$custom_display")
-            OVERALL_PAD=$(printf "%-16s" "$overall_status")
-
-            echo "║ $DEPLOY_PAD ║ $DEPLOYMENT_PAD ║ $POSTMAN_PAD ║ $CUSTOM_PAD ║ $OVERALL_PAD ║"
-          done
-
-          echo "╚════════════════╩═══════════════════╩════════════════╩═══════════════╩══════════════════╝"
