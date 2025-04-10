@@ -255,10 +255,17 @@ jobs:
     steps:
       - name: Summarize test results
         run: |
+          # Create a markdown version for artifact
           echo "## Test Results Summary" > summary.md
           echo "" >> summary.md
           echo "| Deployment | Creation Status | Postman Tests | Custom Tests | Overall Status |" >> summary.md
           echo "|------------|----------------|---------------|-------------|----------------|" >> summary.md
+          
+          # Create a monospaced version for GitHub Actions console
+          echo "::group::Test Results Summary"
+          echo "╔════════════════╦══════════════════╦════════════════╦═══════════════╦══════════════════╗"
+          echo "║ DEPLOYMENT     ║ CREATION STATUS  ║ POSTMAN TESTS  ║ CUSTOM TESTS  ║ OVERALL STATUS   ║"
+          echo "╠════════════════╬══════════════════╬════════════════╬═══════════════╬══════════════════╣"
           
           # Process deployment results
           DEPLOYMENTS='${{ needs.discover-deployments.outputs.deployment-matrix }}'
@@ -287,46 +294,71 @@ jobs:
             # Format creation status
             if [[ "$DEPLOYMENT_STATUS" == "success" ]]; then
               CREATION_DISPLAY="✅ Success"
+              CREATION_CONSOLE="✓ Success"
             else
               CREATION_DISPLAY="❌ Failed"
+              CREATION_CONSOLE="✗ Failed"
             fi
             
             # Format Postman status
             if [[ "$POSTMAN_FOUND" == "true" ]]; then
               if [[ "$POSTMAN_STATUS" == "success" ]]; then
                 POSTMAN_DISPLAY="✅ Passed"
+                POSTMAN_CONSOLE="✓ Passed"
               else
                 POSTMAN_DISPLAY="❌ Failed"
+                POSTMAN_CONSOLE="✗ Failed"
               fi
             else
               POSTMAN_DISPLAY="➖ Skipped"
+              POSTMAN_CONSOLE="- Skipped"
             fi
             
             # Format Custom tests status
             if [[ "$CUSTOM_FOUND" == "true" ]]; then
               if [[ "$CUSTOM_STATUS" == "success" ]]; then
                 CUSTOM_DISPLAY="✅ Passed"
+                CUSTOM_CONSOLE="✓ Passed"
               else
                 CUSTOM_DISPLAY="❌ Failed"
+                CUSTOM_CONSOLE="✗ Failed"
               fi
             else
               CUSTOM_DISPLAY="➖ Skipped"
+              CUSTOM_CONSOLE="- Skipped"
             fi
             
             # Determine overall status
             if [[ "$DEPLOYMENT_STATUS" != "success" ]]; then
-              OVERALL_STATUS="❌ Failed (deployment)"
+              OVERALL_DISPLAY="❌ Failed (deployment)"
+              OVERALL_CONSOLE="✗ Failed (deployment)"
             elif [[ "$POSTMAN_FOUND" == "true" && "$POSTMAN_STATUS" != "success" ]] || [[ "$CUSTOM_FOUND" == "true" && "$CUSTOM_STATUS" != "success" ]]; then
-              OVERALL_STATUS="❌ Failed (tests)"
+              OVERALL_DISPLAY="❌ Failed (tests)"
+              OVERALL_CONSOLE="✗ Failed (tests)"
             else
-              OVERALL_STATUS="✅ Passed"
+              OVERALL_DISPLAY="✅ Passed"
+              OVERALL_CONSOLE="✓ Passed"
             fi
             
-            echo "| $deployment | $CREATION_DISPLAY | $POSTMAN_DISPLAY | $CUSTOM_DISPLAY | $OVERALL_STATUS |" >> summary.md
+            # Add to markdown file
+            echo "| $deployment | $CREATION_DISPLAY | $POSTMAN_DISPLAY | $CUSTOM_DISPLAY | $OVERALL_DISPLAY |" >> summary.md
+            
+            # Add to console output (pad strings for consistent column width)
+            DEPLOY_PAD=$(printf "%-14s" "$deployment")
+            CREATE_PAD=$(printf "%-16s" "$CREATION_CONSOLE")
+            POSTMAN_PAD=$(printf "%-14s" "$POSTMAN_CONSOLE")
+            CUSTOM_PAD=$(printf "%-13s" "$CUSTOM_CONSOLE")
+            OVERALL_PAD=$(printf "%-16s" "$OVERALL_CONSOLE")
+            
+            echo "║ $DEPLOY_PAD ║ $CREATE_PAD ║ $POSTMAN_PAD ║ $CUSTOM_PAD ║ $OVERALL_PAD ║"
           done
           
-          echo "Generated summary:"
-          cat summary.md
+          # Close the console table
+          echo "╚════════════════╩══════════════════╩════════════════╩═══════════════╩══════════════════╝"
+          echo "::endgroup::"
+          
+          # Print the markdown for visibility
+          echo "Markdown summary generated and saved to artifact."
 
       - name: Upload Summary
         uses: actions/upload-artifact@v4
