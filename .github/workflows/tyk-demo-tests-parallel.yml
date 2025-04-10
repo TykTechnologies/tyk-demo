@@ -289,6 +289,7 @@ jobs:
         run: |
           for file in results/**/result.json; do
             # Extract the content from each result.json file
+            echo "Processing file $file"
             result=$(cat "$file")
             # Append to results.json as an array element
             jq ". += [$result]" results.json > temp.json && mv temp.json results.json
@@ -298,6 +299,7 @@ jobs:
         id: set-results
         run: |
           results_json=$(cat results.json | jq -c '.')
+          echo "Results JSON: $results_json"
           echo "results=$results_json" >> $GITHUB_OUTPUT
 
   display-results:
