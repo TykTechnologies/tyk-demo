@@ -306,9 +306,9 @@ jobs:
               postman_display="- Skipped"
             elif [[ "$postman_found" == "true" ]]; then
               if [[ "$postman_status" == "success" ]]; then
-                postman_display="✓ Passed"
+                postman_display="Passed"
               else
-                postman_display="✗ Failed"
+                postman_display="Failed"
               fi
             else
               postman_display="N/A"
@@ -319,9 +319,9 @@ jobs:
               custom_display="- Skipped"
             elif [[ "$custom_found" == "true" ]]; then
               if [[ "$custom_status" == "success" ]]; then
-                custom_display="✓ Passed"
+                custom_display="Passed"
               else
-                custom_display="✗ Failed"
+                custom_display="Failed"
               fi
             else
               custom_display="N/A"
@@ -330,13 +330,13 @@ jobs:
             # Determine overall status
             overall_status=""
             if [[ "$deployment_status" == "skipped" ]]; then
-              overall_status="- Skipped"
+              overall_status="Skipped"
             elif [[ "$deployment_status" == "failure" ]]; then
-              overall_status="✗ Failed (deploy)"
+              overall_status="Failed (deploy)"
             elif [[ "$postman_found" == "true" && "$postman_status" != "success" ]] || [[ "$custom_found" == "true" && "$custom_status" != "success" ]]; then
-              overall_status="✗ Failed (tests)"
+              overall_status="Failed (tests)"
             else
-              overall_status="✓ Passed"
+              overall_status="Passed"
             fi
 
             # Pad strings for consistent column width
