@@ -85,23 +85,25 @@ jobs:
           # Create logs directory
           mkdir -p logs
           
-          # Configure logging based on inputs
-          if ${{ github.event_name == 'workflow_dispatch' }}; then
-            if ${{ inputs.gateway_debug == true }}; then
-              echo "GATEWAY_LOGLEVEL=debug" >> .env
-            fi
-            if ${{ inputs.dashboard_debug == true }}; then
-              echo "DASHBOARD_LOGLEVEL=debug" >> .env
-            fi
-          else
-            echo "GATEWAY_LOGLEVEL=debug" >> .env
-            echo "DASHBOARD_LOGLEVEL=debug" >> .env
+          # Debug logging
+          echo "GATEWAY_LOGLEVEL=debug" >> .env
+          echo "DASHBOARD_LOGLEVEL=debug" >> .env
+          echo "✅ Gateway and Dashboard log levels set to debug 🐛"
+
+          # Licences
+          if [ -z "${{ secrets.DASH_LICENSE }}" ]; then
+            echo "❌ Error: DASH_LICENSE secret is not set or is empty." >&2
+            exit 1
           fi
-          
-          # Add licenses to environment
+          if [ -z "${{ secrets.MDCB_LICENSE }}" ]; then
+            echo "❌ Error: MDCB_LICENSE secret is not set or is empty." >&2
+            exit 1
+          fi
+          echo "✅ DASHBOARD_LICENCE added to .env"
           echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
+          echo "✅ MDCB_LICENCE added to .env"
           echo "MDCB_LICENCE=${{ secrets.MDCB_LICENSE }}" >> .env
-      
+          
       - name: Cache Go Plugins
         uses: actions/cache@v4
         with:
