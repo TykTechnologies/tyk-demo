@@ -314,6 +314,9 @@ jobs:
           
       - name: Summarise test results
         run: |
+          echo -e "${BOLD}Name                 | Deployment | Postman Tests | Custom Tests${RESET}"
+          echo "--------------------------------------------------------------------------------"
+
           cat results.json | jq -c '.[]' | while IFS= read -r result; do
             # Extract values from the JSON object
             deployment=$(echo "$result" | jq -r '.deployment')
@@ -355,12 +358,7 @@ jobs:
               custom_status="${BLUE}SKIP${RESET}"
             fi
 
-            # Print header
-            echo -e "${BOLD}Deployment       | Deploy     | Postman    | Postman    | Custom     | Custom${RESET}"
-            echo -e "${BOLD}Name             | Status     | Found      | Status     | Found      | Status${RESET}"
-            echo "--------------------------------------------------------------------------------"
             
             # Print data row using echo with proper spacing
-            echo -e "$(printf "%-16s" "$deployment") | $(printf "%-10s" "$deployment_status") | $(printf "%-10s" "$postman_found") | $(printf "%-10s" "$postman_status") | $(printf "%-10s" "$custom_found") | $(printf "%-10s" "$custom_status")"
-            echo "--------------------------------------------------------------------------------"
+            echo -e "$(printf "%-22s" "$deployment") | $(printf "%-13s" "$deployment_status") | $(printf "%-15s" "$postman_status") | $(printf "%-14s" "$custom_status")"
           done
