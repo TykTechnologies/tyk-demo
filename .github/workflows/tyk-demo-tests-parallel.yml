@@ -313,9 +313,6 @@ jobs:
           name: combined-results
           
       - name: Summarise test results
-        env:
-          TERM: xterm-256color
-          FORCE_COLOR: 1
         run: |
           cat results.json | jq -c '.[]' | while IFS= read -r result; do
             # Extract values from the JSON object
@@ -327,10 +324,11 @@ jobs:
             custom_status=$(echo "$result" | jq -r '.custom_status')
 
             # Define colors
-            GREEN="\033[32m"
-            RED="\033[31m"
-            BLUE="\033[34m"
-            RESET="\033[0m"
+            GREEN=$'\e[32m'
+            RED=$'\e[31m'
+            BLUE=$'\e[34m'
+            BOLD=$'\e[1m'
+            RESET=$'\e[0m'
 
             # Format statuses with colors
             if [ "$deployment_status" == "success" ]; then
@@ -357,10 +355,12 @@ jobs:
               custom_status="${BLUE}SKIP${RESET}"
             fi
 
-            # Print results in a monospaced table format
-            printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s\n" "Deployment" "Deploy" "Postman" "Postman" "Custom" "Custom"
-            printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s\n" "Name" "Status" "Found" "Status" "Found" "Status"
-            printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s\n" "--------------------" "----------" "----------" "----------" "----------" "----------"
-            printf "%-20s | %-10s | %-10s | %-10s | %-10s | %-10s\n" "$deployment" "$deployment_status" "$postman_found" "$postman_status" "$custom_found" "$custom_status"
+            # Print header
+            echo -e "${BOLD}Deployment       | Deploy     | Postman    | Postman    | Custom     | Custom${RESET}"
+            echo -e "${BOLD}Name             | Status     | Found      | Status     | Found      | Status${RESET}"
+            echo "--------------------------------------------------------------------------------"
+            
+            # Print data row using echo with proper spacing
+            echo -e "$(printf "%-16s" "$deployment") | $(printf "%-10s" "$deployment_status") | $(printf "%-10s" "$postman_found") | $(printf "%-10s" "$postman_status") | $(printf "%-10s" "$custom_found") | $(printf "%-10s" "$custom_status")"
             echo "--------------------------------------------------------------------------------"
           done
