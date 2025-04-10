@@ -70,7 +70,7 @@ jobs:
       matrix:
         deployment: ${{ fromJson(needs.discover-deployments.outputs.deployment-matrix) }}
     env:
-      DEPLOYMENT_DIR: "deployments/${{ matrix.deployment }}"
+      DEPLOYMENT_DIR: "$(pwd)/deployments/${{ matrix.deployment }}"
     
     steps:
       - name: Check Out Repository Code
