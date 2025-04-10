@@ -16,6 +16,7 @@ log_message "Waiting for Dashboard API to be ready"
 wait_for_response "$dashboard_base_url/admin/organisations" "200" "admin-auth: $dashboard_admin_api_credentials"
 
 log_message "Waiting for Keycloak to respond ok"
+curl -v --max-time 10 "$keycloak_base_url/health/ready" || log_message "Curl failed to connect to Keycloak"
 wait_for_response "$keycloak_base_url/health/ready" "200"
 
 
