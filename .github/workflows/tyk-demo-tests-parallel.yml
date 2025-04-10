@@ -1,3 +1,4 @@
+---
 name: Tyk Demo API Tests (Parallel)
 on:
   workflow_dispatch:
@@ -24,7 +25,7 @@ jobs:
     steps:
       - name: Check Out Repository Code
         uses: actions/checkout@v4
-      
+
       - name: Find All Deployments
         id: set-matrix
         run: |
@@ -34,7 +35,7 @@ jobs:
             echo "::error::No deployments found. Exiting workflow." >&2
             exit 1
           fi
-      
+
           echo "deployment-matrix=${DEPLOYMENTS}" >> $GITHUB_OUTPUT
           echo "✅ Found deployments: ${DEPLOYMENTS}"
       - name: Extract Docker Image Tag
@@ -69,11 +70,11 @@ jobs:
       fail-fast: false  # Continue with other tests even if one fails
       matrix:
         deployment: ${{ fromJson(needs.discover-deployments.outputs.deployment-matrix) }}
-    
+
     steps:
       - name: Check Out Repository Code
         uses: actions/checkout@v4
-      
+
       - name: Set global env vars
         run: |
           echo "DEPLOYMENT_DIR=$(pwd)/deployments/${{ matrix.deployment }}" >> $GITHUB_ENV
@@ -84,14 +85,14 @@ jobs:
           wget https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl
           chmod +x websocat.x86_64-unknown-linux-musl
           sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat
-      
+
       - name: Set up environment
         run: |
           echo "::group::Preparing test logs"
           source "$(pwd)/scripts/test-common.sh"
           prepare_test_logs
           echo "::endgroup::"
-          
+
           echo "::group::Defaulting to debug logs for Gateway and Dashboard"
           echo "GATEWAY_LOGLEVEL=debug" >> .env
           echo "DASHBOARD_LOGLEVEL=debug" >> .env
@@ -118,7 +119,7 @@ jobs:
         with:
           path: .bootstrap/plugin-cache/${{ needs.discover-deployments.outputs.gateway-tag }}
           key: ${{ runner.os }}-plugin-cache-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
-      
+
       - name: Create deployment
         id: create-deployment
         run: |
@@ -133,7 +134,7 @@ jobs:
             echo "No deployment manifest found"
           fi
           echo "::endgroup::"
-          
+
           echo "::group::Bringing deployment up"
           if ! ./up.sh "${compose_argument:-${{ matrix.deployment }}}" --hide-progress --skip-hostname-check; then
             echo "::error::Deployment creation failed for ${{ matrix.deployment }}"
@@ -173,7 +174,7 @@ jobs:
         continue-on-error: true
         run: |
           source "$(pwd)/scripts/test-common.sh"
-         
+
           if run_postman_test "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
             echo "✅ Postman tests passed"
           else
@@ -188,7 +189,7 @@ jobs:
         continue-on-error: true
         run: |
           source "$(pwd)/scripts/test-common.sh"
-         
+
           # Run custom tests
           if run_test_scripts "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
             echo "✅ Custom tests passed"
@@ -218,23 +219,23 @@ jobs:
     steps:
       - name: Check Out Repository Code
         uses: actions/checkout@v4
-      
+
       - name: Download all logs
         uses: actions/download-artifact@v4
         with:
           path: all-logs
-      
+
       - name: Summarize test results
         run: |
           echo "## Test Results Summary" > summary.md
           echo "" >> summary.md
           echo "| Deployment | Status |" >> summary.md
           echo "|------------|--------|" >> summary.md
-          
+
           # Analyze artifact directories to determine test outcomes
           for deployment_logs in all-logs/logs-*; do
             deployment=$(echo "$deployment_logs" | sed 's|all-logs/logs-||')
-            
+
             # Check if this is a valid deployment directory
             if [ -d "$deployment_logs" ]; then
               # Look for error indicators in logs
@@ -248,13 +249,13 @@ jobs:
                   status="✅ Passed"
                 fi
               fi
-              
+
               echo "| $deployment | $status |" >> summary.md
             fi
           done
-          
+
           cat summary.md
-      
+
       - name: Upload Summary
         uses: actions/upload-artifact@v4
         with:
