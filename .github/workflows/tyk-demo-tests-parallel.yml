@@ -116,6 +116,23 @@ jobs:
           echo "MDCB_LICENCE=${{ secrets.MDCB_LICENSE }}" >> .env
           echo "::endgroup::"
 
+      - name: Read Deployment Manifest
+        id: read-manifest
+        run: |
+          skip_deployment="false"
+          compose_argument=""
+
+          if [ -f "${DEPLOYMENT_DIR}/deployment.json" ]; then
+            echo "Deployment manifest found in ${DEPLOYMENT_DIR}"
+            skip_deployment=$(jq -r '.github.skipDeployment // "false"' "${DEPLOYMENT_DIR}/deployment.json")
+            compose_argument=$(jq -r '.composeArgument // empty' "${DEPLOYMENT_DIR}/deployment.json")
+          else
+            echo "Deployment manifest not found in ${DEPLOYMENT_DIR}"
+          fi
+
+          echo "skip_deployment=$skip_deployment" >> $GITHUB_OUTPUT
+          echo "compose_argument=$compose_argument" >> $GITHUB_OUTPUT
+
       - name: Cache Go Plugins
         uses: actions/cache@v4
         with:
@@ -124,39 +141,19 @@ jobs:
 
       - name: Create deployment
         id: create-deployment
+        if: steps.read-manifest.outputs.skip_deployment != 'true'
         run: |
-          echo "Creating deployment: ${{ matrix.deployment }}"
-          compose_argument=""
-          skip_deployment=""
+          COMPOSE_ARG="${{ steps.read-manifest.outputs.compose_argument }}"
 
-          echo "::group::Reading deployment manifest"
-          if [ -f "${DEPLOYMENT_DIR}/deployment.json" ]; then
-            compose_argument=$(jq -r '.composeArgument // empty' "${DEPLOYMENT_DIR}/deployment.json")
-            echo ".composeArgument: $compose_argument"
-            skip_deployment=$(jq -r '.github.skipDeployment // "false"' "${DEPLOYMENT_DIR}/deployment.json")
-            echo ".github.skipDeployment: $skip_testing"
-          else
-            echo "No deployment manifest found"
-          fi
-          echo "::endgroup::"
-
-          if [ "$skip_deployment" == "true" ]; then
-            echo "Skipping deployment for ${{ matrix.deployment }}"
-            echo "skip-deployment=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          echo "::group::Bringing deployment up"
-          if ./up.sh "${compose_argument:-${{ matrix.deployment }}}" --hide-progress --skip-hostname-check; then
+          if ./up.sh "${COMPOSE_ARG:-${{ matrix.deployment }}}" --hide-progress --skip-hostname-check; then
             echo "✅ Deployment created successfully"
           else
             echo "::error::Deployment creation failed for ${{ matrix.deployment }}"
             exit 1
           fi
-          echo "::endgroup::"
 
       - name: Validate Tests
-        if: create-deployment.outputs.skip-deployment != 'true'
+        if: steps.read-manifest.outputs.skip_deployment != 'true'
         id: validate-tests
         run: |
           source "$(pwd)/scripts/test-common.sh"
@@ -230,7 +227,7 @@ jobs:
         run: |
           # Determine deployment status - success, skipped, or failure
           DEPLOYMENT_STATUS="failure"
-          if [ "${{ steps.create-deployment.outputs.skip-deployment }}" == "true" ]; then
+          if [ "${{ steps.read-manifest.outputs.skip_deployment }}" == "true" ]; then
             DEPLOYMENT_STATUS="skipped"
           elif [ "${{ steps.create-deployment.outcome }}" == "success" ]; then
             DEPLOYMENT_STATUS="success"
