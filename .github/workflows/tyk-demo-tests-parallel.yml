@@ -270,7 +270,7 @@ jobs:
           name: result-${{ matrix.deployment }}
           path: result.json        
 
-  process-results:
+  collect-results:
     needs: test-deployments
     runs-on: ubuntu-latest
     if: always()
@@ -301,13 +301,18 @@ jobs:
           echo "results=$results_json" >> $GITHUB_OUTPUT
 
   display-results:
-    needs: process-results
+    needs: collect-results
     runs-on: ubuntu-latest
     if: always()
     steps:
+      - name: Get the results JSON from the previous job
+        id: get-results
+        run: |
+          echo "${{ needs.collect-results.outputs.results }}" > results.json
+
       - name: Summarise test results
         run: |
-          cat summary.json | jq -c '.[]' | while IFS= read -r result; do
+          cat results.json | jq -c '.[]' | while IFS= read -r result; do
             # Extract values from the JSON object
             deployment=$(echo "$result" | jq -r '.deployment')
             deployment_status=$(echo "$result" | jq -r '.deployment_status')
