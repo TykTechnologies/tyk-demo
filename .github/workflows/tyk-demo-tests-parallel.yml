@@ -173,11 +173,11 @@ jobs:
           test_success=false
           
           # Run Postman tests if they exist
-          if ! run_postman_test "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
-            echo "❌ Postman tests failed for ${{ matrix.deployment }}"
-          else
+          if run_postman_test "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
             echo "✅ Postman tests passed for ${{ matrix.deployment }}"
             test_success=true
+          else
+            echo "❌ Postman tests failed for ${{ matrix.deployment }}"
           fi
 
           echo "postman-test-result=${test_success}" >> $GITHUB_OUTPUT
