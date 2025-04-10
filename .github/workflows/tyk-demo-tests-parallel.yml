@@ -197,36 +197,11 @@ jobs:
           fi
 
       - name: Capture Container Logs
+        if: failure()  # This ensures the step runs only if any previous step fails
         run: |
-      
+          source "$(pwd)/scripts/test-common.sh"
 
-          
-          # # Capture container logs if tests failed
-          # if [ "$FAILED" = "true" ]; then
-          #   timestamp=$(date -u "+%Y%m%d_%H%M%S")
-          #   container_log_file="logs/containers-${{ matrix.deployment }}-${timestamp}.log"
-          #   echo "Capturing container logs for failed deployment"
-          #   ./docker-compose-command.sh logs --timestamps --no-color > "$container_log_file"
-          # fi
-          
-          # # Tear down the deployment
-          # echo "Removing deployment: ${{ matrix.deployment }}"
-          # ./down.sh
-          
-          # # Handle overall success/failure
-          # if [ "$FAILED" = "true" ]; then
-          #   echo "::error::Tests for ${{ matrix.deployment }} failed"
-          #   exit 1
-          # else
-          #   echo "All tests for ${{ matrix.deployment }} passed"
-          # fi
-          
-          # echo "::endgroup::"
-      
-      - name: Skip deployment (no tests)
-        if: steps.validate-tests.outputs.has-tests != 'true'
-        run: |
-          echo "Skipping deployment ${{ matrix.deployment }} as it has no tests"
+          capture_container_logs ${{ matrix.deployment }}
       
       - name: Upload Logs
         if: always()
