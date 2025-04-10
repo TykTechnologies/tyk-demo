@@ -278,6 +278,7 @@ jobs:
       - name: Download all results
         uses: actions/download-artifact@v4
         with:
+          name: result-*
           path: results/
 
       - name: Initialize results array
@@ -295,23 +296,22 @@ jobs:
             jq ". += [$result]" results.json > temp.json && mv temp.json results.json
           done
 
-      - name: Set results output
-        id: set-results
-        run: |
-          results_json=$(cat results.json | jq -c '.')
-          echo "Results JSON: $results_json"
-          echo "results=$results_json" >> $GITHUB_OUTPUT
+      - name: Upload combined results
+        uses: actions/upload-artifact@v4
+        with:
+          name: combined-results
+          path: results.json
 
   display-results:
     needs: collect-results
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Get the results JSON from the previous job
-        id: get-results
-        run: |
-          echo "${{ needs.collect-results.outputs.results }}" > results.json
-
+      - name: Download combined results
+        uses: actions/download-artifact@v4
+        with:
+          name: combined-results
+          
       - name: Summarise test results
         run: |
           cat results.json | jq -c '.[]' | while IFS= read -r result; do
