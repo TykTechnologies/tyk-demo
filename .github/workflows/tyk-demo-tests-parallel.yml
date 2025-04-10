@@ -127,15 +127,24 @@ jobs:
         run: |
           echo "Creating deployment: ${{ matrix.deployment }}"
           compose_argument=""
+          skip_deployment=""
 
           echo "::group::Reading deployment manifest"
           if [ -f "${DEPLOYMENT_DIR}/deployment.json" ]; then
             compose_argument=$(jq -r '.composeArgument // empty' "${DEPLOYMENT_DIR}/deployment.json")
-            echo "Compose argument set to: $compose_argument"
+            echo ".composeArgument: $compose_argument"
+            skip_deployment=$(jq -r '.github.skipDeployment // "false"' "${DEPLOYMENT_DIR}/deployment.json")
+            echo ".github.skipDeployment: $skip_testing"
           else
             echo "No deployment manifest found"
           fi
           echo "::endgroup::"
+
+          if [ "$skip_deployment" == "true" ]; then
+            echo "Skipping deployment for ${{ matrix.deployment }}"
+            echo "skip-deployment=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
 
           echo "::group::Bringing deployment up"
           if ./up.sh "${compose_argument:-${{ matrix.deployment }}}" --hide-progress --skip-hostname-check; then
@@ -147,6 +156,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Validate Tests
+        if: create-deployment.outputs.skip-deployment != 'true'
         id: validate-tests
         run: |
           source "$(pwd)/scripts/test-common.sh"
@@ -218,8 +228,13 @@ jobs:
         id: set-results
         if: always()
         run: |
-          # Capture deployment status
-          DEPLOYMENT_STATUS=${{ steps.create-deployment.outcome }}
+          # Determine deployment status - success, skipped, or failure
+          DEPLOYMENT_STATUS="failure"
+          if [ "${{ steps.create-deployment.outputs.skip-deployment }}" == "true" ]; then
+            DEPLOYMENT_STATUS="skipped"
+          elif [ "${{ steps.create-deployment.outcome }}" == "success" ]; then
+            DEPLOYMENT_STATUS="success"
+          fi
           
           # Capture Postman test info
           POSTMAN_FOUND=${{ steps.validate-tests.outputs.postman-tests-found || 'false' }}
@@ -258,14 +273,14 @@ jobs:
           # Create a markdown version for artifact
           echo "## Test Results Summary" > summary.md
           echo "" >> summary.md
-          echo "| Deployment | Creation Status | Postman Tests | Custom Tests | Overall Status |" >> summary.md
-          echo "|------------|----------------|---------------|-------------|----------------|" >> summary.md
+          echo "| Deployment | Deployment Status | Postman Tests | Custom Tests | Overall Status |" >> summary.md
+          echo "|------------|-------------------|---------------|--------------|----------------|" >> summary.md
           
           # Create a monospaced version for GitHub Actions console
           echo "::group::Test Results Summary"
-          echo "╔════════════════╦══════════════════╦════════════════╦═══════════════╦══════════════════╗"
-          echo "║ DEPLOYMENT     ║ CREATION STATUS  ║ POSTMAN TESTS  ║ CUSTOM TESTS  ║ OVERALL STATUS   ║"
-          echo "╠════════════════╬══════════════════╬════════════════╬═══════════════╬══════════════════╣"
+          echo "╔════════════════╦═══════════════════╦════════════════╦═══════════════╦══════════════════╗"
+          echo "║ DEPLOYMENT     ║ DEPLOYMENT STATUS ║ POSTMAN TESTS  ║ CUSTOM TESTS  ║ OVERALL STATUS   ║"
+          echo "╠════════════════╬═══════════════════╬════════════════╬═══════════════╬══════════════════╣"
           
           # Process deployment results
           DEPLOYMENTS='${{ needs.discover-deployments.outputs.deployment-matrix }}'
@@ -291,45 +306,47 @@ jobs:
             CUSTOM_FOUND=$(echo "$DEPLOYMENT_RESULT" | jq -r '.custom_found // "false"')
             CUSTOM_STATUS=$(echo "$DEPLOYMENT_RESULT" | jq -r '.custom_status // "failure"')
             
-            # Format creation status
-            if [[ "$DEPLOYMENT_STATUS" == "success" ]]; then
-              CREATION_DISPLAY="✅ Success"
-              CREATION_CONSOLE="✓ Success"
+            # Format deployment status (now handles skipped deployments)
+            if [[ "$DEPLOYMENT_STATUS" == "skipped" ]]; then
+              DEPLOYMENT_DISPLAY="➖ Skipped"
+              DEPLOYMENT_CONSOLE="- Skipped"
+            elif [[ "$DEPLOYMENT_STATUS" == "success" ]]; then
+              DEPLOYMENT_DISPLAY="✅ Success"
+              DEPLOYMENT_CONSOLE="✓ Success"
             else
-              CREATION_DISPLAY="❌ Failed"
-              CREATION_CONSOLE="✗ Failed"
+              DEPLOYMENT_DISPLAY="❌ Failed"
+              DEPLOYMENT_CONSOLE="✗ Failed"
             fi
             
             # Format Postman status
-            if [[ "$POSTMAN_FOUND" == "true" ]]; then
-              if [[ "$POSTMAN_STATUS" == "success" ]]; then
-                POSTMAN_DISPLAY="✅ Passed"
-                POSTMAN_CONSOLE="✓ Passed"
-              else
-                POSTMAN_DISPLAY="❌ Failed"
-                POSTMAN_CONSOLE="✗ Failed"
-              fi
-            else
+            if [[ "$DEPLOYMENT_STATUS" == "skipped" ]]; then
               POSTMAN_DISPLAY="➖ Skipped"
               POSTMAN_CONSOLE="- Skipped"
+            elif [[ "$POSTMAN_STATUS" == "success" ]]; then
+              POSTMAN_DISPLAY="✅ Passed"
+              POSTMAN_CONSOLE="✓ Passed"
+            else
+              POSTMAN_DISPLAY="❌ Failed"
+              POSTMAN_CONSOLE="✗ Failed"
             fi
             
             # Format Custom tests status
-            if [[ "$CUSTOM_FOUND" == "true" ]]; then
-              if [[ "$CUSTOM_STATUS" == "success" ]]; then
-                CUSTOM_DISPLAY="✅ Passed"
-                CUSTOM_CONSOLE="✓ Passed"
-              else
-                CUSTOM_DISPLAY="❌ Failed"
-                CUSTOM_CONSOLE="✗ Failed"
-              fi
-            else
+            if [[ "$DEPLOYMENT_STATUS" == "skipped" ]]; then
               CUSTOM_DISPLAY="➖ Skipped"
               CUSTOM_CONSOLE="- Skipped"
+            elif [[ "$CUSTOM_STATUS" == "success" ]]; then
+              CUSTOM_DISPLAY="✅ Passed"
+              CUSTOM_CONSOLE="✓ Passed"
+            else
+              CUSTOM_DISPLAY="❌ Failed"
+              CUSTOM_CONSOLE="✗ Failed"
             fi
             
             # Determine overall status
-            if [[ "$DEPLOYMENT_STATUS" != "success" ]]; then
+            if [[ "$DEPLOYMENT_STATUS" == "skipped" ]]; then
+              OVERALL_DISPLAY="➖ Skipped"
+              OVERALL_CONSOLE="- Skipped"
+            elif [[ "$DEPLOYMENT_STATUS" == "failure" ]]; then
               OVERALL_DISPLAY="❌ Failed (deployment)"
               OVERALL_CONSOLE="✗ Failed (deployment)"
             elif [[ "$POSTMAN_FOUND" == "true" && "$POSTMAN_STATUS" != "success" ]] || [[ "$CUSTOM_FOUND" == "true" && "$CUSTOM_STATUS" != "success" ]]; then
@@ -341,20 +358,20 @@ jobs:
             fi
             
             # Add to markdown file
-            echo "| $deployment | $CREATION_DISPLAY | $POSTMAN_DISPLAY | $CUSTOM_DISPLAY | $OVERALL_DISPLAY |" >> summary.md
+            echo "| $deployment | $DEPLOYMENT_DISPLAY | $POSTMAN_DISPLAY | $CUSTOM_DISPLAY | $OVERALL_DISPLAY |" >> summary.md
             
             # Add to console output (pad strings for consistent column width)
             DEPLOY_PAD=$(printf "%-14s" "$deployment")
-            CREATE_PAD=$(printf "%-16s" "$CREATION_CONSOLE")
+            DEPLOYMENT_PAD=$(printf "%-17s" "$DEPLOYMENT_CONSOLE")
             POSTMAN_PAD=$(printf "%-14s" "$POSTMAN_CONSOLE")
             CUSTOM_PAD=$(printf "%-13s" "$CUSTOM_CONSOLE")
             OVERALL_PAD=$(printf "%-16s" "$OVERALL_CONSOLE")
             
-            echo "║ $DEPLOY_PAD ║ $CREATE_PAD ║ $POSTMAN_PAD ║ $CUSTOM_PAD ║ $OVERALL_PAD ║"
+            echo "║ $DEPLOY_PAD ║ $DEPLOYMENT_PAD ║ $POSTMAN_PAD ║ $CUSTOM_PAD ║ $OVERALL_PAD ║"
           done
           
           # Close the console table
-          echo "╚════════════════╩══════════════════╩════════════════╩═══════════════╩══════════════════╝"
+          echo "╚════════════════╩═══════════════════╩════════════════╩═══════════════╩══════════════════╝"
           echo "::endgroup::"
           
           # Print the markdown for visibility
