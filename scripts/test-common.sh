@@ -10,7 +10,6 @@ validate_postman_collection() {
     local deployment_dir="$2"
     local collection_path="$deployment_dir/tyk_demo_${deployment//-/_}.postman_collection.json"
 
-echo "Validating Postman collection: $collection_path"
     # No collection file
     [[ ! -f "$collection_path" ]] && return 1
 

@@ -69,13 +69,15 @@ jobs:
       fail-fast: false  # Continue with other tests even if one fails
       matrix:
         deployment: ${{ fromJson(needs.discover-deployments.outputs.deployment-matrix) }}
-    env:
-      DEPLOYMENT_DIR: "$(pwd)/deployments/${{ matrix.deployment }}"
     
     steps:
       - name: Check Out Repository Code
         uses: actions/checkout@v4
       
+      - name: Set DEPLOYMENT_DIR
+        id: set-deployment-dir
+        run: echo "DEPLOYMENT_DIR=$(pwd)/deployments/${{ matrix.deployment }}" >> $GITHUB_ENV
+
       - name: Install websocat for tests
         run: |
           wget https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl
