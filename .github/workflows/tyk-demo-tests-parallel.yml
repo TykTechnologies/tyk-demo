@@ -74,9 +74,11 @@ jobs:
       - name: Check Out Repository Code
         uses: actions/checkout@v4
       
-      - name: Set DEPLOYMENT_DIR
-        id: set-deployment-dir
-        run: echo "DEPLOYMENT_DIR=$(pwd)/deployments/${{ matrix.deployment }}" >> $GITHUB_ENV
+      - name: Set global env vars
+        id: set-global-env-vars
+        run: |
+          echo "DEPLOYMENT_DIR=$(pwd)/deployments/${{ matrix.deployment }}" >> $GITHUB_ENV
+          echo "BASE_DIR=$(pwd)" >> $GITHUB_ENV
 
       - name: Install websocat for tests
         run: |
@@ -167,6 +169,7 @@ jobs:
           fi
           echo "has-custom-tests=${has_custom_tests}" >> $GITHUB_OUTPUT
           echo "::endgroup::"
+
       - name: Test deployment
         if: steps.validate-tests.outputs.has-postman-tests == 'true'
         run: |
