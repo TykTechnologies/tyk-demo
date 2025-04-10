@@ -278,7 +278,7 @@ jobs:
       - name: Download all results
         uses: actions/download-artifact@v4
         with:
-          name: result-*
+          pattern: 'result-*'
           path: results/
 
       - name: Initialize results array
