@@ -66,8 +66,10 @@ jobs:
   test-deployments:
     needs: discover-deployments
     runs-on: ubuntu-latest
+    outputs:
+      deployment-results: ${{ steps.set-results.outputs.results }}
     strategy:
-      fail-fast: false  # Continue with other tests even if one fails
+      fail-fast: false
       matrix:
         deployment: ${{ fromJson(needs.discover-deployments.outputs.deployment-matrix) }}
 
@@ -212,45 +214,114 @@ jobs:
           name: logs-${{ matrix.deployment }}
           path: logs/
 
+      - name: Set Results
+        id: set-results
+        if: always()
+        run: |
+          # Capture deployment status
+          DEPLOYMENT_STATUS=${{ steps.create-deployment.outcome }}
+          
+          # Capture Postman test info
+          POSTMAN_FOUND=${{ steps.validate-tests.outputs.postman-tests-found || 'false' }}
+          POSTMAN_STATUS="skipped"
+          if [ "$POSTMAN_FOUND" == "true" ]; then
+            POSTMAN_STATUS=${{ steps.run-postman-tests.outcome }}
+          fi
+          
+          # Capture custom test info
+          CUSTOM_FOUND=${{ steps.validate-tests.outputs.custom-tests-found || 'false' }}
+          CUSTOM_STATUS="skipped"
+          if [ "$CUSTOM_FOUND" == "true" ]; then
+            CUSTOM_STATUS=${{ steps.run-custom-tests.outcome }}
+          fi
+          
+          # Create JSON result for this deployment
+          RESULT=$(echo '{
+            "deployment": "${{ matrix.deployment }}",
+            "deployment_status": "'$DEPLOYMENT_STATUS'",
+            "postman_found": "'$POSTMAN_FOUND'",
+            "postman_status": "'$POSTMAN_STATUS'",
+            "custom_found": "'$CUSTOM_FOUND'",
+            "custom_status": "'$CUSTOM_STATUS'"
+          }' | jq -c .)
+          
+          echo "results=$RESULT" >> $GITHUB_OUTPUT
+
   # Collect test results and summarize
   summarize-results:
-    needs: [ test-deployments ]
+    needs: [discover-deployments, test-deployments]
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Check Out Repository Code
-        uses: actions/checkout@v4
-
       - name: Summarize test results
         run: |
           echo "## Test Results Summary" > summary.md
           echo "" >> summary.md
-          echo "| Deployment | Postman Test Status | Custom Test Status | Deployment Status |" >> summary.md
-          echo "|------------|--------------------|-------------------|-------------------|" >> summary.md
-
-          for deployment in ${{ fromJson(needs.test-deployments.outputs.deployment-matrix) }}; do
-            # Retrieve the outcomes for this deployment from outputs
-            deployment_status="❌ Deployment creation failed"
-            if [[ "${{ needs.test-deployments.outputs['create-deployment-' + deployment + '-outcome'] }}" == "success" ]]; then
-              deployment_status="✅ Deployment created successfully"
+          echo "| Deployment | Postman Tests | Custom Tests | Overall Status |" >> summary.md
+          echo "|------------|---------------|-------------|----------------|" >> summary.md
+          
+          # Process deployment results
+          DEPLOYMENTS='${{ needs.discover-deployments.outputs.deployment-matrix }}'
+          RESULTS_JSON=$(echo '${{ toJSON(needs.test-deployments.outputs) }}' | jq -r '.["deployment-results"]')
+          
+          # We need a temp file to store the updated results because the array might be large
+          echo "[]" > all_results.json
+          
+          # For each deployment, find its result and add to our result array
+          for deployment in $(echo "$DEPLOYMENTS" | jq -r '.[]'); do
+            # Find the corresponding result or use default values if not found
+            DEPLOYMENT_RESULT="{}"
+            
+            # Loop through results to find the matching deployment
+            while read -r result; do
+              if [[ $(echo "$result" | jq -r '.deployment') == "$deployment" ]]; then
+                DEPLOYMENT_RESULT="$result"
+                break
+              fi
+            done < <(echo "$RESULTS_JSON" | jq -c '.')
+            
+            # Get the statuses (with defaults)
+            DEPLOYMENT_STATUS=$(echo "$DEPLOYMENT_RESULT" | jq -r '.deployment_status // "failure"')
+            POSTMAN_FOUND=$(echo "$DEPLOYMENT_RESULT" | jq -r '.postman_found // "false"')
+            POSTMAN_STATUS=$(echo "$DEPLOYMENT_RESULT" | jq -r '.postman_status // "failure"')
+            CUSTOM_FOUND=$(echo "$DEPLOYMENT_RESULT" | jq -r '.custom_found // "false"')
+            CUSTOM_STATUS=$(echo "$DEPLOYMENT_RESULT" | jq -r '.custom_status // "failure"')
+            
+            # Format Postman status
+            if [[ "$POSTMAN_FOUND" == "true" ]]; then
+              if [[ "$POSTMAN_STATUS" == "success" ]]; then
+                POSTMAN_DISPLAY="✅ Passed"
+              else
+                POSTMAN_DISPLAY="❌ Failed"
+              fi
+            else
+              POSTMAN_DISPLAY="➖ Skipped"
             fi
-
-            # Check if Postman tests were found and passed
-            postman_status="❌ Postman tests failed"
-            if [[ "${{ needs.test-deployments.outputs['postman-tests-found-' + deployment] }}" == "true" ]]; then
-              postman_status="✅ Postman tests passed"
+            
+            # Format Custom tests status
+            if [[ "$CUSTOM_FOUND" == "true" ]]; then
+              if [[ "$CUSTOM_STATUS" == "success" ]]; then
+                CUSTOM_DISPLAY="✅ Passed"
+              else
+                CUSTOM_DISPLAY="❌ Failed"
+              fi
+            else
+              CUSTOM_DISPLAY="➖ Skipped"
             fi
-
-            # Check if custom tests were found and passed
-            custom_tests_status="❌ Custom tests failed"
-            if [[ "${{ needs.test-deployments.outputs['custom-tests-found-' + deployment] }}" == "true" ]]; then
-              custom_tests_status="✅ Custom tests passed"
+            
+            # Determine overall status
+            if [[ "$DEPLOYMENT_STATUS" != "success" ]]; then
+              OVERALL_STATUS="❌ Failed (deployment)"
+            elif [[ "$POSTMAN_FOUND" == "true" && "$POSTMAN_STATUS" != "success" ]] || [[ "$CUSTOM_FOUND" == "true" && "$CUSTOM_STATUS" != "success" ]]; then
+              OVERALL_STATUS="❌ Failed (tests)"
+            else
+              OVERALL_STATUS="✅ Passed"
             fi
-
-            # Write the results for the current deployment
-            echo "| $deployment | $postman_status | $custom_tests_status | $deployment_status |" >> summary.md
+            
+            echo "| $deployment | $POSTMAN_DISPLAY | $CUSTOM_DISPLAY | $OVERALL_STATUS |" >> summary.md
           done
-
+          
+          echo "Generated summary:"
           cat summary.md
 
       - name: Upload Summary
