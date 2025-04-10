@@ -125,7 +125,7 @@ jobs:
 
           echo "::group::Reading deployment manifest"
           DEPLOYMENT_DIR="deployments/${{ matrix.deployment }}"
-          if [ ! -f "${DEPLOYMENT_DIR}/deployment.json" ]; then
+          if [ -f "${DEPLOYMENT_DIR}/deployment.json" ]; then
             compose_argument=$(jq -r '.composeArgument // empty' "${DEPLOYMENT_DIR}/deployment.json")
             echo "Compose argument set to: $compose_argument"
           else
