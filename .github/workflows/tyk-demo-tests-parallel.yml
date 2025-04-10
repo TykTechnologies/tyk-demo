@@ -269,6 +269,9 @@ jobs:
     steps:
       - name: Summarise test results
         run: |
+          echo "## Test Results Summary"
+          echo ""
+          echo "```"
           echo "╔════════════════╦═══════════════════╦════════════════╦═══════════════╦══════════════════╗"
           echo "║ DEPLOYMENT     ║ DEPLOYMENT STATUS ║ POSTMAN TESTS  ║ CUSTOM TESTS  ║ OVERALL STATUS   ║"
           echo "╠════════════════╬═══════════════════╬════════════════╬═══════════════╬══════════════════╣"
@@ -347,9 +350,4 @@ jobs:
           done
 
           echo "╚════════════════╩═══════════════════╩════════════════╩═══════════════╩══════════════════╝"
-
-      - name: Upload Summary
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-summary
-          path: summary.md
+          echo "```"
