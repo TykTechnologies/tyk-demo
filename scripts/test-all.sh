@@ -41,19 +41,6 @@ preserve_log() {
     : > "$log_file_path" 
 }
 
-capture_container_logs() {
-    local deployment_name="$1"
-    
-    # Create a log file with timestamp
-    local timestamp=$(date -u "+%Y%m%d_%H%M%S")
-    local container_log_file="$BASE_DIR/logs/containers-${deployment_name}-${timestamp}.log"
-    
-    log "Using docker compose to retrieve logs with timestamps"
-    ./docker-compose-command.sh logs --timestamps --no-color >> "$container_log_file"
-    
-    log "Saved container logs to $container_log_file"
-}
-
 # Log deployment step with optional colour
 log_deployment_step() {
     local deployment_name="$1"
