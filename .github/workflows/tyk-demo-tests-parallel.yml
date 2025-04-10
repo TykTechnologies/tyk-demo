@@ -229,21 +229,21 @@ jobs:
           echo "|------------|--------------------|-------------------|-------------------|" >> summary.md
 
           for deployment in ${{ fromJson(needs.test-deployments.outputs.deployment-matrix) }}; do
-            # Extract the status of the deployment
+            # Retrieve the outcomes for this deployment from outputs
             deployment_status="❌ Deployment creation failed"
-            if [[ "${{ needs.test-deployments.outputs.create-deployment-${deployment}-outcome }}" == "success" ]]; then
+            if [[ "${{ needs.test-deployments.outputs['create-deployment-' + deployment + '-outcome'] }}" == "success" ]]; then
               deployment_status="✅ Deployment created successfully"
             fi
 
             # Check if Postman tests were found and passed
             postman_status="❌ Postman tests failed"
-            if [[ "${{ needs.test-deployments.outputs.postman-tests-found-${deployment} }}" == "true" ]]; then
+            if [[ "${{ needs.test-deployments.outputs['postman-tests-found-' + deployment] }}" == "true" ]]; then
               postman_status="✅ Postman tests passed"
             fi
 
             # Check if custom tests were found and passed
             custom_tests_status="❌ Custom tests failed"
-            if [[ "${{ needs.test-deployments.outputs.custom-tests-found-${deployment} }}" == "true" ]]; then
+            if [[ "${{ needs.test-deployments.outputs['custom-tests-found-' + deployment] }}" == "true" ]]; then
               custom_tests_status="✅ Custom tests passed"
             fi
 
