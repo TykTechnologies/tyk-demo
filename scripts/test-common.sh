@@ -41,10 +41,7 @@ capture_container_logs() {
     local timestamp=$(date -u "+%Y%m%d_%H%M%S")
     local container_log_file="$BASE_DIR/logs/containers-${deployment_name}-${timestamp}.log"
     
-    log "Using docker compose to retrieve logs with timestamps"
     ./docker-compose-command.sh logs --timestamps --no-color >> "$container_log_file"
-    
-    log "Saved container logs to $container_log_file"
 }
 
 # Run Postman tests
