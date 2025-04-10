@@ -203,7 +203,7 @@ jobs:
           source "$(pwd)/scripts/test-common.sh"
 
           capture_container_logs ${{ matrix.deployment }}
-      
+
       - name: Upload Logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -213,7 +213,7 @@ jobs:
 
   # Collect test results and summarize
   summarize-results:
-    needs: [test-deployments]
+    needs: [ test-deployments ]
     runs-on: ubuntu-latest
     if: always()
     steps:
