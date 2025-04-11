@@ -149,7 +149,7 @@ jobs:
         run: |
           COMPOSE_ARG="${{ steps.read-manifest.outputs.compose-argument }}"
 
-          if ./up.sh "${COMPOSE_ARG:-${{ matrix.deployment }}}" --hide-progress --skip-hostname-check; then
+          if ./up.sh ${COMPOSE_ARG:-${{ matrix.deployment }}} --hide-progress --skip-hostname-check; then
             echo "✅ Deployment created successfully"
           else
             echo "::error::Deployment creation failed for ${{ matrix.deployment }}"
