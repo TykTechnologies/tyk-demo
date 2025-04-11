@@ -22,6 +22,7 @@ jobs:
     outputs:
       deployment-matrix: ${{ steps.set-matrix.outputs.deployment-matrix }}
       gateway-tag: ${{ steps.get-gateway-tag.outputs.gateway-tag }}
+      # jenkins-tag: ${{ steps.get-jenkins-tag.outputs.jenkins-tag }}
     steps:
       - name: Check Out Repository Code
         uses: actions/checkout@v4
@@ -61,6 +62,29 @@ jobs:
 
           echo "✅ Extracted gateway tag: $GATEWAY_TAG"
           echo "gateway-tag=$GATEWAY_TAG" >> "$GITHUB_OUTPUT"
+      # - name: Extract Jenkins Image Tag
+      #   id: get-jenkins-tag
+      #   run: |
+      #     JENKINS_TAG=$(awk '/jenkins:/ { in_jenkins=1; next }
+      #                       in_jenkins && /image:/ {
+      #                         if (match($0, /:[vV]?[0-9]+\.[0-9]+\.[0-9]+([-._a-zA-Z0-9]*)?/)) {
+      #                           print substr($0, RSTART+1, RLENGTH-1)
+      #                         }
+      #                         in_jenkins=0
+      #                       }' deployments/cicd/docker-compose.yml | sort -u | head -n 1)
+
+      #     if [[ -z "$JENKINS_TAG" ]]; then
+      #       echo "::error::JENKINS_TAG is empty"
+      #       exit 1
+      #     fi
+
+      #     if [[ ! "$JENKINS_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-._a-zA-Z0-9]+)?$ ]]; then
+      #       echo "::error::JENKINS_TAG '$JENKINS_TAG' is not in a valid semver format"
+      #       exit 1
+      #     fi
+
+      #     echo "✅ Extracted Jenkins tag: $JENKINS_TAG"
+      #     echo "jenkins-tag=$JENKINS_TAG" >> "$GITHUB_OUTPUT"
 
   # Run each deployment test in parallel
   test-deployments:
@@ -144,6 +168,13 @@ jobs:
         with:
           path: .bootstrap/plugin-cache/${{ needs.discover-deployments.outputs.gateway-tag }}
           key: ${{ runner.os }}-plugin-cache-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
+
+      - name: Cache Jenkins Plugins
+        if: steps.read-manifest.outputs.skip-deployment != 'true' && ${{ matrix.deployment }} == 'cicd'
+        uses: actions/cache@v4
+        with:
+          path: deployments/cicd/volumes/jenkins/plugins
+          key: ${{ runner.os }}-jenkins-plugin-cache-${{ hashFiles('deployments/cicd/volumes/jenkins/plugins/**/*') }}
 
       - name: Create deployment
         if: steps.read-manifest.outputs.skip-deployment != 'true'
