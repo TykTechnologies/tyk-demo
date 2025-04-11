@@ -1,8 +1,40 @@
 #!/bin/bash
 
+# ANSI colour codes
+readonly GREEN='\033[0;32m'
+readonly RED='\033[0;31m'
+readonly BLUE='\033[0;34m'
+readonly NOCOLOUR='\033[0m'
+
 # Variables to track the number of tests and failures
 TEST_SCRIPT_COUNT=0
 TEST_SCRIPT_PASSES=0
+
+# Print status with colour
+print_status() {
+    local status="$1"
+    local width="${2:-8}"
+    case "$status" in
+        pass)
+            printf "${GREEN}%-${width}s${NOCOLOUR}" "$status"
+            ;;
+        fail)
+            printf "${RED}%-${width}s${NOCOLOUR}" "$status"
+            ;;
+        *)
+            printf "${BLUE}%-${width}s${NOCOLOUR}" "$status"
+            ;;
+    esac
+}
+
+# Map outcomes to statuses
+map_status() {
+    case "$1" in
+        success) echo "pass" ;;
+        failure) echo "fail" ;;
+        *) echo "skip" ;;
+    esac
+}
 
 # Validate Postman collection
 validate_postman_collection() {
@@ -32,6 +64,16 @@ validate_test_scripts() {
     [[ ${#test_scripts[@]} -eq 0 ]] && return 1
 
     return 0
+}
+
+capture_container_logs() {
+    local deployment_name="$1"
+    
+    # Create a log file with timestamp
+    local timestamp=$(date -u "+%Y%m%d_%H%M%S")
+    local container_log_file="$BASE_DIR/logs/containers-${deployment_name}-${timestamp}.log"
+    
+    ./docker-compose-command.sh logs --timestamps --no-color >> "$container_log_file"
 }
 
 # Run Postman tests

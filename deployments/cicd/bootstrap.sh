@@ -98,37 +98,43 @@ fi
 log_ok
 bootstrap_progress
 
-log_message "Checking for local Jenkins plugin cache"
-if ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1> /dev/null 2>&1; then
-  log_message "  Plugins found, will use local cache instead of downloading plugins"
+log_message "Checking for plugins in Jenkins container"
+if $(generate_docker_compose_command) exec -T jenkins sh -c "ls /var/jenkins_home/plugins/*.jpi" 1> /dev/null 2>&1; then
+  log_message "  Plugins found in container - skipping plugin download"
 else
-  log_message "  Plugins not found, downloading plugins to local cache... (please be patient, this can take a long time)"
-  attempt_count=0
-  until ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1>/dev/null 2>&1; do
-    attempt_count=$((attempt_count+1))
-    $(generate_docker_compose_command) exec -T jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins/plugins.txt --latest false --verbose 1>>logs/bootstrap.log 2>&1
-    if [ "$?" != "0" ]; then
-      if [ "$attempt_count" = "5" ]; then
-        log_message "  Maximum retry count reached. Aborting."
-        echo "ERROR: Unable to download Jenkins plugins"
-        exit 1
-      else 
-        log_message "  Failed to download Jenkins plugins, retrying"
-        sleep 3
-      fi      
-    fi
-  done
-  log_ok
-fi
-bootstrap_progress
+  log_message "  Plugins not found in container - checking for local Jenkins plugin cache"
+  if ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1> /dev/null 2>&1; then
+    log_message "  Plugins found locally - using existing cache instead of downloading plugins"
+  else
+    log_message "  Plugins not found locally - downloading plugins to local cache... (please be patient, this can take a long time)"
+    attempt_count=0
+    until ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1>/dev/null 2>&1; do
+      attempt_count=$((attempt_count+1))
+      $(generate_docker_compose_command) exec -T jenkins jenkins-plugin-cli -f /var/jenkins_home/plugins.txt --latest false --verbose 1>>logs/bootstrap.log 2>&1
+      if [ "$?" != "0" ]; then
+        if [ "$attempt_count" = "5" ]; then
+          log_message "  Maximum retry count reached. Aborting."
+          echo "ERROR: Unable to download Jenkins plugins"
+          exit 1
+        else 
+          log_message "  Failed to download Jenkins plugins, retrying"
+          sleep 3
+        fi      
+      fi
+    done
+    log_ok
+  fi
+  bootstrap_progress
 
-log_message "Copying local plugin cache to Jenkins"
-$(generate_docker_compose_command) exec -T jenkins sh -c "cp /usr/share/jenkins/ref/plugins/*.jpi /var/jenkins_home/plugins"
-if [ "$?" != "0" ]; then
-  echo "ERROR: Failed to copy local plugin cache to Jenkins"
-  exit 1
+  log_message "Copying local plugin cache to Jenkins"
+  $(generate_docker_compose_command) exec -T jenkins sh -c "cp /usr/share/jenkins/ref/plugins/*.jpi /var/jenkins_home/plugins"
+  if [ "$?" != "0" ]; then
+    echo "ERROR: Failed to copy local plugin cache to Jenkins"
+    exit 1
+  fi
+  log_ok
+  bootstrap_progress
 fi
-log_ok
 bootstrap_progress
 
 log_message "Updating configuration file"

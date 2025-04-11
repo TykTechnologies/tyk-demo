@@ -459,9 +459,19 @@ done
 
 # System
 
+log_message "Restarting Dashboard container to ensure Portal URLs are loaded ok"
+eval $(generate_docker_compose_command) restart tyk-dashboard 1> /dev/null 2>> logs/bootstrap.log
+if [ "$?" != 0 ]; then
+  echo "Error occurred when restarting Dashboard container"
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
 log_message "Reloading Gateways"
 hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
 bootstrap_progress
+wait_for_liveness
 
 log_message "Checking Gateway - Anonymous API access"
 result=""
@@ -602,15 +612,6 @@ bootstrap_progress
 curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: analytics_on" -o /dev/null 
 bootstrap_progress
 log_ok
-
-log_message "Restarting Dashboard container to ensure Portal URLs are loaded ok"
-eval $(generate_docker_compose_command) restart tyk-dashboard 1> /dev/null 2>> logs/bootstrap.log
-if [ "$?" != 0 ]; then
-  echo "Error occurred when restarting Dashboard container"
-  exit 1
-fi
-log_ok
-bootstrap_progress
 
 # Ngrok
 

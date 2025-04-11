@@ -9,6 +9,7 @@ services:
       - tyk
     volumes:
       - ./deployments/cicd/volumes/jenkins/plugins:/usr/share/jenkins/ref/plugins
+      - ./deployments/cicd/volumes/jenkins/plugins.txt:/var/jenkins_home/plugins.txt
       - ./deployments/cicd/volumes/jenkins/bootstrap-import:/tmp/bootstrap-import
     environment:
       - JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
