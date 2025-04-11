@@ -185,14 +185,16 @@ jobs:
         continue-on-error: true
         run: |
           source "$(pwd)/scripts/test-common.sh"
-
+          TEST_RESULT=0
+          
           if run_postman_test "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
             echo "✅ Postman tests passed"
           else
             echo "❌ Postman tests failed"
+            TEST_RESULT=1
           fi
-
           strip_control_chars "logs/postman.log"
+          exit $TEST_RESULT
 
       - name: Run Custom Tests
         id: run-custom-tests
@@ -206,6 +208,7 @@ jobs:
             echo "✅ Custom tests passed"
           else
             echo "❌ Custom tests failed"
+            exit 1
           fi
 
       - name: Capture Container Logs
