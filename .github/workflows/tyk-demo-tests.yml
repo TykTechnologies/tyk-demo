@@ -220,7 +220,7 @@ jobs:
           fi
 
       - name: Check Test Results
-        if: always() && steps.validate-tests.outputs.tests-found != 'true'
+        if: always() && steps.validate-tests.outputs.tests-found == 'true'
         run: |
           TEST_RESULT=0
           
