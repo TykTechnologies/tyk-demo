@@ -307,11 +307,15 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
+      # needed for common test script library
+      - name: Check Out Repository Code 
+        uses: actions/checkout@v4
+
       - name: Download combined results
         uses: actions/download-artifact@v4
         with:
           name: combined-results
-          
+
       - name: Summarise test results
         run: |
           source "$(pwd)/scripts/test-common.sh"
