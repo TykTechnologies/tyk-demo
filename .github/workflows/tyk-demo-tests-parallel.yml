@@ -87,7 +87,9 @@ jobs:
           source "$(pwd)/scripts/test-common.sh"
           prepare_test_logs
 
-      - name: Read Deployment Manifest
+          sudo chmod -R 777 $(pwd)/deployments/cicd/volumes/jenkins/plugins
+
+      - name: Read deployment manifest
         id: read-manifest
         run: |
           skip_deployment="false"
@@ -105,14 +107,14 @@ jobs:
           echo "skip-deployment=$skip_deployment" >> $GITHUB_OUTPUT
           echo "compose-argument=$compose_argument" >> $GITHUB_OUTPUT
 
-      - name: Install websocat for tests
+      - name: Install websocat (for testing)
         if: steps.read-manifest.outputs.skip-deployment != 'true'
         run: |
           wget https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl
           chmod +x websocat.x86_64-unknown-linux-musl
           sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat
 
-      - name: Set up environment
+      - name: Set environment variables
         if: steps.read-manifest.outputs.skip-deployment != 'true'
         run: |
           echo "::group::Default to debug logs for Gateway and Dashboard"
