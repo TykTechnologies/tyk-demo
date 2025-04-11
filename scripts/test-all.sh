@@ -3,12 +3,6 @@
 readonly BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$BASE_DIR/scripts/test-common.sh"
 
-# Colour constants
-readonly RED='\033[0;31m'
-readonly GREEN='\033[0;32m'
-readonly BLUE='\033[0;34m'
-readonly NOCOLOUR='\033[0m'
-
 # Status constants
 readonly STATUS_SKIPPED="Skipped"
 readonly STATUS_PASSED="Passed"
@@ -39,19 +33,6 @@ preserve_log() {
     log "Copied $log_file_name to $new_log_file_name"
     # Reset log file, ready for use
     : > "$log_file_path" 
-}
-
-capture_container_logs() {
-    local deployment_name="$1"
-    
-    # Create a log file with timestamp
-    local timestamp=$(date -u "+%Y%m%d_%H%M%S")
-    local container_log_file="$BASE_DIR/logs/containers-${deployment_name}-${timestamp}.log"
-    
-    log "Using docker compose to retrieve logs with timestamps"
-    ./docker-compose-command.sh logs --timestamps --no-color >> "$container_log_file"
-    
-    log "Saved container logs to $container_log_file"
 }
 
 # Log deployment step with optional colour

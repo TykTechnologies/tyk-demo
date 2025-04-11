@@ -14,7 +14,7 @@ log_ok
 bootstrap_progress
 
 log_message "Migrating data from MongoDB (tyk-mongo) to PostgreSQL (tyk-postgres)"
-eval $(generate_docker_compose_command) exec -T tyk-dashboard sh -c \"/opt/tyk-dashboard/tyk-analytics migrate-sql\" 1>>logs/bootstrap.log 2>&1
+eval $(generate_docker_compose_command) exec -T tyk-dashboard /opt/tyk-dashboard/tyk-analytics migrate-sql 1>>logs/bootstrap.log 2>&1
 if [ "$?" != 0 ]; then
   echo "Error occurred when migrating data."
   exit 1
