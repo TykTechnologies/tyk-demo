@@ -82,6 +82,11 @@ jobs:
           echo "DEPLOYMENT_DIR=$(pwd)/deployments/${{ matrix.deployment }}" >> $GITHUB_ENV
           echo "BASE_DIR=$(pwd)" >> $GITHUB_ENV
 
+      - name: Prepare logs directory
+        run: |
+          source "$(pwd)/scripts/test-common.sh"
+          prepare_test_logs
+
       - name: Read Deployment Manifest
         id: read-manifest
         run: |
@@ -110,18 +115,13 @@ jobs:
       - name: Set up environment
         if: steps.read-manifest.outputs.skip-deployment != 'true'
         run: |
-          echo "::group::Preparing test logs"
-          source "$(pwd)/scripts/test-common.sh"
-          prepare_test_logs
-          echo "::endgroup::"
-
-          echo "::group::Defaulting to debug logs for Gateway and Dashboard"
+          echo "::group::Default to debug logs for Gateway and Dashboard"
           echo "GATEWAY_LOGLEVEL=debug" >> .env
           echo "DASHBOARD_LOGLEVEL=debug" >> .env
           echo "✅ Gateway and Dashboard log levels set to debug 🐛"
           echo "::endgroup::"
 
-          echo "::group::Setting licences"
+          echo "::group::Set licences"
           if [ -z "${{ secrets.DASH_LICENSE }}" ]; then
             echo "::error::DASH_LICENSE secret is not set or is empty." >&2
             exit 1
@@ -219,7 +219,7 @@ jobs:
           capture_container_logs ${{ matrix.deployment }}
 
       - name: Upload Logs
-        if: steps.read-manifest.outputs.skip-deployment != 'true'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: logs-${{ matrix.deployment }}
