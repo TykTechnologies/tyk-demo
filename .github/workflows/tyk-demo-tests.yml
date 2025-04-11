@@ -73,7 +73,7 @@ jobs:
       - name: Prepare file system
         run: |
           source "$(pwd)/scripts/test-common.sh"
-          
+
           # Create log directory and files
           prepare_test_logs
 
