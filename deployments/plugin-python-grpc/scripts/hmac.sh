@@ -11,9 +11,11 @@ function urlencode() {
   python3 -c "import urllib.parse, sys; print(urllib.parse.quote_plus(sys.argv[1]))" "$1"
 }
 
+echo "OpenSSL version: $(openssl version)"
+
 date="$(LC_ALL=C date -u +"%a, %d %b %Y %H:%M:%S GMT")"
 
-signature=$(echo -n "date: ${date}" | openssl dgst -sha512 -mac HMAC -macopt key:"${HMAC_SECRET}" -binary | base64)
+signature=$(echo -n "date: ${date}" | openssl sha512 -binary -hmac "${HMAC_SECRET}" | base64 | tr -d '\n')
 url_encoded_signature=$(urlencode "${signature}")
 
 echo "request: ${REQUEST_URL}"
