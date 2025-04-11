@@ -46,6 +46,10 @@ log_message "Restart Tyk Gateway to pick up env var change"
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway 1>/dev/null 2>>logs/bootstrap.log
 log_ok
 
+log_message "Wait for services to be available after restart"
+wait_for_liveness
+log_ok
+
 log_end_deployment
 
 echo -e "\033[2K
