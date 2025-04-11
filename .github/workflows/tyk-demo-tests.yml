@@ -2,31 +2,30 @@
 name: Tyk Demo API Tests
 on:
   push:
+
 jobs:
-  Tyk-Demo-Api-Tests:
+  # First job to collect all the deployments to test
+  discover-deployments:
     runs-on: ubuntu-latest
+    outputs:
+      deployment-matrix: ${{ steps.set-matrix.outputs.deployment-matrix }}
+      gateway-tag: ${{ steps.get-gateway-tag.outputs.gateway-tag }}
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }}
-          event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by
-          GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository
-          is ${{ github.repository }}."
-      - name: Install websocat (binary method) for use in custom scripted tests
-        run: |
-          wget https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl
-          chmod +x websocat.x86_64-unknown-linux-musl
-          sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat
       - name: Check Out Repository Code
         uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the
-          runner."
-      - name: Set Gateway and Dashboard log levels to debug
-        id: log_levels
+
+      - name: Find All Deployments
+        id: set-matrix
         run: |
-            echo "GATEWAY_LOGLEVEL=debug" >> .env
-            echo "DASHBOARD_LOGLEVEL=debug" >> .env
-            echo "✅ Gateway and Dashboard log levels set to debug 🐛"
+          DEPLOYMENTS=$(find deployments -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | jq -R -s -c 'split("\n") | map(select(length > 0)) | sort')
+
+          if [ "${#DEPLOYMENTS[@]}" -eq 0 ]; then
+            echo "::error::No deployments found. Exiting workflow." >&2
+            exit 1
+          fi
+
+          echo "deployment-matrix=${DEPLOYMENTS}" >> $GITHUB_OUTPUT
+          echo "✅ Found deployments: ${DEPLOYMENTS}"
       - name: Extract Docker Image Tag
         id: get-gateway-tag
         run: |
@@ -39,51 +38,311 @@ jobs:
                             }' deployments/tyk/docker-compose.yml | sort -u | head -n 1)
 
           if [[ -z "$GATEWAY_TAG" ]]; then
-            echo "❌ Error: GATEWAY_TAG is empty"
+            echo "::error::GATEWAY_TAG is empty"
             exit 1
           fi
 
           if [[ ! "$GATEWAY_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-._a-zA-Z0-9]+)?$ ]]; then
-            echo "❌ Error: GATEWAY_TAG '$GATEWAY_TAG' is not in a valid semver format"
+            echo "::error::GATEWAY_TAG '$GATEWAY_TAG' is not in a valid semver format"
             exit 1
           fi
 
           echo "✅ Extracted gateway tag: $GATEWAY_TAG"
           echo "gateway-tag=$GATEWAY_TAG" >> "$GITHUB_OUTPUT"
-      - name: Cache Go Plugins
-        uses: actions/cache@v4
-        with:
-          path: .bootstrap/plugin-cache/${{ steps.get-gateway-tag.outputs.gateway-tag }}
-          key: ${{ runner.os }}-plugin-cache-${{ steps.get-gateway-tag.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
-      - name: Add licences to environment
+
+  # Run each deployment test in parallel
+  test-deployments:
+    needs: discover-deployments
+    runs-on: ubuntu-latest
+    outputs:
+      deployment-results: ${{ steps.set-results.outputs.results }}
+    strategy:
+      fail-fast: false
+      matrix:
+        deployment: ${{ fromJson(needs.discover-deployments.outputs.deployment-matrix) }}
+
+    steps:
+      - name: Check Out Repository Code
+        uses: actions/checkout@v4
+
+      - name: Set global env vars
         run: |
+          echo "DEPLOYMENT_DIR=$(pwd)/deployments/${{ matrix.deployment }}" >> $GITHUB_ENV
+          echo "BASE_DIR=$(pwd)" >> $GITHUB_ENV
+
+      - name: Prepare logs directory
+        run: |
+          source "$(pwd)/scripts/test-common.sh"
+          prepare_test_logs
+
+          sudo chmod -R 777 $(pwd)/deployments/cicd/volumes/jenkins/plugins
+
+      - name: Read deployment manifest
+        id: read-manifest
+        run: |
+          skip_deployment="false"
+          compose_argument=""
+
+          if [ -f "${DEPLOYMENT_DIR}/deployment.json" ]; then
+            echo "Deployment manifest found in ${DEPLOYMENT_DIR}"
+            jq '.' "${DEPLOYMENT_DIR}/deployment.json"
+            skip_deployment=$(jq -r '.github.skipDeployment // "false"' "${DEPLOYMENT_DIR}/deployment.json")
+            compose_argument=$(jq -r '.composeArgument // empty' "${DEPLOYMENT_DIR}/deployment.json")
+          else
+            echo "Deployment manifest not found in ${DEPLOYMENT_DIR}"
+          fi
+
+          echo "skip-deployment=$skip_deployment" >> $GITHUB_OUTPUT
+          echo "compose-argument=$compose_argument" >> $GITHUB_OUTPUT
+
+      - name: Install websocat (for testing)
+        if: steps.read-manifest.outputs.skip-deployment != 'true'
+        run: |
+          wget https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl
+          chmod +x websocat.x86_64-unknown-linux-musl
+          sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat
+
+      - name: Set environment variables
+        if: steps.read-manifest.outputs.skip-deployment != 'true'
+        run: |
+          echo "::group::Default to debug logs for Gateway and Dashboard"
+          echo "GATEWAY_LOGLEVEL=debug" >> .env
+          echo "DASHBOARD_LOGLEVEL=debug" >> .env
+          echo "✅ Gateway and Dashboard log levels set to debug 🐛"
+          echo "::endgroup::"
+
+          echo "::group::Set licences"
           if [ -z "${{ secrets.DASH_LICENSE }}" ]; then
-            echo "❌ Error: DASH_LICENSE secret is not set or is empty." >&2
+            echo "::error::DASH_LICENSE secret is not set or is empty." >&2
             exit 1
           fi
-
           if [ -z "${{ secrets.MDCB_LICENSE }}" ]; then
-            echo "❌ Error: MDCB_LICENSE secret is not set or is empty." >&2
+            echo "::error::MDCB_LICENSE secret is not set or is empty." >&2
             exit 1
           fi
-
           echo "✅ DASHBOARD_LICENCE added to .env"
           echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
-
           echo "✅ MDCB_LICENCE added to .env"
           echo "MDCB_LICENCE=${{ secrets.MDCB_LICENSE }}" >> .env
-      - name: Bootstrap and Test All Eligible Deployments
-        run: ./scripts/test-all.sh
-      - name: Store Logs
+          echo "::endgroup::"
+
+      - name: Cache Go Plugins
+        if: steps.read-manifest.outputs.skip-deployment != 'true'
+        uses: actions/cache@v4
+        with:
+          path: .bootstrap/plugin-cache/${{ needs.discover-deployments.outputs.gateway-tag }}
+          key: tyk-go-plugins-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
+
+      - name: Cache Jenkins Plugins
+        if: steps.read-manifest.outputs.skip-deployment != 'true' && matrix.deployment == 'cicd'
+        uses: actions/cache@v4
+        with:
+          path: deployments/cicd/volumes/jenkins/plugins
+          key: jenkins-plugins-${{ hashFiles('deployments/cicd/volumes/jenkins/plugins.txt') }}
+
+      - name: Create deployment
+        if: steps.read-manifest.outputs.skip-deployment != 'true'
+        id: create-deployment
+        run: |
+          COMPOSE_ARG="${{ steps.read-manifest.outputs.compose-argument }}"
+
+          if ./up.sh ${COMPOSE_ARG:-${{ matrix.deployment }}} --hide-progress --skip-hostname-check; then
+            echo "✅ Deployment created successfully"
+          else
+            echo "::error::Deployment creation failed for ${{ matrix.deployment }}"
+            exit 1
+          fi
+
+      - name: Validate Tests
+        if: steps.create-deployment.outcome == 'success'
+        id: validate-tests
+        run: |
+          source "$(pwd)/scripts/test-common.sh"
+
+          echo "::group::Checking for Postman tests"
+          if validate_postman_collection "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
+            echo "✅ Found Postman tests"
+            echo "postman-tests-found=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ No Postman tests found"
+            echo "postman-tests-found=false" >> $GITHUB_OUTPUT
+          fi
+          echo "::endgroup::"
+
+          echo "::group::Checking for custom tests"
+          if validate_test_scripts "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
+            echo "✅ Found custom tests"
+            echo "custom-tests-found=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ No custom tests found"
+            echo "custom-tests-found=false" >> $GITHUB_OUTPUT
+          fi
+          echo "::endgroup::"
+
+      - name: Run Postman Tests
+        id: run-postman-tests
+        if: steps.validate-tests.outputs.postman-tests-found == 'true'
+        continue-on-error: true
+        run: |
+          source "$(pwd)/scripts/test-common.sh"
+
+          if run_postman_test "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
+            echo "✅ Postman tests passed"
+          else
+            echo "❌ Postman tests failed"
+          fi
+
+          strip_control_chars "logs/postman.log"
+
+      - name: Run Custom Tests
+        id: run-custom-tests
+        if: steps.validate-tests.outputs.custom-tests-found == 'true'
+        continue-on-error: true
+        run: |
+          source "$(pwd)/scripts/test-common.sh"
+
+          # Run custom tests
+          if run_test_scripts "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
+            echo "✅ Custom tests passed"
+          else
+            echo "❌ Custom tests failed"
+          fi
+
+      - name: Capture Container Logs
+        if: steps.read-manifest.outputs.skip-deployment != 'true'
+        run: |
+          source "$(pwd)/scripts/test-common.sh"
+
+          capture_container_logs ${{ matrix.deployment }}
+
+      - name: Upload Logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs-${{ matrix.deployment }}
           path: logs/
-      - name: Show Bootstrap Log
+
+      - name: Get Result
         if: always()
-        run: cat logs/bootstrap.log
-      - name: Show Test Log
+        run: |
+          # Determine deployment status - success, skipped, or failure
+          DEPLOYMENT_STATUS="failure"
+          if [ "${{ steps.read-manifest.outputs.skip-deployment }}" == "true" ]; then
+            DEPLOYMENT_STATUS="skipped"
+          elif [ "${{ steps.create-deployment.outcome }}" == "success" ]; then
+            DEPLOYMENT_STATUS="success"
+          fi
+
+          # Capture Postman test info
+          POSTMAN_FOUND=${{ steps.validate-tests.outputs.postman-tests-found || 'false' }}
+          POSTMAN_STATUS="skipped"
+          if [ "$POSTMAN_FOUND" == "true" ]; then
+            POSTMAN_STATUS=${{ steps.run-postman-tests.outcome }}
+          fi
+
+          # Capture custom test info
+          CUSTOM_FOUND=${{ steps.validate-tests.outputs.custom-tests-found || 'false' }}
+          CUSTOM_STATUS="skipped"
+          if [ "$CUSTOM_FOUND" == "true" ]; then
+            CUSTOM_STATUS=${{ steps.run-custom-tests.outcome }}
+          fi
+
+          # Create JSON result for this deployment
+          echo '{
+            "deployment": "${{ matrix.deployment }}",
+            "deployment_status": "'$DEPLOYMENT_STATUS'",
+            "postman_found": "'$POSTMAN_FOUND'",
+            "postman_status": "'$POSTMAN_STATUS'",
+            "custom_found": "'$CUSTOM_FOUND'",
+            "custom_status": "'$CUSTOM_STATUS'"
+          }' > result.json
+
+          # Print the result to the console
+          cat result.json
+
+      - name: Store result
         if: always()
-        run: cat logs/test.log
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+        uses: actions/upload-artifact@v4
+        with:
+          name: result-${{ matrix.deployment }}
+          path: result.json
+
+  collect-results:
+    needs: test-deployments
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Download all results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: 'result-*'
+          path: results/
+
+      - name: Initialize results array
+        id: init-results
+        run: |
+          echo "[]" > results.json # Start with an empty array
+
+      - name: Build results array
+        run: |
+          for file in results/**/result.json; do
+            # Extract the content from each result.json file
+            echo "Processing file $file"
+            result=$(cat "$file")
+            # Append to results.json as an array element
+            jq ". += [$result]" results.json > temp.json && mv temp.json results.json
+          done
+
+      - name: Upload combined results
+        uses: actions/upload-artifact@v4
+        with:
+          name: combined-results
+          path: results.json
+
+  display-results:
+    needs: collect-results
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      # needed for common test script library
+      - name: Check Out Repository Code
+        uses: actions/checkout@v4
+
+      - name: Download combined results
+        uses: actions/download-artifact@v4
+        with:
+          name: combined-results
+
+      - name: Summarise test results
+        run: |
+          source "$(pwd)/scripts/test-common.sh"
+
+          # Print header
+          printf "%-24s%-8s%-8s%-8s%-8s\n" "DEPLOYMENT" "DEPLOY" "POSTMAN" "CUSTOM" "OVERALL"
+          echo "-------------------------------------------------------"
+
+          # Process each JSON result object
+          cat results.json | jq -c '.[]' | while read -r line; do
+              deployment=$(echo "$line" | jq -r '.deployment')
+              deploy_status=$(echo "$line" | jq -r '.deployment_status')
+              postman_status=$(echo "$line" | jq -r '.postman_status')
+              custom_status=$(echo "$line" | jq -r '.custom_status')
+
+              deploy_short=$(map_status "$deploy_status")
+              postman_short=$(map_status "$postman_status")
+              custom_short=$(map_status "$custom_status")
+
+              if [[ "$deploy_short" == "fail" || "$postman_short" == "fail" || "$custom_short" == "fail" ]]; then
+                  overall="fail"
+              else
+                  overall="pass"
+              fi
+
+              # Print row
+              printf "%-24s" "$deployment"
+              print_status "$deploy_short"
+              print_status "$postman_short"
+              print_status "$custom_short"
+              print_status "$overall"
+              echo
+          done
