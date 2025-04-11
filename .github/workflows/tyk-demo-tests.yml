@@ -159,10 +159,13 @@ jobs:
         run: |
           source "$(pwd)/scripts/test-common.sh"
 
+          tests_found=false
+
           echo "::group::Checking for Postman tests"
           if validate_postman_collection "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
             echo "✅ Found Postman tests"
             echo "postman-tests-found=true" >> $GITHUB_OUTPUT
+            tests_found=true
           else
             echo "❌ No Postman tests found"
             echo "postman-tests-found=false" >> $GITHUB_OUTPUT
@@ -173,11 +176,14 @@ jobs:
           if validate_test_scripts "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
             echo "✅ Found custom tests"
             echo "custom-tests-found=true" >> $GITHUB_OUTPUT
+            tests_found=true
           else
             echo "❌ No custom tests found"
             echo "custom-tests-found=false" >> $GITHUB_OUTPUT
           fi
           echo "::endgroup::"
+
+          echo "tests-found=$tests_found" >> $GITHUB_OUTPUT
 
       - name: Run Postman Tests
         id: run-postman-tests
@@ -214,7 +220,7 @@ jobs:
           fi
 
       - name: Check Test Results
-        if: always() && steps.read-manifest.outputs.skip-deployment != 'true'
+        if: always() && steps.validate-tests.outputs.tests-found != 'true'
         run: |
           TEST_RESULT=0
           
