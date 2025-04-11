@@ -173,7 +173,7 @@ jobs:
         if: steps.read-manifest.outputs.skip-deployment != 'true' && ${{ matrix.deployment }} == 'cicd'
         uses: actions/cache@v4
         with:
-          path: deployments/cicd/volumes/jenkins/plugins
+          path: /var/jenkins_home/plugins
           key: jenkins-plugins-${{ hashFiles('deployments/cicd/volumes/jenkins/plugins/plugins.txt') }}
 
       - name: Create deployment
