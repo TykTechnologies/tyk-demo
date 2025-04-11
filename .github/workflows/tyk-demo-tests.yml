@@ -75,7 +75,7 @@ jobs:
           source "$(pwd)/scripts/test-common.sh"
           prepare_test_logs
 
-          # sudo chmod -R 777 $(pwd)/deployments/cicd/volumes/jenkins/plugins
+          sudo chmod -R 777 $(pwd)/deployments/cicd/volumes/jenkins/plugins
 
       - name: Read deployment manifest
         id: read-manifest
