@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 BASE_URL=http://tyk-gateway.localhost:8080
 ENDPOINT=/grpc-custom-auth/get
@@ -7,35 +7,26 @@ HMAC_SECRET=c2VjcmV0
 KEY=eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImdycGNfaG1hY19rZXkiLCJoIjoibXVybXVyNjQifQ==
 REQUEST_URL=${BASE_URL}${ENDPOINT}
 
-
 function urlencode() {
-  echo -n "$1" | perl -MURI::Escape -ne 'print uri_escape($_)' | sed "s/%20/+/g"
+  python3 -c "import urllib.parse, sys; print(urllib.parse.quote_plus(sys.argv[1]))" "$1"
 }
 
-# Set date in expected format
 date="$(LC_ALL=C date -u +"%a, %d %b %Y %H:%M:%S GMT")"
 
-# Generate the signature using hmac algorithm with hmac secret from created Tyk key and
-# then base64 encoded
-signature=$(echo -n "date: ${date}" | openssl sha512 -binary -hmac "${HMAC_SECRET}" | base64)
+signature=$(echo -n "date: ${date}" | openssl dgst -sha512 -mac HMAC -macopt key:"${HMAC_SECRET}" -binary | base64)
+url_encoded_signature=$(urlencode "${signature}")
 
-# Ensure the signature is base64 encoded
-url_encoded_signature=$(echo -n "${signature}" | perl -MURI::Escape -ne 'print uri_escape($_)' | sed "s/%20/+/g")
-
-# Output the date, encoded date, signature and the url encoded signature
 echo "request: ${REQUEST_URL}"
 echo "date: $date"
 echo "signature: $signature"
 echo "url_encoded_signature: $url_encoded_signature"
 
-# Make the curl request using headers
-printf "\n\n----\n\nMaking request to  $BASE_URL/grpc-custom-auth/get\n\n"
+printf "\n\n----\n\nMaking request to  $REQUEST_URL\n\n"
 
 response=$(curl -s -w "\n%{http_code}" -H "Date: ${date}" \
     -H "Authorization: Signature keyId=\"${KEY}\",algorithm=\"${HMAC_ALGORITHM}\",signature=\"${url_encoded_signature}\"" \
-    ${REQUEST_URL})
+    "${REQUEST_URL}")
 
-# Extract the HTTP status code and response body
 http_code=$(echo "$response" | tail -n1)
 response_body=$(echo "$response" | sed '$d')
 
