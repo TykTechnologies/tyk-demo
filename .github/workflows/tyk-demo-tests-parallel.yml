@@ -166,7 +166,7 @@ jobs:
           fi
 
       - name: Validate Tests
-        if: steps.create-deployment.outcome == 'success'     
+        if: steps.create-deployment.outcome == 'success'
         id: validate-tests
         run: |
           source "$(pwd)/scripts/test-common.sh"
@@ -277,7 +277,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: result-${{ matrix.deployment }}
-          path: result.json        
+          path: result.json
 
   collect-results:
     needs: test-deployments
@@ -317,7 +317,7 @@ jobs:
     if: always()
     steps:
       # needed for common test script library
-      - name: Check Out Repository Code 
+      - name: Check Out Repository Code
         uses: actions/checkout@v4
 
       - name: Download combined results
