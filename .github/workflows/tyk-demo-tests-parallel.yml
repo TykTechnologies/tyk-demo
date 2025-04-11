@@ -167,14 +167,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .bootstrap/plugin-cache/${{ needs.discover-deployments.outputs.gateway-tag }}
-          key: ${{ runner.os }}-plugin-cache-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
+          key: tyk-go-plugins-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
 
       - name: Cache Jenkins Plugins
         if: steps.read-manifest.outputs.skip-deployment != 'true' && ${{ matrix.deployment }} == 'cicd'
         uses: actions/cache@v4
         with:
           path: deployments/cicd/volumes/jenkins/plugins
-          key: ${{ runner.os }}-jenkins-plugin-cache-${{ hashFiles('deployments/cicd/volumes/jenkins/plugins/**/*') }}
+          key: jenkins-plugins-${{ hashFiles('deployments/cicd/volumes/jenkins/plugins/plugins.txt') }}
 
       - name: Create deployment
         if: steps.read-manifest.outputs.skip-deployment != 'true'
