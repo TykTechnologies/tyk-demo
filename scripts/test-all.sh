@@ -3,12 +3,6 @@
 readonly BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$BASE_DIR/scripts/test-common.sh"
 
-# Colour constants
-readonly RED='\033[0;31m'
-readonly GREEN='\033[0;32m'
-readonly BLUE='\033[0;34m'
-readonly NOCOLOUR='\033[0m'
-
 # Status constants
 readonly STATUS_SKIPPED="Skipped"
 readonly STATUS_PASSED="Passed"

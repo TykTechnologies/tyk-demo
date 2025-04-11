@@ -314,51 +314,34 @@ jobs:
           
       - name: Summarise test results
         run: |
-          echo -e "${BOLD}Name                 | Deployment | Postman Tests | Custom Tests${RESET}"
-          echo "--------------------------------------------------------------------------------"
+          source "$(pwd)/scripts/test-common.sh"
 
-          cat results.json | jq -c '.[]' | while IFS= read -r result; do
-            # Extract values from the JSON object
-            deployment=$(echo "$result" | jq -r '.deployment')
-            deployment_status=$(echo "$result" | jq -r '.deployment_status')
-            postman_found=$(echo "$result" | jq -r '.postman_found')
-            postman_status=$(echo "$result" | jq -r '.postman_status')
-            custom_found=$(echo "$result" | jq -r '.custom_found')
-            custom_status=$(echo "$result" | jq -r '.custom_status')
+          # Print header
+          printf "%-24s%-8s%-8s%-8s%-8s\n" "DEPLOYMENT" "DEPLOY" "POSTMAN" "CUSTOM" "OVERALL"
+          echo "-------------------------------------------------------"
 
-            # Define colors
-            GREEN=$'\e[32m'
-            RED=$'\e[31m'
-            BLUE=$'\e[34m'
-            BOLD=$'\e[1m'
-            RESET=$'\e[0m'
+          # Process each JSON result object
+          cat results.json | jq -c '.[]' | while read -r line; do
+              deployment=$(echo "$line" | jq -r '.deployment')
+              deploy_status=$(echo "$line" | jq -r '.deployment_status')
+              postman_status=$(echo "$line" | jq -r '.postman_status')
+              custom_status=$(echo "$line" | jq -r '.custom_status')
 
-            # Format statuses with colors
-            if [ "$deployment_status" == "success" ]; then
-              deployment_status="${GREEN}PASS${RESET}"
-            elif [ "$deployment_status" == "failure" ]; then
-              deployment_status="${RED}FAIL${RESET}"
-            else
-              deployment_status="${BLUE}SKIP${RESET}"
-            fi
+              deploy_short=$(map_status "$deploy_status")
+              postman_short=$(map_status "$postman_status")
+              custom_short=$(map_status "$custom_status")
 
-            if [ "$postman_status" == "success" ]; then
-              postman_status="${GREEN}PASS${RESET}"
-            elif [ "$postman_status" == "failure" ]; then
-              postman_status="${RED}FAIL${RESET}"
-            else
-              postman_status="${BLUE}SKIP${RESET}"
-            fi
+              if [[ "$deploy_short" == "fail" || "$postman_short" == "fail" || "$custom_short" == "fail" ]]; then
+                  overall="fail"
+              else
+                  overall="pass"
+              fi
 
-            if [ "$custom_status" == "success" ]; then
-              custom_status="${GREEN}PASS${RESET}"
-            elif [ "$custom_status" == "failure" ]; then
-              custom_status="${RED}FAIL${RESET}"
-            else
-              custom_status="${BLUE}SKIP${RESET}"
-            fi
-
-            
-            # Print data row using echo with proper spacing
-            echo -e "$(printf "%-22s" "$deployment") | $(printf "%-13s" "$deployment_status") | $(printf "%-15s" "$postman_status") | $(printf "%-14s" "$custom_status")"
+              # Print row
+              printf "%-24s" "$deployment"
+              print_status "$deploy_short"
+              print_status "$postman_short"
+              print_status "$custom_short"
+              print_status "$overall"
+              echo
           done
