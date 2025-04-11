@@ -214,7 +214,7 @@ jobs:
           fi
 
       - name: Check Test Results
-        if: always()
+        if: always() && steps.read-manifest.outputs.skip-deployment != 'true'
         run: |
           TEST_RESULT=0
           
@@ -231,7 +231,7 @@ jobs:
           exit $TEST_RESULT
 
       - name: Capture Container Logs
-        if: steps.read-manifest.outputs.skip-deployment != 'true'
+        if: always() && steps.read-manifest.outputs.skip-deployment != 'true'
         run: |
           source "$(pwd)/scripts/test-common.sh"
 
