@@ -219,6 +219,7 @@ jobs:
             exit 1
           fi
 
+      # This is required because both of the test steps are set to continue-on-error
       - name: Check Test Results
         if: always() && steps.validate-tests.outputs.tests-found == 'true'
         run: |
