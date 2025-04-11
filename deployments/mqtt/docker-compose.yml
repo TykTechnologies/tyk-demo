@@ -8,7 +8,7 @@ services:
       - ./deployments/mqtt/volumes/mosquitto/config:/mosquitto/config
     ports:
       - 1883:1883
-      - 9001:9001
+      - 9101:9001
   nodered:
     image: nodered/node-red:1.1.2
     networks:
