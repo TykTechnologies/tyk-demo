@@ -186,14 +186,16 @@ jobs:
         run: |
           source "$(pwd)/scripts/test-common.sh"
           TEST_RESULT=0
-          
+
           if run_postman_test "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
             echo "✅ Postman tests passed"
           else
             echo "❌ Postman tests failed"
             TEST_RESULT=1
           fi
+
           strip_control_chars "logs/postman.log"
+          
           exit $TEST_RESULT
 
       - name: Run Custom Tests
@@ -210,6 +212,23 @@ jobs:
             echo "❌ Custom tests failed"
             exit 1
           fi
+
+      - name: Check Test Results
+        if: always()
+        run: |
+          TEST_RESULT=0
+          
+          if [[ "${{ steps.run-postman-tests.outcome }}" == "failure" ]]; then
+            echo "::error::Postman tests failed"
+            TEST_RESULT=1
+          fi
+          
+          if [[ "${{ steps.run-custom-tests.outcome }}" == "failure" ]]; then
+            echo "::error::Custom tests failed"
+            TEST_RESULT=1
+          fi
+          
+          exit $TEST_RESULT
 
       - name: Capture Container Logs
         if: steps.read-manifest.outputs.skip-deployment != 'true'
