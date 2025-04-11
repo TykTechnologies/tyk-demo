@@ -30,7 +30,21 @@ echo "url_encoded_signature: $url_encoded_signature"
 
 # Make the curl request using headers
 printf "\n\n----\n\nMaking request to  http://localhost:8080/grpc-custom-auth/get\n\n"
-set -x
-curl -v -H "Date: ${date}" \
+
+response=$(curl -s -w "\n%{http_code}" -H "Date: ${date}" \
     -H "Authorization: Signature keyId=\"${KEY}\",algorithm=\"${HMAC_ALGORITHM}\",signature=\"${url_encoded_signature}\"" \
-    ${REQUEST_URL}
+    ${REQUEST_URL})
+
+# Extract the HTTP status code and response body
+http_code=$(echo "$response" | tail -n1)
+response_body=$(echo "$response" | sed '$d')
+
+if [ "$http_code" -eq 200 ]; then
+    echo "Request was successful. HTTP Status: $http_code"
+    echo "Response Body: $response_body"
+    exit 0
+else
+    echo "Request failed. HTTP Status: $http_code"
+    echo "Response Body: $response_body"
+    exit 1
+fi
