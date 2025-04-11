@@ -100,17 +100,17 @@ bootstrap_progress
 
 log_message "Checking for plugins in Jenkins container"
 if $(generate_docker_compose_command) exec -T jenkins sh -c "ls /var/jenkins_home/plugins/*.jpi" 1> /dev/null 2>&1; then
-  log_message "  Plugins found in container. Skipping plugin download."
+  log_message "  Plugins found in container - skipping plugin download"
 else
-  log_message "  Plugins not found in container. Checking for local Jenkins plugin cache."
+  log_message "  Plugins not found in container - checking for local Jenkins plugin cache"
   if ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1> /dev/null 2>&1; then
-    log_message "  Plugins found locally, will use existing cache instead of downloading plugins"
+    log_message "  Plugins found locally - using existing cache instead of downloading plugins"
   else
-    log_message "  Plugins not found locally, downloading plugins to local cache... (please be patient, this can take a long time)"
+    log_message "  Plugins not found locally - downloading plugins to local cache... (please be patient, this can take a long time)"
     attempt_count=0
     until ls deployments/cicd/volumes/jenkins/plugins/*.jpi 1>/dev/null 2>&1; do
       attempt_count=$((attempt_count+1))
-      $(generate_docker_compose_command) exec -T jenkins jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins/plugins.txt --latest false --verbose 1>>logs/bootstrap.log 2>&1
+      $(generate_docker_compose_command) exec -T jenkins jenkins-plugin-cli -f /var/jenkins_home/plugins.txt --latest false --verbose 1>>logs/bootstrap.log 2>&1
       if [ "$?" != "0" ]; then
         if [ "$attempt_count" = "5" ]; then
           log_message "  Maximum retry count reached. Aborting."
