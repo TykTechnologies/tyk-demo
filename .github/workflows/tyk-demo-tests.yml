@@ -70,12 +70,15 @@ jobs:
           echo "DEPLOYMENT_DIR=$(pwd)/deployments/${{ matrix.deployment }}" >> $GITHUB_ENV
           echo "BASE_DIR=$(pwd)" >> $GITHUB_ENV
 
-      - name: Prepare logs directory
+      - name: Prepare file system
         run: |
           source "$(pwd)/scripts/test-common.sh"
+
+          # Create log directory and files
           prepare_test_logs
 
-          # sudo chmod -R 777 $(pwd)/deployments/cicd/volumes/jenkins/plugins
+          # Enable the cicd plugin volume mapped directory, so that it can be modified from within the Jenkins container
+          sudo chmod -R 777 $(pwd)/deployments/cicd/volumes/jenkins/plugins
 
       - name: Read deployment manifest
         id: read-manifest
