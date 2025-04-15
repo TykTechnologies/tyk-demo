@@ -94,7 +94,7 @@ jobs:
             compose_argument=$(jq -r '.composeArgument // empty' "${DEPLOYMENT_DIR}/deployment.json")
             
             # Check if websocat is in the dependencies list
-            needs_websocat=$(jq -r '.dependencies | contains(["websocat"]) // false' "${DEPLOYMENT_DIR}/deployment.json")
+            needs_websocat=$(jq -r 'if .dependencies then .dependencies | contains(["websocat"]) else false end' "${DEPLOYMENT_DIR}/deployment.json")          
           else
             echo "Deployment manifest not found in ${DEPLOYMENT_DIR}"
           fi
