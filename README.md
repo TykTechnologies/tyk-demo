@@ -2,6 +2,187 @@
 
 # Tyk Demo
 
+A ready-to-run sandbox for exploring Tyk’s API management platform through practical, hands-on use.
+
+Tyk Demo provides:
+- Pre-configured deployments showcasing various Tyk capabilities
+- Automated setup and bootstrapping
+- Postman collections and scripts for interactive exploration
+- A modular structure for mixing and matching features of interest
+
+While created primarily for Tyk's technical staff, anyone interested in exploring Tyk functionality can benefit from this sandbox environment.
+
+> **Note:** This repository was developed and tested on macOS using Docker Desktop. The instructions provided are tailored for this setup. Users on other operating systems may encounter differences and should adapt accordingly.
+
+## Getting Started
+
+### Prerequisites
+
+- Docker Desktop with Docker Compose
+  - Allocate at least 2GB RAM to Docker
+- `jq` command-line utility
+- A valid Tyk license
+- (Optional) A valid MDCB license
+
+### Quick Start
+
+Follow these steps to get started. For more detailed instructions and advanced information, see the [Detailed Setup Guide](docs/SETUP.md).
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/TykTechnologies/tyk-demo.git
+cd tyk-demo
+```
+
+**2. Configure local DNS entries**
+
+```bash
+sudo ./scripts/update-hosts.sh
+```
+
+> **Note:** You may be prompted for your password due to the use of `sudo`.
+
+**3. Add your licence**
+
+Use this command to apply your Tyk licence, replacing `YOUR_LICENCE_KEY` with your actual licence key:
+
+```bash
+./scripts/update-env.sh DASHBOARD_LICENCE YOUR_LICENCE_KEY
+```
+
+If you also have a licence for MDCB, that can also be added:
+
+```bash
+./scripts/update-env.sh MDCB_LICENCE YOUR_MDCB_LICENCE_KEY
+```
+
+**4. Launch the environment**
+
+```bash
+./up.sh
+```
+
+Wait until you see the message "Tyk Demo initialisation process completed". The environment details, including usernames, password and API keys will also be shown at this point.
+
+> **Note:** On the first run, the Go plugins will be built. This can take 5–10 minutes or longer, depending on your system’s performance. The build is cached for future runs. To skip building the plugins, use the `--skip-plugin-build` flag, but any functionality that depends on Go plugins could be affected.
+
+**5. Access the Tyk dashboard**
+
+Use the credentials shown in the output to log in to the [Tyk Dashboard](http://tyk-dashboard.localhost:3000).
+
+**6. Import the Postman collection**
+
+Import the [provided collection](deployments/tyk/tyk_demo_tyk.postman_collection.json) into Postman to explore Tyk's functionality.
+
+## Architecture
+
+Tyk Demo uses a modular approach:
+
+- **Base deployment**: Core Tyk components (Gateway, Dashboard, Pump) with supporting databases
+- **Feature deployments**: Optional extensions (analytics, SSO, observability etc.)
+
+The base deployment is always active. Feature deployments can be added selectively.
+
+### Available Feature Deployments
+
+| Feature Deployment                  | Description                                                                 |
+|-------------------------------------|-----------------------------------------------------------------------------|
+| [Analytics to Datadog](deployments/analytics-datadog/README.md) | Export analytics data to Datadog for monitoring and visualization. |
+| [Analytics to Kibana](deployments/analytics-kibana/README.md) | Export analytics data to Kibana for log analysis and visualization. |
+| [Analytics to Splunk](deployments/analytics-splunk/README.md) | Export analytics data to Splunk for advanced analytics and monitoring. |
+| [Bench test suite](deployments/bench/README.md) | Run performance and load testing for Tyk deployments. |
+| [CI/CD with Jenkins](deployments/cicd/README.md) | Integrate Tyk with Jenkins for continuous integration and deployment. |
+| [Postgres database](deployments/database-postgres/README.md) | Migrate from MongoDB to Postgres. |
+| [Federation](deployments/federation/README.md) | Enable multi-region or multi-cloud API management with Tyk Federation. |
+| [Healthcheck Blackbox](deployments/healthcheck-blackbox/README.md) | Monitor Tyk system health using Prometheus and Blackbox Exporter. |
+| [Instrumentation](deployments/instrumentation/README.md) | Add instrumentation for monitoring and debugging. |
+| [Kubernetes Operator](deployments/k8s-operator/README.md) | Use the Tyk K8s Operator to configure the Dashboard. |
+| [Keycloak](deployments/keycloak-dcr/README.md) | Integrate with Keycloak for dynamic client registration. |
+| [NGINX Load Balancer](deployments/load-balancer-nginx/README.md) | Use NGINX to load balance Tyk Gateways. |
+| [Mail server](deployments/mailserver/README.md) | Set up a mail server for email notifications and testing. |
+| [MDCB](deployments/mdcb/README.md) | Deploy Multi-Data Center Bridge for distributed API management. |
+| [MQTT](deployments/mqtt/README.md) | Enable MQTT protocol support for IoT use cases. |
+| [OpenTelemetry with Jaeger](deployments/otel-jaeger/README.md) | Use OpenTelemetry with Jaeger for distributed tracing. |
+| [OpenTelemetry with New Relic](deployments/otel-new-relic/README.md) | Use OpenTelemetry with New Relic for distributed tracing. |
+| [Python gRPC server](deployments/plugin-grpc-python/README.md) | Example deployment of a Python-based gRPC plugin server. |
+| [Enterprise Portal](deployments/portal/README.md) | Deploy the Tyk Enterprise Developer Portal. |
+| [SLIs with Prometheus/Grafana](deployments/slo-prometheus-grafana/README.md) | Monitor Service Level Indicators and Objectives with Prometheus and Grafana. |
+| [Single Sign-On](deployments/sso/README.md) | Enable Single Sign-On for Tyk Dashboard and Portal. |
+| [Subscriptions](deployments/subscriptions/README.md) | Use GraphQL to service websocket subscriptions. |
+| [Tyk 2](deployments/tyk2/README.md) | Add a second Tyk environment. |
+| [Unikernel Unikraft](deployments/unikernel-unikraft/README.md) | Deploy the Tyk Gateway as a unikernel. |
+| [WAF](deployments/waf/README.md) | Add Web Application Firewall capabilities to your deployment. |
+
+## Common Operations
+
+### Add Feature Deployments
+
+Append feature deployment names to the `up.sh` command:
+
+```bash
+./up.sh analytics-kibana instumentation
+```
+
+### Stop and Remove
+
+Tear down the environment and remove Docker resources:
+
+```bash
+./down.sh
+```
+
+### Resume a Paused Deployment
+
+Start existing Tyk Demo containers that are currently stopped:
+
+```bash
+./up.sh
+```
+
+### Expand a Running Deployment
+
+Append feature deployment names to the `up.sh` command:
+
+```bash
+./up.sh sso
+```
+
+### Use Docker Compose Directly
+
+Use `docker-compose-command.sh` to generate the correct Docker Compose command for your environment.
+
+Check running containers:
+
+```bash
+./docker-compose-command.sh ps
+```
+
+View logs:
+
+```bash
+./docker-compose-command.sh logs -f tyk-gateway
+```
+
+Restart a service:
+
+```bash
+./docker-compose-command.sh restart tyk-dashboard
+```
+
+## Troubleshooting
+Check the [Troubleshooting Guide](docs/TROUBLESHOOTING.md) for solutions to common issues.
+
+## Contributing
+Contributions are welcome. See the [Contributor Guide](CONTRIBUTING.md) for more information.
+
+
+
+
+
+
+# Tyk Demo
+
 Tyk Demo offers a pre-configured deployment that includes various examples showcasing Tyk's capabilities. Powered by Docker Compose for swift setup, it allows you to pick and choose the features you want to explore.
 
 The primary use case for Tyk Demo is to act as a centralised knowledge sharing resource for client-facing technical Tyk staff. However, anyone curious about Tyk can benefit from Tyk Demo. It's hands-on sandbox environment allows anyone to experiment and learn more about Tyk's features.
@@ -87,18 +268,6 @@ If you are using the MDCB (`mdcb`) deployment, then you need to do the same for 
 
 ### Notable environment variables are:
 
-| Variable | Description | Required | Default |
-| -------- | ----------- | -------- | ------- | 
-| DASHBOARD_LICENCE | Sets the licence used by the Tyk Dashboard | Yes | None - **Must** be manually set |
-| INSTRUMENTATION_ENABLED | Controls whether the instrumentation feature is enabled (`1`) or disabled (`0`) | No | `0` - Set automatically by the `up.sh` script |
-| TRACING_ENABLED | Controls whether the tracing feature is enabled (`true`) or disabled (`false`) | No | `false` - Set automatically by the `up.sh` script |
-| GATEWAY_VERSION | Sets the Tyk Gateway container image tag e.g. `v4.0.0` | No | Based on the latest release |
-| GATEWAY_LOGLEVEL | Sets the log level for the Tyk Gateway application e.g. `debug`  | No | `info` |
-| MDCB_LICENCE | Sets the licence used by the Tyk MDCB | Yes, if using the `mdcb` deployment, otherwise no | None - **Must** be manually set |
-| MDCB_USER_API_CREDENTIALS | Sets the credentials used by the Tyk MDCB to authenticate with the Dashboard | Yes, if using the `mdcb` deployment, otherwise no | None - Set automatically by the `bootstrap.sh` script |
-| PMP_SPLUNK_META_COLLECTORTOKEN | Sets the credentials used by the Tyk Pump to authenticate with the Splunk collector | Yes, if using the `analytics-splunk` deployment, otherwise no | None - Set automatically by the `bootstrap.sh` script |
-| NEW_RELIC_API_KEY | Sets the API Key used by the OpenTelemetry collector to send data to New Relic | Yes, if using the `otel/new-relic` deployment, otherwise no | None - **Must** be manually set |
-| NGROK_AUTHTOKEN | Sets the authentication token used by the Ngrok agent | Yes, if use of Ngrok/geolocation is required, otherwise no | None - **Must** be manually set |
 
 There are various other environment variables used, but it's not normally necessary to set them. See the [Tyk environment variables documentation](https://tyk.io/docs/tyk-environment-variables/) for more information. The exception being the variables used for the DataDog Analytics deployment (`analytics-datadog`), which has its own set of variables for configuring the DataDog integration - see the [Setup section of that deployment's readme](https://github.com/TykTechnologies/tyk-demo/blob/master/deployments/analytics-datadog/README.md#setup) for more information.
 
@@ -305,13 +474,3 @@ You will also see an error in the field that has the base64 encoding of the OAS 
 Since the value cannot be base64 *decoded* it means that the base64 *encoding* failed during bootstrap.
 One possible reason is that you are using Brew's base64 binary since Brew's version inserts `\r` to the output rather than just output the base64 encoding as is. You can run `whereis base64` to find out. The expected path should be `/usr/bin/base64`.
 
-### Bootstrap gets stuck with `Request unsuccessful: wanted '200'...` message
-
-It is normal to see this message in the `logs/bootstrap.log` file. It appears when the bootstrap script is waiting for a service to become available before proceeding to the next step. The number of times the message is repeated depends on the performance of your system, as errors are usually due to waiting for a service to start up. So you may find that this message is repeated many times, but will eventually stop and the bootstrap process moves on.
-
-If the message repeats without moving on then the service being tested is experiencing a problem. In this situation, you should:
-
-- Check for error messages in the container logs of the service being tested.
-- Ensure Docker has sufficient resources to run the deployment. The standard `tyk` deployment should be ok with just 1GB RAM, but it is recommended to make more RAM available (2GB+) when combining multiple deployments.
-
-These steps will help you diagnose the source of the problem.
