@@ -85,21 +85,26 @@ jobs:
         run: |
           skip_deployment="false"
           compose_argument=""
+          needs_websocat="false"
 
           if [ -f "${DEPLOYMENT_DIR}/deployment.json" ]; then
             echo "Deployment manifest found in ${DEPLOYMENT_DIR}"
             jq '.' "${DEPLOYMENT_DIR}/deployment.json"
             skip_deployment=$(jq -r '.github.skipDeployment // "false"' "${DEPLOYMENT_DIR}/deployment.json")
             compose_argument=$(jq -r '.composeArgument // empty' "${DEPLOYMENT_DIR}/deployment.json")
+            
+            # Check if websocat is in the dependencies list
+            needs_websocat=$(jq -r '.dependencies | contains(["websocat"]) // false' "${DEPLOYMENT_DIR}/deployment.json")
           else
             echo "Deployment manifest not found in ${DEPLOYMENT_DIR}"
           fi
 
           echo "skip-deployment=$skip_deployment" >> $GITHUB_OUTPUT
           echo "compose-argument=$compose_argument" >> $GITHUB_OUTPUT
+          echo "needs-websocat=$needs_websocat" >> $GITHUB_OUTPUT
 
-      - name: Install websocat (for testing)
-        if: steps.read-manifest.outputs.skip-deployment != 'true'
+      - name: Install websocat
+        if: steps.read-manifest.outputs.skip-deployment != 'true' && steps.read-manifest.outputs.needs-websocat == 'true'        
         run: |
           wget https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl
           chmod +x websocat.x86_64-unknown-linux-musl
