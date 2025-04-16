@@ -163,18 +163,28 @@ Note that changing Tyk Demo ports may result in other issues, due to dependencie
 
 For more help, refer to the [troubleshooting guide](docs/TROUBLESHOOTING.md).
 
+### Check Docker Resource Allocation
+
+Ensure that Docker has enough resources to run the Tyk Demo containers. Insufficient resources can lead to failures.
+
+It is recommended to allocate at least 4GB RAM to Docker. This will ensure that it is possible to run any of the deployments.
+
+Note that combining multiple deployments together will further increase the amount of resources needed by Docker.
+
 ## 10. Environment Variables Reference
 
 The Tyk Demo uses the `.env` file to configure various settings. Below is a list of commonly used environment variables, their descriptions, and defaults.
 
-The only mandatory environment variable is `DASHBOARD_LICENCE`.
+The only mandatory environment variable is `DASHBOARD_LICENCE`, which is set as part of the "getting started" process. `MDCB_LICENCE` is also required, but only when using the `mdcb` deployment.
+
+Many of the other variables are automatically set by the scripts. If a deployment requires manually set environment variables, the relevant instructions will be contained in its readme.
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
 | `DASHBOARD_LICENCE` | Licence key for the Tyk Dashboard | Yes | None — **Must** be manually set |
 | `INSTRUMENTATION_ENABLED` | Enables (`1`) or disables (`0`) instrumentation | No | `0` — Set automatically by `up.sh` |
 | `TRACING_ENABLED` | Enables (`true`) or disables (`false`) tracing | No | `false` — Set automatically by `up.sh` |
-| `GATEWAY_VERSION` | Tyk Gateway Docker image tag (e.g., `v5.8.0`) | No | Based on the latest release |
+| `GATEWAY_VERSION` | Override the Gateway version used (e.g., `v5.8.0`) | No | Defined in the docker compose YAML |
 | `GATEWAY_LOGLEVEL` | Log level for the Tyk Gateway (e.g., `debug`, `info`) | No | `info` |
 | `MDCB_LICENCE` | Licence key for the Tyk MDCB | Only when using the `mdcb` deployment | None — **Must** be manually set |
 | `MDCB_USER_API_CREDENTIALS` | API credentials for MDCB to authenticate with the Dashboard | Only when using the `mdcb` deployment | None — Set automatically by `bootstrap.sh` |
