@@ -19,7 +19,7 @@ While created primarily for Tyk's technical staff, anyone interested in explorin
 ### Prerequisites
 
 - Docker Desktop with Docker Compose
-  - Allocate at least 2GB RAM to Docker
+  - Recommended 4GB RAM allocated for Docker resources
 - `jq` command-line utility
 - A valid Tyk license
 - (Optional) A valid MDCB license
