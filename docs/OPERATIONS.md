@@ -12,7 +12,7 @@ To start the base deployment:
 ./up.sh
 ```
 
-The `tyk` deployment is automatically included, so does not need to be specified.
+The `tyk` deployment is automatically included, so it does not need to be specified.
 
 The `bootstrap.sh` script is triggered for each deployment.
 
@@ -39,7 +39,7 @@ This will remove all deployments listed in `.bootstrap/bootstrapped_deployments`
 
 The `teardown.sh` script is triggered for each deployment, if it exists.
 
-> **Note:** Any changes to Tyk data will be lost, as the volumes are removed. If you wish to persist changes, then the data must be exported - see the *Exporting Tyk Configuration* section for more info.
+> **Warning:** The existing system state will be lost, as the volumes are removed. If you wish to persist changes, then the data must be exported - see the *Exporting Tyk Configuration* section for more info.
 
 ### Resuming a Stopped Environment
 
@@ -60,6 +60,8 @@ To completely redeploy your environment (removing all data and starting fresh):
 ```bash
 ./down.sh && ./up.sh
 ```
+
+> **Warning:** This operation will remove all data and containers. Ensure important data is exported first.
 
 ### Appending Feature Deployments
 
@@ -84,7 +86,7 @@ Check the bootstrap log for detailed information about the deployment process:
 tail -f logs/bootstrap.log
 ```
 
-### Viewing Licence Status
+### Viewing Licence Status
 
 Check the licence status:
 
@@ -158,10 +160,10 @@ Example:
 
 | Variable | Description | Required |
 |----------|-------------|---------|
-| DASHBOARD_LICENCE | Tyk license key | Required for all deployments |
-| MDCB_LICENCE | MDCB license key | Required only for the MDCB deployment |
+| DASHBOARD_LICENCE | Tyk licence key | Required for all deployments |
+| MDCB_LICENCE | MDCB licence key | Required only for the MDCB deployment |
 
-If a feature deployment requires an environment variable to be manually set, it will be stated in the deployment's readme.
+If a feature deployment requires an environment variable to be manually set, it will be stated in the deployment `README.md`.
 
 ## Data Management
 
@@ -173,7 +175,7 @@ Persist changes to Tyk APIs definitions and policies by exporting the data:
 ./scripts/export.sh
 ```
 
-This exports all API defnitions and policies from the current deployment to the relevant locations within the `deployments/tyk/data/tyk-dashboard` directory. This allows the data to persist between deployments, as it will be automatically imported during the bootstrap process.
+This exports all API definitions and policies from the current deployment to the relevant locations within the `deployments/tyk/data/tyk-dashboard` directory. This ensures the data persists between deployments, as it will be automatically imported during the bootstrap process.
 
 Other types of data (e.g. users) are not covered by the export script, so must be exported manually.
 
@@ -203,7 +205,7 @@ The script runs a Newman container that tests the currently deployed environment
 
 **Running Newman Locally**
 
-It's also possible to run tests locally::
+It's also possible to run tests locally:
 
 ```bash
 newman run deployments/tyk/tyk_demo_tyk.postman_collection.json
@@ -239,6 +241,6 @@ To skip plugin building:
 
 To add your own plugins:
 
-1. Add plugin code to the appropriate deployment's `plugins` directory - for go plugins, this is `deployments/tyk/volumes/tyk-gateway/plugins/go`
+1. Add plugin code to the appropriate deployment's `plugins` directory - for Go plugins, this is `deployments/tyk/volumes/tyk-gateway/plugins/go`
 2. Configure an API to use the plugin, then export it using `scripts/export.sh`
 3. Run `./down.sh` and then `./up.sh` to rebuild and deploy
