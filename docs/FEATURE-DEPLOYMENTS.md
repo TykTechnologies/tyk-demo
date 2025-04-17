@@ -50,6 +50,8 @@ Multiple features can be deployed simultaneously:
 ./up.sh analytics-kibana instrumentation sso
 ```
 
+> **Note:** Make sure there are sufficient Docker resources available when using multiple deployments.
+
 ## Combining Features
 
 Most feature deployments can be combined with others. When features are combined:
