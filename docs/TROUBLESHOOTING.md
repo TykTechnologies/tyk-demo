@@ -1,13 +1,13 @@
 # Troubleshooting Guide
 
-This guide outlines common issues encountered while using the Tyk Demo and steps to resolve them. If your issue isn't listed, please consider opening a pull request once resolved to help others.
+This guide outlines common issues encountered while using the Tyk Demo and steps to resolve them.
 
 ## General Troubleshooting Steps
 
-- Ensure you are using Docker Desktop on macOS, as this setup was created and tested on macOS. Linux and Windows may require additional configuration.
+- Use Docker Desktop and macOS, as this is the intended deployment environment; Linux and Windows may require additional configuration.
 - Run `./down.sh` to clean the environment before retrying `./up.sh`.
-- Check logs in `logs/bootstrap.log` for detailed errors.
-- Check the relevant deployment’s `README.md`.
+- Check logs in `logs/bootstrap.log` for detailed error messages.
+- Refer to the relevant deployment’s `README.md` for additional setup instructions.
 
 ## Docker Issues
 
@@ -19,40 +19,40 @@ Run:
 docker ps -a
 ```
 
-Look for containers that exited with errors. Check logs:
+Look for containers that exited with errors. To inspect logs:
 
 ```
 docker logs <container-name>
 ```
 
-Also check `logs/bootstrap.log` for indications of cause.
+Also review `logs/bootstrap.log` for more information.
 
 Common issues:
 - Incorrect or missing environment variables
 - Port conflicts
-- Insufficient resources (RAM/storage)
+- Insufficient Docker resources (RAM/storage)
 
 ### Ports already in use
 
-If ports like 3000, 8080, or 5432 are already used by another process:
+If ports such as 3000, 8080, or 5432 are already in use:
 
 ```bash
 lsof -i :3000
 ```
 
-Either stop the conflicting service or update the port numbers in the relevant Docker Compose file.
+Either stop the conflicting process or update the port numbers in the appropriate Docker Compose file.
 
 ### Error: `Version in "./docker-compose.yml" is unsupported`
 
-Docker Compose v2+ is required.
+This indicates Docker Compose v2+ is required.
 
 Update Docker and Docker Compose to latest.
 
 ### Insufficient Resources
 
-If containers unexpectedly error, check that Docker has been allocated sufficient CPU, RAM and storage resources.
+If containers fail unexpectedly, ensure Docker has been allocated sufficient CPU, RAM, and disk space.
 
-The most important resource is RAM, for which Docker should be allocated at least 4GB.
+Docker should have at least 4GB of RAM allocated.
 
 ## Bootstrapping Issues
 
@@ -64,27 +64,27 @@ Install `jq`:
 - macOS: `brew install jq`
 - Ubuntu/Debian: `sudo apt-get install jq`
 
-### Bootstrap gets stuck with `Request unsuccessful: wanted '200'...` message
+### Bootstrap stuck on `Request unsuccessful: wanted '200'...`
 
-This message occurs when the bootstrap process is waiting on a service to become available. It should usually disappear after 5-10 attempts.
+This message means the bootstrap script is polling for a service to become available. It usually resolves after 5–10 attempts.
 
-If the error loops indefinitely:
-- Check the `logs/bootstrap.log` for indications of cause
-- Check container logs of the service returning the unsuccessful result
+If it continues indefinitely:
+- Check the `logs/bootstrap.log` for the underlying issue
+- Review logs of the service container that is not responding
 
 ## Environment File Issues
 
 ### Licence error displayed
 
-Ensure your `.env` file exists at the root of the repo and contains:
+Ensure the `.env` file exists at the root of the repo and includes:
 
 ```bash
 DASHBOARD_LICENCE=<your valid licence>
 ```
 
-> **Note:** Licence should not include quotes or extra spaces around the key.
+> **Note:** The licence value should not include quotes or spaces.
 
-Additionally, run the `licences.sh` script to check your licences:
+To validate your licence:
 
 ```bash
 ./scripts/licences.sh
@@ -92,15 +92,15 @@ Additionally, run the `licences.sh` script to check your licences:
 
 Check that the licence has not expired.
 
-If the licence doesn't look correct, update it as per the process defined in the [setup guide](SETUP.md).
+If it appears incorrect, follow the steps in the [getting started](../README.md) section to update it.
 
 ## Host Mapping Issues
 
 ### Browser requests do not resolve as expected
 
-Hostnames not mapped to 127.0.0.1.
+Hostnames may not be mapped to `127.0.0.1`.
 
-Run the script to add the hostnames:
+To add the required hostnames, run:
 
 ```bash
 sudo ./scripts/update-hosts.sh
@@ -110,28 +110,40 @@ sudo ./scripts/update-hosts.sh
 
 ### Feature deployment fails during bootstrap
 
-Review `logs/bootstrap.log` for indications of error.
+Check `logs/bootstrap.log` for errors.
 
-Review the deployment `README.md` to ensure any prerequisites are handled.
+Also review the relevant feature deployment’s `README.md` to confirm prerequisites are met.
 
 ### MDCB feature doesn’t work
 
-Ensure `MDCB_LICENCE` is set in your `.env` file.
+Ensure the following is set in your `.env` file:
 
-## Postman Issues
+```bash
+MDCB_LICENCE=<your valid MDCB licence>
+```
+
+## Postman Request Issues
 
 ### Postman requests fail
 
-Some requests are designed to fail. Check the request description and tests.
-
-Review the `logs/bootstrap.log` file for indications of error.
-
-Run `scripts/test.sh` to validate the current deployment.
+Some requests are designed to fail — check the request description and test cases:
+- Review `logs/bootstrap.log` for underlying issues.
+- Run the test script and check for test failures:
+  ```bash
+  ./scripts/test.sh
+  ```
 
 ## Resetting Issues
 
 ### `down.sh` doesn't remove expected containers
 
-Ensure the `.bootstrap/bootstrapped_deployments` file exists and is correctly populated. 
+Check that `.bootstrap/bootstrapped_deployments` exists and is populated with th expected deployment names.
 
-If not, manually remove remaining resources (containers, volumes) using `docker` commands.
+If not, manually remove remaining Docker resources:
+
+```bash
+docker ps -a
+docker rm <container-id>
+docker volume ls
+docker volume rm <volume-name>
+```
