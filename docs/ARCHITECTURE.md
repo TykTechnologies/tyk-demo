@@ -1,6 +1,6 @@
 # Tyk Demo Architecture
 
-This document provides detailed information about the Tyk Demo architecture and its components.
+This document provides detailed information about the Tyk Demo architecture and its components. It is intended for developers and users working with Tyk Demo.
 
 ## Deployment Structure
 
@@ -10,7 +10,7 @@ Tyk Demo implements a modular architecture with two types of deployments:
    - Located in `deployments/tyk` directory
    - Provides standard Tyk components (Gateway, Dashboard, Pump)
    - Includes supporting databases (Redis and MongoDB)
-   - Implements a wide range of Tyk features and functionality
+   - Implements a wide range of core Tyk features and capabilities
    - Serves as the foundation for all feature deployments
 
 2. **Feature Deployments** (optional)
@@ -38,18 +38,18 @@ tyk-demo/
 
 ### Deployment Directory Structure
 
-Each deployment directory contains:
+Each deployment directory may contain:
 
 | File/Directory                          | Description                              | Required |
 |-----------------------------------------|------------------------------------------|----------|
-| `bootstrap.sh`                          | Initialization script                    | Yes      |
-| `deployment.json`                       | Information manifest                     | No       |
+| `bootstrap.sh`                          | Initialisation script                    | Yes      |
+| `deployment.json`                       | Metadata manifest                        | No       |
 | `docker-compose.yml`                    | Container configuration                  | Yes      |
 | `README.md`                             | Documentation                            | No       |
 | `data/` or `volumes/`                   | Data and volume mappings                 | No       |
 | `scripts/`                              | Utility scripts                          | No       |
 | `scripts/examples/`                     | Script-based examples                    | No       |
-| `teardown.sh`                           | Removes assets outside of Docker Compose control | No |
+| `teardown.sh`                           | Removes non-Docker assets                | No       |
 | `tyk_demo_<deployment>.postman_collection.json` | Postman-based examples and tests | No       |
 
 ## Component Architecture
