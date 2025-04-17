@@ -25,11 +25,12 @@ Look for containers that exited with errors. Check logs:
 docker logs <container-name>
 ```
 
-Also check `/logs/bootstrap.log` for indications of cause
+Also check `logs/bootstrap.log` for indications of cause.
 
 Common issues:
 - Incorrect or missing environment variables
 - Port conflicts
+- Insufficient resources (RAM/storage)
 
 ### Ports already in use
 
@@ -45,11 +46,13 @@ Either stop the conflicting service or update the port numbers in the relevant D
 
 Docker Compose v2+ is required.
 
-Update Docker and Docker Compose to latest
+Update Docker and Docker Compose to latest.
 
 ### Insufficient Resources
 
-If contains unexpectedly error, check the Docker has been allocated sufficient CPU, RAM and storage resources.
+If containers unexpectedly error, check that Docker has been allocated sufficient CPU, RAM and storage resources.
+
+The most important resource is RAM, for which Docker should be allocated at least 4GB.
 
 ## Bootstrapping Issues
 
@@ -86,6 +89,8 @@ Additionally, run the `licences.sh` script to check your licences:
 ```bash
 ./scripts/licences.sh
 ```
+
+Check that the licence has not expired.
 
 If the licence doesn't look correct, update it as per the process defined in the [setup guide](SETUP.md).
 
