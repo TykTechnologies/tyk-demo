@@ -39,16 +39,18 @@ tyk-demo/
 ### Deployment Directory Structure
 
 Each deployment directory contains:
-| File/Directory                          | Description                              | Optional |
+
+| File/Directory                          | Description                              | Required |
 |-----------------------------------------|------------------------------------------|----------|
-| `deployment.json`                       | Deployment manifest                      | Yes      |
-| `docker-compose.yml`                    | Container configuration                  | No       |
-| `bootstrap.sh`                          | Initialization script for the deployment | No       |
-| `README.md`                             | Deployment-specific documentation        | No       |
-| `data/` or `volumes/`                   | Data and volume mappings                 | Yes      |
-| `scripts/`                              | Deployment-specific scripts              | Yes      |
-| `teardown.sh`                           | Used to remove assets outside of Docker Compose | Yes |
-| `tyk_demo_<deployment>.postman_collection.json` | Deployment-specific examples           | Yes      |
+| `bootstrap.sh`                          | Initialization script                    | Yes      |
+| `deployment.json`                       | Information manifest                     | No       |
+| `docker-compose.yml`                    | Container configuration                  | Yes      |
+| `README.md`                             | Documentation                            | No       |
+| `data/` or `volumes/`                   | Data and volume mappings                 | No       |
+| `scripts/`                              | Utility scripts                          | No       |
+| `scripts/examples/`                     | Script-based examples                    | No       |
+| `teardown.sh`                           | Removes assets outside of Docker Compose control | No |
+| `tyk_demo_<deployment>.postman_collection.json` | Postman-based examples and tests | No       |
 
 ## Component Architecture
 
