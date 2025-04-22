@@ -87,7 +87,7 @@ Tyk Demo uses a modular approach:
 - **Base deployment**: Core Tyk components (Gateway, Dashboard, Pump) with supporting databases
 - **Feature deployments**: Optional extensions (analytics, SSO, observability etc.)
 
-For architecture details, see the [Architecture Guide](docs/ARCHITECTURE.md).
+For architecture details, see the [Architecture Guide](docs/architecture.md).
 
 ## Feature Deployments
 
@@ -104,7 +104,7 @@ Example:
 ./up.sh analytics-kibana
 ```
 
-For a complete list of all available feature deployments and their descriptions, see the [Feature Deployments Guide](docs/FEATURE-DEPLOYMENTS.md).
+For a complete list of all available feature deployments and their descriptions, see the [Feature Deployments Guide](docs/feature-deployments.md).
 
 ## Common Operations
 
@@ -126,11 +126,11 @@ For a complete list of all available feature deployments and their descriptions,
 ./up.sh
 ```
 
-For more operations, see the [Operations Guide](docs/OPERATIONS.md).
+For more operations, see the [Operations Guide](docs/operations.md).
 
 ## Troubleshooting
 
-Check the [Troubleshooting Guide](docs/TROUBLESHOOTING.md) for solutions to common issues.
+Check the [Troubleshooting Guide](docs/troubleshooting.md) for solutions to common issues.
 
 ## Contributing
 
