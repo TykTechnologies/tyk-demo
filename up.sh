@@ -77,12 +77,6 @@ mkdir -p logs 1> /dev/null
 # ensure Docker environment variables are correctly set before creating containers
 # these allow for specialised deployments to be easily used, without having to manually set the environment variables
 # this approach aims to avoid misconfiguration and issues related to that
-if [[ "$*" == *tracing* ]]; then
-  set_docker_environment_value "TRACING_ENABLED" "true"
-else
-  set_docker_environment_value "TRACING_ENABLED" "false"
-fi
-
 if [[ "$*" == *instrumentation* ]]; then
   set_docker_environment_value "INSTRUMENTATION_ENABLED" "1"
 else
