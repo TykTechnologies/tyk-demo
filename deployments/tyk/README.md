@@ -1,108 +1,131 @@
-# Standard Tyk Deployment
+# Tyk Deployment Guide
 
-The standard Tyk deployment, with Dashboard, Gateway, Pump, Redis and MongoDB.
+A comprehensive guide for standard Tyk deployment with Dashboard, Gateway, Pump, Redis, and MongoDB components.
+
+## Quick Access URLs
 
 - [Tyk Dashboard](http://tyk-dashboard.localhost:3000)
-- [Tyk Portal](http://tyk-portal.localhost:3000/portal)
+- [Tyk Portal (Classic)](http://tyk-portal.localhost:3000/portal)
 - [Tyk Gateway](http://tyk-gateway.localhost:8080/basic-open-api/get)
-- [Tyk Gateway 2](https://tyk-gateway-2.localhost:8081/basic-open-api/get)
+- [Tyk Gateway 2 (TLS)](https://tyk-gateway-2.localhost:8081/basic-open-api/get)
 
-## Setup
+## Getting Started
 
-This deployment is required by all other deployments. It is automatically deployed by the `up.sh` script, so no parameter is required:
+### Basic Setup
 
-```
+This deployment serves as the foundation for all other deployments. It's automatically deployed using the `up.sh` script, so no `tyk` argument is needed:
+
+```bash
 ./up.sh
 ```
 
-## Usage
+### Usage Guide
 
-The bootstrap process imports sample data to demonstrate how APIs and Policies can be configured. Log into the [Tyk Dashboard](http://tyk-dashboard.localhost:3000) to start using the product.
+The bootstrap process imports sample data demonstrating API and Policy configurations. Sign in to the [Tyk Dashboard](http://tyk-dashboard.localhost:3000) to start exploring.
 
-### Querying the APIs
+The terminal output displays all the relevant URLs and credentials.
 
-Import the `Tyk Demo.postman_collection.json` file into Postman to gain access to a library of API requests which demonstrate the features of Tyk
+#### API Testing
 
-### Scaling the solution
+Import the [Postman collection](deployments/tyk/tyk_demo_tyk.postman_collection.json) into Postman to access a comprehensive library of API requests showcasing Tyk's features.
 
-Run the `scripts/add-gateway.sh` script to create a new Gateway instance. It will behave like the existing `tyk-gateway` container as it will use the same configuration. The new Gateway will be mapped on a random port, to avoid collisions.
+#### Scaling Your Deployment
 
-### Multi-tenancy
+Run the `./scripts/add-gateway.sh` script to create additional Gateway instances. New instances will use the same configuration as the existing `tyk-gateway` container but will be mapped to random ports to avoid conflicts.
 
-There are two Organisations in the deployment who operate as separate tenants:
+## Multi-tenancy
 
-- Tyk Demo
-- Acme
+The deployment includes two separate organisational tenants:
 
-The Organisations have separate users accounts with which to access the Dashboard. When using the Dashboard, users can only access and manage data which belongs to their Organisation.
+- **Tyk Demo**: The main organisation, containing the majority of examples
+- **Acme**: An additional organisation, to demonstrate multi-tenant functionality
 
-## Features
+Each organisation has dedicated user accounts for Dashboard access. Users can only access and manage data within their respective organisation.
 
-### Secure Payloads
+## Key Features
 
-The deployment is configured to for [secure communication](https://tyk.io/docs/tyk-configuration-reference/securing-system-payloads/) between the Dashboard and Gateway. The Dashboard signs messages sent to the Gateway, which is the Gateway is able to verify.
+### Secure Communications
 
-This is acheived using a public/private key pair. The Gateway has the public key, and the Dashboard has the private key - see the mappings for `public-key.pem` and `private-key.pem` in `docker-compose.yml`. To enable the feature, the `allow_insecure_configs` setting in `tyk.conf` is set to `false`.
+The deployment implements [secure communication](https://tyk.io/docs/api-management/security-best-practices/#sign-payloads) between Dashboard and Gateway through signed messages.
 
-### TLS Gateway
+- **Implementation**: Public/private key pair
+- **Configuration**: Gateway holds the public key, Dashboard holds the private key
+- **Security Setting**: `allow_insecure_configs` in `tyk.conf` is set to `false`
 
-The TLS-enabled Gateway (`tyk-gateway-2`) uses a self-signed certificate. This requires that your HTTP client ignores certificate verification errors when accessing this Gateway.
+### TLS-Enabled Gateway
+
+The `tyk-gateway-2` gateway is configured to listen using TLS:
 
 - [Tyk TLS Gateway](https://tyk-gateway-2.localhost:8081/basic-open-api/get)
 
-### RBAC API Portal Catalogue
+> **Note:** The gateway uses a self-signed certificate, requiring HTTP clients to ignore certificate verification errors when accessing.
 
-The Dashboard has a slightly modified API Catalogue template.  If you publish a policy and name it "Internal API", it won't be visible to any developers unless they have the correct role.
+### Role-Based API Portal Catalog
 
-Try viewing the API Catalogue with a developer, then add the "internal" role to the Developer Profile, and see the outcome with values "0" and "1".
+The classic Portal has a [slightly modified API Catalogue template](https://github.com/TykTechnologies/tyk-demo/blob/751b99f6a6798b0cd8e0d96952fa0d99579d1080/deployments/tyk/volumes/tyk-dashboard/catalogue.html#L26). If you publish a API and name it "Internal API", it won't be visible to any developers unless they have the necessary profile attribute.
 
-### Multi-Organisation User
+To try:
+1. Add an API Definition named "Internal API"
+2. Add a policy for the API definition
+3. Add a catalog entry for the API to the classic portal
+4. Visit the [catalog page](http://tyk-portal.localhost:3000/portal/apis/), the *Internal API* will not be visible
+5. Using the Dashboard, edit the developer portal account `portal-developer@example.org`, adding a custom field `internal` with the value `1`
+6. Log into the [developer portal](http://tyk-portal.localhost:3000/portal/) - username `portal-developer@example.org`, password `yrPL6CdeJmSCYv7q`
+7. Visit the [catalog page](http://tyk-portal.localhost:3000/portal/apis/) again, the *Internal API* will be visible
 
-[Multi-Organiation Users](https://tyk.io/docs/release-notes/version-2.8/#multi-organisation-users) can access multiple Organisations, unlike normal users, who are limited to a single Organisation.
+### Multi-Organisation User Support
 
-This is made possible by creating an account in each Organisation that has the same username (email address). When this user authenticates with the Dashboard they are presented with a list of Organisations they can access. Selecting an Organisation will then log them into the Dashboard in that Organisational context - it is not possible to log into multiple Organisations at the same time.
+[Multi-Organisation Users](https://tyk.io/docs/api-management/user-management/#manage-tyk-dashboard-users-in-multiple-organizations) can access multiple organisations by:
 
-To try this out, run the `up.sh` script then log into the Dashboard using the credentials shown for the **Multi-Organisation User**.
+1. Creating accounts with identical email addresses across organisations
+2. Authenticating with the Dashboard to view accessible organisations
+3. Selecting an organisation to operate within that context
+
+> **Note**: It's not possible to log into multiple organisations simultaneously.
+
+To test this feature, run the `up.sh` script and log in using the provided **Multi-Organisation User** credentials - username `multi-org-user@example.org`, password `eN6yAZwvXUYk2p9S`.
 
 ### Detailed Analytics Logging
 
-[Detailed analytics logging](https://tyk.io/docs/analytics-and-reporting/useful-debug-modes/#enabling-detailed-logging) is a feature which records the full HTTP request and response payloads as part of the analytics data.
+[Detailed analytics logging](https://tyk.io/docs/api-management/troubleshooting-debugging/#enabling-detailed-logging) captures full HTTP request and response payloads within analytics data.
 
 This feature can be enabled at three levels:
-
 1. Global (Gateway)
 2. API
 3. Key
 
-When a request/response is processed, if any of the levels is enabled, then the detailed analytics data will be logged.
+The bootstrap script demonstrates each scenario, with the result analytics viewable in the Log Browser report. Additional examples are available in the Postman collection under *API Definition* > *Detailed Analytics Logging*.
 
-The bootstrap script sends requests for each scenario, which you can see in the Log Browser report. There are also requests in the Postman collection - see *API Definition* > *Detailed Analytics Logging* for more information.
+### Middleware Implementations
 
-### Python Middleware
+#### Go Plugin
 
-[Python middleware](https://tyk.io/docs/plugins/supported-languages/rich-plugins/python/python/) is implemented for the *Python Middleware API*. It is a basic implementation which adds headers to the request and response, and adds log entries to the Gateway's application log. See the *Middleware - Python* request (API Definition > Middleware > Middleware - Python) in the Postman collection for an example.
+The *Go Plugin API* implements a [Go Plugin](https://tyk.io/docs/plugins/supported-languages/golang/) that:
+1. Adds a header to requests
+2. Masks/obfuscates response data in analytics logs
 
-During the bootstrap script, the Gateway is used to create a plugin bundle, which it signs with its private key so that it can be validated before the Gateway loads it. The plugin is then copied to an Apache server to make it available to the Gateway at runtime when the *Python Middleware API* is requested.
+During bootstrap, the Go source at `deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.go` is compiled into a shared object library, referenced by the *Go Plugin API*.
 
-The source and manifest file for the plugin are available in `deployments/tyk/volumes/tyk-gateway/middleware/python/basic-example`.
+##### Analytics Plugin Example
 
-### Go Plugin
+The `MaskAnalyticsData` function in the example Go plugin demonstrates [analytics plugin](https://tyk.io/docs/plugins/plugin-types/analytics-plugins/) functionality by:
+- Updating analytics data before database storage
+- Replacing the `origin` field value with asterisks
 
-A [Go Plugin](https://tyk.io/docs/plugins/supported-languages/golang/) is implemented for the *Go Plugin API*. It is a basic implementation which (1) adds a header to the request and (2) masks/obfuscates some response data in the analytics log. See the *Middleware - Go* request (API Definitions > Middleware > Middleware - Go) in the Postman collection for an example.
-
-During the bootstrap script, the Go source in `deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.go` is complied into a shared object library file (`deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.so`), which is referenced by the *Go Plugin API*. A special container is used to build the library file, using the same Go version used to build the Gateway.
-
-#### Analytics Plugin
-
-An example [analytics plugin](https://tyk.io/docs/plugins/plugin-types/analytics-plugins/) function, called *MaskAnalyticsData*, can be found in the [example go plugin](volumes/tyk-gateway/plugins/go/example/example-go-plugin.go). It demonstrates analytics plugin functionality by updating analytics data prior to it being saved in the database. In this example, it replaces the value of the `origin` field with asterisks. This can be demonstrated by sending a request to the [Go Plugin API (No Auth)](http://tyk-gateway.localhost:8080/go-plugin-api-no-auth/get) and viewing the corresponding analytics record in the Dashboard, where the `origin` field in the *Response* body data will be `"origin": "****"` instead of showing an IP address.
+Test this by sending a request to the [Go Plugin API (No Auth)](http://tyk-gateway.localhost:8080/go-plugin-api-no-auth/get) and viewing the analytics record in the Dashboard.
 
 ### WebSockets and Server-Sent Events
 
-These examples use the *Echo Server* API Definition, which is configured to proxy to `echo-server:8080`, a simple echo server container. The echo server echoes back any message it receives, and has special endpoints which enable demonstration of WebSockets and Server-Sent Events.
+These examples use the *Echo Server* API Definition configured to proxy to `echo-server:8080`.
 
-#### WebSockets
+#### WebSockets Demo
 
-To see a live demonstration, open the [WebSocket Test Page](http://echo-server.localhost:8080/.ws) in a browser. When this page loads, it automatically opens a WebSocket connection with the API Gateway and uses JavaScript to exchange messages. The Gateway proxies the message to the upstream server and returns the response to the web page. One message is sent every second. If all goes well, it will look something like this:
+Visit the [WebSocket Test Page](http://echo-server.localhost:8080/.ws) to see a live demonstration that:
+- Automatically opens a WebSocket connection
+- Exchanges messages via the API Gateway
+- Sends one message per second
+
+Successful operation produces output similar to:
 
 ```
 [info]  attempting to connect
@@ -114,11 +137,15 @@ To see a live demonstration, open the [WebSocket Test Page](http://echo-server.l
 [recv]  1 = 0x1
 ```
 
-Check the browser's developer tool network information to see the `MessageEvent` objects.
+Check browser developer tools for `MessageEvent` objects in the network information.
 
-#### Server-Sent Events
+#### Server-Sent Events Demo
 
-To see a live demonstration, open the [SSE Test Page](http://echo-server.localhost:8080/.sse) in a browser (**Note**: If you are using Firefox, the browser will display a download dialog, rather than write the data to the page). When this page loads, it automatically opens a connection with the API Gateway and awaits messages sent via the open connection. The server sends timestamp data every second, which is then displayed on the page. The output should look something like this:
+Visit the [SSE Test Page](http://echo-server.localhost:8080/.sse) to see a live demonstration that:
+- Opens a connection with the API Gateway
+- Receives timestamp data sent every second
+
+Expected output:
 
 ```
 event: server
@@ -141,51 +168,40 @@ event: time
 data: 2021-10-15T03:32:36Z
 id: 4
 ```
-### ngrok 
 
-Using ngrok generates an external IP and hostname which makes the Tyk Gateway publicly accessible from the internet.
+### External Access via ngrok
 
-This will simulate and external access which will allow Tyk Gatway to find from which location you are making a request and show it in the "Activity by location section"
+ngrok provides external access to your Tyk Gateway, enabling:
+- Public internet accessibility
+- Geolocation tracking in the "Activity by location" dashboard
+- Request recording through the ngrok dashboard
 
-The ngrok deployment contains a dashboard which records all requests which pass through the ngrok tunnel.
+#### Configuration
+
+**Important**: ngrok requires an auth token. To configure:
+1. Create an ngrok account on their website
+2. Obtain an auth token (not an API key)
+3. Add it to the Tyk Demo `.env` file: `NGROK_AUTHTOKEN=MY-AUTH-TOKEN-123`
+
+#### Access and Monitoring
 
 - [ngrok dashboard](http://localhost:4040)
+- The ngrok tunnel URL is displayed in the bootstrap script output
 
-**Important**: Ngrok requires an auth token. You must provide your own token by creating an Ngrok account via their website. Once you have an auth token (note, "auth token", not "api key", ngrok has both), add it to the Tyk Demo `.env` file as `NGROK_AUTHTOKEN` e.g. `NGROK_AUTHTOKEN=MY-AUTH-TOKEN-123`.
+APIs are accessible through both the Gateway URL and tunnel URL:
+- Gateway URL: `http://tyk-gateway.localhost:8080/basic-open-api/get`
+- External Tunnel URL: `http://<dynamic-id>.ngrok.io/basic-open-api/get`
 
-#### Usage
+#### Managing the Tunnel
 
-The Ngrok tunnel URL is displayed in the output of the bootstrap script (`./up.sh`). 
-The URL will be something that looks like this: `http://11e3-103-252-202-110.ngrok.io`
-
-APIs can be accessed through the tunnel URL using the same paths as they are accessed through the Gateway URL. For example, using the example tunnel URL provided above, the Basic Open API can be accessed as follows:
-
-- Gateway URL: http://tyk-gateway.localhost:8080/basic-open-api/get
-- External Tunnel URL: http://11e3-103-252-202-110.ngrok.io/basic-open-api/get
-
-Requests sent via the tunnel are recorded and displayed in the [Ngrok dashboard](http://localhost:4040). 
-Try sending some requests through the tunnel URL to generate some data, then check the Dashboard to see what has been recorded.
-
-You can also set the external url as custom domain in the api definition.
- 
-##### Getting the tunnel URL
-
-To get the tunnel URL at any time, run the following:
-```
-curl localhost:4040/api/tunnels --silent| jq ".tunnels[0].public_url" --raw-output
-```
-
-This will display the tunnel URL e.g. `https://<dynamic-ngrok-allocated-ip>.ngrok.io`.
-
-The tunnel IP can also be seen in the [ngrok dashboard](http://localhost:4040).
-
-##### Renewing the Ngrok session
-
-Anonymous ngrok sessions are capped at 2 hours. So after 2 hours you will need to restart the ngrok container to generate a new session and URL:
-`./docker-compose-command.sh restart www-ngrok`
-
-Then, to get the new URL use:
-
-```
+To retrieve the current tunnel URL:
+```bash
 curl localhost:4040/api/tunnels --silent | jq ".tunnels[0].public_url" --raw-output
 ```
+
+To renew the ngrok session (anonymous sessions expire after 2 hours):
+```bash
+./docker-compose-command.sh restart www-ngrok
+```
+
+You can also configure the external URL as a custom domain in the API definition.
