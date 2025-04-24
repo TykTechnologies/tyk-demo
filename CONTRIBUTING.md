@@ -1,195 +1,304 @@
-This file serves as guidance to those wishing to contribute/extend this repo.
+# Tyk Demo Contributor Guide
 
-You can use the Tyk deployment `deployments/tyk` as a reference implementation.
+This guide provides comprehensive instructions for anyone who wants to contribute to or extend this repository. 
 
-# Deployments
+> **Tip:** You can use the Tyk deployment in `deployments/tyk` as a reference implementation.
 
-Deployments are the discrete elements of this repo which enable users to decide what to deploy.
+## Table of Contents
+- [Deployment Structure](#deployment-structure)
+  - [Directory Name](#directory-name)
+  - [Required Files](#required-files)
+  - [Optional Files](#optional-files)
+  - [Directory Structure](#directory-structure)
+  - [Data Organisation](#data-organisation)
+- [Creating a Deployment](#creating-a-deployment)
+  - [Docker Compose Configuration](#docker-compose-configuration)
+  - [Docker Environment Variables](#docker-environment-variables)
+  - [Bootstrap Script](#bootstrap-script)
+  - [Documentation](#documentation)
+- [Working with Scripts](#working-with-scripts)
+  - [Core Scripts](#core-scripts)
+  - [Utility Scripts](#utility-scripts)
+- [Managing API and Policy Data](#managing-api-and-policy-data)
+  - [Exporting Changes](#exporting-changes)
+  - [Synchronising Updates](#synchronising-updates)
+- [Postman Testing Framework](#postman-testing-framework)
+  - [Tyk Postman Library](#tyk-postman-library)
+  - [Writing Tests](#writing-tests)
+  - [Dynamic Testing Environment](#dynamic-testing-environment)
+  - [Test Automation](#test-automation)
+  - [Usage Examples](#usage-examples)
 
-Deployments should be contained within their own directory within the `deployments` directory. The deployment directory name should be refer to the purpose of the deployment i.e. the functionality that can be demonstrated by the deployment.
+## Deployment Structure
 
-## Files
+Deployments are discrete elements that enable users to choose what functionality to deploy. Each deployment should be contained within its own directory inside the `deployments` directory.
 
-Deployments must contain the following files:
+### Directory Name
 
-* `docker-compose.yml`: A Docker Compose file which specifies the services to deploy
-* `bootstrap.sh`: A bootstrap script which prepares the deployment so that it's ready to use
-* `readme.md`: A readme file which describes how the deployment can be used
+The deployment directory name should reflect the purpose or functionality of the deployment:
+- Use lowercase letters with words separated by hyphens (e.g., `my-deployment`)
+- If the deployment is related to a particular theme, use the theme name as a prefix
 
-Optionally, a Postman collection can be provided, containing deployment-specific requests. This file should be named `tyk_demo_<DEPLOYMENT_NAME>.postman_collection.json` e.g. for the `mdcb` deployment, the file is called `tyk_demo_mdcb.postman_collection.json`.
+For example, the `analytics-datadog` deployment relates to analytics reporting through Datadog. Prefixing the name in this way helps group related deployments together alphabetically.
 
-## Directories
+### Deployment Files
 
-Deployments can also contain directories, if needed:
+**Required Files**
 
-* `volumes`: Contains data for use as volumes referenced by the `docker-compose.yml` file
-* `data`: Contains data for general use e.g. during bootstrapping
-* `scripts`: Contains scripts related to bootstrapping or using the deployment
+Every deployment must include these files:
 
-Both the `volumes` and `data` directories should contain sub-directories named after services, using the service name from the `docker-compose.yml` file. 
+| File | Purpose |
+|------|---------|
+| `docker-compose.yml` | Defines the services to deploy |
+| `bootstrap.sh` | Prepares the deployment for immediate use |
+| `README.md` | Describes how to use the deployment |
 
-For example, in the `tyk` deployment, the Tyk Gateway's (`tyk-gateway`) configuration file (`tyk.conf`) is mapped as a volume, so has the path `volumes/tyk-gateway/tyk.conf`.
+**Optional Files**
 
-### Data Groups
+| File | Purpose |
+|------|---------|
+| `tyk_demo_<DEPLOYMENT_NAME>.postman_collection.json` | Provides guided usage examples and validates functionality |
+| `deployment.json` | Contains deployment metadata that can be read by scripts or external systems |
+| `teardown.sh` | Run as part of `down.sh` process to remove resources not handled by Docker |
 
-Numbered directories within the `/data/tyk-dashboard` directory allow the data files to be grouped and processed in a segmented manner. This approach simplifies bootstrapping of separate organisations and recording resulting data.
+> **Note about Postman Collections:** While optional, collections are highly recommended as they provide guided usage examples and validate functionality. Example: `tyk_demo_mdcb.postman_collection.json` for the `mdcb` deployment.
 
-The bootstrap and export scripts are written to iterate through these directories, processing them in numerical order.
-## Docker Compose
+### Directory Structure
 
-The deployment's Docker Compose file must be named `docker-compose.yml`, and contain the services required by the deployment.
+Deployments may include these directories:
 
-This file will be used as a parameter, alongside the base deployment's `deployments/tyk/docker-compose.yml`. This means that it only needs to contain services beyond those in the base deployment i.e. you do not need to specify a Dashboard, Gateway pump etc, as these are already in the base deployment.
+| Directory | Purpose |
+|-----------|---------|
+| `volumes` | Contains data used as Docker volumes |
+| `data` | Contains data for bootstrapping |
+| `scripts` | Contains deployment-specific scripts |
 
-## Docker Environment Variables
+Both `volumes` and `data` directories should contain subdirectories named after the services defined in `docker-compose.yml`. For example, in the `tyk` deployment, the Gateway's configuration file is at `volumes/tyk-gateway/tyk.conf`.
 
-If the deployment makes use of Docker environment variables which would have adverse effects on the system if set incorrectly, use the `up.sh` script to verify the values and correct them as needed.
+### Data Organisation
 
-The `scripts/common.sh` provides the `set_docker_environment_value` function to set Docker environment variables to desired values. Check the `up.sh` script for implementations for the `tracing` and `instrumentation` deployments.
-
-## Bootstrap Script
-
-The bootstrapping process prepares the deployment for use, so that they can immediately be demonstrated.
-
-When creating the bootstrap for a deployment, follow these conventions:
-
-* At the start of the bootstrap script:
-  * Reference the `scripts/common.sh` script, as this contains useful bootstrap functions e.g. `source scripts/common.sh`
-  * Set the `deployment` variable, as this is used in the `common.sh` bootstrap functions e.g. `deployment="My Deployment Name"`
-  * Call the `log_start_deployment` function, to log the start of the deployment
-* At the start of each step:
-  * Call the `log_message` function to log what is happening e.g. `log_message "Updating configuration"`
-* During each step:
-  * Call the `log_message` function to log any useful information, prefixing messages with two spaces to indent them e.g. `log_message "  Useful indented message"`
-  * Call the `bootstrap_progress` function to provide progress feedback during long-running steps
-* At the end of each step:
-  * Call the `bootstrap_progress` function to provide progress feedback
-  * Call either the `log_ok`, `log_json_result` or `log_http_result` function, as appropriate, to log the end of the step
-* At the end of the bootstrap script:
-  * Call the `log_end_deployment` function, to log the end of the deployment
-  * Echo relevant information about the deployment (see Displaying Information, below)
-
-### Displaying Information
-
-At the end of the bootstrap process, display relevant information about the deployment that the user will find useful. This may be URLs of services, usernames, passwords etc.
-
-Follow these rules when displaying the deployment output:
-
-* Start with the echo command `echo -e "\033[2K`
-* Put the deployment name prefixed with `▼ ` e.g. `▼ Deployment name`
-* For each service you want to display:
-  * In column 3, put the service name, prefixed with `▽ ` e.g. `  ▽ Service name`
-  * For each piece of information you want to display:
-    * Display the information as a colon separated label and value, aligned so that the colon is on column 25 e.g. `            Useful info : $variable_data`
-  * If you need to embed additional information you can use the small triangle `▾` and `▿` characters
-* Remember to end the last line with a string terminator e.g. `"`
-
-Here is an example:
+Numbered directories within `/data/tyk-dashboard` allow data files to be processed in a structured manner.
 
 ```
+data/
+└── tyk-dashboard/
+    ├── 1/
+    │   ├── apis/
+    │   └── policies/
+    └── 2/
+        ├── apis/
+        └── policies/
+```
+
+This approach simplifies bootstrapping separate organisations and recording the resulting data. The bootstrap and export scripts process these directories in numerical order, enabling organised data handling.
+
+## Creating a Deployment
+
+### Docker Compose Configuration
+
+Your deployment's `docker-compose.yml` must:
+
+1. Define only the services specific to your deployment
+2. Be compatible with the base deployment's `deployments/tyk/docker-compose.yml`
+
+You don't need to redefine services already present in the base deployment (Dashboard, Gateway, etc.).
+
+Example:
+
+```yaml
+version: '3.8'
+services:
+  my-custom-service:
+    image: my-custom-image:latest
+    ports:
+      - "8888:8080"
+    environment:
+      - VARIABLE=value
+    volumes:
+      - ./deploymentys/my-deployment/volumes/my-custom-service:/etc/my-custom-service
+```
+
+### Docker Environment Variables
+
+If your deployment requires specific Docker environment variables, use the `up.sh` script to verify and correct their values as needed.
+
+The `scripts/common.sh` provides the `set_docker_environment_value` function to help manage these variables. 
+
+Example:
+
+```bash
+# Example from up.sh for the instrumentation deployment
+if [[ "$*" == *instrumentation* ]]; then
+  set_docker_environment_value "INSTRUMENTATION_ENABLED" "1"
+else
+  set_docker_environment_value "INSTRUMENTATION_ENABLED" "0"
+fi
+```
+
+### Bootstrap Script
+
+The bootstrap script prepares your deployment for immediate demonstration. Follow these conventions for consistency:
+
+#### Script Structure
+
+```bash
+#!/bin/bash
+
+# Import common functions
+source scripts/common.sh
+
+# Set deployment name
+deployment="My Deployment Name"
+
+# Log deployment start
+log_start_deployment
+
+# Step 1: Setup Configuration
+log_message "Setting up configuration"
+# ... configuration code ...
+log_message "  Additional details about configuration"
+bootstrap_progress
+log_ok
+
+# Step 2: Creating Resources
+log_message "Creating resources"
+# ... resource creation code ...
+bootstrap_progress
+log_json_result "$response"
+
+# Additional steps as needed...
+
+# Log deployment completion
+log_end_deployment
+
+# Display deployment information
 echo -e "\033[2K
-▼ Deployment name
-  ▽ Service name
-            Useful info : $variable_data
-             Other info : hardcoded data
-    ▾ Embedded object
-         With some info : $variable_data_2
-  ▽ Another service
-              More data : $another_variable"
+▼ My Deployment Name
+  ▽ Service Name
+          Dashboard URL : http://localhost:3000
+               Username : admin@example.com
+               Password : $password_variable
+  ▽ Another Service
+           API Endpoint : http://localhost:8080/api"
 ```
 
-Following these rules will allow the displayed data to be aligned uniformly with other bootstrap output.
+#### Display Conventions
 
-For more examples, check the `bootstrap.sh` files in other deployments.
+When displaying deployment information, follow this format:
 
-### Context Data Directory
+- Start with `echo -e "\033[2K`
+- Use `▼ Deployment Name` for the deployment name
+- Use `▽ Service Name` for each service (indented 2 spaces)
+- Format information as `Label : Value` with the colon at column 25
+- Use `▾` and `▿` for nested information
+- End with a closing quote (`"`)
 
-The `.context-data` directory is used to store data generated during bootstrap scripts so that other scripts can access and use that data. This is particularly important for dynamic data, such as the ids of data added via the Dashboard API. The `scripts/common.sh` script contains functions to read (`get_context_data`) and write (`set_context_data`) this data.
+#### Context Data
 
-For example, the base Tyk deployment bootstrap script (`deployments/tyk/bootstrap.sh`) writes the Dashboard API credentials to `.context-data/1_dashboard-user_1_api-key`, which can then be read by other scripts. When the SSO deployment is used, its bootstrap script (`deployments/sso/bootstrap.sh`) reads the content of the file so that it can access the Dashboard API.
+Store generated data in the `.context-data` directory to make it accessible to other scripts. The `scripts/common.sh` script provides `get_context_data` and `set_context_data` functions for this purpose.
 
-## Readme
+```bash
+# Setting context data
+set_context_data "$data_group" "dashboard-user" "$index" "email" "$dashboard_user_email"
+set_context_data "$data_group" "dashboard-user" "$index" "password" "$dashboard_user_password"
 
-The deployment's `readme.md` should contain:
-
-* A description of the deployment
-* Example command to deploy the deployment
-* Useful information on the usage of the deployment
-
-# Scripts
-
-The `up.sh` and `down.sh` scripts bring the deployments up and down.
-
-Both scripts accept arguments for the deployments to include. The base Tyk deployment is hard-coded into the scripts, so there is no need to pass `tyk` as an argument.
-
-The up script has three main purposes:
-
-1. Ensure the Docker environment variables are set correctly based on the deployment arguments
-2. Run a Docker Compose command referencing the base Tyk deployment (`deployments/tyk/docker-compose.yml`) and any deployments provided as arguments
-3. Run the bootstrap script for the base Tyk deployment (`deployments/tyk/bootstrap.sh`) and any deployments provided as arguments
-
-The down script's only purpose is to run a docker-compose command to bring the deployments down. The docker-compose command include the `-v` switch, which removes the volumes, ensuring that no data is persisted.
-
-## Utilities
-
-These utility scripts are available in the `scripts` directory:
-
-* `add-gateway.sh`: Creates a new Tyk Gateway container, using the same configuration as the base Tyk deployment Gateway
-* `common.sh`: Contains functions useful for bootstrap scripts
-* `export.sh`: Uses the Dashboard API to export API and Policy definitions, overwriting data used to bootstrap the base Tyk deployment
-* `test.sh`: Uses a Newman container to run the Postman collection tests for all deployment that are currently bootstrapped
-* `test-all.sh`: As `test.sh`, but runs for all deployments
-* `update-hosts.sh`: Adds the necessary hosts to the `/etc/hosts` file
-
-Note that there is no *import* script, as the `up.sh` script essentially imports the data when bootstrapping the deployment.
-
-# Working with APIs, Policies and Postman Data
-
-There are two scenarios for working with this data:
-
-1. You have made changes and want to commit them so that others can get them
-2. You want to get the changes other people have made
-
-## Scenario 1: Committing Changes to Remote
-
-In this scenario you have made updates to the repo which you want to commit back to master.
-
-Before making a pull request, if your changes are to an existing deployment, please check that **all tests are working correctly** by running the `./scripts/test-all.sh` script. If any tests fail then please resolve.
-
-If you have made changes to APIs or Policies, you can run the export script to update the version controlled data files:
-
+# Retrieving context data
+username=$(get_context_data "1" "dashboard-user" "1" "email")
+password=$(get_context_data "1" "dashboard-user" "1" "password")
 ```
+
+### Documentation
+
+Your deployment's `README.md` should include:
+
+1. A clear description of the deployment's purpose
+2. Example commands to deploy and use it
+3. Any specific configuration or usage instructions
+4. Any additional assets that are helpful, such as screenshots or diagrams
+
+## Working with Scripts
+
+### Core Scripts
+
+The repository includes two main scripts:
+
+- `up.sh`: Brings deployments up by:
+  1. Setting environment variables correctly
+  2. Running Docker Compose with the base Tyk deployment and any additional deployments
+  3. Running bootstrap scripts for each deployment
+
+- `down.sh`: Brings deployments down with the `-v` flag to remove volumes and prevent data persistence
+
+The `up.sh` script accepts deployment names as arguments, with the base Tyk deployment included by default:
+
+```bash
+# Example: Deploy the base Tyk deployment plus the analytics deployment based on Kibana
+./up.sh analytics-kibana
+```
+
+The `down.sh` script does not take arguments, instead reading from `.bootstrap/bootstrapped_deployments` to determine which deployments to stop.
+
+### Utility Scripts
+
+The `scripts` directory contains these utilities:
+
+| Script | Purpose |
+|--------|---------|
+| `add-gateway.sh` | Creates a new Tyk Gateway container |
+| `common.sh` | Provides common functions for bootstrap scripts |
+| `export.sh` | Exports API and Policy definitions |
+| `licences.sh` | Displays Tyk license information |
+| `recreate-gateways.sh` | Recreates all current Tyk gateway containers |
+| `test-all.sh` | Runs tests for all deployments |
+| `test-common.sh` | Provides common functions for test scripts |
+| `test.sh` | Runs Postman collection tests for bootstrapped deployments |
+| `update-env.sh` | Adds or updates values in the `.env` file |
+| `update-hosts.sh` | Updates `/etc/hosts` with necessary entries |
+
+## Managing API and Policy Data
+
+### Exporting Changes
+
+If you've modified APIs or Policies, persist the data by exporting it:
+
+```bash
 ./scripts/export.sh
 ```
 
-This will update the `apis.json` and `policies.json` files in the `deployments/tyk/data/tyk-dashboard` path. Other types of data will need to be exported manually, or update the `export.sh` script to include your data. Please ensure that any necessary data is automatically added to the deployment when the `up.sh` script is run.
+This updates APIs and Policies within the `deployments/tyk/data/tyk-dashboard` path. For other data types, update the export script or export manually.
 
-When adding functionality to this repo, please also add requests to the Postman collection to demonstrate the functionality. Include a description and enough tests to validate the response. Tests are especially important to avoid regressions, so please add them. Export the collection and overwrite the `tyk_demo.postman_collection.json` file in the deployment directory.
+Update the relevant `bootstrap.sh` scripts to import the exported data.
 
-## Scenario 2: Synchronising Updates from Remote
+When adding new functionality:
+- Include Postman requests that demonstrate it
+- Add tests to prevent regressions
+- Verify tests pass by running `./scripts/test-all.sh`
 
-The simplest and best-practice approach is to simply bring the environment down, pull the repo then bring it back up again. The `up.sh` script includes commands to import APIs, Policies and other data, so all latest data will be imported:
+Tests must be passing before a PR can be merged.
 
-```
+### Synchronising Updates
+
+To get the latest changes from the remote repository:
+
+```bash
 ./down.sh
 git pull
 ./up.sh
 ```
 
-# Postman Scripts
+This approach ensures that you cleanly import all the latest API definitions, policies, and other data.
 
-## Tyk Postman Library
+Any updated Postman collections should be reimported into Postman.
 
-The Tyk Postman Library provides functions for simplified access to the Tyk Gateway, Dashboard and Dashboard Admin APIs.
+## Postman Testing Framework
 
-The library simplifies Tyk API access by wrapping the Postman HTTP request method (`pm.sendRequest`) and automatically setting the necessary host, method, path, headers and body. All the developer must do is provide the necessary parameter values, callback function (if needed) and Postman context:
-- The parameters vary depending on the function e.g. the id of an object to retrieve, or the body data to create an object.
-- The callback function can be used to perform further operations once the request is completed. The function is passed straight to Postman's `pm.sendRequest` function.
-- The Postman context is needed, as it is not accessible by the script directly, so must be passed into the function at runtime.
+### Tyk Postman Library
 
-The library is stored in the root of the Postman collection as a pre-request script. To view it, click the *Tyk Demo* tree root element, then click on *Pre-request Script*. Storing the script here makes it available to all requests within the collection.
+The Tyk Postman Library provides functions for easy access to Tyk Gateway, Dashboard, and Admin APIs. It simplifies Tyk API access by wrapping Postman's `pm.sendRequest` method and automatically configuring the necessary request components.
 
-Functions are namespaced, by API and object e.g. `tyk.dashboardAdminApi.organisations`. Within the namespaces are the functions which represent the different endpoints for that API and object. For example, the `create` function within `tyk.dashboardAdminApi.organisations` represents a `POST` request to the `/admin/organisations` endpoint:
+The library is stored as a pre-request script in the root of the Postman collection, making it available to all requests.
+
+Functions are organised by namespace:
 
 ```javascript
 tyk = {
@@ -211,11 +320,86 @@ tyk = {
 }
 ```
 
-Postman variables are used to retrieve some data, where it's possible and appropriate to do so, such as hostnames and API keys.
+### Writing Tests
 
-### Use in Postman Scripts
+Effective tests validate:
 
-Some requests benefit from or require access to Tyk data. The Tyk Postman Library can be used to perform the necessary interactions with the Tyk API.
+#### 1. HTTP Status Codes
+
+```javascript
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+```
+
+#### 2. Response Body Data
+
+```javascript
+pm.test("Status is ok", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.status).to.eql("ok");
+});
+```
+
+#### 3. Response Headers
+
+```javascript
+pm.test("'New-Header' header is present", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.headers['New-Header']).to.eql("new-header-value");
+});
+```
+
+#### 4. Additional Request Validation
+
+```javascript
+pm.test("Rate limiting works", function () {
+    var rateLimitRequest = {
+        url: 'http://' + tykGatewayHost + '/basic-protected-api/get',
+        method: 'GET',
+        header: 'Authorization:' + keyId
+    };
+    
+    // Make multiple requests to trigger rate limiting
+    pm.sendRequest(rateLimitRequest, function (err, response) {
+        pm.expect(response.code).to.eql(200);
+        pm.sendRequest(rateLimitRequest, function (err, response) {
+            pm.expect(response.code).to.eql(200);
+            pm.sendRequest(rateLimitRequest, function (err, response) {
+                pm.expect(response.code).to.eql(429);
+            });
+        });
+    });
+});
+```
+
+Use Postman's dynamic variables for random test data:
+```javascript
+var organisationName = pm.variables.replaceIn("{{$randomCompanyName}}");
+```
+
+### Dynamic Testing Environment
+
+For test scenarios requiring non-deterministic data (like randomly generated API keys), create a `dynamic-test-vars.env` file in your deployment directory:
+
+```bash
+echo "jwt=$portal_admin_api_token" > deployments/portal/dynamic-test-vars.env
+```
+
+The env file should contain key/value pairs, with one entry per line:
+```
+my-key=my-value
+hello=world
+```
+
+### Test Automation
+
+Deployments are included in test automation if they:
+1. Include a Postman collection
+2. Don't have a `test-runner-ignore` variable set to `true`
+3. Contain tests in the collection
+
+### Usage Examples
 
 #### Creating Data
 
@@ -245,11 +429,11 @@ tyk.dashboardAdminApi.users.create(
 );
 ```
 
-Notice that the Postman variables `user-id` and `user-api-key` are used to temporarily store the data. This is so it can be used later on, in the request and tests.
+Notice that the Postman variables `user-id` and `user-api-key` are used to temporarily store the data so it can be used later in the request and tests.
 
 #### Deleting Data
 
-Any temporary data created should be deleted once it's no longer required. This prevents the Tyk deployment from filling up with temporary data when running requests in the Postman collection. Use the Tyk Postman Library's `delete` functions to do this. In this example, the user is deleted at the end of the *Tests* script:
+Always delete temporary data after it's no longer needed to prevent the Tyk deployment from accumulating test data:
 
 ```javascript
 tyk.dashboardApi.users.delete(
@@ -264,7 +448,7 @@ tyk.dashboardApi.users.delete(
 
 #### Reading Data
 
-The *Tyk Demo > General Tests > Dashboard Admin API > Organisations > Create an Organisation* request uses the `Meta` JSON value returned in the response to retreive the organisation and then validate the value of its `owner_name` property:
+The *Create an Organisation* request uses the `Meta` JSON value returned in the response to retrieve the organisation and validate its `owner_name` property:
 
 ```javascript
 pm.test("Organisation is created", function () {
@@ -281,126 +465,21 @@ pm.test("Organisation is created", function () {
 
 #### Dashboard API Keys
 
-The Dashboard API requires authentication using a Dashboard User API key. These keys are randomly generated when a user is created, so cannot be defined in advance like the Dashboard Admin API key. 
+The Dashboard API requires authentication using a Dashboard User API key. These keys are randomly generated when a user is created and can't be defined in advance.
 
-To provide the Dashboard API requests with a key, there are two functions which will generate and delete a key (and the related user). When the key is generated it is automatically stored in the `tyk-dashboard.api-key` Postman variable so that it can be used in the requests.
+To provide Dashboard API requests with a key, two functions generate and delete a key (and the related user):
 
-To facilitate the generation of Dashboard API Keys for all Dashboard API requests, the *Tyk Demo > General Tests > Dashboard API* tree element has a pre-request script which generates a Dashboard API key:
+1. Generate a key in the pre-request script (and set the `tyk-dashboard.api-key` environment variable):
+   ```javascript
+   tyk.dashboardApi.tools.apiKey.create(pm);
+   ```
 
-```javascript
-tyk.dashboardApi.tools.apiKey.create(pm);
-```
+2. Use the key in requests via the Postman environment variable:
+   ```
+   Authorization: {{tyk-dashboard.api-key}}
+   ```
 
-This key can then be used by all the scripts within the *Dashboard API* branch, such as *Users > Get a User*, by referencing the Postman variable `{{tyk-dashboard.api-key}}` for the value of the `Authorization` header. 
-
-Once the tests are finished, the `delete` function can be called to remove the key from the database:
-
-```javascript
-tyk.dashboardApi.tools.apiKey.delete(pm);
-```
-
-## Test Automation
-
-Deployments are included in test scripts (`scripts/test.sh` and `scripts/test-all.sh`) if all of the following criteria are met:
-
-- A Postman collection is found in the deployment
-- The collection does *not* contain a variable `test-runner-ignore` with the value `true`
-- The collection contains tests
-
-### Dynamic Environment Varibles
-
-Some test scenarios may rely on data that is non-deterministic e.g. an API key that's randomly generated during the bootstrap process. To support these scenarios, the test scripts check the deployment directory for a `dynamic-test-vars.env` file. If it exists, the values within are added as environment variables when running test containers.
-
-For example, the `portal` deployment generates an API key that's required by the tests. To make the key available to the tests, the deployment bootstrap scripts adds the key to the `dynamic-test-vars.env` file:
-
-```bash
-echo "jwt=$portal_admin_api_token" > deployments/portal/dynamic-test-vars.env
-```
-
-Entries added to the env file must be key/value pairs, with the format `key=value`. The values must also be on separate lines. For example:
-
-```shell
-my-key=my-value
-hello=world
-```
-
-## Testing Responses
-
-The Tyk Demo Postman collection contains many requests, each of which demonstrate a particular piece of functionality. Testing the responses generated by these requests provides validation that the desired result was achieved.
-
-There are many ways in which the response can be validated, here are some examples.
-
-### HTTP Response Status Code
-
-The HTTP Status Code returned by the response e.g. 200:
-
-```javascript
-pm.test("Status code is 200", function () {
-    pm.response.to.have.status(200);
-});
-```
-
-### Response Body Data
-
-The body data returned by the response, depending if it's relevant e.g. "status" is "ok":
-
-```javascript
-pm.test("Status is ok", function () {
-    var jsonData = pm.response.json();
-    pm.expect(jsonData.status).to.eql("ok");
-});
-```
-
-### Response Header Data
-
-The header data returned by the response, depending if it's relevant e.g. "New-Header" is present:
-
-```javascript
-pm.test("'New-Header' header is present", function () {
-    var jsonData = pm.response.json();
-    pm.expect(jsonData.headers['New-Header']).to.eql("new-header-value");
-});
-```
-
-### Additional Requests
-
-Making additional requests can help validate a feature e.g. rate limiting:
-
-```javascript
-pm.test("Status code is 429", function () {
-    var rateLimitRequest = {
-        url: 'http://' + tykGatewayHost + '/basic-protected-api/get',
-        method: 'GET',
-        header: 'Authorization:' + keyId
-    };
-    pm.sendRequest(rateLimitRequest, function (err, response) {
-        pm.expect(response.code).to.eql(200);
-        pm.sendRequest(rateLimitRequest, function (err, response) {
-            pm.expect(response.code).to.eql(200);
-            pm.sendRequest(rateLimitRequest, function (err, response) {
-                pm.expect(response.code).to.eql(429);
-            });
-        });
-    });
-});
-```
-## Dynamic Variables
-
-Postman's dynamic variables produces random values such as names e.g. `"{{$randomFirstName}}"`. More information can be found on the [Postman dynamic variables documentation](https://learning.postman.com/docs/writing-scripts/script-references/variables-list/).
-
-These can be found throughout the collection, where general random values are helpful. For example, the *Tyk Demo > General Tests > Dashboard Admin API > Organisations > Get an Organisation* request uses `{{$randomCompanyName}}` to generate a random company name:
-
-```javascript
-var organisationName = pm.variables.replaceIn("{{$randomCompanyName}}");
-tyk.dashboardAdminApi.organisations.create(
-    JSON.stringify({ 
-        owner_name: organisationName 
-    }),
-    (error, response) => {
-        pm.expect(response.code).to.eql(200);
-        pm.variables.set("organisation-id", response.json().Meta);
-        pm.variables.set("organisation-name", organisationName);
-    }, 
-    pm
-);
-```
+3. Delete the key (and user) after tests are complete:
+   ```javascript
+   tyk.dashboardApi.tools.apiKey.delete(pm);
+   ```

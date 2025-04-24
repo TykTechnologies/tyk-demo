@@ -69,7 +69,6 @@ services:
     environment:
       - TYK_LOGLEVEL=${GATEWAY2_LOGLEVEL:-info}
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
-      - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-false}
       - TYK_DB_STREAMING_ENABLED=true
     env_file:
       - .env

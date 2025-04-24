@@ -1,0 +1,14 @@
+tyk-dashboard.localhost
+tyk-portal.localhost
+tyk-gateway.localhost
+tyk-gateway-2.localhost
+tyk-custom-domain.com
+tyk-worker-gateway.localhost
+acme-portal.localhost
+go-bench-suite.localhost
+tyk-dynamic-looping.com
+echo-server.localhost
+keycloak
+tyk-mongo
+tls-multiplex-1.localhost
+tls-multiplex-2.localhost

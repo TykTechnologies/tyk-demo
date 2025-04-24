@@ -77,12 +77,6 @@ mkdir -p logs 1> /dev/null
 # ensure Docker environment variables are correctly set before creating containers
 # these allow for specialised deployments to be easily used, without having to manually set the environment variables
 # this approach aims to avoid misconfiguration and issues related to that
-if [[ "$*" == *tracing* ]]; then
-  set_docker_environment_value "TRACING_ENABLED" "true"
-else
-  set_docker_environment_value "TRACING_ENABLED" "false"
-fi
-
 if [[ "$*" == *instrumentation* ]]; then
   set_docker_environment_value "INSTRUMENTATION_ENABLED" "1"
 else
@@ -190,13 +184,18 @@ fi
 
 # check hostnames exist (unless skipped)
 if [ "$skip_hostname_check" = false ]; then
-  for i in "${tyk_demo_hostnames[@]}"; do
-    if ! grep -q "$i" /etc/hosts; then
-      echo "ERROR: /etc/hosts is missing entry for $i. Run this command to update: sudo ./scripts/update-hosts.sh"
+  if [ ! -f "deployments/tyk/data/misc/hosts/hosts.list" ]; then
+    echo "ERROR: File deployments/tyk/data/misc/hosts/hosts.list not found."
+    exit 1
+  fi
+
+  while IFS= read -r hostname || [ -n "$hostname" ]; do
+    if ! grep -q "$hostname" /etc/hosts; then
+      echo "ERROR: /etc/hosts is missing entry for $hostname. Run this command to update: sudo ./scripts/update-hosts.sh"
       echo "Note: You can skip this check by using the --skip-hostname-check option"
       exit 1
     fi
-  done
+  done < "deployments/tyk/data/misc/hosts/hosts.list"
 else
   echo "Warning: Hostname validation has been skipped. Ensure your hosts are correctly configured."
 fi
