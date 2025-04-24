@@ -28,6 +28,10 @@ This guide provides comprehensive instructions for anyone who wants to contribut
   - [Dynamic Testing Environment](#dynamic-testing-environment)
   - [Test Automation](#test-automation)
   - [Usage Examples](#usage-examples)
+- [GitHub Test Workflow](#github-test-workflow)
+  - [Overview](#overview)
+  - [Workflow Structure](#workflow-structure)
+  - [How It Works](#how-it-works)
 
 ## Deployment Structure
 
