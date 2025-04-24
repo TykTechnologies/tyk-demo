@@ -483,3 +483,80 @@ To provide Dashboard API requests with a key, two functions generate and delete 
    ```javascript
    tyk.dashboardApi.tools.apiKey.delete(pm);
    ```
+
+## GitHub Test Workflow
+
+### Overview
+
+The [Tyk Demo Tests workflow](.github/workflows/tyk-demo-tests.yml) is an automated testing framework that validates all deployment configurations in our repository. This workflow runs automatically on every push and ensures that each deployment configuration is properly tested and verified.
+
+### Workflow Structure
+
+The workflow consists of four main jobs:
+
+1. **Discover Deployments**: Scans the repository to find all deployment configurations
+2. **Test Deployments**: Runs tests against each deployment in parallel 
+3. **Collect Results**: Gathers test results from all deployments
+4. **Display Results**: Summarises the test results in a readable format
+
+### How It Works
+
+#### Discovery Phase
+
+The workflow begins by scanning the `deployments/` directory to find all deployment configurations. It also extracts the Tyk Gateway Docker image tag to ensure consistent testing across all deployments.
+
+#### Testing Phase
+
+Each deployment undergoes the following test process:
+
+- **Environment Setup**: Configures necessary environment variables and licences
+- **Deployment Creation**: Spins up the deployment using the `up.sh` script
+- **Test Validation**: Checks for the presence of two types of tests:
+  - **Postman Tests**: API tests defined in Postman collections
+  - **Custom Tests**: Custom test scripts specific to each deployment
+- **Test Execution**: Runs both types of tests if available
+- **Log Collection**: Captures container logs for debugging purposes
+
+#### Results Collection
+
+After all tests complete, the workflow:
+- Collects individual test results
+- Combines them into a single report
+- Publishes the report as an artifact
+
+#### Results Display
+
+The final step displays a summary table showing the status of each deployment:
+
+```
+DEPLOYMENT            DEPLOY  POSTMAN CUSTOM  OVERALL
+-------------------------------------------------------
+deployment-name       ✅      ✅      ❌      ❌
+```
+
+#### Test Types
+
+The workflow supports two types of tests:
+
+1. **Postman Tests**: API tests using Postman collections located in the deployment directory
+2. **Custom Tests**: Shell scripts or other custom test implementations specific to each deployment
+
+> **Note:** Whether the deployment is successfully deployed is also counted as a test
+
+#### Configuration Options
+
+Each deployment can include a `deployment.json` file with the following options:
+
+```json
+{
+  "github": {
+    "skipDeployment": false
+  },
+  "composeArgument": "custom-arg",
+  "dependencies": ["websocat"]
+}
+```
+
+- `skipDeployment`: Set to `true` to exclude a deployment from github workflow testing
+- `composeArgument`: Custom argument to pass to the `up.sh` script
+- `dependencies`: Additional tools needed for testing (e.g., "websocat")
