@@ -9,10 +9,14 @@ bootstrap_progress
 
 log_message "Setting global variables"
 dashboard_base_url="http://tyk-dashboard.localhost:$(jq -r '.listen_port' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
+DASHBOARD_DISPLAY_URL="$dashboard_base_url"
 gateway_base_url="http://$(jq -r '.host_config.override_hostname' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
+GATEWAY_DISPLAY_URL="$gateway_base_url"
 set_context_data "1" "gateway" "1" "base-url" $gateway_base_url
 gateway_base_url_tcp="tyk-gateway.localhost:8086"
+GATEWAY_DISPLAY_URL_TCP="$gateway_base_url_tcp"
 gateway2_base_url="https://tyk-gateway-2.localhost:8081"
+GATEWAY2_DISPLAY_URL="$gateway2_base_url"
 log_ok
 bootstrap_progress
 
@@ -44,6 +48,44 @@ log_message "  Dashboard Admin API Credentials = $dashboard_admin_api_credential
 portal_root_path=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .host_config.portal_root_path 2>> logs/bootstrap.log)
 gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
 gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
+bootstrap_progress
+
+# Check whether this script is being run in a container
+log_message "Checking for containerised runner environment"
+if [ "$CONTAINERISED_RUNNER" == "true" ]; then
+  log_message "  Running on container"
+  # Get the runner container's hostname
+  RUNNER_ID=$(hostname)
+
+  # Wait for network to exist
+  NETWORK_NAME="tyk-demo_tyk"
+  TIMEOUT=10
+  until docker network inspect "$NETWORK_NAME" > /dev/null 2>&1 || [ $TIMEOUT -eq 0 ]; do
+    log_message "  Waiting for network $NETWORK_NAME to be created..."
+    bootstrap_progress
+    sleep 1
+    TIMEOUT=$((TIMEOUT - 1))
+  done
+
+  # Connect the runner container to the network
+  docker network connect "$NETWORK_NAME" "$RUNNER_ID"
+
+  if [ $? -eq 0 ]; then
+    log_message "  Successfully connected the runner container $RUNNER_ID to the network $NETWORK_NAME"
+  else
+    echo "ERROR: Failed to connect the runner container $RUNNER_ID to the network $NETWORK_NAME"
+    exit 1
+  fi
+
+  # Redefine the base URLs, such that the services can be accessed from the container running this script
+  gateway_base_url="http://tyk-gateway:8080"
+  dashboard_base_url="http://tyk-dashboard:3000"
+  gateway2_base_url="https://tyk-gateway-2:8080"
+  set_context_data "1" "gateway" "1" "base-url" $gateway_base_url
+else
+  log_message "  Running on host - no further action required"
+fi
+log_ok
 bootstrap_progress
 
 # Certificates
@@ -181,7 +223,7 @@ eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gat
 log_ok
 
 log_message "Wait for services to be available after restart"
-wait_for_liveness
+wait_for_liveness "$gateway_base_url/hello"
 
 log_message "Removing temporary OpenSSL container $OPENSSL_CONTAINER_NAME"
 docker rm -f $OPENSSL_CONTAINER_NAME >/dev/null 2>>logs/bootstrap.log
@@ -225,7 +267,7 @@ fi
 # Dashboard Data
 
 log_message "Wait for services to be ready before importing data"
-wait_for_liveness
+wait_for_liveness "$gateway_base_url/hello"
 
 # The order these are processed in is important, due to dependencies between objects
 log_message "Processing Dashboard Data"
@@ -471,7 +513,7 @@ bootstrap_progress
 log_message "Reloading Gateways"
 hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
 bootstrap_progress
-wait_for_liveness
+wait_for_liveness "$gateway_base_url/hello"
 
 log_message "Checking Gateway - Anonymous API access"
 result=""
@@ -677,7 +719,7 @@ echo -e "\033[2K
 ▼ Tyk
   ▽ Dashboard ($(get_service_image_tag "tyk-dashboard"))
                 Licence : $dashboard_licence_days_remaining days remaining
-                    URL : $dashboard_base_url
+                    URL : $DASHBOARD_DISPLAY_URL
        Admin API Header : admin-auth
           Admin API Key : $dashboard_admin_api_credentials 
    Dashboard API Header : Authorization       
@@ -702,13 +744,13 @@ echo -e "\033[2K
                Username : $(get_context_data "2" "portal-developer" "1" "email")
                Password : $(get_context_data "2" "portal-developer" "1" "password")
   ▽ Gateway ($(get_service_image_tag "tyk-gateway"))
-                    URL : $gateway_base_url
-               URL(TCP) : $gateway_base_url_tcp
+                    URL : $GATEWAY_DISPLAY_URL
+               URL(TCP) : $GATEWAY_DISPLAY_URL_TCP
            External URL : $ngrok_gateway_tunnel_url
      Gateway API Header : x-tyk-authorization
         Gateway API Key : $gateway_api_credentials
   ▽ Gateway 2 ($(get_service_image_tag "tyk-gateway-2"))
-                    URL : $gateway2_base_url  
+                    URL : $GATEWAY2_DISPLAY_URL  
      Gateway API Header : x-tyk-authorization
         Gateway API Key : $gateway2_api_credentials"
 if [ "$ngrok_available" = "true" ]; then

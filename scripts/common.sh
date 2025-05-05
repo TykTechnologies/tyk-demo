@@ -1091,6 +1091,7 @@ wait_for_liveness () {
   local attempt_count=0
 
   log_message "Waiting for Gateway, Dashboard and Redis to be up and running"
+  log_message "  Gateway status endpoint: $status_endpoint"
 
   while true; do
     attempt_count=$((attempt_count+1))
