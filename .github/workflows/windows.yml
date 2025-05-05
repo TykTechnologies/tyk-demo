@@ -13,7 +13,7 @@ jobs:
 
       - name: Install Docker CLI and Compose via Chocolatey
         run: |
-          choco install docker-cli docker-compose jq -y
+          choco install docker-cli docker-compose -y
         shell: powershell
 
       - name: Ensure Docker is available in PATH
@@ -24,7 +24,7 @@ jobs:
       - name: Check Docker version
         run: |
           docker version
-          docker-compose version
+          docker compose version
         shell: powershell
 
       - name: Simulate user running setup via Git Bash
