@@ -11,6 +11,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Write secrets to .env
+        run: |
+          echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
+        shell: pwsh
+
       - name: Install Docker CLI and Compose via Chocolatey
         run: |
           choco install docker-cli docker-compose -y
