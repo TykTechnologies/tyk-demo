@@ -36,7 +36,7 @@ jobs:
         shell: bash
         run: |
           echo "Simulating: ./up.sh"
-          ./up.sh
+          ./up.sh --hide-progress --skip-hostname-check
 
       - name: Check services
         shell: bash
