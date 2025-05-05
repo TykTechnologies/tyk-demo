@@ -1,0 +1,49 @@
+name: Windows Simulation
+
+on:
+  push:
+
+jobs:
+  simulate-windows-user:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Docker CLI and Compose via Chocolatey
+        run: |
+          choco install docker-cli docker-compose jq -y
+        shell: powershell
+
+      - name: Ensure Docker is available in PATH
+        run: |
+          $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
+        shell: powershell
+
+      - name: Check Docker version
+        run: |
+          docker version
+          docker-compose version
+        shell: powershell
+
+      - name: Simulate user running setup via Git Bash
+        shell: bash
+        run: |
+          echo "Simulating: ./up.sh"
+          ./up.sh
+
+      - name: Check services
+        shell: bash
+        run: |
+          docker ps
+
+      # - name: Run app-level test commands (optional)
+      #   shell: bash
+      #   run: |
+      #     docker-compose exec -T app ./run-tests.sh || echo "Tests failed but script executed"
+
+      - name: Tear down
+        shell: bash
+        run: |
+          ./down.sh
