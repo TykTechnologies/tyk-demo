@@ -22,7 +22,7 @@ display_help() {
     echo "  --persist-log         Persist log files between bootstraps"
     echo "  --hide-progress       Hide deployment progress meter"
     echo "  --skip-plugin-build   Skip building Go plugins (can also use --spb)"
-    echo "  --skip-hostname-check Skip validation of hostnames in /etc/hosts"
+    echo "  --skip-hostname-check Skip validation of hostnames in /etc/hosts (can also use --shc)"
     echo
     echo "Examples:"
     echo "  ./up.sh                       # Bring up default Tyk deployment"
@@ -167,7 +167,7 @@ if (( ${#commands_to_process[@]} != 0 )); then
         echo "  skip-plugin-build: Go plugins will not be built"
         touch .bootstrap/skip_plugin_build
         ;;
-      "--skip-hostname-check")
+      "--skip-hostname-check" | "--shc")
         echo "  skip-hostname-check: Hostname validation will be skipped"
         skip_hostname_check=true
         ;;
