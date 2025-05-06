@@ -20,31 +20,18 @@ jobs:
         wsl --set-version Ubuntu 2
         
     - name: Install required tools in WSL
-      shell: wsl-bash {0}
+      shell: powershell
       run: |
-        apt-get update
-        apt-get install -y jq curl git
+        wsl sudo apt-get update
+        wsl sudo apt-get install -y jq curl git
         
-    - name: Verify Docker and Docker Compose v2
-      shell: wsl-bash {0}
+    - name: Verify Docker and Docker Compose versions
+      shell: powershell
       run: |
-        # Verify Docker
-        docker --version
-        
-        # Verify Docker Compose V2
-        docker compose version
-        
-        # Should show the v2 output format (not docker-compose)
-        echo "Docker Compose V2 confirmed if previous command shows 'Docker Compose version v2.x.x'"
+        wsl docker --version
+        wsl docker compose version
     
     - name: Run your scripts inside WSL
-      shell: wsl-bash {0}
+      shell: powershell
       run: |
-        cd $GITHUB_WORKSPACE
-        chmod +x *.sh
-        
-        # Run your script
-        ./your-script.sh
-        
-        # If your script uses docker compose, you can verify it worked
-        docker compose ps
+        wsl bash -c "cd \$GITHUB_WORKSPACE && ./up.sh"
