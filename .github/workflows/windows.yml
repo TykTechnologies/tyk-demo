@@ -24,4 +24,4 @@ jobs:
 
     - name: Run up.sh script
       shell: bash
-      run: ./up.sh
+      run: ./up.sh --skip-hostname-check
