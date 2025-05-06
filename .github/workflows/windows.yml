@@ -17,6 +17,11 @@ jobs:
         docker --version
         docker compose version
 
+    - name: Set environment variables
+      shell: bash
+      run: |
+        echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
+
     - name: Run up.sh script
       shell: bash
       run: ./up.sh
