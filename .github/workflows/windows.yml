@@ -14,6 +14,7 @@ jobs:
     - name: Set up WSL
       shell: powershell
       run: |
+        wsl --update
         wsl --install -d Ubuntu
         wsl --set-default Ubuntu
         wsl --set-version Ubuntu 2
