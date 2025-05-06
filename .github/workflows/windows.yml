@@ -1,54 +1,49 @@
-name: Windows Simulation
+name: Windows and WSL2
 
 on:
   push:
 
 jobs:
-  simulate-windows-user:
+  test-wsl2:
     runs-on: windows-latest
-
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Write secrets to .env
-        run: |
-          echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
-        shell: pwsh
-
-      - name: Install Docker CLI and Compose via Chocolatey
-        run: |
-          choco install docker-cli docker-compose -y
-        shell: powershell
-
-      - name: Ensure Docker is available in PATH
-        run: |
-          $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
-        shell: powershell
-
-      - name: Check Docker version
-        run: |
-          docker version
-          docker compose version
-        shell: powershell
-
-      - name: Simulate user running setup via Git Bash
-        shell: bash
-        run: |
-          echo "Simulating: ./up.sh"
-          ./up.sh --hide-progress --skip-hostname-check
-
-      - name: Check services
-        shell: bash
-        run: |
-          docker ps
-
-      # - name: Run app-level test commands (optional)
-      #   shell: bash
-      #   run: |
-      #     docker-compose exec -T app ./run-tests.sh || echo "Tests failed but script executed"
-
-      - name: Tear down
-        shell: bash
-        run: |
-          ./down.sh
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up WSL
+      shell: powershell
+      run: |
+        wsl --install -d Ubuntu
+        wsl --set-default Ubuntu
+        wsl --set-version Ubuntu 2
+        
+    - name: Install required tools in WSL
+      shell: wsl-bash {0}
+      run: |
+        apt-get update
+        apt-get install -y jq curl git
+        
+    - name: Verify Docker and Docker Compose v2
+      shell: wsl-bash {0}
+      run: |
+        # Verify Docker
+        docker --version
+        
+        # Verify Docker Compose V2
+        docker compose version
+        
+        # Should show the v2 output format (not docker-compose)
+        echo "Docker Compose V2 confirmed if previous command shows 'Docker Compose version v2.x.x'"
+    
+    - name: Run your scripts inside WSL
+      shell: wsl-bash {0}
+      run: |
+        cd $GITHUB_WORKSPACE
+        chmod +x *.sh
+        
+        # Run your script
+        ./your-script.sh
+        
+        # If your script uses docker compose, you can verify it worked
+        docker compose ps
