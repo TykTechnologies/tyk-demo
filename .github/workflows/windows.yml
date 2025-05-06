@@ -11,27 +11,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       
-    - name: Set up WSL
+    - name: Verify Docker and Docker Compose
       shell: powershell
       run: |
-        wsl --update
-        wsl --install -d Ubuntu
-        wsl --set-default Ubuntu
-        wsl --set-version Ubuntu 2
-        
-    - name: Install required tools in WSL
-      shell: powershell
-      run: |
-        wsl sudo apt-get update
-        wsl sudo apt-get install -y jq curl git
-        
-    - name: Verify Docker and Docker Compose versions
-      shell: powershell
-      run: |
-        wsl docker --version
-        wsl docker compose version
-    
-    - name: Run your scripts inside WSL
-      shell: powershell
-      run: |
-        wsl bash -c "cd \$GITHUB_WORKSPACE && ./up.sh"
+        docker --version
+        docker compose version
+
+    - name: Run up.sh script
+      shell: bash
+      run: ./up.sh
