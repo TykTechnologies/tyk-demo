@@ -326,6 +326,13 @@ check_licence_expiry () {
   # check if licence time remaining (in seconds) is less or equal to 0
   if [ "$licence_seconds_remaining" -le "0" ]; then
     log_message "  ERROR: Licence $1 has expired"
+    if [[ "$1" == "DASHBOARD_LICENCE" ]]; then
+      echo "ERROR: Tyk Dashboard licence has expired. Update DASHBOARD_LICENCE variable in .env file with a new licence."
+    elif [[ "$1" == "MDCB_LICENCE" ]]; then
+      echo "ERROR: Tyk MDCB licence has expired. Update MDCB_LICENCE variable in .env file with a new licence."
+    else
+      echo "ERROR: Licence $1 has expired."
+    fi
     return 1; # does not meet requirements
   else
     if [[ "$licence_days_remaining" -le "7" ]]; then

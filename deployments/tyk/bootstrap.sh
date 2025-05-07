@@ -30,9 +30,9 @@ bootstrap_progress
 
 log_message "Checking Dashboard licence expiry"
 licence_days_remaining=0
-check_licence_expiry "DASHBOARD_LICENCE"
-if [[ "$?" -eq "1" ]]; then
-  log_message "ERROR: Tyk Dashboard licence has expired. Update DASHBOARD_LICENCE variable in .env file with a new licence."
+check_licence_expiry "DASHBOARD_LICENCE"; expiry_check=$?
+if [[ "$expiry_check" -eq "1" ]]; then
+  # The error message is now displayed by the check_licence_expiry function itself
   exit 1
 fi
 dashboard_licence_days_remaining=$licence_days_remaining
@@ -83,8 +83,8 @@ done
 log_message "OpenSSL version used for generating certs: $(docker exec $OPENSSL_CONTAINER_NAME openssl version)"
 
 log_message "Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost"
-docker exec $OPENSSL_CONTAINER_NAME sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tyk-gateway-2.localhost\" -keyout /tyk-gateway-certs/tls-private-key.pem -out /tyk-gateway-certs/tls-certificate.pem -days 365 -nodes" >/dev/null 2>&1
-if [ "$?" -ne "0" ]; then
+docker exec $OPENSSL_CONTAINER_NAME sh -c "openssl req -x509 -newkey rsa:4096 -subj \"/CN=tyk-gateway-2.localhost\" -keyout /tyk-gateway-certs/tls-private-key.pem -out /tyk-gateway-certs/tls-certificate.pem -days 365 -nodes" >/dev/null 2>&1; openssl_cmd_status=$?
+if [ "$openssl_cmd_status" -ne "0" ]; then
   echo "ERROR: Could not generate self-signed certificate"
   exit 1
 fi

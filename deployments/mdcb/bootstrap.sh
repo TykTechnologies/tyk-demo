@@ -24,9 +24,9 @@ bootstrap_progress
 # check the MDCB licence expiry
 log_message "Checking MDCB licence expiry"
 licence_days_remaining=0
-check_licence_expiry "MDCB_LICENCE"
-if [[ "$?" -eq "1" ]]; then
-  echo "ERROR: Tyk MDCB licence has expired. Update MDCB_LICENCE variable in .env file with a new licence."
+check_licence_expiry "MDCB_LICENCE"; expiry_check=$?
+if [[ "$expiry_check" -eq "1" ]]; then
+  # The error message is now displayed by the check_licence_expiry function itself
   exit 1
 fi
 mdcb_licence_days_remaining=$licence_days_remaining

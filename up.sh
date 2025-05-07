@@ -211,17 +211,18 @@ log_message "$(docker compose version)"
 # bring the containers up
 command_docker_compose="$(generate_docker_compose_command) up --quiet-pull --remove-orphans -d"
 echo "Running docker compose command: $command_docker_compose"
-eval $command_docker_compose
-if [ "$?" != 0 ]; then
+eval $command_docker_compose; command_exit_code=$?
+if [ "$command_exit_code" != 0 ]; then
   echo "Error occurred when using Docker Compose to bring containers up"
   exit 1
 fi
 
 # bootstrap the deployments
 for deployment in "${deployments_to_create[@]}"; do
-  eval "deployments/$deployment/bootstrap.sh"
-  if [ "$?" != 0 ]; then
+  eval "deployments/$deployment/bootstrap.sh"; bootstrap_exit_code=$?
+  if [ "$bootstrap_exit_code" != 0 ]; then
     capture_container_logs $deployment
+    # Generic error message for other issues
     echo "Error occurred during bootstrap of $deployment, when running deployments/$deployment/bootstrap.sh"
     echo "Log files can be found in the the logs directory"
     exit 1
