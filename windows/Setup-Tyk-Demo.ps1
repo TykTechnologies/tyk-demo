@@ -102,11 +102,7 @@ if [ -d ~/tyk-demo ]; then
 else
     echo "Cloning tyk-demo repo..."
     git clone https://github.com/TykTechnologies/tyk-demo.git ~/tyk-demo
-    cd ~/tyk-demo
 fi
-
-echo "Starting Tyk demo..."
-chmod +x up.sh && ./up.sh
 '@
     $setupScript | wsl -d Ubuntu bash
 
