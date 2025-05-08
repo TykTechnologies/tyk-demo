@@ -17,7 +17,7 @@
    Copy and paste this into the PowerShell window:
 
    ```powershell
-   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/TykTechnologies/tyk-demo/windows/windows/Setup-Tyk-Demo.ps1" -OutFile "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
+   curl.exe -L "https://raw.githubusercontent.com/TykTechnologies/tyk-demo/windows/windows/Setup-Tyk-Demo.ps1" -o "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
    powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
    ```
 
