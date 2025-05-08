@@ -106,7 +106,6 @@ try {
     # Clone or update Tyk demo repository
     Write-Status "Setting up Tyk demo repository"
     $repoSetupResult = wsl -d Ubuntu -- bash -c "if [ -d ~/tyk-demo ]; then echo 'Updating existing repository'; cd ~/tyk-demo && git pull; else echo 'Cloning repository'; git clone https://github.com/TykTechnologies/tyk-demo.git ~/tyk-demo; fi"
-    Write-Host $repoSetupResult
     if ($LASTEXITCODE -ne 0) {
         Write-Status "Failed to setup Tyk demo repository" -Type "ERROR"
         exit 1
