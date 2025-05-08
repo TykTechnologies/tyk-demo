@@ -83,9 +83,6 @@ try {
     }
     Write-Status "Docker is available inside WSL" -Type "SUCCESS"
 
-    # Run Tyk demo setup
-    Write-Status "Running Tyk demo setup in Ubuntu"
-
     # Update packages
     Write-Status "Updating packages in Ubuntu"
     $updateResult = wsl -d Ubuntu -- bash -c "sudo apt-get update -qq && sudo apt-get install -y -qq git jq curl"
@@ -115,8 +112,6 @@ try {
         exit 1
     }
     Write-Status "Tyk demo repository setup completed" -Type "SUCCESS"
-
-    Write-Status "Tyk demo setup completed successfully" -Type "SUCCESS"
 
     Read-Host -Prompt "Press Enter to exit"
 }
