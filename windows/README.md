@@ -10,8 +10,12 @@
 1. **Open PowerShell as Administrator**:
    - Search for PowerShell in the Start menu
    - Right-click on Windows PowerShell and select "Run as Administrator"
+   - You might be asked for permission — click Yes
 
 2. **Set PowerShell Execution Policy for Current Session** (if needed):
+
+   If it's your first time using PowerShell, copy and paste the following into the PowerShell window and press Enter:
+
    ```powershell
    Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
    ```
@@ -20,16 +24,16 @@
 3. **Download and Run the Setup Script**:
    ```powershell
    # Download the script
-   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/TykTechnologies/tyk-demo/windows/windows/Setup-TykDemo.ps1" -OutFile "$env:USERPROFILE\Downloads\Setup-TykDemo.ps1"
+   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/TykTechnologies/tyk-demo/windows/windows/Setup-Tyk-Demo.ps1" -OutFile "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
    
    # Run the script directly with execution policy bypass (alternative to step 2)
-   powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\Downloads\Setup-TykDemo.ps1"
+   powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
    ```
    
    Or alternatively, if you did step 2:
    ```powershell
    # Run the script directly
-   & "$env:USERPROFILE\Downloads\Setup-TykDemo.ps1"
+   & "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
    ```
 
 ## What This Script Does
