@@ -70,15 +70,40 @@ try {
     Write-Status "Checking if Docker Desktop is running"
     $dockerProcess = Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue
     if (-not $dockerProcess) {
-      Write-Status "Attempting to start Docker Desktop" -Type "INFO"
-      Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe" -NoNewWindow
-      Start-Sleep -Seconds 10
-      $dockerProcess = Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue
-      if (-not $dockerProcess) {
-        Write-Status "Failed to start Docker Desktop. Please start it manually and re-run the script." -Type "ERROR"
-        Read-Host -Prompt "Press Enter to exit"
-        exit 1
-      }
+        Write-Status "Attempting to start Docker Desktop" -Type "INFO"
+        Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe" -WindowStyle Minimized
+
+        $maxWaitSeconds = 120
+        $waitInterval = 5
+        $elapsed = 0
+
+        Write-Status "Waiting for Docker Desktop to start (timeout: $maxWaitSeconds seconds)" -Type "INFO"
+
+        while ($elapsed -lt $maxWaitSeconds) {
+            Start-Sleep -Seconds $waitInterval
+            $elapsed += $waitInterval
+
+            $dockerProcess = Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue
+            if ($dockerProcess) {
+              try {
+                  docker info > $null 2>&1
+                  if ($LASTEXITCODE -eq 0) {
+                      Write-Status "Docker Desktop is running and responsive" -Type "SUCCESS"
+                      break
+                  }
+              } catch { }
+          }
+
+          Write-Host -NoNewline "."
+        }
+
+        if ($elapsed -ge $maxWaitSeconds -or -not $dockerProcess) {
+            Write-Host
+            Write-Status "Docker Desktop did not start in time or is not responsive." -Type "ERROR"
+            Write-Status "Please start Docker Desktop manually and re-run the script." -Type "ERROR"
+            Read-Host -Prompt "Press Enter to exit"
+            exit 1
+        }
     }
     
     # Check if Docker daemon is responsive
