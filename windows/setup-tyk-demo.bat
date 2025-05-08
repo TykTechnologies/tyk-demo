@@ -5,7 +5,7 @@ setlocal enabledelayedexpansion
 :: Step 1: Check for Docker Desktop
 :: -------------------------------
 echo ==== Checking for Docker Desktop installation ====
-where "Docker Desktop.exe" >nul 2>&1
+where docker >nul 2>&1
 if errorlevel 1 (
     echo [ERROR] Docker Desktop is not installed.
     echo Please install it from https://www.docker.com/products/docker-desktop/
@@ -17,8 +17,8 @@ if errorlevel 1 (
 :: Step 2: Check if Docker Desktop is running
 :: -------------------------------
 echo ==== Checking if Docker Desktop is running ====
-tasklist /FI "IMAGENAME eq Docker Desktop.exe" | findstr /I "Docker Desktop.exe" >nul
-if errorlevel 1 (
+powershell -Command "Get-Process -Name 'Docker Desktop' -ErrorAction SilentlyContinue" >nul
+if %errorlevel% neq 0 (
     echo [ERROR] Docker Desktop is not running.
     echo Please start Docker Desktop before continuing.
     pause
@@ -38,6 +38,8 @@ if errorlevel 1 (
     exit /b
 )
 
+wsl --set-default-version 2
+
 :: -------------------------------
 :: Step 4: Check for Ubuntu
 :: -------------------------------
@@ -56,17 +58,21 @@ if errorlevel 1 (
 :: -------------------------------
 echo ==== Setting Ubuntu as default distro ====
 wsl --set-default Ubuntu
+if errorlevel 1 (
+    echo [ERROR] Failed to set Ubuntu as the default WSL distro.
+    pause
+    exit /b
+)
 
 echo ==== Starting tyk-demo in Ubuntu ====
 wsl -e bash -c "
   set -e
-  sudo apt update && sudo apt install -y git
+  sudo apt update && sudo apt install -y git jq curl
 
   echo 'Checking Docker Compose availability...'
   docker compose version >/dev/null 2>&1 || { echo >&2 '[ERROR] Docker Compose is not available in WSL. Enable WSL integration for Ubuntu in Docker Desktop → Settings → Resources → WSL Integration.'; exit 1; }
 
-  [ -d ~/tyk-demo ] || git clone https://github.com/TykTechnologies/tyk-demo.git ~/tyk-demo
-
+  [ ! -d ~/tyk-demo ] && git clone https://github.com/TykTechnologies/tyk-demo.git ~/tyk-demo
   cd ~/tyk-demo
   chmod +x up.sh
   ./up.sh
