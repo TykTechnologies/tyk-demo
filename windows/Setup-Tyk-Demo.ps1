@@ -60,7 +60,7 @@ try {
 
     # Check for Ubuntu
     Write-Status "Checking for Ubuntu distro"
-    $ubuntuInstalled = (wsl -l -v | Out-String) -match "Ubuntu"
+    $ubuntuInstalled = wsl -l -v | ForEach-Object { $_ -match "Ubuntu" }
     if (-not $ubuntuInstalled) {
         Write-Status "Ubuntu is not installed. Please install it with 'wsl --install -d Ubuntu'" -Type "ERROR"
         exit 1
