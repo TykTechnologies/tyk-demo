@@ -229,6 +229,13 @@ for deployment in "${deployments_to_create[@]}"; do
   fi
 done
 
+# log deployed services
+log_message "Deployed services:"
+services_command="$(generate_docker_compose_command) config --services"
+for service in $(eval $services_command); do
+  log_message "  $service: $(get_service_container_data "$service" "{{ .Config.Image }}")"
+done
+
 up_end_time=$(date +%s)
 up_elapsed_time=$((up_end_time - up_start_time))
 up_minutes=$((up_elapsed_time / 60))
