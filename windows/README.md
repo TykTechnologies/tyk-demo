@@ -11,22 +11,32 @@
    - Search for PowerShell in the Start menu
    - Right-click on Windows PowerShell and select "Run as Administrator"
 
-2. **Set PowerShell Execution Policy** (if you haven't run PowerShell scripts before):
+2. **Set PowerShell Execution Policy for Current Session** (if needed):
    ```powershell
-   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
    ```
+   This temporarily allows script execution only in the current PowerShell window.
 
 3. **Download and Run the Setup Script**:
    ```powershell
-   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/TykTechnologies/tyk-demo/windows/windows/Setup-Tyk-Demo.ps1" -OutFile "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
-   & "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
+   # Download the script
+   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/TykTechnologies/tyk-demo/windows/windows/Setup-TykDemo.ps1" -OutFile "$env:USERPROFILE\Downloads\Setup-TykDemo.ps1"
+   
+   # Run the script directly with execution policy bypass (alternative to step 2)
+   powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\Downloads\Setup-TykDemo.ps1"
+   ```
+   
+   Or alternatively, if you did step 2:
+   ```powershell
+   # Run the script directly
+   & "$env:USERPROFILE\Downloads\Setup-TykDemo.ps1"
    ```
 
 ## What This Script Does
 
 The script will automatically:
 
-- Check for and guide you through installing Docker Desktop if needed
+- Check for Docker Desktop and start it if not running
 - Set up WSL 2 (Windows Subsystem for Linux) if not already installed
 - Install Ubuntu distribution in WSL if not present
 - Configure Docker Desktop WSL integration
@@ -36,7 +46,7 @@ The script will automatically:
 
 - **System Restart Required**: If prompted to restart after WSL installation, please do so and run the script again after reboot.
 - **Docker Desktop WSL Integration**: Ensure WSL integration is enabled in Docker Desktop (Settings → Resources → WSL Integration).
-- **Script Execution Issues**: If you encounter "execution of scripts is disabled on this system", make sure to run the execution policy command in step 2.
+- **Script Execution Issues**: If you encounter "execution of scripts is disabled on this system", use the execution policy command in step 2, which temporarily enables script execution only for your current PowerShell session.
 
 ## Manual Setup
 
