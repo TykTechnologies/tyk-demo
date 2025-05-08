@@ -230,7 +230,7 @@ for deployment in "${deployments_to_create[@]}"; do
 done
 
 # log deployed services
-log_message "Deployed services:"
+log_message "Deployed service images:"
 services_command="$(generate_docker_compose_command) config --services"
 for service in $(eval $services_command); do
   log_message "  $service: $(get_service_container_data "$service" "{{ .Config.Image }}")"
