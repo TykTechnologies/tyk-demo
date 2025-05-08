@@ -18,8 +18,8 @@
 
 3. **Download and Run the Setup Script**:
    ```powershell
-   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/TykTechnologies/tyk-demo/windows/windows/Setup-TykDemo.ps1" -OutFile "$env:USERPROFILE\Downloads\Setup-TykDemo.ps1"
-   & "$env:USERPROFILE\Downloads\Setup-TykDemo.ps1"
+   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/TykTechnologies/tyk-demo/windows/windows/Setup-Tyk-Demo.ps1" -OutFile "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
+   & "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
    ```
 
 ## What This Script Does
