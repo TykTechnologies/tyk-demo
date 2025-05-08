@@ -103,8 +103,6 @@ else
     echo "Cloning tyk-demo repo..."
     git clone https://github.com/TykTechnologies/tyk-demo.git ~/tyk-demo
 fi
-
-echo "Starting Tyk demo..."
 '@
     $setupScript | wsl -d Ubuntu bash
 
