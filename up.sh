@@ -229,6 +229,22 @@ for deployment in "${deployments_to_create[@]}"; do
   fi
 done
 
+# log deployed services
+log_message "Deployed service images:"
+services_command="$(generate_docker_compose_command) ps -q"
+container_ids=$(eval "$services_command")
+
+if [ -n "$container_ids" ]; then
+  docker inspect $container_ids \
+    --format '{{ index .Config.Labels "com.docker.compose.service" }}: {{ .Config.Image }}' |
+  while IFS= read -r line; do
+    log_message "  $line"
+  done
+else
+  log_message "  (No running containers)"
+fi
+
+# report on elapsed time
 up_end_time=$(date +%s)
 up_elapsed_time=$((up_end_time - up_start_time))
 up_minutes=$((up_elapsed_time / 60))

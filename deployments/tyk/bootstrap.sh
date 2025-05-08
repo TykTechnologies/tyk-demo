@@ -46,13 +46,6 @@ gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq 
 gateway2_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk-2.conf | jq -r .secret)
 bootstrap_progress
 
-log_message "Service Images:"
-log_message "  Tyk Dashboard: $(get_service_container_data "tyk-dashboard" "{{ .Config.Image }}")"
-log_message "  Tyk Gateway: $(get_service_container_data "tyk-gateway" "{{ .Config.Image }}")"
-log_message "  Tyk Gateway 2: $(get_service_container_data "tyk-gateway-2" "{{ .Config.Image }}")"
-log_message "  Tyk Pump: $(get_service_container_data "tyk-pump" "{{ .Config.Image }}")"
-bootstrap_progress
-
 # Certificates
 
 log_message "Checking for existing OpenSSL container"
