@@ -88,7 +88,7 @@ try {
 
     # Update packages
     Write-Status "Updating packages in Ubuntu"
-    $updateResult = wsl -d Ubuntu -- bash -c "sudo apt update && sudo apt install -y git jq curl"
+    $updateResult = wsl -d Ubuntu -- bash -c "sudo apt-get update -qq && sudo apt-get install -y -qq git jq curl"
     if ($LASTEXITCODE -ne 0) {
         Write-Status "Failed to update packages in Ubuntu" -Type "ERROR"
         Write-Host $updateResult
