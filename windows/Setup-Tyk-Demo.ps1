@@ -7,8 +7,8 @@ $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Pri
 $isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 if (-not $isAdmin) {
-    Write-Host "This script requires administrator privileges to install and configure WSL if needed." -ForegroundColor Yellow
-    Write-Host "Please run this script as administrator and try again." -ForegroundColor Yellow
+    Write-Host "This script requires administrator privileges." -ForegroundColor Yellow
+    Write-Host "Please close this PowerShell windows, then reload PowerShell using the 'Run as Administrator' option." -ForegroundColor Yellow
     Read-Host -Prompt "Press Enter to exit"
     exit 1
 }
