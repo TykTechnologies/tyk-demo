@@ -71,21 +71,9 @@ function Install-DockerDesktop {
                 $process = Start-Process -FilePath $installerPath -ArgumentList "install", "--quiet" -Wait -PassThru -ErrorAction Stop
                 $exitCode = $process.ExitCode
                 
-                if ($exitCode -eq 0) {
-                    Write-Status "Docker Desktop installation completed. You may need to restart your computer." -Type "SUCCESS"
-                    Write-Status "After restart, please enable WSL integration in Docker Desktop settings." -Type "WARNING"
-                    Write-Status "Go to Docker Desktop → Settings → Resources → WSL Integration → Enable for Ubuntu" -Type "WARNING"
-                    
-                    $restartChoice = Read-Host "Do you want to restart your computer now? (y/n)"
-                    if ($restartChoice -eq "y") {
-                        Restart-Computer -Force
-                    } else {
-                        Write-Status "Please restart your computer manually before continuing with Tyk setup." -Type "WARNING"
-                    }
-                    
+                if ($exitCode -eq 0) {                    
                     return $true
                 } else {
-                    Write-Status "Docker Desktop installation failed with exit code: $exitCode" -Type "ERROR"
                     return $false
                 }
             }
@@ -180,7 +168,12 @@ try {
             }
             
             Write-Status "Docker Desktop has been installed. A system restart is required." -Type "WARNING"
-            Write-Status "After restart, WSL will be properly configured with Docker integration." -Type "INFO"
+            Write-Status "After restart, you'll need to complete the Docker Desktop first-time setup:" -Type "INFO"
+            Write-Status "1. Accept the Docker T&Cs" -Type "INFO"
+            Write-Status "2. Choose your Docker Desktop settings - select the default option" -Type "INFO"
+            Write-Status "3. IMPORTANT: Setup will take several minutes as Docker installs and configures WSL" -Type "INFO"
+            Write-Status "4. A Windows Subsystem for Linux (WSL) window may appear during the process - it can be closed" -Type "INFO"
+            Write-Status "4. You'll know setup is complete when 'Starting the Docker Engine...' disappears" -Type "INFO"
             $restartChoice = Read-Host "Do you want to restart your computer now? (y/n)"
             if ($restartChoice -eq "y") {
                 Restart-Computer -Force
@@ -262,6 +255,9 @@ try {
     if ($dockerInstalled -and -not $dockerRunning) {
         # Try to start Docker Desktop service
         Write-Status "Attempting to start Docker Desktop..." -Type "INFO"
+        Write-Status "If Docker Desktop is starting for the first time, you may need to complete the setup wizard." -Type "INFO"
+        Write-Status "This process can take several minutes, especially if installing WSL components." -Type "WARNING"
+        Write-Status "Wait until the 'Starting the Docker Engine...' message disappears before proceeding." -Type "WARNING"
         
         # Check if Docker Desktop.exe exists in the default location
         $dockerDesktopPath = "C:\Program Files\Docker\Docker\Docker Desktop.exe"
@@ -461,6 +457,8 @@ try {
         
         if (-not $dockerInWsl) {
             Write-Status "Docker is still not available in WSL. Please ensure Docker Desktop WSL integration is enabled for Ubuntu." -Type "ERROR"
+            Write-Status "NOTE: You may need to wait for Docker Desktop's initial setup to fully complete first." -Type "WARNING"
+            Write-Status "The setup is complete when the 'Setting up Docker Engine...' message disappears." -Type "INFO"
             exit 1
         }
     }
@@ -530,8 +528,10 @@ try {
     }
     Write-Status "Tyk demo repository setup completed" -Type "SUCCESS"
     
-    # Launch Tyk Demo
+            # Launch Tyk Demo
     Write-Status "Ready to launch Tyk demo" -Type "SUCCESS"
+    Write-Status "Make sure Docker Desktop is properly configured with WSL Integration enabled for Ubuntu" -Type "INFO"
+    Write-Status "To verify, check Docker Desktop → Settings → Resources → WSL Integration" -Type "INFO"
     Write-Status "To start the demo, run the following command in WSL:" -Type "INFO"
     Write-Status "cd ~/tyk-demo && ./up.sh" -Type "INFO"
 
