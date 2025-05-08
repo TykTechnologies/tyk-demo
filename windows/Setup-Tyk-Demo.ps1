@@ -1,237 +1,121 @@
 # Tyk Demo Setup Script
-# This PowerShell script sets up the necessary prerequisites and launches the Tyk demo
+# This PowerShell script checks prerequisites and launches the Tyk demo in WSL
 # Note: Run as administrator to ensure all operations can complete successfully
 
-# Check if running as administrator
+# Check for administrator privileges
 $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 $isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 if (-not $isAdmin) {
     Write-Host "This script requires administrator privileges." -ForegroundColor Yellow
-    Write-Host "Please close this PowerShell windows, then reload PowerShell using the 'Run as Administrator' option." -ForegroundColor Yellow
+    Write-Host "Please close this PowerShell window and re-run it using 'Run as Administrator'." -ForegroundColor Yellow
     Read-Host -Prompt "Press Enter to exit"
     exit 1
 }
 
-# Function to display status messages with color
+# Display status messages
 function Write-Status {
     param (
-        [Parameter(Mandatory=$true)]
         [string]$Message,
-        
-        [Parameter(Mandatory=$false)]
         [string]$Type = "INFO"
     )
-    
-    switch ($Type) {
-        "INFO" { 
-            Write-Host "==== $Message ====" -ForegroundColor Cyan 
-        }
-        "SUCCESS" { 
-            Write-Host "[SUCCESS] $Message" -ForegroundColor Green 
-        }
-        "ERROR" { 
-            Write-Host "[ERROR] $Message" -ForegroundColor Red 
-        }
-        "WARNING" { 
-            Write-Host "[WARNING] $Message" -ForegroundColor Yellow 
-        }
-    }
+    $color = @{
+        "INFO"    = "Cyan"
+        "SUCCESS" = "Green"
+        "ERROR"   = "Red"
+        "WARNING" = "Yellow"
+    }[$Type]
+    $prefix = if ($Type -eq "INFO") { "==== $Message ====" } else { "[$Type] $Message" }
+    Write-Host $prefix -ForegroundColor $color
 }
 
-# Function to check if a command exists
+# Check if a command exists
 function Test-CommandExists {
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$Command
-    )
-    
-    $exists = $null -ne (Get-Command -Name $Command -ErrorAction SilentlyContinue)
-    return $exists
+    param ([string]$Command)
+    return $null -ne (Get-Command -Name $Command -ErrorAction SilentlyContinue)
 }
 
 try {
-    # -------------------------------
-    # Step 1: Check for Docker Desktop
-    # -------------------------------
-    Write-Status "Checking for Docker Desktop installation"
-    
+    # Check for Docker
+    Write-Status "Checking for Docker CLI"
     if (-not (Test-CommandExists "docker")) {
-        Write-Status "Docker Desktop is not installed. Please install it from https://www.docker.com/products/docker-desktop/" -Type "ERROR"
-        Read-Host -Prompt "Press Enter to exit"
+        Write-Status "Docker is not installed. Please install Docker Desktop from https://www.docker.com/products/docker-desktop/" -Type "ERROR"
         exit 1
     }
-    
-    Write-Status "Docker is installed" -Type "SUCCESS"
-    
-    # -------------------------------
-    # Step 2: Check if Docker Desktop is running and the daemon is responsive
-    # -------------------------------
-    Write-Status "Checking if Docker Desktop is running"
-    $dockerProcess = Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue
-    if (-not $dockerProcess) {
-        Write-Status "Attempting to start Docker Desktop" -Type "INFO"
-        Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe" -WindowStyle Minimized
-
-        $maxWaitSeconds = 120
-        $waitInterval = 5
-        $elapsed = 0
-
-        Write-Status "Waiting for Docker Desktop to start (timeout: $maxWaitSeconds seconds)" -Type "INFO"
-
-        while ($elapsed -lt $maxWaitSeconds) {
-            Start-Sleep -Seconds $waitInterval
-            $elapsed += $waitInterval
-
-            $dockerProcess = Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue
-            if ($dockerProcess) {
-              try {
-                  docker info > $null 2>&1
-                  if ($LASTEXITCODE -eq 0) {
-                      Write-Status "Docker Desktop is running and responsive" -Type "SUCCESS"
-                      break
-                  }
-              } catch { }
-          }
-
-          Write-Host -NoNewline "."
-        }
-
-        if ($elapsed -ge $maxWaitSeconds -or -not $dockerProcess) {
-            Write-Host
-            Write-Status "Docker Desktop did not start in time or is not responsive." -Type "ERROR"
-            Write-Status "Please start Docker Desktop manually and re-run the script." -Type "ERROR"
-            Read-Host -Prompt "Press Enter to exit"
-            exit 1
-        }
-    }
-    
-    # Check if Docker daemon is responsive
-    try {
-        $dockerInfo = docker info 2>$null
-        if ($LASTEXITCODE -ne 0) {
-            throw "Docker daemon is not responsive"
-        }
-    }
-    catch {
-        Write-Status "Docker daemon is not responsive. Please ensure Docker Desktop is fully started." -Type "ERROR"
-        Read-Host -Prompt "Press Enter to exit"
+    docker info > $null 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Status "Docker is installed but not running or not responsive. Please ensure Docker Desktop is running." -Type "ERROR"
         exit 1
     }
-    
-    Write-Status "Docker Desktop is running and responsive" -Type "SUCCESS"
-    
-    # -------------------------------
-    # Step 3: Check for WSL
-    # -------------------------------
-    Write-Status "Checking WSL status"
-    
-    try {
-        $wslStatus = wsl --status 2>$null
-        if ($LASTEXITCODE -ne 0) {
-            throw "WSL is not installed"
-        }
-    }
-    catch {
-        Write-Status "WSL is not installed. Installing..." -Type "WARNING"
-        wsl --install
-        Write-Status "Please reboot your computer and re-run this script." -Type "WARNING"
-        Read-Host -Prompt "Press Enter to exit"
+    Write-Status "Docker is installed and responsive" -Type "SUCCESS"
+
+    # Check for WSL
+    Write-Status "Checking WSL availability"
+    wsl --status > $null 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Status "WSL is not installed. Please install it via 'wsl --install' and reboot." -Type "ERROR"
         exit 1
     }
-    
-    # Check WSL version
-    $wslVersion = (wsl --status | Select-String -Pattern "Default Version" -SimpleMatch).Line
-    if (-not ($wslVersion -match "2")) {
-        Write-Status "Setting WSL 2 as default version" -Type "INFO"
-        wsl --set-default-version 2
-    }
-    
-    Write-Status "WSL is properly installed" -Type "SUCCESS"
-    
-    # -------------------------------
-    # Step 4: Check for Ubuntu
-    # -------------------------------
+    Write-Status "WSL is available" -Type "SUCCESS"
+
+    # Check for Ubuntu
     Write-Status "Checking for Ubuntu distro"
-    
     $ubuntuInstalled = wsl -l -v | Select-String -Pattern "Ubuntu" -SimpleMatch
     if (-not $ubuntuInstalled) {
-        Write-Status "Ubuntu not found. Installing via WSL..." -Type "WARNING"
-        wsl --install -d Ubuntu
-        Write-Status "Ubuntu installation starting. Please follow on-screen instructions." -Type "WARNING"
-        Read-Host -Prompt "Press Enter to exit"
+        Write-Status "Ubuntu is not installed. Please install it with 'wsl --install -d Ubuntu'" -Type "ERROR"
         exit 1
     }
-    
     Write-Status "Ubuntu is installed" -Type "SUCCESS"
-    
-    # -------------------------------
-    # Step 5: Set Ubuntu as default and run setup
-    # -------------------------------
-    Write-Status "Setting Ubuntu as default distro"
-    
+
+    # Set Ubuntu as default
     wsl --set-default Ubuntu
     if ($LASTEXITCODE -ne 0) {
-        Write-Status "Failed to set Ubuntu as the default WSL distro." -Type "ERROR"
-        Read-Host -Prompt "Press Enter to exit"
+        Write-Status "Failed to set Ubuntu as default WSL distro." -Type "ERROR"
         exit 1
     }
-    
-    Write-Status "Ubuntu is set as default WSL distro" -Type "SUCCESS"
-    
-    # Check Docker Desktop WSL integration
-    Write-Status "Checking Docker integration with WSL"
-    
-    $dockerIntegration = wsl -d Ubuntu -- which docker 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        Write-Status "Docker integration with WSL is not enabled. Please enable WSL integration for Ubuntu in Docker Desktop → Settings → Resources → WSL Integration." -Type "ERROR"
-        Read-Host -Prompt "Press Enter to exit"
+
+    # Check Docker integration inside WSL
+    Write-Status "Checking Docker inside Ubuntu"
+    $dockerInWsl = wsl -d Ubuntu -- which docker 2>$null
+    if (-not $dockerInWsl) {
+        Write-Status "Docker is not available in WSL. Enable Docker Desktop → Settings → Resources → WSL Integration → Enable for Ubuntu." -Type "ERROR"
         exit 1
     }
-    
-    Write-Status "Docker integration with WSL is enabled" -Type "SUCCESS"
-    
-    # -------------------------------
-    # Step 6: Starting tyk-demo in Ubuntu
-    # -------------------------------
-    Write-Status "Starting Tyk demo setup in Ubuntu"
-    
+    Write-Status "Docker is available inside WSL" -Type "SUCCESS"
+
+    # Run Tyk demo setup
+    Write-Status "Running Tyk demo setup in Ubuntu"
     $setupScript = @'
-    set -e
-    echo "Updating Ubuntu packages..."
-    sudo apt update && sudo apt install -y git jq curl
+set -e
+echo "Updating packages..."
+sudo apt update && sudo apt install -y git jq curl
 
-    echo "Checking Docker Compose availability..."
-    if ! docker compose version > /dev/null 2>&1; then
-        echo "ERROR: Docker Compose is not available in WSL. Enable WSL integration for Ubuntu in Docker Desktop → Settings → Resources → WSL Integration."
-        exit 1
-    fi
+echo "Checking Docker Compose..."
+if ! docker compose version > /dev/null 2>&1; then
+    echo "ERROR: Docker Compose not available. Enable Docker integration in WSL settings."
+    exit 1
+fi
 
-    # Check if tyk-demo directory exists
-    if [ -d ~/tyk-demo ]; then
-        echo "Tyk demo directory already exists, updating..."
-        cd ~/tyk-demo
-        git pull
-    else
-        echo "Cloning Tyk demo repository..."
-        git clone https://github.com/TykTechnologies/tyk-demo.git ~/tyk-demo
-        cd ~/tyk-demo
-    fi
-    
-    echo "Setting up Tyk demo..."
-    chmod +x up.sh
-    ./up.sh
+if [ -d ~/tyk-demo ]; then
+    echo "Updating existing tyk-demo repo..."
+    cd ~/tyk-demo && git pull
+else
+    echo "Cloning tyk-demo repo..."
+    git clone https://github.com/TykTechnologies/tyk-demo.git ~/tyk-demo
+    cd ~/tyk-demo
+fi
+
+echo "Starting Tyk demo..."
+chmod +x up.sh && ./up.sh
 '@
-    
-    # Run the setup script in WSL
     $setupScript | wsl -d Ubuntu bash
-    
-    if ($LASTEXITCODE -ne 0) {
-        Write-Status "There was an error setting up the Tyk demo in Ubuntu." -Type "ERROR"
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Status "Tyk demo setup completed successfully" -Type "SUCCESS"
     } else {
-        Write-Status "Tyk demo setup completed successfully!" -Type "SUCCESS"
+        Write-Status "Tyk demo setup failed inside Ubuntu." -Type "ERROR"
     }
-    
+
     Read-Host -Prompt "Press Enter to exit"
 }
 catch {
