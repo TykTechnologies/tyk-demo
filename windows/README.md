@@ -12,29 +12,17 @@
    - Right-click on Windows PowerShell and select "Run as Administrator"
    - You might be asked for permission — click Yes
 
-2. **Set PowerShell Execution Policy for Current Session** (if needed):
+2. **Download and Run the Setup Script**:
 
-   If it's your first time using PowerShell, copy and paste the following into the PowerShell window and press Enter:
+   Copy and paste this into the PowerShell window:
 
    ```powershell
-   Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
-   ```
-   This temporarily allows script execution only in the current PowerShell window.
-
-3. **Download and Run the Setup Script**:
-   ```powershell
-   # Download the script
    Invoke-WebRequest -Uri "https://raw.githubusercontent.com/TykTechnologies/tyk-demo/windows/windows/Setup-Tyk-Demo.ps1" -OutFile "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
-   
-   # Run the script directly with execution policy bypass (alternative to step 2)
    powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
    ```
-   
-   Or alternatively, if you did step 2:
-   ```powershell
-   # Run the script directly
-   & "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
-   ```
+
+   This will download and run the script.
+
 
 ## What This Script Does
 
