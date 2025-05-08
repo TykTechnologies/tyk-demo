@@ -9,8 +9,8 @@
 
 1. **Open PowerShell as Administrator**:
    - Search for PowerShell in the Start menu
-   - Right-click on Windows PowerShell and select "Run as Administrator"
-   - You might be asked for permission — click Yes
+   - Right-click on Windows PowerShell and select "Run as administrator"
+   - When asked for permission — click Yes
 
 2. **Download and Run the Setup Script**:
 
@@ -21,7 +21,7 @@
    powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
    ```
 
-   This will download and run the script.
+   This will download and a script that prepares your system for Tyk Demo.
 
 
 ## What This Script Does

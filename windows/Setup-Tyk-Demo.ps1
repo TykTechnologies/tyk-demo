@@ -68,12 +68,17 @@ try {
     # Step 2: Check if Docker Desktop is running and the daemon is responsive
     # -------------------------------
     Write-Status "Checking if Docker Desktop is running"
-    
     $dockerProcess = Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue
     if (-not $dockerProcess) {
-        Write-Status "Docker Desktop is not running. Please start Docker Desktop before continuing." -Type "ERROR"
+      Write-Status "Attempting to start Docker Desktop" -Type "INFO"
+      Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe" -NoNewWindow
+      Start-Sleep -Seconds 10
+      $dockerProcess = Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue
+      if (-not $dockerProcess) {
+        Write-Status "Failed to start Docker Desktop. Please start it manually and re-run the script." -Type "ERROR"
         Read-Host -Prompt "Press Enter to exit"
         exit 1
+      }
     }
     
     # Check if Docker daemon is responsive
