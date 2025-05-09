@@ -453,7 +453,7 @@ try {
     
     try {
         # Capture command output
-        $updateOutput = & wsl -d Ubuntu -- bash -c "sudo apt-get update -qq && sudo apt-get install -y -qq git jq curl" 2>&1
+        $updateOutput = & wsl -d Ubuntu -- bash -c "sudo apt-get update && sudo apt-get install -y git jq curl" 2>&1
         
         # Check for errors
         if ($LASTEXITCODE -ne 0) {
@@ -511,12 +511,10 @@ try {
     }
     Write-Status "Tyk demo repository setup completed" -Type "SUCCESS"
     
-            # Launch Tyk Demo
+    # Ready to launch Tyk Demo
     Write-Status "Ready to launch Tyk demo" -Type "SUCCESS"
-    Write-Status "Make sure Docker Desktop is properly configured with WSL Integration enabled for Ubuntu" -Type "INFO"
-    Write-Status "To verify, check Docker Desktop → Settings → Resources → WSL Integration" -Type "INFO"
     Write-Status "To start the demo, run the following command in WSL:" -Type "INFO"
-    Write-Status "cd ~/tyk-demo && ./up.sh" -Type "INFO"
+    Write-Status "wsl -d ubuntu cd ~/tyk-demo && ./up.sh" -Type "INFO"
 
     Read-Host -Prompt "Press Enter to exit"
 }
