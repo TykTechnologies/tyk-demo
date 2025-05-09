@@ -1,0 +1,98 @@
+{
+    "components": {
+        "securitySchemes": {
+            "jwt": {
+                "bearerFormat": "JWT",
+                "scheme": "bearer",
+                "type": "http"
+            }
+        }
+    },
+    "info": {
+        "title": "JWT API",
+        "version": "Default"
+    },
+    "openapi": "3.0.6",
+    "paths": {},
+    "security": [
+        {
+            "jwt": []
+        }
+    ],
+    "x-tyk-api-gateway": {
+        "info": {
+            "dbId": "650c327aa1ed7e6c97e78b64",
+            "id": "612180d8b3ca42eb5cb7d976d93c3e2a",
+            "name": "JWT API",
+            "orgId": "650c04faa1ed7e7420871360",
+            "state": {
+                "active": true
+            }
+        },
+        "middleware": {
+            "global": {
+                "cache": {
+                    "enabled": true,
+                    "timeout": 60
+                },
+                "cors": {
+                    "enabled": false,
+                    "maxAge": 24
+                }
+            }
+        },
+        "server": {
+            "authentication": {
+                "enabled": true,
+                "securitySchemes": {
+                    "jwt": {
+                        "defaultPolicies": [
+                            "5ead72955759610001818688"
+                        ],
+                        "enabled": true,
+                        "header": {
+                            "enabled": true,
+                            "name": "Authorization"
+                        },
+                        "identityBaseField": "sub",
+                        "policyFieldName": "pol",
+                        "scopes": {
+                            "claimName": "policy_claim",
+                            "scopeToPolicyMapping": [
+                                {
+                                    "policyId": "5ead73565759610001818689",
+                                    "scope": "restricted"
+                                }
+                            ]
+                        },
+                        "signingMethod": "hmac",
+                        "source": "c2VjcmV0"
+                    }
+                }
+            },
+            "listenPath": {
+                "strip": true,
+                "value": "/oas-jwt-api/"
+            },
+            "slug": "jwt-api"
+        },
+        "upstream": {
+            "serviceDiscovery": {
+                "cache": {
+                    "enabled": true
+                },
+                "enabled": false
+            },
+            "test": {
+                "serviceDiscovery": {
+                    "cache": {
+                        "enabled": true,
+                        "timeout": 60
+                    },
+                    "enabled": false
+                }
+            },
+            "url": "http://httpbin/"
+        }
+    }
+}

@@ -1,0 +1,63 @@
+{
+    "components": {},
+    "info": {
+        "title": "Basic Open API",
+        "version": "Default"
+    },
+    "openapi": "3.0.6",
+    "paths": {},
+    "x-tyk-api-gateway": {
+        "info": {
+            "dbId": "650c3132a1ed7e6c97e78b63",
+            "id": "78d13a71db89414651090ef4753c1473",
+            "name": "Basic Open API",
+            "orgId": "650c04faa1ed7e7420871360",
+            "state": {
+                "active": true
+            }
+        },
+        "middleware": {
+            "global": {
+                "cache": {
+                    "enabled": true,
+                    "timeout": 60
+                },
+                "cors": {
+                    "enabled": false,
+                    "maxAge": 24
+                }
+            }
+        },
+        "server": {
+            "gatewayTags": {
+                "enabled": true,
+                "tags": [
+                    "tyk-gateway-2"
+                ]
+            },
+            "listenPath": {
+                "strip": true,
+                "value": "/oas-basic-open-api/"
+            },
+            "slug": "basic-open-api"
+        },
+        "upstream": {
+            "serviceDiscovery": {
+                "cache": {
+                    "enabled": true
+                },
+                "enabled": false
+            },
+            "test": {
+                "serviceDiscovery": {
+                    "cache": {
+                        "enabled": true,
+                        "timeout": 60
+                    },
+                    "enabled": false
+                }
+            },
+            "url": "http://httpbin/"
+        }
+    }
+}
