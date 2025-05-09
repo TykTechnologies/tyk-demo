@@ -334,9 +334,27 @@ try {
     try {
         $wslListOutput = & wsl -l -v 2>&1
         
-        # Convert to string if needed
-        if ($wslListOutput -isnot [String]) {
-            $wslListOutput = $wslListOutput | Out-String
+        # Handle different output types for compatibility
+        # PowerShell 5.1 might return array of strings directly
+        if ($wslListOutput -is [Array]) {
+            # Process each line in the array
+            Write-Status "Processing WSL output as array" -Type "INFO"
+            foreach ($line in $wslListOutput) {
+                if ($line -match "Ubuntu") {
+                    Write-Status "Found Ubuntu distribution in array output: $line" -Type "INFO"
+                    $ubuntuInstalled = $true
+                    break
+                }
+            }
+        }
+        else {
+            # Convert to string and process (for newer PowerShell versions)
+            Write-Status "Processing WSL output as string" -Type "INFO"
+            $wslString = $wslListOutput | Out-String
+            if ($wslString -match "Ubuntu") {
+                Write-Status "Found Ubuntu distribution in string output" -Type "INFO"
+                $ubuntuInstalled = $true
+            }
         }
         
         $ubuntuInstalled = $wslListOutput -match "Ubuntu"
