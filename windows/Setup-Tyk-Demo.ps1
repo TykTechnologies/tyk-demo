@@ -405,29 +405,6 @@ try {
     }
     Write-Status "Ubuntu is installed" -Type "SUCCESS"
 
-    # Set Ubuntu as default with error handling for PS 5.1
-    try {
-        $defaultOutput = & wsl --set-default Ubuntu 2>&1
-        
-        # Convert to string if needed
-        if ($defaultOutput -isnot [String]) {
-            $defaultOutput = $defaultOutput | Out-String
-        }
-        
-        if ($defaultOutput -like "*error*" -or $defaultOutput -like "*is not recognized*") {
-            Write-Status "Could not set Ubuntu as default WSL distro using modern command." -Type "WARNING"
-            # Try alternative approach for older systems
-            $wslConfigPath = "$env:USERPROFILE\.wslconfig"
-            "[wsl2]`ndefaultDistribution=Ubuntu" | Out-File -FilePath $wslConfigPath -Encoding ASCII -Force
-            Write-Status "Attempted to set Ubuntu as default using .wslconfig file" -Type "INFO"
-        } else {
-            Write-Status "Set Ubuntu as default WSL distro" -Type "SUCCESS"
-        }
-    } catch {
-        Write-Status "Failed to set Ubuntu as default WSL distro: $($_.Exception.Message)" -Type "WARNING"
-        # This is not critical, so we'll continue
-    }
-
     # Check Docker integration inside WSL with explicit error handling
     Write-Status "Checking Docker inside Ubuntu"
     $dockerInWsl = $false
