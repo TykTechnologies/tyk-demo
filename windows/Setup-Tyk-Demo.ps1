@@ -332,32 +332,20 @@ try {
     $ubuntuInstalled = $false
     
     try {
-        $wslListOutput = & wsl -l -v 2>&1
-        
-        # Handle different output types for compatibility
-        # PowerShell 5.1 might return array of strings directly
-        if ($wslListOutput -is [Array]) {
-            # Process each line in the array
-            Write-Status "Processing WSL output as array" -Type "INFO"
-            foreach ($line in $wslListOutput) {
-                if ($line -match "Ubuntu") {
-                    Write-Status "Found Ubuntu distribution in array output: $line" -Type "INFO"
-                    $ubuntuInstalled = $true
-                    break
-                }
-            }
-        }
-        else {
-            # Convert to string and process (for newer PowerShell versions)
-            Write-Status "Processing WSL output as string" -Type "INFO"
-            $wslString = $wslListOutput | Out-String
-            if ($wslString -match "Ubuntu") {
-                Write-Status "Found Ubuntu distribution in string output" -Type "INFO"
-                $ubuntuInstalled = $true
-            }
+        $wslOutput = wsl -l -v | Out-String
+
+        # Process each line:
+        # 1. Remove null characters (U+0000). This step is harmless if no null characters exist.
+        # 2. Normalize all sequences of whitespace characters into a single standard space.
+        # 3. Pipe the cleaned lines to Where-Object to find any line matching "ubuntu" (case-insensitive).
+        #    We pipe directly to Where-Object to stop processing as soon as a match is found, for efficiency.
+        $isUbuntuFound = $wslOutput | ForEach-Object {
+            $_ -replace [char]0x0000, '' -replace '\s+', ' '
+        } | Where-Object {
+            $_ -match "ubuntu" # -match is case-insensitive by default
         }
         
-        $ubuntuInstalled = $wslListOutput -match "Ubuntu"
+        $ubuntuInstalled = [bool]$isUbuntuFound
     } catch {
         $ubuntuInstalled = $false
         Write-Status "Error checking for Ubuntu: $($_.Exception.Message)" -Type "WARNING"
