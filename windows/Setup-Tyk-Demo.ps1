@@ -47,22 +47,27 @@ function Set-TykDemoEnvironment {
     }
 
     # Check Docker Compose v2
-    if (-not (Test-CommandExists "docker")) {
+    if (-not (Test-CommandExists "docker compose")) {
         $prereqsPassed = $false
-        $failedChecks += "Docker Compose v2 (docker compose) is not installed"
+        $failedChecks += "Docker Compose is not installed"
     }
 
     # Check WSL2
     try {
-        $wslVersion = (wsl --status) -match "Default Version: 2"
-        if (-not $wslVersion) {
-            $prereqsPassed = $false
-            $failedChecks += "WSL2 is not installed or not set as default"
-        }
+        $wslVersionOutput = wsl --version 2>&1
+    } catch {
+        $failedChecks += "WSL is not installed or not available in PATH."
     }
-    catch {
-        $prereqsPassed = $false
-        $failedChecks += "WSL2 is not installed"
+
+    if ($wslVersionOutput -match "WSL version:\s*([\d\.]+)") {
+        $versionString = $Matches[1]
+        $version = [version]$versionString
+
+        if ($version.Major -lt 2) {
+            $failedChecks += "WSL version $versionString is too old. WSL 2.x or higher is required."
+        }
+    } else {
+        failedChecks += "Could not determine WSL version from output:"
     }
 
     # Check Docker is Running
