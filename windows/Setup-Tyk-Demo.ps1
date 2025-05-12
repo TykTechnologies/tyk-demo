@@ -54,7 +54,7 @@ function Set-TykDemoEnvironment {
             $failedChecks += "WSL version $versionString is too old. WSL 2.x or higher is required."
         }
     } else {
-        failedChecks += "Could not determine WSL version from output:"
+        $failedChecks += "Could not determine WSL version from output:"
     }
 
     # Check if the Docker Desktop process is running
