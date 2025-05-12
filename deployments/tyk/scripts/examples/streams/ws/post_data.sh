@@ -10,4 +10,4 @@ MESSAGE=$1
 
 echo "Posting message $MESSAGE"
 
-curl -X POST http://tyk-gateway.localhost:8080/streams-ws/post -H "Content-Type: text/plain" --data "$MESSAGE"
+curl http://tyk-gateway.localhost:8080/streams-ws/post -H "Content-Type: text/plain" -d "$MESSAGE"
