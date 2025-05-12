@@ -1,55 +1,91 @@
-# Improved Tyk Demo Setup Script
-# This PowerShell script sets up the Tyk demo in WSL using Tyk-Demo-Ubuntu distribution
+# Tyk Demo Setup Script
+# This PowerShell script checks prerequisites and launches the Tyk demo in WSL
+# Note: Run as administrator to ensure all operations can complete successfully
+# Compatible with PowerShell 5.1 and newer
 
 # Check for administrator privileges
-$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+$currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+$isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
 if (-not $isAdmin) {
-    Write-Host "This script requires administrator privileges. Please run as Administrator." -ForegroundColor Yellow
+    Write-Host "This script requires administrator privileges." -ForegroundColor Yellow
+    Write-Host "Please close this PowerShell window and re-run it using 'Run as Administrator'." -ForegroundColor Yellow
     Read-Host -Prompt "Press Enter to exit"
     exit 1
 }
 
-# Constants
-$WSL_DISTRO_NAME = "Tyk-Demo-Ubuntu"
-$DOCKER_INSTALLER_URL = "https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe"
-$DOCKER_DESKTOP_PATH = "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-$TYK_REPO_URL = "https://github.com/TykTechnologies/tyk-demo.git"
+$distributionName = "Tyk-Demo-Ubuntu"
 
-# Display status messages with timestamp
-function Write-Status($Message, $Type = "INFO") {
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $color = @{"INFO" = "Cyan"; "SUCCESS" = "Green"; "ERROR" = "Red"; "WARNING" = "Yellow"}[$Type]
-    Write-Host "[$timestamp] [$Type] $Message" -ForegroundColor $color
+# Display status messages
+function Write-Status {
+    param (
+        [string]$Message,
+        [string]$Type = "INFO"
+    )
+    $color = @{
+        "INFO"    = "Cyan"
+        "SUCCESS" = "Green"
+        "ERROR"   = "Red"
+        "WARNING" = "Yellow"
+    }[$Type]
+    $prefix = if ($Type -eq "INFO") { "==== $Message ====" } else { "[$Type] $Message" }
+    Write-Host $prefix -ForegroundColor $color
 }
 
-# Check if a command exists
-function Test-CommandExists($Command) {
-    return $null -ne (Get-Command -Name $Command -ErrorAction SilentlyContinue)
+# Check if a command exists - PS 5.1 compatible
+function Test-CommandExists {
+    param ([string]$Command)
+    $cmdTest = Get-Command -Name $Command -ErrorAction SilentlyContinue
+    return $null -ne $cmdTest
 }
 
-# Install Docker Desktop
+# Function to download and install Docker Desktop - PS 5.1 compatible
 function Install-DockerDesktop {
-    Write-Status "Installing Docker Desktop..." -Type "INFO"
-    $tempDir = Join-Path $env:TEMP "DockerInstall"
-    New-Item -ItemType Directory -Path $tempDir -Force -ErrorAction SilentlyContinue | Out-Null
-    $installerPath = Join-Path $tempDir "DockerDesktopInstaller.exe"
-    
     try {
+        Write-Status "Docker Desktop is not installed. Attempting to download and install..." -Type "INFO"
+        
+        # Setup temporary directory for downloads
+        $tempDir = Join-Path $env:TEMP "DockerInstall"
+        if (-not (Test-Path $tempDir)) {
+            New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+        }
+        $installerPath = Join-Path $tempDir "DockerDesktopInstaller.exe"
+        
+        # Download Docker Desktop installer - PS 5.1 compatible approach
         Write-Status "Downloading Docker Desktop installer..." -Type "INFO"
-        $webClient = New-Object System.Net.WebClient
-        $webClient.DownloadFile($DOCKER_INSTALLER_URL, $installerPath)
+        $dockerUrl = "https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe"
+        
+        try {
+            # Use .NET WebClient for PowerShell 5.1 compatibility
+            $webClient = New-Object System.Net.WebClient
+            $webClient.DownloadFile($dockerUrl, $installerPath)
+        }
+        catch {
+            Write-Status "Failed to download Docker Desktop: $($_.Exception.Message)" -Type "ERROR"
+            return $false
+        }
         
         if (Test-Path $installerPath) {
-            Write-Status "Running Docker Desktop installer..." -Type "INFO"
-            $process = Start-Process -FilePath $installerPath -ArgumentList "install", "--quiet" -Wait -PassThru
+            Write-Status "Download completed. Installing Docker Desktop..." -Type "INFO"
             
-            if ($process.ExitCode -eq 0) {
-                Write-Status "Docker Desktop installation completed successfully" -Type "SUCCESS"
-                return $true
-            } else {
-                Write-Status "Docker Desktop installation failed with exit code: $($process.ExitCode)" -Type "ERROR"
+            # Install Docker Desktop silently with explicit error handling
+            try {
+                $process = Start-Process -FilePath $installerPath -ArgumentList "install", "--quiet" -Wait -PassThru -ErrorAction Stop
+                $exitCode = $process.ExitCode
+                
+                if ($exitCode -eq 0) {                    
+                    return $true
+                } else {
+                    return $false
+                }
+            }
+            catch {
+                Write-Status "Error during Docker Desktop installation: $($_.Exception.Message)" -Type "ERROR"
                 return $false
             }
+        } else {
+            Write-Status "Failed to download Docker Desktop installer." -Type "ERROR"
+            return $false
         }
     }
     catch {
@@ -57,196 +93,436 @@ function Install-DockerDesktop {
         return $false
     }
     finally {
-        Remove-Item -Path $tempDir -Recurse -Force -ErrorAction SilentlyContinue
-    }
-    
-    return $false
-}
-
-# Wait for Docker to be ready
-function Wait-ForDocker($MaxSeconds = 60) {
-    Write-Status "Waiting for Docker to start (max $MaxSeconds seconds)..." -Type "INFO"
-    
-    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-    while ($stopwatch.Elapsed.TotalSeconds -lt $MaxSeconds) {
-        try {
-            $dockerInfo = docker info 2>&1
-            if ($dockerInfo -notlike "*Cannot connect*" -and $dockerInfo -notlike "*error*") {
-                Write-Status "Docker is ready after $([int]$stopwatch.Elapsed.TotalSeconds) seconds" -Type "SUCCESS"
-                return $true
-            }
+        # Clean up temp files - with error handling
+        if (Test-Path $tempDir) {
+            Remove-Item -Path $tempDir -Recurse -Force -ErrorAction SilentlyContinue
         }
-        catch { }
-        
-        Write-Host "." -NoNewline
-        Start-Sleep -Seconds 2
     }
+}
+
+try {
+    # Check for WSL first since Docker Desktop depends on it
+    Write-Status "Checking WSL availability"
+    $wslInstalled = $false
     
-    Write-Status "Docker did not start within $MaxSeconds seconds" -Type "ERROR"
-    return $false
-}
-
-# Check if WSL distribution exists
-function Test-WslDistributionExists($DistroName) {
-    $wslOutput = wsl --list | Out-String
-    return $wslOutput -match $DistroName
-}
-
-# MAIN SCRIPT EXECUTION
-Write-Host "`n=== Tyk Demo Setup for WSL ($WSL_DISTRO_NAME) ===`n" -ForegroundColor Magenta
-
-# 1. Check WSL
-Write-Status "Checking WSL availability"
-$wslInstalled = Test-CommandExists "wsl"
-if (-not $wslInstalled) {
-    Write-Status "WSL is not installed. Installing..." -Type "WARNING"
+    # PS 5.1 compatible approach for command existence and output capture
     try {
-        wsl --install -ErrorAction Stop
-        Write-Status "WSL installation initiated. Please restart your computer and run this script again." -Type "WARNING"
-        Read-Host -Prompt "Press Enter to exit"
-        exit 0
+        $wslOutput = ""
+        $wslOutput = & wsl --status 2>&1
+        # Convert to string if needed for PS 5.1
+        if ($wslOutput -isnot [String]) {
+            $wslOutput = $wslOutput | Out-String
+        }
+        
+        # Check if the command was recognized
+        if ($wslOutput -notlike "*is not recognized*" -and $wslOutput -notlike "*not found*") {
+            $wslInstalled = $true
+            Write-Status "WSL is available" -Type "SUCCESS"
+        } else {
+            Write-Status "WSL is not installed or not properly configured" -Type "WARNING"
+        }
     }
     catch {
-        Write-Status "Error installing WSL: $($_.Exception.Message)" -Type "ERROR"
-        exit 1
+        Write-Status "WSL is not installed or not properly configured" -Type "WARNING"
+        $wslInstalled = $false
     }
-}
-Write-Status "WSL is available" -Type "SUCCESS"
 
-# 2. Check Docker
-Write-Status "Checking for Docker"
-$dockerInstalled = Test-CommandExists "docker"
-if (-not $dockerInstalled) {
-    Write-Status "Docker is not installed. Installing..." -Type "WARNING"
-    $installDocker = Install-DockerDesktop
-    if (-not $installDocker) {
-        Write-Status "Docker installation failed. Please install Docker Desktop manually." -Type "ERROR"
-        exit 1
+    # Check for Docker
+    Write-Status "Checking for Docker CLI"
+    $dockerInstalled = Test-CommandExists "docker"
+    $dockerRunning = $false
+    
+    if ($dockerInstalled) {
+        # Check if Docker is running - with explicit error handling for PS 5.1
+        try {
+            $dockerOutput = ""
+            $dockerOutput = & docker info 2>&1
+            
+            # Convert to string if needed for PS 5.1
+            if ($dockerOutput -isnot [String]) {
+                $dockerOutput = $dockerOutput | Out-String
+            }
+            
+            # Check for error patterns in output
+            if ($dockerOutput -notlike "*Cannot connect to the Docker daemon*" -and 
+                $dockerOutput -notlike "*error during connect*") {
+                $dockerRunning = $true
+                Write-Status "Docker is installed and responsive" -Type "SUCCESS"
+            } else {
+                Write-Status "Docker is installed but not running or not responsive." -Type "WARNING"
+            }
+        } catch {
+            Write-Status "Docker is installed but not running or not responsive: $($_.Exception.Message)" -Type "WARNING"
+        }
+    } else {
+        Write-Status "Docker is not installed." -Type "WARNING"
     }
-    Write-Status "Docker Desktop has been installed. A system restart is required." -Type "WARNING"
-    Read-Host -Prompt "Press Enter to exit and restart your computer"
-    exit 0
-}
-
-# 3. Check if Docker is running
-$dockerRunning = $false
-try {
-    $dockerInfo = docker info 2>&1
-    if ($dockerInfo -notlike "*Cannot connect*" -and $dockerInfo -notlike "*error*") {
-        $dockerRunning = $true
+    
+    # Install in the correct order
+    if (-not $wslInstalled -or -not $dockerInstalled) {
+        # If Docker isn't installed, install it first since it might install WSL components
+        if (-not $dockerInstalled) {
+            Write-Status "Installing Docker Desktop first (will include WSL components)..." -Type "INFO"
+            $installDocker = Install-DockerDesktop
+            if (-not $installDocker) {
+                Write-Status "Docker installation failed. Please install Docker Desktop manually from https://www.docker.com/products/docker-desktop/" -Type "ERROR"
+                exit 1
+            }
+            
+            Write-Status "Docker Desktop has been installed. A system restart is required." -Type "WARNING"
+            Write-Status "After restart, you'll need to complete the Docker Desktop first-time setup:" -Type "INFO"
+            Write-Status "1. Accept the Docker T&Cs" -Type "INFO"
+            Write-Status "2. Choose your Docker Desktop settings - select the default option" -Type "INFO"
+            Write-Status "3. IMPORTANT: Setup will take several minutes as Docker installs and configures WSL" -Type "INFO"
+            Write-Status "4. A Windows Subsystem for Linux (WSL) window may appear during the process - it can be closed" -Type "INFO"
+            Write-Status "4. You'll know setup is complete when 'Starting the Docker Engine...' disappears" -Type "INFO"
+            $restartChoice = Read-Host "Do you want to restart your computer now? (y/n)"
+            if ($restartChoice -eq "y") {
+                Restart-Computer -Force
+            } else {
+                Write-Status "Please restart your computer manually before continuing with Tyk setup." -Type "WARNING"
+            }
+            exit 0
+        }
+        
+        # If only WSL is missing (rare case if Docker is installed without WSL)
+        if (-not $wslInstalled -and $dockerInstalled) {
+            Write-Status "WSL is not installed. Installing WSL..." -Type "WARNING"
+            
+            # Install WSL with compatibility check
+            Write-Status "Installing WSL..." -Type "INFO"
+            try {
+                # Check PowerShell version to use appropriate WSL installation method
+                $psVersion = $PSVersionTable.PSVersion.Major
+                
+                # Try the modern approach first with error handling
+                try {
+                    $wslInstallOutput = & wsl --install 2>&1
+                    
+                    # Convert to string if needed for PS 5.1
+                    if ($wslInstallOutput -isnot [String]) {
+                        $wslInstallOutput = $wslInstallOutput | Out-String
+                    }
+                    
+                    # Check if the command was successful
+                    if ($wslInstallOutput -like "*is not recognized*" -or $wslInstallOutput -like "*not found*") {
+                        throw "Modern WSL install command not available"
+                    }
+                } catch {
+                    # Fall back to manual installation for older Windows versions
+                    Write-Status "Using alternative WSL installation method for compatibility..." -Type "INFO"
+                    
+                    # Enable WSL feature with explicit error handling
+                    Write-Status "Enabling Windows Subsystem for Linux feature..." -Type "INFO"
+                    try {
+                        $process = Start-Process -FilePath "dism.exe" -ArgumentList "/online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart" -Wait -PassThru -NoNewWindow
+                        if ($process.ExitCode -ne 0) {
+                            Write-Status "Failed to enable WSL feature. Exit code: $($process.ExitCode)" -Type "ERROR"
+                        }
+                    } catch {
+                        Write-Status "Error enabling WSL feature: $($_.Exception.Message)" -Type "ERROR"
+                    }
+                    
+                    # Enable Virtual Machine Platform feature (required for WSL 2)
+                    Write-Status "Enabling Virtual Machine Platform feature..." -Type "INFO"
+                    try {
+                        $process = Start-Process -FilePath "dism.exe" -ArgumentList "/online /enable-feature /featurename:VirtualMachinePlatform /all /norestart" -Wait -PassThru -NoNewWindow
+                        if ($process.ExitCode -ne 0) {
+                            Write-Status "Failed to enable VM Platform feature. Exit code: $($process.ExitCode)" -Type "ERROR"
+                        }
+                    } catch {
+                        Write-Status "Error enabling VM Platform feature: $($_.Exception.Message)" -Type "ERROR"
+                    }
+                }
+                
+                Write-Status "WSL installation initiated. A system restart is required." -Type "WARNING"
+                Write-Status "After restart, run this script again to install Ubuntu." -Type "INFO"
+                
+            } catch {
+                Write-Status "Error installing WSL: $($_.Exception.Message)" -Type "ERROR"
+                Write-Status "Please install WSL manually. Visit https://docs.microsoft.com/en-us/windows/wsl/install for instructions." -Type "INFO"
+            }
+            
+            $restartChoice = Read-Host "Do you want to restart your computer now? (y/n)"
+            if ($restartChoice -eq "y") {
+                Restart-Computer -Force
+            } else {
+                Write-Status "Please restart your computer manually before continuing with Tyk setup." -Type "WARNING"
+            }
+            exit 0
+        }
     }
-}
-catch { }
-
-if (-not $dockerRunning) {
-    Write-Status "Docker is not running. Starting Docker Desktop..." -Type "INFO"
-    if (Test-Path $DOCKER_DESKTOP_PATH) {
-        Start-Process $DOCKER_DESKTOP_PATH
-        $dockerStarted = Wait-ForDocker -MaxSeconds 60
+    
+    # If Docker is installed but not running, try to start it
+    if ($dockerInstalled -and -not $dockerRunning) {
+        # Try to start Docker Desktop service
+        Write-Status "Attempting to start Docker Desktop..." -Type "INFO"
+        Write-Status "If Docker Desktop is starting for the first time, you may need to complete the setup wizard." -Type "INFO"
+        Write-Status "This process can take several minutes, especially if installing WSL components." -Type "WARNING"
+        Write-Status "Wait until the 'Starting the Docker Engine...' message disappears before proceeding." -Type "WARNING"
+        
+        # Check if Docker Desktop.exe exists in the default location
+        $dockerDesktopPath = "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+        $dockerStarted = $false
+        
+        try {
+            if (Test-Path $dockerDesktopPath) {
+                Start-Process $dockerDesktopPath -ErrorAction SilentlyContinue
+            } else {
+                # Try alternative location for older Docker versions
+                $altDockerPath = "${env:ProgramFiles}\Docker\Docker\Docker for Windows.exe"
+                if (Test-Path $altDockerPath) {
+                    Start-Process $altDockerPath -ErrorAction SilentlyContinue
+                } else {
+                    Write-Status "Could not find Docker Desktop executable. Please start Docker manually." -Type "WARNING"
+                }
+            }
+            
+            Write-Status "Waiting for Docker to start (up to 60 seconds)..." -Type "INFO"
+            for ($i = 0; $i -lt 12; $i++) {
+                Start-Sleep -Seconds 5
+                try {
+                    $dockerCheckOutput = & docker info 2>&1
+                    
+                    # Convert to string if needed
+                    if ($dockerCheckOutput -isnot [String]) {
+                        $dockerCheckOutput = $dockerCheckOutput | Out-String
+                    }
+                    
+                    if ($dockerCheckOutput -notlike "*Cannot connect to the Docker daemon*" -and 
+                        $dockerCheckOutput -notlike "*error during connect*") {
+                        $dockerStarted = $true
+                        break
+                    }
+                } catch {
+                    # Continue trying
+                }
+            }
+        } catch {
+            Write-Status "Error starting Docker Desktop: $($_.Exception.Message)" -Type "ERROR"
+        }
+        
         if (-not $dockerStarted) {
-            Write-Status "Docker did not start successfully. Please start Docker Desktop manually and run this script again." -Type "ERROR"
+            Write-Status "Docker Desktop failed to start. Please start Docker Desktop manually and run this script again." -Type "ERROR"
+            exit 1
+        }
+        Write-Status "Docker is now running" -Type "SUCCESS"
+    }
+    
+    # Second WSL check after possible installations
+    Write-Status "Verifying WSL availability"
+    try {
+        $wslVerifyOutput = & wsl --status 2>&1
+        
+        # Convert to string if needed
+        if ($wslVerifyOutput -isnot [String]) {
+            $wslVerifyOutput = $wslVerifyOutput | Out-String
+        }
+        
+        if ($wslVerifyOutput -like "*is not recognized*" -or $wslVerifyOutput -like "*not found*") {
+            Write-Status "WSL is still not properly configured. This may require manual troubleshooting." -Type "ERROR"
+            exit 1
+        }
+        Write-Status "WSL is properly configured" -Type "SUCCESS"
+    } catch {
+        Write-Status "WSL verification failed: $($_.Exception.Message)" -Type "ERROR"
+        exit 1
+    }
+
+    # Check for Ubuntu using a PS 5.1 compatible approach
+    Write-Status "Checking for Ubuntu distro"
+    $ubuntuInstalled = $false
+    
+    try {
+        $wslOutput = wsl -l -v | Out-String
+
+        # Process each line:
+        # 1. Remove null characters (U+0000). This step is harmless if no null characters exist.
+        # 2. Normalize all sequences of whitespace characters into a single standard space.
+        # 3. Pipe the cleaned lines to Where-Object to find any line matching "ubuntu" (case-insensitive).
+        #    We pipe directly to Where-Object to stop processing as soon as a match is found, for efficiency.
+        $isUbuntuFound = $wslOutput | ForEach-Object {
+            $_ -replace [char]0x0000, '' -replace '\s+', ' '
+        } | Where-Object {
+            $_ -match "ubuntu" # -match is case-insensitive by default
+        }
+        
+        $ubuntuInstalled = [bool]$isUbuntuFound
+    } catch {
+        $ubuntuInstalled = $false
+        Write-Status "Error checking for Ubuntu: $($_.Exception.Message)" -Type "WARNING"
+    }
+    
+    if (-not $ubuntuInstalled) {
+        Write-Status "Ubuntu is not installed. Installing Ubuntu..." -Type "WARNING"
+        
+        # Try different approaches for compatibility
+        try {
+            # Modern approach with error handling
+            Write-Status "Installing Ubuntu on WSL..." -Type "INFO"
+            $ubuntuInstallOutput = & wsl --install -d Ubuntu 2>&1
+            
+            # Convert to string if needed
+            if ($ubuntuInstallOutput -isnot [String]) {
+                $ubuntuInstallOutput = $ubuntuInstallOutput | Out-String
+            }
+            
+            # Check if command was recognized
+            if ($ubuntuInstallOutput -like "*is not recognized*" -or $ubuntuInstallOutput -like "*not found*") {
+                # Fall back to alternative method for older systems
+                Write-Status "Using alternative Ubuntu installation method..." -Type "INFO"
+                
+                # Direct users to Microsoft Store (manual approach)
+                Write-Status "Please install Ubuntu from the Microsoft Store:" -Type "WARNING"
+                Write-Status "1. Open Microsoft Store" -Type "INFO"
+                Write-Status "2. Search for 'Ubuntu'" -Type "INFO"
+                Write-Status "3. Install and run Ubuntu to complete setup" -Type "INFO"
+                Write-Status "4. Run this script again after Ubuntu is configured" -Type "INFO"
+                
+                # Try to open Microsoft Store for them
+                try {
+                    Start-Process "ms-windows-store://search/?query=Ubuntu"
+                } catch {
+                    Write-Status "Could not open Microsoft Store. Please open it manually." -Type "WARNING"
+                }
+                exit 0
+            }
+        } catch {
+            Write-Status "Error installing Ubuntu: $($_.Exception.Message)" -Type "ERROR"
+            Write-Status "Please install Ubuntu manually from the Microsoft Store." -Type "INFO"
+            exit 1
+        }
+        
+        Write-Status "Ubuntu installation completed. You'll need to configure it on first run." -Type "SUCCESS"
+        Write-Status "The Ubuntu setup will start in a new window. Please complete the setup there." -Type "INFO"
+        Write-Status "After configuration, please run this script again." -Type "INFO"
+        
+        # Launch Ubuntu to complete setup (with error handling)
+        try {
+            Start-Process "wsl.exe" -ArgumentList "-d", "Ubuntu" -ErrorAction SilentlyContinue
+        } catch {
+            Write-Status "Could not automatically launch Ubuntu. Please launch it manually to complete setup." -Type "WARNING"
+        }
+        exit 0
+    }
+    Write-Status "Ubuntu is installed" -Type "SUCCESS"
+
+    # Check Docker integration inside WSL with explicit error handling
+    Write-Status "Checking Docker inside Ubuntu"
+    $dockerInWsl = $false
+    
+    try {
+        # Capture and suppress stderr to avoid error output to console in PS 5.1
+        $dockerCheckWsl = & wsl -d Ubuntu -- which docker 2>$null
+        $dockerInWsl = $null -ne $dockerCheckWsl -and $dockerCheckWsl -ne ""
+    } catch {
+        $dockerInWsl = $false
+    }
+    
+    if (-not $dockerInWsl) {
+        Write-Status "Docker is not available in WSL." -Type "WARNING"
+        Write-Status "Checking Docker Desktop WSL integration setting..." -Type "INFO"
+        
+        # Prompt user to enable integration
+        Write-Status "Please enable Docker Desktop WSL integration:" -Type "WARNING"
+        Write-Status "1. Open Docker Desktop" -Type "INFO"
+        Write-Status "2. Go to Settings → Resources → WSL Integration" -Type "INFO"
+        Write-Status "3. Enable integration for Ubuntu" -Type "INFO"
+        Write-Status "4. Click Apply & Restart" -Type "INFO"
+        
+        $dockerChoice = Read-Host "Press Enter once you've enabled Docker WSL integration"
+        
+        # Check again with explicit error handling
+        try {
+            $dockerCheckWsl = & wsl -d Ubuntu -- which docker 2>$null
+            $dockerInWsl = $null -ne $dockerCheckWsl -and $dockerCheckWsl -ne ""
+        } catch {
+            $dockerInWsl = $false
+        }
+        
+        if (-not $dockerInWsl) {
+            Write-Status "Docker is still not available in WSL. Please ensure Docker Desktop WSL integration is enabled for Ubuntu." -Type "ERROR"
+            Write-Status "NOTE: You may need to wait for Docker Desktop's initial setup to fully complete first." -Type "WARNING"
+            Write-Status "The setup is complete when the 'Setting up Docker Engine...' message disappears." -Type "INFO"
             exit 1
         }
     }
-    else {
-        Write-Status "Could not find Docker Desktop executable at expected path: $DOCKER_DESKTOP_PATH" -Type "WARNING"
-        Write-Status "Please start Docker Desktop manually and run this script again." -Type "WARNING"
-        exit 1
-    }
-}
-Write-Status "Docker is running" -Type "SUCCESS"
+    Write-Status "Docker is available inside WSL" -Type "SUCCESS"
 
-# 4. Check for Tyk-Demo-Ubuntu distribution
-Write-Status "Checking for $WSL_DISTRO_NAME distribution"
-$distroExists = Test-WslDistributionExists $WSL_DISTRO_NAME
-
-if (-not $distroExists) {
-    Write-Status "$WSL_DISTRO_NAME distribution not found. Creating it based on Ubuntu..." -Type "INFO"
-    try {
-        # First check if we have Ubuntu, or need to install it temporarily
-        $ubuntuExists = Test-WslDistributionExists "Ubuntu"
-        if (-not $ubuntuExists) {
-            Write-Status "Installing temporary Ubuntu distribution..." -Type "INFO"
-            wsl --install -d Ubuntu
-            Start-Sleep -Seconds 10  # Give it time to initialize
-        }
-        
-        # Now export Ubuntu and import as our custom distribution
-        Write-Status "Creating $WSL_DISTRO_NAME from Ubuntu..." -Type "INFO"
-        $tempDir = Join-Path $env:TEMP "WslExport"
-        New-Item -ItemType Directory -Path $tempDir -Force -ErrorAction SilentlyContinue | Out-Null
-        $exportPath = Join-Path $tempDir "ubuntu-export.tar"
-        
-        # Export Ubuntu
-        wsl --terminate Ubuntu 2>$null
-        wsl --export Ubuntu $exportPath
-        
-        # Import as our custom distribution
-        $installPath = Join-Path $env:LOCALAPPDATA "WSL\$WSL_DISTRO_NAME"
-        New-Item -ItemType Directory -Path $installPath -Force -ErrorAction SilentlyContinue | Out-Null
-        wsl --import $WSL_DISTRO_NAME $installPath $exportPath
-        
-        # Clean up
-        Remove-Item -Path $exportPath -Force -ErrorAction SilentlyContinue
-        
-        Write-Status "$WSL_DISTRO_NAME distribution created successfully" -Type "SUCCESS"
-    }
-    catch {
-        Write-Status "Error creating $WSL_DISTRO_NAME: $($_.Exception.Message)" -Type "ERROR"
-        exit 1
-    }
-}
-else {
-    Write-Status "$WSL_DISTRO_NAME distribution already exists" -Type "SUCCESS"
-}
-
-# 5. Check Docker integration in WSL
-Write-Status "Checking Docker inside $WSL_DISTRO_NAME"
-$dockerInWsl = $null -ne (wsl -d $WSL_DISTRO_NAME -- which docker 2>$null)
-
-if (-not $dockerInWsl) {
-    Write-Status "Docker is not available in WSL. Enabling Docker Desktop WSL integration..." -Type "WARNING"
-    Write-Status "Please ensure the following steps are completed manually:" -Type "INFO"
-    Write-Status "1. Open Docker Desktop → Settings → Resources → WSL Integration" -Type "INFO"
-    Write-Status "2. Enable integration for $WSL_DISTRO_NAME and click Apply & Restart" -Type "INFO"
-    Read-Host -Prompt "Press Enter once you've enabled Docker WSL integration"
+    # Update packages with explicit error handling
+    Write-Status "Updating packages in Ubuntu"
+    $updateFailed = $false
     
-    # Verify again
-    $dockerInWsl = $null -ne (wsl -d $WSL_DISTRO_NAME -- which docker 2>$null)
-    if (-not $dockerInWsl) {
-        Write-Status "Docker is still not available in WSL. Please check Docker Desktop settings and try again." -Type "ERROR"
+    try {
+        # Capture command output
+        $updateOutput = & wsl -d Ubuntu -- bash -c "sudo apt-get update && sudo apt-get install -y git jq curl" 2>&1
+        
+        # Check for errors
+        if ($LASTEXITCODE -ne 0) {
+            $updateFailed = $true
+            Write-Status "APT command failed with exit code: $LASTEXITCODE" -Type "ERROR"
+        }
+    } catch {
+        $updateFailed = $true
+        Write-Status "Error updating packages: $($_.Exception.Message)" -Type "ERROR"
+    }
+    
+    if ($updateFailed) {
+        Write-Status "Failed to update packages in Ubuntu" -Type "ERROR"
         exit 1
     }
+    Write-Status "Packages updated successfully" -Type "SUCCESS"
+
+    # Check Docker Compose with explicit error handling
+    Write-Status "Checking Docker Compose in Ubuntu"
+    $dockerComposeAvailable = $false
+    
+    try {
+        $dockerComposeOutput = & wsl -d Ubuntu -- bash -c "docker compose version > /dev/null 2>&1 || (echo 'Docker Compose not available' && exit 1)" 2>&1
+        $dockerComposeAvailable = $LASTEXITCODE -eq 0
+    } catch {
+        $dockerComposeAvailable = $false
+        Write-Status "Error checking Docker Compose: $($_.Exception.Message)" -Type "ERROR"
+    }
+    
+    if (-not $dockerComposeAvailable) {
+        Write-Status "Docker Compose not available in Ubuntu. Enable Docker integration in WSL settings." -Type "ERROR"
+        exit 1
+    }
+    Write-Status "Docker Compose is available in Ubuntu" -Type "SUCCESS"
+
+    # Clone or update Tyk demo repository with explicit error handling
+    Write-Status "Setting up Tyk demo repository"
+    $repoSetupFailed = $false
+    
+    try {
+        $repoSetupOutput = & wsl -d Ubuntu -- bash -c "if [ -d ~/tyk-demo ]; then echo 'Updating existing repository'; cd ~/tyk-demo && git pull; else echo 'Cloning repository'; git clone https://github.com/TykTechnologies/tyk-demo.git ~/tyk-demo; fi" 2>&1
+        
+        if ($LASTEXITCODE -ne 0) {
+            $repoSetupFailed = $true
+            Write-Status "Git command failed with exit code: $LASTEXITCODE" -Type "ERROR"
+        }
+    } catch {
+        $repoSetupFailed = $true
+        Write-Status "Error setting up repository: $($_.Exception.Message)" -Type "ERROR"
+    }
+    
+    if ($repoSetupFailed) {
+        Write-Status "Failed to setup Tyk demo repository" -Type "ERROR"
+        exit 1
+    }
+    Write-Status "Tyk demo repository setup completed" -Type "SUCCESS"
+    
+    # Ready to launch Tyk Demo
+    Write-Status "Ready to launch Tyk demo" -Type "SUCCESS"
+    Write-Status "To start the demo, run the following command in WSL:" -Type "INFO"
+    Write-Status "wsl -d ubuntu cd ~/tyk-demo && ./up.sh" -Type "INFO"
+
+    Read-Host -Prompt "Press Enter to exit"
 }
-Write-Status "Docker is available inside $WSL_DISTRO_NAME" -Type "SUCCESS"
-
-# 6. Update packages and check Docker Compose
-Write-Status "Updating packages in $WSL_DISTRO_NAME"
-wsl -d $WSL_DISTRO_NAME -- bash -c "sudo apt-get update && sudo apt-get install -y git jq curl nano" | Out-Null
-
-Write-Status "Checking Docker Compose"
-$dockerComposeAvailable = (wsl -d $WSL_DISTRO_NAME -- bash -c "docker compose version > /dev/null 2>&1 && echo 'yes' || echo 'no'") -eq "yes"
-if (-not $dockerComposeAvailable) {
-    Write-Status "Docker Compose not available in $WSL_DISTRO_NAME. Check Docker Desktop WSL integration." -Type "ERROR"
+catch {
+    Write-Status "An unexpected error occurred: $_" -Type "ERROR"
+    Write-Host $_.ScriptStackTrace -ForegroundColor Red
+    Read-Host -Prompt "Press Enter to exit"
     exit 1
 }
-Write-Status "Docker Compose is available" -Type "SUCCESS"
-
-# 7. Setup Tyk demo repository
-Write-Status "Setting up Tyk demo repository in $WSL_DISTRO_NAME"
-$setupOutput = wsl -d $WSL_DISTRO_NAME -- bash -c "if [ -d ~/tyk-demo ]; then cd ~/tyk-demo && git pull; else git clone $TYK_REPO_URL ~/tyk-demo; fi"
-if ($LASTEXITCODE -ne 0) {
-    Write-Status "Error setting up Tyk demo repository: $setupOutput" -Type "ERROR"
-    exit 1
-}
-Write-Status "Tyk demo repository is ready" -Type "SUCCESS"
-
-# 8. Ready to launch
-Write-Host "`n=== Setup Complete ===`n" -ForegroundColor Magenta
-Write-Status "Ready to launch Tyk demo" -Type "SUCCESS"
-Write-Status "To start the demo, run the following command:" -Type "INFO"
-Write-Host "`nwsl -d $WSL_DISTRO_NAME -e bash -c 'cd ~/tyk-demo && ./up.sh'`n" -ForegroundColor Green
-Write-Host "`nTo shut down the demo when finished:" -ForegroundColor Cyan
-Write-Host "wsl -d $WSL_DISTRO_NAME -e bash -c 'cd ~/tyk-demo && ./down.sh'`n" -ForegroundColor White
-
-Read-Host -Prompt "Press Enter to exit"
