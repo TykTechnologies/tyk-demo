@@ -1185,12 +1185,12 @@ check_for_grpcurl () {
   fi
 }
 
-check_for_wscat () {
-  # Check if wscat is installed
-  if ! command -v wscat &> /dev/null
+check_for_websocat () {
+  # Check if websocat is installed
+  if ! command -v websocat &> /dev/null
   then
-      echo "wscat is not installed. Please install wscat via NPM to proceed:"
-      echo "npm install -g wscat"
+      echo "websocat is not installed. Please install websocat to proceed:"
+      echo "brew install websocat"
       exit 1
   fi
 }

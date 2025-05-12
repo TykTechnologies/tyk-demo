@@ -1,10 +1,8 @@
 #!/bin/bash
 
-# Ensure wscat is installed
-if ! command -v websocat &> /dev/null; then
-    echo "Error: websocat is not installed. Install it using 'brew install websocat' (MacOS)."
-    exit 1
-fi
+source scripts/common.sh
+
+check_for_websocat
 
 WS_URL=ws://tyk-gateway.localhost:8080/streams-ws/get/ws
 
