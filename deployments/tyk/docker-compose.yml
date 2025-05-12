@@ -152,15 +152,10 @@ services:
     image: moul/grpcbin:renovate_all
     networks:
       - tyk
-    ports:
-      - 9000:9000
-      - 9001:9001
   kafka:
     image: apache/kafka:3.8.0
     networks:
       - tyk
-    ports:
-      - "9092:9092"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -180,14 +175,10 @@ services:
     image: davidgarvey/countries-rest-api:latest
     networks:
       - tyk
-    ports:
-      - "4100:4100"
   countries-graphql-api:
     image: mangomm/trevorblades-countries:latest
     networks:
       - tyk
-    ports:
-      - "4000:4000"
 
 volumes:
   tyk-redis-data:
