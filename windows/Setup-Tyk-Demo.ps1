@@ -19,16 +19,6 @@ function Test-CommandExists {
     }
 }
 
-function Test-DockerRunning {
-    try {
-        $dockerInfo = docker info
-        return $true
-    }
-    catch {
-        return $false
-    }
-}
-
 function Set-TykDemoEnvironment {
     # Check Admin Privileges
     if (-not (Test-AdminPrivileges)) {
@@ -56,6 +46,7 @@ function Set-TykDemoEnvironment {
     try {
         $wslVersionOutput = wsl --version 2>&1
     } catch {
+        $prereqsPassed = $false
         $failedChecks += "WSL is not installed or not available in PATH."
     }
 
@@ -64,16 +55,20 @@ function Set-TykDemoEnvironment {
         $version = [version]$versionString
 
         if ($version.Major -lt 2) {
+            $prereqsPassed = $false
             $failedChecks += "WSL version $versionString is too old. WSL 2.x or higher is required."
         }
     } else {
         failedChecks += "Could not determine WSL version from output:"
     }
 
-    # Check Docker is Running
-    if (-not (Test-DockerRunning)) {
-        $prereqsPassed = $false
-        $failedChecks += "Docker is not running"
+    # Check if the Docker Desktop process is running
+    $dockerProcess = Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue
+
+    if ($dockerProcess) {
+        Write-Output "Docker Desktop is running."
+    } else {
+        Write-Output "Docker Desktop is NOT running."
     }
 
     # Output Prerequisite Check Results
