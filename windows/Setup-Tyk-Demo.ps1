@@ -140,4 +140,4 @@ if (-not (ValidateEnvironment)) {
     exit 1
 }
 
-Write-Host "Tyk Demo environment is ready."
+Write-Host "Tyk Demo environment is prepared."
