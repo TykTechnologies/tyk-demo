@@ -38,6 +38,8 @@ function Set-TykDemoEnvironment {
         $failedChecks += "Docker Compose is not installed"
     }
 
+    docker compose version
+
     # Check WSL
     if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
         $failedChecks += "WSL is not installed"
