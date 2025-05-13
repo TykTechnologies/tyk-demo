@@ -1,24 +1,12 @@
 # Tyk Demo Environment Setup Script
-# This script checks prerequisites and sets up the Tyk demo environment
+# This script checks prerequisites and prepares the Tyk Demo environment
 
 function Test-AdminPrivileges {
     $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
     return $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
-function Test-CommandExists {
-    param (
-        [string]$Command
-    )
-    if (Get-Command $Command -ErrorAction SilentlyContinue) {
-        return $true
-    } else {
-        return $false
-    }
-}
-
 function ValidatePrerequisites {
-
     # Prerequisite Checks
     $status=$true
 
@@ -78,7 +66,7 @@ function ValidateEnvironment {
     }
 
     # Check for Tyk Demo repo
-    $tykDemoRepoPath = "/home/$env:USERNAME/tyk-demo"
+    $tykDemoRepoPath = "~/tyk-demo"
     wsl -d $tykDemoDistroName -e bash -c "test -d '$tykDemoRepoPath'"
     if ($LASTEXITCODE -eq 0) {
         Write-Host "The Tyk Demo repository exists." -ForegroundColor Green
@@ -96,7 +84,6 @@ function ValidateEnvironment {
 
     return $true
 }
- 
 
 # Main Execution
 
@@ -108,18 +95,14 @@ if (-not (Test-AdminPrivileges)) {
 
 Write-Host "Validating Prerequisites" -ForegroundColor Cyan
 
-if (ValidatePrerequisites) {
-    Write-Host "Prerequisite check passed." -ForegroundColor Green
-} else {
+if (-not (ValidatePrerequisites)) {
     Write-Host "Prerequisite check failed." -ForegroundColor Red
     exit 1
 }
 
 Write-Host "Validating Environment" -ForegroundColor Cyan
 
-if (ValidateEnvironment) {
-    Write-Host "Environment check passed." -ForegroundColor Green
-} else {
-    Write-Host "Environment check passed." -ForegroundColor Red
+if (-not (ValidateEnvironment)) {
+    Write-Host "Environment check failed." -ForegroundColor Red
     exit 1
 }
