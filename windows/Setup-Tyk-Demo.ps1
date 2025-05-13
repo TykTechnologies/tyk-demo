@@ -46,7 +46,7 @@ function ValidatePrerequisites {
     return $status
 }
 
-function ValidateEnvironment {
+function PrepareEnvironment {
     $tykDemoDistroName = "tyk-demo"
 
     # Check for Tyk Demo distro
@@ -100,9 +100,9 @@ if (-not (ValidatePrerequisites)) {
     exit 1
 }
 
-Write-Host "Validating Environment" -ForegroundColor Cyan
+Write-Host "Preparing Environment" -ForegroundColor Cyan
 
-if (-not (ValidateEnvironment)) {
-    Write-Host "Environment check failed." -ForegroundColor Red
+if (-not (PrepareEnvironment)) {
+    Write-Host "Environment preparation failed." -ForegroundColor Red
     exit 1
 }
