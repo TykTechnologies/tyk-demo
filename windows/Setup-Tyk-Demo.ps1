@@ -10,11 +10,9 @@ function Test-CommandExists {
     param (
         [string]$Command
     )
-    try {
-        Get-Command $Command -ErrorAction Stop | Out-Null
+    if (Get-Command $Command -ErrorAction SilentlyContinue) {
         return $true
-    }
-    catch {
+    } else {
         return $false
     }
 }
@@ -39,28 +37,13 @@ function Set-TykDemoEnvironment {
         $failedChecks += "Docker Compose is not installed"
     }
 
-    # Check WSL2
-    try {
-        $wslVersionOutput = wsl --version 2>&1
-    } catch {
-        $failedChecks += "WSL is not installed or not available in PATH."
-    }
-
-    if ($wslVersionOutput -match "WSL version:\s*([\d\.]+)") {
-        $versionString = $Matches[1]
-        $version = [version]$versionString
-
-        if ($version.Major -lt 2) {
-            $failedChecks += "WSL version $versionString is too old. WSL 2.x or higher is required."
-        }
-    } else {
-        $failedChecks += "Could not determine WSL version from output:"
+    # Check WSL
+    if (-not (Test-CommandExists "wsl")) {
+        $failedChecks += "WSL is not installed"
     }
 
     # Check if the Docker Desktop process is running
-    $dockerProcess = Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue
-
-    if (-not $dockerProcess) {
+    if (-not (Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue)) {
         $failedChecks += "Docker Desktop is not running."
     }
 
@@ -72,8 +55,6 @@ function Set-TykDemoEnvironment {
         }
         return $false
     }
-
-    
 
     return $true
 }
