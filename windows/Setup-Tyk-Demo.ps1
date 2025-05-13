@@ -65,7 +65,7 @@ function ValidateEnvironment {
             } else {
                 Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
                 return $false
-            }
+            }            
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
             return $false
