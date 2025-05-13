@@ -46,19 +46,26 @@ function ValidatePrerequisites {
     return $status
 }
 
-function PrepareEnvironment {
-    $tykDemoDistroName = "tyk-demo"
+function ValidateEnvironment {
+    $distroName = "tyk-demo"
 
     # Check for Tyk Demo distro
     $wslDistros = wsl.exe --list --quiet
-    if ($wslDistros -contains $tykDemoDistroName) {
-        Write-Host "Tyk Demo WSL distro present." -ForegroundColor Green
+    if ($wslDistros -contains $distroName) {
+        Write-Host "Tyk Demo WSL distro is present." -ForegroundColor Green
     } else {
-        Write-Host "Tyk Demo WSL distro not present." -ForegroundColor Yellow
-        Write-Host "Creating Tyk Demo distro... " -NoNewline
-        wsl --install ubuntu --name $tykDemoDistroName
+        Write-Host "Tyk Demo WSL distro not is present." -ForegroundColor Yellow
+        Write-Host "Creating Tyk Demo distro... "
+        wsl --install ubuntu --name $distroName
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Done." -ForegroundColor Green
+            # now install jq
+            wsl -d $distroName -e bash -c "apt-get update && apt-get install -y jq"
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "Done." -ForegroundColor Green
+            } else {
+                Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
+                return $false
+            }
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
             return $false
@@ -66,16 +73,33 @@ function PrepareEnvironment {
     }
 
     # Check for Tyk Demo repo
-    $tykDemoRepoPath = "~/tyk-demo"
-    wsl -d $tykDemoDistroName -e bash -c "test -d '$tykDemoRepoPath'"
+    $repoPath = "/opt/tyk-demo"
+    wsl -d $distroName -e test -d $repoPath
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "The Tyk Demo repository exists." -ForegroundColor Green
+        Write-Host "Tyk Demo repository is present." -ForegroundColor Green
     } else {
-        Write-Host "The Tyk Demo repository does not exist." -ForegroundColor Yellow
-        Write-Host "Cloning Tyk Demo repository... " -NoNewline
-        wsl -d $tykDemoDistroName -e bash -c 'git clone https://github.com/TykTechnologies/tyk-demo $tykDemoRepoPath'
+        Write-Host "Tyk Demo repository is not present." -ForegroundColor Yellow
+        Write-Host "Cloning Tyk Demo repository... "
+        wsl -d $distroName -e git clone https://github.com/TykTechnologies/tyk-demo $repoPath
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Done."
+            Write-Host "Done." -ForegroundColor Green
+        } else {
+            Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
+            return $false
+        }
+    }
+
+    # Check for Tyk licence
+    $envFilePath = "$repoPath/.env"
+    wsl -d $distroName -e bash -c "test -f '$envFilePath' && grep '^DASHBOARD_LICENCE=' '$envFilePath'"
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Tyk licence found." -ForegroundColor Green
+    } else {
+        Write-Host "Tyk licence not found..." -ForegroundColor Yellow
+        $newLicence = Read-Host "Paste your Tyk licence and press return"
+        wsl -d $distroName -e bash -c "cd $repoPath && ./scripts/update-env.sh DASHBOARD_LICENCE $newLicence"
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Done." -ForegroundColor Green
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
             return $false
@@ -100,9 +124,9 @@ if (-not (ValidatePrerequisites)) {
     exit 1
 }
 
-Write-Host "Preparing Environment" -ForegroundColor Cyan
+Write-Host "Validating Environment" -ForegroundColor Cyan
 
-if (-not (PrepareEnvironment)) {
-    Write-Host "Environment preparation failed." -ForegroundColor Red
+if (-not (ValidateEnvironment)) {
+    Write-Host "Environment check failed." -ForegroundColor Red
     exit 1
 }
