@@ -28,17 +28,18 @@ function Set-TykDemoEnvironment {
     $failedChecks = @()
 
     # Check Docker Desktop
-    if (-not (Test-CommandExists "docker")) {
+    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
         $failedChecks += "Docker Desktop is not installed"
     }
 
-    # Check Docker Compose v2
-    if (-not (Test-CommandExists "docker compose")) {
+    # Check Docker Compose 
+    $composeAvailable = docker compose version 2>$null
+    if (-not ($LASTEXITCODE -eq 0)) {
         $failedChecks += "Docker Compose is not installed"
     }
 
     # Check WSL
-    if (-not (Test-CommandExists "wsl")) {
+    if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
         $failedChecks += "WSL is not installed"
     }
 
