@@ -17,57 +17,109 @@ function Test-CommandExists {
     }
 }
 
-function Set-TykDemoEnvironment {
-    # Check Admin Privileges
-    if (-not (Test-AdminPrivileges)) {
-        Write-Host "This script requires administrator privileges. Please run PowerShell as an administrator." -ForegroundColor Red
-        return $false
-    }
+function ValidatePrerequisites {
 
     # Prerequisite Checks
-    $failedChecks = @()
+    $status=$true
 
-    # Check Docker Desktop
-    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-        $failedChecks += "Docker Desktop is not installed"
+    # Check Docker
+    if (Get-Command docker -ErrorAction SilentlyContinue) {
+        Write-Host "Docker is installed." -ForegroundColor Green
+    } else {
+        Write-Host "Docker is not installed." -ForegroundColor Red
+        $status=$false
     }
 
     # Check Docker Compose 
     $composeAvailable = docker compose version 2>$null
-    if (-not ($LASTEXITCODE -eq 0)) {
-        $failedChecks += "Docker Compose is not installed"
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Docker Compose is installed." -ForegroundColor Green
+    } else {
+        Write-Host "Docker Compose is not installed." -ForegroundColor Red
+        $status=$false
     }
 
-    docker compose version
-
     # Check WSL
-    if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
-        $failedChecks += "WSL is not installed"
+    if (Get-Command wsl -ErrorAction SilentlyContinue) {
+        Write-Host "Windows Subsystem for Linux is installed." -ForegroundColor Green
+    } else {
+        Write-Host "Windows Subsystem for Linux is not installed." -ForegroundColor Red
+        $status=$false
     }
 
     # Check if the Docker Desktop process is running
-    if (-not (Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue)) {
-        $failedChecks += "Docker Desktop is not running."
+    if (Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue) {
+        Write-Host "Docker Desktop is running." -ForegroundColor Green
+    } else {
+        Write-Host "Docker Desktop is not installed." -ForegroundColor Red
+        $status=$false
     }
 
-    # Output Prerequisite Check Results
-    if ($failedChecks.Count -gt 0) {
-        Write-Host "Prerequisite checks failed:" -ForegroundColor Red
-        foreach ($check in $failedChecks) {
-            Write-Host "- $check" -ForegroundColor Yellow
+    return $status
+}
+
+function ValidateEnvironment {
+    $tykDemoDistroName = "tyk-demo"
+
+    # Check for Tyk Demo distro
+    $wslDistros = wsl.exe --list --quiet
+    if ($wslDistros -contains $tykDemoDistroName) {
+        Write-Host "Tyk Demo WSL distro present." -ForegroundColor Green
+    } else {
+        Write-Host "Tyk Demo WSL distro not present." -ForegroundColor Yellow
+        Write-Host "Creating Tyk Demo distro... " -NoNewline
+        wsl --install ubuntu --name $tykDemoDistroName
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Done." -ForegroundColor Green
+        } else {
+            Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
+            return $false
         }
-        return $false
+    }
+
+    # Check for Tyk Demo repo
+    $tykDemoRepoPath = "/home/$env:USERNAME/tyk-demo"
+    wsl -d $tykDemoDistroName -e bash -c "test -d '$tykDemoRepoPath'"
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "The Tyk Demo repository exists." -ForegroundColor Green
+    } else {
+        Write-Host "The Tyk Demo repository does not exist." -ForegroundColor Yellow
+        Write-Host "Cloning Tyk Demo repository... " -NoNewline
+        wsl -d $tykDemoDistroName -e bash -c 'git clone https://github.com/TykTechnologies/tyk-demo $tykDemoRepoPath'
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Done."
+        } else {
+            Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
+            return $false
+        }
     }
 
     return $true
 }
+ 
 
 # Main Execution
-Write-Host "Starting Tyk Demo Environment Setup..." -ForegroundColor Cyan
-$setupResult = Set-TykDemoEnvironment
 
-if ($setupResult) {
-    Write-Host "Tyk Demo environment setup completed successfully!" -ForegroundColor Green
+# Check Admin Privileges
+if (-not (Test-AdminPrivileges)) {
+    Write-Host "This script requires administrator privileges. Please run PowerShell as an administrator." -ForegroundColor Red
+    return $false
+}
+
+Write-Host "Validating Prerequisites" -ForegroundColor Cyan
+
+if (ValidatePrerequisites) {
+    Write-Host "Prerequisite check passed." -ForegroundColor Green
 } else {
-    Write-Host "Tyk Demo environment setup encountered errors." -ForegroundColor Red
+    Write-Host "Prerequisite check failed." -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "Validating Environment" -ForegroundColor Cyan
+
+if (ValidateEnvironment) {
+    Write-Host "Environment check passed." -ForegroundColor Green
+} else {
+    Write-Host "Environment check passed." -ForegroundColor Red
+    exit 1
 }
