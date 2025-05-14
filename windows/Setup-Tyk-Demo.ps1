@@ -55,13 +55,13 @@ function ValidateEnvironment {
         Write-Host "- Tyk Demo WSL distro is present." -ForegroundColor Green
     } else {
         Write-Host "- Tyk Demo WSL distro not is present." -ForegroundColor Yellow
-        Write-Host "Creating Tyk Demo distro... "
+        Write-Host "Creating Tyk Demo distro... "
         wsl --install ubuntu --name $distroName
         if ($LASTEXITCODE -eq 0) {
             # now install jq
             wsl -d $distroName -e bash -c "apt-get update && apt-get install -y jq"
             if ($LASTEXITCODE -eq 0) {
-                Write-Host "Done." -ForegroundColor Green
+                Write-Host "Done." -ForegroundColor Green
             } else {
                 Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
                 return $false
