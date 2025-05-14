@@ -1,4 +1,4 @@
-# Tyk Demo Technical Setup Guide
+# Tyk Demo Windows Setup Guide
 
 This guide outlines the technical process for setting up Tyk Demo on Windows for users who already have prerequisites installed and may wish to integrate Tyk Demo with existing environments.
 
