@@ -1,52 +1,99 @@
-# Windows Setup (PowerShell)
+# Tyk Demo Technical Setup Guide
 
-## Prerequisites
+This guide outlines the technical process for setting up Tyk Demo on Windows for users who already have prerequisites installed and may wish to integrate Tyk Demo with existing environments.
 
-- Windows 10 version 2004 or higher / Windows 11
-- Administrator privileges on your system
+## Setup Process Overview
 
-## Setup Instructions
+The [included script](setup-tyk-demo.ps1) performs these key operations:
 
-1. **Open PowerShell as Administrator**:
-   - Search for PowerShell in the Start menu
-   - Right-click on Windows PowerShell and select "Run as administrator"
-   - When asked for permission — click Yes
+1. Prerequisite validation
+2. WSL distro creation/validation
+3. Repository cloning
+4. License configuration
+5. Docker-WSL integration check
 
-2. **Download and Run the Setup Script**:
+The script is intended for users who may benefit from an automated approach to preparing their Tyk Demo environment.
 
-   Copy and paste this into the PowerShell window:
+## Manual Setup Steps
 
-   ```powershell
-   curl.exe -s -L "https://raw.githubusercontent.com/TykTechnologies/tyk-demo/windows/windows/Setup-Tyk-Demo.ps1" -o "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
-   powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\Downloads\Setup-Tyk-Demo.ps1"
-   ```
+If you prefer manual setup or want to integrate with existing environments, follow these steps.
 
-   This will download and a script that prepares your system for Tyk Demo.
+### Prerequisites
 
+Required components:
+- Docker Desktop with WSL2 backend
+- Windows Subsystem for Linux (WSL2)
+- A suitable WSL Linux distribution (Ubuntu recommended)
+- Docker-WSL integration enabled for your target distro
 
-## What This Script Does
+### Installation Steps
 
-The script will automatically:
+#### 1. Prepare WSL Environment
 
-- Check for Docker Desktop and start it if not running
-- Set up WSL 2 (Windows Subsystem for Linux) if not already installed
-- Install Ubuntu distribution in WSL if not present
-- Configure Docker Desktop WSL integration
-- Clone and set up the Tyk Demo environment
+**Option A: Use existing WSL distro**
+- Ensure your existing distro has `git`, `jq` and `curl` installed:
+  ```bash
+  sudo apt update && sudo apt install -y git jq curl
+  ```
 
-## Troubleshooting
+**Option B: Create dedicated distro**
+- Create a new WSL distro for Tyk (optional):
+  ```powershell
+  wsl --install ubuntu --name tyk-demo
+  wsl -d tyk-demo -e bash -c "apt-get update && apt-get install -y jq"
+  ```
 
-- **System Restart Required**: If prompted to restart after WSL installation, please do so and run the script again after reboot.
-- **Docker Desktop WSL Integration**: Ensure WSL integration is enabled in Docker Desktop (Settings → Resources → WSL Integration).
-- **Script Execution Issues**: If you encounter "execution of scripts is disabled on this system", use the execution policy command in step 2, which temporarily enables script execution only for your current PowerShell session.
+**Note:** Ubuntu comes with `git` and `curl` pre-installed, so only `jq` needs installation.
 
-## Manual Setup
+#### 2. Clone Tyk Demo Repository
 
-If you prefer to install components manually:
+Inside your chosen WSL distro:
+```bash
+git clone https://github.com/TykTechnologies/tyk-demo /opt/tyk-demo
+```
 
-1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-2. Install WSL 2 by running `wsl --install` in PowerShell as Administrator
-3. Install Ubuntu from the Microsoft Store
-4. Enable WSL integration in Docker Desktop settings
-5. Clone the repository: `git clone https://github.com/TykTechnologies/tyk-demo.git`
-6. Run the setup script: `cd tyk-demo && ./up.sh`
+**Note:** You can clone to an alternative location, if you prefer. But these instructions will assume `/opt/tyk-demo`.
+
+#### 3. Configure Tyk Licence
+
+Create or update the `.env` file with your licence:
+```bash
+cd /opt/tyk-demo
+./scripts/update-env.sh DASHBOARD_LICENCE your_licence_key_here
+```
+
+Replace `your_licence_key_here` with your actual Tyk licence.
+
+The licence can also be modified directly in the `.env` file, by editing the line starting with `DASHBOARD_LICENCE`.
+
+#### 4. Verify Docker Integration
+
+Ensure Docker commands work within your WSL distro:
+```bash
+docker version
+```
+
+If this fails, enable integration in Docker Desktop:
+- Settings → Resources → WSL Integration
+- Enable for your distro
+
+#### 5. Start Tyk Demo
+
+```bash
+cd /opt/tyk-demo
+./up.sh
+```
+
+## Cleanup
+
+Remove the current Tyk Demo deployment:
+```bash
+cd /opt/tyk-demo
+./down.sh
+```
+
+This will remove all the docker resources (containers, volumes and networks) associated with Tyk Demo. The WSL distro will be unaffected.
+
+## General Usage
+
+Refer to the [standard Tyk Demo documentation](../README.md) for general usage. Once the Windows environment is correctly set up, you should be able to operate Tyk Demo using the stndard scripts and process.
