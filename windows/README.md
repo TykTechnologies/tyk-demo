@@ -96,4 +96,4 @@ This will remove all the docker resources (containers, volumes and networks) ass
 
 ## General Usage
 
-Refer to the [standard Tyk Demo documentation](../README.md) for general usage. Once the Windows environment is correctly set up, you should be able to operate Tyk Demo using the stndard scripts and process.
+Refer to the [standard Tyk Demo documentation](../README.md) for general usage. Once the Windows environment is correctly set up, you should be able to operate Tyk Demo from within your WSL distro using the standard Tyk Demo scripts and process.
