@@ -19,7 +19,7 @@ function ValidatePrerequisites {
     }
 
     # Check Docker Compose 
-    $composeAvailable = docker compose version 2>$null
+    docker compose version > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "- Docker Compose is installed." -ForegroundColor Green
     } else {
@@ -35,12 +35,12 @@ function ValidatePrerequisites {
         $status=$false
     }
 
-    # Check if the Docker Desktop process is running
-    if (Get-Process -Name "Docker Desktop" -ErrorAction SilentlyContinue) {
-        Write-Host "- Docker Desktop is running." -ForegroundColor Green
+    # Check if the Docker daemon is running
+    docker info > $null 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "- Docker daemon is running." -ForegroundColor Green
     } else {
-        Write-Host "- Docker Desktop is not installed." -ForegroundColor Red
-        $status=$false
+        Write-Host "- Docker daemon is not installed." -ForegroundColor Red
     }
 
     return $status
