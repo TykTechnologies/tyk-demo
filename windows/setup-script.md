@@ -26,16 +26,13 @@ The script will check for and help set up:
 4. **Tyk Demo Repository** - The actual demo environment code
 5. **Docker in WSL Integration** - Allows Docker commands to run within WSL
 
-If you do not require this level of assistance with setting up the environment (e.g. you already have Docker and WSL installed, and have a pre-existing distro available), then you can find general instructions in the [windows README](README.md).
+**Note:** If you already have some of these components available (e.g. you already have Docker and WSL installed, and have a pre-existing distro available you want to use), then you can find general instructions in the [windows README](README.md).
 
 ## Installation Instructions
 
 ### Step 1: Install Prerequisites (if not already installed)
 
-Before running the script, ensure you have:
-
-- **Docker Desktop** - [Download here](https://www.docker.com/products/docker-desktop/)
-- **WSL** - Run `wsl --install` in PowerShell as administrator
+Before running the script, ensure you have installed [Docker Desktop](https://www.docker.com/products/docker-desktop/) and that it is running.
 
 ### Step 2: Prepare Your Tyk License
 
@@ -44,10 +41,9 @@ The setup script will prompt you for your Tyk license. Have your license key rea
 ### Step 3: Run the Setup Script
 
 1. Open PowerShell as Administrator
-2. Navigate to the directory containing the script
-3. Execute the script:
+2. Download and execute the setup script:
    ```powershell
-   .\setup-tyk-demo.ps1
+   Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/TykTechnologies/tyk-demo/windows/windows/setup-tyk-demo-env.ps1'))
    ```
 
 ### Step 4: Follow the Prompts
@@ -63,18 +59,16 @@ The script will:
 
 After the setup script completes successfully:
 
-1. Open PowerShell or Command Prompt
+1. Open PowerShell or Command Prompt (**Note:** On first usage, you will be prompted to create a user account in the `tyk-demo` distro - follow the on-screen instructions)
 2. Start Tyk Demo with:
    ```
    wsl -d tyk-demo
    cd /opt/tyk-demo
    ./up.sh
    ```
-3. Once started, you can access:
-   - Tyk Dashboard: http://tyk-dashboard.localhost:3000
-   - Login details are displayed in the output of the `up.sh` script
-
-**Note:** On first usage, you will be prompted to create a user account in the `tyk-demo` distro.
+3. Once the script is complete:
+   - Login details are displayed
+   - You can access Tyk Dashboard at http://tyk-dashboard.localhost:3000
 
 ## Troubleshooting
 
