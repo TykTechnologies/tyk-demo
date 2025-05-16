@@ -2,7 +2,7 @@
 # This script checks prerequisites and prepares the Tyk Demo environment
 param (
     [string]$DistroName = "Ubuntu",
-    [string]$RepoPath = "/opt/tyk-demo"
+    [string]$RepoPath = "/usr/local/share/tyk-demo"
 )
 
 function Test-AdminPrivileges {
@@ -52,6 +52,15 @@ function ValidateDistro {
             Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
             return $false
         }
+    }
+
+    # Check if non-root user is available
+    $user = wsl -d $distroName -e whoami 2>$null
+    if ($user.Trim() -eq "root") {
+        Write-Output "$distroName: default user is root"
+    } else {
+        Write-Output "$distroName: default user is '$($user.Trim())'"
+        return $false
     }
 
     # Check for Tyk Demo repo
@@ -117,7 +126,7 @@ function ValidateDistro {
     } else {
         Write-Host "- jq is not installed in $distroName distro." -ForegroundColor Red
         Write-Host "Installing jq in $distroName distro."
-        wsl -d $distroName -e bash -c "apt-get update && apt-get install -y jq"
+        wsl -d $distroName -e bash -c "sudo apt-get update && sudo apt-get install -y jq"
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done." -ForegroundColor Green
         } else {
