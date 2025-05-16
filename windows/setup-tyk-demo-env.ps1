@@ -67,7 +67,7 @@ function ValidateDistro {
 
     # Check if user is available
     Write-Host "Is user '$distroUser' available in '$distroName' distro - " -NoNewLine
-    $userId = wsl -d $distroName -e id -u $distroUser 2>/dev/null
+    $userId = wsl -d $distroName -e id -u $distroUser > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Yes" -ForegroundColor Green
     } else {
