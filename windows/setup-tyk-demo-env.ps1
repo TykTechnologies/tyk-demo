@@ -17,7 +17,7 @@ function ValidateHost {
     $status=$true
 
     # Check WSL is installed
-    Write-Host "Check: WSL is installed - " -NoNewLine
+    Write-Host "Checking WSL is installed... " -NoNewLine
     if (Get-Command wsl -ErrorAction SilentlyContinue) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -26,7 +26,7 @@ function ValidateHost {
     }
 
     # Check if the Docker daemon is available
-    Write-Host "Check: Docker daemon available - " -NoNewLine
+    Write-Host "Checking Docker daemon available... " -NoNewLine
     docker info > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
@@ -44,7 +44,7 @@ function ValidateDistro {
     )
 
     # Check for distro
-    Write-Host "Check: Distro '$distroName' present - " -NoNewLine
+    Write-Host "Checking Distro '$distroName' present... " -NoNewLine
     $wslDistros = wsl --list --quiet
     if ($wslDistros -contains $distroName) {
         Write-Host "Pass" -ForegroundColor Green
@@ -66,7 +66,7 @@ function ValidateDistro {
     }
 
     # Check if user is available
-    Write-Host "Check: User '$distroUser' available in '$distroName' distro - " -NoNewLine
+    Write-Host "Checking User '$distroUser' available in '$distroName' distro... " -NoNewLine
     $userId = wsl -d $distroName -e id -u $distroUser > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
@@ -88,7 +88,7 @@ function ValidateDistro {
     }
 
     # Check for Docker in distro
-    Write-Host "Check: Docker available in '$distroName' distro - " -NoNewLine
+    Write-Host "Checking Docker available in '$distroName' distro... " -NoNewLine
     wsl -d $distroName -e bash -c "docker version" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
@@ -99,7 +99,7 @@ function ValidateDistro {
     }
 
     # Check Docker Compose in distro
-    Write-Host "Check: Docker Compose available in '$distroName' distro - " -NoNewLine
+    Write-Host "Checking Docker Compose available in '$distroName' distro... " -NoNewLine
     wsl -d $distroName -e bash -c "docker compose version" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
@@ -110,7 +110,7 @@ function ValidateDistro {
     }
 
     # Check for jq in distro
-    Write-Host "Check: jq available in '$distroName' distro - " -NoNewLine
+    Write-Host "Checking jq available in '$distroName' distro... " -NoNewLine
     wsl -d $distroName -e jq --version > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
@@ -118,10 +118,10 @@ function ValidateDistro {
         Write-Host "Fail" -ForegroundColor Yellow
         $confirmation = Read-Host "Install jq in '$distroName' distro? (y/n)"
         if ($confirmation -ne "y" -and $confirmation -ne "Y") {
-            Write-Host "Please manually install jq in '$distroName' distro."
+            Write-Host "Please manually install jq in '$distroName' distro"
             return $false
         }
-        Write-Host "Installing jq in $distroName distro."
+        Write-Host "Installing jq in '$distroName' distro..."
         wsl -d $distroName -u root -e bash -c "sudo apt-get update && sudo apt-get install -y jq"
         if ($LASTEXITCODE -eq 0) {
             Write-Host "jq installed" -ForegroundColor Green
@@ -141,7 +141,7 @@ function ValidateRepo() {
     )
 
     # Check for Tyk Demo repo
-    Write-Host "Check: Tyk Demo repository available at '$repoPath' - " -NoNewLine
+    Write-Host "Checking Tyk Demo repository available at '$repoPath'... " -NoNewLine
     wsl -d $distroName -u $tykUser -e bash -c "test -d $repoPath"
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
@@ -166,7 +166,7 @@ function ValidateRepo() {
     }
 
     # Check for Tyk licence
-    Write-Host "Check: Tyk licence available - " -NoNewLine
+    Write-Host "Checking Tyk licence available... " -NoNewLine
     $envFilePath = "$repoPath/.env"
     wsl -d $distroName -u $tykUser -e bash -c "test -f $envFilePath && grep '^DASHBOARD_LICENCE=' $envFilePath" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
