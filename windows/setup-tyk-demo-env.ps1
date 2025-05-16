@@ -203,25 +203,28 @@ Write-Host "Tyk Demo Setup Configuration:" -ForegroundColor Cyan
 Write-Host "- Using WSL Distro: $DistroName" -ForegroundColor White
 Write-Host "- Using Repository Path: $RepoPath" -ForegroundColor White
 
-Write-Host "Validating Host:" -ForegroundColor Cyan
-
-if (-not (ValidateHost)) {
-    Write-Host "Host check failed"
+Write-Host "Validating Host:" -ForegroundColor Cyan -NoNewLine
+if (ValidateHost) {
+    Write-Host "Pass" -ForegroundColor Green
+} else {
+    Write-Host "Fail" -ForegroundColor Red
     return
 }
 
-Write-Host "Validating Distro:" -ForegroundColor Cyan
-
-if (-not (ValidateDistro -distroName $DistroName)) {
-    Write-Host "Distro check failed"
+Write-Host "Validating Distro:" -ForegroundColor Cyan -NoNewLine
+if (ValidateDistro -distroName $DistroName) {
+    Write-Host "Pass" -ForegroundColor Green
+} else {
+    Write-Host "Fail" -ForegroundColor Red
     return
 }
 
-Write-Host "Validating Repo:" -ForegroundColor Cyan
-
-if (-not (ValidateRepo -distroName $DistroName -repoPath $RepoPath)) {
-    Write-Host "Repo check failed"
+Write-Host "Validating Repo:" -ForegroundColor Cyan -NoNewLine
+if (ValidateRepo -distroName $DistroName -repoPath $RepoPath) {
+    Write-Host "Pass" -ForegroundColor Green
+} else {
+    Write-Host "Fail" -ForegroundColor Red
     return
 }
 
-Write-Host "Checks complete. Tyk Demo environment is ready." -ForegroundColor Green
+Write-Host "All checks complete. Tyk Demo environment is ready." -ForegroundColor Green
