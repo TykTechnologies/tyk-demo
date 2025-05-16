@@ -263,4 +263,4 @@ if (ValidateRepo -distroName $DistroName -distroUser $DistroUser -repoPath $Repo
     return
 }
 
-Write-Host "Validation process complete" -ForegroundColor Green
+Write-Host "Validation process completed" -ForegroundColor Green
