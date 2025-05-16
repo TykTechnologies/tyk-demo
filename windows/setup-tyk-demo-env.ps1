@@ -2,8 +2,10 @@
 # This script checks prerequisites and prepares the Tyk Demo environment
 param (
     [string]$DistroName = "Ubuntu",
-    [string]$RepoPath = "/usr/local/share/tyk-demo"
+    [string]$RepoPath = "~/tyk-demo"
 )
+
+$tykUser="tyk"
 
 function Test-AdminPrivileges {
     $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
@@ -36,8 +38,7 @@ function ValidateHost {
 
 function ValidateDistro {
     param (
-        [string]$distroName,
-        [string]$repoPath
+        [string]$distroName
     )
 
     # Check for distro
@@ -48,32 +49,6 @@ function ValidateDistro {
         Write-Host "- WSL distro '$distroName' not is present." -ForegroundColor Yellow
         Write-Host "Creating WSL distro '$distroName'... "
         wsl --install ubuntu --name $distroName
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
-            return $false
-        }
-    }
-
-    # Check if non-root user is available
-    $user = wsl -d $distroName -e whoami 2>$null
-    if ($user.Trim() -eq "root") {
-        Write-Host "- $distroName default user is root"
-    } else {
-        Write-Host "- $distroName default user is '$($user.Trim())'"
-        return $false
-    }
-
-    # Check for Tyk Demo repo
-    wsl -d $distroName -e test -d $repoPath
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "- Tyk Demo repository at '$repoPath' is present." -ForegroundColor Green
-    } else {
-        Write-Host "- Tyk Demo repository at '$repoPath' is not present." -ForegroundColor Yellow
-        Write-Host "Cloning Tyk Demo repository to '$repoPath'... "
-        # Create parent directory if needed
-        $parentDir = Split-Path -Parent $repoPath
-        wsl -d $distroName -e mkdir -p $parentDir
-        wsl -d $distroName -e git clone https://github.com/TykTechnologies/tyk-demo $repoPath
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done." -ForegroundColor Green
         } else {
@@ -82,15 +57,14 @@ function ValidateDistro {
         }
     }
 
-    # Check for Tyk licence
-    $envFilePath = "$repoPath/.env"
-    wsl -d $distroName -e bash -c "test -f '$envFilePath' && grep '^DASHBOARD_LICENCE=' '$envFilePath'"
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "- Tyk licence found." -ForegroundColor Green
+    # Check if non-root user is available
+    $user = wsl -d $distroName -e whoami 2>$null
+    if ($user.Trim() -ne "root") {
+        Write-Host "- $distroName default user is '$($user.Trim())'" -ForegroundColor Green
     } else {
-        Write-Host "- Tyk licence not found..." -ForegroundColor Yellow
-        $newLicence = Read-Host "Paste your Tyk licence and press return"
-        wsl -d $distroName -e bash -c "cd $repoPath && ./scripts/update-env.sh DASHBOARD_LICENCE $newLicence"
+        Write-Host "- $distroName default user is root" -ForegroundColor Yellow
+        Write-Host "Creating non-root user '$tykUser' in $distroName distro... "
+        wsl -d $distroName -e bash -c "sudo adduser --disabled-password --gecos '' $tykUser"
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done." -ForegroundColor Green
         } else {
@@ -100,7 +74,7 @@ function ValidateDistro {
     }
 
     # Check for Docker in distro
-    wsl -d $distroName -e bash -c "docker version" > $null 2>&1
+    wsl -d $distroName -u $tykUser -e bash -c "docker version" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "- Docker is available in $distroName distro." -ForegroundColor Green
     } else {
@@ -110,7 +84,7 @@ function ValidateDistro {
     }
 
     # Check Docker Compose in distro
-    wsl -d $distroName -e bash -c "docker compose version" > $null 2>&1
+    wsl -d $distroName -u $tykUser -e bash -c "docker compose version" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "- Docker Compose is installed in $distroName distro." -ForegroundColor Green
     } else {
@@ -120,13 +94,13 @@ function ValidateDistro {
     }
 
     # Check for jq in distro
-    wsl -d $distroName -e jq --version > $null 2>&1
+    wsl -d $distroName -u $tykUser -e jq --version > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "- jq is installed in $distroName distro." -ForegroundColor Green
     } else {
-        Write-Host "- jq is not installed in $distroName distro." -ForegroundColor Red
+        Write-Host "- jq is not installed in $distroName distro." -ForegroundColor Yellow
         Write-Host "Installing jq in $distroName distro."
-        wsl -d $distroName -e bash -c "sudo apt-get update && sudo apt-get install -y jq"
+        wsl -d $distroName -u root -e bash -c "sudo apt-get update && sudo apt-get install -y jq"
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done." -ForegroundColor Green
         } else {
@@ -138,12 +112,55 @@ function ValidateDistro {
     return $true
 }
 
+function ValidateRepo() {
+    param (
+        [string]$distroName,
+        [string]$repoPath
+    )
+
+    # Check for Tyk Demo repo
+    wsl -d $distroName -u $tykUser -e test -d $repoPath
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "- Tyk Demo repository at '$repoPath' is present." -ForegroundColor Green
+    } else {
+        Write-Host "- Tyk Demo repository at '$repoPath' is not present." -ForegroundColor Yellow
+        Write-Host "Cloning Tyk Demo repository to '$repoPath'... "
+        # Create parent directory if needed
+        $parentDir = Split-Path -Parent $repoPath
+        wsl -d $distroName -u $tykUser -e mkdir -p $parentDir
+        wsl -d $distroName -u $tykUser -e git clone https://github.com/TykTechnologies/tyk-demo $repoPath
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Done." -ForegroundColor Green
+        } else {
+            Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
+            return $false
+        }
+    }
+
+    # Check for Tyk licence
+    $envFilePath = "$repoPath/.env"
+    wsl -d $distroName -u $tykUser -e bash -c "test -f '$envFilePath' && grep '^DASHBOARD_LICENCE=' '$envFilePath'"
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "- Tyk licence found." -ForegroundColor Green
+    } else {
+        Write-Host "- Tyk licence not found..." -ForegroundColor Yellow
+        $newLicence = Read-Host "Paste your Tyk licence and press return"
+        wsl -d $distroName -u $tykUser -e bash -c "cd $repoPath && ./scripts/update-env.sh DASHBOARD_LICENCE $newLicence"
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Done." -ForegroundColor Green
+        } else {
+            Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
+            return $false
+        }
+    }
+}
+
 # Main Execution
 
 # Check Admin Privileges
 if (-not (Test-AdminPrivileges)) {
     Write-Host "This script requires administrator privileges. Please run PowerShell as an administrator." -ForegroundColor Red
-    return 1
+    return $false
 }
 
 Write-Host "Tyk Demo Setup Configuration:" -ForegroundColor Cyan
@@ -154,14 +171,21 @@ Write-Host "Validating Host:" -ForegroundColor Cyan
 
 if (-not (ValidateHost)) {
     Write-Host "Host check failed." -ForegroundColor Red
-    return 1
+    return $false
 }
 
 Write-Host "Validating Distro:" -ForegroundColor Cyan
 
-if (-not (ValidateDistro -distroName $DistroName -repoPath $RepoPath)) {
+if (-not (ValidateDistro -distroName $DistroName)) {
     Write-Host "Distro check failed." -ForegroundColor Red
-    return 1
+    return $false
+}
+
+Write-Host "Validating Repo:" -ForegroundColor Cyan
+
+if (-not (ValidateRepo -distroName $DistroName -repoPath $RepoPath)) {
+    Write-Host "Distro check failed." -ForegroundColor Red
+    return $false
 }
 
 Write-Host "Tyk Demo environment is prepared successfully." -ForegroundColor Green
