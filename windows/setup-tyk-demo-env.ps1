@@ -206,21 +206,21 @@ Write-Host "- Using Repository Path: $RepoPath" -ForegroundColor White
 Write-Host "Validating Host:" -ForegroundColor Cyan
 
 if (-not (ValidateHost)) {
-    Write-Error "Host check failed"
+    Write-Host "Host check failed"
     return
 }
 
 Write-Host "Validating Distro:" -ForegroundColor Cyan
 
 if (-not (ValidateDistro -distroName $DistroName)) {
-    Write-Error "Distro check failed"
+    Write-Host "Distro check failed"
     return
 }
 
 Write-Host "Validating Repo:" -ForegroundColor Cyan
 
 if (-not (ValidateRepo -distroName $DistroName -repoPath $RepoPath)) {
-    Write-Error "Repo check failed"
+    Write-Host "Repo check failed"
     return
 }
 
