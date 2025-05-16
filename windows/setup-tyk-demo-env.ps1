@@ -3,10 +3,9 @@
 param (
     [string]$DistroName = "tyk-demo-ubuntu",
     [string]$RepoPath = "~/tyk-demo",
+    [string]$DistroUser = "tyk",
     [switch]$AutoInstall = $false
 )
-
-$distroUser="tyk"
 
 function Test-AdminPrivileges {
     $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
@@ -41,7 +40,8 @@ function ValidateHost {
 
 function ValidateDistro {
     param (
-        [string]$distroName
+        [string]$distroName,
+        [string]$distroUser
     )
 
     # Check for distro
@@ -144,6 +144,7 @@ function ValidateDistro {
 function ValidateRepo() {
     param (
         [string]$distroName,
+        [string]$distroUser,
         [string]$repoPath
     )
 
@@ -223,7 +224,7 @@ if (ValidateHost) {
 }
 
 Write-Host "Validating Distro" -ForegroundColor Cyan
-if (ValidateDistro -distroName $DistroName) {
+if (ValidateDistro -distroName $DistroName -distroUser $DistroUser) {
     Write-Host "Distro validation passed" -ForegroundColor Green
 } else {
     Write-Host "Distro validation failed" -ForegroundColor Red
@@ -231,7 +232,7 @@ if (ValidateDistro -distroName $DistroName) {
 }
 
 Write-Host "Validating Repo" -ForegroundColor Cyan
-if (ValidateRepo -distroName $DistroName -repoPath $RepoPath) {
+if (ValidateRepo -distroName $DistroName -distroUser $DistroUser -repoPath $RepoPath) {
     Write-Host "Repo validation passed" -ForegroundColor Green
 } else {
     Write-Host "Repo validation failed" -ForegroundColor Red
