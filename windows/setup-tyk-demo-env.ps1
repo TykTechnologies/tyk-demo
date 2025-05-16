@@ -101,7 +101,7 @@ function ValidateDistro {
     }
 
     # Check Docker Compose in distro
-    wsl -d $distroName -e bash "docker compose version" > $null 2>&1
+    wsl -d $distroName -e bash -c "docker compose version" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "- Docker Compose is installed in $distroName distro." -ForegroundColor Green
     } else {
