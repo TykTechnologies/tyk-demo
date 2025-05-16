@@ -171,21 +171,21 @@ Write-Host "Validating Host:" -ForegroundColor Cyan
 
 if (-not (ValidateHost)) {
     Write-Host "Host check failed." -ForegroundColor Red
-    return $false
+    return
 }
 
 Write-Host "Validating Distro:" -ForegroundColor Cyan
 
 if (-not (ValidateDistro -distroName $DistroName)) {
     Write-Host "Distro check failed." -ForegroundColor Red
-    return $false
+    return
 }
 
 Write-Host "Validating Repo:" -ForegroundColor Cyan
 
 if (-not (ValidateRepo -distroName $DistroName -repoPath $RepoPath)) {
     Write-Host "Distro check failed." -ForegroundColor Red
-    return $false
+    return
 }
 
 Write-Host "Tyk Demo environment is prepared successfully." -ForegroundColor Green
