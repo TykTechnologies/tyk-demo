@@ -110,7 +110,7 @@ function ValidateDistro {
     }
 
     # Check for jq in distro
-    Write-Host "Check jq available in '$distroName' distro - " -NoNewLine
+    Write-Host "Check: jq available in '$distroName' distro - " -NoNewLine
     wsl -d $distroName -e jq --version > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
@@ -126,7 +126,7 @@ function ValidateDistro {
         if ($LASTEXITCODE -eq 0) {
             Write-Host "jq installed" -ForegroundColor Green
         } else {
-            Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
+            Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
             return $false
         }
     }
@@ -155,12 +155,12 @@ function ValidateRepo() {
         Write-Host "Cloning Tyk Demo repository to '$repoPath' in '$distroName' distro..."
         # Create parent directory if needed
         $parentDir = Split-Path -Parent $repoPath
-        wsl -d $distroName -u $tykUser -e mkdir -p $parentDir > $null
-        wsl -d $distroName -u $tykUser -e git clone https://github.com/TykTechnologies/tyk-demo $repoPath > $null
+        wsl -d $distroName -u $tykUser -e bash -c "mkdir -p $parentDir" > $null
+        wsl -d $distroName -u $tykUser -e bash -c "git clone https://github.com/TykTechnologies/tyk-demo $repoPath" > $null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Repo cloned" -ForegroundColor Green
         } else {
-            Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
+            Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
             return $false
         }
     }
@@ -183,7 +183,7 @@ function ValidateRepo() {
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done" -ForegroundColor Green
         } else {
-            Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
+            Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
             return $false
         }
     }
