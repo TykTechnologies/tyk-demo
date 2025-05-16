@@ -143,7 +143,7 @@ function ValidateDistro {
 # Check Admin Privileges
 if (-not (Test-AdminPrivileges)) {
     Write-Host "This script requires administrator privileges. Please run PowerShell as an administrator." -ForegroundColor Red
-    exit 1
+    return 1
 }
 
 Write-Host "Tyk Demo Setup Configuration:" -ForegroundColor Cyan
@@ -154,14 +154,14 @@ Write-Host "Validating Host:" -ForegroundColor Cyan
 
 if (-not (ValidateHost)) {
     Write-Host "Host check failed." -ForegroundColor Red
-    exit 1
+    return 1
 }
 
 Write-Host "Validating Distro:" -ForegroundColor Cyan
 
 if (-not (ValidateDistro -distroName $DistroName -repoPath $RepoPath)) {
     Write-Host "Distro check failed." -ForegroundColor Red
-    exit 1
+    return 1
 }
 
 Write-Host "Tyk Demo environment is prepared successfully." -ForegroundColor Green
