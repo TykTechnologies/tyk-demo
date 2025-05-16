@@ -28,6 +28,7 @@ function ValidateHost {
         Write-Host "- Docker daemon is running." -ForegroundColor Green
     } else {
         Write-Host "- Docker daemon is not installed." -ForegroundColor Red
+        $status = $false
     }
 
     return $status
