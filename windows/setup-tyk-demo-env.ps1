@@ -152,11 +152,11 @@ function ValidateRepo() {
             Write-Host "Please manually clone the repo to $repoPath in '$distroName' distro"
             return $false
         }
-        Write-Host "Cloning Tyk Demo repository to '$repoPath'..."
+        Write-Host "Cloning Tyk Demo repository to '$repoPath' in '$distroName' distro..."
         # Create parent directory if needed
         $parentDir = Split-Path -Parent $repoPath
-        wsl -d $distroName -u $tykUser -e mkdir -p $parentDir
-        wsl -d $distroName -u $tykUser -e git clone https://github.com/TykTechnologies/tyk-demo $repoPath
+        wsl -d $distroName -u $tykUser -e mkdir -p $parentDir > $null
+        wsl -d $distroName -u $tykUser -e git clone https://github.com/TykTechnologies/tyk-demo $repoPath > $null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Repo cloned" -ForegroundColor Green
         } else {
@@ -187,6 +187,8 @@ function ValidateRepo() {
             return $false
         }
     }
+
+    return $true
 }
 
 # Main Execution
