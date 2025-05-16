@@ -236,8 +236,11 @@ if (-not (Test-AdminPrivileges)) {
 }
 
 Write-Host "Tyk Demo Setup Configuration" -ForegroundColor Cyan
-Write-Host "WSL Distro: $DistroName" -ForegroundColor White
-Write-Host "Repository Path: $RepoPath" -ForegroundColor White
+Write-Host "WSL Distro: $DistroName"
+Write-Host "Repository Path: $RepoPath"
+Write-Host "Distro User: $DistroUser"
+Write-Host "Auto Install: $AutoInstall"
+Write-Host "----------------------------------------"
 
 Write-Host "Validating Host" -ForegroundColor Cyan
 if (ValidateHost) {
@@ -263,4 +266,5 @@ if (ValidateRepo -distroName $DistroName -distroUser $DistroUser -repoPath $Repo
     return
 }
 
+Write-Host "----------------------------------------"
 Write-Host "Validation process completed" -ForegroundColor Green
