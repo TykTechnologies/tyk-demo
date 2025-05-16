@@ -584,28 +584,32 @@ do
 done
 log_ok
 
-log_message "Checking Gateway - Go plugin"
-result=""
-reload_attempt=0
-while [ "$result" != "0" ]
-do
-  wait_for_response "$gateway_base_url/go-plugin-api-no-auth/get" "200" "" 3
-  result="$?"
-  if [ "$result" != "0" ]
-  then
-    reload_attempt=$((reload_attempt+1))
-    if [ "$reload_attempt" -lt "3"  ]; then
-      log_message "  Gateway not returning desired response, attempting hot reload"
-      hot_reload "$gateway_base_url" "$gateway_api_credentials"
-      sleep 2
-    else
-      log_message "  Maximum reload attempt reached"
-      exit 1
+if [ -f .bootstrap/skip_plugin_build ]; then
+  log_message "Skipping Go plugin check - skip_plugin_build flag is set"
+else
+  log_message "Checking Gateway - Go plugin"
+  result=""
+  reload_attempt=0
+  while [ "$result" != "0" ]
+  do
+    wait_for_response "$gateway_base_url/go-plugin-api-no-auth/get" "200" "" 3
+    result="$?"
+    if [ "$result" != "0" ]
+    then
+      reload_attempt=$((reload_attempt+1))
+      if [ "$reload_attempt" -lt "3"  ]; then
+        log_message "  Gateway not returning desired response, attempting hot reload"
+        hot_reload "$gateway_base_url" "$gateway_api_credentials"
+        sleep 2
+      else
+        log_message "  Maximum reload attempt reached"
+        exit 1
+      fi
     fi
-  fi
-  bootstrap_progress
-done
-log_ok
+    bootstrap_progress
+  done
+  log_ok
+fi
 
 log_message "Checking Gateway 2 - Anonymous API access"
 if [ "$(licence_allowed_nodes "DASHBOARD_LICENCE")" -lt 2 ]; then
