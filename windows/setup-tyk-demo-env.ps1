@@ -17,21 +17,21 @@ function ValidateHost {
     $status=$true
 
     # Check WSL is installed
-    Write-Host "Is Windows Subsystem for Linux is installed? - " -NoNewLine
+    Write-Host "Check: WSL is installed - " -NoNewLine
     if (Get-Command wsl -ErrorAction SilentlyContinue) {
-        Write-Host "Yes" -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "No" -ForegroundColor Red
+        Write-Host "Fail" -ForegroundColor Red
         $status = $false
     }
 
     # Check if the Docker daemon is available
-    Write-Host "Is the Docker daemon available - " -NoNewLine
+    Write-Host "Check: Docker daemon available - " -NoNewLine
     docker info > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "Yes" -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "No" -ForegroundColor Red
+        Write-Host "Fail" -ForegroundColor Red
         $status = $false
     }
 
@@ -44,12 +44,12 @@ function ValidateDistro {
     )
 
     # Check for distro
-    Write-Host "Is the distro '$distroName' present - " -NoNewLine
+    Write-Host "Check: Distro '$distroName' present - " -NoNewLine
     $wslDistros = wsl --list --quiet
     if ($wslDistros -contains $distroName) {
-        Write-Host "Yes" -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "No" -ForegroundColor Yellow
+        Write-Host "Fail" -ForegroundColor Yellow
         $confirmation = Read-Host "Create missing '$distroName' distro? (y/n)"
         if ($confirmation -ne "y" -and $confirmation -ne "Y") {
             Write-Host "Please manually create the '$distroName' distro"
@@ -66,12 +66,12 @@ function ValidateDistro {
     }
 
     # Check if user is available
-    Write-Host "Is user '$distroUser' available in '$distroName' distro - " -NoNewLine
+    Write-Host "Check: User '$distroUser' available in '$distroName' distro - " -NoNewLine
     $userId = wsl -d $distroName -e id -u $distroUser > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "Yes" -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "No" -ForegroundColor Yellow
+        Write-Host "Fail" -ForegroundColor Yellow
         $confirmation = Read-Host "Create missing '$distroUser' user? (y/n)"
         if ($confirmation -ne "y" -and $confirmation -ne "Y") {
             Write-Host "Please manually create the '$distroUser' user in $distroName distro"
@@ -88,34 +88,34 @@ function ValidateDistro {
     }
 
     # Check for Docker in distro
-    Write-Host "Is Docker available in '$distroName' distro - " -NoNewLine
+    Write-Host "Check: Docker available in '$distroName' distro - " -NoNewLine
     wsl -d $distroName -e bash -c "docker version" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "Yes" -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "No" -ForegroundColor Red
+        Write-Host "Fail" -ForegroundColor Red
         Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with '$distroName' distro."
         return $false
     }
 
     # Check Docker Compose in distro
-    Write-Host "Is Docker Compose available in '$distroName' distro - " -NoNewLine
+    Write-Host "Check: Docker Compose available in '$distroName' distro - " -NoNewLine
     wsl -d $distroName -e bash -c "docker compose version" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "Yes" -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "No" -ForegroundColor Red
+        Write-Host "Fail" -ForegroundColor Red
         Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with '$distroName' distro."
         return $false
     }
 
     # Check for jq in distro
-    Write-Host "Is jq available in '$distroName' distro - " -NoNewLine
+    Write-Host "Check jq available in '$distroName' distro - " -NoNewLine
     wsl -d $distroName -e jq --version > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "Yes" -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "No" -ForegroundColor Yellow
+        Write-Host "Fail" -ForegroundColor Yellow
         $confirmation = Read-Host "Install jq in '$distroName' distro? (y/n)"
         if ($confirmation -ne "y" -and $confirmation -ne "Y") {
             Write-Host "Please manually install jq in '$distroName' distro."
@@ -141,7 +141,7 @@ function ValidateRepo() {
     )
 
     # Check for Tyk Demo repo
-    Write-Host "Tyk Demo repository available at '$repoPath' - " -NoNewLine
+    Write-Host "Check: Tyk Demo repository available at '$repoPath' - " -NoNewLine
     wsl -d $distroName -u $tykUser -e test -d $repoPath
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
@@ -166,7 +166,7 @@ function ValidateRepo() {
     }
 
     # Check for Tyk licence
-    Write-Host "Tyk licence available - " -NoNewLine
+    Write-Host "Check: Tyk licence available - " -NoNewLine
     $envFilePath = "$repoPath/.env"
     wsl -d $distroName -u $tykUser -e bash -c "test -f '$envFilePath' && grep '^DASHBOARD_LICENCE=' '$envFilePath'"
     if ($LASTEXITCODE -eq 0) {
