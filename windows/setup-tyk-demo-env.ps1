@@ -144,7 +144,7 @@ Write-Host "- Using Repository Path: $RepoPath" -ForegroundColor White
 Write-Host "Validating Host:" -ForegroundColor Cyan
 
 if (-not (ValidateHost)) {
-    Write-Host "Host prerequisite check failed." -ForegroundColor Red
+    Write-Host "Host check failed." -ForegroundColor Red
     exit 1
 }
 
