@@ -142,7 +142,7 @@ function ValidateRepo() {
 
     # Check for Tyk Demo repo
     Write-Host "Check: Tyk Demo repository available at '$repoPath' - " -NoNewLine
-    wsl -d $distroName -u $tykUser -e test -d $repoPath
+    wsl -d $distroName -u $tykUser -e bash -c "test -d $repoPath"
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
