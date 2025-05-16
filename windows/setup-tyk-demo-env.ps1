@@ -96,7 +96,7 @@ function ValidateDistro {
         Write-Host "- Docker is available in $distroName distro." -ForegroundColor Green
     } else {
         Write-Host "- Docker is not available in $distroName distro" -ForegroundColor Red
-        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with $distroName distro. Apply changes and restart."
+        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with $distroName distro."
         return $false
     }
 
@@ -106,7 +106,7 @@ function ValidateDistro {
         Write-Host "- Docker Compose is installed in $distroName distro." -ForegroundColor Green
     } else {
         Write-Host "- Docker Compose is not installed in $distroName distro." -ForegroundColor Red
-        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with $distroName distro. Apply changes and restart."
+        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with $distroName distro."
         return $false
     }
 
