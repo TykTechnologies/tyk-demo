@@ -99,7 +99,7 @@ function ValidateDistro {
         Write-Host "Pass" -ForegroundColor Green
     } else {
         Write-Host "Fail" -ForegroundColor Red
-        Write-Host "Please update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with '$distroName' distro."
+        Write-Host "Please update WSL integration settings to provide Docker access to '$distroName' distro."
         return $false
     }
 
@@ -110,7 +110,7 @@ function ValidateDistro {
         Write-Host "Pass" -ForegroundColor Green
     } else {
         Write-Host "Fail" -ForegroundColor Red
-        Write-Host "Please update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with '$distroName' distro."
+        Write-Host "Please update WSL integration settings to provide Docker access to '$distroName' distro."
         return $false
     }
 
