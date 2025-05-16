@@ -10,33 +10,7 @@ function Test-AdminPrivileges {
     return $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
-function Install-WSL {
-    Write-Host "Installing Windows Subsystem for Linux... " -NoNewline
-    try {
-        # This will install WSL2 with Ubuntu by default
-        wsl --install
-        
-        Write-Host "WSL installation initiated." -ForegroundColor Green
-        Write-Host "NOTE: A system restart is required to complete the WSL installation." -ForegroundColor Yellow
-        
-        $restartNow = Read-Host "Would you like to restart now? (y/n)"
-        if ($restartNow -eq "y") {
-            Restart-Computer -Force
-        } else {
-            Write-Host "Please restart your computer manually to complete the WSL installation." -ForegroundColor Yellow
-            Write-Host "After restarting, please run this script again." -ForegroundColor Yellow
-        }
-        
-        # Return false since we need a restart before continuing
-        return $false
-    }
-    catch {
-        Write-Host "Failed to install WSL: $_" -ForegroundColor Red
-        return $false
-    }
-}
-
-function ValidatePrerequisites {
+function ValidateHost {
     # Prerequisite Checks
     $status=$true
 
@@ -45,33 +19,7 @@ function ValidatePrerequisites {
         Write-Host "- Windows Subsystem for Linux is installed." -ForegroundColor Green
     } else {
         Write-Host "- Windows Subsystem for Linux is not installed." -ForegroundColor Red
-        
-        $installWSL = Read-Host "Would you like to install Windows Subsystem for Linux now? (y/n)"
-        if ($installWSL -eq "y") {
-            $wslInstalled = Install-WSL
-            if (-not $wslInstalled) {
-                $status = $false
-            }
-        } else {
-            $status = $false
-        }
-    }
-
-    # Check Docker
-    if (Get-Command docker -ErrorAction SilentlyContinue) {
-        Write-Host "- Docker is installed." -ForegroundColor Green
-    } else {
-        Write-Host "- Docker is not installed." -ForegroundColor Red
-        $status=$false
-    }
-
-    # Check Docker Compose 
-    docker compose version > $null 2>&1
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "- Docker Compose is installed." -ForegroundColor Green
-    } else {
-        Write-Host "- Docker Compose is not installed." -ForegroundColor Red
-        $status=$false
+        $status = $false
     }
 
     # Check if the Docker daemon is running
@@ -85,30 +33,21 @@ function ValidatePrerequisites {
     return $status
 }
 
-function ValidateEnvironment {
+function ValidateDistro {
     param (
         [string]$distroName,
         [string]$repoPath
     )
 
-    # Check for Tyk Demo distro
+    # Check for distro
     $wslDistros = wsl.exe --list --quiet
     if ($wslDistros -contains $distroName) {
-        Write-Host "- Tyk Demo WSL distro '$distroName' is present." -ForegroundColor Green
+        Write-Host "- WSL distro '$distroName' is present." -ForegroundColor Green
     } else {
-        Write-Host "- Tyk Demo WSL distro '$distroName' not is present." -ForegroundColor Yellow
-        Write-Host "Creating Tyk Demo distro '$distroName'... "
+        Write-Host "- WSL distro '$distroName' not is present." -ForegroundColor Yellow
+        Write-Host "Creating WSL distro '$distroName'... "
         wsl --install ubuntu --name $distroName
-        if ($LASTEXITCODE -eq 0) {
-            # now install jq
-            wsl -d $distroName -e bash -c "apt-get update && apt-get install -y jq"
-            if ($LASTEXITCODE -eq 0) {
-                Write-Host "Done." -ForegroundColor Green
-            } else {
-                Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
-                return $false
-            }            
-        } else {
+        if ($LASTEXITCODE -ne 0) {
             Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
             return $false
         }
@@ -151,12 +90,39 @@ function ValidateEnvironment {
     }
 
     # Check for Docker in distro
-    $dockerResponse = wsl -d $distroName -e docker version 2>$null
+    wsl -d $distroName -e docker version > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "- Docker is available in Tyk Demo distro." -ForegroundColor Green
+        Write-Host "- Docker is available in $distroName distro." -ForegroundColor Green
     } else {
-        Write-Host "- Docker is not available in Tyk Demo distro" -ForegroundColor Red
-        Write-Host "To resolve, update Docker Desktop (Settings -> Resources -> WSL Integration) to enable WSL integration with $distroName distro. Apply changes and restart Docker Desktop."
+        Write-Host "- Docker is not available in $distroName distro" -ForegroundColor Red
+        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> Resources -> WSL Integration) to enable WSL integration with $distroName distro. Apply changes and restart."
+        return $false
+    }
+
+    # Check Docker Compose in distro
+    wsl -d $distroName -e docker compose version > $null 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "- Docker Compose is installed in $distroName distro." -ForegroundColor Green
+    } else {
+        Write-Host "- Docker Compose is not installed in $distroName distro." -ForegroundColor Red
+        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> Resources -> WSL Integration) to enable WSL integration with $distroName distro. Apply changes and restart."
+        return $false
+    }
+
+    # Check for jq in distro
+    wsl -d $distroName -e jq --version > $null 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "- jq is installed in $distroName distro." -ForegroundColor Green
+    } else {
+        Write-Host "- jq is not installed in $distroName distro." -ForegroundColor Red
+        Write-Host "Installing jq in $distroName distro."
+        wsl -d $distroName -e bash -c "apt-get update && apt-get install -y jq"
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Done." -ForegroundColor Green
+        } else {
+            Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
+            return $false
+        }
     }
 
     return $true
@@ -174,17 +140,17 @@ Write-Host "Tyk Demo Setup Configuration:" -ForegroundColor Cyan
 Write-Host "- Using WSL Distro: $DistroName" -ForegroundColor White
 Write-Host "- Using Repository Path: $RepoPath" -ForegroundColor White
 
-Write-Host "Validating Prerequisites:" -ForegroundColor Cyan
+Write-Host "Validating Host:" -ForegroundColor Cyan
 
-if (-not (ValidatePrerequisites)) {
-    Write-Host "Prerequisite check failed." -ForegroundColor Red
+if (-not (ValidateHost)) {
+    Write-Host "Host prerequisite check failed." -ForegroundColor Red
     exit 1
 }
 
-Write-Host "Validating Environment:" -ForegroundColor Cyan
+Write-Host "Validating Distro:" -ForegroundColor Cyan
 
-if (-not (ValidateEnvironment -distroName $DistroName -repoPath $RepoPath)) {
-    Write-Host "Environment check failed." -ForegroundColor Red
+if (-not (ValidateDistro -distroName $DistroName -repoPath $RepoPath)) {
+    Write-Host "Distro check failed." -ForegroundColor Red
     exit 1
 }
 
