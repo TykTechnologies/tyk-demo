@@ -1,7 +1,7 @@
 # Tyk Demo Environment Setup Script
 # This script checks prerequisites and prepares the Tyk Demo environment
 param (
-    [string]$DistroName = "tyk-demo",
+    [string]$DistroName = "rancher-desktop",
     [string]$RepoPath = "/opt/tyk-demo"
 )
 
