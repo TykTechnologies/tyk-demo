@@ -240,6 +240,7 @@ Write-Host "WSL Distro: $DistroName"
 Write-Host "Repository Path: $RepoPath"
 Write-Host "Distro User: $DistroUser"
 Write-Host "Auto Install: $AutoInstall"
+
 Write-Host "----------------------------------------"
 
 Write-Host "Validating Host" -ForegroundColor Cyan
@@ -250,6 +251,8 @@ if (ValidateHost) {
     return
 }
 
+Write-Host "----------------------------------------"
+
 Write-Host "Validating Distro" -ForegroundColor Cyan
 if (ValidateDistro -distroName $DistroName -distroUser $DistroUser) {
     Write-Host "Distro validation passed" -ForegroundColor Green
@@ -257,6 +260,8 @@ if (ValidateDistro -distroName $DistroName -distroUser $DistroUser) {
     Write-Host "Distro validation failed" -ForegroundColor Red
     return
 }
+
+Write-Host "----------------------------------------"
 
 Write-Host "Validating Repo" -ForegroundColor Cyan
 if (ValidateRepo -distroName $DistroName -distroUser $DistroUser -repoPath $RepoPath) {
@@ -267,4 +272,5 @@ if (ValidateRepo -distroName $DistroName -distroUser $DistroUser -repoPath $Repo
 }
 
 Write-Host "----------------------------------------"
+
 Write-Host "Validation process completed" -ForegroundColor Green
