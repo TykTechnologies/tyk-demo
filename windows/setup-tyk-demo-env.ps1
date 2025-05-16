@@ -99,7 +99,7 @@ function ValidateDistro {
         Write-Host "Pass" -ForegroundColor Green
     } else {
         Write-Host "Fail" -ForegroundColor Red
-        Write-Host "Please update WSL integration settings to provide Docker access to '$distroName' distro."
+        Write-Host "Please update WSL integration settings to provide Docker access to '$distroName' distro"
         return $false
     }
 
@@ -110,7 +110,7 @@ function ValidateDistro {
         Write-Host "Pass" -ForegroundColor Green
     } else {
         Write-Host "Fail" -ForegroundColor Red
-        Write-Host "Please update WSL integration settings to provide Docker access to '$distroName' distro."
+        Write-Host "Please update WSL integration settings to provide Docker access to '$distroName' distro"
         return $false
     }
 
@@ -129,7 +129,7 @@ function ValidateDistro {
             }
         }
         Write-Host "Installing jq in '$distroName' distro..."
-        wsl -d $distroName -u root -e bash -c "sudo apt-get update && sudo apt-get install -y jq"
+        wsl -d $distroName -u root -e bash -c "sudo apt-get update && sudo apt-get install -y jq" > $null 2>&1
         if ($LASTEXITCODE -eq 0) {
             Write-Host "jq installed" -ForegroundColor Green
         } else {
@@ -153,7 +153,7 @@ function ValidateDistro {
             }
         }
         Write-Host "Installing websocat in '$distroName' distro..."
-        wsl -d $distroName -u root -e bash -c "curl -LO https://github.com/vi/websocat/releases/latest/download/websocat.x86_64-linux && chmod +x websocat.x86_64-linux && sudo mv websocat.x86_64-linux /usr/local/bin/websocat"
+        wsl -d $distroName -u root -e bash -c "curl -LO https://github.com/vi/websocat/releases/latest/download/websocat.x86_64-linux && chmod +x websocat.x86_64-linux && sudo mv websocat.x86_64-linux /usr/local/bin/websocat" > $null 2>&1
         if ($LASTEXITCODE -eq 0) {
             Write-Host "websocat installed" -ForegroundColor Green
         } else {
