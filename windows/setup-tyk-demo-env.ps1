@@ -153,7 +153,7 @@ function ValidateDistro {
             }
         }
         Write-Host "Installing websocat in '$distroName' distro..."
-        wsl -d $distroName -u root -e bash -c "curl -LO https://github.com/vi/websocat/releases/latest/download/websocat.x86_64-linux && chmod +x websocat.x86_64-linux && sudo mv websocat.x86_64-linux /usr/local/bin/websocat" > $null 2>&1
+        wsl -d $distroName -u root -e bash -c "curl -LO https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl && chmod +x websocat.x86_64-linux && sudo mv websocat.x86_64-linux /usr/local/bin/websocat" > $null 2>&1
         if ($LASTEXITCODE -eq 0) {
             Write-Host "websocat installed" -ForegroundColor Green
         } else {
