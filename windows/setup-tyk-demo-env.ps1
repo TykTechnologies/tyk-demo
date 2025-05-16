@@ -57,9 +57,9 @@ function ValidateDistro {
     # Check if non-root user is available
     $user = wsl -d $distroName -e whoami 2>$null
     if ($user.Trim() -eq "root") {
-        Write-Output "$distroName: default user is root"
+        Write-Host "- $distroName default user is root"
     } else {
-        Write-Output "$distroName: default user is '$($user.Trim())'"
+        Write-Host "- $distroName default user is '$($user.Trim())'"
         return $false
     }
 
