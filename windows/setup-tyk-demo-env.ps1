@@ -91,22 +91,22 @@ function ValidateDistro {
     }
 
     # Check for Docker in distro
-    wsl -d $distroName -e docker version > $null 2>&1
+    wsl -d $distroName -e bash -c "docker version" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "- Docker is available in $distroName distro." -ForegroundColor Green
     } else {
         Write-Host "- Docker is not available in $distroName distro" -ForegroundColor Red
-        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> Resources -> WSL Integration) to enable WSL integration with $distroName distro. Apply changes and restart."
+        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with $distroName distro. Apply changes and restart."
         return $false
     }
 
     # Check Docker Compose in distro
-    wsl -d $distroName -e docker compose version > $null 2>&1
+    wsl -d $distroName -e bash "docker compose version" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "- Docker Compose is installed in $distroName distro." -ForegroundColor Green
     } else {
         Write-Host "- Docker Compose is not installed in $distroName distro." -ForegroundColor Red
-        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> Resources -> WSL Integration) to enable WSL integration with $distroName distro. Apply changes and restart."
+        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with $distroName distro. Apply changes and restart."
         return $false
     }
 
