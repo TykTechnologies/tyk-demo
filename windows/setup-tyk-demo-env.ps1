@@ -1,11 +1,11 @@
 # Tyk Demo Environment Setup Script
 # This script checks prerequisites and prepares the Tyk Demo environment
 param (
-    [string]$DistroName = "Ubuntu",
+    [string]$DistroName = "tyk-demo-ubuntu",
     [string]$RepoPath = "~/tyk-demo"
 )
 
-$tykUser="tyk"
+$distroUser="tyk"
 
 function Test-AdminPrivileges {
     $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
@@ -16,20 +16,22 @@ function ValidateHost {
     # Prerequisite Checks
     $status=$true
 
-    # Check WSL
+    # Check WSL is installed
+    Write-Host "Windows Subsystem for Linux is installed - " -NoNewLine
     if (Get-Command wsl -ErrorAction SilentlyContinue) {
-        Write-Host "- Windows Subsystem for Linux is installed." -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "- Windows Subsystem for Linux is not installed." -ForegroundColor Red
+        Write-Host "Fail" -ForegroundColor Red
         $status = $false
     }
 
-    # Check if the Docker daemon is running
+    # Check if the Docker daemon is available
+    Write-Host "Docker daemon is available - " -NoNewLine
     docker info > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "- Docker daemon is running." -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "- Docker daemon is not installed." -ForegroundColor Red
+        Write-Host "Fail" -ForegroundColor Red
         $status = $false
     }
 
@@ -42,67 +44,87 @@ function ValidateDistro {
     )
 
     # Check for distro
-    $wslDistros = wsl.exe --list --quiet
+    Write-Host "WSL distro '$distroName' is present - " -NoNewLine
+    $wslDistros = wsl --list --quiet
     if ($wslDistros -contains $distroName) {
-        Write-Host "- WSL distro '$distroName' is present." -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "- WSL distro '$distroName' not is present." -ForegroundColor Yellow
+        Write-Host "Missing" -ForegroundColor Yellow
+        $confirmation = Read-Host "Create missing '$distroName' distro? (y/n)"
+        if ($confirmation -ne "y" -and $confirmation -ne "Y") {
+            Write-Host "Please manually create the '$distroName' distro"
+            return $false
+        }
         Write-Host "Creating WSL distro '$distroName'... "
         wsl --install ubuntu --name $distroName
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Done." -ForegroundColor Green
+            Write-Host "Distro '$distroName' created" -ForegroundColor Green
         } else {
-            Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
+            Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
             return $false
         }
     }
 
-    # Check if non-root user is available
-    $user = wsl -d $distroName -e whoami 2>$null
-    if ($user.Trim() -ne "root") {
-        Write-Host "- $distroName default user is '$($user.Trim())'" -ForegroundColor Green
+    # Check if user is available
+    Write-Host "User '$distroUser' exists - " -NoNewLine
+    $userId = wsl -d $distroUser -e id -u username 2>/dev/null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "- $distroName default user is root" -ForegroundColor Yellow
-        Write-Host "Creating non-root user '$tykUser' in $distroName distro... "
-        wsl -d $distroName -e bash -c "sudo adduser --disabled-password --gecos '' $tykUser"
+        Write-Host "Missing" -ForegroundColor Yellow
+        $confirmation = Read-Host "Create missing '$distroUser' user? (y/n)"
+        if ($confirmation -ne "y" -and $confirmation -ne "Y") {
+            Write-Host "Please manually create the '$distroUser' user in $distroName distro"
+            return $false
+        }
+        Write-Host "Creating user '$distroUser' in '$distroName' distro..."
+        wsl -d $distroName -e bash -c "sudo adduser --disabled-password --gecos '' $distroUser"
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Done." -ForegroundColor Green
+            Write-Host "User '$distroUser' created" -ForegroundColor Green
         } else {
-            Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
+            Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
             return $false
         }
     }
 
     # Check for Docker in distro
-    wsl -d $distroName -u $tykUser -e bash -c "docker version" > $null 2>&1
+    Write-Host "Docker is available in '$distroName' distro - " -NoNewLine
+    wsl -d $distroName -e bash -c "docker version" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "- Docker is available in $distroName distro." -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "- Docker is not available in $distroName distro" -ForegroundColor Red
-        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with $distroName distro."
+        Write-Host "Fail" -ForegroundColor Red
+        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with '$distroName' distro."
         return $false
     }
 
     # Check Docker Compose in distro
-    wsl -d $distroName -u $tykUser -e bash -c "docker compose version" > $null 2>&1
+    Write-Host "Docker Compose is available in '$distroName' distro - " -NoNewLine
+    wsl -d $distroName -e bash -c "docker compose version" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "- Docker Compose is installed in $distroName distro." -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "- Docker Compose is not installed in $distroName distro." -ForegroundColor Red
-        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with $distroName distro."
+        Write-Host "Fail" -ForegroundColor Red
+        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with '$distroName' distro."
         return $false
     }
 
     # Check for jq in distro
-    wsl -d $distroName -u $tykUser -e jq --version > $null 2>&1
+    Write-Host "jq is available in '$distroName' distro - " -NoNewLine
+    wsl -d $distroName -e jq --version > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "- jq is installed in $distroName distro." -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "- jq is not installed in $distroName distro." -ForegroundColor Yellow
+        Write-Host "Fail" -ForegroundColor Yellow
+        $confirmation = Read-Host "Install jq in '$distroName' distro? (y/n)"
+        if ($confirmation -ne "y" -and $confirmation -ne "Y") {
+            Write-Host "Please manually install jq in '$distroName' distro."
+            return $false
+        }
         Write-Host "Installing jq in $distroName distro."
         wsl -d $distroName -u root -e bash -c "sudo apt-get update && sudo apt-get install -y jq"
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Done." -ForegroundColor Green
+            Write-Host "jq installed" -ForegroundColor Green
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
             return $false
@@ -119,18 +141,24 @@ function ValidateRepo() {
     )
 
     # Check for Tyk Demo repo
+    Write-Host "Tyk Demo repository available at '$repoPath' - " -NoNewLine
     wsl -d $distroName -u $tykUser -e test -d $repoPath
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "- Tyk Demo repository at '$repoPath' is present." -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "- Tyk Demo repository at '$repoPath' is not present." -ForegroundColor Yellow
-        Write-Host "Cloning Tyk Demo repository to '$repoPath'... "
+        Write-Host "Fail" -ForegroundColor Yellow
+        $confirmation = Read-Host "Clone repo to '$repoPath'? (y/n)"
+        if ($confirmation -ne "y" -and $confirmation -ne "Y") {
+            Write-Host "Please manually clone the repo to $repoPath in '$distroName' distro"
+            return $false
+        }
+        Write-Host "Cloning Tyk Demo repository to '$repoPath'..."
         # Create parent directory if needed
         $parentDir = Split-Path -Parent $repoPath
         wsl -d $distroName -u $tykUser -e mkdir -p $parentDir
         wsl -d $distroName -u $tykUser -e git clone https://github.com/TykTechnologies/tyk-demo $repoPath
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Done." -ForegroundColor Green
+            Write-Host "Repo cloned" -ForegroundColor Green
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
             return $false
@@ -138,16 +166,22 @@ function ValidateRepo() {
     }
 
     # Check for Tyk licence
+    Write-Host "Tyk licence available - " -NoNewLine
     $envFilePath = "$repoPath/.env"
     wsl -d $distroName -u $tykUser -e bash -c "test -f '$envFilePath' && grep '^DASHBOARD_LICENCE=' '$envFilePath'"
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "- Tyk licence found." -ForegroundColor Green
+        Write-Host "Pass" -ForegroundColor Green
     } else {
-        Write-Host "- Tyk licence not found..." -ForegroundColor Yellow
+        Write-Host "Fail" -ForegroundColor Yellow
+        $confirmation = Read-Host "Add Tyk licence? (y/n)"
+        if ($confirmation -ne "y" -and $confirmation -ne "Y") {
+            Write-Host "Please manually add a Tyk licence to $envFilePath in '$distroName' distro"
+            return $false
+        }
         $newLicence = Read-Host "Paste your Tyk licence and press return"
         wsl -d $distroName -u $tykUser -e bash -c "cd $repoPath && ./scripts/update-env.sh DASHBOARD_LICENCE $newLicence"
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Done." -ForegroundColor Green
+            Write-Host "Done" -ForegroundColor Green
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))." -ForegroundColor Red
             return $false
@@ -170,22 +204,22 @@ Write-Host "- Using Repository Path: $RepoPath" -ForegroundColor White
 Write-Host "Validating Host:" -ForegroundColor Cyan
 
 if (-not (ValidateHost)) {
-    Write-Host "Host check failed." -ForegroundColor Red
+    Write-Error "Host check failed"
     return
 }
 
 Write-Host "Validating Distro:" -ForegroundColor Cyan
 
 if (-not (ValidateDistro -distroName $DistroName)) {
-    Write-Host "Distro check failed." -ForegroundColor Red
+    Write-Error "Distro check failed"
     return
 }
 
 Write-Host "Validating Repo:" -ForegroundColor Cyan
 
 if (-not (ValidateRepo -distroName $DistroName -repoPath $RepoPath)) {
-    Write-Host "Distro check failed." -ForegroundColor Red
+    Write-Error "Repo check failed"
     return
 }
 
-Write-Host "Tyk Demo environment is prepared successfully." -ForegroundColor Green
+Write-Host "Checks complete. Tyk Demo environment is ready." -ForegroundColor Green
