@@ -13,14 +13,16 @@ The included [PowerShell script](setup-tyk-demo.ps1) automates the process of pr
 Before running the setup script, you'll need:
 
 - Windows 10 or 11
+- Rancher Desktop installed
 - Administrator access on your machine
 - Internet connection
+- Tyk Dashboard licence
 
 ## Components Installed/Configured
 
 The script will check for and help set up:
 
-1. **Docker Desktop** - Container platform required to run Tyk services
+1. **Rancher Desktop** - Container platform required to run Tyk services
 2. **Windows Subsystem for Linux (WSL)** - Enables running Linux environments on Windows
 3. **Ubuntu WSL Distro** - A dedicated Linux distribution for Tyk Demo
 4. **Tyk Demo Repository** - The actual demo environment code
@@ -32,7 +34,7 @@ The script will check for and help set up:
 
 ### Step 1: Install Prerequisites (if not already installed)
 
-Before running the script, ensure you have installed [Docker Desktop](https://www.docker.com/products/docker-desktop/) and that it is running.
+Before running the script, ensure you have installed [Rancher Desktop](https://rancherdesktop.io/) and that it is running.
 
 ### Step 2: Prepare Your Tyk License
 
