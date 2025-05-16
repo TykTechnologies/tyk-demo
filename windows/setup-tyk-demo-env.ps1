@@ -199,11 +199,11 @@ if (-not (Test-AdminPrivileges)) {
     return $false
 }
 
-Write-Host "Tyk Demo Setup Configuration:" -ForegroundColor Cyan
-Write-Host "- Using WSL Distro: $DistroName" -ForegroundColor White
-Write-Host "- Using Repository Path: $RepoPath" -ForegroundColor White
+Write-Host "Tyk Demo Setup Configuration" -ForegroundColor Cyan
+Write-Host "WSL Distro: $DistroName" -ForegroundColor White
+Write-Host "Repository Path: $RepoPath" -ForegroundColor White
 
-Write-Host "Validating Host:" -ForegroundColor Cyan
+Write-Host "Validating Host" -ForegroundColor Cyan
 if (ValidateHost) {
     Write-Host "Host validation passed" -ForegroundColor Green
 } else {
@@ -211,7 +211,7 @@ if (ValidateHost) {
     return
 }
 
-Write-Host "Validating Distro:" -ForegroundColor Cyan
+Write-Host "Validating Distro" -ForegroundColor Cyan
 if (ValidateDistro -distroName $DistroName) {
     Write-Host "Distro validation passed" -ForegroundColor Green
 } else {
@@ -219,7 +219,7 @@ if (ValidateDistro -distroName $DistroName) {
     return
 }
 
-Write-Host "Validating Repo:" -ForegroundColor Cyan
+Write-Host "Validating Repo" -ForegroundColor Cyan
 if (ValidateRepo -distroName $DistroName -repoPath $RepoPath) {
     Write-Host "Repo validation passed" -ForegroundColor Green
 } else {
@@ -227,4 +227,4 @@ if (ValidateRepo -distroName $DistroName -repoPath $RepoPath) {
     return
 }
 
-Write-Host "Validation complete. Tyk Demo environment is ready." -ForegroundColor Green
+Write-Host "Validation complete" -ForegroundColor Green
