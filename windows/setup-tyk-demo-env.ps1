@@ -17,21 +17,21 @@ function ValidateHost {
     $status=$true
 
     # Check WSL is installed
-    Write-Host "Windows Subsystem for Linux is installed - " -NoNewLine
+    Write-Host "Is Windows Subsystem for Linux is installed? - " -NoNewLine
     if (Get-Command wsl -ErrorAction SilentlyContinue) {
-        Write-Host "Pass" -ForegroundColor Green
+        Write-Host "Yes" -ForegroundColor Green
     } else {
-        Write-Host "Fail" -ForegroundColor Red
+        Write-Host "No" -ForegroundColor Red
         $status = $false
     }
 
     # Check if the Docker daemon is available
-    Write-Host "Docker daemon is available - " -NoNewLine
+    Write-Host "Is the Docker daemon available - " -NoNewLine
     docker info > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "Pass" -ForegroundColor Green
+        Write-Host "Yes" -ForegroundColor Green
     } else {
-        Write-Host "Fail" -ForegroundColor Red
+        Write-Host "No" -ForegroundColor Red
         $status = $false
     }
 
@@ -44,18 +44,18 @@ function ValidateDistro {
     )
 
     # Check for distro
-    Write-Host "WSL distro '$distroName' is present - " -NoNewLine
+    Write-Host "Is the distro '$distroName' present - " -NoNewLine
     $wslDistros = wsl --list --quiet
     if ($wslDistros -contains $distroName) {
-        Write-Host "Pass" -ForegroundColor Green
+        Write-Host "Yes" -ForegroundColor Green
     } else {
-        Write-Host "Missing" -ForegroundColor Yellow
+        Write-Host "No" -ForegroundColor Yellow
         $confirmation = Read-Host "Create missing '$distroName' distro? (y/n)"
         if ($confirmation -ne "y" -and $confirmation -ne "Y") {
             Write-Host "Please manually create the '$distroName' distro"
             return $false
         }
-        Write-Host "Creating WSL distro '$distroName'... "
+        Write-Host "Creating distro '$distroName'... "
         wsl --install ubuntu --name $distroName
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Distro '$distroName' created" -ForegroundColor Green
@@ -66,12 +66,12 @@ function ValidateDistro {
     }
 
     # Check if user is available
-    Write-Host "User '$distroUser' exists - " -NoNewLine
-    $userId = wsl -d $distroUser -e id -u username 2>/dev/null
+    Write-Host "Is user '$distroUser' available in '$distroName' distro - " -NoNewLine
+    $userId = wsl -d $distroName -e id -u $distroUser 2>/dev/null
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "Pass" -ForegroundColor Green
+        Write-Host "Yes" -ForegroundColor Green
     } else {
-        Write-Host "Missing" -ForegroundColor Yellow
+        Write-Host "No" -ForegroundColor Yellow
         $confirmation = Read-Host "Create missing '$distroUser' user? (y/n)"
         if ($confirmation -ne "y" -and $confirmation -ne "Y") {
             Write-Host "Please manually create the '$distroUser' user in $distroName distro"
@@ -88,34 +88,34 @@ function ValidateDistro {
     }
 
     # Check for Docker in distro
-    Write-Host "Docker is available in '$distroName' distro - " -NoNewLine
+    Write-Host "Is Docker available in '$distroName' distro - " -NoNewLine
     wsl -d $distroName -e bash -c "docker version" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "Pass" -ForegroundColor Green
+        Write-Host "Yes" -ForegroundColor Green
     } else {
-        Write-Host "Fail" -ForegroundColor Red
+        Write-Host "No" -ForegroundColor Red
         Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with '$distroName' distro."
         return $false
     }
 
     # Check Docker Compose in distro
-    Write-Host "Docker Compose is available in '$distroName' distro - " -NoNewLine
+    Write-Host "Is Docker Compose available in '$distroName' distro - " -NoNewLine
     wsl -d $distroName -e bash -c "docker compose version" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "Pass" -ForegroundColor Green
+        Write-Host "Yes" -ForegroundColor Green
     } else {
-        Write-Host "Fail" -ForegroundColor Red
+        Write-Host "No" -ForegroundColor Red
         Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with '$distroName' distro."
         return $false
     }
 
     # Check for jq in distro
-    Write-Host "jq is available in '$distroName' distro - " -NoNewLine
+    Write-Host "Is jq available in '$distroName' distro - " -NoNewLine
     wsl -d $distroName -e jq --version > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "Pass" -ForegroundColor Green
+        Write-Host "Yes" -ForegroundColor Green
     } else {
-        Write-Host "Fail" -ForegroundColor Yellow
+        Write-Host "No" -ForegroundColor Yellow
         $confirmation = Read-Host "Install jq in '$distroName' distro? (y/n)"
         if ($confirmation -ne "y" -and $confirmation -ne "Y") {
             Write-Host "Please manually install jq in '$distroName' distro."
