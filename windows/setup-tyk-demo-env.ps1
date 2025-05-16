@@ -94,7 +94,7 @@ function ValidateDistro {
         Write-Host "Pass" -ForegroundColor Green
     } else {
         Write-Host "Fail" -ForegroundColor Red
-        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with '$distroName' distro."
+        Write-Host "Please update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with '$distroName' distro."
         return $false
     }
 
@@ -105,7 +105,7 @@ function ValidateDistro {
         Write-Host "Pass" -ForegroundColor Green
     } else {
         Write-Host "Fail" -ForegroundColor Red
-        Write-Host "To resolve, update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with '$distroName' distro."
+        Write-Host "Please update Rancher Desktop settings (Preferences -> WSL -> Integrations) to enable WSL integration with '$distroName' distro."
         return $false
     }
 
@@ -168,7 +168,7 @@ function ValidateRepo() {
     # Check for Tyk licence
     Write-Host "Check: Tyk licence available - " -NoNewLine
     $envFilePath = "$repoPath/.env"
-    wsl -d $distroName -u $tykUser -e bash -c "test -f '$envFilePath' && grep '^DASHBOARD_LICENCE=' '$envFilePath'"
+    wsl -d $distroName -u $tykUser -e bash -c "test -f $envFilePath && grep '^DASHBOARD_LICENCE=' $envFilePath" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
