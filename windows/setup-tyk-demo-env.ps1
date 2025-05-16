@@ -138,6 +138,30 @@ function ValidateDistro {
         }
     }
 
+    # Check for websocat in distro
+    Write-Host "Checking websocat available in '$distroName' distro... " -NoNewLine
+    wsl -d $distroName -e websocat --version > $null 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Pass" -ForegroundColor Green
+    } else {
+        Write-Host "Fail" -ForegroundColor Yellow
+        if (-not $AutoInstall) {
+            $confirmation = Read-Host "Install websocat in '$distroName' distro? (y/n)"
+            if ($confirmation -ne "y" -and $confirmation -ne "Y") {
+                Write-Host "Please manually install websocat in '$distroName' distro"
+                return $false
+            }
+        }
+        Write-Host "Installing websocat in '$distroName' distro..."
+        wsl -d $distroName -u root -e bash -c "curl -LO https://github.com/vi/websocat/releases/latest/download/websocat.x86_64-linux && chmod +x websocat.x86_64-linux && sudo mv websocat.x86_64-linux /usr/local/bin/websocat"
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "websocat installed" -ForegroundColor Green
+        } else {
+            Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
+            return $false
+        }
+    }
+
     return $true
 }
 
