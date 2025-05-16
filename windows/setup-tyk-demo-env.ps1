@@ -2,7 +2,8 @@
 # This script checks prerequisites and prepares the Tyk Demo environment
 param (
     [string]$DistroName = "tyk-demo-ubuntu",
-    [string]$RepoPath = "~/tyk-demo"
+    [string]$RepoPath = "~/tyk-demo",
+    [switch]$AutoInstall = $false
 )
 
 $distroUser="tyk"
@@ -50,10 +51,12 @@ function ValidateDistro {
         Write-Host "Pass" -ForegroundColor Green
     } else {
         Write-Host "Fail" -ForegroundColor Yellow
-        $confirmation = Read-Host "Create missing '$distroName' distro? (y/n)"
-        if ($confirmation -ne "y" -and $confirmation -ne "Y") {
-            Write-Host "Please manually create the '$distroName' distro"
-            return $false
+        if (-not $AutoInstall) {
+            $confirmation = Read-Host "Create missing '$distroName' distro? (y/n)"
+            if ($confirmation -ne "y" -and $confirmation -ne "Y") {
+                Write-Host "Please manually create the '$distroName' distro"
+                return $false
+            }
         }
         Write-Host "Creating distro '$distroName'... "
         wsl --install ubuntu --name $distroName
@@ -72,10 +75,12 @@ function ValidateDistro {
         Write-Host "Pass" -ForegroundColor Green
     } else {
         Write-Host "Fail" -ForegroundColor Yellow
-        $confirmation = Read-Host "Create missing '$distroUser' user? (y/n)"
-        if ($confirmation -ne "y" -and $confirmation -ne "Y") {
-            Write-Host "Please manually create the '$distroUser' user in $distroName distro"
-            return $false
+        if (-not $AutoInstall) {
+            $confirmation = Read-Host "Create missing '$distroUser' user? (y/n)"
+            if ($confirmation -ne "y" -and $confirmation -ne "Y") {
+                Write-Host "Please manually create the '$distroUser' user in $distroName distro"
+                return $false
+            }
         }
         Write-Host "Creating user '$distroUser' in '$distroName' distro..."
         wsl -d $distroName -e bash -c "sudo adduser --disabled-password --gecos '' $distroUser"
@@ -116,10 +121,12 @@ function ValidateDistro {
         Write-Host "Pass" -ForegroundColor Green
     } else {
         Write-Host "Fail" -ForegroundColor Yellow
-        $confirmation = Read-Host "Install jq in '$distroName' distro? (y/n)"
-        if ($confirmation -ne "y" -and $confirmation -ne "Y") {
-            Write-Host "Please manually install jq in '$distroName' distro"
-            return $false
+        if (-not $AutoInstall) {
+            $confirmation = Read-Host "Install jq in '$distroName' distro? (y/n)"
+            if ($confirmation -ne "y" -and $confirmation -ne "Y") {
+                Write-Host "Please manually install jq in '$distroName' distro"
+                return $false
+            }
         }
         Write-Host "Installing jq in '$distroName' distro..."
         wsl -d $distroName -u root -e bash -c "sudo apt-get update && sudo apt-get install -y jq"
@@ -142,21 +149,23 @@ function ValidateRepo() {
 
     # Check for Tyk Demo repo
     Write-Host "Checking Tyk Demo repository available at '$repoPath'... " -NoNewLine
-    wsl -d $distroName -u $tykUser -e bash -c "test -d $repoPath"
+    wsl -d $distroName -u $distroUser -e bash -c "test -d $repoPath"
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
         Write-Host "Fail" -ForegroundColor Yellow
-        $confirmation = Read-Host "Clone repo to '$repoPath'? (y/n)"
-        if ($confirmation -ne "y" -and $confirmation -ne "Y") {
-            Write-Host "Please manually clone the repo to $repoPath in '$distroName' distro"
-            return $false
+        if (-not $AutoInstall) {
+            $confirmation = Read-Host "Clone repo to '$repoPath'? (y/n)"
+            if ($confirmation -ne "y" -and $confirmation -ne "Y") {
+                Write-Host "Please manually clone the repo to $repoPath in '$distroName' distro"
+                return $false
+            }
         }
         Write-Host "Cloning Tyk Demo repository to '$repoPath' in '$distroName' distro..."
         # Create parent directory if needed
         $parentDir = Split-Path -Parent $repoPath
-        wsl -d $distroName -u $tykUser -e bash -c "mkdir -p $parentDir" > $null
-        wsl -d $distroName -u $tykUser -e bash -c "git clone https://github.com/TykTechnologies/tyk-demo $repoPath" > $null
+        wsl -d $distroName -u $distroUser -e bash -c "mkdir -p $parentDir" > $null
+        wsl -d $distroName -u $distroUser -e bash -c "git clone https://github.com/TykTechnologies/tyk-demo $repoPath" > $null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Repo cloned" -ForegroundColor Green
         } else {
@@ -168,18 +177,20 @@ function ValidateRepo() {
     # Check for Tyk licence
     Write-Host "Checking Tyk licence available... " -NoNewLine
     $envFilePath = "$repoPath/.env"
-    wsl -d $distroName -u $tykUser -e bash -c "test -f $envFilePath && grep '^DASHBOARD_LICENCE=' $envFilePath" > $null 2>&1
+    wsl -d $distroName -u $distroUser -e bash -c "test -f $envFilePath && grep '^DASHBOARD_LICENCE=' $envFilePath" > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
         Write-Host "Fail" -ForegroundColor Yellow
-        $confirmation = Read-Host "Add Tyk licence? (y/n)"
-        if ($confirmation -ne "y" -and $confirmation -ne "Y") {
-            Write-Host "Please manually add a Tyk licence to $envFilePath in '$distroName' distro"
-            return $false
+        if (-not $AutoInstall) {
+            $confirmation = Read-Host "Add Tyk licence? (y/n)"
+            if ($confirmation -ne "y" -and $confirmation -ne "Y") {
+                Write-Host "Please manually add a Tyk licence to $envFilePath in '$distroName' distro"
+                return $false
+            }
         }
         $newLicence = Read-Host "Paste your Tyk licence and press return"
-        wsl -d $distroName -u $tykUser -e bash -c "cd $repoPath && ./scripts/update-env.sh DASHBOARD_LICENCE $newLicence"
+        wsl -d $distroName -u $distroUser -e bash -c "cd $repoPath && ./scripts/update-env.sh DASHBOARD_LICENCE $newLicence"
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done" -ForegroundColor Green
         } else {
