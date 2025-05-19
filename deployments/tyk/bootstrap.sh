@@ -584,10 +584,10 @@ do
 done
 log_ok
 
+log_message "Checking Gateway - Go plugin"
 if [ -f .bootstrap/skip_plugin_build ]; then
-  log_message "Skipping Go plugin check - skip_plugin_build flag is set"
+  log_message "  Skipping Go plugin check - skip_plugin_build flag is set"
 else
-  log_message "Checking Gateway - Go plugin"
   result=""
   reload_attempt=0
   while [ "$result" != "0" ]
@@ -608,8 +608,9 @@ else
     fi
     bootstrap_progress
   done
-  log_ok
 fi
+log_ok
+
 
 log_message "Checking Gateway 2 - Anonymous API access"
 if [ "$(licence_allowed_nodes "DASHBOARD_LICENCE")" -lt 2 ]; then
