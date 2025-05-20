@@ -46,7 +46,12 @@ log_json_result () {
   if [ "$status" == "true" ]; then
     log_ok
   else
-    log_message "  ERROR: $(echo $1 | jq -r '.message // .Message')"
+    local error_message=$(echo $1 | jq -r '.message // .Message // empty')
+    if [ -n "$error_message" ]; then
+      log_message "  ERROR: $error_message"
+    else
+      log_message "  ERROR: $(echo $1 | jq .)"
+    fi
     exit 1
   fi
 }
