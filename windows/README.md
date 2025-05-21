@@ -109,7 +109,7 @@ For more information, please refer to the [main readme](../README.md) and [tyk d
 
 This command will bring the Tyk Demo environment up:
 ```bash
-wsl -d tyk-demo-ubuntu -u tyk -e bash -c "cd ~/tyk-demo; ./up.sh --skip-hostname-check"
+wsl -d tyk-demo-ubuntu -u tyk --cd ~/tyk-demo -e bash -c "./up.sh --skip-hostname-check"
 ```
 
 **Note:** The `--skip-hostname-check` flag is used as this WSL-based approach does not require hostnames to be checked within the distro.
@@ -118,7 +118,7 @@ wsl -d tyk-demo-ubuntu -u tyk -e bash -c "cd ~/tyk-demo; ./up.sh --skip-hostname
 
 This command will tear the Tyk Demo environment down:
 ```bash
-wsl -d tyk-demo-ubuntu -u tyk -e bash -c "cd ~/tyk-demo; ./down.sh"
+wsl -d tyk-demo-ubuntu -u tyk --cd ~/tyk-demo -e bash -c "./down.sh"
 ```
 
 ## Validation Steps
