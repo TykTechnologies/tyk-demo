@@ -403,8 +403,12 @@
         "http://localhost:3100"
       ],
       "allowed_methods": [],
-      "allowed_headers": [],
-      "exposed_headers": [],
+      "exposed_headers": [
+        "*"
+      ],
+      "allowed_headers": [
+        "*"
+      ],
       "allow_credentials": true,
       "max_age": 24,
       "options_passthrough": true,
