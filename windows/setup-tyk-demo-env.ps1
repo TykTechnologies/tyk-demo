@@ -214,7 +214,7 @@ function ValidateRepo() {
                 return $false
             }
         }
-        $newLicence = Read-Host "Paste your Tyk licence and press return"
+        $newLicence = Read-Host "Paste your Tyk licence and press enter"
         wsl -d $distroName -u $distroUser -e bash -c "cd $repoPath && ./scripts/update-env.sh DASHBOARD_LICENCE $newLicence"
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done" -ForegroundColor Green
