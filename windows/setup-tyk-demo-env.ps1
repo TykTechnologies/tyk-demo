@@ -253,13 +253,27 @@ if (ValidateHost) {
 
 Write-Host "----------------------------------------"
 
-Write-Host "Validating Distro" -ForegroundColor Cyan
-if (ValidateDistro -distroName $DistroName -distroUser $DistroUser) {
+# Capture the result explicitly
+$distroValidationResult = ValidateDistro -distroName $DistroName -distroUser $DistroUser
+
+Write-Host "DEBUG: Function completed. Result type: $($distroValidationResult.GetType().Name)" -ForegroundColor Magenta
+Write-Host "DEBUG: Result value: '$distroValidationResult'" -ForegroundColor Magenta
+Write-Host "DEBUG: Result as boolean: $([bool]$distroValidationResult)" -ForegroundColor Magenta
+
+if ($distroValidationResult) {
     Write-Host "Distro validation passed" -ForegroundColor Green
 } else {
     Write-Host "Distro validation failed" -ForegroundColor Red
     return
 }
+
+# Write-Host "Validating Distro" -ForegroundColor Cyan
+# if (ValidateDistro -distroName $DistroName -distroUser $DistroUser) {
+#     Write-Host "Distro validation passed" -ForegroundColor Green
+# } else {
+#     Write-Host "Distro validation failed" -ForegroundColor Red
+#     return
+# }
 
 Write-Host "----------------------------------------"
 
