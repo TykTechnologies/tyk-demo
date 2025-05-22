@@ -59,7 +59,8 @@ function ValidateDistro {
             }
         }
         Write-Host "Creating distro '$distroName'... "
-        wsl --install ubuntu --name $distroName
+        # SUPPRESS OUTPUT - this was leaking into the return value
+        wsl --install ubuntu --name $distroName | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Distro '$distroName' created" -ForegroundColor Green
         } else {
@@ -70,7 +71,7 @@ function ValidateDistro {
 
     # Check if user is available
     Write-Host "Checking User '$distroUser' available in '$distroName' distro... " -NoNewLine
-    $userId = wsl -d $distroName -e id -u $distroUser > $null 2>&1
+    wsl -d $distroName -e id -u $distroUser 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -83,7 +84,8 @@ function ValidateDistro {
             }
         }
         Write-Host "Creating user '$distroUser' in '$distroName' distro..."
-        wsl -d $distroName -e bash -c "sudo adduser --disabled-password --gecos '' $distroUser"
+        # SUPPRESS OUTPUT - this was leaking into the return value
+        wsl -d $distroName -e bash -c "sudo adduser --disabled-password --gecos '' $distroUser" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "User '$distroUser' created" -ForegroundColor Green
         } else {
@@ -94,7 +96,7 @@ function ValidateDistro {
 
     # Check for Docker in distro
     Write-Host "Checking Docker available in '$distroName' distro... " -NoNewLine
-    wsl -d $distroName -e bash -c "docker version" > $null 2>&1
+    wsl -d $distroName -e bash -c "docker version" 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -105,7 +107,7 @@ function ValidateDistro {
 
     # Check Docker Compose in distro
     Write-Host "Checking Docker Compose available in '$distroName' distro... " -NoNewLine
-    wsl -d $distroName -e bash -c "docker compose version" > $null 2>&1
+    wsl -d $distroName -e bash -c "docker compose version" 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -116,7 +118,7 @@ function ValidateDistro {
 
     # Check for jq in distro
     Write-Host "Checking jq available in '$distroName' distro... " -NoNewLine
-    wsl -d $distroName -e jq --version > $null 2>&1
+    wsl -d $distroName -e jq --version 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -129,7 +131,8 @@ function ValidateDistro {
             }
         }
         Write-Host "Installing jq in '$distroName' distro..."
-        wsl -d $distroName -u root -e bash -c "sudo apt-get update && sudo apt-get install -y jq" > $null 2>&1
+        # SUPPRESS OUTPUT - this was leaking into the return value
+        wsl -d $distroName -u root -e bash -c "sudo apt-get update && sudo apt-get install -y jq" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "jq installed" -ForegroundColor Green
         } else {
@@ -140,7 +143,7 @@ function ValidateDistro {
 
     # Check for websocat in distro
     Write-Host "Checking websocat available in '$distroName' distro... " -NoNewLine
-    wsl -d $distroName -e websocat --version > $null 2>&1
+    wsl -d $distroName -e websocat --version 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -153,7 +156,8 @@ function ValidateDistro {
             }
         }
         Write-Host "Installing websocat in '$distroName' distro..."
-        wsl -d $distroName -u root -e bash -c "curl -LO https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl && chmod +x websocat.x86_64-unknown-linux-musl && sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat" > $null 2>&1
+        # SUPPRESS OUTPUT - this was leaking into the return value
+        wsl -d $distroName -u root -e bash -c "curl -LO https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl && chmod +x websocat.x86_64-unknown-linux-musl && sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "websocat installed" -ForegroundColor Green
         } else {
