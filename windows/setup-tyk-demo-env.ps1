@@ -27,7 +27,7 @@ function ValidateHost {
 
     # Check if the Docker daemon is available
     Write-Host "Checking Docker daemon available... " -NoNewLine
-    docker info > $null 2>&1
+    docker info 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -59,8 +59,7 @@ function ValidateDistro {
             }
         }
         Write-Host "Creating distro '$distroName'... "
-        # SUPPRESS OUTPUT - this was leaking into the return value
-        wsl --install ubuntu --name $distroName | Out-Null
+        wsl --install ubuntu --name $distroName 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Distro '$distroName' created" -ForegroundColor Green
         } else {
@@ -84,7 +83,6 @@ function ValidateDistro {
             }
         }
         Write-Host "Creating user '$distroUser' in '$distroName' distro..."
-        # SUPPRESS OUTPUT - this was leaking into the return value
         wsl -d $distroName -e bash -c "sudo adduser --disabled-password --gecos '' $distroUser" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "User '$distroUser' created" -ForegroundColor Green
@@ -131,7 +129,6 @@ function ValidateDistro {
             }
         }
         Write-Host "Installing jq in '$distroName' distro..."
-        # SUPPRESS OUTPUT - this was leaking into the return value
         wsl -d $distroName -u root -e bash -c "sudo apt-get update && sudo apt-get install -y jq" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "jq installed" -ForegroundColor Green
@@ -156,7 +153,6 @@ function ValidateDistro {
             }
         }
         Write-Host "Installing websocat in '$distroName' distro..."
-        # SUPPRESS OUTPUT - this was leaking into the return value
         wsl -d $distroName -u root -e bash -c "curl -LO https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl && chmod +x websocat.x86_64-unknown-linux-musl && sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "websocat installed" -ForegroundColor Green
@@ -178,7 +174,7 @@ function ValidateRepo() {
 
     # Check for Tyk Demo repo
     Write-Host "Checking Tyk Demo repository available at '$repoPath'... " -NoNewLine
-    wsl -d $distroName -u $distroUser -e bash -c "test -d $repoPath"
+    wsl -d $distroName -u $distroUser -e bash -c "test -d $repoPath" 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -193,8 +189,8 @@ function ValidateRepo() {
         Write-Host "Cloning Tyk Demo repository to '$repoPath' in '$distroName' distro..."
         # Create parent directory if needed
         $parentDir = Split-Path -Parent $repoPath
-        wsl -d $distroName -u $distroUser -e bash -c "mkdir -p $parentDir" > $null
-        wsl -d $distroName -u $distroUser -e bash -c "git clone https://github.com/TykTechnologies/tyk-demo $repoPath" > $null
+        wsl -d $distroName -u $distroUser -e bash -c "mkdir -p $parentDir" 2>&1 | Out-Null
+        wsl -d $distroName -u $distroUser -e bash -c "git clone https://github.com/TykTechnologies/tyk-demo $repoPath"  2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Repo cloned" -ForegroundColor Green
         } else {
@@ -206,7 +202,7 @@ function ValidateRepo() {
     # Check for Tyk licence
     Write-Host "Checking Tyk licence available... " -NoNewLine
     $envFilePath = "$repoPath/.env"
-    wsl -d $distroName -u $distroUser -e bash -c "test -f $envFilePath && grep '^DASHBOARD_LICENCE=' $envFilePath" > $null 2>&1
+    wsl -d $distroName -u $distroUser -e bash -c "test -f $envFilePath && grep '^DASHBOARD_LICENCE=' $envFilePath" 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -219,7 +215,7 @@ function ValidateRepo() {
             }
         }
         $newLicence = Read-Host "Paste your Tyk licence and press enter"
-        wsl -d $distroName --cd $repoPath -u $distroUser -e bash -c "./scripts/update-env.sh DASHBOARD_LICENCE $newLicence"
+        wsl -d $distroName --cd $repoPath -u $distroUser -e bash -c "./scripts/update-env.sh DASHBOARD_LICENCE $newLicence" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done" -ForegroundColor Green
         } else {
@@ -257,27 +253,13 @@ if (ValidateHost) {
 
 Write-Host "----------------------------------------"
 
-# Capture the result explicitly
-$distroValidationResult = ValidateDistro -distroName $DistroName -distroUser $DistroUser
-
-Write-Host "DEBUG: Function completed. Result type: $($distroValidationResult.GetType().Name)" -ForegroundColor Magenta
-Write-Host "DEBUG: Result value: '$distroValidationResult'" -ForegroundColor Magenta
-Write-Host "DEBUG: Result as boolean: $([bool]$distroValidationResult)" -ForegroundColor Magenta
-
-if ($distroValidationResult) {
+Write-Host "Validating Distro" -ForegroundColor Cyan
+if (ValidateDistro -distroName $DistroName -distroUser $DistroUser) {
     Write-Host "Distro validation passed" -ForegroundColor Green
 } else {
     Write-Host "Distro validation failed" -ForegroundColor Red
     return
 }
-
-# Write-Host "Validating Distro" -ForegroundColor Cyan
-# if (ValidateDistro -distroName $DistroName -distroUser $DistroUser) {
-#     Write-Host "Distro validation passed" -ForegroundColor Green
-# } else {
-#     Write-Host "Distro validation failed" -ForegroundColor Red
-#     return
-# }
 
 Write-Host "----------------------------------------"
 
