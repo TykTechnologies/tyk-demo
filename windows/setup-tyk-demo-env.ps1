@@ -61,7 +61,7 @@ function ValidateDistro {
         Write-Host "Creating distro '$distroName'... " -NoNewLine
         wsl --install ubuntu --name $distroName 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Distro '$distroName' created" -ForegroundColor Green
+            Write-Host "Done" -ForegroundColor Green
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
             return $false
@@ -85,12 +85,38 @@ function ValidateDistro {
         Write-Host "Creating user '$distroUser' in '$distroName' distro... " -NoNewLine
         wsl -d $distroName -e bash -c "sudo adduser --disabled-password --gecos '' $distroUser" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "User '$distroUser' created" -ForegroundColor Green
+            Write-Host "Done" -ForegroundColor Green
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
             return $false
         }
     }
+
+    # Check for Docker config
+    Write-Host "Checking Docker config available... " -NoNewLine
+    $configFilePath = "~/.docker/config.json"
+    wsl -d $distroName -u $distroUser -e bash -c "test -f $configFilePath && grep 'cliPluginsExtraDirs' $configFilePath" 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Pass" -ForegroundColor Green
+    } else {
+        Write-Host "Fail" -ForegroundColor Yellow
+        if (-not $AutoInstall) {
+            $confirmation = Read-Host "Config file? (y/n)"
+            if ($confirmation -ne "y" -and $confirmation -ne "Y") {
+                Write-Host "Please manually add a docker config file $configFilePath in '$distroName' distro"
+                return $false
+            }
+        }
+
+        wsl -d $distroName -u $distroUser -- bash -c 'mkdir -p ~/.docker && printf "{\"cliPluginsExtraDirs\":[\"/mnt/c/Program Files/Rancher Desktop/resources/resources/linux/docker-cli-plugins\"],\"credsStore\":\"wincred.exe\"}" > ~/.docker/config.json' 2>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Done" -ForegroundColor Green
+        } else {
+            Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
+            return $false
+        }
+    }
+
 
     # Check for Docker in distro
     Write-Host "Checking Docker available in '$distroName' distro... " -NoNewLine
@@ -131,7 +157,7 @@ function ValidateDistro {
         Write-Host "Installing jq in '$distroName' distro... " -NoNewLine
         wsl -d $distroName -u root -e bash -c "sudo apt-get update && sudo apt-get install -y jq" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "jq installed" -ForegroundColor Green
+            Write-Host "Done" -ForegroundColor Green
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
             return $false
@@ -155,7 +181,7 @@ function ValidateDistro {
         Write-Host "Installing websocat in '$distroName' distro... " -NoNewLine
         wsl -d $distroName -u root -e bash -c "curl -LO https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl && chmod +x websocat.x86_64-unknown-linux-musl && sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "websocat installed" -ForegroundColor Green
+            Write-Host "Done" -ForegroundColor Green
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
             return $false
@@ -192,7 +218,7 @@ function ValidateRepo() {
         wsl -d $distroName -u $distroUser -e bash -c "mkdir -p $parentDir" 2>&1 | Out-Null
         wsl -d $distroName -u $distroUser -e bash -c "git clone --branch windows --single-branch https://github.com/TykTechnologies/tyk-demo $repoPath"  2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Repository cloned" -ForegroundColor Green
+            Write-Host "Done" -ForegroundColor Green
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
             return $false
@@ -215,9 +241,10 @@ function ValidateRepo() {
             }
         }
         $newLicence = Read-Host "Paste your Tyk licence and press enter"
+        Write-Host "Adding licence... " -NoNewLine
         wsl -d $distroName --cd $repoPath -u $distroUser -e bash -c "./scripts/update-env.sh DASHBOARD_LICENCE $newLicence" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Licence added" -ForegroundColor Green
+            Write-Host "Done" -ForegroundColor Green
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
             return $false
