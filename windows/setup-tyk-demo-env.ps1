@@ -83,7 +83,7 @@ function ValidateDistro {
             }
         }
         Write-Host "Creating user '$distroUser' in '$distroName' distro... " -NoNewLine
-        wsl -d $distroName -e bash -c "sudo adduser --disabled-password --gecos '' $distroUser" 2>&1 | Out-Null
+        wsl -d $distroName -- sudo adduser --disabled-password --gecos '' $distroUser 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             # provision the user, to avoid issues related to creating files in the home directory
             Start-Process wsl.exe -ArgumentList '-d', 'tyk-demo-ubuntu' -WindowStyle Hidden
@@ -96,7 +96,7 @@ function ValidateDistro {
 
     # Check for Docker in distro
     Write-Host "Checking Docker available in '$distroName' distro... " -NoNewLine
-    wsl -d $distroName -u $distroUser -e bash -c "docker version" 2>&1 | Out-Null
+    wsl -d $distroName -u $distroUser -- docker version 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -107,7 +107,7 @@ function ValidateDistro {
 
     # Check Docker Compose in distro
     Write-Host "Checking Docker Compose available in '$distroName' distro... " -NoNewLine
-    wsl -d $distroName -u $distroUser -e bash -c "docker compose version" 2>&1 | Out-Null
+    wsl -d $distroName -u $distroUser -- docker compose version 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -131,7 +131,7 @@ function ValidateDistro {
             }
         }
         Write-Host "Installing jq in '$distroName' distro... " -NoNewLine
-        wsl -d $distroName -u root -e bash -c "sudo apt-get update && sudo apt-get install -y jq" 2>&1 | Out-Null
+        wsl -d $distroName -u root -- sudo apt-get update && sudo apt-get install -y jq 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done" -ForegroundColor Green
         } else {
@@ -155,7 +155,7 @@ function ValidateDistro {
             }
         }
         Write-Host "Installing websocat in '$distroName' distro... " -NoNewLine
-        wsl -d $distroName -u root -e bash -c "curl -LO https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl && chmod +x websocat.x86_64-unknown-linux-musl && sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat" 2>&1 | Out-Null
+        wsl -d $distroName -u root -- curl -LO https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl && chmod +x websocat.x86_64-unknown-linux-musl && sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done" -ForegroundColor Green
         } else {
@@ -176,7 +176,7 @@ function ValidateRepo() {
 
     # Check for Tyk Demo repo
     Write-Host "Checking Tyk Demo repository available at '$repoPath'... " -NoNewLine
-    wsl -d $distroName -u $distroUser -e bash -c "test -d $repoPath" 2>&1 | Out-Null
+    wsl -d $distroName -u $distroUser -- test -d $repoPath 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -191,8 +191,8 @@ function ValidateRepo() {
         Write-Host "Cloning Tyk Demo repository to '$repoPath' in '$distroName' distro... " -NoNewLine
         # Create parent directory if needed
         $parentDir = Split-Path -Parent $repoPath
-        wsl -d $distroName -u $distroUser -e bash -c "mkdir -p $parentDir" 2>&1 | Out-Null
-        wsl -d $distroName -u $distroUser -e bash -c "git clone --branch windows --single-branch https://github.com/TykTechnologies/tyk-demo $repoPath"  2>&1 | Out-Null
+        wsl -d $distroName -u $distroUser -- mkdir -p $parentDir 2>&1 | Out-Null
+        wsl -d $distroName -u $distroUser -- git clone --branch windows --single-branch https://github.com/TykTechnologies/tyk-demo $repoPath 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done" -ForegroundColor Green
         } else {
@@ -204,7 +204,7 @@ function ValidateRepo() {
     # Check for Tyk licence
     Write-Host "Checking Tyk licence available... " -NoNewLine
     $envFilePath = "$repoPath/.env"
-    wsl -d $distroName -u $distroUser -e bash -c "test -f $envFilePath && grep '^DASHBOARD_LICENCE=' $envFilePath" 2>&1 | Out-Null
+    wsl -d $distroName -u $distroUser -- test -f $envFilePath && grep '^DASHBOARD_LICENCE=' $envFilePath 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -218,7 +218,7 @@ function ValidateRepo() {
         }
         $newLicence = Read-Host "Paste your Tyk licence and press enter"
         Write-Host "Adding licence... " -NoNewLine
-        wsl -d $distroName --cd $repoPath -u $distroUser -e bash -c "./scripts/update-env.sh DASHBOARD_LICENCE $newLicence" 2>&1 | Out-Null
+        wsl -d $distroName --cd $repoPath -u $distroUser -- ./scripts/update-env.sh DASHBOARD_LICENCE $newLicence 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done" -ForegroundColor Green
         } else {
