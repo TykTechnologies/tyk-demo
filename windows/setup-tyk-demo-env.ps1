@@ -131,7 +131,7 @@ function ValidateDistro {
             }
         }
         Write-Host "Installing jq in '$distroName' distro... " -NoNewLine
-        wsl -d $distroName -u root -- sudo apt-get update && sudo apt-get install -y jq 2>&1 | Out-Null
+        wsl -d $distroName -u root -- bash -c "sudo apt-get update && sudo apt-get install -y jq" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done" -ForegroundColor Green
         } else {
@@ -155,7 +155,7 @@ function ValidateDistro {
             }
         }
         Write-Host "Installing websocat in '$distroName' distro... " -NoNewLine
-        wsl -d $distroName -u root -- curl -LO https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl && chmod +x websocat.x86_64-unknown-linux-musl && sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat 2>&1 | Out-Null
+        wsl -d $distroName -u root -- bash -c "curl -LO https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl && chmod +x websocat.x86_64-unknown-linux-musl && sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done" -ForegroundColor Green
         } else {
@@ -204,7 +204,7 @@ function ValidateRepo() {
     # Check for Tyk licence
     Write-Host "Checking Tyk licence available... " -NoNewLine
     $envFilePath = "$repoPath/.env"
-    wsl -d $distroName -u $distroUser -- test -f $envFilePath && grep '^DASHBOARD_LICENCE=' $envFilePath 2>&1 | Out-Null
+    wsl -d $distroName -u $distroUser -- bash -c "test -f $envFilePath && grep '^DASHBOARD_LICENCE=' $envFilePath" 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
