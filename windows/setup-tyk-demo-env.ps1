@@ -94,31 +94,6 @@ function ValidateDistro {
         }
     }
 
-    # Check for Docker config
-    # Write-Host "Checking Docker config available... " -NoNewLine
-    # $configFilePath = "~/.docker/config.json"
-    # wsl -d $distroName -u $distroUser -e bash -c "test -f $configFilePath && grep 'cliPluginsExtraDirs' $configFilePath" 2>&1 | Out-Null
-    # if ($LASTEXITCODE -eq 0) {
-    #     Write-Host "Pass" -ForegroundColor Green
-    # } else {
-    #     Write-Host "Fail" -ForegroundColor Yellow
-    #     if (-not $AutoInstall) {
-    #         $confirmation = Read-Host "Config file? (y/n)"
-    #         if ($confirmation -ne "y" -and $confirmation -ne "Y") {
-    #             Write-Host "Please manually add a docker config file $configFilePath in '$distroName' distro"
-    #             return $false
-    #         }
-    #     }
-
-    #     wsl -d $distroName -u $distroUser -- bash -c 'mkdir -p ~/.docker && printf "{\"cliPluginsExtraDirs\":[\"/mnt/c/Program Files/Rancher Desktop/resources/resources/linux/docker-cli-plugins\"],\"credsStore\":\"wincred.exe\"}" > ~/.docker/config.json' 2>&1 | Out-Null
-    #     if ($LASTEXITCODE -eq 0) {
-    #         Write-Host "Done" -ForegroundColor Green
-    #     } else {
-    #         Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
-    #         return $false
-    #     }
-    # }
-
     # Check for Docker in distro
     Write-Host "Checking Docker available in '$distroName' distro... " -NoNewLine
     wsl -d $distroName -u $distroUser -e bash -c "docker version" 2>&1 | Out-Null
