@@ -94,7 +94,7 @@ function ValidateDistro {
 
     # Check for Docker in distro
     Write-Host "Checking Docker available in '$distroName' distro... " -NoNewLine
-    wsl -d $distroName -e bash -c "docker version" 2>&1 | Out-Null
+    wsl -d $distroName -u $distroUser -e bash -c "docker version" 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -105,7 +105,7 @@ function ValidateDistro {
 
     # Check Docker Compose in distro
     Write-Host "Checking Docker Compose available in '$distroName' distro... " -NoNewLine
-    wsl -d $distroName -e bash -c "docker compose version" 2>&1 | Out-Null
+    wsl -d $distroName -u $distroUser -e bash -c "docker compose version" 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -116,7 +116,7 @@ function ValidateDistro {
 
     # Check for jq in distro
     Write-Host "Checking jq available in '$distroName' distro... " -NoNewLine
-    wsl -d $distroName -e jq --version 2>&1 | Out-Null
+    wsl -d $distroName -u $distroUser -e jq --version 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -140,7 +140,7 @@ function ValidateDistro {
 
     # Check for websocat in distro
     Write-Host "Checking websocat available in '$distroName' distro... " -NoNewLine
-    wsl -d $distroName -e websocat --version 2>&1 | Out-Null
+    wsl -d $distroName -u $distroUser -e websocat --version 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
