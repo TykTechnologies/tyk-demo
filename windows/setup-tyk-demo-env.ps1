@@ -70,7 +70,7 @@ function ValidateDistro {
 
     # Check if user is available
     Write-Host "Checking user '$distroUser' available in '$distroName' distro... " -NoNewLine
-    wsl -d $distroName -e id -u $distroUser 2>&1 | Out-Null
+    wsl -d $distroName -- id -u $distroUser 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
     } else {
@@ -83,7 +83,7 @@ function ValidateDistro {
             }
         }
         Write-Host "Creating user '$distroUser' in '$distroName' distro... " -NoNewLine
-        wsl -d $distroName -- sudo adduser --disabled-password --gecos '' $distroUser 2>&1 | Out-Null
+        wsl -d $distroName -e bash -c "sudo adduser --disabled-password --gecos '' $distroUser" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             # provision the user, to avoid issues related to creating files in the home directory
             Start-Process wsl.exe -ArgumentList '-d', 'tyk-demo-ubuntu' -WindowStyle Hidden
