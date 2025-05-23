@@ -192,7 +192,7 @@ function ValidateRepo() {
         wsl -d $distroName -u $distroUser -e bash -c "mkdir -p $parentDir" 2>&1 | Out-Null
         wsl -d $distroName -u $distroUser -e bash -c "git clone --branch windows --single-branch https://github.com/TykTechnologies/tyk-demo $repoPath"  2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Repo cloned" -ForegroundColor Green
+            Write-Host "Repository cloned" -ForegroundColor Green
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
             return $false
@@ -217,7 +217,7 @@ function ValidateRepo() {
         $newLicence = Read-Host "Paste your Tyk licence and press enter"
         wsl -d $distroName --cd $repoPath -u $distroUser -e bash -c "./scripts/update-env.sh DASHBOARD_LICENCE $newLicence" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Done" -ForegroundColor Green
+            Write-Host "Licence added" -ForegroundColor Green
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
             return $false
