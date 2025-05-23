@@ -85,6 +85,8 @@ function ValidateDistro {
         Write-Host "Creating user '$distroUser' in '$distroName' distro... " -NoNewLine
         wsl -d $distroName -e bash -c "sudo adduser --disabled-password --gecos '' $distroUser" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
+            # provision the user, so that the ~/.docker/config.json can be created
+            Start-Process wsl.exe -ArgumentList '-d', 'tyk-demo-ubuntu' -WindowStyle Hidden
             Write-Host "Done" -ForegroundColor Green
         } else {
             Write-Host "Error (exit code $($LASTEXITCODE))" -ForegroundColor Red
