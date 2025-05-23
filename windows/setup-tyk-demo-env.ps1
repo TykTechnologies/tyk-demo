@@ -82,7 +82,7 @@ function ValidateDistro {
                 return $false
             }
         }
-        Write-Host "Creating user '$distroUser' in '$distroName' distro..." -NoNewLine
+        Write-Host "Creating user '$distroUser' in '$distroName' distro... " -NoNewLine
         wsl -d $distroName -e bash -c "sudo adduser --disabled-password --gecos '' $distroUser" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "User '$distroUser' created" -ForegroundColor Green
@@ -128,7 +128,7 @@ function ValidateDistro {
                 return $false
             }
         }
-        Write-Host "Installing jq in '$distroName' distro..." -NoNewLine
+        Write-Host "Installing jq in '$distroName' distro... " -NoNewLine
         wsl -d $distroName -u root -e bash -c "sudo apt-get update && sudo apt-get install -y jq" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "jq installed" -ForegroundColor Green
@@ -152,7 +152,7 @@ function ValidateDistro {
                 return $false
             }
         }
-        Write-Host "Installing websocat in '$distroName' distro..." -NoNewLine
+        Write-Host "Installing websocat in '$distroName' distro... " -NoNewLine
         wsl -d $distroName -u root -e bash -c "curl -LO https://github.com/vi/websocat/releases/download/v1.14.0/websocat.x86_64-unknown-linux-musl && chmod +x websocat.x86_64-unknown-linux-musl && sudo mv websocat.x86_64-unknown-linux-musl /usr/local/bin/websocat" 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "websocat installed" -ForegroundColor Green
@@ -186,7 +186,7 @@ function ValidateRepo() {
                 return $false
             }
         }
-        Write-Host "Cloning Tyk Demo repository to '$repoPath' in '$distroName' distro..." -NoNewLine
+        Write-Host "Cloning Tyk Demo repository to '$repoPath' in '$distroName' distro... " -NoNewLine
         # Create parent directory if needed
         $parentDir = Split-Path -Parent $repoPath
         wsl -d $distroName -u $distroUser -e bash -c "mkdir -p $parentDir" 2>&1 | Out-Null
