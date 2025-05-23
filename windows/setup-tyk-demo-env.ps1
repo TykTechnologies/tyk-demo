@@ -45,7 +45,7 @@ function ValidateDistro {
     )
 
     # Check for distro
-    Write-Host "Checking Distro '$distroName' present... " -NoNewLine
+    Write-Host "Checking distro '$distroName' present... " -NoNewLine
     $wslDistros = wsl --list --quiet
     if ($wslDistros -contains $distroName) {
         Write-Host "Pass" -ForegroundColor Green
@@ -69,7 +69,7 @@ function ValidateDistro {
     }
 
     # Check if user is available
-    Write-Host "Checking User '$distroUser' available in '$distroName' distro... " -NoNewLine
+    Write-Host "Checking user '$distroUser' available in '$distroName' distro... " -NoNewLine
     wsl -d $distroName -e id -u $distroUser 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) {
         Write-Host "Pass" -ForegroundColor Green
