@@ -192,7 +192,7 @@ function ValidateRepo() {
         # Create parent directory if needed
         $parentDir = Split-Path -Parent $repoPath
         wsl -d $distroName -u $distroUser -- mkdir -p $parentDir 2>&1 | Out-Null
-        wsl -d $distroName -u $distroUser -- git clone --branch windows --single-branch https://github.com/TykTechnologies/tyk-demo $repoPath 2>&1 | Out-Null
+        wsl -d $distroName -u $distroUser -- git clone --single-branch https://github.com/TykTechnologies/tyk-demo $repoPath 2>&1 | Out-Null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Done" -ForegroundColor Green
         } else {
