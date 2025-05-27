@@ -1,0 +1,23 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install Docker CLI, Docker Compose plugin, and jq
+RUN apt-get update && \
+    apt-get install -y curl ca-certificates unzip gnupg lsb-release jq && \
+    \
+    # Install Docker CLI
+    curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-25.0.2.tgz | tar xz && \
+    mv docker/docker /usr/bin/docker && \
+    \
+    # Create the necessary directory for Docker Compose plugin
+    mkdir -p /usr/local/lib/docker/cli-plugins && \
+    \
+    # Install Docker Compose plugin (v2)
+    curl -fsSL https://github.com/docker/compose/releases/download/v2.34.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/lib/docker/cli-plugins/docker-compose && \
+    chmod +x /usr/local/lib/docker/cli-plugins/docker-compose && \
+    \
+    # Clean up
+    apt-get clean && rm -rf /var/lib/apt/lists/* docker
+
+ENTRYPOINT []
