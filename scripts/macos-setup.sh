@@ -84,4 +84,17 @@ else
   echo "Directory $DEST_DIR already exists. Skipping clone."
 fi
 
+# Check if Docker socket is available
+echo "Checking Docker availability..."
+if [ -S /var/run/docker.sock ]; then
+  echo "Docker socket is available at /var/run/docker.sock."
+elif command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+  echo "Docker is running and accessible."
+else
+  echo "⚠️  Docker is not running or not accessible."
+  echo "   Please ensure Docker (or Rancher Desktop with dockerd enabled) is running before proceeding."
+  echo "   If using Rancher Desktop, make sure 'dockerd' is selected in Preferences > Container Engine."
+  exit 1
+fi
+
 echo "✅ Setup complete. You can now begin using the Tyk demo environment."
