@@ -21,7 +21,6 @@ if ! command -v brew >/dev/null 2>&1; then
   add_brew_to_path
 else
   echo "Homebrew is already installed."
-  add_brew_to_path
 fi
 
 echo "Updating Homebrew..."
