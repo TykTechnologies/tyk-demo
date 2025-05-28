@@ -1,99 +1,163 @@
 #!/bin/bash
-set -e
-echo "Starting setup for Tyk demo environment on macOS..."
+set -euo pipefail
 
-# Add Homebrew to PATH depending on where it's installed
-add_brew_to_path() {
-  if [ -x /opt/homebrew/bin/brew ]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  elif [ -x /usr/local/bin/brew ]; then
-    eval "$(/usr/local/bin/brew shellenv)"
-  else
-    echo "Error: Homebrew binary not found after install."
-    exit 1
-  fi
+# Default values
+AUTOINSTALL=false
+CLONE_DIR="$HOME/tyk-demo"
+DASHBOARD_LICENCE=""
+
+# Print help message
+print_help() {
+    cat <<EOF
+Usage: $0 [OPTIONS]
+
+Options:
+  --autoinstall         Automatically proceed with installation without prompting
+  --clone-dir DIR       Override the git clone directory (default: \$HOME/tyk-demo)
+  --licence LICENCE     Provide the Tyk dashboard licence
+  -h, --help            Show this help message
+EOF
 }
 
-# Install Homebrew if missing
-if ! command -v brew >/dev/null 2>&1; then
-  echo "Homebrew not found. Installing Homebrew..."
-  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  add_brew_to_path
-else
-  echo "Homebrew is already installed."
+# Parse command-line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --autoinstall)
+            AUTOINSTALL=true
+            shift
+            ;;
+        --clone-dir)
+            CLONE_DIR="$2"
+            shift 2
+            ;;
+        --licence)
+            DASHBOARD_LICENCE="$2"
+            shift 2
+            ;;
+        -h|--help)
+            print_help
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
+    esac
+done
+
+echo "🔧 Starting setup for Tyk demo environment on macOS..."
+
+# Confirm continuation unless autoinstall is set
+if [ "$AUTOINSTALL" = false ]; then
+    cat <<EOF
+
+This script will:
+- Install required dependencies via Homebrew
+- Install CLI tools: jq, websocat
+- Install GUI apps: Rancher Desktop, Postman
+- Clone the Tyk demo repository to: $CLONE_DIR
+- Ensure Docker is available
+
+EOF
+    read -p "Do you want to continue? (y/N): " -n 1 -r
+    echo ""
+    [[ $REPLY =~ ^[Yy]$ ]] || { echo "Setup cancelled."; exit 0; }
 fi
 
-echo "Updating Homebrew..."
+# Add Homebrew to PATH depending on location
+add_brew_to_path() {
+    if [ -x /opt/homebrew/bin/brew ]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [ -x /usr/local/bin/brew ]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    else
+        echo "❌ Homebrew binary not found after install."
+        exit 1
+    fi
+}
+
+# Install Homebrew if needed
+if ! command -v brew >/dev/null 2>&1; then
+    echo "📦 Homebrew not found. Installing..."
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    add_brew_to_path
+else
+    echo "✅ Homebrew is already installed."
+fi
+
+echo "🔄 Updating Homebrew..."
 brew update
 
 # Install CLI tools
-echo "Checking CLI tools..."
+install_cli_tool() {
+    local tool="$1"
+    if command -v "$tool" >/dev/null 2>&1; then
+        echo "✅ $tool is already installed."
+    else
+        echo "📦 Installing $tool..."
+        brew install "$tool"
+    fi
+}
 
-# Check jq
-if command -v jq >/dev/null 2>&1; then
-  echo "jq is already installed."
-elif brew list jq >/dev/null 2>&1; then
-  echo "jq is installed via Homebrew but not in PATH."
-else
-  echo "Installing jq..."
-  brew install jq
-fi
-
-# Check websocat
-if command -v websocat >/dev/null 2>&1; then
-  echo "websocat is already installed."
-elif brew list websocat >/dev/null 2>&1; then
-  echo "websocat is installed via Homebrew but not in PATH."
-else
-  echo "Installing websocat..."
-  brew install websocat
-fi
+echo "🔍 Checking CLI tools..."
+install_cli_tool jq
+install_cli_tool websocat
 
 # Install GUI apps
-echo "Checking GUI applications..."
+install_cask_app() {
+    local app="$1"
+    local app_path="/Applications/${2:-$app}.app"
+    if [ -d "$app_path" ]; then
+        echo "✅ $app is already installed in $app_path."
+    elif brew list --cask "$app" >/dev/null 2>&1; then
+        echo "✅ $app is installed via Homebrew cask."
+    else
+        echo "📦 Installing $app..."
+        brew install --cask "$app"
+    fi
+}
 
-# Check Rancher Desktop
-if [ -d "/Applications/Rancher Desktop.app" ]; then
-  echo "Rancher Desktop is already installed in /Applications."
-elif brew list --cask rancher >/dev/null 2>&1; then
-  echo "Rancher Desktop is installed via Homebrew cask."
-else
-  echo "Installing Rancher Desktop..."
-  brew install --cask rancher
-fi
+echo "🖥️ Checking GUI applications..."
+install_cask_app rancher "Rancher Desktop"
+install_cask_app postman "Postman"
 
-# Check Postman
-if [ -d "/Applications/Postman.app" ]; then
-  echo "Postman is already installed in /Applications."
-elif brew list --cask postman >/dev/null 2>&1; then
-  echo "Postman is installed via Homebrew cask."
-else
-  echo "Installing Postman..."
-  brew install --cask postman
-fi
+# Add Rancher Docker CLI to PATH
+ensure_rancher_docker_in_path() {
+    local rancher_docker="$HOME/.rd/bin/docker"
+    if [[ ":$PATH:" != *":$HOME/.rd/bin:"* ]] && [ -x "$rancher_docker" ]; then
+        export PATH="$HOME/.rd/bin:$PATH"
+        echo "🛠️ Added ~/.rd/bin to PATH for this session."
+    fi
+}
 
 # Clone Tyk demo repository
 REPO_URL="https://github.com/TykTechnologies/tyk-demo.git"
-DEST_DIR="$HOME/tyk-demo"
-
-if [ ! -d "$DEST_DIR" ]; then
-  echo "Cloning Tyk demo repository to $DEST_DIR..."
-  git clone "$REPO_URL" "$DEST_DIR"
+if [ ! -d "$CLONE_DIR" ]; then
+    echo "📁 Cloning Tyk demo repository to $CLONE_DIR..."
+    git clone "$REPO_URL" "$CLONE_DIR"
 else
-  echo "Directory $DEST_DIR already exists. Skipping clone."
+    echo "✅ Directory $CLONE_DIR already exists. Skipping clone."
 fi
 
-# Check if Docker socket is available
-echo "Checking Docker availability..."
+# Check Docker availability
+echo "🐳 Checking Docker availability..."
 if [ -S /var/run/docker.sock ]; then
-  echo "Docker socket is available at /var/run/docker.sock."
+    echo "✅ Docker socket is available."
 elif command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
-  echo "Docker is running and accessible."
+    echo "✅ Docker is running and accessible."
 else
-  echo "⚠️  Docker is not running or not accessible."
-  echo "   Please ensure Docker (or Rancher Desktop with dockerd enabled) is running before proceeding."
-  echo "   If using Rancher Desktop, make sure 'dockerd' is selected in Preferences > Container Engine."
-  exit 1
+    echo "❌ Docker is not accessible."
+    echo "   Ensure Docker or Rancher Desktop is running with 'dockerd' enabled."
+    exit 1
+fi
+
+# Update licence if provided
+if [ -n "$DASHBOARD_LICENCE" ]; then
+    echo "🔐 Updating licence using update-env.sh..."
+    (cd "$CLONE_DIR" && ./scripts/update-env.sh DASHBOARD_LICENCE "$DASHBOARD_LICENCE")
+    echo "✅ Licence updated in .env"
 fi
 
 echo "✅ Setup complete. You can now begin using the Tyk demo environment."
+echo "📂 Repository cloned to: $CLONE_DIR"
