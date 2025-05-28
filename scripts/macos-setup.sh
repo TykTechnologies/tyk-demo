@@ -4,6 +4,7 @@ set -euo pipefail
 # Default values
 AUTOINSTALL=false
 CLONE_DIR="$HOME/tyk-demo"
+DASHBOARD_LICENCE=""
 
 # ANSI colours
 GREEN='\033[0;32m'
@@ -20,6 +21,7 @@ Usage: $0 [OPTIONS]
 Options:
   --autoinstall         Automatically proceed with installation without prompting
   --clone-dir DIR       Override the git clone directory (default: \$HOME/tyk-demo)
+  --licence LICENCE     Provide the Tyk dashboard licence
   -h, --help            Show this help message
 EOF
 }
@@ -33,6 +35,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --clone-dir)
             CLONE_DIR="$2"
+            shift 2
+            ;;
+        --licence)
+            DASHBOARD_LICENCE="$2"
             shift 2
             ;;
         -h|--help)
@@ -89,7 +95,7 @@ else
     echo -e "Homebrew: ${GREEN}ok${NC}"
 fi
 
-# Ensure Homebrew is up-to-date
+# Ensure Homebrew is up to date
 brew update
 
 # Install CLI tools
@@ -125,6 +131,7 @@ echo -e "${BLUE}==> Checking GUI applications...${NC}"
 install_cask_app rancher "Rancher Desktop"
 install_cask_app postman "Postman"
 
+echo -e "${BLUE}==> Checking Repository...${NC}"
 # Clone Tyk demo repository
 REPO_URL="https://github.com/TykTechnologies/tyk-demo.git"
 if [ ! -d "$CLONE_DIR" ]; then
@@ -134,8 +141,15 @@ else
     echo -e "Repo clone: ${GREEN}ok${NC}"
 fi
 
+# Update licence if provided
+if [ -n "$DASHBOARD_LICENCE" ]; then
+    echo -e "${BLUE}==> Updating licence...${NC}"
+    (cd "$CLONE_DIR" && ./scripts/update-env.sh DASHBOARD_LICENCE "$DASHBOARD_LICENCE")
+    echo -e "Licence update: ${GREEN}ok${NC}"
+fi
+
 # Check Docker availability
-echo -e "${BLUE}==> Checking Docker availability...${NC}"
+echo -e "${BLUE}==> Checking Docker...${NC}"
 if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
     echo -e "Docker: ${GREEN}ok${NC}"
 else
