@@ -156,14 +156,21 @@ Example:
 ./scripts/update-env.sh DASHBOARD_LICENCE my-new-licence-key
 ```
 
-### Commonly Used Environment Variables
+### Environment Variables
 
 | Variable | Description | Required |
 |----------|-------------|---------|
 | DASHBOARD_LICENCE | Tyk licence key | Required for all deployments |
 | MDCB_LICENCE | MDCB licence key | Required only for the MDCB deployment |
+| DASHBOARD_VERSION | Dashboard image version override | No, defaults to current release |
+| GATEWAY_VERSION | Gateway image version override | No, defaults to current release |
+| GATEWAY2_VERSION | Gateway 2 image version override | No, defaults to current release |
+| PUMP_VERSION | Pump image version override | No, defaults to current release  |
+| TYK_LOGLEVEL | Tyk component log level | No, defaults to `info` |
 
 If a feature deployment requires an environment variable to be manually set, it will be stated in the deployment `README.md`.
+
+**Note:** Overriding image versions can have negative consequences, as there are compatible ranges between Tyk component versions.
 
 ## Data Management
 
