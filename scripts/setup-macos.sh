@@ -84,6 +84,17 @@ add_brew_to_path() {
     fi
 }
 
+# Validate if a string is a base64url-encoded JWT
+is_valid_jwt() {
+    local jwt="$1"
+    # A JWT has three parts separated by dots
+    if [[ "$jwt" =~ ^[A-Za-z0-9_-]+\.([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)$ ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 echo -e "${BLUE}==> Checking Homebrew...${NC}"
 
 # Install Homebrew if needed
@@ -141,12 +152,56 @@ else
     echo -e "Repo clone: ${GREEN}ok${NC}"
 fi
 
-# Update licence if provided
-if [ -n "$DASHBOARD_LICENCE" ]; then
-    echo -e "${BLUE}==> Updating licence...${NC}"
-    (cd "$CLONE_DIR" && ./scripts/update-env.sh DASHBOARD_LICENCE "$DASHBOARD_LICENCE")
-    echo -e "Licence update: ${GREEN}ok${NC}"
+# Change to the cloned directory
+cd "$CLONE_DIR"
+
+# Check licence
+echo -e "${BLUE}==> Checking Tyk Licence...${NC}"
+if ! grep -q '^DASHBOARD_LICENCE=[^[:space:]]' $CLONE_DIR/.env; then
+    echo -e "${YELLOW}Licence missing${NC}"
+
+    if [ -n "$DASHBOARD_LICENCE" ]; then
+        echo -e "${YELLOW}Found 'licence' argument...${NC}"
+
+        if ! is_valid_jwt "$DASHBOARD_LICENCE"; then
+            echo "${RED}Error:${NC} Licence argument does not appear to be a valid JWT."
+            echo "Licence provided (first 10 characters): ${licence:0:10}"
+        fi
+    else
+        while true; do
+            echo "Please copy your Tyk Licence to the clipboard, then press Enter:"
+            read -r
+
+            # Check if pbpaste is available
+            if ! command -v pbpaste >/dev/null 2>&1; then
+                echo "${RED}Error:${NC} pbpaste command is not available."
+                exit 1
+            fi
+
+            # Get JWT from macOS clipboard - cannot capture directly from read due to input length limits
+            DASHBOARD_LICENCE=$(pbpaste 2>/dev/null | tr -d '[:space:]')
+
+            if [[ -z "$DASHBOARD_LICENCE" ]]; then
+                echo "${YELLOW}Error:${NC} Licence is empty. Try again."
+                continue
+            fi
+
+            if is_valid_jwt "$DASHBOARD_LICENCE"; then
+                break
+            else
+                echo "${YELLOW}Error:${NC} Input does not appear to be a valid JWT. Try again."
+                echo "Your input (first 10 characters): ${DASHBOARD_LICENCE:0:10}"
+            fi
+        done
+    fi
+
+    ./scripts/update-env.sh DASHBOARD_LICENCE "$DASHBOARD_LICENCE"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error:${NC} Failed to update the licence in .env file."
+        exit 1
+    fi
 fi
+echo -e "Licence: ${GREEN}ok${NC}"
 
 # Check Docker availability
 echo -e "${BLUE}==> Checking Docker...${NC}"
