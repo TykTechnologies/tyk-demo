@@ -101,7 +101,7 @@ echo -e "${BLUE}==> Checking Homebrew...${NC}"
 # Install Homebrew if needed
 if ! command -v brew >/dev/null 2>&1; then
     echo -e "${YELLOW}Installing Homebrew...${NC}"
-    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     add_brew_to_path
 else
     echo -e "Homebrew: ${GREEN}ok${NC}"
@@ -218,5 +218,5 @@ else
 fi
 
 echo "---------------------------------------------------"
-echo -e "${GREEN}Setup complete. You can now begin using the Tyk demo environment.${NC}"
+echo -e "${GREEN}Success. Your environment is ready for Tyk Demo.${NC}"
 echo "Repository cloned to: $CLONE_DIR"
