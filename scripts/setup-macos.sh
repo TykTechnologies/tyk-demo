@@ -85,6 +85,19 @@ add_brew_to_path() {
     fi
 }
 
+# Check if brew command is missing but binary exists, then fix PATH using add_brew_to_path
+check_brew_and_fix_path() {
+    if ! command -v brew >/dev/null 2>&1; then
+        if [ -x /opt/homebrew/bin/brew ] || [ -x /usr/local/bin/brew ]; then
+            echo "brew not found in PATH but binary exists — fixing PATH..."
+            add_brew_to_path
+        else
+            echo -e "${RED}Error:${NC} brew not found and binary does not exist in standard locations."
+            return 1
+        fi
+    fi
+}
+
 # Validate if a string is a base64url-encoded JWT
 is_valid_jwt() {
     local jwt="$1"
@@ -98,11 +111,18 @@ is_valid_jwt() {
 
 echo -e "${BLUE}==> Checking Homebrew...${NC}"
 
-# Install Homebrew if needed
+# Check if brew command is available
 if ! command -v brew >/dev/null 2>&1; then
-    echo -e "${YELLOW}Installing Homebrew...${NC}"
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    add_brew_to_path
+    # If brew binary exists but PATH is missing it, fix the environment
+    if [ -x /opt/homebrew/bin/brew ] || [ -x /usr/local/bin/brew ]; then
+        echo -e "${YELLOW}brew binary found, but not in PATH. Fixing...${NC}"
+        add_brew_to_path
+    else
+        # Install Homebrew if no binary is found
+        echo -e "${YELLOW}Installing Homebrew...${NC}"
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        add_brew_to_path
+    fi
 else
     echo -e "Homebrew: ${GREEN}ok${NC}"
 fi
