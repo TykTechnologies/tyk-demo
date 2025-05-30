@@ -61,7 +61,7 @@ if [ "$AUTOINSTALL" = false ]; then
 
 This script will:
 - Install required dependencies via Homebrew
-- Install CLI tools: jq, websocat
+- Install CLI tools: jq, websocat, git, curl
 - Install GUI apps: Rancher Desktop, Postman
 - Clone the Tyk demo repository to: $CLONE_DIR
 - Ensure the Tyk licence is available
@@ -144,6 +144,8 @@ install_cli_tool() {
 echo -e "${BLUE}==> Checking CLI tools...${NC}"
 install_cli_tool jq
 install_cli_tool websocat
+install_cli_tool git
+install_cli_tool curl
 
 # Install GUI apps
 install_cask_app() {
