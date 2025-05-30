@@ -238,5 +238,5 @@ else
 fi
 
 echo "---------------------------------------------------"
-echo -e "${GREEN}Success. Your environment is ready for Tyk Demo.${NC}"
+echo -e "${GREEN}Success. Your Tyk Demo environment is prepared.${NC}"
 echo "Repository cloned to: $CLONE_DIR"
