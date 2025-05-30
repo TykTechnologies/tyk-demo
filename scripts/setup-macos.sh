@@ -64,6 +64,7 @@ This script will:
 - Install CLI tools: jq, websocat
 - Install GUI apps: Rancher Desktop, Postman
 - Clone the Tyk demo repository to: $CLONE_DIR
+- Ensure the Tyk licence is available
 - Ensure Docker is available
 
 EOF
@@ -164,7 +165,7 @@ if ! grep -q '^DASHBOARD_LICENCE=[^[:space:]]' $CLONE_DIR/.env; then
         echo -e "${YELLOW}Found 'licence' argument...${NC}"
 
         if ! is_valid_jwt "$DASHBOARD_LICENCE"; then
-            echo "${RED}Error:${NC} Licence argument does not appear to be a valid JWT."
+            echo -e "${RED}Error:${NC} Licence argument does not appear to be a valid JWT."
             echo "Licence provided (first 10 characters): ${licence:0:10}"
             exit 1
         fi
@@ -175,7 +176,7 @@ if ! grep -q '^DASHBOARD_LICENCE=[^[:space:]]' $CLONE_DIR/.env; then
 
             # Check if pbpaste is available
             if ! command -v pbpaste >/dev/null 2>&1; then
-                echo "${RED}Error:${NC} pbpaste command is not available."
+                echo -e "${RED}Error:${NC} pbpaste command is not available."
                 exit 1
             fi
 
@@ -183,14 +184,14 @@ if ! grep -q '^DASHBOARD_LICENCE=[^[:space:]]' $CLONE_DIR/.env; then
             DASHBOARD_LICENCE=$(pbpaste 2>/dev/null | tr -d '[:space:]')
 
             if [[ -z "$DASHBOARD_LICENCE" ]]; then
-                echo "${YELLOW}Warning:${NC} Licence is empty. Try again."
+                echo -e "${YELLOW}Warning:${NC} Licence is empty. Try again."
                 continue
             fi
 
             if is_valid_jwt "$DASHBOARD_LICENCE"; then
                 break
             else
-                echo "${YELLOW}Warning:${NC} Input does not appear to be a valid JWT. Try again."
+                echo -e "${YELLOW}Warning:${NC} Input does not appear to be a valid JWT. Try again."
                 echo "Your input (first 10 characters): ${DASHBOARD_LICENCE:0:10}"
             fi
         done
