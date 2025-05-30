@@ -166,6 +166,7 @@ if ! grep -q '^DASHBOARD_LICENCE=[^[:space:]]' $CLONE_DIR/.env; then
         if ! is_valid_jwt "$DASHBOARD_LICENCE"; then
             echo "${RED}Error:${NC} Licence argument does not appear to be a valid JWT."
             echo "Licence provided (first 10 characters): ${licence:0:10}"
+            exit 1
         fi
     else
         while true; do
@@ -182,21 +183,20 @@ if ! grep -q '^DASHBOARD_LICENCE=[^[:space:]]' $CLONE_DIR/.env; then
             DASHBOARD_LICENCE=$(pbpaste 2>/dev/null | tr -d '[:space:]')
 
             if [[ -z "$DASHBOARD_LICENCE" ]]; then
-                echo "${YELLOW}Error:${NC} Licence is empty. Try again."
+                echo "${YELLOW}Warning:${NC} Licence is empty. Try again."
                 continue
             fi
 
             if is_valid_jwt "$DASHBOARD_LICENCE"; then
                 break
             else
-                echo "${YELLOW}Error:${NC} Input does not appear to be a valid JWT. Try again."
+                echo "${YELLOW}Warning:${NC} Input does not appear to be a valid JWT. Try again."
                 echo "Your input (first 10 characters): ${DASHBOARD_LICENCE:0:10}"
             fi
         done
     fi
 
-    ./scripts/update-env.sh DASHBOARD_LICENCE "$DASHBOARD_LICENCE"
-    if [ $? -ne 0 ]; then
+    if ! ./scripts/update-env.sh DASHBOARD_LICENCE "$DASHBOARD_LICENCE"; then
         echo -e "${RED}Error:${NC} Failed to update the licence in .env file."
         exit 1
     fi
