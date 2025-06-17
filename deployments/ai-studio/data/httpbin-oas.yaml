@@ -1,0 +1,175 @@
+openapi: 3.1.0
+info:
+  description: 'A simple HTTP Request & Response Service. The httpbin service is useful for testing HTTP libraries, debugging proxies, exploring API features, and learning web protocols.'
+  version: 1.0.0
+  title: httpbin API
+  contact:
+    email: support@httpbin.org
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: https://httpbingo.org
+tags:
+  - name: http
+    description: HTTP request/response endpoints
+  - name: auth
+    description: Authentication endpoints
+  - name: status
+    description: HTTP status code endpoints
+paths:
+  '/get':
+    get:
+      tags:
+        - http
+      summary: Returns GET data
+      description: 'Returns the GET request data, including URL parameters, headers, etc.'
+      operationId: getRequest
+      parameters: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpResponse'
+  '/post':
+    post:
+      tags:
+        - http
+      summary: Returns POST data
+      description: 'Returns the POST request data, including form data, JSON, headers, etc.'
+      operationId: postRequest
+      parameters: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+          multipart/form-data:
+            schema:
+              type: object
+        description: Data to be sent in the POST request
+  '/status/{statusCode}':
+    get:
+      tags:
+        - status
+      summary: Returns specified HTTP status code
+      description: 'Returns a response with the specified HTTP status code'
+      operationId: getStatus
+      parameters:
+        - name: statusCode
+          in: path
+          description: HTTP status code to return
+          required: true
+          schema:
+            type: integer
+            format: int32
+            minimum: 100
+            maximum: 599
+      responses:
+        '200':
+          description: OK response
+        '4XX':
+          description: Client error response
+        '5XX':
+          description: Server error response
+        default:
+          description: Status code returned matches the requested code
+  '/headers':
+    get:
+      tags:
+        - http
+      summary: Returns headers
+      description: 'Returns the request headers as the response body'
+      operationId: getHeaders
+      parameters: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeadersResponse'
+  '/basic-auth/{user}/{passwd}':
+    get:
+      tags:
+        - auth
+      summary: Basic auth protected endpoint
+      description: 'Challenges HTTP Basic Auth and returns authentication status'
+      operationId: getBasicAuth
+      parameters:
+        - name: user
+          in: path
+          description: Username for basic auth
+          required: true
+          schema:
+            type: string
+        - name: passwd
+          in: path
+          description: Password for basic auth
+          required: true
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          description: Basic auth credentials
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccess'
+        '401':
+          description: Unauthorized
+components:
+  schemas:
+    HttpResponse:
+      type: object
+      properties:
+        args:
+          type: object
+          description: URL arguments
+        headers:
+          type: object
+          description: Request headers
+        origin:
+          type: string
+          description: Origin IP address
+        url:
+          type: string
+          description: Request URL
+    HeadersResponse:
+      type: object
+      properties:
+        headers:
+          type: object
+          description: Request headers
+    AuthSuccess:
+      type: object
+      properties:
+        authenticated:
+          type: boolean
+          example: true
+        user:
+          type: string
+    TimestampResponse:
+      type: object
+      properties:
+        time:
+          type: string
+          format: date-time
