@@ -11,7 +11,7 @@ authors = [
 python = "^3.12"
 grpcio = "^1.60.1"
 grpcio-reflection = "^1.60.1"
-protobuf = "^4.25.3"
+protobuf = "^4.25.8"
 
 [tool.poetry.group.dev.dependencies]
 grpcio-tools = "^1.60.1"
