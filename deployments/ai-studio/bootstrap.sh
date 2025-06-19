@@ -12,4 +12,12 @@ $(generate_docker_compose_command) up -d --no-deps --force-recreate 1>/dev/null 
 log_message "Done."
 log_end_deployment
 
-echo -e "\nLog in to Tyk AI Studio with:\n  Username: dev@tyk.io\n  Password: T0pSecR3t!\n"
+
+echo -e "\033[2K 
+▼ Tyk AI Studio
+  ▽ AI Gateway
+                    URL : http://localhost:9090
+  ▽ UI
+                    URL : http://localhost:3010
+               Username : dev@tyk.io
+               Password : T0pSecR3t!"
