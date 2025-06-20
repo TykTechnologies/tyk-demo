@@ -21,3 +21,6 @@ deployments/portal/volumes/logs
 
 # Unikraft
 .unikraft
+
+# AI Studio
+deployments/ai-studio/volumes/tyk-ai-studio/db/ai-studio.db
