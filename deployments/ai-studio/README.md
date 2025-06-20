@@ -1,4 +1,4 @@
-# midsommar-quickstart
+# Tyk AI Studio
 
 To run Tyk AI Studio:
 
@@ -6,9 +6,13 @@ To run Tyk AI Studio:
 
 `TYK_AI_STUDIO_LICENSE=<YOUR_AI_STUDIO_LICENSE>`
 
-2. `docker compose up` 
+2. Run the Tyk Demo `up.sh` script with the `ai-studio` argument:
 
-3. Visit app on your browser at `localhost:8080`
+```shell
+./up.sh ai-studio
+```
+
+3. Visit AI Studio in your browser at http://localhost:3011
 
 4. Log on using:
 
