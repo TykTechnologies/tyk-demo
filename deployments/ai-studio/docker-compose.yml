@@ -4,7 +4,7 @@ services:
     platform: linux/${TARGETARCH:-arm64}
     image: tykio/tyk-ai-studio:latest
     volumes:
-      - ./deployments/ai-studio/volumes/ai-studio.db:/app/ai-studio.db # Use bind mount for the repo file
+      - ./deployments/ai-studio/volumes/tyk-ai-studio/db:/app/db # Map the database directory
     ports:
       - "3011:8080" # Frontend
       - "9090:9090" # Proxy
@@ -17,7 +17,7 @@ services:
       - DEVMODE=true
       - DEBUG_HTTP=false
       - DEBUG_HTTP_PROXY=false
-      - DATABASE_URL=ai-studio.db # Ensure this matches the filename
+      - DATABASE_URL=db/ai-studio.db # Ensure this matches the filename
       - DATABASE_TYPE=sqlite
       - ECHO_CONVERSATION=true
       - TYK_AI_SECRET_KEY=top-secret
