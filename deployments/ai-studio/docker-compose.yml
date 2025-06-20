@@ -9,7 +9,7 @@ services:
       - "3011:8080" # Frontend
       - "9090:9090" # Proxy
     environment:
-      - TYK_AI_LICENSE=${TYK_AI_STUDIO_LICENSE:?Licence missing from Docker environment file .env.}
+      - TYK_AI_LICENSE=${DASHBOARD_LICENCE:?Licence missing from Docker environment file .env.}
       - CHOKIDAR_USEPOLLING=true
       - ALLOW_REGISTRATIONS=true
       - SITE_URL=http://localhost:8080
