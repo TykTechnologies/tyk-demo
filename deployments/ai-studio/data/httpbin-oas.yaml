@@ -1,3 +1,4 @@
+---
 openapi: 3.1.0
 info:
   description: 'A simple HTTP Request & Response Service. The httpbin service is useful for testing HTTP libraries, debugging proxies, exploring API features, and learning web protocols.'
