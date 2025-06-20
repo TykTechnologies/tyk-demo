@@ -17,7 +17,7 @@ echo -e "\033[2K
 ▼ Tyk AI Studio
   ▽ AI Gateway
                     URL : http://localhost:9090
-  ▽ UI
-                    URL : http://localhost:3010
+  ▽ AI Portal
+                    URL : http://localhost:3011
                Username : dev@tyk.io
                Password : T0pSecR3t!"
