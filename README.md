@@ -14,7 +14,7 @@ Tyk Demo provides:
 
 While created primarily for Tyk's technical staff, anyone interested in exploring Tyk functionality can benefit from this sandbox environment.
 
-> **Note:** This repository was developed and tested on macOS using Docker. The instructions provided are tailored for this setup. Users on other operating systems may encounter differences and should adapt accordingly. There is a separate [Windows readme](windows/README.md) that provides guidance on preparing Tyk Demo to run on that platform.
+> **Note:** This repository was developed and tested on macOS using Docker/Rancher. The instructions provided are tailored for this setup. Users on other operating systems may encounter differences and should adapt accordingly. There is a separate [Windows readme](windows/README.md) that provides guidance on preparing Tyk Demo to run on that platform.
 
 ## Getting Started
 
