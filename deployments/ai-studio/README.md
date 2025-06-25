@@ -4,9 +4,7 @@ To run Tyk AI Studio:
 
 1. Add your license to `.env`:
 
-`DASHBOARD_LICENCE=<YOUR_AI_STUDIO_LICENSE>`
-
-**Note:** This uses the same licence as the Dashboard, so if you have already added your Dashboard licence you can skip this step.
+`TYK_AI_STUDIO_LICENSE=<YOUR_AI_STUDIO_LICENSE>`
 
 2. Run the Tyk Demo `up.sh` script with the `ai-studio` argument:
 

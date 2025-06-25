@@ -128,10 +128,12 @@ jobs:
             echo "::error::MDCB_LICENSE secret is not set or is empty." >&2
             exit 1
           fi
-          echo "✅ DASHBOARD_LICENCE added to .env"
           echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
-          echo "✅ MDCB_LICENCE added to .env"
+          echo "✅ DASHBOARD_LICENCE added to .env"
           echo "MDCB_LICENCE=${{ secrets.MDCB_LICENSE }}" >> .env
+          echo "✅ MDCB_LICENCE added to .env"
+          echo "AI_STUDIO_LICENSE=${{ secrets.DASH_LICENSE }}" >> .env
+          echo "✅ AI_STUDIO_LICENSE added to .env"
           echo "::endgroup::"
 
       - name: Cache Go Plugins
