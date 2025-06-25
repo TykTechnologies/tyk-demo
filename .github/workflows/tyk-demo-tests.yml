@@ -132,7 +132,7 @@ jobs:
           echo "✅ DASHBOARD_LICENCE added to .env"
           echo "MDCB_LICENCE=${{ secrets.MDCB_LICENSE }}" >> .env
           echo "✅ MDCB_LICENCE added to .env"
-          echo "AI_STUDIO_LICENSE=${{ secrets.AI_STUDIO_LICENSE }}" >> .env
+          echo "AI_STUDIO_LICENSE=${{ secrets.DASH_LICENSE }}" >> .env
           echo "✅ AI_STUDIO_LICENSE added to .env"
           echo "::endgroup::"
 
