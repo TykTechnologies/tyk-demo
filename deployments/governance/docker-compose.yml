@@ -2,12 +2,6 @@
 services:        
    tyk-governance-dashboard:
        image: tykio/governance-api:v0.2.0-rc2
-       command: [
-           "--bootstrap",
-           "--email=admin@example.com",
-           "--name=Admin User",
-           "--password=admin123"
-       ]
        environment:
            # Database connection -  MongoDB instance
            TYK_GOV_STORAGE_DATABASEDSN: "mongodb://tyk-mongo:27017/gov"
@@ -43,6 +37,9 @@ services:
      image: tykio/governance-agent:v0.2.0-rc2
      volumes:
          - ./deployments/governance/volumes/governance-agent/config.yaml:/app/config.yaml
+     environment:
+        TYK_AGENT_LICENSEKEY: "${GOVERNANCE_LICENSE:?Governance license missing from Docker environment file .env}"
+        TYK_AGENT_GOVERNANCEDASHBOARD_AUTH_TOKEN: "${AGENT_API_CREDENTIALS:-placeholder}"
      ports:
          - "5959:5959" 
      depends_on:
