@@ -46,7 +46,7 @@ response=$(curl $GOVN_DASHBOARD_BASE_URL/api/agents/ -s \
 agent_id=$(echo "$response" | jq -r '.id')
 if [[ $agent_id == "" ]]; then
     log_message "  Failed"
-    echo "ERROR: Failed to bootstrap create agent. Response: $response"
+    echo "ERROR: Failed to create agent. Response: $response"
     exit 1
 else 
     log_message "  Agent id: $agent_id"
@@ -55,7 +55,22 @@ fi
 bootstrap_progress
 
 
-agent_governance_credentials=""
+log_message "Creating Agent Token"
+response=$(curl $GOVN_DASHBOARD_BASE_URL/api/auth/token/ -s \
+    -H "X-API-Key: $govn_user_api_token" \
+    -H "Content-Type: application/json" \
+    --data-raw "{ \"agent_id\": \"$agent_id\" }" 2>> logs/bootstrap.log)
+
+agent_token=$(echo "$response" | jq -r '.token')
+if [[ $agent_token == "" ]]; then
+    log_message "  Failed"
+    echo "ERROR: Failed to create agent token. Response: $response"
+    exit 1
+else 
+    log_message "  Agent token: $agent_token"
+    log_ok
+fi
+bootstrap_progress
 
 # set agent credentials and recreate the agent container
 log_message "Setting Docker environment variable for agent API credentials"
@@ -74,5 +89,6 @@ echo -e "\033[2K
                     URL : $GOVN_DASHBOARD_BASE_URL
                Username : $GOVN_USER_EMAIL
                Password : $GOVN_USER_PASSWORD
+              API Token : $govn_user_api_token
   ▽ Governance Agent ($(get_service_image_tag "tyk-governance-agent"))
              TBC       URL : http://tyk-governance-agent.localhost:5959"

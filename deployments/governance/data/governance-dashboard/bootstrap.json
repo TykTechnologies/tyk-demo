@@ -1,6 +1,6 @@
 {
-    "email": "admin@example.com",
-    "name": "System Administrator",
-    "password": "securePassword123",
+    "email": "govn.user@example.com",
+    "name": "Governance User",
+    "password": "m8YEVG4L",
     "organization": "My Organization"
 }
