@@ -39,17 +39,17 @@ services:
          - ./deployments/governance/volumes/governance-agent/config.yaml:/app/config.yaml
      environment:
         TYK_AGENT_LICENSEKEY: "${GOVERNANCE_LICENSE:?Governance license missing from Docker environment file .env}"
-        TYK_AGENT_GOVERNANCEDASHBOARD_AUTH_TOKEN: "${AGENT_API_CREDENTIALS:-placeholder}"
+        TYK_AGENT_GOVERNANCEDASHBOARD_AUTH_TOKEN: "${GOVN_AGENT_TOKEN:-placeholder}"
      ports:
          - "5959:5959" 
      depends_on:
          - tyk-governance-dashboard
      networks:
          - tyk
-     healthcheck:
-         test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5959/health || exit 1"]
-         interval: 30s
-         timeout: 10s
-         retries: 5
-         start_period: 40s
-     restart: unless-stopped
+    #  healthcheck:
+    #      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5959/health || exit 1"]
+    #      interval: 30s
+    #      timeout: 10s
+    #      retries: 5
+    #      start_period: 40s
+    #  restart: unless-stopped
