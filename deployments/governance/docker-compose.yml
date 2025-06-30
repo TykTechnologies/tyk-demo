@@ -35,5 +35,6 @@ services:
          - "5959:5959" 
      depends_on:
          - tyk-governance-dashboard
+         - tyk-dashboard
      networks:
          - tyk
