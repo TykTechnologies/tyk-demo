@@ -27,7 +27,7 @@ services:
            - tyk
        # Health check
        healthcheck:
-           test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8082/api/health || exit 1"]
+           test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1"]
            interval: 30s
            timeout: 10s
            retries: 5
@@ -39,7 +39,6 @@ services:
          - ./deployments/governance/volumes/governance-agent/config.yaml:/app/config.yaml
      environment:
         TYK_AGENT_LICENSEKEY: "${GOVERNANCE_LICENSE:?Governance license missing from Docker environment file .env}"
-        TYK_AGENT_GOVERNANCEDASHBOARD_AUTH_TOKEN: "${GOVN_AGENT_TOKEN:-placeholder}"
      ports:
          - "5959:5959" 
      depends_on:

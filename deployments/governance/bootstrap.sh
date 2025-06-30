@@ -31,10 +31,11 @@ response=$(curl $GOVN_DASHBOARD_BASE_URL/api/bootstrap/ -s \
     -H "Content-Type: application/json" \
     -d @deployments/governance/data/governance-dashboard/bootstrap.json 2>> logs/bootstrap.log)
 # validate success
+GOVN_BOOTSTRAP_SUCCESS_MESSAGE="bootstrap successful"
 bootstrap_message=$(echo "$response" | jq -r '.Message')
-if [[ $bootstrap_message != "bootstrap successful" ]]; then
+if [[ $bootstrap_message != $GOVN_BOOTSTRAP_SUCCESS_MESSAGE ]]; then
     log_message "  Failed"
-    echo "ERROR: Failed to bootstrap Governance Dashboard. Response: $response"
+    echo "ERROR: Failed to bootstrap Governance Dashboard. Expected "$GOVN_BOOTSTRAP_SUCCESS_MESSAGE" message. Response: $response"
     exit 1
 else 
     govn_user_api_token=$(echo "$response" | jq -r '.api_token')
@@ -51,7 +52,7 @@ response=$(curl $GOVN_DASHBOARD_BASE_URL/api/agents/ -s \
 agent_id=$(echo "$response" | jq -r '.id')
 if [[ $agent_id == "" ]]; then
     log_message "  Failed"
-    echo "ERROR: Failed to create agent. Response: $response"
+    echo "ERROR: Failed to create agent. Expected agent id. Response: $response"
     exit 1
 else 
     log_message "  Agent id: $agent_id"
@@ -89,20 +90,14 @@ else
     log_ok
 fi
 
-# # set agent credentials
-# log_message "Setting Docker environment variable for agent token"
-# set_docker_environment_value "GOVN_AGENT_TOKEN" "$agent_token"
-# # set_context_data "1" "governance" "agent" "token" "$agent_governance_credentials"
-# log_ok
-# bootstrap_progress
-
 log_message "Updating agent configuration file"
-rm -rf deployments/governance/volumes/governance-agent/config.yaml
-yq eval ".instances[0].config.auth = \"$dashboard_agent_token\"| .governanceDashboard.auth.token = \"$govn_agent_token\"" deployments/governance/data/governance-agent/config.yaml > deployments/governance/volumes/governance-agent/config.yaml
+yq -i ".instances[0].config.auth = \"$dashboard_agent_token\"" deployments/governance/volumes/governance-agent/config.yaml
+yq -i ".governanceDashboard.auth.token = \"$govn_agent_token\"" deployments/governance/volumes/governance-agent/config.yaml
+yq -i ".licenseKey = \"$govn_agent_token\"" deployments/governance/volumes/governance-agent/config.yaml
 log_ok
 bootstrap_progress
 
-log_message "Recreating governance agent Service"
+log_message "Recreating governance agent Service (to use updated config file)"
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-governance-agent 2> /dev/null
 log_ok
 bootstrap_progress
@@ -116,7 +111,7 @@ echo -e "\033[2K
                     URL : $GOVN_DASHBOARD_BASE_URL
                Username : $GOVN_USER_EMAIL
                Password : $GOVN_USER_PASSWORD
-              API Token : $govn_user_api_token
+        Agent API Token : $govn_user_api_token
   ▽ Governance Agent ($(get_service_image_tag "tyk-governance-agent"))
              TBC       URL : http://tyk-governance-agent.localhost:5959
    Tyk Dash Agent Token : $dashboard_agent_token"
