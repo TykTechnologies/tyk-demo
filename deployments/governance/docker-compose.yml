@@ -25,14 +25,6 @@ services:
            - tyk-mongo
        networks:
            - tyk
-       # Health check
-       healthcheck:
-           test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1"]
-           interval: 30s
-           timeout: 10s
-           retries: 5
-           start_period: 40s
-       restart: unless-stopped
    tyk-governance-agent:
      image: tykio/governance-agent:v0.2.0-rc2
      volumes:
@@ -45,10 +37,3 @@ services:
          - tyk-governance-dashboard
      networks:
          - tyk
-    #  healthcheck:
-    #      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5959/health || exit 1"]
-    #      interval: 30s
-    #      timeout: 10s
-    #      retries: 5
-    #      start_period: 40s
-    #  restart: unless-stopped
