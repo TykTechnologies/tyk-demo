@@ -91,14 +91,33 @@ else
 fi
 
 log_message "Updating agent configuration file"
-yq -i ".instances[0].config.auth = \"$dashboard_agent_token\"" deployments/governance/volumes/governance-agent/config.yaml
-yq -i ".governanceDashboard.auth.token = \"$govn_agent_token\"" deployments/governance/volumes/governance-agent/config.yaml
-log_ok
+yq -i ".instances[0].config.auth = \"$dashboard_agent_token\"|.governanceDashboard.auth.token = \"$govn_agent_token\"" deployments/governance/volumes/governance-agent/config.yaml
+if [[ $? -ne 0 ]]; then
+    log_message "  Failed"
+    echo "ERROR: Failed to update governance agent configuration file."
+    exit 1
+else 
+    log_ok
+fi 
 bootstrap_progress
 
 log_message "Recreating governance agent Service (to use updated config file)"
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-governance-agent 2> /dev/null
 log_ok
+bootstrap_progress
+
+log_message "Synchronising the API Repository"
+response=$(curl $GOVN_DASHBOARD_BASE_URL/api/sync/ -s \
+    -H "X-API-Key: $govn_user_api_token" \
+    -H "Content-Type: application/json" \
+    --data-raw "{ }" 2>> logs/bootstrap.log)
+if [[ $? -ne 0 ]]; then
+    log_message "  Failed"
+    echo "ERROR: Failed to synchronise the API Repository. Response: $response"
+    exit 1
+else 
+    log_ok
+fi 
 bootstrap_progress
 
 log_end_deployment
