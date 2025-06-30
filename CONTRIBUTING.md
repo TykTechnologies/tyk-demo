@@ -63,6 +63,7 @@ Every deployment must include these files:
 |------|---------|
 | `tyk_demo_<DEPLOYMENT_NAME>.postman_collection.json` | Provides guided usage examples and validates functionality |
 | `deployment.json` | Contains deployment metadata that can be read by scripts or external systems |
+| `pre.sh` | Run as part of `up.sh` process to perform actions prior to containers being created |
 | `teardown.sh` | Run as part of `down.sh` process to remove resources not handled by Docker |
 
 > **Note about Postman Collections:** While optional, collections are highly recommended as they provide guided usage examples and validate functionality. Example: `tyk_demo_mdcb.postman_collection.json` for the `mdcb` deployment.
