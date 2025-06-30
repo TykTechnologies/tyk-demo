@@ -93,7 +93,6 @@ fi
 log_message "Updating agent configuration file"
 yq -i ".instances[0].config.auth = \"$dashboard_agent_token\"" deployments/governance/volumes/governance-agent/config.yaml
 yq -i ".governanceDashboard.auth.token = \"$govn_agent_token\"" deployments/governance/volumes/governance-agent/config.yaml
-yq -i ".licenseKey = \"$govn_agent_token\"" deployments/governance/volumes/governance-agent/config.yaml
 log_ok
 bootstrap_progress
 
