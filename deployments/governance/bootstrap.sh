@@ -106,12 +106,40 @@ eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gov
 log_ok
 bootstrap_progress
 
-log_message "Synchronising the API Repository"
+
+log_message "Waiting for agent providers to become active"
+max_retries=10
+retry_count=0
+while true; do
+    log_message "  Attempt $((retry_count+1)) of $max_retries..."
+    response=$(curl $GOVN_DASHBOARD_BASE_URL/api/agents/$agent_id/providers \
+        -H "X-API-Key: $govn_user_api_token" -s)
+    bootstrap_progress
+
+    if jq -e '(.providers | length > 0) and all(.providers[]; .provider.status == "active")' <<< "$response" > /dev/null; then
+        log_ok
+        break
+    fi
+
+    if [[ $retry_count -ge $max_retries ]]; then
+        log_message "  Max retries reached, exiting loop"
+        echo "ERROR: Providers did not become active after $max_retries attempts."
+        exit 1
+    fi
+
+    sleep 2
+    ((retry_count++))
+done
+bootstrap_progress
+
+log_message "Triggering agent synchronisation"
 response=$(curl $GOVN_DASHBOARD_BASE_URL/api/sync/ -s \
     -H "X-API-Key: $govn_user_api_token" \
     -H "Content-Type: application/json" \
     --data-raw "{ }" 2>> logs/bootstrap.log)
-if [[ $? -ne 0 ]]; then
+GOVN_SYNC_SUCCESS_MESSAGE="Sync triggered successfully"
+sync_message=$(echo "$response" | jq -r '.message')
+if [[ $sync_message != $GOVN_SYNC_SUCCESS_MESSAGE ]]; then
     log_message "  Failed"
     echo "ERROR: Failed to synchronise the API Repository. Response: $response"
     exit 1
