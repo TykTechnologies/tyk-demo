@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 source scripts/common.sh
 deployment="Governance"
 
