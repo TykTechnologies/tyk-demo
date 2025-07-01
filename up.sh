@@ -208,6 +208,20 @@ fi
 # log docker compose version
 log_message "$(docker compose version)"
 
+# Run pre scripts
+for deployment in "${deployments_to_create[@]}"; do
+  deployment_pre_script="deployments/$deployment/pre.sh"
+  if [ -f "$deployment_pre_script" ]; then
+    echo "Running pre script for $deployment: $deployment_pre_script"
+    eval "$deployment_pre_script"; pre_exit_code=$?
+    if [ "$pre_exit_code" != 0 ]; then
+      capture_container_logs $deployment
+      echo "ERROR: Pre script for $deployment failed $deployment_pre_script"
+      exit 1
+    fi
+  fi
+done
+
 # bring the containers up
 command_docker_compose="$(generate_docker_compose_command) up --quiet-pull --remove-orphans -d"
 echo "Running docker compose command: $command_docker_compose"

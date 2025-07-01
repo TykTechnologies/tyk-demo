@@ -1,0 +1,59 @@
+---
+# ==============================================================================
+# Tyk Governance Agent Configuration
+# ==============================================================================
+
+# Your Tyk Governance license key - required for agent authentication
+# This is provided by Tyk when you subscribe to the Governance service
+licenseKey: "placeholder"
+# Configuration for connecting to the Tyk Governance dashboard/service
+governanceDashboard:
+  server:
+    # The gRPC endpoint URL of the Tyk Governance service
+    # Format: hostname:port (without protocol)
+    # This will be provided in your welcome email from Tyk
+    url: "tyk-governance-dashboard:50051"
+  auth:
+    # Authentication token for this agent
+    # Generated via API call to /auth/token endpoint
+    # This token identifies and authorizes this specific agent
+    token: "placeholder"
+
+
+# ==============================================================================
+# API Provider Configurations
+# ==============================================================================
+
+# List of API management platforms this agent will connect to
+# Each agent can connect to multiple providers of different types
+instances:
+  # --------------------------------------------------------------------------
+  # Tyk Provider Configuration
+  # --------------------------------------------------------------------------
+  - name: "tyk-provider" # Descriptive name for this provider instance
+    type: "tyk" # Provider type: must be "tyk" for Tyk Dashboard
+    config:
+      # The URL of your Tyk Dashboard
+      # For Kubernetes deployments, this might be an internal service URL
+      host: "http://tyk-dashboard:3000"
+      # API key with read access to the Tyk Dashboard
+      # Can be obtained in Tyk Dashboard under "User" > "User Details": "Tyk Dashboard API Access Credentials"
+      # Requires read permissions for APIs and policies
+      auth: "placeholder"
+
+
+# ==============================================================================
+# Agent Settings
+# ==============================================================================
+
+# Log level controls verbosity of agent logs
+# Options: debug, info, warn, error
+# Recommended: info for production, debug for troubleshooting
+logLevel: debug
+# Health probe configuration for monitoring agent health
+# Used by container orchestration systems like Kubernetes
+healthProbe:
+  server:
+    # Port on which the health probe server will listen
+    # Ensure this port is not used by other services
+    port: 5959

@@ -1,0 +1,13 @@
+{
+	"first_name": "Governance Agent",
+	"last_name": "User",
+	"email_address": "govn.agent.user@example.org",
+	"org_id": "5e9d9544a1dcd60001d0ed20",
+	"active": true,
+	"password": "rpCiZL5o9d3b2X7",
+    "user_permissions": {
+        "apis": "read",
+        "policies": "read",
+		"users": "read"
+    }
+}

@@ -24,3 +24,6 @@ deployments/portal/volumes/logs
 
 # AI Studio
 deployments/ai-studio/volumes/tyk-ai-studio/db/ai-studio.db
+
+# Governance
+deployments/governance/volumes/governance-agent/config.yaml

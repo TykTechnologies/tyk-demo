@@ -134,6 +134,8 @@ jobs:
           echo "✅ MDCB_LICENCE added to .env"
           echo "AI_STUDIO_LICENSE=${{ secrets.DASH_LICENSE }}" >> .env
           echo "✅ AI_STUDIO_LICENSE added to .env"
+          echo "GOVERNANCE_LICENSE=${{ secrets.DASH_LICENSE }}" >> .env
+          echo "✅ GOVERNANCE_LICENSE added to .env"
           echo "::endgroup::"
 
       - name: Cache Go Plugins
