@@ -159,5 +159,5 @@ echo -e "\033[2K
                Password : $GOVN_USER_PASSWORD
               API Token : $govn_user_api_token
   ▽ Governance Agent ($(get_service_image_tag "tyk-governance-agent"))
-             TBC       URL : http://tyk-governance-agent.localhost:5959
+        Health Endpoint : http://tyk-governance-agent.localhost:5959/health
    Tyk Dash Agent Token : $dashboard_agent_token"
