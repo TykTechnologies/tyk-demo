@@ -106,7 +106,6 @@ eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gov
 log_ok
 bootstrap_progress
 
-
 log_message "Waiting for agent providers to become active"
 max_retries=10
 retry_count=0
