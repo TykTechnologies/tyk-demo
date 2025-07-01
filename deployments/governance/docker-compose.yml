@@ -1,40 +1,40 @@
 ---
-services:        
-   tyk-governance-dashboard:
-       image: tykio/governance-api:v0.2.0-rc2
-       environment:
-           # Database connection -  MongoDB instance
-           TYK_GOV_STORAGE_DATABASEDSN: "mongodb://tyk-mongo:27017/gov"
-           # Security configuration
-           TYK_GOV_SECURITY_JWTSECRET: "amazingsecret"
-           TYK_GOV_ADMINKEY: "12345"
-           # Logging
-           TYK_GOV_LOG_LEVEL: "debug"
-           # License key (you need to set this)
-           TYK_GOV_LICENSEKEY: "${GOVERNANCE_LICENSE:?Governance license missing from Docker environment file .env}"
-           # Server keepalive configuration
-           TYK_GOV_SERVER_KEEPALIVE_ENABLED: "true"
-           TYK_GOV_SERVER_KEEPALIVE_MAXCONNECTIONIDLE: "90s"
-           TYK_GOV_SERVER_KEEPALIVE_MAXCONNECTIONAGE: "60m"
-           TYK_GOV_SERVER_KEEPALIVE_TIME: "60s"
-           TYK_GOV_SERVER_KEEPALIVE_TIMEOUT: "20s"
-       ports:
-           - "8082:8080"  # HTTP API and Dashboard UI
-           - "50051:50051"  # gRPC for agents
-       depends_on:
-           - tyk-mongo
-       networks:
-           - tyk
-   tyk-governance-agent:
-     image: tykio/governance-agent:v0.2.0-rc2
-     volumes:
-         - ./deployments/governance/volumes/governance-agent/config.yaml:/app/config.yaml
-     environment:
-        TYK_AGENT_LICENSEKEY: "${GOVERNANCE_LICENSE:?Governance license missing from Docker environment file .env}"
-     ports:
-         - "5959:5959" 
-     depends_on:
-         - tyk-governance-dashboard
-         - tyk-dashboard
-     networks:
-         - tyk
+services:
+  tyk-governance-dashboard:
+    image: tykio/governance-api:v0.2.0-rc2
+    environment:
+      # Database connection -  MongoDB instance
+      TYK_GOV_STORAGE_DATABASEDSN: "mongodb://tyk-mongo:27017/gov"
+      # Security configuration
+      TYK_GOV_SECURITY_JWTSECRET: "amazingsecret"
+      TYK_GOV_ADMINKEY: "12345"
+      # Logging
+      TYK_GOV_LOG_LEVEL: "debug"
+      # License key (you need to set this)
+      TYK_GOV_LICENSEKEY: "${GOVERNANCE_LICENSE:?Governance license missing from Docker environment file .env}"
+      # Server keepalive configuration
+      TYK_GOV_SERVER_KEEPALIVE_ENABLED: "true"
+      TYK_GOV_SERVER_KEEPALIVE_MAXCONNECTIONIDLE: "90s"
+      TYK_GOV_SERVER_KEEPALIVE_MAXCONNECTIONAGE: "60m"
+      TYK_GOV_SERVER_KEEPALIVE_TIME: "60s"
+      TYK_GOV_SERVER_KEEPALIVE_TIMEOUT: "20s"
+    ports:
+      - "8082:8080"  # HTTP API and Dashboard UI
+      - "50051:50051"  # gRPC for agents
+    depends_on:
+      - tyk-mongo
+    networks:
+      - tyk
+  tyk-governance-agent:
+    image: tykio/governance-agent:v0.2.0-rc2
+    volumes:
+      - ./deployments/governance/volumes/governance-agent/config.yaml:/app/config.yaml
+    environment:
+      TYK_AGENT_LICENSEKEY: "${GOVERNANCE_LICENSE:?Governance license missing from Docker environment file .env}"
+    ports:
+      - "5959:5959" 
+    depends_on:
+      - tyk-governance-dashboard
+      - tyk-dashboard
+    networks:
+      - tyk
