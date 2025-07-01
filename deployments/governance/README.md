@@ -33,7 +33,7 @@ GOVERNANCE_LICENSE=<YOUR_LICENSE_HERE>
 
 `yq` is required by the bootstrap script.
 
-It can be installed using the Brew package manager:
+It can be installed on MacOS using the Brew package manager:
 
 ```bash
 brew install yq
