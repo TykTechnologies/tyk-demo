@@ -1,0 +1,4 @@
+---
+name: tyk-demo
+# This deployment does not deploy any additional resources via Docker Compose.
+# Instead, resources are added and removed via the bootstrap and teardown scripts.
