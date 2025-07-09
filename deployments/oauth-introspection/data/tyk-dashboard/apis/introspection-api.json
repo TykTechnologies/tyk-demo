@@ -8,7 +8,7 @@
     "enable_proxy_protocol": false,
     "api_id": "3f9c33c29f0f4a4f8f9b6a3de8cb1e8e",
     "org_id": "5e9d9544a1dcd60001d0ed20",
-    "use_keyless": true,
+    "use_keyless": false,
     "use_oauth2": false,
     "external_oauth": {
       "enabled": false,
@@ -208,7 +208,7 @@
     "pinned_public_keys": {},
     "enable_jwt": false,
     "use_standard_auth": false,
-    "use_go_plugin_auth": false,
+    "use_go_plugin_auth": true,
     "enable_coprocess_auth": false,
     "custom_plugin_auth_enabled": false,
     "jwt_signing_method": "",
@@ -342,20 +342,12 @@
     "disable_rate_limit": false,
     "disable_quota": false,
     "custom_middleware": {
-      "pre": [
-        {
-          "disabled": false,
-          "name": "HelloWorld",
-          "path": "plugins/go/introspection/introspection.so",
-          "require_session": false,
-          "raw_body_only": false
-        }
-      ],
+      "pre": [],
       "post_key_auth": [],
       "auth_check": {
         "disabled": false,
-        "name": "",
-        "path": "",
+        "name": "OAuthIntrospection",
+        "path": "plugins/go/introspection/introspection.so",
         "require_session": false,
         "raw_body_only": false
       },
@@ -406,14 +398,8 @@
     "response_processors": [],
     "CORS": {
       "enable": false,
-      "allowed_origins": [
-        "*"
-      ],
-      "allowed_methods": [
-        "GET",
-        "POST",
-        "HEAD"
-      ],
+      "allowed_origins": ["*"],
+      "allowed_methods": ["GET", "POST", "HEAD"],
       "allowed_headers": [
         "Origin",
         "Accept",
