@@ -7,6 +7,10 @@ bootstrap_progress
 
 # Configuration
 keycloak_base_url="http://keycloak.localhost:8180"
+gateway_base_url="http://$(jq -r '.host_config.override_hostname' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
+gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq -r .secret)
+dashboard_base_url="http://tyk-dashboard.localhost:$(jq -r '.listen_port' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
+dashboard_user_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
 
 log_message "Waiting for Keycloak to be ready"
 wait_for_response "$keycloak_base_url/health/ready" "200"
@@ -97,6 +101,17 @@ log_http_result "$(curl -s -X POST \
   -o /dev/null \
   -w "%{http_code}" \
   "$keycloak_base_url/admin/realms/tyk/users")"
+bootstrap_progress
+
+if [ -f .bootstrap/skip_plugin_build ]; then
+  log_message "Skipping Go plugin build - skip_plugin_build flag is set"
+else
+  build_go_plugin "deployments/oauth-introspection/volumes/tyk-gateway/plugins/go/introspection/introspection.so"
+  bootstrap_progress
+fi
+
+log_message "Creating introspection API"
+create_api "deployments/oauth-introspection/data/tyk-dashboard/apis/introspection-api.json" "$dashboard_user_api_key"
 bootstrap_progress
 
 log_end_deployment

@@ -1,4 +1,5 @@
 ---
-name: tyk-demo
-# This deployment does not deploy any additional resources via Docker Compose.
-# Instead, resources are added and removed via the bootstrap and teardown scripts.
+services:
+  tyk-gateway:
+    volumes:
+      - ./deployments/oauth-introspection/volumes/tyk-gateway/plugins/go/introspection:/opt/tyk-gateway/plugins/go/introspection
