@@ -362,10 +362,13 @@ decode_jwt () { _decode_base64_url $(echo -n $1 | cut -d "." -f ${2:-2}) | jq .;
 
 build_go_plugin () {
   local gateway_image_tag=$(get_service_image_tag "tyk-gateway")
-  local go_plugin_filename=$1
-  # each plugin must be in its own directory
-  local go_plugin_directory="$PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/$2"
-  local go_plugin_path="$go_plugin_directory/$go_plugin_filename"
+  local go_plugin_relative_path=$1
+  
+  # Calculate full path and extract directory and filename
+  local go_plugin_path="$PWD/$go_plugin_relative_path"
+  local go_plugin_directory=$(dirname "$go_plugin_path")
+  local go_plugin_filename=$(basename "$go_plugin_path")
+  
   local go_plugin_cache_directory="$PWD/.bootstrap/plugin-cache"
   local go_plugin_cache_version_directory="$go_plugin_cache_directory/$gateway_image_tag"
   local go_plugin_cache_file_path="$go_plugin_cache_version_directory/$go_plugin_filename"

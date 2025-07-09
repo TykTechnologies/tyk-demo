@@ -254,13 +254,13 @@ bootstrap_progress
 if [ -f .bootstrap/skip_plugin_build ]; then
   log_message "Skipping Go plugin build - skip_plugin_build flag is set"
 else
-  build_go_plugin "example-go-plugin.so" "example"
+  build_go_plugin "deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.so"
   bootstrap_progress
 
-  build_go_plugin "jwt-go-plugin.so" "jwt"
+  build_go_plugin "deployments/tyk/volumes/tyk-gateway/plugins/go/jwt/jwt-go-plugin.so"
   bootstrap_progress
 
-  build_go_plugin "ip-rate-limit.so" "ipratelimit"
+  build_go_plugin "deployments/tyk/volumes/tyk-gateway/plugins/go/ipratelimit/ip-rate-limit.so"
   bootstrap_progress
 fi
 
