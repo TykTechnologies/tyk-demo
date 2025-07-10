@@ -229,11 +229,6 @@ main() {
     test_api_with_invalid_token
 
     echo "🏁 All tests completed!"
-    echo ""
-    echo "✨ Client Separation Summary:"
-    echo "  • test-client: Used for token generation only"
-    echo "  • tyk-introspection-client: Used for token introspection only"
-    echo "  • This follows OAuth 2.0 best practices for client separation"
 }
 
 # Run the tests
