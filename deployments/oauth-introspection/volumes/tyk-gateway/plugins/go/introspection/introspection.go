@@ -276,11 +276,6 @@ func OAuthIntrospection(rw http.ResponseWriter, r *http.Request) {
 	r.Header.Set("X-OAuth-Scope", introspectionResp.Scope)
 }
 
-// HelloWorld is kept for backward compatibility and testing
-func HelloWorld(rw http.ResponseWriter, r *http.Request) {
-	logger.Info("HELLO, WORLD!")
-}
-
 func init() {
 	logger.Info("OAuth Introspection Go Plugin initialized")
 }
