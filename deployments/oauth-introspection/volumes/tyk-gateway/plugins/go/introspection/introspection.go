@@ -44,7 +44,7 @@ type IntrospectionConfig struct {
 // getIntrospectionConfig returns the configuration for OAuth introspection
 func getIntrospectionConfig() *IntrospectionConfig {
 	return &IntrospectionConfig{
-		IntrospectionURL: "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect",
+		IntrospectionURL: "http://keycloak:8180/realms/tyk/protocol/openid-connect/token/introspect",
 		ClientID:         "tyk-introspection-client",
 		ClientSecret:     "tyk-introspection-secret",
 	}
