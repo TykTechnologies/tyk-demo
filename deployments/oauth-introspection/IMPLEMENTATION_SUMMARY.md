@@ -32,34 +32,35 @@ Modified the API definition to use the Go plugin for authentication:
 - Set `use_keyless: false` to require authentication
 - Set `use_go_plugin_auth: true` to enable Go plugin authentication
 - Configured `auth_check` middleware to use `OAuthIntrospection` function
-- Removed the simple "HelloWorld" pre-middleware
+- Updated plugin to use the same client (`test-client`) for both token generation and introspection
 
-### 3. Enhanced Documentation
+### 3. Network Configuration Fix
+
+**Docker Network Setup:**
+- Added `keycloak.localhost` network alias to the Keycloak service
+- Ensures consistent hostname resolution from both host and container environments
+- Allows the plugin to use the same URL (`keycloak.localhost:8180`) as external clients
+
+### 4. Enhanced Documentation
 
 **Updated README.md:**
 - Added comprehensive plugin documentation
 - Included testing instructions
 - Provided manual testing examples
-- Documented configuration options
+- Documented configuration options and network setup
 
 **New Files:**
 - `IMPLEMENTATION_SUMMARY.md` - This summary document
 - `scripts/test-introspection.sh` - Automated testing script
-- `tyk_demo_oauth_introspection.postman_collection.json` - Postman collection
 
-### 4. Testing Infrastructure
+### 5. Testing Infrastructure
 
 **Test Script (`test-introspection.sh`):**
 - Automated testing of user token flow
 - Automated testing of service account token flow
 - Tests for missing/invalid token scenarios
 - Direct token introspection testing
-
-**Postman Collection:**
-- Token generation requests (user & service account)
-- Direct token introspection calls
-- API testing with valid/invalid tokens
-- Automated test assertions
+- Validates OAuth metadata injection in response headers
 
 ## Technical Implementation Details
 
@@ -83,9 +84,10 @@ The plugin follows Tyk's Go plugin architecture:
 
 The plugin creates rich session objects containing:
 - OAuth client ID and metadata
-- Token expiration and rate limiting
+- Token expiration using absolute Unix timestamps (not TTL)
 - Access rights for the API
 - Custom metadata for downstream services
+- Proper session caching in Redis
 
 ### Error Handling
 
@@ -102,8 +104,8 @@ Comprehensive error handling for:
 
 The plugin uses these Keycloak resources (created by bootstrap):
 - **Realm**: `tyk`
-- **Introspection Client**: `tyk-introspection-client` / `tyk-introspection-secret`
-- **Test Client**: `test-client` / `test-client-secret`
+- **Introspection Client**: `tyk-introspection-client` / `tyk-introspection-secret` (created but not used)
+- **Test Client**: `test-client` / `test-client-secret` (used for both token generation and introspection)
 - **Test User**: `testuser` / `password`
 
 ### Plugin Configuration
@@ -111,8 +113,18 @@ The plugin uses these Keycloak resources (created by bootstrap):
 Hard-coded configuration in the plugin:
 ```go
 IntrospectionURL: "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect"
-ClientID:         "tyk-introspection-client"
-ClientSecret:     "tyk-introspection-secret"
+ClientID:         "test-client"
+ClientSecret:     "test-client-secret"
+```
+
+### Network Configuration
+
+Keycloak service Docker configuration:
+```yaml
+networks:
+  tyk:
+    aliases:
+      - keycloak.localhost
 ```
 
 ## Testing Results
@@ -135,21 +147,26 @@ The implementation provides:
 
 The plugin injects these headers for downstream services:
 - `X-OAuth-Client-ID` - OAuth client identifier
-- `X-OAuth-Username` - Username (for user tokens)
-- `X-OAuth-Subject` - Token subject
-- `X-OAuth-Scope` - Token scope
+- `X-OAuth-Username` - Username (for user tokens) or service account name (for service tokens)
+- `X-OAuth-Subject` - Token subject (user ID)
+- `X-OAuth-Scope` - Token scope (e.g., "email profile")
 
-## Next Steps
+## Key Implementation Decisions
 
-This implementation provides a solid foundation for OAuth introspection with Tyk and Keycloak. Potential enhancements include:
+### Using Same Client for Token Generation and Introspection
+- **Problem**: Separate introspection client required complex permission setup
+- **Solution**: Use the same client (`test-client`) for both operations
+- **Benefit**: Eliminates permission issues and simplifies configuration
 
-1. **Configuration Externalization**: Move hardcoded values to environment variables or config files
-2. **Caching Improvements**: Implement more sophisticated caching strategies
-3. **Token Refresh**: Add support for token refresh workflows
-4. **Scope-based Authorization**: Implement fine-grained authorization based on OAuth scopes
-5. **Multi-Provider Support**: Extend to support multiple OAuth providers
-6. **Monitoring**: Add metrics and monitoring for introspection performance
-7. **Rate Limiting**: Implement introspection-specific rate limiting
+### Network Alias Configuration
+- **Problem**: Tokens issued with `keycloak.localhost` issuer but plugin accessed `keycloak` internally
+- **Solution**: Added `keycloak.localhost` network alias to Keycloak service
+- **Benefit**: Consistent hostname resolution from both host and container environments
+
+### Session Expiration Handling
+- **Problem**: Session TTL calculation was incorrect, causing immediate expiration
+- **Solution**: Use absolute Unix timestamp from token's `exp` claim
+- **Benefit**: Proper session lifecycle
 
 ## Files Modified/Created
 

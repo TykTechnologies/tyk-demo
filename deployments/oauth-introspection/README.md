@@ -33,7 +33,7 @@ The bootstrap process will:
 - **Enabled**: true
 
 ### Introspection Client: `tyk-introspection-client`
-- **Purpose**: For Tyk Gateway to introspect tokens
+- **Purpose**: For Tyk Gateway to introspect tokens (created but not used in current implementation)
 - **Secret**: `tyk-introspection-secret`
 - **Type**: Service account only
 - **Flows**: Service account enabled, others disabled
@@ -99,21 +99,22 @@ The deployment includes a Go plugin (`introspection.go`) that demonstrates OAuth
 
 ### Plugin Functionality
 - Extracts Bearer tokens from the Authorization header
-- Validates tokens using Keycloak's introspection endpoint
-- Creates Tyk sessions for valid tokens
+- Validates tokens using Keycloak's introspection endpoint via the same client used for token generation
+- Creates Tyk sessions for valid tokens with proper expiration handling
 - Adds OAuth metadata to request headers for downstream services
 
 ### Plugin Features
-- **Token Validation**: Calls Keycloak's introspection endpoint to validate tokens
-- **Session Management**: Creates and caches Tyk sessions for valid tokens
+- **Token Validation**: Calls Keycloak's introspection endpoint using the same client credentials as token generation
+- **Session Management**: Creates and caches Tyk sessions with proper expiration timestamps
+- **Network Compatibility**: Uses `keycloak.localhost` for both external and internal network access
 - **Metadata Injection**: Adds OAuth client ID, username, subject, and scope as request headers
 - **Error Handling**: Proper error responses for invalid/missing tokens
 
 ### Request Headers Added
 - `X-OAuth-Client-ID`: OAuth client identifier
-- `X-OAuth-Username`: Username (for user tokens)
-- `X-OAuth-Subject`: Token subject
-- `X-OAuth-Scope`: Token scope
+- `X-OAuth-Username`: Username (for user tokens) or service account name (for service tokens)
+- `X-OAuth-Subject`: Token subject (user ID)
+- `X-OAuth-Scope`: Token scope (e.g., "email profile")
 
 ## Testing the Plugin
 
@@ -124,10 +125,11 @@ Use the provided test script to demonstrate the functionality:
 ```
 
 The test script will:
-1. Generate user and service account tokens
-2. Test API access with valid tokens
-3. Test API rejection of invalid/missing tokens
-4. Show OAuth metadata injection
+1. Generate user and service account tokens from Keycloak
+2. Test direct token introspection to verify tokens are valid
+3. Test API access with valid tokens (should return 200 with OAuth headers)
+4. Test API rejection of invalid/missing tokens (should return 401)
+5. Show OAuth metadata injection in response headers
 
 ### Manual Testing
 
@@ -159,3 +161,12 @@ curl "http://tyk-gateway.localhost:8080/introspection/anything"
 The plugin is configured in the API definition with:
 - **Authentication Type**: Go Plugin Auth (`use_go_plugin_auth: true`)
 - **Middleware**: `auth_check` middleware using `OAuthIntrospection`
+- **Client Configuration**: Uses `test-client` credentials for introspection (same as token generation)
+- **Network Setup**: Keycloak service has `keycloak.localhost` network alias for consistent resolution
+
+## Implementation Notes
+
+- The plugin uses the same client (`test-client`) for both token generation and introspection to avoid permission issues
+- Network alias `keycloak.localhost` is configured in the Keycloak service to ensure consistent hostname resolution from both host and container environments
+- Session expiration uses absolute Unix timestamps from the token's `exp` claim
+- All OAuth metadata from the introspection response is preserved and passed to downstream services via request headers

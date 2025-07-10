@@ -17,7 +17,7 @@ echo "=================================="
 
 # Function to generate a user token
 generate_user_token() {
-    echo "📝 Generating user token..."
+    echo "📝 Generating user token..." >&2
 
     token_response=$(curl -s -X POST \
         -H "Content-Type: application/x-www-form-urlencoded" \
@@ -31,19 +31,20 @@ generate_user_token() {
     access_token=$(echo $token_response | jq -r '.access_token')
 
     if [ "$access_token" == "null" ] || [ -z "$access_token" ]; then
-        echo "❌ Failed to generate user token"
-        echo "Response: $token_response"
+        echo "❌ Failed to generate user token" >&2
+        echo "Response: $token_response" >&2
         return 1
     fi
 
-    echo "✅ User token generated successfully"
-    echo "Token: ${access_token:0:50}..."
+    echo "✅ User token generated successfully" >&2
+    echo "Token: ${access_token:0:50}..." >&2
+    echo "" >&2
     echo "$access_token"
 }
 
 # Function to generate a service account token
 generate_service_token() {
-    echo "📝 Generating service account token..."
+    echo "📝 Generating service account token..." >&2
 
     token_response=$(curl -s -X POST \
         -H "Content-Type: application/x-www-form-urlencoded" \
@@ -55,13 +56,13 @@ generate_service_token() {
     access_token=$(echo $token_response | jq -r '.access_token')
 
     if [ "$access_token" == "null" ] || [ -z "$access_token" ]; then
-        echo "❌ Failed to generate service account token"
-        echo "Response: $token_response"
+        echo "❌ Failed to generate service account token" >&2
+        echo "Response: $token_response" >&2
         return 1
     fi
 
-    echo "✅ Service account token generated successfully"
-    echo "Token: ${access_token:0:50}..."
+    echo "✅ Service account token generated successfully" >&2
+    echo "Token: ${access_token:0:50}..." >&2
     echo "$access_token"
 }
 

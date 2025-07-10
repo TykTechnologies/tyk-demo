@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -19,6 +20,14 @@ import (
 )
 
 var logger = log.Get()
+
+// min returns the minimum of two integers
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
 
 // OAuth2 introspection response structure
 type IntrospectionResponse struct {
@@ -44,9 +53,9 @@ type IntrospectionConfig struct {
 // getIntrospectionConfig returns the configuration for OAuth introspection
 func getIntrospectionConfig() *IntrospectionConfig {
 	return &IntrospectionConfig{
-		IntrospectionURL: "http://keycloak:8180/realms/tyk/protocol/openid-connect/token/introspect",
-		ClientID:         "tyk-introspection-client",
-		ClientSecret:     "tyk-introspection-secret",
+		IntrospectionURL: "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect",
+		ClientID:         "test-client",
+		ClientSecret:     "test-client-secret",
 	}
 }
 
@@ -85,8 +94,14 @@ func introspectToken(token string, config *IntrospectionConfig) (*IntrospectionR
 	client := &http.Client{
 		Timeout: 10 * time.Second,
 	}
+
+	logger.Infof("Making introspection request to: %s", config.IntrospectionURL)
+	logger.Infof("Using client ID: %s", config.ClientID)
+	logger.Infof("Token being introspected: %s...", token[:min(len(token), 20)])
+
 	resp, err := client.Do(req)
 	if err != nil {
+		logger.Errorf("HTTP request failed: %v", err)
 		return nil, fmt.Errorf("failed to call introspection endpoint: %v", err)
 	}
 	defer resp.Body.Close()
@@ -94,19 +109,29 @@ func introspectToken(token string, config *IntrospectionConfig) (*IntrospectionR
 	// Read the response
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		logger.Errorf("Failed to read response body: %v", err)
 		return nil, fmt.Errorf("failed to read introspection response: %v", err)
 	}
 
+	logger.Infof("Introspection response status: %d", resp.StatusCode)
+	logger.Infof("Introspection response body: %s", string(body))
+
 	// Check for HTTP errors
 	if resp.StatusCode != http.StatusOK {
+		logger.Errorf("Introspection endpoint returned error status %d: %s", resp.StatusCode, string(body))
 		return nil, fmt.Errorf("introspection endpoint returned status %d: %s", resp.StatusCode, string(body))
 	}
 
 	// Parse the response
 	var introspectionResp IntrospectionResponse
 	if err := json.Unmarshal(body, &introspectionResp); err != nil {
+		logger.Errorf("Failed to parse JSON response: %v", err)
+		logger.Errorf("Response body was: %s", string(body))
 		return nil, fmt.Errorf("failed to parse introspection response: %v", err)
 	}
+
+	logger.Infof("Parsed introspection response - Active: %v, ClientID: %s, Username: %s",
+		introspectionResp.Active, introspectionResp.ClientID, introspectionResp.Username)
 
 	return &introspectionResp, nil
 }
@@ -129,22 +154,25 @@ func createSessionFromToken(r *http.Request, token string, introspectionResp *In
 		sessionAlias += "unknown"
 	}
 
-	// Calculate token expiration (convert from Unix timestamp to TTL)
+	// Use the token expiration timestamp directly (Tyk expects absolute timestamp)
 	var expires int64 = 0
 	if introspectionResp.Exp > 0 {
-		expires = introspectionResp.Exp - time.Now().Unix()
-		if expires < 0 {
+		expires = introspectionResp.Exp
+		logger.Infof("Token expiration: exp=%d", expires)
+		if expires < time.Now().Unix() {
+			logger.Warnf("Token has already expired: exp=%d, current=%d", expires, time.Now().Unix())
 			expires = 0
 		}
 	}
 
 	// Create a session state
 	sessionState := &user.SessionState{
-		OrgID:   requestedAPI.OrgID,
-		Alias:   sessionAlias,
-		Rate:    1000, // requests per second
-		Per:     1,    // per 1 second
-		Expires: expires,
+		OrgID:       requestedAPI.OrgID,
+		Alias:       sessionAlias,
+		Rate:        1000, // requests per second
+		Per:         1,    // per 1 second
+		Expires:     expires,
+		LastUpdated: strconv.FormatInt(time.Now().Unix(), 10),
 		BasicAuthData: user.BasicAuthData{
 			Password: token, // Store the original token for reference
 		},
@@ -225,16 +253,21 @@ func storeSessionInRedis(sessionAlias string, sessionState *user.SessionState, o
 func OAuthIntrospection(rw http.ResponseWriter, r *http.Request) {
 	logger.Info("OAuth Introspection plugin started")
 
+	// Log all headers for debugging
+	logger.Infof("Request headers: %v", r.Header)
+
 	// Extract bearer token from Authorization header
 	token := extractBearerToken(r)
 	if token == "" {
 		logger.Info("No bearer token found in Authorization header")
+		authHeader := r.Header.Get("Authorization")
+		logger.Infof("Authorization header value: '%s'", authHeader)
 		rw.WriteHeader(http.StatusUnauthorized)
 		rw.Write([]byte(`{"error": "missing_token", "error_description": "Bearer token is required"}`))
 		return
 	}
 
-	logger.Info("Bearer token extracted: ", token[:20], "...")
+	logger.Info("Bearer token extracted: ", token[:min(len(token), 20)], "...")
 
 	// Get introspection configuration
 	config := getIntrospectionConfig()
@@ -248,9 +281,11 @@ func OAuthIntrospection(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logger.Infof("Introspection response: %+v", introspectionResp)
+
 	// Check if token is active
 	if !introspectionResp.Active {
-		logger.Info("Token is not active")
+		logger.Infof("Token is not active. Full response: %+v", introspectionResp)
 		rw.WriteHeader(http.StatusUnauthorized)
 		rw.Write([]byte(`{"error": "invalid_token", "error_description": "Token is not active"}`))
 		return

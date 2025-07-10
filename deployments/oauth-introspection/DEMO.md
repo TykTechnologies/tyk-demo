@@ -102,7 +102,7 @@ You can also test the introspection endpoint directly:
 ```bash
 curl -X POST \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  -u "tyk-introspection-client:tyk-introspection-secret" \
+  -u "test-client:test-client-secret" \
   -d "token=$TOKEN" \
   "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect"
 ```
@@ -133,11 +133,11 @@ curl -X POST \
 ## Plugin Features Demonstrated
 
 ✅ **Token Extraction**: Extracts Bearer tokens from Authorization headers
-✅ **Token Validation**: Validates tokens against Keycloak's introspection endpoint
-✅ **Session Management**: Creates Tyk sessions for valid tokens
+✅ **Token Validation**: Validates tokens against Keycloak's introspection endpoint using the same client as token generation
+✅ **Session Management**: Creates Tyk sessions for valid tokens with proper expiration handling
 ✅ **Metadata Injection**: Adds OAuth client ID, username, subject, and scope as headers
 ✅ **Error Handling**: Proper HTTP error responses for invalid/missing tokens
-✅ **Caching**: Sessions are cached in Redis for performance
+✅ **Network Compatibility**: Uses keycloak.localhost for consistent hostname resolution
 
 ## Automated Testing
 
@@ -164,6 +164,7 @@ Import the Postman collection for interactive testing:
 2. **Invalid Token**: Tokens expire after 5 minutes, generate a new one
 3. **Plugin Not Found**: Ensure the plugin was built successfully
 4. **404 Not Found**: Check that the API is deployed and accessible
+5. **Token Introspection Failed**: The plugin uses the same client (`test-client`) for introspection as token generation
 
 ### Debug Information
 
@@ -182,10 +183,10 @@ Look for log messages like:
 
 The OAuth introspection plugin successfully demonstrates:
 
-1. **OAuth2 Token Introspection** with Keycloak
-2. **Seamless Integration** with Tyk Gateway
-3. **Session Management** and caching
-4. **Security** through proper token validation
-5. **Metadata Injection** for downstream services
+1. **OAuth2 Token Introspection** with Keycloak using unified client credentials
+2. **Seamless Integration** with Tyk Gateway via Go plugin
+3. **Session Management** with proper expiration handling
+4. **Security** through proper token validation and network configuration
+5. **Metadata Injection** for downstream services with OAuth context
 
 This implementation provides a solid foundation for production OAuth authentication workflows with Tyk Gateway.

@@ -103,6 +103,8 @@ log_http_result "$(curl -s -X POST \
   "$keycloak_base_url/admin/realms/tyk/users")"
 bootstrap_progress
 
+
+
 if [ -f .bootstrap/skip_plugin_build ]; then
   log_message "Skipping Go plugin build - skip_plugin_build flag is set"
 else
