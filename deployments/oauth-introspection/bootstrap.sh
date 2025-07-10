@@ -12,6 +12,14 @@ gateway_api_credentials=$(cat deployments/tyk/volumes/tyk-gateway/tyk.conf | jq 
 dashboard_base_url="http://tyk-dashboard.localhost:$(jq -r '.listen_port' deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf)"
 dashboard_user_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
 
+log_message "Checking if keycloak-dcr deployment is available"
+if ! deployment_is_bootstrapped "keycloak-dcr"; then
+  echo "ERROR: keycloak-dcr deployment is not available. Please ensure it is bootstrapped."
+  exit 1
+fi
+log_ok
+bootstrap_progress
+
 log_message "Waiting for Keycloak to be ready"
 wait_for_response "$keycloak_base_url/health/ready" "200"
 
