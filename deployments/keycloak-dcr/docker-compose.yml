@@ -30,7 +30,9 @@ services:
     depends_on:
       - keycloak-db
     networks:
-      - tyk
+      tyk:
+        aliases:
+          - keycloak.localhost
     ports:
       - 8180:8180
     command:
