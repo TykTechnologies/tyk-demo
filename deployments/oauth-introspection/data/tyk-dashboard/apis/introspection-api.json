@@ -417,7 +417,16 @@
     "certificates": [],
     "do_not_track": false,
     "enable_context_vars": false,
-    "config_data": {},
+    "config_data": {
+      "introspection_url": "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect",
+      "client_id": "test-client",
+      "client_secret": "test-client-secret",
+      "timeout_seconds": 10,
+      "cache_enabled": true,
+      "cache_ttl": 300,
+      "max_retries": 3,
+      "retry_delay": 1000
+    },
     "config_data_disabled": false,
     "tag_headers": [],
     "global_rate_limit": {

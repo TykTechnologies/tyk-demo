@@ -48,15 +48,148 @@ type IntrospectionConfig struct {
 	IntrospectionURL string
 	ClientID         string
 	ClientSecret     string
+	TimeoutSeconds   int
+	CacheEnabled     bool
+	CacheTTL         int
+	MaxRetries       int
+	RetryDelay       int
 }
 
 // getIntrospectionConfig returns the configuration for OAuth introspection
-func getIntrospectionConfig() *IntrospectionConfig {
-	return &IntrospectionConfig{
+// Now reads from API config_data if available, falls back to defaults
+func getIntrospectionConfig(r *http.Request) *IntrospectionConfig {
+	// Default configuration
+	config := &IntrospectionConfig{
 		IntrospectionURL: "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect",
 		ClientID:         "test-client",
 		ClientSecret:     "test-client-secret",
+		TimeoutSeconds:   10,
+		CacheEnabled:     true,
+		CacheTTL:         300,
+		MaxRetries:       3,
+		RetryDelay:       1000,
 	}
+
+	// Get API definition from request context
+	apiSpec := ctx.GetDefinition(r)
+	if apiSpec == nil {
+		logger.Warn("Could not get API definition, using default config")
+		return config
+	}
+
+	// Check if config data is available and not disabled
+	if apiSpec.ConfigDataDisabled {
+		logger.Info("Config data is disabled, using default config")
+		return config
+	}
+
+	configData := apiSpec.ConfigData
+	if configData == nil {
+		logger.Info("No config data found, using default config")
+		return config
+	}
+
+	logger.Info("Reading configuration from API config_data")
+
+	// Extract configuration values from config_data
+	if introspectionURL, ok := configData["introspection_url"].(string); ok && introspectionURL != "" {
+		config.IntrospectionURL = introspectionURL
+		logger.Infof("Using introspection URL from config: %s", introspectionURL)
+	}
+
+	if clientID, ok := configData["client_id"].(string); ok && clientID != "" {
+		config.ClientID = clientID
+		logger.Infof("Using client ID from config: %s", clientID)
+	}
+
+	if clientSecret, ok := configData["client_secret"].(string); ok && clientSecret != "" {
+		config.ClientSecret = clientSecret
+		logger.Info("Using client secret from config (value hidden for security)")
+	}
+
+	if timeoutSeconds, ok := configData["timeout_seconds"].(float64); ok && timeoutSeconds > 0 {
+		config.TimeoutSeconds = int(timeoutSeconds)
+		logger.Infof("Using timeout from config: %d seconds", config.TimeoutSeconds)
+	}
+
+	if cacheEnabled, ok := configData["cache_enabled"].(bool); ok {
+		config.CacheEnabled = cacheEnabled
+		logger.Infof("Using cache enabled from config: %v", cacheEnabled)
+	}
+
+	if cacheTTL, ok := configData["cache_ttl"].(float64); ok && cacheTTL > 0 {
+		config.CacheTTL = int(cacheTTL)
+		logger.Infof("Using cache TTL from config: %d seconds", config.CacheTTL)
+	}
+
+	if maxRetries, ok := configData["max_retries"].(float64); ok && maxRetries >= 0 {
+		config.MaxRetries = int(maxRetries)
+		logger.Infof("Using max retries from config: %d", config.MaxRetries)
+	}
+
+	if retryDelay, ok := configData["retry_delay"].(float64); ok && retryDelay > 0 {
+		config.RetryDelay = int(retryDelay)
+		logger.Infof("Using retry delay from config: %d ms", config.RetryDelay)
+	}
+
+	// Validate configuration
+	if err := validateConfig(config); err != nil {
+		logger.Errorf("Configuration validation failed: %v", err)
+		// Return default config on validation failure
+		return &IntrospectionConfig{
+			IntrospectionURL: "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect",
+			ClientID:         "test-client",
+			ClientSecret:     "test-client-secret",
+			TimeoutSeconds:   10,
+			CacheEnabled:     true,
+			CacheTTL:         300,
+			MaxRetries:       3,
+			RetryDelay:       1000,
+		}
+	}
+
+	return config
+}
+
+// validateConfig validates the introspection configuration
+func validateConfig(config *IntrospectionConfig) error {
+	if config.IntrospectionURL == "" {
+		return fmt.Errorf("introspection_url cannot be empty")
+	}
+
+	if config.ClientID == "" {
+		return fmt.Errorf("client_id cannot be empty")
+	}
+
+	if config.ClientSecret == "" {
+		return fmt.Errorf("client_secret cannot be empty")
+	}
+
+	if config.TimeoutSeconds <= 0 {
+		return fmt.Errorf("timeout_seconds must be greater than 0")
+	}
+
+	if config.TimeoutSeconds > 300 {
+		return fmt.Errorf("timeout_seconds cannot exceed 300 seconds")
+	}
+
+	if config.CacheTTL <= 0 {
+		return fmt.Errorf("cache_ttl must be greater than 0")
+	}
+
+	if config.MaxRetries < 0 {
+		return fmt.Errorf("max_retries cannot be negative")
+	}
+
+	if config.MaxRetries > 10 {
+		return fmt.Errorf("max_retries cannot exceed 10")
+	}
+
+	if config.RetryDelay <= 0 {
+		return fmt.Errorf("retry_delay must be greater than 0")
+	}
+
+	return nil
 }
 
 // extractBearerToken extracts the bearer token from the Authorization header
@@ -76,6 +209,28 @@ func extractBearerToken(r *http.Request) string {
 
 // introspectToken calls the OAuth introspection endpoint to validate the token
 func introspectToken(token string, config *IntrospectionConfig) (*IntrospectionResponse, error) {
+	var lastErr error
+
+	for attempt := 0; attempt <= config.MaxRetries; attempt++ {
+		if attempt > 0 {
+			logger.Infof("Retrying introspection request (attempt %d/%d)", attempt+1, config.MaxRetries+1)
+			time.Sleep(time.Duration(config.RetryDelay) * time.Millisecond)
+		}
+
+		resp, err := performIntrospectionRequest(token, config)
+		if err == nil {
+			return resp, nil
+		}
+
+		lastErr = err
+		logger.Warnf("Introspection attempt %d failed: %v", attempt+1, err)
+	}
+
+	return nil, fmt.Errorf("introspection failed after %d attempts: %v", config.MaxRetries+1, lastErr)
+}
+
+// performIntrospectionRequest performs a single introspection request
+func performIntrospectionRequest(token string, config *IntrospectionConfig) (*IntrospectionResponse, error) {
 	// Prepare the request data
 	data := url.Values{}
 	data.Set("token", token)
@@ -92,7 +247,7 @@ func introspectToken(token string, config *IntrospectionConfig) (*IntrospectionR
 
 	// Make the request
 	client := &http.Client{
-		Timeout: 10 * time.Second,
+		Timeout: time.Duration(config.TimeoutSeconds) * time.Second,
 	}
 
 	logger.Infof("Making introspection request to: %s", config.IntrospectionURL)
@@ -253,6 +408,12 @@ func storeSessionInRedis(sessionAlias string, sessionState *user.SessionState, o
 func OAuthIntrospection(rw http.ResponseWriter, r *http.Request) {
 	logger.Info("OAuth Introspection plugin started")
 
+	// Get introspection configuration first
+	config := getIntrospectionConfig(r)
+	logger.Infof("Using configuration: URL=%s, ClientID=%s, Timeout=%ds, Cache=%v, CacheTTL=%ds, MaxRetries=%d, RetryDelay=%dms",
+		config.IntrospectionURL, config.ClientID, config.TimeoutSeconds,
+		config.CacheEnabled, config.CacheTTL, config.MaxRetries, config.RetryDelay)
+
 	// Log all headers for debugging
 	logger.Infof("Request headers: %v", r.Header)
 
@@ -268,9 +429,6 @@ func OAuthIntrospection(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Info("Bearer token extracted: ", token[:min(len(token), 20)], "...")
-
-	// Get introspection configuration
-	config := getIntrospectionConfig()
 
 	// Introspect the token
 	introspectionResp, err := introspectToken(token, config)
