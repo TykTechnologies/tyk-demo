@@ -71,13 +71,6 @@ log_http_result "$(curl -s -X POST \
   "$keycloak_base_url/admin/realms/tyk/clients")"
 bootstrap_progress
 
-log_message "Configuring introspection client permissions"
-# In Keycloak, a client can introspect tokens by default if it has the proper client credentials
-# No additional role mappings are required for basic token introspection
-# The service account is automatically created and configured correctly
-log_ok
-bootstrap_progress
-
 log_message "Creating test client for generating tokens"
 log_http_result "$(curl -s -X POST \
   -H "Content-Type: application/json" \
@@ -118,8 +111,6 @@ log_http_result "$(curl -s -X POST \
   "$keycloak_base_url/admin/realms/tyk/users")"
 bootstrap_progress
 
-
-
 if [ -f .bootstrap/skip_plugin_build ]; then
   log_message "Skipping Go plugin build - skip_plugin_build flag is set"
 else
@@ -137,20 +128,13 @@ echo -e "\033[2K
 ▼ OAuth Introspection
   ▽ Keycloak Resources
                   Realm : tyk
-    ▾ Introspection Client (Used by Tyk Gateway)
+      Introspection URL : $keycloak_base_url/realms/tyk/protocol/openid-connect/token/introspect
+    ▾ Introspection Client (for introspecting tokens)
               Client ID : tyk-introspection-client
           Client Secret : tyk-introspection-secret
-                   Type : Service Account Only
-                Purpose : Token Introspection
-    ▾ Test Client (Used for Token Generation)
+    ▾ Test Client (for generating tokens)
               Client ID : test-client
           Client Secret : test-client-secret
-                   Type : Confidential Client
-                Purpose : Token Generation
     ▾ Test User
                Username : testuser
-               Password : password
-  ▽ Client Separation
-         Token Generation : test-client
-      Token Introspection : tyk-introspection-client
-          Best Practice : ✓ Separate clients for different OAuth operations"
+               Password : password"
