@@ -419,8 +419,8 @@
     "enable_context_vars": false,
     "config_data": {
       "introspection_url": "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect",
-      "client_id": "test-client",
-      "client_secret": "test-client-secret",
+      "client_id": "tyk-introspection-client",
+      "client_secret": "tyk-introspection-secret",
       "timeout_seconds": 10,
       "cache_enabled": true,
       "cache_ttl": 300,

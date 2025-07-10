@@ -2,6 +2,8 @@
 
 This document provides practical examples of how to configure the OAuth introspection plugin for different environments and use cases.
 
+**Client Separation Best Practice**: All examples follow OAuth 2.0 best practices by using separate clients for token generation and introspection. This provides better security isolation and follows the principle of least privilege.
+
 ## Table of Contents
 
 1. [Basic Configuration](#basic-configuration)
@@ -12,6 +14,7 @@ This document provides practical examples of how to configure the OAuth introspe
 6. [Performance Optimized](#performance-optimized)
 7. [Security Hardened](#security-hardened)
 8. [Troubleshooting Configuration](#troubleshooting-configuration)
+9. [Client Separation Examples](#client-separation-examples)
 
 ## Basic Configuration
 
@@ -37,8 +40,8 @@ This document provides practical examples of how to configure the OAuth introspe
     },
     "config_data": {
       "introspection_url": "https://auth.example.com/oauth/introspect",
-      "client_id": "your-client-id",
-      "client_secret": "your-client-secret"
+      "client_id": "your-introspection-client-id",
+      "client_secret": "your-introspection-client-secret"
     },
     "config_data_disabled": false,
     "active": true
@@ -70,8 +73,8 @@ This document provides practical examples of how to configure the OAuth introspe
     },
     "config_data": {
       "introspection_url": "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect",
-      "client_id": "test-client",
-      "client_secret": "test-client-secret",
+      "client_id": "tyk-introspection-client",
+      "client_secret": "tyk-introspection-secret",
       "timeout_seconds": 10,
       "cache_enabled": false,
       "max_retries": 1,
@@ -110,8 +113,8 @@ This document provides practical examples of how to configure the OAuth introspe
     },
     "config_data": {
       "introspection_url": "https://dev-tenant.auth0.com/oauth/introspect",
-      "client_id": "dev-client-id",
-      "client_secret": "dev-client-secret",
+      "client_id": "dev-introspection-client",
+      "client_secret": "dev-introspection-secret",
       "timeout_seconds": 15,
       "cache_enabled": false,
       "max_retries": 2,
@@ -147,8 +150,8 @@ This document provides practical examples of how to configure the OAuth introspe
     },
     "config_data": {
       "introspection_url": "https://auth.company.com/oauth/introspect",
-      "client_id": "prod-api-gateway",
-      "client_secret": "prod-secure-secret",
+      "client_id": "prod-introspection-client",
+      "client_secret": "prod-introspection-secret",
       "timeout_seconds": 30,
       "cache_enabled": true,
       "cache_ttl": 600,
@@ -192,8 +195,8 @@ This document provides practical examples of how to configure the OAuth introspe
     },
     "config_data": {
       "introspection_url": "https://company.okta.com/oauth2/v1/introspect",
-      "client_id": "okta-client-id",
-      "client_secret": "okta-client-secret",
+      "client_id": "okta-introspection-client",
+      "client_secret": "okta-introspection-secret",
       "timeout_seconds": 25,
       "cache_enabled": true,
       "cache_ttl": 300,
@@ -517,13 +520,71 @@ For sensitive data like client secrets, consider using environment variables:
 }
 ```
 
-## Best Practices
+## Client Separation Examples
 
-1. **Security**: Never commit client secrets to version control
-2. **Performance**: Enable caching in production environments
-3. **Reliability**: Configure appropriate retry policies
-4. **Monitoring**: Use detailed recording for troubleshooting
-5. **Testing**: Always validate configurations before deployment
+### Token Generation vs Introspection Clients
+
+The following example shows how to properly separate OAuth clients:
+
+#### Token Generation Client (Keycloak)
+```json
+{
+  "clientId": "api-token-generator",
+  "name": "API Token Generator",
+  "enabled": true,
+  "secret": "token-generator-secret",
+  "directAccessGrantsEnabled": true,
+  "serviceAccountsEnabled": true,
+  "standardFlowEnabled": true,
+  "publicClient": false
+}
+```
+
+#### Introspection Client (Keycloak)
+```json
+{
+  "clientId": "api-introspection-client",
+  "name": "API Introspection Client",
+  "enabled": true,
+  "secret": "introspection-client-secret",
+  "serviceAccountsEnabled": true,
+  "standardFlowEnabled": false,
+  "directAccessGrantsEnabled": false,
+  "publicClient": false
+}
+```
+
+#### API Definition Using Introspection Client
+```json
+{
+  "api_definition": {
+    "name": "Properly Separated OAuth API",
+    "slug": "separated-oauth",
+    "api_id": "separated-oauth-api",
+    "org_id": "your-org",
+    "use_go_plugin_auth": true,
+    "custom_middleware": {
+      "auth_check": {
+        "disabled": false,
+        "name": "OAuthIntrospection",
+        "path": "plugins/go/introspection/introspection.so",
+        "require_session": false,
+        "raw_body_only": false
+      },
+      "driver": "goplugin"
+    },
+    "config_data": {
+      "introspection_url": "https://auth.company.com/oauth/introspect",
+      "client_id": "api-introspection-client",
+      "client_secret": "introspection-client-secret",
+      "timeout_seconds": 15,
+      "cache_enabled": true,
+      "cache_ttl": 300,
+      "max_retries": 3,
+      "retry_delay": 1000
+    },
+    "config_data_disabled": false,
+
 
 ## Summary
 

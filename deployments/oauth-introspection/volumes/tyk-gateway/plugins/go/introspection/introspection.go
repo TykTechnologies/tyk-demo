@@ -61,8 +61,8 @@ func getIntrospectionConfig(r *http.Request) *IntrospectionConfig {
 	// Default configuration
 	config := &IntrospectionConfig{
 		IntrospectionURL: "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect",
-		ClientID:         "test-client",
-		ClientSecret:     "test-client-secret",
+		ClientID:         "tyk-introspection-client",
+		ClientSecret:     "tyk-introspection-secret",
 		TimeoutSeconds:   10,
 		CacheEnabled:     true,
 		CacheTTL:         300,
@@ -138,8 +138,8 @@ func getIntrospectionConfig(r *http.Request) *IntrospectionConfig {
 		// Return default config on validation failure
 		return &IntrospectionConfig{
 			IntrospectionURL: "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect",
-			ClientID:         "test-client",
-			ClientSecret:     "test-client-secret",
+			ClientID:         "tyk-introspection-client",
+			ClientSecret:     "tyk-introspection-secret",
 			TimeoutSeconds:   10,
 			CacheEnabled:     true,
 			CacheTTL:         300,

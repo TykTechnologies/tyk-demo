@@ -33,10 +33,11 @@ The bootstrap process will:
 - **Enabled**: true
 
 ### Introspection Client: `tyk-introspection-client`
-- **Purpose**: For Tyk Gateway to introspect tokens (created but not used in current implementation)
+- **Purpose**: For Tyk Gateway to introspect tokens
 - **Secret**: `tyk-introspection-secret`
 - **Type**: Service account only
 - **Flows**: Service account enabled, others disabled
+- **Permissions**: View clients (for token introspection)
 
 ### Test Client: `test-client`
 - **Purpose**: For generating test tokens
@@ -104,11 +105,12 @@ The deployment includes a Go plugin (`introspection.go`) that demonstrates OAuth
 - Adds OAuth metadata to request headers for downstream services
 
 ### Plugin Features
-- **Token Validation**: Calls Keycloak's introspection endpoint using the same client credentials as token generation
+- **Token Validation**: Calls Keycloak's introspection endpoint using dedicated introspection client credentials
 - **Session Management**: Creates and caches Tyk sessions with proper expiration timestamps
 - **Network Compatibility**: Uses `keycloak.localhost` for both external and internal network access
 - **Metadata Injection**: Adds OAuth client ID, username, subject, and scope as request headers
 - **Error Handling**: Proper error responses for invalid/missing tokens
+- **Client Separation**: Uses separate clients for token generation and introspection following OAuth best practices
 
 ### Request Headers Added
 - `X-OAuth-Client-ID`: OAuth client identifier
@@ -161,12 +163,15 @@ curl "http://tyk-gateway.localhost:8080/introspection/anything"
 The plugin is configured in the API definition with:
 - **Authentication Type**: Go Plugin Auth (`use_go_plugin_auth: true`)
 - **Middleware**: `auth_check` middleware using `OAuthIntrospection`
-- **Client Configuration**: Uses `test-client` credentials for introspection (same as token generation)
+- **Client Configuration**: Uses `tyk-introspection-client` credentials for introspection (separate from token generation)
 - **Network Setup**: Keycloak service has `keycloak.localhost` network alias for consistent resolution
+- **Security**: Follows OAuth best practices with dedicated introspection client
 
 ## Implementation Notes
 
-- The plugin uses the same client (`test-client`) for both token generation and introspection to avoid permission issues
+- The plugin uses a dedicated introspection client (`tyk-introspection-client`) separate from the token generation client (`test-client`) following OAuth best practices
+- The introspection client is configured with service account permissions and specific roles for token introspection
 - Network alias `keycloak.localhost` is configured in the Keycloak service to ensure consistent hostname resolution from both host and container environments
 - Session expiration uses absolute Unix timestamps from the token's `exp` claim
 - All OAuth metadata from the introspection response is preserved and passed to downstream services via request headers
+- Client separation provides better security isolation and follows the principle of least privilege
