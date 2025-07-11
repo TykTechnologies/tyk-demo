@@ -254,14 +254,31 @@ bootstrap_progress
 if [ -f .bootstrap/skip_plugin_build ]; then
   log_message "Skipping Go plugin build - skip_plugin_build flag is set"
 else
-  build_go_plugin "deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.so"
+  plugin_changed=false
+
+  if ensure_go_plugin "deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.so"; then
+    plugin_changed=true
+  fi
   bootstrap_progress
 
-  build_go_plugin "deployments/tyk/volumes/tyk-gateway/plugins/go/jwt/jwt-go-plugin.so"
+  if ensure_go_plugin "deployments/tyk/volumes/tyk-gateway/plugins/go/jwt/jwt-go-plugin.so"; then
+    plugin_changed=true
+  fi
   bootstrap_progress
 
-  build_go_plugin "deployments/tyk/volumes/tyk-gateway/plugins/go/ipratelimit/ip-rate-limit.so"
+  if ensure_go_plugin "deployments/tyk/volumes/tyk-gateway/plugins/go/ipratelimit/ip-rate-limit.so"; then
+    plugin_changed=true
+  fi
   bootstrap_progress
+
+  if [ "$plugin_changed" = true ]; then
+    log_message "Recreating tyk-gateway to load Go plugins"
+    eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway 1>/dev/null 2>>logs/bootstrap.log
+    log_ok
+    bootstrap_progress
+  else
+    log_message "All Go plugins already up-to-date, skipping gateway recreation"
+  fi
 fi
 
 # Dashboard Data
@@ -379,13 +396,13 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     log_message "Initialising Portal"
     initialise_portal "$organisation_id" "$dashboard_user_api_key"
     bootstrap_progress
-    
+
     # Portal - Pages
     log_message "Creating Portal Pages"
     for file in $data_group_path/portal/pages/*; do
       if [[ -f $file ]]; then
         create_portal_page "$file" "$dashboard_user_api_key"
-        bootstrap_progress        
+        bootstrap_progress
       fi
     done
 
@@ -396,7 +413,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
       if [[ -f $file ]]; then
         create_portal_developer "$file" "$dashboard_user_api_key" "$index"
         index=$((index + 1))
-        bootstrap_progress        
+        bootstrap_progress
       fi
     done
 
@@ -411,7 +428,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
         if [[ -f $documentation_path ]]; then
           documentation_id=$(create_portal_documentation "$documentation_path" "$dashboard_user_api_key")
         fi
-        bootstrap_progress        
+        bootstrap_progress
 
         catalogue_path="$directory/catalogue.json"
         if [[ -f $catalogue_path ]]; then
@@ -420,7 +437,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
           log_message "ERROR: catalogue file missing: $catalogue_path"
           exit 1
         fi
-        bootstrap_progress        
+        bootstrap_progress
 
         # Social Media REST
         documentation_path="$directory/documentation_socialmedia_rest.json"
@@ -440,7 +457,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
 
         # Social Media GQL
         documentation_id_graph=$(create_portal_graphql_documentation "$dashboard_user_api_key" "Social Media GQL")
-        bootstrap_progress  
+        bootstrap_progress
 
         catalogue_path_graph="$directory/catalogue_socialmediagql.json"
         if [[ -f $catalogue_path_graph ]]; then
@@ -449,7 +466,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
           log_message "ERROR: catalogue file missing: $catalogue_path"
           exit 1
         fi
-        bootstrap_progress        
+        bootstrap_progress
       fi
     done
 
@@ -458,7 +475,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     for file in $data_group_path/keys/basic/*; do
       if [[ -f $file ]]; then
         create_basic_key "$file" "$dashboard_user_api_key"
-        bootstrap_progress        
+        bootstrap_progress
       fi
     done
 
@@ -467,7 +484,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
     for file in $data_group_path/keys/bearer-token/*; do
       if [[ -f $file ]]; then
         create_bearer_token_dash "$file" "$dashboard_user_api_key"
-        bootstrap_progress        
+        bootstrap_progress
       fi
     done
 
@@ -480,7 +497,7 @@ for data_group_path in deployments/tyk/data/tyk-dashboard/*; do
         wait_for_api_loaded "$target_api_id" "$gateway_base_url" "$gateway_api_credentials"
         # reaching this point means that the gateway has loaded target OAuth API
         create_oauth_client "$file" "$dashboard_user_api_key"
-        bootstrap_progress        
+        bootstrap_progress
       fi
     done
   fi
@@ -627,7 +644,7 @@ else
       reload_attempt=$((reload_attempt+1))
       if [ "$reload_attempt" -lt "3"  ]; then
         log_message "  Gateway 2 not returning desired response, attempting hot reload"
-        hot_reload "$gateway2_base_url" "$gateway2_api_credentials" 
+        hot_reload "$gateway2_base_url" "$gateway2_api_credentials"
         sleep 2
       else
         log_message "  Maximum reload attempt reached"
@@ -641,7 +658,7 @@ fi
 
 log_message "Sending API requests to generate analytics data"
 # global analytics off
-curl $gateway_base_url/basic-open-api/anything/[1-10] -s -o /dev/null 
+curl $gateway_base_url/basic-open-api/anything/[1-10] -s -o /dev/null
 bootstrap_progress
 # global analytics on
 curl $gateway2_base_url/basic-open-api/anything/[1-10] -s -k -o /dev/null
@@ -650,13 +667,13 @@ bootstrap_progress
 curl $gateway_base_url/detailed-analytics-off/get -s -o /dev/null
 bootstrap_progress
 # api analytics on
-curl $gateway_base_url/detailed-analytics-on/get -s -o /dev/null 
+curl $gateway_base_url/detailed-analytics-on/get -s -o /dev/null
 bootstrap_progress
 # key analytics off
-curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key" -o /dev/null 
+curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: auth_key" -o /dev/null
 bootstrap_progress
 # key analytics on
-curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: analytics_on" -o /dev/null 
+curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: analytics_on" -o /dev/null
 bootstrap_progress
 log_ok
 
@@ -677,7 +694,7 @@ else
   ngrok_gateway_tunnel_url=$(curl -s --show-error ${ngrok_api_gateway_endpoint} 2>> logs/bootstrap.log | jq ".public_url" --raw-output)
   log_message "  Getting MDCB tunnel URL from $ngrok_api_mdcb_endpoint"
   ngrok_mdcb_tunnel_url=$(curl -s --show-error ${ngrok_api_mdcb_endpoint} 2>> logs/bootstrap.log | jq ".public_url" --raw-output)
-  
+
   # we want to handle ngrok failure gracefully, such that it doesn't prevent the bootstrap from completing
   if [ "$?" != 0 ]; then
     log_message "  ERROR: Unable to get Ngrok configuration from $ngrok_api_gateway_endpoint"
@@ -689,7 +706,7 @@ else
     else
       log_message "  Ngrok gateway URL: $ngrok_gateway_tunnel_url"
       ngrok_available=true
-      log_ok  
+      log_ok
     fi
     if [ "$ngrok_mdcb_tunnel_url" = "" ]; then
       log_message "  ERROR: The Ngrok MDCB URL is empty"
@@ -699,7 +716,7 @@ else
       ngrok_available=true
       ngrok_mdcb_url=$(echo "$ngrok_mdcb_tunnel_url" | cut -d'/' -f3)
       set_context_data "1" "ngrok" "mdcb" "url" "$ngrok_mdcb_url"
-      log_ok  
+      log_ok
     fi
   fi
 fi
@@ -716,9 +733,9 @@ echo -e "\033[2K
         ${CYAN}▓▓▓▓▓${NOCOLOUR}      ▓▓▓  ▓▓▓     ▓▓▓  ▓▓▓     ▓▓
         ${CYAN}▓▓▓▓▓▓▓${NOCOLOUR}    ▓▓▓  ▓▓▓     ▓▓▓  ▓▓▓    ▓▓
           ${CYAN}▓▓▓▓▓${NOCOLOUR}    ▓▓▓  ▓▓▓     ▓▓▓  ▓▓▓▓▓▓▓▓▓
-                   ▓▓▓  ▓▓▓     ▓▓▓  ▓▓▓    ▓▓ 
+                   ▓▓▓  ▓▓▓     ▓▓▓  ▓▓▓    ▓▓
                    ▓▓▓   ▓▓▓▓▓▓▓▓▓▓  ▓▓▓     ▓▓
-                                ▓▓▓  
+                                ▓▓▓
                          ▓▓▓▓▓▓▓▓▓
 
 ▼ Tyk
@@ -726,8 +743,8 @@ echo -e "\033[2K
                 Licence : $dashboard_licence_days_remaining days remaining
                     URL : $DASHBOARD_DISPLAY_URL
        Admin API Header : admin-auth
-          Admin API Key : $dashboard_admin_api_credentials 
-   Dashboard API Header : Authorization       
+          Admin API Key : $dashboard_admin_api_credentials
+   Dashboard API Header : Authorization
     ▾ $(get_context_data "1" "organisation" "1" "name") Organisation
                Username : $(get_context_data "1" "dashboard-user" "1" "email")
                Password : $(get_context_data "1" "dashboard-user" "1" "password")
@@ -755,7 +772,7 @@ echo -e "\033[2K
      Gateway API Header : x-tyk-authorization
         Gateway API Key : $gateway_api_credentials
   ▽ Gateway 2 ($(get_service_image_tag "tyk-gateway-2"))
-                    URL : $GATEWAY2_DISPLAY_URL  
+                    URL : $GATEWAY2_DISPLAY_URL
      Gateway API Header : x-tyk-authorization
         Gateway API Key : $gateway2_api_credentials"
 if [ "$ngrok_available" = "true" ]; then

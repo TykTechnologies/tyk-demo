@@ -114,7 +114,16 @@ bootstrap_progress
 if [ -f .bootstrap/skip_plugin_build ]; then
   log_message "Skipping Go plugin build - skip_plugin_build flag is set"
 else
-  build_go_plugin "deployments/oauth-introspection/volumes/tyk-gateway/plugins/go/introspection/introspection.so"
+  if ensure_go_plugin "deployments/oauth-introspection/volumes/tyk-gateway/plugins/go/introspection/introspection.so"; then
+    # Plugin was built or copied - gateway needs to be recreated
+    log_message "Recreating tyk-gateway to load Go plugin"
+    eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-gateway 1>/dev/null 2>>logs/bootstrap.log
+    log_ok
+    bootstrap_progress
+  else
+    # Plugin already up-to-date - no need to recreate gateway
+    log_message "Go plugin already up-to-date, skipping gateway recreation"
+  fi
   bootstrap_progress
 fi
 

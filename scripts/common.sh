@@ -31,9 +31,9 @@ bootstrap_progress () {
 
 log_http_result () {
   if [ "$1" = "200" ] || [ "$1" = "201" ]
-  then 
+  then
     log_ok
-  else 
+  else
     log_message "  ERROR: $1"
     exit 1
   fi
@@ -95,7 +95,7 @@ set_docker_environment_value () {
       echo "" >> .env
     fi
     log_message "Adding Docker environment variable: $setting_desired_value"
-    echo "$setting_desired_value" >> .env  
+    echo "$setting_desired_value" >> .env
   else
     if [ "$setting_current_value" != "$setting_desired_value" ]
     then
@@ -327,7 +327,7 @@ check_licence_expiry () {
   # calculate the number of days remaining for the licence
   # do not make licence_days_remaining a local variable - this sets a global variable, allowing the value to be used elsewhere
   licence_days_remaining=$(expr $licence_seconds_remaining / 86400)
-  
+
   # check if licence time remaining (in seconds) is less or equal to 0
   if [ "$licence_seconds_remaining" -le "0" ]; then
     log_message "  ERROR: Licence $1 has expired"
@@ -353,80 +353,148 @@ _decode_base64_url () {
   local len=$((${#1} % 4))
   local result="$1"
   if [ $len -eq 2 ]; then result="$1"'=='
-  elif [ $len -eq 3 ]; then result="$1"'=' 
+  elif [ $len -eq 3 ]; then result="$1"'='
   fi
   echo "$result" | tr '_-' '/+' | base64 -d
 }
 
 decode_jwt () { _decode_base64_url $(echo -n $1 | cut -d "." -f ${2:-2}) | jq .; }
 
-build_go_plugin () {
-  local gateway_image_tag=$(get_service_image_tag "tyk-gateway")
-  local go_plugin_relative_path=$1
-  
-  # Calculate full path and extract directory and filename
-  local go_plugin_path="$PWD/$go_plugin_relative_path"
-  local go_plugin_directory=$(dirname "$go_plugin_path")
-  local go_plugin_filename=$(basename "$go_plugin_path")
-  
+plugin_exists_in_cache() {
+  local gateway_image_tag="$1"
+  local go_plugin_filename="$2"
+
   local go_plugin_cache_directory="$PWD/.bootstrap/plugin-cache"
   local go_plugin_cache_version_directory="$go_plugin_cache_directory/$gateway_image_tag"
   local go_plugin_cache_file_path="$go_plugin_cache_version_directory/$go_plugin_filename"
 
+  [ -f "$go_plugin_cache_file_path" ]
+}
+
+copy_plugin_from_cache() {
+  local gateway_image_tag="$1"
+  local go_plugin_directory="$2"
+  local go_plugin_filename="$3"
+
+  local go_plugin_cache_directory="$PWD/.bootstrap/plugin-cache"
+  local go_plugin_cache_version_directory="$go_plugin_cache_directory/$gateway_image_tag"
+  local go_plugin_cache_file_path="$go_plugin_cache_version_directory/$go_plugin_filename"
+  local go_plugin_target_path="$go_plugin_directory/$go_plugin_filename"
+
+  # Check if target file exists and is identical to cached version
+  if [ -f "$go_plugin_target_path" ] && cmp -s "$go_plugin_cache_file_path" "$go_plugin_target_path"; then
+    log_message "  Target plugin $go_plugin_filename already matches cached version, no copy needed"
+    return 1  # No copy needed
+  fi
+
+  if [ -f "$go_plugin_target_path" ]; then
+    log_message "  Target plugin exists but differs from cache, updating from cache"
+  else
+    log_message "  Target plugin missing, copying from cache"
+  fi
+  cp "$go_plugin_cache_file_path" "$go_plugin_directory/$go_plugin_filename"
+  return 0  # Copy performed
+}
+
+compile_go_plugin() {
+  local gateway_image_tag="$1"
+  local go_plugin_path="$2"
+  local go_plugin_directory="$3"
+  local go_plugin_filename="$4"
+
+  log_message "  Not found in cache. Building Go plugin $go_plugin_path using tag $gateway_image_tag"
+
+  # default Go build targets
+  local goarch="amd64"
+  local goos="linux"
+  # get the current platform
+  local platform=$(uname -m)
+  log_message "  Current hardware platform: $platform"
+  if [ "$platform" == 'arm64' ]; then
+    goarch=$platform
+  fi
+  log_message "  Target Go Platform: $goos/$goarch"
+
+  docker run --rm -v "$go_plugin_directory:/plugin-source" -e GOOS=$goos -e GOARCH=$goarch --platform linux/amd64 tykio/tyk-plugin-compiler:$gateway_image_tag "$go_plugin_filename"
+  local plugin_container_exit_code="$?"
+  if [[ "$plugin_container_exit_code" -ne "0" ]]; then
+    log_message "  ERROR: Tyk Plugin Compiler container returned error code: $plugin_container_exit_code"
+    exit 1
+  fi
+
+  # the .so file created by the plugin build container includes the target release version and architecture e.g. example-go-plugin_v4.1.0_linux_amd64.so
+  # we need to remove these so that the file name matches what's in the API definition e.g. example-go-plugin.so
+  rm "$go_plugin_directory/$go_plugin_filename"
+  mv "$go_plugin_directory"/*.so "$go_plugin_directory/$go_plugin_filename"
+
+  # copy to cache, to enable built plugins to be reused across bootstraps
+  local go_plugin_cache_directory="$PWD/.bootstrap/plugin-cache"
+  local go_plugin_cache_version_directory="$go_plugin_cache_directory/$gateway_image_tag"
+  cp "$go_plugin_directory"/*.so "$go_plugin_cache_version_directory"
+
+  # limit the number of plugin caches to prevent uncontrolled growth
+  local PLUGIN_CACHE_MAX_SIZE=$(grep -E '^PLUGIN_CACHE_MAX_SIZE=[0-9]+' .env | cut -d '=' -f2)
+  PLUGIN_CACHE_MAX_SIZE=${PLUGIN_CACHE_MAX_SIZE:-3}
+  local plugin_cache_count=$(find "$go_plugin_cache_directory" -maxdepth 1 -type d -not -path "$go_plugin_cache_directory" | wc -l | xargs)
+  log_message "  Plugin cache used/max: $plugin_cache_count/$PLUGIN_CACHE_MAX_SIZE"
+  if [ "$plugin_cache_count" -gt "$PLUGIN_CACHE_MAX_SIZE" ]; then
+    oldest_plugin_cache_path=$(find "$go_plugin_cache_directory" -type d -not -path "$go_plugin_cache_directory" -exec ls -ld -ltr {} + | head -n 1 | awk '{print $9}')
+    if [ -n "$oldest_plugin_cache_path" ]; then
+      log_message "  Pruning oldest plugin cache $oldest_plugin_cache_path"
+      rm "$oldest_plugin_cache_path"/*.so
+      rm -r "$oldest_plugin_cache_path"
+    fi
+  fi
+}
+
+
+
+ensure_go_plugin() {
+  local gateway_image_tag=$(get_service_image_tag "tyk-gateway")
+  local go_plugin_relative_path=$1
+
+  # Calculate full path and extract directory and filename
+  local go_plugin_path="$PWD/$go_plugin_relative_path"
+  local go_plugin_directory=$(dirname "$go_plugin_path")
+  local go_plugin_filename=$(basename "$go_plugin_path")
+
+  local go_plugin_cache_directory="$PWD/.bootstrap/plugin-cache"
+  local go_plugin_cache_version_directory="$go_plugin_cache_directory/$gateway_image_tag"
+
   # create cache directories if missing
   if [ ! -d "$go_plugin_cache_directory" ]; then
-    mkdir $go_plugin_cache_directory
+    mkdir "$go_plugin_cache_directory"
   fi
   if [ ! -d "$go_plugin_cache_version_directory" ]; then
-    mkdir $go_plugin_cache_version_directory
+    mkdir "$go_plugin_cache_version_directory"
   fi
 
-  log_message "Checking for Go plugin $go_plugin_filename $gateway_image_tag in cache"
-  # build plugin if it does not exist in the cache
-  if [ ! -f $go_plugin_cache_file_path ]; then
-    log_message "  Not found. Building Go plugin $go_plugin_path using tag $gateway_image_tag"
-    # default Go build targets
-    local goarch="amd64"
-    local goos="linux"
-    # get the current platform
-    local platform=$(uname -m)
-    log_message "  Current hardware platform: $platform"
-    if [ "$platform" == 'arm64' ]; then
-      goarch=$platform
-    fi
-    log_message "  Target Go Platform: $goos/$goarch"
-    docker run --rm -v $go_plugin_directory:/plugin-source -e GOOS=$goos -e GOARCH=$goarch --platform linux/amd64 tykio/tyk-plugin-compiler:$gateway_image_tag $go_plugin_filename
-    local plugin_container_exit_code="$?"
-    if [[ "$plugin_container_exit_code" -ne "0" ]]; then
-      log_message "  ERROR: Tyk Plugin Compiler container returned error code: $plugin_container_exit_code"
-      exit 1
-    fi
-    # the .so file created by the plugin build container includes the target release version and architecture e.g. example-go-plugin_v4.1.0_linux_amd64.so
-    # we need to remove these so that the file name matches what's in the API definition e.g. example-go-plugin.so
-    rm $go_plugin_directory/$go_plugin_filename
-    mv $go_plugin_directory/*.so $go_plugin_directory/$go_plugin_filename
-    # copy to cache, to enable built plugins to be reused across bootstraps
-    cp $go_plugin_directory/*.so $go_plugin_cache_version_directory
+  log_message "Ensuring Go plugin $go_plugin_filename matches gateway version $gateway_image_tag"
 
-    # limit the number of plugin caches to prevent uncontrolled growth
-    local PLUGIN_CACHE_MAX_SIZE=$(grep -E '^PLUGIN_CACHE_MAX_SIZE=[0-9]+' .env | cut -d '=' -f2)
-    PLUGIN_CACHE_MAX_SIZE=${PLUGIN_CACHE_MAX_SIZE:-3}
-    local plugin_cache_count=$(find "$go_plugin_cache_directory" -maxdepth 1 -type d -not -path "$go_plugin_cache_directory" | wc -l | xargs)
-    log_message "  Plugin cache used/max: $plugin_cache_count/$PLUGIN_CACHE_MAX_SIZE"
-    if [ "$plugin_cache_count" -gt "$PLUGIN_CACHE_MAX_SIZE" ]; then
-      oldest_plugin_cache_path=$(find "$go_plugin_cache_directory" -type d -not -path "$go_plugin_cache_directory" -exec ls -ld -ltr {} + | head -n 1 | awk '{print $9}')
-      if [ -n "$oldest_plugin_cache_path" ]; then
-        log_message "  Pruning oldest plugin cache $oldest_plugin_cache_path"
-        rm "$oldest_plugin_cache_path/*.so"
-        rm -r "$oldest_plugin_cache_path"
-      fi
+  # Check if plugin exists in cache for current gateway version
+  if plugin_exists_in_cache "$gateway_image_tag" "$go_plugin_filename"; then
+    # Try to copy from cache (will check if files are identical)
+    if copy_plugin_from_cache "$gateway_image_tag" "$go_plugin_directory" "$go_plugin_filename"; then
+      log_message "  Plugin updated from cache"
+      log_ok
+      return 0  # Plugin was copied
+    else
+      log_message "  Plugin already up-to-date with gateway version"
+      log_ok
+      return 1  # No change needed
     fi
   else
-    log_message "  Found. Copying Go plugin $go_plugin_filename $gateway_image_tag from cache"
-    cp $go_plugin_cache_file_path $go_plugin_directory/$go_plugin_filename
-    # note: if you want to force a recompile of the plugin .so file, delete the .so file from the applicable .bootstrap/plugin-cache directory
+    # Build from source and cache it
+    compile_go_plugin "$gateway_image_tag" "$go_plugin_path" "$go_plugin_directory" "$go_plugin_filename"
+    log_message "  Plugin built from source for gateway version $gateway_image_tag"
+    log_ok
+    return 0  # Plugin was built
   fi
-  log_ok
+}
+
+# Legacy function name for backward compatibility
+build_go_plugin() {
+  ensure_go_plugin "$@"
 }
 
 create_organisation () {
@@ -448,7 +516,7 @@ create_organisation () {
 
   # validate result
   log_json_result "$api_response"
-  
+
   # add details to context data
   set_context_data "$data_group" "organisation" "$index" "id" "$organisation_id"
   set_context_data "$data_group" "organisation" "$index" "name" "$organisation_name"
@@ -483,9 +551,9 @@ create_dashboard_user () {
   local data_group="$3"
   local index="$4"
   local dashboard_user_password=$(jq -r '.password' $dashboard_user_data_path)
-  
+
   check_variables
-  
+
   # create user in Tyk Dashboard database
   log_message "  Creating Dashboard User: $(jq -r '.email_address' $dashboard_user_data_path)"
   local api_response=$(curl $dashboard_base_url/admin/users -s \
@@ -543,7 +611,7 @@ create_user_group () {
 
   # validate result
   log_json_result "$api_response"
-  
+
   # extract data from response
   local user_group_id=$(echo "$api_response" | jq -r '.Meta')
 
@@ -588,7 +656,7 @@ initialise_portal () {
     -H "Authorization: $api_key" \
     -d '{"org_id": "'$organisation_id'"}' 2>> logs/bootstrap.log)
   log_json_result "$api_response"
-  
+
   catalogue_id=$(echo "$api_response" | jq -r '.Message')
   log_message "    Id: $catalogue_id"
 }
@@ -631,7 +699,7 @@ create_portal_developer () {
 create_portal_graphql_documentation () {
   local api_key="$1"
   local documentation_title="$2"
-  
+
   check_variables
 
   log_message "  Creating Documentation: $documentation_title"
@@ -653,7 +721,7 @@ create_portal_documentation () {
   local documentation_data_path="$1"
   local api_key="$2"
   local documentation_title=$(jq -r '.info.title' $documentation_data_path)
-  
+
   check_variables
 
   log_message "  Creating Documentation: $documentation_title"
@@ -724,12 +792,12 @@ create_api2 () {
   if [ "$api_is_oas" == true ]; then
     # OAS API
     api_name=$(jq -r '.["x-tyk-api-gateway"].info.name' $api_data_path)
-    api_id=$(jq -r '.["x-tyk-api-gateway"].info.id' $api_data_path)    
+    api_id=$(jq -r '.["x-tyk-api-gateway"].info.id' $api_data_path)
     # import endpoint differs between classic and OAS APIs
     api_endpoint="$api_endpoint/oas"
     log_message "  Creating OAS API: $api_name"
   else
-    # Tyk API 
+    # Tyk API
     api_name=$(jq -r '.api_definition.name' $api_data_path)
     api_id=$(jq -r '.api_definition.api_id' $api_data_path)
     log_message "  Creating Classic API: $api_name"
@@ -749,7 +817,7 @@ create_api2 () {
       log_message "    Updating Webhook Reference: $webhook_name"
 
       local new_webhook_id=$(jq -r --arg webhook_name "$webhook_name" 'select ( .name == $webhook_name ) .id' <<< "$webhook_data")
-      
+
       # update the hook reference id, matching by the webhook name
       api_data=$(jq --arg webhook_id "$new_webhook_id" --arg webhook_name "$webhook_name" '(.hook_references[] | select(.hook.name == $webhook_name) .hook.id) = $webhook_id' <<< "$api_data")
 
@@ -1149,7 +1217,7 @@ wait_for_status() {
   if [[ -n "$json_path" && -n "$expected_value" ]]; then
     log_message "Validating JSON path: $json_path with expected value: $expected_value"
   fi
-  
+
   while (( attempt < max_retries )); do
     # Perform the curl request
     response=$(curl -s -w "\n%{http_code}" "$url")
@@ -1216,11 +1284,11 @@ api_has_section () {
 
 licence_has_scope () {
   local licence_payload scope scopes search_term
-  
+
   licence_name="$1"
   search_term="$2"
   licence_payload=$(get_licence_payload "$licence_name") || return 2
-  
+
   # Check if jq command succeeds
   scopes=$(echo "$licence_payload" | jq -r '.scope') || return 2
 
@@ -1284,7 +1352,7 @@ create_enterprise_portal_page () {
   local api_response_status=$(echo "$api_response" | tail -n1)     # Last line is the status code
 
   # Look for 201 - Created
-  if [[ "$api_response_status" == "201" ]]; then 
+  if [[ "$api_response_status" == "201" ]]; then
     local page_id=$(echo "$api_response_body" | jq -r '.ID')
     log_message "  Page created with ID: $page_id"
   else
