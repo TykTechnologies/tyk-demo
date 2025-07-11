@@ -1,0 +1,768 @@
+{
+  "info": {
+    "_postman_id": "tyk-demo-oauth-introspection",
+    "name": "Tyk Demo - OAuth Introspection",
+    "description": "Comprehensive OAuth2 token introspection testing with Keycloak and Tyk Gateway. Tests token generation, revocation, introspection, and API access control scenarios.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Token Management",
+      "item": [
+        {
+          "name": "Generate User Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    ",
+                  "    pm.test('Access token received', function () {",
+                  "        pm.expect(response.access_token).to.not.be.undefined;",
+                  "    });",
+                  "    ",
+                  "    pm.test('Token type is Bearer', function () {",
+                  "        pm.expect(response.token_type).to.equal('Bearer');",
+                  "    });",
+                  "} else {",
+                  "    pm.test('Token generation failed', function () {",
+                  "        pm.expect(pm.response.code).to.equal(200);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "description": "Generates an OAuth2 access token using the password grant type for a test user. Demonstrates token generation and validates the response format.",
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "client_id",
+                  "value": "test-client",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "test-client-secret",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "testuser",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "password",
+                  "type": "text"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "password",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token",
+              "protocol": "http",
+              "host": ["keycloak", "localhost"],
+              "port": "8180",
+              "path": ["realms", "tyk", "protocol", "openid-connect", "token"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Service Account Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    ",
+                  "    pm.test('Service access token received', function () {",
+                  "        pm.expect(response.access_token).to.not.be.undefined;",
+                  "    });",
+                  "    ",
+                  "    pm.test('Token type is Bearer', function () {",
+                  "        pm.expect(response.token_type).to.equal('Bearer');",
+                  "    });",
+                  "} else {",
+                  "    pm.test('Service token generation failed', function () {",
+                  "        pm.expect(pm.response.code).to.equal(200);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "description": "Generates an OAuth2 access token using the client credentials grant type for service-to-service authentication. Demonstrates service account token generation and validates the response format.",
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "client_id",
+                  "value": "test-client",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "test-client-secret",
+                  "type": "text"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token",
+              "protocol": "http",
+              "host": ["keycloak", "localhost"],
+              "port": "8180",
+              "path": ["realms", "tyk", "protocol", "openid-connect", "token"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Introspect User Token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Generate user token before introspection",
+                  "pm.sendRequest({",
+                  "    url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token',",
+                  "    method: 'POST',",
+                  "    header: {",
+                  "        'Content-Type': 'application/x-www-form-urlencoded'",
+                  "    },",
+                  "    body: {",
+                  "        mode: 'urlencoded',",
+                  "        urlencoded: [",
+                  "            {key: 'client_id', value: 'test-client'},",
+                  "            {key: 'client_secret', value: 'test-client-secret'},",
+                  "            {key: 'username', value: 'testuser'},",
+                  "            {key: 'password', value: 'password'},",
+                  "            {key: 'grant_type', value: 'password'}",
+                  "        ]",
+                  "    }",
+                  "}, function (err, res) {",
+                  "    if (err) {",
+                  "        console.log('Error generating token for introspection:', err);",
+                  "    } else if (res.code === 200) {",
+                  "        const response = res.json();",
+                  "        pm.environment.set('introspect_user_token', response.access_token);",
+                  "        console.log('Token generated successfully for introspection');",
+                  "    } else {",
+                  "        console.log('Failed to generate token for introspection:', res.code, res.text());",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    ",
+                  "    pm.test('Token is active', function () {",
+                  "        pm.expect(response.active).to.be.true;",
+                  "    });",
+                  "    ",
+                  "    pm.test('Client ID present', function () {",
+                  "        pm.expect(response.client_id).to.not.be.undefined;",
+                  "    });",
+                  "    ",
+                  "    pm.test('Username present for user token', function () {",
+                  "        pm.expect(response.username).to.not.be.undefined;",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "description": "Generates a fresh user token and introspects it to verify it is active and contains expected claims. Tests the OAuth2 introspection endpoint with an active token.",
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "token",
+                  "value": "{{introspect_user_token}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect",
+              "protocol": "http",
+              "host": ["keycloak", "localhost"],
+              "port": "8180",
+              "path": [
+                "realms",
+                "tyk",
+                "protocol",
+                "openid-connect",
+                "token",
+                "introspect"
+              ]
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "tyk-introspection-client",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "tyk-introspection-secret",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Introspect Revoked Token (Inactive)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// First generate a token",
+                  "pm.sendRequest({",
+                  "    url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token',",
+                  "    method: 'POST',",
+                  "    header: {",
+                  "        'Content-Type': 'application/x-www-form-urlencoded'",
+                  "    },",
+                  "    body: {",
+                  "        mode: 'urlencoded',",
+                  "        urlencoded: [",
+                  "            {key: 'client_id', value: 'test-client'},",
+                  "            {key: 'client_secret', value: 'test-client-secret'},",
+                  "            {key: 'username', value: 'testuser'},",
+                  "            {key: 'password', value: 'password'},",
+                  "            {key: 'grant_type', value: 'password'}",
+                  "        ]",
+                  "    }",
+                  "}, function (err, res) {",
+                  "    if (err) {",
+                  "        console.log('Error generating token for revocation test:', err);",
+                  "    } else if (res.code === 200) {",
+                  "        const response = res.json();",
+                  "        const tokenToRevoke = response.access_token;",
+                  "        ",
+                  "        // Now revoke the token",
+                  "        pm.sendRequest({",
+                  "            url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/revoke',",
+                  "            method: 'POST',",
+                  "            header: {",
+                  "                'Content-Type': 'application/x-www-form-urlencoded'",
+                  "            },",
+                  "            body: {",
+                  "                mode: 'urlencoded',",
+                  "                urlencoded: [",
+                  "                    {key: 'token', value: tokenToRevoke},",
+                  "                    {key: 'client_id', value: 'test-client'},",
+                  "                    {key: 'client_secret', value: 'test-client-secret'}",
+                  "                ]",
+                  "            }",
+                  "        }, function (revokeErr, revokeRes) {",
+                  "            if (revokeErr) {",
+                  "                console.log('Error revoking token:', revokeErr);",
+                  "            } else if (revokeRes.code === 200) {",
+                  "                pm.environment.set('revoked_token', tokenToRevoke);",
+                  "                console.log('Token revoked successfully, ready for introspection test');",
+                  "            } else {",
+                  "                console.log('Failed to revoke token:', revokeRes.code, revokeRes.text());",
+                  "            }",
+                  "        });",
+                  "    } else {",
+                  "        console.log('Failed to generate token for revocation test:', res.code, res.text());",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    ",
+                  "    pm.test('Token is inactive', function () {",
+                  "        pm.expect(response.active).to.be.false;",
+                  "    });",
+                  "    ",
+                  "    pm.test('Revoked token introspection successful', function () {",
+                  "        pm.expect(response).to.have.property('active');",
+                  "    });",
+                  "} else {",
+                  "    pm.test('Introspection request failed', function () {",
+                  "        pm.expect(pm.response.code).to.equal(200);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "description": "Generates a token, revokes it, then introspects it to verify it shows as inactive. Tests the complete token lifecycle and introspection of revoked tokens.",
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "token",
+                  "value": "{{revoked_token}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect",
+              "protocol": "http",
+              "host": ["keycloak", "localhost"],
+              "port": "8180",
+              "path": [
+                "realms",
+                "tyk",
+                "protocol",
+                "openid-connect",
+                "token",
+                "introspect"
+              ]
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "tyk-introspection-client",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "tyk-introspection-secret",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Testing",
+      "item": [
+        {
+          "name": "Test API with User Token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Generate user token before API test",
+                  "pm.sendRequest({",
+                  "    url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token',",
+                  "    method: 'POST',",
+                  "    header: {",
+                  "        'Content-Type': 'application/x-www-form-urlencoded'",
+                  "    },",
+                  "    body: {",
+                  "        mode: 'urlencoded',",
+                  "        urlencoded: [",
+                  "            {key: 'client_id', value: 'test-client'},",
+                  "            {key: 'client_secret', value: 'test-client-secret'},",
+                  "            {key: 'username', value: 'testuser'},",
+                  "            {key: 'password', value: 'password'},",
+                  "            {key: 'grant_type', value: 'password'}",
+                  "        ]",
+                  "    }",
+                  "}, function (err, res) {",
+                  "    if (err) {",
+                  "        console.log('Error generating user token:', err);",
+                  "    } else if (res.code === 200) {",
+                  "        const response = res.json();",
+                  "        pm.environment.set('user_access_token', response.access_token);",
+                  "        pm.environment.set('user_refresh_token', response.refresh_token);",
+                  "        pm.environment.set('user_token_type', response.token_type);",
+                  "        pm.environment.set('user_expires_in', response.expires_in);",
+                  "        console.log('User token generated successfully');",
+                  "    } else {",
+                  "        console.log('Failed to generate user token:', res.code, res.text());",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('API call successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    ",
+                  "    pm.test('OAuth Client ID header present', function () {",
+                  "        pm.expect(response.headers['X-Oauth-Client-Id']).to.not.be.undefined;",
+                  "    });",
+                  "    ",
+                  "    pm.test('OAuth Username header present', function () {",
+                  "        pm.expect(response.headers['X-Oauth-Username']).to.not.be.undefined;",
+                  "    });",
+                  "    ",
+                  "    pm.test('OAuth Subject header present', function () {",
+                  "        pm.expect(response.headers['X-Oauth-Subject']).to.not.be.undefined;",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "description": "Tests API access using a valid user token. Verifies that Tyk Gateway properly introspects the token and allows access while injecting OAuth claims as headers.",
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://tyk-gateway.localhost:8080/introspection/anything",
+              "protocol": "http",
+              "host": ["tyk-gateway", "localhost"],
+              "port": "8080",
+              "path": ["introspection", "anything"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Test API with Service Token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Generate service account token before API test",
+                  "pm.sendRequest({",
+                  "    url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token',",
+                  "    method: 'POST',",
+                  "    header: {",
+                  "        'Content-Type': 'application/x-www-form-urlencoded'",
+                  "    },",
+                  "    body: {",
+                  "        mode: 'urlencoded',",
+                  "        urlencoded: [",
+                  "            {key: 'client_id', value: 'test-client'},",
+                  "            {key: 'client_secret', value: 'test-client-secret'},",
+                  "            {key: 'grant_type', value: 'client_credentials'}",
+                  "        ]",
+                  "    }",
+                  "}, function (err, res) {",
+                  "    if (err) {",
+                  "        console.log('Error generating service token:', err);",
+                  "    } else if (res.code === 200) {",
+                  "        const response = res.json();",
+                  "        pm.environment.set('service_access_token', response.access_token);",
+                  "        pm.environment.set('service_token_type', response.token_type);",
+                  "        pm.environment.set('service_expires_in', response.expires_in);",
+                  "        console.log('Service token generated successfully');",
+                  "    } else {",
+                  "        console.log('Failed to generate service token:', res.code, res.text());",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('API call successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    ",
+                  "    pm.test('OAuth Client ID header present', function () {",
+                  "        pm.expect(response.headers['X-Oauth-Client-Id']).to.not.be.undefined;",
+                  "    });",
+                  "    ",
+                  "    pm.test('OAuth Subject header present', function () {",
+                  "        pm.expect(response.headers['X-Oauth-Subject']).to.not.be.undefined;",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "description": "Tests API access using a valid service account token. Verifies that Tyk Gateway properly introspects the service token and allows access while injecting OAuth claims as headers.",
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{service_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://tyk-gateway.localhost:8080/introspection/anything",
+              "protocol": "http",
+              "host": ["tyk-gateway", "localhost"],
+              "port": "8080",
+              "path": ["introspection", "anything"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Test API without Token (401 Expected)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('API correctly rejects request without token', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Error response contains expected error', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.error).to.equal('missing_token');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "description": "Tests API access without providing an authorization token. Verifies that Tyk Gateway properly rejects requests with missing authentication.",
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://tyk-gateway.localhost:8080/introspection/anything",
+              "protocol": "http",
+              "host": ["tyk-gateway", "localhost"],
+              "port": "8080",
+              "path": ["introspection", "anything"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Test API with Invalid Token (401 Expected)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('API correctly rejects invalid token', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Error response contains expected error', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.error).to.equal('invalid_token');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "description": "Tests API access using a malformed/invalid token. Verifies that Tyk Gateway properly rejects requests with invalid authentication tokens.",
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid.token.here",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://tyk-gateway.localhost:8080/introspection/anything",
+              "protocol": "http",
+              "host": ["tyk-gateway", "localhost"],
+              "port": "8080",
+              "path": ["introspection", "anything"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Test API with Revoked Token (401 Expected)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// First generate a token",
+                  "pm.sendRequest({",
+                  "    url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token',",
+                  "    method: 'POST',",
+                  "    header: {",
+                  "        'Content-Type': 'application/x-www-form-urlencoded'",
+                  "    },",
+                  "    body: {",
+                  "        mode: 'urlencoded',",
+                  "        urlencoded: [",
+                  "            {key: 'client_id', value: 'test-client'},",
+                  "            {key: 'client_secret', value: 'test-client-secret'},",
+                  "            {key: 'username', value: 'testuser'},",
+                  "            {key: 'password', value: 'password'},",
+                  "            {key: 'grant_type', value: 'password'}",
+                  "        ]",
+                  "    }",
+                  "}, function (err, res) {",
+                  "    if (err) {",
+                  "        console.log('Error generating token for API revocation test:', err);",
+                  "    } else if (res.code === 200) {",
+                  "        const response = res.json();",
+                  "        const tokenToRevoke = response.access_token;",
+                  "        ",
+                  "        // Now revoke the token",
+                  "        pm.sendRequest({",
+                  "            url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/revoke',",
+                  "            method: 'POST',",
+                  "            header: {",
+                  "                'Content-Type': 'application/x-www-form-urlencoded'",
+                  "            },",
+                  "            body: {",
+                  "                mode: 'urlencoded',",
+                  "                urlencoded: [",
+                  "                    {key: 'token', value: tokenToRevoke},",
+                  "                    {key: 'client_id', value: 'test-client'},",
+                  "                    {key: 'client_secret', value: 'test-client-secret'}",
+                  "                ]",
+                  "            }",
+                  "        }, function (revokeErr, revokeRes) {",
+                  "            if (revokeErr) {",
+                  "                console.log('Error revoking token for API test:', revokeErr);",
+                  "            } else if (revokeRes.code === 200) {",
+                  "                pm.environment.set('revoked_api_token', tokenToRevoke);",
+                  "                console.log('Token revoked successfully, ready for API access test');",
+                  "            } else {",
+                  "                console.log('Failed to revoke token for API test:', revokeRes.code, revokeRes.text());",
+                  "            }",
+                  "        });",
+                  "    } else {",
+                  "        console.log('Failed to generate token for API revocation test:', res.code, res.text());",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('API correctly rejects revoked token', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Error response contains expected error', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.error).to.equal('invalid_token');",
+                  "});",
+                  "",
+                  "pm.test('Revoked token properly blocked from API access', function () {",
+                  "    pm.expect(pm.response.code).to.equal(401);",
+                  "    console.log('Successfully verified that revoked token is blocked from API access');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "description": "Generates a token, revokes it, then attempts API access. Verifies that Tyk Gateway properly introspects revoked tokens and blocks access with appropriate error responses.",
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{revoked_api_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://tyk-gateway.localhost:8080/introspection/anything",
+              "protocol": "http",
+              "host": ["tyk-gateway", "localhost"],
+              "port": "8080",
+              "path": ["introspection", "anything"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
