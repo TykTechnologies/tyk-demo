@@ -76,11 +76,16 @@
               ]
             },
             "url": {
-              "raw": "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token",
+              "raw": "http://{{keycloak.host}}/realms/{{realm}}/protocol/openid-connect/token",
               "protocol": "http",
-              "host": ["keycloak", "localhost"],
-              "port": "8180",
-              "path": ["realms", "tyk", "protocol", "openid-connect", "token"]
+              "host": ["{{keycloak.host}}"],
+              "path": [
+                "realms",
+                "{{realm}}",
+                "protocol",
+                "openid-connect",
+                "token"
+              ]
             }
           },
           "response": []
@@ -142,11 +147,16 @@
               ]
             },
             "url": {
-              "raw": "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token",
+              "raw": "http://{{keycloak.host}}/realms/{{realm}}/protocol/openid-connect/token",
               "protocol": "http",
-              "host": ["keycloak", "localhost"],
-              "port": "8180",
-              "path": ["realms", "tyk", "protocol", "openid-connect", "token"]
+              "host": ["{{keycloak.host}}"],
+              "path": [
+                "realms",
+                "{{realm}}",
+                "protocol",
+                "openid-connect",
+                "token"
+              ]
             }
           },
           "response": []
@@ -159,8 +169,10 @@
               "script": {
                 "exec": [
                   "// Generate user token before introspection",
+                  "const keycloakHost = pm.variables.get('keycloak.host');",
+                  "const realm = pm.variables.get('realm');",
                   "pm.sendRequest({",
-                  "    url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token',",
+                  "    url: `http://${keycloakHost}/realms/${realm}/protocol/openid-connect/token`,",
                   "    method: 'POST',",
                   "    header: {",
                   "        'Content-Type': 'application/x-www-form-urlencoded'",
@@ -234,13 +246,12 @@
               ]
             },
             "url": {
-              "raw": "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect",
+              "raw": "http://{{keycloak.host}}/realms/{{realm}}/protocol/openid-connect/token/introspect",
               "protocol": "http",
-              "host": ["keycloak", "localhost"],
-              "port": "8180",
+              "host": ["{{keycloak.host}}"],
               "path": [
                 "realms",
-                "tyk",
+                "{{realm}}",
                 "protocol",
                 "openid-connect",
                 "token",
@@ -273,8 +284,10 @@
               "script": {
                 "exec": [
                   "// First generate a token",
+                  "const keycloakHost = pm.variables.get('keycloak.host');",
+                  "const realm = pm.variables.get('realm');",
                   "pm.sendRequest({",
-                  "    url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token',",
+                  "    url: `http://${keycloakHost}/realms/${realm}/protocol/openid-connect/token`,",
                   "    method: 'POST',",
                   "    header: {",
                   "        'Content-Type': 'application/x-www-form-urlencoded'",
@@ -298,7 +311,7 @@
                   "        ",
                   "        // Now revoke the token",
                   "        pm.sendRequest({",
-                  "            url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/revoke',",
+                  "            url: `http://${keycloakHost}/realms/${realm}/protocol/openid-connect/revoke`,",
                   "            method: 'POST',",
                   "            header: {",
                   "                'Content-Type': 'application/x-www-form-urlencoded'",
@@ -313,16 +326,16 @@
                   "            }",
                   "        }, function (revokeErr, revokeRes) {",
                   "            if (revokeErr) {",
-                  "                console.log('Error revoking token:', revokeErr);",
+                  "                console.log('Error revoking token for API test:', revokeErr);",
                   "            } else if (revokeRes.code === 200) {",
-                  "                pm.environment.set('revoked_token', tokenToRevoke);",
-                  "                console.log('Token revoked successfully, ready for introspection test');",
+                  "                pm.environment.set('revoked_api_token', tokenToRevoke);",
+                  "                console.log('Token revoked successfully, ready for API access test');",
                   "            } else {",
-                  "                console.log('Failed to revoke token:', revokeRes.code, revokeRes.text());",
+                  "                console.log('Failed to revoke token for API test:', revokeRes.code, revokeRes.text());",
                   "            }",
                   "        });",
                   "    } else {",
-                  "        console.log('Failed to generate token for revocation test:', res.code, res.text());",
+                  "        console.log('Failed to generate token for API revocation test:', res.code, res.text());",
                   "    }",
                   "});"
                 ],
@@ -373,13 +386,12 @@
               ]
             },
             "url": {
-              "raw": "http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token/introspect",
+              "raw": "http://{{keycloak.host}}/realms/{{realm}}/protocol/openid-connect/token/introspect",
               "protocol": "http",
-              "host": ["keycloak", "localhost"],
-              "port": "8180",
+              "host": ["{{keycloak.host}}"],
               "path": [
                 "realms",
-                "tyk",
+                "{{realm}}",
                 "protocol",
                 "openid-connect",
                 "token",
@@ -417,8 +429,10 @@
               "script": {
                 "exec": [
                   "// Generate user token before API test",
+                  "const keycloakHost = pm.variables.get('keycloak.host');",
+                  "const realm = pm.variables.get('realm');",
                   "pm.sendRequest({",
-                  "    url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token',",
+                  "    url: `http://${keycloakHost}/realms/${realm}/protocol/openid-connect/token`,",
                   "    method: 'POST',",
                   "    header: {",
                   "        'Content-Type': 'application/x-www-form-urlencoded'",
@@ -490,10 +504,9 @@
               }
             ],
             "url": {
-              "raw": "http://tyk-gateway.localhost:8080/introspection/anything",
+              "raw": "http://{{tyk-gateway.host}}/introspection/anything",
               "protocol": "http",
-              "host": ["tyk-gateway", "localhost"],
-              "port": "8080",
+              "host": ["{{tyk-gateway.host}}"],
               "path": ["introspection", "anything"]
             }
           },
@@ -507,8 +520,10 @@
               "script": {
                 "exec": [
                   "// Generate service account token before API test",
+                  "const keycloakHost = pm.variables.get('keycloak.host');",
+                  "const realm = pm.variables.get('realm');",
                   "pm.sendRequest({",
-                  "    url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token',",
+                  "    url: `http://${keycloakHost}/realms/${realm}/protocol/openid-connect/token`,",
                   "    method: 'POST',",
                   "    header: {",
                   "        'Content-Type': 'application/x-www-form-urlencoded'",
@@ -573,10 +588,9 @@
               }
             ],
             "url": {
-              "raw": "http://tyk-gateway.localhost:8080/introspection/anything",
+              "raw": "http://{{tyk-gateway.host}}/introspection/anything",
               "protocol": "http",
-              "host": ["tyk-gateway", "localhost"],
-              "port": "8080",
+              "host": ["{{tyk-gateway.host}}"],
               "path": ["introspection", "anything"]
             }
           },
@@ -607,10 +621,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://tyk-gateway.localhost:8080/introspection/anything",
+              "raw": "http://{{tyk-gateway.host}}/introspection/anything",
               "protocol": "http",
-              "host": ["tyk-gateway", "localhost"],
-              "port": "8080",
+              "host": ["{{tyk-gateway.host}}"],
               "path": ["introspection", "anything"]
             }
           },
@@ -647,10 +660,9 @@
               }
             ],
             "url": {
-              "raw": "http://tyk-gateway.localhost:8080/introspection/anything",
+              "raw": "http://{{tyk-gateway.host}}/introspection/anything",
               "protocol": "http",
-              "host": ["tyk-gateway", "localhost"],
-              "port": "8080",
+              "host": ["{{tyk-gateway.host}}"],
               "path": ["introspection", "anything"]
             }
           },
@@ -664,8 +676,10 @@
               "script": {
                 "exec": [
                   "// First generate a token",
+                  "const keycloakHost = pm.variables.get('keycloak.host');",
+                  "const realm = pm.variables.get('realm');",
                   "pm.sendRequest({",
-                  "    url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/token',",
+                  "    url: `http://${keycloakHost}/realms/${realm}/protocol/openid-connect/token`,",
                   "    method: 'POST',",
                   "    header: {",
                   "        'Content-Type': 'application/x-www-form-urlencoded'",
@@ -689,7 +703,7 @@
                   "        ",
                   "        // Now revoke the token",
                   "        pm.sendRequest({",
-                  "            url: 'http://keycloak.localhost:8180/realms/tyk/protocol/openid-connect/revoke',",
+                  "            url: `http://${keycloakHost}/realms/${realm}/protocol/openid-connect/revoke`,",
                   "            method: 'POST',",
                   "            header: {",
                   "                'Content-Type': 'application/x-www-form-urlencoded'",
@@ -753,16 +767,37 @@
               }
             ],
             "url": {
-              "raw": "http://tyk-gateway.localhost:8080/introspection/anything",
+              "raw": "http://{{tyk-gateway.host}}/introspection/anything",
               "protocol": "http",
-              "host": ["tyk-gateway", "localhost"],
-              "port": "8080",
+              "host": ["{{tyk-gateway.host}}"],
               "path": ["introspection", "anything"]
             }
           },
           "response": []
         }
       ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "tyk-gateway.host",
+      "value": "tyk-gateway.localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "keycloak.host",
+      "value": "keycloak.localhost:8180",
+      "type": "string"
+    },
+    {
+      "key": "realm",
+      "value": "tyk",
+      "type": "string"
+    },
+    {
+      "key": "test-runner-ignore",
+      "value": "false",
+      "type": "string"
     }
   ]
 }
