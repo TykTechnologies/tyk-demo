@@ -22,7 +22,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-gateway:
-    image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY_VERSION:-v5.9.0-rc6}
+    image: tykio/tyk-gateway-ee:v5.9.0-rc6
     ports:
       - 8080:8080
       - 8086:8086
