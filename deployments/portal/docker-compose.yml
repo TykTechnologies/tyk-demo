@@ -27,7 +27,7 @@ services:
     entrypoint: /opt/portal/dev-portal
     volumes:
       - ./deployments/portal/volumes/logs:/opt/portal/logs
-      - ./deployments/portal/volumes/assets/:/opt/portal/public/system/products/
+      - ./deployments/portal/volumes/assets:/opt/portal/public/system
       - ./deployments/portal/volumes/theme/:/opt/portal/themes
   tyk-portal-postgres:
     image: postgres:16-alpine
