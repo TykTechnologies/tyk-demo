@@ -1,0 +1,1166 @@
+grpcbin-1      | WARNING: Package "github.com/golang/protobuf/protoc-gen-go/generator" is deprecated.
+grpcbin-1      | 	A future release of golang/protobuf will delete this package,
+grpcbin-1      | 	which has long been excluded from the compatibility promise.
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Tyk API Gateway 5.8.2" prefix=main
+grpcbin-1      | 
+grpcbin-1      | 2025/08/03 18:30:52 listening on :9000 (insecure gRPC)
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="storage: connected to redis" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=warning msg="Tyk has not detected any setting for session lifetime (`global_session_lifetime` defaults to 0 seconds). \n\tThis means that in case there's also no `session_lifetime` defined in the api, Tyk will not set expiration on keys\n\tcreated in Redis, i.e. tokens will not get deleted from Redis and it eventually become overgrown.\n\tPlease refer to the following link for further guidance:\n\thttps://tyk.io/docs/basic-config-and-security/security/authentication-authorization/physical-token-expiry/" prefix=checkup
+tyk-gateway-1  | time="Aug 03 18:31:05" level=warning msg="Default node_secret should be changed for production." config.node_secret=352d20ee67be67f6340b4c0605b044b7 prefix=checkup
+tyk-gateway-1  | time="Aug 03 18:31:05" level=warning msg="AnalyticsConfig.PoolSize unset. Defaulting to number of available CPUs" prefix=checkup runtime.NumCPU=2
+grpcbin-1      | 2025/08/03 18:30:52 listening on :9001 (secure gRPC + secure HTTP/2)
+tyk-gateway-1  | time="Aug 03 18:31:05" level=warning msg="AnalyticsConfig.RecordsBufferSize < minimum - Overriding" minRecordsBufferSize=1000 prefix=checkup
+tyk-gateway-1  | time="Aug 03 18:31:05" level=warning msg="AnalyticsConfig.StorageExpirationTime is 0, defaulting to 60s" prefix=checkup storageExpirationTime=0
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Setting up analytics normaliser" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="PIDFile location set to: ./tyk-gateway.pid" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=warning msg="The control_api_port should be changed for production" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Initialising Tyk REST API Endpoints" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="--> Standard listener (http)" port=":8080" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=warning msg="Starting HTTP server on:[::]:8080" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Registering gateway node with Dashboard" prefix=dashboard
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="job run successful" name=purge-oauth-tokens prefix=scheduler
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Node Registered" id=0fe2ef49-038c-43c8-60e8-bc23db0ed3e3 prefix=dashboard
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Loading policies" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Using Policies from Dashboard Service" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Mutex lock acquired... calling" prefix=policy
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Calling dashboard service for policy list" prefix=policy
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Processing policy list" prefix=policy
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Policies found (0 total):" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Detected 0 APIs" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=warning msg="No API Definitions found, not reloading" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="[RATELIMIT] DRL with Redis Rate Limiter enabled (using pipeline)"
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Initialising distributed rate limiter" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="Tyk Gateway started (5.8.2)" prefix=main
+tyk-gateway-1  | time="Aug 03 18:31:05" level=info msg="--> Listening on address: (open interface)" prefix=main
+tyk-gateway-1    | time="Aug 03 18:31:05" level=info msg="--> Listening on port: 8080" prefix=main
+tyk-gateway-1    | time="Aug 03 18:31:05" level=info msg="--> PID: 1" prefix=main
+tyk-gateway-1    | time="Aug 03 18:31:05" level=info msg="Starting gateway rate limiter notifications..."
+tyk-gateway-1    | time="Aug 03 18:31:05" level=warning msg="Creating new NotificationVerifier with pubkey: \"certs/public-key.pem\""
+tyk-gateway-1    | time="Aug 03 18:31:05" level=info msg="Loading policies" prefix=main
+tyk-gateway-1    | time="Aug 03 18:31:05" level=info msg="Using Policies from Dashboard Service" prefix=main
+tyk-gateway-1    | time="Aug 03 18:31:05" level=info msg="Mutex lock acquired... calling" prefix=policy
+tyk-gateway-1    | time="Aug 03 18:31:05" level=info msg="Calling dashboard service for policy list" prefix=policy
+tyk-gateway-1    | time="Aug 03 18:31:05" level=info msg="Processing policy list" prefix=policy
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Tyk API Gateway 5.8.2" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="storage: connected to redis" prefix=main
+tyk-gateway-1    | time="Aug 03 18:31:05" level=info msg="Policies found (0 total):" prefix=main
+tyk-gateway-1    | time="Aug 03 18:31:05" level=info msg="Detected 0 APIs" prefix=main
+tyk-gateway-1    | time="Aug 03 18:31:05" level=warning msg="No API Definitions found, not reloading" prefix=main
+tyk-gateway-1    | time="Aug 03 18:31:15" level=info msg="Starting Poller" prefix=host-check-mgr
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=warning msg="Tyk has not detected any setting for session lifetime (`global_session_lifetime` defaults to 0 seconds). \n\tThis means that in case there's also no `session_lifetime` defined in the api, Tyk will not set expiration on keys\n\tcreated in Redis, i.e. tokens will not get deleted from Redis and it eventually become overgrown.\n\tPlease refer to the following link for further guidance:\n\thttps://tyk.io/docs/basic-config-and-security/security/authentication-authorization/physical-token-expiry/" prefix=checkup
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=warning msg="Default node_secret should be changed for production." config.node_secret=352d20ee67be67f6340b4c0605b044b7 prefix=checkup
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=warning msg="AnalyticsConfig.PoolSize unset. Defaulting to number of available CPUs" prefix=checkup runtime.NumCPU=2
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=warning msg="AnalyticsConfig.RecordsBufferSize < minimum - Overriding" minRecordsBufferSize=1000 prefix=checkup
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=warning msg="AnalyticsConfig.StorageExpirationTime is 0, defaulting to 60s" prefix=checkup storageExpirationTime=0
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Rich plugins are disabled" prefix=coprocess
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Setting up analytics normaliser" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="PIDFile location set to: ./tyk-gateway.pid" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=warning msg="The control_api_port should be changed for production" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Initialising Tyk REST API Endpoints" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="job run successful" name=purge-oauth-tokens prefix=scheduler
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="--> Using TLS (https)" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=warning msg="Starting HTTP server on:[::]:8080" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Registering gateway node with Dashboard" prefix=dashboard
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Node Registered" id=2c10a59c-6a18-4521-60a7-2b059ced7887 prefix=dashboard
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Loading policies" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Using Policies from Dashboard Service" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Mutex lock acquired... calling" prefix=policy
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Calling dashboard service for policy list" prefix=policy
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Processing policy list" prefix=policy
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Policies found (0 total):" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Detected 0 APIs" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=warning msg="No API Definitions found, not reloading" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="[RATELIMIT] DRL with Redis Rate Limiter enabled (using pipeline)"
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Initialising distributed rate limiter" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Tyk Gateway started (5.8.2)" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="--> Listening on address: (open interface)" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="--> Listening on port: 8080" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="--> PID: 1" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Starting gateway rate limiter notifications..."
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=warning msg="Creating new NotificationVerifier with pubkey: \"certs/public-key.pem\""
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Loading policies" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Using Policies from Dashboard Service" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Mutex lock acquired... calling" prefix=policy
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Calling dashboard service for policy list" prefix=policy
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Processing policy list" prefix=policy
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Policies found (0 total):" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=info msg="Detected 0 APIs" prefix=main
+tyk-gateway-2-1  | time="Aug 03 18:31:05" level=warning msg="No API Definitions found, not reloading" prefix=main
+tyk-redis-1      | 1:C 03 Aug 2025 18:30:51.283 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+tyk-redis-1      | 1:C 03 Aug 2025 18:30:51.283 * Redis version=7.2.0, bits=64, commit=00000000, modified=0, pid=1, just started
+tyk-redis-1      | 1:C 03 Aug 2025 18:30:51.283 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+tyk-redis-1      | 1:M 03 Aug 2025 18:30:51.284 * monotonic clock: POSIX clock_gettime
+tyk-redis-1      | 1:M 03 Aug 2025 18:30:51.285 * Running mode=standalone, port=6379.
+tyk-redis-1      | 1:M 03 Aug 2025 18:30:51.285 * Server initialized
+tyk-redis-1      | 1:M 03 Aug 2025 18:30:51.285 * Ready to accept connections tcp
+tyk-redis-1      | 1:M 03 Aug 2025 18:35:52.026 * 100 changes in 300 seconds. Saving...
+tyk-redis-1      | 1:M 03 Aug 2025 18:35:52.028 * Background saving started by pid 19
+tyk-redis-1      | 19:C 03 Aug 2025 18:35:52.039 * DB saved on disk
+tyk-redis-1      | 19:C 03 Aug 2025 18:35:52.039 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+tyk-redis-1      | 1:M 03 Aug 2025 18:35:52.129 * Background saving terminated with success
+kafka-1          | ===> User
+kafka-1          | uid=1000(appuser) gid=1000(appuser) groups=1000(appuser)
+kafka-1          | ===> Setting default values of environment variables if not already set.
+kafka-1          | CLUSTER_ID not set. Setting it to default value: "5L6g3nShT-eMCtK--X86sw"
+kafka-1          | ===> Configuring ...
+kafka-1          | Running in KRaft mode...
+kafka-1          | ===> Launching ... 
+kafka-1          | ===> Using provided cluster id 5L6g3nShT-eMCtK--X86sw ...
+kafka-1          | [2025-08-03 18:30:54,696] INFO Registered kafka:type=kafka.Log4jController MBean (kafka.utils.Log4jControllerRegistration$)
+kafka-1          | [2025-08-03 18:30:54,753] INFO Setting -D jdk.tls.rejectClientInitiatedRenegotiation=true to disable client-initiated TLS renegotiation (org.apache.zookeeper.common.X509Util)
+kafka-1          | [2025-08-03 18:30:54,756] INFO RemoteLogManagerConfig values: 
+kafka-1          | 	log.local.retention.bytes = -2
+kafka-1          | 	log.local.retention.ms = -2
+kafka-1          | 	remote.fetch.max.wait.ms = 500
+kafka-1          | 	remote.log.index.file.cache.total.size.bytes = 1073741824
+kafka-1          | 	remote.log.manager.copier.thread.pool.size = 10
+kafka-1          | 	remote.log.manager.copy.max.bytes.per.second = 9223372036854775807
+kafka-1          | 	remote.log.manager.copy.quota.window.num = 11
+kafka-1          | 	remote.log.manager.copy.quota.window.size.seconds = 1
+kafka-1          | 	remote.log.manager.expiration.thread.pool.size = 10
+kafka-1          | 	remote.log.manager.fetch.max.bytes.per.second = 9223372036854775807
+kafka-1          | 	remote.log.manager.fetch.quota.window.num = 11
+kafka-1          | 	remote.log.manager.fetch.quota.window.size.seconds = 1
+kafka-1          | 	remote.log.manager.task.interval.ms = 30000
+kafka-1          | 	remote.log.manager.task.retry.backoff.max.ms = 30000
+kafka-1          | 	remote.log.manager.task.retry.backoff.ms = 500
+kafka-1          | 	remote.log.manager.task.retry.jitter = 0.2
+kafka-1          | 	remote.log.manager.thread.pool.size = 10
+kafka-1          | 	remote.log.metadata.custom.metadata.max.bytes = 128
+kafka-1          | 	remote.log.metadata.manager.class.name = org.apache.kafka.server.log.remote.metadata.storage.TopicBasedRemoteLogMetadataManager
+kafka-1          | 	remote.log.metadata.manager.class.path = null
+kafka-1          | 	remote.log.metadata.manager.impl.prefix = rlmm.config.
+kafka-1          | 	remote.log.metadata.manager.listener.name = null
+kafka-1          | 	remote.log.reader.max.pending.tasks = 100
+kafka-1          | 	remote.log.reader.threads = 10
+kafka-1          | 	remote.log.storage.manager.class.name = null
+kafka-1          | 	remote.log.storage.manager.class.path = null
+kafka-1          | 	remote.log.storage.manager.impl.prefix = rsm.config.
+kafka-1          | 	remote.log.storage.system.enable = false
+kafka-1          |  (org.apache.kafka.server.log.remote.storage.RemoteLogManagerConfig)
+kafka-1          | [2025-08-03 18:30:54,831] INFO RemoteLogManagerConfig values: 
+kafka-1          | 	log.local.retention.bytes = -2
+kafka-1          | 	log.local.retention.ms = -2
+kafka-1          | 	remote.fetch.max.wait.ms = 500
+kafka-1          | 	remote.log.index.file.cache.total.size.bytes = 1073741824
+kafka-1          | 	remote.log.manager.copier.thread.pool.size = 10
+kafka-1          | 	remote.log.manager.copy.max.bytes.per.second = 9223372036854775807
+kafka-1          | 	remote.log.manager.copy.quota.window.num = 11
+kafka-1          | 	remote.log.manager.copy.quota.window.size.seconds = 1
+kafka-1          | 	remote.log.manager.expiration.thread.pool.size = 10
+kafka-1          | 	remote.log.manager.fetch.max.bytes.per.second = 9223372036854775807
+kafka-1          | 	remote.log.manager.fetch.quota.window.num = 11
+kafka-1          | 	remote.log.manager.fetch.quota.window.size.seconds = 1
+kafka-1          | 	remote.log.manager.task.interval.ms = 30000
+kafka-1          | 	remote.log.manager.task.retry.backoff.max.ms = 30000
+kafka-1          | 	remote.log.manager.task.retry.backoff.ms = 500
+kafka-1          | 	remote.log.manager.task.retry.jitter = 0.2
+kafka-1          | 	remote.log.manager.thread.pool.size = 10
+kafka-1          | 	remote.log.metadata.custom.metadata.max.bytes = 128
+kafka-1          | 	remote.log.metadata.manager.class.name = org.apache.kafka.server.log.remote.metadata.storage.TopicBasedRemoteLogMetadataManager
+kafka-1          | 	remote.log.metadata.manager.class.path = null
+kafka-1          | 	remote.log.metadata.manager.impl.prefix = rlmm.config.
+kafka-1          | 	remote.log.metadata.manager.listener.name = null
+kafka-1          | 	remote.log.reader.max.pending.tasks = 100
+kafka-1          | 	remote.log.reader.threads = 10
+kafka-1          | 	remote.log.storage.manager.class.name = null
+kafka-1          | 	remote.log.storage.manager.class.path = null
+kafka-1          | 	remote.log.storage.manager.impl.prefix = rsm.config.
+kafka-1          | 	remote.log.storage.system.enable = false
+kafka-1          |  (org.apache.kafka.server.log.remote.storage.RemoteLogManagerConfig)
+kafka-1          | [2025-08-03 18:30:54,842] INFO RemoteLogManagerConfig values: 
+kafka-1          | 	log.local.retention.bytes = -2
+kafka-1          | 	log.local.retention.ms = -2
+kafka-1          | 	remote.fetch.max.wait.ms = 500
+kafka-1          | 	remote.log.index.file.cache.total.size.bytes = 1073741824
+kafka-1          | 	remote.log.manager.copier.thread.pool.size = 10
+kafka-1          | 	remote.log.manager.copy.max.bytes.per.second = 9223372036854775807
+kafka-1          | 	remote.log.manager.copy.quota.window.num = 11
+kafka-1          | 	remote.log.manager.copy.quota.window.size.seconds = 1
+kafka-1          | 	remote.log.manager.expiration.thread.pool.size = 10
+kafka-1          | 	remote.log.manager.fetch.max.bytes.per.second = 9223372036854775807
+kafka-1          | 	remote.log.manager.fetch.quota.window.num = 11
+kafka-1          | 	remote.log.manager.fetch.quota.window.size.seconds = 1
+kafka-1          | 	remote.log.manager.task.interval.ms = 30000
+kafka-1          | 	remote.log.manager.task.retry.backoff.max.ms = 30000
+kafka-1          | 	remote.log.manager.task.retry.backoff.ms = 500
+kafka-1          | 	remote.log.manager.task.retry.jitter = 0.2
+kafka-1          | 	remote.log.manager.thread.pool.size = 10
+kafka-1          | 	remote.log.metadata.custom.metadata.max.bytes = 128
+kafka-1          | 	remote.log.metadata.manager.class.name = org.apache.kafka.server.log.remote.metadata.storage.TopicBasedRemoteLogMetadataManager
+kafka-1          | 	remote.log.metadata.manager.class.path = null
+kafka-1          | 	remote.log.metadata.manager.impl.prefix = rlmm.config.
+kafka-1          | 	remote.log.metadata.manager.listener.name = null
+kafka-1          | 	remote.log.reader.max.pending.tasks = 100
+kafka-1          | 	remote.log.reader.threads = 10
+kafka-1          | 	remote.log.storage.manager.class.name = null
+kafka-1          | 	remote.log.storage.manager.class.path = null
+kafka-1          | 	remote.log.storage.manager.impl.prefix = rsm.config.
+kafka-1          | 	remote.log.storage.system.enable = false
+kafka-1          |  (org.apache.kafka.server.log.remote.storage.RemoteLogManagerConfig)
+kafka-1          | [2025-08-03 18:30:54,856] INFO Registered signal handlers for TERM, INT, HUP (org.apache.kafka.common.utils.LoggingSignalHandler)
+kafka-1          | [2025-08-03 18:30:54,858] INFO [ControllerServer id=1] Starting controller (kafka.server.ControllerServer)
+kafka-1          | [2025-08-03 18:30:54,859] INFO RemoteLogManagerConfig values: 
+kafka-1          | 	log.local.retention.bytes = -2
+kafka-1          | 	log.local.retention.ms = -2
+kafka-1          | 	remote.fetch.max.wait.ms = 500
+kafka-1          | 	remote.log.index.file.cache.total.size.bytes = 1073741824
+kafka-1          | 	remote.log.manager.copier.thread.pool.size = 10
+kafka-1          | 	remote.log.manager.copy.max.bytes.per.second = 9223372036854775807
+kafka-1          | 	remote.log.manager.copy.quota.window.num = 11
+kafka-1          | 	remote.log.manager.copy.quota.window.size.seconds = 1
+kafka-1          | 	remote.log.manager.expiration.thread.pool.size = 10
+kafka-1          | 	remote.log.manager.fetch.max.bytes.per.second = 9223372036854775807
+kafka-1          | 	remote.log.manager.fetch.quota.window.num = 11
+kafka-1          | 	remote.log.manager.fetch.quota.window.size.seconds = 1
+kafka-1          | 	remote.log.manager.task.interval.ms = 30000
+kafka-1          | 	remote.log.manager.task.retry.backoff.max.ms = 30000
+kafka-1          | 	remote.log.manager.task.retry.backoff.ms = 500
+kafka-1          | 	remote.log.manager.task.retry.jitter = 0.2
+kafka-1          | 	remote.log.manager.thread.pool.size = 10
+kafka-1          | 	remote.log.metadata.custom.metadata.max.bytes = 128
+json-placeholder-1  | 
+json-placeholder-1  |   \{^_^}/ hi!
+json-placeholder-1  | 
+json-placeholder-1  |   Loading db.json
+json-placeholder-1  |   Done
+json-placeholder-1  | 
+json-placeholder-1  |   Resources
+json-placeholder-1  |   http://0.0.0.0:3000/posts
+json-placeholder-1  |   http://0.0.0.0:3000/comments
+json-placeholder-1  |   http://0.0.0.0:3000/albums
+json-placeholder-1  |   http://0.0.0.0:3000/photos
+json-placeholder-1  |   http://0.0.0.0:3000/users
+json-placeholder-1  |   http://0.0.0.0:3000/todos
+json-placeholder-1  | 
+json-placeholder-1  |   Home
+json-placeholder-1  |   http://0.0.0.0:3000
+kafka-1             | 	remote.log.metadata.manager.class.name = org.apache.kafka.server.log.remote.metadata.storage.TopicBasedRemoteLogMetadataManager
+kafka-1             | 	remote.log.metadata.manager.class.path = null
+kafka-1             | 	remote.log.metadata.manager.impl.prefix = rlmm.config.
+kafka-1             | 	remote.log.metadata.manager.listener.name = null
+json-placeholder-1  | 
+json-placeholder-1  |   Type s + enter at any time to create a snapshot of the database
+json-placeholder-1  |   Watching...
+json-placeholder-1  | 
+kafka-1             | 	remote.log.reader.max.pending.tasks = 100
+kafka-1             | 	remote.log.reader.threads = 10
+kafka-1             | 	remote.log.storage.manager.class.name = null
+kafka-1             | 	remote.log.storage.manager.class.path = null
+kafka-1             | 	remote.log.storage.manager.impl.prefix = rsm.config.
+kafka-1             | 	remote.log.storage.system.enable = false
+kafka-1             |  (org.apache.kafka.server.log.remote.storage.RemoteLogManagerConfig)
+kafka-1             | [2025-08-03 18:30:54,983] INFO Updated connection-accept-rate max connection creation rate to 2147483647 (kafka.network.ConnectionQuotas)
+kafka-1             | [2025-08-03 18:30:54,996] INFO [SocketServer listenerType=CONTROLLER, nodeId=1] Created data-plane acceptor and processors for endpoint : ListenerName(CONTROLLER) (kafka.network.SocketServer)
+kafka-1             | [2025-08-03 18:30:54,998] INFO CONTROLLER: resolved wildcard host to b8a52beb42ee (org.apache.kafka.metadata.ListenerInfo)
+kafka-1             | [2025-08-03 18:30:55,001] INFO authorizerStart completed for endpoint CONTROLLER. Endpoint is now READY. (org.apache.kafka.server.network.EndpointReadyFutures)
+kafka-1             | [2025-08-03 18:30:55,003] INFO [SharedServer id=1] Starting SharedServer (kafka.server.SharedServer)
+kafka-1             | [2025-08-03 18:30:55,003] INFO RemoteLogManagerConfig values: 
+kafka-1             | 	log.local.retention.bytes = -2
+kafka-1             | 	log.local.retention.ms = -2
+kafka-1             | 	remote.fetch.max.wait.ms = 500
+kafka-1             | 	remote.log.index.file.cache.total.size.bytes = 1073741824
+kafka-1             | 	remote.log.manager.copier.thread.pool.size = 10
+kafka-1             | 	remote.log.manager.copy.max.bytes.per.second = 9223372036854775807
+kafka-1             | 	remote.log.manager.copy.quota.window.num = 11
+kafka-1             | 	remote.log.manager.copy.quota.window.size.seconds = 1
+kafka-1             | 	remote.log.manager.expiration.thread.pool.size = 10
+kafka-1             | 	remote.log.manager.fetch.max.bytes.per.second = 9223372036854775807
+kafka-1             | 	remote.log.manager.fetch.quota.window.num = 11
+kafka-1             | 	remote.log.manager.fetch.quota.window.size.seconds = 1
+kafka-1             | 	remote.log.manager.task.interval.ms = 30000
+kafka-1             | 	remote.log.manager.task.retry.backoff.max.ms = 30000
+kafka-1             | 	remote.log.manager.task.retry.backoff.ms = 500
+kafka-1             | 	remote.log.manager.task.retry.jitter = 0.2
+kafka-1             | 	remote.log.manager.thread.pool.size = 10
+kafka-1             | 	remote.log.metadata.custom.metadata.max.bytes = 128
+kafka-1             | 	remote.log.metadata.manager.class.name = org.apache.kafka.server.log.remote.metadata.storage.TopicBasedRemoteLogMetadataManager
+kafka-1             | 	remote.log.metadata.manager.class.path = null
+kafka-1             | 	remote.log.metadata.manager.impl.prefix = rlmm.config.
+kafka-1             | 	remote.log.metadata.manager.listener.name = null
+kafka-1             | 	remote.log.reader.max.pending.tasks = 100
+kafka-1             | 	remote.log.reader.threads = 10
+httpbin-1           | [2025-08-03 18:30:52 +0000] [1] [INFO] Starting gunicorn 19.9.0
+httpbin-1           | [2025-08-03 18:30:52 +0000] [1] [INFO] Listening at: http://0.0.0.0:80 (1)
+httpbin-1           | [2025-08-03 18:30:52 +0000] [1] [INFO] Using worker: gevent
+httpbin-1           | [2025-08-03 18:30:52 +0000] [9] [INFO] Booting worker with pid: 9
+kafka-1             | 	remote.log.storage.manager.class.name = null
+kafka-1             | 	remote.log.storage.manager.class.path = null
+kafka-1             | 	remote.log.storage.manager.impl.prefix = rsm.config.
+kafka-1             | 	remote.log.storage.system.enable = false
+kafka-1             |  (org.apache.kafka.server.log.remote.storage.RemoteLogManagerConfig)
+kafka-1             | [2025-08-03 18:30:55,042] INFO [LogLoader partition=__cluster_metadata-0, dir=/tmp/kafka-logs] Loading producer state till offset 0 with message format version 2 (kafka.log.UnifiedLog$)
+kafka-1             | [2025-08-03 18:30:55,043] INFO [LogLoader partition=__cluster_metadata-0, dir=/tmp/kafka-logs] Reloading from producer snapshot and rebuilding producer state from offset 0 (kafka.log.UnifiedLog$)
+kafka-1             | [2025-08-03 18:30:55,045] INFO [LogLoader partition=__cluster_metadata-0, dir=/tmp/kafka-logs] Producer state recovery took 0ms for snapshot load and 0ms for segment recovery from offset 0 (kafka.log.UnifiedLog$)
+kafka-1             | [2025-08-03 18:30:55,052] INFO Initialized snapshots with IDs SortedSet() from /tmp/kafka-logs/__cluster_metadata-0 (kafka.raft.KafkaMetadataLog$)
+kafka-1             | [2025-08-03 18:30:55,057] INFO [raft-expiration-reaper]: Starting (kafka.raft.TimingWheelExpirationService$ExpiredOperationReaper)
+kafka-1             | [2025-08-03 18:30:55,059] INFO [RaftManager id=1] Reading KRaft snapshot and log as part of the initialization (org.apache.kafka.raft.KafkaRaftClient)
+kafka-1             | [2025-08-03 18:30:55,060] INFO [RaftManager id=1] Starting request manager with static voters: [localhost:9093 (id: 1 rack: null)] (org.apache.kafka.raft.KafkaRaftClient)
+kafka-1             | [2025-08-03 18:30:55,080] INFO [RaftManager id=1] Completed transition to Unattached(epoch=0, voters=[1], electionTimeoutMs=1811) from null (org.apache.kafka.raft.QuorumState)
+kafka-1             | [2025-08-03 18:30:55,084] INFO [RaftManager id=1] Completed transition to CandidateState(localId=1, localDirectoryId=NcV2VEYU8mmySgihYo5qeA,epoch=1, retries=1, voteStates={1=GRANTED}, highWatermark=Optional.empty, electionTimeoutMs=1477) from Unattached(epoch=0, voters=[1], electionTimeoutMs=1811) (org.apache.kafka.raft.QuorumState)
+kafka-1             | [2025-08-03 18:30:55,087] INFO [RaftManager id=1] Completed transition to Leader(localId=1, epoch=1, epochStartOffset=0, highWatermark=Optional.empty, voterStates={1=ReplicaState(nodeId=1, endOffset=Optional.empty, lastFetchTimestamp=-1, lastCaughtUpTimestamp=-1, hasAcknowledgedLeader=true)}) from CandidateState(localId=1, localDirectoryId=NcV2VEYU8mmySgihYo5qeA,epoch=1, retries=1, voteStates={1=GRANTED}, highWatermark=Optional.empty, electionTimeoutMs=1477) (org.apache.kafka.raft.QuorumState)
+kafka-1             | [2025-08-03 18:30:55,100] INFO [kafka-1-raft-outbound-request-thread]: Starting (org.apache.kafka.raft.KafkaNetworkChannel$SendThread)
+kafka-1             | [2025-08-03 18:30:55,100] INFO [kafka-1-raft-io-thread]: Starting (org.apache.kafka.raft.KafkaRaftClientDriver)
+kafka-1             | [2025-08-03 18:30:55,110] INFO [MetadataLoader id=1] initializeNewPublishers: the loader is still catching up because we still don't know the high water mark yet. (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,112] INFO [ControllerServer id=1] Waiting for controller quorum voters future (kafka.server.ControllerServer)
+kafka-1             | [2025-08-03 18:30:55,112] INFO [ControllerServer id=1] Finished waiting for controller quorum voters future (kafka.server.ControllerServer)
+kafka-1             | [2025-08-03 18:30:55,115] INFO [RaftManager id=1] High watermark set to LogOffsetMetadata(offset=1, metadata=Optional[(segmentBaseOffset=0,relativePositionInSegment=91)]) for the first time for epoch 1 based on indexOfHw 0 and voters [ReplicaState(nodeId=1, endOffset=Optional[LogOffsetMetadata(offset=1, metadata=Optional[(segmentBaseOffset=0,relativePositionInSegment=91)])], lastFetchTimestamp=-1, lastCaughtUpTimestamp=-1, hasAcknowledgedLeader=true)] (org.apache.kafka.raft.LeaderState)
+kafka-1             | [2025-08-03 18:30:55,124] INFO [RaftManager id=1] Registered the listener org.apache.kafka.image.loader.MetadataLoader@5564816 (org.apache.kafka.raft.KafkaRaftClient)
+kafka-1             | [2025-08-03 18:30:55,124] INFO [RaftManager id=1] Registered the listener org.apache.kafka.controller.QuorumController$QuorumMetaLogListener@608664216 (org.apache.kafka.raft.KafkaRaftClient)
+kafka-1             | [2025-08-03 18:30:55,125] INFO [MetadataLoader id=1] maybePublishMetadata(LOG_DELTA): The loader is still catching up because we have not loaded a controller record as of offset 0 and high water mark is 1 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,125] INFO [controller-1-ThrottledChannelReaper-Fetch]: Starting (kafka.server.ClientQuotaManager$ThrottledChannelReaper)
+kafka-1             | [2025-08-03 18:30:55,128] INFO [controller-1-ThrottledChannelReaper-Produce]: Starting (kafka.server.ClientQuotaManager$ThrottledChannelReaper)
+kafka-1             | [2025-08-03 18:30:55,129] INFO [controller-1-ThrottledChannelReaper-Request]: Starting (kafka.server.ClientQuotaManager$ThrottledChannelReaper)
+kafka-1             | [2025-08-03 18:30:55,132] INFO [controller-1-ThrottledChannelReaper-ControllerMutation]: Starting (kafka.server.ClientQuotaManager$ThrottledChannelReaper)
+kafka-1             | [2025-08-03 18:30:55,137] INFO [ExpirationReaper-1-AlterAcls]: Starting (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+echo-server-1       | Echo server listening on port 8080.
+kafka-1             | [2025-08-03 18:30:55,141] INFO [ControllerServer id=1] Waiting for the controller metadata publishers to be installed (kafka.server.ControllerServer)
+kafka-1             | [2025-08-03 18:30:55,141] INFO [MetadataLoader id=1] initializeNewPublishers: The loader finished catching up to the current high water mark of 1 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,142] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing SnapshotGenerator with a snapshot at offset 0 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,142] INFO [ControllerServer id=1] Finished waiting for the controller metadata publishers to be installed (kafka.server.ControllerServer)
+kafka-1             | [2025-08-03 18:30:55,142] INFO [SocketServer listenerType=CONTROLLER, nodeId=1] Enabling request processing. (kafka.network.SocketServer)
+kafka-1             | [2025-08-03 18:30:55,143] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing KRaftMetadataCachePublisher with a snapshot at offset 0 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,144] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing FeaturesPublisher with a snapshot at offset 0 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,144] INFO [ControllerServer id=1] Loaded new metadata Features(metadataVersion=3.0-IV1, finalizedFeatures={metadata.version=1}, finalizedFeaturesEpoch=0). (org.apache.kafka.metadata.publisher.FeaturesPublisher)
+kafka-1             | [2025-08-03 18:30:55,144] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing ControllerRegistrationsPublisher with a snapshot at offset 0 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,144] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing ControllerRegistrationManager with a snapshot at offset 0 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,144] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing DynamicConfigPublisher controller id=1 with a snapshot at offset 0 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,144] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing DynamicClientQuotaPublisher controller id=1 with a snapshot at offset 0 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,145] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing ScramPublisher controller id=1 with a snapshot at offset 0 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,147] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing DelegationTokenPublisher controller id=1 with a snapshot at offset 0 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,147] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing ControllerMetadataMetricsPublisher with a snapshot at offset 0 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,145] INFO Awaiting socket connections on 0.0.0.0:9093. (kafka.network.DataPlaneAcceptor)
+kafka-1             | [2025-08-03 18:30:55,148] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing AclPublisher controller id=1 with a snapshot at offset 0 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1             | [2025-08-03 18:30:55,154] INFO [ControllerServer id=1] Waiting for all of the authorizer futures to be completed (kafka.server.ControllerServer)
+kafka-1             | [2025-08-03 18:30:55,154] INFO [ControllerServer id=1] Finished waiting for all of the authorizer futures to be completed (kafka.server.ControllerServer)
+kafka-1             | [2025-08-03 18:30:55,155] INFO [ControllerServer id=1] Waiting for all of the SocketServer Acceptors to be started (kafka.server.ControllerServer)
+kafka-1             | [2025-08-03 18:30:55,155] INFO [ControllerServer id=1] Finished waiting for all of the SocketServer Acceptors to be started (kafka.server.ControllerServer)
+kafka-1             | [2025-08-03 18:30:55,155] INFO [BrokerServer id=1] Transition from SHUTDOWN to STARTING (kafka.server.BrokerServer)
+kafka-1             | [2025-08-03 18:30:55,155] INFO [BrokerServer id=1] Starting broker (kafka.server.BrokerServer)
+kafka-1             | [2025-08-03 18:30:55,154] INFO [ControllerRegistrationManager id=1 incarnation=ynK22ZVzRBu7FdPkaE9VOA] initialized channel manager. (kafka.server.ControllerRegistrationManager)
+kafka-1             | [2025-08-03 18:30:55,156] INFO [ControllerRegistrationManager id=1 incarnation=ynK22ZVzRBu7FdPkaE9VOA] maybeSendControllerRegistration: cannot register yet because the metadata.version is still 3.0-IV1, which does not support KIP-919 controller registration. (kafka.server.ControllerRegistrationManager)
+kafka-1             | [2025-08-03 18:30:55,156] INFO [ControllerServer id=1] Loaded new metadata Features(metadataVersion=3.8-IV0, finalizedFeatures={metadata.version=20}, finalizedFeaturesEpoch=4). (org.apache.kafka.metadata.publisher.FeaturesPublisher)
+kafka-1             | [2025-08-03 18:30:55,154] INFO [controller-1-to-controller-registration-channel-manager]: Starting (kafka.server.NodeToControllerRequestThread)
+kafka-1             | [2025-08-03 18:30:55,157] INFO [controller-1-to-controller-registration-channel-manager]: Recorded new KRaft controller, from now on will use node localhost:9093 (id: 1 rack: null) (kafka.server.NodeToControllerRequestThread)
+kafka-1             | [2025-08-03 18:30:55,159] INFO [ControllerRegistrationManager id=1 incarnation=ynK22ZVzRBu7FdPkaE9VOA] sendControllerRegistration: attempting to send ControllerRegistrationRequestData(controllerId=1, incarnationId=ynK22ZVzRBu7FdPkaE9VOA, zkMigrationReady=false, listeners=[Listener(name='CONTROLLER', host='b8a52beb42ee', port=9093, securityProtocol=0)], features=[Feature(name='metadata.version', minSupportedVersion=1, maxSupportedVersion=20)]) (kafka.server.ControllerRegistrationManager)
+kafka-1             | [2025-08-03 18:30:55,160] INFO RemoteLogManagerConfig values: 
+kafka-1             | 	log.local.retention.bytes = -2
+kafka-1             | 	log.local.retention.ms = -2
+kafka-1             | 	remote.fetch.max.wait.ms = 500
+kafka-1             | 	remote.log.index.file.cache.total.size.bytes = 1073741824
+kafka-1             | 	remote.log.manager.copier.thread.pool.size = 10
+kafka-1             | 	remote.log.manager.copy.max.bytes.per.second = 9223372036854775807
+kafka-1             | 	remote.log.manager.copy.quota.window.num = 11
+kafka-1             | 	remote.log.manager.copy.quota.window.size.seconds = 1
+kafka-1             | 	remote.log.manager.expiration.thread.pool.size = 10
+kafka-1             | 	remote.log.manager.fetch.max.bytes.per.second = 9223372036854775807
+kafka-1             | 	remote.log.manager.fetch.quota.window.num = 11
+kafka-1             | 	remote.log.manager.fetch.quota.window.size.seconds = 1
+kafka-1             | 	remote.log.manager.task.interval.ms = 30000
+kafka-1             | 	remote.log.manager.task.retry.backoff.max.ms = 30000
+kafka-1             | 	remote.log.manager.task.retry.backoff.ms = 500
+kafka-1             | 	remote.log.manager.task.retry.jitter = 0.2
+kafka-1             | 	remote.log.manager.thread.pool.size = 10
+kafka-1             | 	remote.log.metadata.custom.metadata.max.bytes = 128
+kafka-1             | 	remote.log.metadata.manager.class.name = org.apache.kafka.server.log.remote.metadata.storage.TopicBasedRemoteLogMetadataManager
+kafka-1             | 	remote.log.metadata.manager.class.path = null
+kafka-1             | 	remote.log.metadata.manager.impl.prefix = rlmm.config.
+kafka-1             | 	remote.log.metadata.manager.listener.name = null
+kafka-1             | 	remote.log.reader.max.pending.tasks = 100
+kafka-1             | 	remote.log.reader.threads = 10
+kafka-1             | 	remote.log.storage.manager.class.name = null
+kafka-1             | 	remote.log.storage.manager.class.path = null
+kafka-1             | 	remote.log.storage.manager.impl.prefix = rsm.config.
+kafka-1             | 	remote.log.storage.system.enable = false
+kafka-1             |  (org.apache.kafka.server.log.remote.storage.RemoteLogManagerConfig)
+kafka-1             | [2025-08-03 18:30:55,169] INFO [broker-1-ThrottledChannelReaper-Fetch]: Starting (kafka.server.ClientQuotaManager$ThrottledChannelReaper)
+kafka-1             | [2025-08-03 18:30:55,170] INFO [broker-1-ThrottledChannelReaper-Produce]: Starting (kafka.server.ClientQuotaManager$ThrottledChannelReaper)
+kafka-1             | [2025-08-03 18:30:55,170] INFO [broker-1-ThrottledChannelReaper-Request]: Starting (kafka.server.ClientQuotaManager$ThrottledChannelReaper)
+kafka-1             | [2025-08-03 18:30:55,171] INFO [broker-1-ThrottledChannelReaper-ControllerMutation]: Starting (kafka.server.ClientQuotaManager$ThrottledChannelReaper)
+kafka-1             | [2025-08-03 18:30:55,181] INFO [BrokerServer id=1] Waiting for controller quorum voters future (kafka.server.BrokerServer)
+kafka-1             | [2025-08-03 18:30:55,182] INFO [BrokerServer id=1] Finished waiting for controller quorum voters future (kafka.server.BrokerServer)
+kafka-1             | [2025-08-03 18:30:55,186] INFO [broker-1-to-controller-forwarding-channel-manager]: Starting (kafka.server.NodeToControllerRequestThread)
+kafka-1             | [2025-08-03 18:30:55,186] INFO [broker-1-to-controller-forwarding-channel-manager]: Recorded new KRaft controller, from now on will use node localhost:9093 (id: 1 rack: null) (kafka.server.NodeToControllerRequestThread)
+kafka-1             | [2025-08-03 18:30:55,188] INFO [client-metrics-reaper]: Starting (org.apache.kafka.server.util.timer.SystemTimerReaper$Reaper)
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Tyk Analytics Dashboard 5.8.2"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Copyright Tyk Technologies Ltd 2023"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="https://www.tyk.io"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Using /opt/tyk-dashboard/tyk_analytics.conf for configuration"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Loading configuration file" path=/opt/tyk-dashboard/tyk_analytics.conf
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Configuration loaded ok" path=/opt/tyk-dashboard/tyk_analytics.conf
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=warning msg="Notice: The 'TYK_IB_SESSION_SECRET' environment variable was not set. Defaulting to the `admin_secret` value. For enhanced security, please consider setting this variable explicitly."
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Listening on port: 3000"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=warning msg="Default shared_node_secret `352d20ee67be67f6340b4c0605b044b7` should be changed for production use."
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=warning msg="mongo_url is not empty, ignoring `storage.main` section"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Initializing Main storage with `mongo` database"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=warning msg="mongo_url is not empty, ignoring `storage.main` section"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Initializing Analytics storage with `mongo` database"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=warning msg="mongo_url is not empty, ignoring `storage.main` section"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Initializing Logs storage with `mongo` database"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=warning msg="mongo_url is not empty, ignoring `storage.main` section"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Initializing Uptime storage with `mongo` database"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Creating new KV connection pool"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Attempting to reach KV store"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Creating new KV connection pool"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Attempting to reach KV store"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Creating new KV connection pool"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Attempting to reach KV store"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="initializing SMTP email driver" prefix=email
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="SMTP settings" address=mailserver port=2500 prefix=email
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="SMTP email driver initialized" prefix=email
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="OAS Extensions migration successful"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="OAS storage migration successful"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="API assets orgs migration successful"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="API storage timestamp migration successful"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Creating new KV connection pool"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Attempting to reach KV store"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Creating new KV connection pool"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Attempting to reach KV store"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Creating new KV connection pool"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Attempting to reach KV store"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Licensing: Setting new license"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Licensing: Registering nodes..."
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Adding available nodes..."
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Licensing: Checking capabilities"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Creating new KV connection pool"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Attempting to reach KV store"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="--> Standard listener (http) for dashboard and API"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Starting zeroconf heartbeat"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Starting notification handler for gateway cluster"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Creating new KV connection pool"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Attempting to reach KV store"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Loading routes..."
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Initializing Internal TIB v1.7.0"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Creating new KV connection pool"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Attempting to reach KV store"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Subscription started: tyk.cluster.notifications"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Initializing Identity Cache" prefix="TIB INITIALIZER"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Set KV store" prefix="TIB REDIS STORE"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Subscription started: dashboard.ui.messages"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Initializing Identity Cache" prefix="TIB INITIALIZER"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Set KV store" prefix="TIB REDIS STORE"
+tyk-dashboard-1     | time="Aug 03 18:30:58" level=info msg="Using internal Identity Broker v1.7.0. Routes are loaded and available."
+tyk-dashboard-1     | time="Aug 03 18:30:59" level=info msg="Creating new KV connection pool"
+tyk-dashboard-1     | time="Aug 03 18:30:59" level=info msg="Attempting to reach KV store"
+tyk-dashboard-1     | time="Aug 03 18:30:59" level=info msg="Got configuration for nodeID: 2c10a59c-6a18-4521-60a7-2b059ced7887|ba892d6c1ef7"
+tyk-dashboard-1     | time="Aug 03 18:31:00" level=info msg="Deregistering: 0fe2ef49-038c-43c8-60e8-bc23db0ed3e3"
+tyk-dashboard-1     | time="Aug 03 18:31:04" level=info msg="Deregistering: 2c10a59c-6a18-4521-60a7-2b059ced7887"
+tyk-dashboard-1     | time="Aug 03 18:31:05" level=info msg="Got configuration for nodeID: 0fe2ef49-038c-43c8-60e8-bc23db0ed3e3|ef66e877f70b"
+tyk-dashboard-1     | time="Aug 03 18:31:05" level=info msg="Got configuration for nodeID: 2c10a59c-6a18-4521-60a7-2b059ced7887|d86a3fb71e75"
+tyk-dashboard-1     | time="Aug 03 18:31:08" level=info msg="Sending config request for node: 0fe2ef49-038c-43c8-60e8-bc23db0ed3e3-ef66e877f70b"
+tyk-dashboard-1     | time="Aug 03 18:31:08" level=info msg="Got configuration for nodeID: 0fe2ef49-038c-43c8-60e8-bc23db0ed3e3|ef66e877f70b"
+tyk-dashboard-1     | time="Aug 03 18:31:08" level=info msg="Sending config request for node: 2c10a59c-6a18-4521-60a7-2b059ced7887-d86a3fb71e75"
+tyk-dashboard-1     | time="Aug 03 18:31:08" level=info msg="Got configuration for nodeID: 2c10a59c-6a18-4521-60a7-2b059ced7887|d86a3fb71e75"
+www-ngrok-1         | start - start tunnels by name from the configuration file
+www-ngrok-1         | 
+www-ngrok-1         | USAGE:
+www-ngrok-1         |   ngrok start [flags]
+www-ngrok-1         | 
+www-ngrok-1         | AUTHOR:
+www-ngrok-1         |   ngrok - <support@ngrok.com>
+www-ngrok-1         | 
+www-ngrok-1         | COMMANDS: 
+www-ngrok-1         |   config          update or migrate ngrok's configuration file
+www-ngrok-1         |   http            start an HTTP tunnel
+www-ngrok-1         |   tcp             start a TCP tunnel
+www-ngrok-1         |   tunnel          start a tunnel for use with a tunnel-group backend
+www-ngrok-1         | 
+www-ngrok-1         | EXAMPLES: 
+www-ngrok-1         |   ngrok http 80                                                 # secure public URL for port 80 web server
+www-ngrok-1         |   ngrok http --domain baz.ngrok.dev 8080                        # port 8080 available at baz.ngrok.dev
+www-ngrok-1         |   ngrok tcp 22                                                  # tunnel arbitrary TCP traffic to port 22
+www-ngrok-1         |   ngrok http 80 --oauth=google --oauth-allow-email=foo@foo.com  # secure your app with oauth
+www-ngrok-1         | 
+www-ngrok-1         | Paid Features: 
+www-ngrok-1         |   ngrok http 80 --domain mydomain.com                           # run ngrok with your own custom domain
+www-ngrok-1         |   ngrok http 80 --allow-cidr 2600:8c00::a03c:91ee:fe69:9695/32  # run ngrok with IP policy restrictions
+www-ngrok-1         |   Upgrade your account at https://dashboard.ngrok.com/billing/subscription to access paid features
+www-ngrok-1         | 
+www-ngrok-1         | Upgrade your account at https://dashboard.ngrok.com/billing/subscription to access paid features
+www-ngrok-1         | 
+www-ngrok-1         | Flags:
+www-ngrok-1         |   -h, --help      help for ngrok
+www-ngrok-1         | 
+www-ngrok-1         | Use "ngrok [command] --help" for more information about a command.
+www-ngrok-1         | 
+www-ngrok-1         | ERROR:  authentication failed: Usage of ngrok requires a verified account and authtoken.
+www-ngrok-1         | ERROR:  
+www-ngrok-1         | ERROR:  Sign up for an account: https://dashboard.ngrok.com/signup
+www-ngrok-1         | ERROR:  Install your authtoken: https://dashboard.ngrok.com/get-started/your-authtoken
+www-ngrok-1         | ERROR:  
+www-ngrok-1         | ERROR:  ERR_NGROK_4018
+www-ngrok-1         | ERROR:  https://ngrok.com/docs/errors/err_ngrok_4018
+www-ngrok-1         | ERROR:  
+countries-rest-api-1  | 
+countries-rest-api-1  | > countries-rest-api@1.0.0 start
+countries-rest-api-1  | > node index.js
+countries-rest-api-1  | 
+countries-rest-api-1  | Server running on port 4100
+kafka-1               | [2025-08-03 18:30:55,261] INFO [ControllerRegistrationManager id=1 incarnation=ynK22ZVzRBu7FdPkaE9VOA] Our registration has been persisted to the metadata log. (kafka.server.ControllerRegistrationManager)
+kafka-1               | [2025-08-03 18:30:55,264] INFO [ControllerRegistrationManager id=1 incarnation=ynK22ZVzRBu7FdPkaE9VOA] RegistrationResponseHandler: controller acknowledged ControllerRegistrationRequest. (kafka.server.ControllerRegistrationManager)
+kafka-1               | [2025-08-03 18:30:55,273] INFO Updated connection-accept-rate max connection creation rate to 2147483647 (kafka.network.ConnectionQuotas)
+kafka-1               | [2025-08-03 18:30:55,276] INFO [SocketServer listenerType=BROKER, nodeId=1] Created data-plane acceptor and processors for endpoint : ListenerName(PLAINTEXT) (kafka.network.SocketServer)
+kafka-1               | [2025-08-03 18:30:55,283] INFO [broker-1-to-controller-alter-partition-channel-manager]: Starting (kafka.server.NodeToControllerRequestThread)
+kafka-1               | [2025-08-03 18:30:55,284] INFO [broker-1-to-controller-alter-partition-channel-manager]: Recorded new KRaft controller, from now on will use node localhost:9093 (id: 1 rack: null) (kafka.server.NodeToControllerRequestThread)
+kafka-1               | [2025-08-03 18:30:55,285] INFO [broker-1-to-controller-directory-assignments-channel-manager]: Starting (kafka.server.NodeToControllerRequestThread)
+kafka-1               | [2025-08-03 18:30:55,286] INFO [broker-1-to-controller-directory-assignments-channel-manager]: Recorded new KRaft controller, from now on will use node localhost:9093 (id: 1 rack: null) (kafka.server.NodeToControllerRequestThread)
+kafka-1               | [2025-08-03 18:30:55,288] INFO [ExpirationReaper-1-Produce]: Starting (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+kafka-1               | [2025-08-03 18:30:55,288] INFO [ExpirationReaper-1-Fetch]: Starting (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+kafka-1               | [2025-08-03 18:30:55,289] INFO [ExpirationReaper-1-DeleteRecords]: Starting (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+kafka-1               | [2025-08-03 18:30:55,292] INFO [ExpirationReaper-1-ElectLeader]: Starting (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+kafka-1               | [2025-08-03 18:30:55,297] INFO [ExpirationReaper-1-RemoteFetch]: Starting (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+kafka-1               | [2025-08-03 18:30:55,299] INFO [ExpirationReaper-1-Heartbeat]: Starting (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+kafka-1               | [2025-08-03 18:30:55,299] INFO [ExpirationReaper-1-Rebalance]: Starting (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+kafka-1               | [2025-08-03 18:30:55,304] INFO Unable to read the broker epoch in /tmp/kafka-logs. (kafka.log.LogManager)
+kafka-1               | [2025-08-03 18:30:55,305] INFO [BrokerLifecycleManager id=1] Incarnation lCUunln1RbKjXnn_LU4fWw of broker 1 in cluster 5L6g3nShT-eMCtK--X86sw is now STARTING. (kafka.server.BrokerLifecycleManager)
+kafka-1               | [2025-08-03 18:30:55,306] INFO [broker-1-to-controller-heartbeat-channel-manager]: Starting (kafka.server.NodeToControllerRequestThread)
+kafka-1               | [2025-08-03 18:30:55,306] INFO [broker-1-to-controller-heartbeat-channel-manager]: Recorded new KRaft controller, from now on will use node localhost:9093 (id: 1 rack: null) (kafka.server.NodeToControllerRequestThread)
+kafka-1               | [2025-08-03 18:30:55,317] INFO [ExpirationReaper-1-AlterAcls]: Starting (kafka.server.DelayedOperationPurgatory$ExpiredOperationReaper)
+kafka-1               | [2025-08-03 18:30:55,347] INFO [BrokerLifecycleManager id=1] Successfully registered broker 1 with broker epoch 6 (kafka.server.BrokerLifecycleManager)
+kafka-1               | [2025-08-03 18:30:55,360] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing MetadataVersionPublisher(id=1) with a snapshot at offset 6 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1               | [2025-08-03 18:30:55,360] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing BrokerMetadataPublisher with a snapshot at offset 6 (org.apache.kafka.image.loader.MetadataLoader)
+kafka-1               | [2025-08-03 18:30:55,360] INFO [BrokerMetadataPublisher id=1] Publishing initial metadata at offset OffsetAndEpoch(offset=6, epoch=1) with metadata.version 3.8-IV0. (kafka.server.metadata.BrokerMetadataPublisher)
+kafka-1               | [2025-08-03 18:30:55,360] INFO Loading logs from log dirs ArrayBuffer(/tmp/kafka-logs) (kafka.log.LogManager)
+kafka-1               | [2025-08-03 18:30:55,363] INFO [BrokerServer id=1] Waiting for the broker metadata publishers to be installed (kafka.server.BrokerServer)
+kafka-1               | [2025-08-03 18:30:55,363] INFO [BrokerServer id=1] Finished waiting for the broker metadata publishers to be installed (kafka.server.BrokerServer)
+kafka-1               | [2025-08-03 18:30:55,363] INFO [BrokerServer id=1] Waiting for the controller to acknowledge that we are caught up (kafka.server.BrokerServer)
+kafka-1               | [2025-08-03 18:30:55,367] INFO [BrokerLifecycleManager id=1] The broker has caught up. Transitioning from STARTING to RECOVERY. (kafka.server.BrokerLifecycleManager)
+kafka-1               | [2025-08-03 18:30:55,368] INFO [BrokerServer id=1] Finished waiting for the controller to acknowledge that we are caught up (kafka.server.BrokerServer)
+kafka-1               | [2025-08-03 18:30:55,368] INFO [BrokerServer id=1] Waiting for the initial broker metadata update to be published (kafka.server.BrokerServer)
+kafka-1               | [2025-08-03 18:30:55,371] INFO No logs found to be loaded in /tmp/kafka-logs (kafka.log.LogManager)
+kafka-1               | [2025-08-03 18:30:55,373] INFO Loaded 0 logs in 13ms (kafka.log.LogManager)
+kafka-1               | [2025-08-03 18:30:55,375] INFO Starting log cleanup with a period of 300000 ms. (kafka.log.LogManager)
+kafka-1               | [2025-08-03 18:30:55,375] INFO Starting log flusher with a default period of 9223372036854775807 ms. (kafka.log.LogManager)
+kafka-1               | [2025-08-03 18:30:55,387] INFO [BrokerLifecycleManager id=1] The broker is in RECOVERY. (kafka.server.BrokerLifecycleManager)
+kafka-1               | [2025-08-03 18:30:55,438] INFO [kafka-log-cleaner-thread-0]: Starting (kafka.log.LogCleaner$CleanerThread)
+kafka-1               | [2025-08-03 18:30:55,442] INFO [LogDirFailureHandler]: Starting (kafka.server.ReplicaManager$LogDirFailureHandler)
+kafka-1               | [2025-08-03 18:30:55,444] INFO [AddPartitionsToTxnSenderThread-1]: Starting (kafka.server.AddPartitionsToTxnManager)
+kafka-1               | [2025-08-03 18:30:55,444] INFO [GroupCoordinator 1]: Starting up. (kafka.coordinator.group.GroupCoordinator)
+kafka-1               | [2025-08-03 18:30:55,449] INFO [GroupCoordinator 1]: Startup complete. (kafka.coordinator.group.GroupCoordinator)
+kafka-1               | [2025-08-03 18:30:55,449] INFO [TransactionCoordinator id=1] Starting up. (kafka.coordinator.transaction.TransactionCoordinator)
+kafka-1               | [2025-08-03 18:30:55,452] INFO [TxnMarkerSenderThread-1]: Starting (kafka.coordinator.transaction.TransactionMarkerChannelManager)
+kafka-1               | [2025-08-03 18:30:55,453] INFO [TransactionCoordinator id=1] Startup complete. (kafka.coordinator.transaction.TransactionCoordinator)
+kafka-1               | [2025-08-03 18:30:55,459] INFO [BrokerServer id=1] Finished waiting for the initial broker metadata update to be published (kafka.server.BrokerServer)
+kafka-1               | [2025-08-03 18:30:55,460] INFO KafkaConfig values: 
+kafka-1               | 	advertised.listeners = PLAINTEXT://kafka:9092
+kafka-1               | 	alter.config.policy.class.name = null
+kafka-1               | 	alter.log.dirs.replication.quota.window.num = 11
+kafka-1               | 	alter.log.dirs.replication.quota.window.size.seconds = 1
+kafka-1               | 	authorizer.class.name = 
+kafka-1               | 	auto.create.topics.enable = true
+kafka-1               | 	auto.include.jmx.reporter = true
+kafka-1               | 	auto.leader.rebalance.enable = true
+kafka-1               | 	background.threads = 10
+kafka-1               | 	broker.heartbeat.interval.ms = 2000
+kafka-1               | 	broker.id = 1
+kafka-1               | 	broker.id.generation.enable = true
+kafka-1               | 	broker.rack = null
+kafka-1               | 	broker.session.timeout.ms = 9000
+kafka-1               | 	client.quota.callback.class = null
+kafka-1               | 	compression.gzip.level = -1
+kafka-1               | 	compression.lz4.level = 9
+kafka-1               | 	compression.type = producer
+kafka-1               | 	compression.zstd.level = 3
+kafka-1               | 	connection.failed.authentication.delay.ms = 100
+kafka-1               | 	connections.max.idle.ms = 600000
+kafka-1               | 	connections.max.reauth.ms = 0
+kafka-1               | 	control.plane.listener.name = null
+kafka-1               | 	controlled.shutdown.enable = true
+kafka-1               | 	controlled.shutdown.max.retries = 3
+kafka-1               | 	controlled.shutdown.retry.backoff.ms = 5000
+kafka-1               | 	controller.listener.names = CONTROLLER
+kafka-1               | 	controller.quorum.append.linger.ms = 25
+kafka-1               | 	controller.quorum.bootstrap.servers = []
+kafka-1               | 	controller.quorum.election.backoff.max.ms = 1000
+kafka-1               | 	controller.quorum.election.timeout.ms = 1000
+kafka-1               | 	controller.quorum.fetch.timeout.ms = 2000
+kafka-1               | 	controller.quorum.request.timeout.ms = 2000
+kafka-1               | 	controller.quorum.retry.backoff.ms = 20
+kafka-1               | 	controller.quorum.voters = [1@localhost:9093]
+kafka-1               | 	controller.quota.window.num = 11
+kafka-1               | 	controller.quota.window.size.seconds = 1
+kafka-1               | 	controller.socket.timeout.ms = 30000
+kafka-1               | 	create.topic.policy.class.name = null
+kafka-1               | 	default.replication.factor = 1
+kafka-1               | 	delegation.token.expiry.check.interval.ms = 3600000
+kafka-1               | 	delegation.token.expiry.time.ms = 86400000
+kafka-1               | 	delegation.token.master.key = null
+kafka-1               | 	delegation.token.max.lifetime.ms = 604800000
+kafka-1               | 	delegation.token.secret.key = null
+kafka-1               | 	delete.records.purgatory.purge.interval.requests = 1
+kafka-1               | 	delete.topic.enable = true
+kafka-1               | 	early.start.listeners = null
+kafka-1               | 	eligible.leader.replicas.enable = false
+kafka-1               | 	fetch.max.bytes = 57671680
+kafka-1               | 	fetch.purgatory.purge.interval.requests = 1000
+kafka-1               | 	group.consumer.assignors = [org.apache.kafka.coordinator.group.assignor.UniformAssignor, org.apache.kafka.coordinator.group.assignor.RangeAssignor]
+kafka-1               | 	group.consumer.heartbeat.interval.ms = 5000
+kafka-1               | 	group.consumer.max.heartbeat.interval.ms = 15000
+kafka-1               | 	group.consumer.max.session.timeout.ms = 60000
+kafka-1               | 	group.consumer.max.size = 2147483647
+kafka-1               | 	group.consumer.migration.policy = disabled
+kafka-1               | 	group.consumer.min.heartbeat.interval.ms = 5000
+kafka-1               | 	group.consumer.min.session.timeout.ms = 45000
+kafka-1               | 	group.consumer.session.timeout.ms = 45000
+kafka-1               | 	group.coordinator.append.linger.ms = 10
+kafka-1               | 	group.coordinator.new.enable = false
+kafka-1               | 	group.coordinator.rebalance.protocols = [classic]
+kafka-1               | 	group.coordinator.threads = 1
+kafka-1               | 	group.initial.rebalance.delay.ms = 0
+kafka-1               | 	group.max.session.timeout.ms = 1800000
+kafka-1               | 	group.max.size = 2147483647
+kafka-1               | 	group.min.session.timeout.ms = 6000
+kafka-1               | 	initial.broker.registration.timeout.ms = 60000
+kafka-1               | 	inter.broker.listener.name = null
+kafka-1               | 	inter.broker.protocol.version = 3.8-IV0
+kafka-1               | 	kafka.metrics.polling.interval.secs = 10
+kafka-1               | 	kafka.metrics.reporters = []
+kafka-1               | 	leader.imbalance.check.interval.seconds = 300
+kafka-1               | 	leader.imbalance.per.broker.percentage = 10
+kafka-1               | 	listener.security.protocol.map = CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+kafka-1               | 	listeners = PLAINTEXT://:9092,CONTROLLER://:9093
+kafka-1               | 	log.cleaner.backoff.ms = 15000
+kafka-1               | 	log.cleaner.dedupe.buffer.size = 134217728
+kafka-1               | 	log.cleaner.delete.retention.ms = 86400000
+kafka-1               | 	log.cleaner.enable = true
+kafka-1               | 	log.cleaner.io.buffer.load.factor = 0.9
+kafka-1               | 	log.cleaner.io.buffer.size = 524288
+kafka-1               | 	log.cleaner.io.max.bytes.per.second = 1.7976931348623157E308
+kafka-1               | 	log.cleaner.max.compaction.lag.ms = 9223372036854775807
+kafka-1               | 	log.cleaner.min.cleanable.ratio = 0.5
+kafka-1               | 	log.cleaner.min.compaction.lag.ms = 0
+kafka-1               | 	log.cleaner.threads = 1
+kafka-1               | 	log.cleanup.policy = [delete]
+kafka-1               | 	log.dir = /tmp/kafka-logs
+kafka-1               | 	log.dir.failure.timeout.ms = 30000
+kafka-1               | 	log.dirs = null
+kafka-1               | 	log.flush.interval.messages = 9223372036854775807
+kafka-1               | 	log.flush.interval.ms = null
+kafka-1               | 	log.flush.offset.checkpoint.interval.ms = 60000
+kafka-1               | 	log.flush.scheduler.interval.ms = 9223372036854775807
+kafka-1               | 	log.flush.start.offset.checkpoint.interval.ms = 60000
+kafka-1               | 	log.index.interval.bytes = 4096
+kafka-1               | 	log.index.size.max.bytes = 10485760
+kafka-1               | 	log.initial.task.delay.ms = 30000
+kafka-1               | 	log.local.retention.bytes = -2
+kafka-1               | 	log.local.retention.ms = -2
+kafka-1               | 	log.message.downconversion.enable = true
+kafka-1               | 	log.message.format.version = 3.0-IV1
+kafka-1               | 	log.message.timestamp.after.max.ms = 9223372036854775807
+kafka-1               | 	log.message.timestamp.before.max.ms = 9223372036854775807
+kafka-1               | 	log.message.timestamp.difference.max.ms = 9223372036854775807
+kafka-1               | 	log.message.timestamp.type = CreateTime
+kafka-1               | 	log.preallocate = false
+kafka-1               | 	log.retention.bytes = -1
+kafka-1               | 	log.retention.check.interval.ms = 300000
+kafka-1               | 	log.retention.hours = 168
+kafka-1               | 	log.retention.minutes = null
+kafka-1               | 	log.retention.ms = null
+kafka-1               | 	log.roll.hours = 168
+kafka-1               | 	log.roll.jitter.hours = 0
+kafka-1               | 	log.roll.jitter.ms = null
+kafka-1               | 	log.roll.ms = null
+kafka-1               | 	log.segment.bytes = 1073741824
+kafka-1               | 	log.segment.delete.delay.ms = 60000
+kafka-1               | 	max.connection.creation.rate = 2147483647
+kafka-1               | 	max.connections = 2147483647
+kafka-1               | 	max.connections.per.ip = 2147483647
+kafka-1               | 	max.connections.per.ip.overrides = 
+kafka-1               | 	max.incremental.fetch.session.cache.slots = 1000
+kafka-1               | 	max.request.partition.size.limit = 2000
+kafka-1               | 	message.max.bytes = 1048588
+kafka-1               | 	metadata.log.dir = null
+kafka-1               | 	metadata.log.max.record.bytes.between.snapshots = 20971520
+kafka-1               | 	metadata.log.max.snapshot.interval.ms = 3600000
+kafka-1               | 	metadata.log.segment.bytes = 1073741824
+kafka-1               | 	metadata.log.segment.min.bytes = 8388608
+kafka-1               | 	metadata.log.segment.ms = 604800000
+kafka-1               | 	metadata.max.idle.interval.ms = 500
+kafka-1               | 	metadata.max.retention.bytes = 104857600
+kafka-1               | 	metadata.max.retention.ms = 604800000
+kafka-1               | 	metric.reporters = []
+kafka-1               | 	metrics.num.samples = 2
+kafka-1               | 	metrics.recording.level = INFO
+kafka-1               | 	metrics.sample.window.ms = 30000
+kafka-1               | 	min.insync.replicas = 1
+kafka-1               | 	node.id = 1
+kafka-1               | 	num.io.threads = 8
+kafka-1               | 	num.network.threads = 3
+kafka-1               | 	num.partitions = 3
+kafka-1               | 	num.recovery.threads.per.data.dir = 1
+kafka-1               | 	num.replica.alter.log.dirs.threads = null
+kafka-1               | 	num.replica.fetchers = 1
+kafka-1               | 	offset.metadata.max.bytes = 4096
+kafka-1               | 	offsets.commit.required.acks = -1
+kafka-1               | 	offsets.commit.timeout.ms = 5000
+kafka-1               | 	offsets.load.buffer.size = 5242880
+kafka-1               | 	offsets.retention.check.interval.ms = 600000
+kafka-1               | 	offsets.retention.minutes = 10080
+kafka-1               | 	offsets.topic.compression.codec = 0
+kafka-1               | 	offsets.topic.num.partitions = 50
+kafka-1               | 	offsets.topic.replication.factor = 1
+kafka-1               | 	offsets.topic.segment.bytes = 104857600
+kafka-1               | 	password.encoder.cipher.algorithm = AES/CBC/PKCS5Padding
+kafka-1               | 	password.encoder.iterations = 4096
+kafka-1               | 	password.encoder.key.length = 128
+kafka-1               | 	password.encoder.keyfactory.algorithm = null
+kafka-1               | 	password.encoder.old.secret = null
+kafka-1               | 	password.encoder.secret = null
+kafka-1               | 	principal.builder.class = class org.apache.kafka.common.security.authenticator.DefaultKafkaPrincipalBuilder
+kafka-1               | 	process.roles = [broker, controller]
+kafka-1               | 	producer.id.expiration.check.interval.ms = 600000
+kafka-1               | 	producer.id.expiration.ms = 86400000
+kafka-1               | 	producer.purgatory.purge.interval.requests = 1000
+kafka-1               | 	queued.max.request.bytes = -1
+kafka-1               | 	queued.max.requests = 500
+kafka-1               | 	quota.window.num = 11
+kafka-1               | 	quota.window.size.seconds = 1
+kafka-1               | 	remote.fetch.max.wait.ms = 500
+kafka-1               | 	remote.log.index.file.cache.total.size.bytes = 1073741824
+kafka-1               | 	remote.log.manager.copier.thread.pool.size = 10
+kafka-1               | 	remote.log.manager.copy.max.bytes.per.second = 9223372036854775807
+kafka-1               | 	remote.log.manager.copy.quota.window.num = 11
+kafka-1               | 	remote.log.manager.copy.quota.window.size.seconds = 1
+kafka-1               | 	remote.log.manager.expiration.thread.pool.size = 10
+kafka-1               | 	remote.log.manager.fetch.max.bytes.per.second = 9223372036854775807
+kafka-1               | 	remote.log.manager.fetch.quota.window.num = 11
+kafka-1               | 	remote.log.manager.fetch.quota.window.size.seconds = 1
+kafka-1               | 	remote.log.manager.task.interval.ms = 30000
+kafka-1               | 	remote.log.manager.task.retry.backoff.max.ms = 30000
+kafka-1               | 	remote.log.manager.task.retry.backoff.ms = 500
+kafka-1               | 	remote.log.manager.task.retry.jitter = 0.2
+kafka-1               | 	remote.log.manager.thread.pool.size = 10
+kafka-1               | 	remote.log.metadata.custom.metadata.max.bytes = 128
+kafka-1               | 	remote.log.metadata.manager.class.name = org.apache.kafka.server.log.remote.metadata.storage.TopicBasedRemoteLogMetadataManager
+kafka-1               | 	remote.log.metadata.manager.class.path = null
+kafka-1               | 	remote.log.metadata.manager.impl.prefix = rlmm.config.
+kafka-1               | 	remote.log.metadata.manager.listener.name = null
+kafka-1               | 	remote.log.reader.max.pending.tasks = 100
+kafka-1               | 	remote.log.reader.threads = 10
+kafka-1               | 	remote.log.storage.manager.class.name = null
+kafka-1               | 	remote.log.storage.manager.class.path = null
+tyk-pump-1            | time="Aug 03 18:30:51" level=info msg="## Tyk Pump, 1.12.0 ##" prefix=main
+tyk-pump-1            | time="Aug 03 18:30:51" level=info msg="Serving health check endpoint at http://localhost:8083/health ..." prefix=server
+tyk-pump-1            | time="Aug 03 18:30:51" level=info msg="-- No max batch size set, defaulting to 10MB" prefix=mongo-pump-selective
+tyk-pump-1            | time="Aug 03 18:30:51" level=info msg="-- No max document size set, defaulting to 10MB" prefix=mongo-pump-selective
+tyk-pump-1            | time="Aug 03 18:30:53" level=info msg="MongoDB Selective Pump Initialized" prefix=mongo-pump-selective
+tyk-pump-1            | time="Aug 03 18:30:53" level=info msg="Init Pump: MONGO-PUMP-SELECTIVE" prefix=main
+tyk-pump-1            | time="Aug 03 18:30:53" level=warning msg="AggregationTime is not set or is not between 1 and 60. Defaulting to 60" prefix=mongo-pump-aggregate
+tyk-pump-1            | time="Aug 03 18:30:53" level=info msg="MongoDB Aggregate Pump Initialized" prefix=mongo-pump-aggregate
+tyk-pump-1            | time="Aug 03 18:30:53" level=info msg="Init Pump: MONGO-PUMP-AGGREGATE" prefix=main
+kafka-1               | 	remote.log.storage.manager.impl.prefix = rsm.config.
+kafka-1               | 	remote.log.storage.system.enable = false
+kafka-1               | 	replica.fetch.backoff.ms = 1000
+kafka-1               | 	replica.fetch.max.bytes = 1048576
+kafka-1               | 	replica.fetch.min.bytes = 1
+kafka-1               | 	replica.fetch.response.max.bytes = 10485760
+kafka-1               | 	replica.fetch.wait.max.ms = 500
+kafka-1               | 	replica.high.watermark.checkpoint.interval.ms = 5000
+kafka-1               | 	replica.lag.time.max.ms = 30000
+kafka-1               | 	replica.selector.class = null
+kafka-1               | 	replica.socket.receive.buffer.bytes = 65536
+kafka-1               | 	replica.socket.timeout.ms = 30000
+kafka-1               | 	replication.quota.window.num = 11
+kafka-1               | 	replication.quota.window.size.seconds = 1
+kafka-1               | 	request.timeout.ms = 30000
+kafka-1               | 	reserved.broker.max.id = 1000
+kafka-1               | 	sasl.client.callback.handler.class = null
+kafka-1               | 	sasl.enabled.mechanisms = [GSSAPI]
+kafka-1               | 	sasl.jaas.config = null
+kafka-1               | 	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+kafka-1               | 	sasl.kerberos.min.time.before.relogin = 60000
+kafka-1               | 	sasl.kerberos.principal.to.local.rules = [DEFAULT]
+tyk-pump-1            | time="Aug 03 18:30:53" level=info msg="'dont_purge_uptime_data' set to false, attempting to start Uptime pump! " prefix=main
+tyk-pump-1            | time="Aug 03 18:30:53" level=info msg=Init collection_name=tyk_uptime_analytics prefix=mongo-pump url="mongodb://tyk-mongo:27017/tyk_analytics"
+tyk-pump-1            | time="Aug 03 18:30:53" level=info msg="MongoDB Pump Initialized" prefix=mongo-pump
+tyk-pump-1            | time="Aug 03 18:30:53" level=info msg="Init Uptime Pump: MongoDB Pump" prefix=main type=
+tyk-pump-1            | time="Aug 03 18:30:53" level=info msg="Starting purge loop @2, chunk size 0" prefix=main
+kafka-1               | 	sasl.kerberos.service.name = null
+kafka-1               | 	sasl.kerberos.ticket.renew.jitter = 0.05
+kafka-1               | 	sasl.kerberos.ticket.renew.window.factor = 0.8
+kafka-1               | 	sasl.login.callback.handler.class = null
+kafka-1               | 	sasl.login.class = null
+kafka-1               | 	sasl.login.connect.timeout.ms = null
+kafka-1               | 	sasl.login.read.timeout.ms = null
+kafka-1               | 	sasl.login.refresh.buffer.seconds = 300
+kafka-1               | 	sasl.login.refresh.min.period.seconds = 60
+kafka-1               | 	sasl.login.refresh.window.factor = 0.8
+kafka-1               | 	sasl.login.refresh.window.jitter = 0.05
+kafka-1               | 	sasl.login.retry.backoff.max.ms = 10000
+kafka-1               | 	sasl.login.retry.backoff.ms = 100
+kafka-1               | 	sasl.mechanism.controller.protocol = GSSAPI
+kafka-1               | 	sasl.mechanism.inter.broker.protocol = GSSAPI
+kafka-1               | 	sasl.oauthbearer.clock.skew.seconds = 30
+kafka-1               | 	sasl.oauthbearer.expected.audience = null
+kafka-1               | 	sasl.oauthbearer.expected.issuer = null
+kafka-1               | 	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+kafka-1               | 	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+kafka-1               | 	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+kafka-1               | 	sasl.oauthbearer.jwks.endpoint.url = null
+kafka-1               | 	sasl.oauthbearer.scope.claim.name = scope
+kafka-1               | 	sasl.oauthbearer.sub.claim.name = sub
+kafka-1               | 	sasl.oauthbearer.token.endpoint.url = null
+kafka-1               | 	sasl.server.callback.handler.class = null
+kafka-1               | 	sasl.server.max.receive.size = 524288
+kafka-1               | 	security.inter.broker.protocol = PLAINTEXT
+kafka-1               | 	security.providers = null
+kafka-1               | 	server.max.startup.time.ms = 9223372036854775807
+kafka-1               | 	socket.connection.setup.timeout.max.ms = 30000
+kafka-1               | 	socket.connection.setup.timeout.ms = 10000
+kafka-1               | 	socket.listen.backlog.size = 50
+kafka-1               | 	socket.receive.buffer.bytes = 102400
+kafka-1               | 	socket.request.max.bytes = 104857600
+kafka-1               | 	socket.send.buffer.bytes = 102400
+kafka-1               | 	ssl.allow.dn.changes = false
+kafka-1               | 	ssl.allow.san.changes = false
+kafka-1               | 	ssl.cipher.suites = []
+kafka-1               | 	ssl.client.auth = none
+kafka-1               | 	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+kafka-1               | 	ssl.endpoint.identification.algorithm = https
+swagger-petstore-1    | 2025-08-03 18:30:53.595:INFO::main: Logging initialized @925ms
+swagger-petstore-1    | 2025-08-03 18:30:53.625:INFO:oejr.Runner:main: Runner
+swagger-petstore-1    | 2025-08-03 18:30:53.821:INFO:oejs.Server:main: jetty-9.2.9.v20150224
+swagger-petstore-1    | Aug 03, 2025 6:30:56 PM com.sun.jersey.api.core.PackagesResourceConfig init
+swagger-petstore-1    | INFO: Scanning for root resource and provider classes in the packages:
+swagger-petstore-1    |   io.swagger.jaxrs.json
+swagger-petstore-1    |   io.swagger.sample.util
+swagger-petstore-1    |   io.swagger.sample.resource
+swagger-petstore-1    |   io.swagger.jaxrs.listing
+swagger-petstore-1    | Aug 03, 2025 6:30:56 PM com.sun.jersey.api.core.ScanningResourceConfig logClasses
+swagger-petstore-1    | INFO: Root resource classes found:
+kafka-1               | 	ssl.engine.factory.class = null
+kafka-1               | 	ssl.key.password = null
+kafka-1               | 	ssl.keymanager.algorithm = SunX509
+kafka-1               | 	ssl.keystore.certificate.chain = null
+kafka-1               | 	ssl.keystore.key = null
+kafka-1               | 	ssl.keystore.location = null
+kafka-1               | 	ssl.keystore.password = null
+kafka-1               | 	ssl.keystore.type = JKS
+kafka-1               | 	ssl.principal.mapping.rules = DEFAULT
+kafka-1               | 	ssl.protocol = TLSv1.3
+kafka-1               | 	ssl.provider = null
+kafka-1               | 	ssl.secure.random.implementation = null
+kafka-1               | 	ssl.trustmanager.algorithm = PKIX
+kafka-1               | 	ssl.truststore.certificates = null
+kafka-1               | 	ssl.truststore.location = null
+kafka-1               | 	ssl.truststore.password = null
+kafka-1               | 	ssl.truststore.type = JKS
+kafka-1               | 	telemetry.max.bytes = 1048576
+kafka-1               | 	transaction.abort.timed.out.transaction.cleanup.interval.ms = 10000
+kafka-1               | 	transaction.max.timeout.ms = 900000
+kafka-1               | 	transaction.partition.verification.enable = true
+kafka-1               | 	transaction.remove.expired.transaction.cleanup.interval.ms = 3600000
+kafka-1               | 	transaction.state.log.load.buffer.size = 5242880
+kafka-1               | 	transaction.state.log.min.isr = 1
+kafka-1               | 	transaction.state.log.num.partitions = 50
+kafka-1               | 	transaction.state.log.replication.factor = 1
+kafka-1               | 	transaction.state.log.segment.bytes = 104857600
+kafka-1               | 	transactional.id.expiration.ms = 604800000
+kafka-1               | 	unclean.leader.election.enable = false
+kafka-1               | 	unstable.api.versions.enable = false
+kafka-1               | 	unstable.feature.versions.enable = false
+kafka-1               | 	zookeeper.clientCnxnSocket = null
+kafka-1               | 	zookeeper.connect = null
+kafka-1               | 	zookeeper.connection.timeout.ms = null
+kafka-1               | 	zookeeper.max.in.flight.requests = 10
+kafka-1               | 	zookeeper.metadata.migration.enable = false
+kafka-1               | 	zookeeper.metadata.migration.min.batch.size = 200
+kafka-1               | 	zookeeper.session.timeout.ms = 18000
+kafka-1               | 	zookeeper.set.acl = false
+kafka-1               | 	zookeeper.ssl.cipher.suites = null
+kafka-1               | 	zookeeper.ssl.client.enable = false
+swagger-petstore-1    |   class io.swagger.sample.resource.PetResource
+swagger-petstore-1    |   class io.swagger.jaxrs.listing.ApiListingResource
+swagger-petstore-1    |   class io.swagger.sample.resource.PetStoreResource
+swagger-petstore-1    |   class io.swagger.jaxrs.listing.AcceptHeaderApiListingResource
+swagger-petstore-1    |   class io.swagger.sample.resource.UserResource
+swagger-petstore-1    | Aug 03, 2025 6:30:56 PM com.sun.jersey.api.core.ScanningResourceConfig logClasses
+swagger-petstore-1    | INFO: Provider classes found:
+swagger-petstore-1    |   class io.swagger.sample.util.JacksonJsonProvider
+swagger-petstore-1    |   class io.swagger.sample.resource.SampleExceptionMapper
+swagger-petstore-1    |   class io.swagger.jaxrs.listing.SwaggerSerializers
+swagger-petstore-1    | Aug 03, 2025 6:30:56 PM com.sun.jersey.server.impl.application.WebApplicationImpl _initiate
+swagger-petstore-1    | INFO: Initiating Jersey application, version 'Jersey: 1.13 06/29/2012 05:14 PM'
+swagger-petstore-1    | 18:30:56,681 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback.groovy]
+swagger-petstore-1    | 18:30:56,682 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.xml]
+swagger-petstore-1    | 18:30:56,682 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Found resource [logback.xml] at [file:/petstore/webapp/WEB-INF/classes/logback.xml]
+swagger-petstore-1    | 18:30:56,710 |-INFO in ch.qos.logback.classic.joran.action.ConfigurationAction - debug attribute not set
+swagger-petstore-1    | 18:30:56,721 |-INFO in ch.qos.logback.core.joran.action.AppenderAction - About to instantiate appender of type [ch.qos.logback.core.ConsoleAppender]
+swagger-petstore-1    | 18:30:56,725 |-INFO in ch.qos.logback.core.joran.action.AppenderAction - Naming appender as [STDOUT]
+swagger-petstore-1    | 18:30:56,767 |-WARN in ch.qos.logback.core.ConsoleAppender[STDOUT] - This appender no longer admits a layout as a sub-component, set an encoder instead.
+swagger-petstore-1    | 18:30:56,767 |-WARN in ch.qos.logback.core.ConsoleAppender[STDOUT] - To ensure compatibility, wrapping your layout in LayoutWrappingEncoder.
+swagger-petstore-1    | 18:30:56,767 |-WARN in ch.qos.logback.core.ConsoleAppender[STDOUT] - See also http://logback.qos.ch/codes.html#layoutInsteadOfEncoder for details
+swagger-petstore-1    | 18:30:56,767 |-INFO in ch.qos.logback.classic.joran.action.LoggerAction - Setting level of logger [io.swagger] to INFO
+swagger-petstore-1    | 18:30:56,770 |-INFO in ch.qos.logback.classic.joran.action.RootLoggerAction - Setting level of ROOT logger to ERROR
+swagger-petstore-1    | 18:30:56,770 |-INFO in ch.qos.logback.core.joran.action.AppenderRefAction - Attaching appender named [STDOUT] to Logger[ROOT]
+swagger-petstore-1    | 18:30:56,770 |-INFO in ch.qos.logback.classic.joran.action.ConfigurationAction - End of configuration.
+swagger-petstore-1    | 18:30:56,771 |-INFO in ch.qos.logback.classic.joran.JoranConfigurator@750e2b97 - Registering current configuration as safe fallback point
+swagger-petstore-1    | 
+swagger-petstore-1    | 2025-08-03 18:30:57.074:INFO:oejsh.ContextHandler:main: Started o.e.j.w.WebAppContext@5680a178{/,file:/petstore/webapp/,AVAILABLE}{file:/petstore/webapp/}
+swagger-petstore-1    | 2025-08-03 18:30:57.079:INFO:oejs.AbstractNCSARequestLog:main: Opened /var/log/2025_08_03-requests.log
+swagger-petstore-1    | 2025-08-03 18:30:57.090:INFO:oejs.ServerConnector:main: Started ServerConnector@1e8b7643{HTTP/1.1}{0.0.0.0:8080}
+swagger-petstore-1    | 2025-08-03 18:30:57.092:INFO:oejs.Server:main: Started @4432ms
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:51.978+00:00"},"s":"I",  "c":"CONTROL",  "id":23285,   "ctx":"main","msg":"Automatically disabling TLS 1.0, to force-enable TLS 1.0 specify --sslDisabledProtocols 'none'"}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:51.979+00:00"},"s":"I",  "c":"NETWORK",  "id":4915701, "ctx":"main","msg":"Initialized wire specification","attr":{"spec":{"incomingExternalClient":{"minWireVersion":0,"maxWireVersion":21},"incomingInternalClient":{"minWireVersion":0,"maxWireVersion":21},"outgoing":{"minWireVersion":6,"maxWireVersion":21},"isInternalClient":true}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:51.988+00:00"},"s":"I",  "c":"NETWORK",  "id":4648601, "ctx":"main","msg":"Implicit TCP FastOpen unavailable. If TCP FastOpen is required, set tcpFastOpenServer, tcpFastOpenClient, and tcpFastOpenQueueSize."}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:51.996+00:00"},"s":"I",  "c":"REPL",     "id":5123008, "ctx":"main","msg":"Successfully registered PrimaryOnlyService","attr":{"service":"TenantMigrationDonorService","namespace":"config.tenantMigrationDonors"}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:51.996+00:00"},"s":"I",  "c":"REPL",     "id":5123008, "ctx":"main","msg":"Successfully registered PrimaryOnlyService","attr":{"service":"TenantMigrationRecipientService","namespace":"config.tenantMigrationRecipients"}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:51.996+00:00"},"s":"I",  "c":"CONTROL",  "id":5945603, "ctx":"main","msg":"Multi threading initialized"}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:51.997+00:00"},"s":"I",  "c":"TENANT_M", "id":7091600, "ctx":"main","msg":"Starting TenantMigrationAccessBlockerRegistry"}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:51.998+00:00"},"s":"I",  "c":"CONTROL",  "id":4615611, "ctx":"initandlisten","msg":"MongoDB starting","attr":{"pid":1,"port":27017,"dbPath":"/data/db","architecture":"64-bit","host":"88a5f8f1b384"}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:51.998+00:00"},"s":"I",  "c":"CONTROL",  "id":23403,   "ctx":"initandlisten","msg":"Build Info","attr":{"buildInfo":{"version":"7.0.9","gitVersion":"3ff3a3925c36ed277cf5eafca5495f2e3728dd67","openSSLVersion":"OpenSSL 3.0.2 15 Mar 2022","modules":[],"allocator":"tcmalloc","environment":{"distmod":"ubuntu2204","distarch":"aarch64","target_arch":"aarch64"}}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:51.998+00:00"},"s":"I",  "c":"CONTROL",  "id":51765,   "ctx":"initandlisten","msg":"Operating System","attr":{"os":{"name":"Ubuntu","version":"22.04"}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:51.998+00:00"},"s":"I",  "c":"CONTROL",  "id":21951,   "ctx":"initandlisten","msg":"Options set by command line","attr":{"options":{"net":{"bindIp":"*"}}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:52.012+00:00"},"s":"I",  "c":"STORAGE",  "id":22297,   "ctx":"initandlisten","msg":"Using the XFS filesystem is strongly recommended with the WiredTiger storage engine. See http://dochub.mongodb.org/core/prodnotes-filesystem","tags":["startupWarnings"]}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:52.012+00:00"},"s":"I",  "c":"STORAGE",  "id":22315,   "ctx":"initandlisten","msg":"Opening WiredTiger","attr":{"config":"create,cache_size=474M,session_max=33000,eviction=(threads_min=4,threads_max=4),config_base=false,statistics=(fast),log=(enabled=true,remove=true,path=journal,compressor=snappy),builtin_extension_config=(zstd=(compression_level=6)),file_manager=(close_idle_time=600,close_scan_interval=10,close_handle_minimum=2000),statistics_log=(wait=0),json_output=(error,message),verbose=[recovery_progress:1,checkpoint_progress:1,compact_progress:1,backup:0,checkpoint:0,compact:0,evict:0,history_store:0,recovery:0,rts:0,salvage:0,tiered:0,timestamp:0,transaction:0,verify:0,log:0],"}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.656+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1754245853,"ts_usec":656738,"thread":"1:0xffff8239d040","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"recovery log replay has successfully finished and ran for 0 milliseconds"}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.656+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1754245853,"ts_usec":656791,"thread":"1:0xffff8239d040","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"Set global recovery timestamp: (0, 0)"}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.656+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1754245853,"ts_usec":656801,"thread":"1:0xffff8239d040","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"Set global oldest timestamp: (0, 0)"}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.657+00:00"},"s":"I",  "c":"WTRECOV",  "id":22430,   "ctx":"initandlisten","msg":"WiredTiger message","attr":{"message":{"ts_sec":1754245853,"ts_usec":656813,"thread":"1:0xffff8239d040","session_name":"txn-recover","category":"WT_VERB_RECOVERY_PROGRESS","category_id":30,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"recovery was completed successfully and took 0ms, including 0ms for the log replay, 0ms for the rollback to stable, and 0ms for the checkpoint."}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.660+00:00"},"s":"I",  "c":"STORAGE",  "id":4795906, "ctx":"initandlisten","msg":"WiredTiger opened","attr":{"durationMillis":1647}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.660+00:00"},"s":"I",  "c":"RECOVERY", "id":23987,   "ctx":"initandlisten","msg":"WiredTiger recoveryTimestamp","attr":{"recoveryTimestamp":{"$timestamp":{"t":0,"i":0}}}}
+kafka-1               | 	zookeeper.ssl.crl.enable = false
+kafka-1               | 	zookeeper.ssl.enabled.protocols = null
+kafka-1               | 	zookeeper.ssl.endpoint.identification.algorithm = HTTPS
+kafka-1               | 	zookeeper.ssl.keystore.location = null
+kafka-1               | 	zookeeper.ssl.keystore.password = null
+kafka-1               | 	zookeeper.ssl.keystore.type = null
+kafka-1               | 	zookeeper.ssl.ocsp.enable = false
+kafka-1               | 	zookeeper.ssl.protocol = TLSv1.2
+kafka-1               | 	zookeeper.ssl.truststore.location = null
+kafka-1               | 	zookeeper.ssl.truststore.password = null
+kafka-1               | 	zookeeper.ssl.truststore.type = null
+kafka-1               |  (kafka.server.KafkaConfig)
+kafka-1               | [2025-08-03 18:30:55,462] INFO [MetadataLoader id=1] InitializeNewPublishers: initializing BrokerRegistrationTracker(id=1) with a snapshot at offset 6 (org.apache.kafka.image.loader.MetadataLoader)
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.682+00:00"},"s":"W",  "c":"CONTROL",  "id":22120,   "ctx":"initandlisten","msg":"Access control is not enabled for the database. Read and write access to data and configuration is unrestricted","tags":["startupWarnings"]}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.682+00:00"},"s":"W",  "c":"CONTROL",  "id":22178,   "ctx":"initandlisten","msg":"/sys/kernel/mm/transparent_hugepage/enabled is 'always'. We suggest setting it to 'never' in this binary version","tags":["startupWarnings"]}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.682+00:00"},"s":"W",  "c":"CONTROL",  "id":5123300, "ctx":"initandlisten","msg":"vm.max_map_count is too low","attr":{"currentValue":262144,"recommendedMinimum":1677720,"maxConns":838860},"tags":["startupWarnings"]}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.682+00:00"},"s":"I",  "c":"STORAGE",  "id":20320,   "ctx":"initandlisten","msg":"createCollection","attr":{"namespace":"admin.system.version","uuidDisposition":"provided","uuid":{"uuid":{"$uuid":"ad3195e3-f675-4e7b-a5eb-c51dbc2c184b"}},"options":{"uuid":{"$uuid":"ad3195e3-f675-4e7b-a5eb-c51dbc2c184b"}}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.701+00:00"},"s":"I",  "c":"INDEX",    "id":20345,   "ctx":"initandlisten","msg":"Index build: done building","attr":{"buildUUID":null,"collectionUUID":{"uuid":{"$uuid":"ad3195e3-f675-4e7b-a5eb-c51dbc2c184b"}},"namespace":"admin.system.version","index":"_id_","ident":"index-1-9037743918137932370","collectionIdent":"collection-0-9037743918137932370","commitTimestamp":null}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.705+00:00"},"s":"I",  "c":"REPL",     "id":20459,   "ctx":"initandlisten","msg":"Setting featureCompatibilityVersion","attr":{"newVersion":"7.0"}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.705+00:00"},"s":"I",  "c":"REPL",     "id":5853300, "ctx":"initandlisten","msg":"current featureCompatibilityVersion value","attr":{"featureCompatibilityVersion":"7.0","context":"setFCV"}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.705+00:00"},"s":"I",  "c":"NETWORK",  "id":4915702, "ctx":"initandlisten","msg":"Updated wire specification","attr":{"oldSpec":{"incomingExternalClient":{"minWireVersion":0,"maxWireVersion":21},"incomingInternalClient":{"minWireVersion":0,"maxWireVersion":21},"outgoing":{"minWireVersion":6,"maxWireVersion":21},"isInternalClient":true},"newSpec":{"incomingExternalClient":{"minWireVersion":0,"maxWireVersion":21},"incomingInternalClient":{"minWireVersion":21,"maxWireVersion":21},"outgoing":{"minWireVersion":21,"maxWireVersion":21},"isInternalClient":true}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.705+00:00"},"s":"I",  "c":"NETWORK",  "id":4915702, "ctx":"initandlisten","msg":"Updated wire specification","attr":{"oldSpec":{"incomingExternalClient":{"minWireVersion":0,"maxWireVersion":21},"incomingInternalClient":{"minWireVersion":21,"maxWireVersion":21},"outgoing":{"minWireVersion":21,"maxWireVersion":21},"isInternalClient":true},"newSpec":{"incomingExternalClient":{"minWireVersion":0,"maxWireVersion":21},"incomingInternalClient":{"minWireVersion":21,"maxWireVersion":21},"outgoing":{"minWireVersion":21,"maxWireVersion":21},"isInternalClient":true}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.705+00:00"},"s":"I",  "c":"REPL",     "id":5853300, "ctx":"initandlisten","msg":"current featureCompatibilityVersion value","attr":{"featureCompatibilityVersion":"7.0","context":"startup"}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.705+00:00"},"s":"I",  "c":"STORAGE",  "id":5071100, "ctx":"initandlisten","msg":"Clearing temp directory"}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.705+00:00"},"s":"I",  "c":"CONTROL",  "id":6608200, "ctx":"initandlisten","msg":"Initializing cluster server parameters from disk"}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.705+00:00"},"s":"I",  "c":"CONTROL",  "id":20536,   "ctx":"initandlisten","msg":"Flow Control is enabled on this deployment"}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.706+00:00"},"s":"I",  "c":"FTDC",     "id":20625,   "ctx":"initandlisten","msg":"Initializing full-time diagnostic data capture","attr":{"dataDirectory":"/data/db/diagnostic.data"}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.707+00:00"},"s":"I",  "c":"STORAGE",  "id":20320,   "ctx":"initandlisten","msg":"createCollection","attr":{"namespace":"local.startup_log","uuidDisposition":"generated","uuid":{"uuid":{"$uuid":"5ec7e835-bec0-482a-af10-9d6c19bcf414"}},"options":{"capped":true,"size":10485760}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.714+00:00"},"s":"I",  "c":"INDEX",    "id":20345,   "ctx":"initandlisten","msg":"Index build: done building","attr":{"buildUUID":null,"collectionUUID":{"uuid":{"$uuid":"5ec7e835-bec0-482a-af10-9d6c19bcf414"}},"namespace":"local.startup_log","index":"_id_","ident":"index-3-9037743918137932370","collectionIdent":"collection-2-9037743918137932370","commitTimestamp":null}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.714+00:00"},"s":"I",  "c":"REPL",     "id":6015317, "ctx":"initandlisten","msg":"Setting new configuration state","attr":{"newState":"ConfigReplicationDisabled","oldState":"ConfigPreStart"}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.716+00:00"},"s":"I",  "c":"STORAGE",  "id":22262,   "ctx":"initandlisten","msg":"Timestamp monitor starting"}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.716+00:00"},"s":"I",  "c":"STORAGE",  "id":20320,   "ctx":"LogicalSessionCacheRefresh","msg":"createCollection","attr":{"namespace":"config.system.sessions","uuidDisposition":"generated","uuid":{"uuid":{"$uuid":"9521ba7e-b57a-49eb-b41f-52134915e098"}},"options":{}}}
+kafka-1               | [2025-08-03 18:30:55,463] INFO RemoteLogManagerConfig values: 
+kafka-1               | 	log.local.retention.bytes = -2
+kafka-1               | 	log.local.retention.ms = -2
+kafka-1               | 	remote.fetch.max.wait.ms = 500
+kafka-1               | 	remote.log.index.file.cache.total.size.bytes = 1073741824
+kafka-1               | 	remote.log.manager.copier.thread.pool.size = 10
+kafka-1               | 	remote.log.manager.copy.max.bytes.per.second = 9223372036854775807
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.716+00:00"},"s":"I",  "c":"CONTROL",  "id":20712,   "ctx":"LogicalSessionCacheReap","msg":"Sessions collection is not set up; waiting until next sessions reap interval","attr":{"error":"NamespaceNotFound: config.system.sessions does not exist"}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.716+00:00"},"s":"I",  "c":"NETWORK",  "id":23015,   "ctx":"listener","msg":"Listening on","attr":{"address":"/tmp/mongodb-27017.sock"}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.717+00:00"},"s":"I",  "c":"NETWORK",  "id":23015,   "ctx":"listener","msg":"Listening on","attr":{"address":"0.0.0.0"}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.717+00:00"},"s":"I",  "c":"NETWORK",  "id":23016,   "ctx":"listener","msg":"Waiting for connections","attr":{"port":27017,"ssl":"off"}}
+kafka-1               | 	remote.log.manager.copy.quota.window.num = 11
+kafka-1               | 	remote.log.manager.copy.quota.window.size.seconds = 1
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.717+00:00"},"s":"I",  "c":"CONTROL",  "id":8423403, "ctx":"initandlisten","msg":"mongod startup complete","attr":{"Summary of time elapsed":{"Startup from clean shutdown?":true,"Statistics":{"Transport layer setup":"0 ms","Run initial syncer crash recovery":"0 ms","Create storage engine lock file in the data directory":"0 ms","Get metadata describing storage engine":"0 ms","Create storage engine":"1663 ms","Write current PID to file":"0 ms","Write a new metadata for storage engine":"0 ms","Initialize FCV before rebuilding indexes":"0 ms","Drop abandoned idents and get back indexes that need to be rebuilt or builds that need to be restarted":"0 ms","Rebuild indexes for collections":"0 ms","Load cluster parameters from disk for a standalone":"0 ms","Build user and roles graph":"0 ms","Set up the background thread pool responsible for waiting for opTimes to be majority committed":"0 ms","Initialize information needed to make a mongod instance shard aware":"0 ms","Start up the replication coordinator":"0 ms","Start transport layer":"1 ms","_initAndListen total elapsed time":"1719 ms"}}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.725+00:00"},"s":"I",  "c":"REPL",     "id":7360102, "ctx":"LogicalSessionCacheRefresh","msg":"Added oplog entry for create to transaction","attr":{"namespace":"config.$cmd","uuid":{"uuid":{"$uuid":"9521ba7e-b57a-49eb-b41f-52134915e098"}},"object":{"create":"system.sessions","idIndex":{"v":2,"key":{"_id":1},"name":"_id_"}}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.725+00:00"},"s":"I",  "c":"REPL",     "id":7360100, "ctx":"LogicalSessionCacheRefresh","msg":"Added oplog entry for createIndexes to transaction","attr":{"namespace":"config.$cmd","uuid":{"uuid":{"$uuid":"9521ba7e-b57a-49eb-b41f-52134915e098"}},"object":{"createIndexes":"system.sessions","v":2,"key":{"lastUse":1},"name":"lsidTTLIndex","expireAfterSeconds":1800}}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.729+00:00"},"s":"I",  "c":"INDEX",    "id":20345,   "ctx":"LogicalSessionCacheRefresh","msg":"Index build: done building","attr":{"buildUUID":null,"collectionUUID":{"uuid":{"$uuid":"9521ba7e-b57a-49eb-b41f-52134915e098"}},"namespace":"config.system.sessions","index":"_id_","ident":"index-5-9037743918137932370","collectionIdent":"collection-4-9037743918137932370","commitTimestamp":null}}
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.729+00:00"},"s":"I",  "c":"INDEX",    "id":20345,   "ctx":"LogicalSessionCacheRefresh","msg":"Index build: done building","attr":{"buildUUID":null,"collectionUUID":{"uuid":{"$uuid":"9521ba7e-b57a-49eb-b41f-52134915e098"}},"namespace":"config.system.sessions","index":"lsidTTLIndex","ident":"index-6-9037743918137932370","collectionIdent":"collection-4-9037743918137932370","commitTimestamp":null}}
+kafka-1               | 	remote.log.manager.expiration.thread.pool.size = 10
+kafka-1               | 	remote.log.manager.fetch.max.bytes.per.second = 9223372036854775807
+kafka-1               | 	remote.log.manager.fetch.quota.window.num = 11
+kafka-1               | 	remote.log.manager.fetch.quota.window.size.seconds = 1
+kafka-1                  | 	remote.log.manager.task.interval.ms = 30000
+kafka-1                  | 	remote.log.manager.task.retry.backoff.max.ms = 30000
+kafka-1                  | 	remote.log.manager.task.retry.backoff.ms = 500
+kafka-1                  | 	remote.log.manager.task.retry.jitter = 0.2
+kafka-1                  | 	remote.log.manager.thread.pool.size = 10
+countries-graphql-api-1  | 🚀  Server ready at http://localhost:4000/
+kafka-1                  | 	remote.log.metadata.custom.metadata.max.bytes = 128
+kafka-1                  | 	remote.log.metadata.manager.class.name = org.apache.kafka.server.log.remote.metadata.storage.TopicBasedRemoteLogMetadataManager
+kafka-1                  | 	remote.log.metadata.manager.class.path = null
+kafka-1                  | 	remote.log.metadata.manager.impl.prefix = rlmm.config.
+kafka-1                  | 	remote.log.metadata.manager.listener.name = null
+kafka-1                  | 	remote.log.reader.max.pending.tasks = 100
+kafka-1                  | 	remote.log.reader.threads = 10
+kafka-1                  | 	remote.log.storage.manager.class.name = null
+kafka-1                  | 	remote.log.storage.manager.class.path = null
+kafka-1                  | 	remote.log.storage.manager.impl.prefix = rsm.config.
+kafka-1                  | 	remote.log.storage.system.enable = false
+kafka-1                  |  (org.apache.kafka.server.log.remote.storage.RemoteLogManagerConfig)
+kafka-1                  | [2025-08-03 18:30:55,468] INFO [BrokerServer id=1] Waiting for the broker to be unfenced (kafka.server.BrokerServer)
+kafka-1                  | [2025-08-03 18:30:55,502] INFO [BrokerLifecycleManager id=1] The broker has been unfenced. Transitioning from RECOVERY to RUNNING. (kafka.server.BrokerLifecycleManager)
+kafka-1                  | [2025-08-03 18:30:55,502] INFO [BrokerServer id=1] Finished waiting for the broker to be unfenced (kafka.server.BrokerServer)
+kafka-1                  | [2025-08-03 18:30:55,503] INFO authorizerStart completed for endpoint PLAINTEXT. Endpoint is now READY. (org.apache.kafka.server.network.EndpointReadyFutures)
+kafka-1                  | [2025-08-03 18:30:55,503] INFO [SocketServer listenerType=BROKER, nodeId=1] Enabling request processing. (kafka.network.SocketServer)
+kafka-1                  | [2025-08-03 18:30:55,503] INFO Awaiting socket connections on 0.0.0.0:9092. (kafka.network.DataPlaneAcceptor)
+kafka-1                  | [2025-08-03 18:30:55,505] INFO [BrokerServer id=1] Waiting for all of the authorizer futures to be completed (kafka.server.BrokerServer)
+kafka-1                  | [2025-08-03 18:30:55,505] INFO [BrokerServer id=1] Finished waiting for all of the authorizer futures to be completed (kafka.server.BrokerServer)
+tyk-mongo-1           | {"t":{"$date":"2025-08-03T18:30:53.766+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.13:33004","uuid":{"uuid":{"$uuid":"a793c092-4fda-4277-86e9-8069aa2160cb"}},"connectionId":1,"connectionCount":1}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.767+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn1","msg":"client metadata","attr":{"remote":"172.20.0.13:33004","client":"conn1","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"v1.13.1"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.22.12","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.768+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.13:33008","uuid":{"uuid":{"$uuid":"b246ea60-aaf8-4c60-997d-4d59e460c6fb"}},"connectionId":2,"connectionCount":2}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.768+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.13:33006","uuid":{"uuid":{"$uuid":"4602abd7-64f8-4dc3-b9e8-9db85dfab6f5"}},"connectionId":3,"connectionCount":3}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.768+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn3","msg":"client metadata","attr":{"remote":"172.20.0.13:33006","client":"conn3","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"v1.13.1"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.22.12","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.769+00:00"},"s":"I",  "c":"NETWORK",  "id":6788700, "ctx":"conn3","msg":"Received first command on ingress connection since session start or auth handshake","attr":{"elapsedMillis":0}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.769+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn2","msg":"client metadata","attr":{"remote":"172.20.0.13:33008","client":"conn2","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"v1.13.1"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.22.12","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.769+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.13:33024","uuid":{"uuid":{"$uuid":"e458a8e4-3b81-4556-98a9-11a9345d4163"}},"connectionId":4,"connectionCount":4}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.769+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn4","msg":"client metadata","attr":{"remote":"172.20.0.13:33024","client":"conn4","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"v1.13.1"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.22.12","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.770+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.13:33038","uuid":{"uuid":{"$uuid":"b7881124-0f76-46a2-b787-be66d45ea931"}},"connectionId":5,"connectionCount":5}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.771+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn5","msg":"client metadata","attr":{"remote":"172.20.0.13:33038","client":"conn5","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"v1.13.1"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.22.12","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.771+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.13:33048","uuid":{"uuid":{"$uuid":"dc864e0e-632d-410b-b345-8abd639931e8"}},"connectionId":6,"connectionCount":6}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.771+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn6","msg":"client metadata","attr":{"remote":"172.20.0.13:33048","client":"conn6","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"v1.13.1"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.22.12","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.771+00:00"},"s":"I",  "c":"NETWORK",  "id":6788700, "ctx":"conn6","msg":"Received first command on ingress connection since session start or auth handshake","attr":{"elapsedMillis":0}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.772+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.13:33062","uuid":{"uuid":{"$uuid":"575320f3-db60-48c8-8a01-ec91d669e17d"}},"connectionId":7,"connectionCount":7}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.772+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn7","msg":"client metadata","attr":{"remote":"172.20.0.13:33062","client":"conn7","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"v1.13.1"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.22.12","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.772+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.13:33064","uuid":{"uuid":{"$uuid":"5b79f20f-56f7-4121-a0f2-1c9073a9872d"}},"connectionId":8,"connectionCount":8}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.773+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.13:33076","uuid":{"uuid":{"$uuid":"1061e288-a7ca-4a09-a544-1d12bbff052f"}},"connectionId":9,"connectionCount":9}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.773+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn8","msg":"client metadata","attr":{"remote":"172.20.0.13:33064","client":"conn8","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"v1.13.1"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.22.12","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.773+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn9","msg":"client metadata","attr":{"remote":"172.20.0.13:33076","client":"conn9","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"v1.13.1"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.22.12","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.773+00:00"},"s":"I",  "c":"NETWORK",  "id":6788700, "ctx":"conn9","msg":"Received first command on ingress connection since session start or auth handshake","attr":{"elapsedMillis":0}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.773+00:00"},"s":"I",  "c":"STORAGE",  "id":20320,   "ctx":"conn9","msg":"createCollection","attr":{"namespace":"tyk_analytics.tyk_uptime_analytics","uuidDisposition":"generated","uuid":{"uuid":{"$uuid":"4c6a6339-915f-4ac9-9861-b638899c0ad9"}},"options":{}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.779+00:00"},"s":"I",  "c":"REPL",     "id":7360102, "ctx":"conn9","msg":"Added oplog entry for create to transaction","attr":{"namespace":"tyk_analytics.$cmd","uuid":{"uuid":{"$uuid":"4c6a6339-915f-4ac9-9861-b638899c0ad9"}},"object":{"create":"tyk_uptime_analytics","idIndex":{"v":2,"key":{"_id":1},"name":"_id_"}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.779+00:00"},"s":"I",  "c":"REPL",     "id":7360100, "ctx":"conn9","msg":"Added oplog entry for createIndexes to transaction","attr":{"namespace":"tyk_analytics.$cmd","uuid":{"uuid":{"$uuid":"4c6a6339-915f-4ac9-9861-b638899c0ad9"}},"object":{"createIndexes":"tyk_uptime_analytics","v":2,"key":{"orgid":1},"name":"orgid_1","background":true}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.782+00:00"},"s":"I",  "c":"INDEX",    "id":20345,   "ctx":"conn9","msg":"Index build: done building","attr":{"buildUUID":null,"collectionUUID":{"uuid":{"$uuid":"4c6a6339-915f-4ac9-9861-b638899c0ad9"}},"namespace":"tyk_analytics.tyk_uptime_analytics","index":"_id_","ident":"index-8-9037743918137932370","collectionIdent":"collection-7-9037743918137932370","commitTimestamp":null}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.782+00:00"},"s":"I",  "c":"INDEX",    "id":20345,   "ctx":"conn9","msg":"Index build: done building","attr":{"buildUUID":null,"collectionUUID":{"uuid":{"$uuid":"4c6a6339-915f-4ac9-9861-b638899c0ad9"}},"namespace":"tyk_analytics.tyk_uptime_analytics","index":"orgid_1","ident":"index-9-9037743918137932370","collectionIdent":"collection-7-9037743918137932370","commitTimestamp":null}}
+kafka-1                  | [2025-08-03 18:30:55,505] INFO [BrokerServer id=1] Waiting for all of the SocketServer Acceptors to be started (kafka.server.BrokerServer)
+kafka-1                  | [2025-08-03 18:30:55,505] INFO [BrokerServer id=1] Finished waiting for all of the SocketServer Acceptors to be started (kafka.server.BrokerServer)
+kafka-1                  | [2025-08-03 18:30:55,506] INFO [BrokerServer id=1] Transition from STARTING to STARTED (kafka.server.BrokerServer)
+kafka-1                  | [2025-08-03 18:30:55,506] INFO Kafka version: 3.8.0 (org.apache.kafka.common.utils.AppInfoParser)
+kafka-1                  | [2025-08-03 18:30:55,506] INFO Kafka commitId: 771b9576b00ecf5b (org.apache.kafka.common.utils.AppInfoParser)
+kafka-1                  | [2025-08-03 18:30:55,506] INFO Kafka startTimeMs: 1754245855506 (org.apache.kafka.common.utils.AppInfoParser)
+kafka-1                  | [2025-08-03 18:30:55,510] INFO [KafkaRaftServer nodeId=1] Kafka Server started (kafka.server.KafkaRaftServer)
+kafka-1                  | [2025-08-03 18:31:16,895] INFO [ReplicaFetcherManager on broker 1] Removed fetcher for partitions Set(tyk-streams-example-0, tyk-streams-example-1, tyk-streams-example-2) (kafka.server.ReplicaFetcherManager)
+kafka-1                  | [2025-08-03 18:31:16,907] INFO [LogLoader partition=tyk-streams-example-0, dir=/tmp/kafka-logs] Loading producer state till offset 0 with message format version 2 (kafka.log.UnifiedLog$)
+kafka-1                  | [2025-08-03 18:31:16,907] INFO Created log for partition tyk-streams-example-0 in /tmp/kafka-logs/tyk-streams-example-0 with properties {} (kafka.log.LogManager)
+kafka-1                  | [2025-08-03 18:31:16,908] INFO [Partition tyk-streams-example-0 broker=1] No checkpointed highwatermark is found for partition tyk-streams-example-0 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:16,909] INFO [Partition tyk-streams-example-0 broker=1] Log loaded for partition tyk-streams-example-0 with initial high watermark 0 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:16,913] INFO [LogLoader partition=tyk-streams-example-1, dir=/tmp/kafka-logs] Loading producer state till offset 0 with message format version 2 (kafka.log.UnifiedLog$)
+kafka-1                  | [2025-08-03 18:31:16,913] INFO Created log for partition tyk-streams-example-1 in /tmp/kafka-logs/tyk-streams-example-1 with properties {} (kafka.log.LogManager)
+kafka-1                  | [2025-08-03 18:31:16,913] INFO [Partition tyk-streams-example-1 broker=1] No checkpointed highwatermark is found for partition tyk-streams-example-1 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:16,913] INFO [Partition tyk-streams-example-1 broker=1] Log loaded for partition tyk-streams-example-1 with initial high watermark 0 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:16,916] INFO [LogLoader partition=tyk-streams-example-2, dir=/tmp/kafka-logs] Loading producer state till offset 0 with message format version 2 (kafka.log.UnifiedLog$)
+kafka-1                  | [2025-08-03 18:31:16,916] INFO Created log for partition tyk-streams-example-2 in /tmp/kafka-logs/tyk-streams-example-2 with properties {} (kafka.log.LogManager)
+kafka-1                  | [2025-08-03 18:31:16,916] INFO [Partition tyk-streams-example-2 broker=1] No checkpointed highwatermark is found for partition tyk-streams-example-2 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:16,916] INFO [Partition tyk-streams-example-2 broker=1] Log loaded for partition tyk-streams-example-2 with initial high watermark 0 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:17,832] INFO [ReplicaFetcherManager on broker 1] Removed fetcher for partitions Set(jobs-2, jobs-0, jobs-1) (kafka.server.ReplicaFetcherManager)
+kafka-1                  | [2025-08-03 18:31:17,835] INFO [LogLoader partition=jobs-2, dir=/tmp/kafka-logs] Loading producer state till offset 0 with message format version 2 (kafka.log.UnifiedLog$)
+kafka-1                  | [2025-08-03 18:31:17,836] INFO Created log for partition jobs-2 in /tmp/kafka-logs/jobs-2 with properties {} (kafka.log.LogManager)
+kafka-1                  | [2025-08-03 18:31:17,836] INFO [Partition jobs-2 broker=1] No checkpointed highwatermark is found for partition jobs-2 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:17,836] INFO [Partition jobs-2 broker=1] Log loaded for partition jobs-2 with initial high watermark 0 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:17,838] INFO [LogLoader partition=jobs-0, dir=/tmp/kafka-logs] Loading producer state till offset 0 with message format version 2 (kafka.log.UnifiedLog$)
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.784+00:00"},"s":"I",  "c":"INDEX",    "id":20438,   "ctx":"conn9","msg":"Index build: registering","attr":{"buildUUID":{"uuid":{"$uuid":"9c7da2ab-05ec-444c-9433-31def19b7260"}},"namespace":"tyk_analytics.tyk_uptime_analytics","collectionUUID":{"uuid":{"$uuid":"4c6a6339-915f-4ac9-9861-b638899c0ad9"}},"indexes":1,"firstIndex":{"name":"apiid_1"},"command":{"createIndexes":"tyk_uptime_analytics","v":2,"indexes":[{"key":{"apiid":1},"background":true,"name":"apiid_1"}],"ignoreUnknownIndexOptions":false}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.784+00:00"},"s":"I",  "c":"REPL",     "id":7360100, "ctx":"conn9","msg":"Added oplog entry for createIndexes to transaction","attr":{"namespace":"tyk_analytics.$cmd","uuid":{"uuid":{"$uuid":"4c6a6339-915f-4ac9-9861-b638899c0ad9"}},"object":{"createIndexes":"tyk_uptime_analytics","v":2,"key":{"apiid":1},"name":"apiid_1","background":true}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.792+00:00"},"s":"I",  "c":"INDEX",    "id":20345,   "ctx":"conn9","msg":"Index build: done building","attr":{"buildUUID":null,"collectionUUID":{"uuid":{"$uuid":"4c6a6339-915f-4ac9-9861-b638899c0ad9"}},"namespace":"tyk_analytics.tyk_uptime_analytics","index":"apiid_1","ident":"index-10-9037743918137932370","collectionIdent":"collection-7-9037743918137932370","commitTimestamp":null}}
+kafka-1                  | [2025-08-03 18:31:17,839] INFO Created log for partition jobs-0 in /tmp/kafka-logs/jobs-0 with properties {} (kafka.log.LogManager)
+kafka-1                  | [2025-08-03 18:31:17,839] INFO [Partition jobs-0 broker=1] No checkpointed highwatermark is found for partition jobs-0 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:17,839] INFO [Partition jobs-0 broker=1] Log loaded for partition jobs-0 with initial high watermark 0 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:17,842] INFO [LogLoader partition=jobs-1, dir=/tmp/kafka-logs] Loading producer state till offset 0 with message format version 2 (kafka.log.UnifiedLog$)
+kafka-1                  | [2025-08-03 18:31:17,842] INFO Created log for partition jobs-1 in /tmp/kafka-logs/jobs-1 with properties {} (kafka.log.LogManager)
+kafka-1                  | [2025-08-03 18:31:17,842] INFO [Partition jobs-1 broker=1] No checkpointed highwatermark is found for partition jobs-1 (kafka.cluster.Partition)
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.792+00:00"},"s":"I",  "c":"INDEX",    "id":20440,   "ctx":"conn9","msg":"Index build: waiting for index build to complete","attr":{"buildUUID":{"uuid":{"$uuid":"9c7da2ab-05ec-444c-9433-31def19b7260"}},"deadline":{"$date":"2025-08-03T18:31:03.784Z"}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.792+00:00"},"s":"I",  "c":"INDEX",    "id":20447,   "ctx":"conn9","msg":"Index build: completed","attr":{"buildUUID":{"uuid":{"$uuid":"9c7da2ab-05ec-444c-9433-31def19b7260"}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.795+00:00"},"s":"I",  "c":"INDEX",    "id":20438,   "ctx":"conn9","msg":"Index build: registering","attr":{"buildUUID":{"uuid":{"$uuid":"8c0cab61-bee9-4ef5-84b1-c94840884c52"}},"namespace":"tyk_analytics.tyk_uptime_analytics","collectionUUID":{"uuid":{"$uuid":"4c6a6339-915f-4ac9-9861-b638899c0ad9"}},"indexes":1,"firstIndex":{"name":"logBrowserIndex"},"command":{"createIndexes":"tyk_uptime_analytics","v":2,"indexes":[{"key":{"timestamp":-1,"orgid":1,"apiid":1,"apikey":1,"responsecode":1},"background":true,"name":"logBrowserIndex"}],"ignoreUnknownIndexOptions":false}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.795+00:00"},"s":"I",  "c":"REPL",     "id":7360100, "ctx":"conn9","msg":"Added oplog entry for createIndexes to transaction","attr":{"namespace":"tyk_analytics.$cmd","uuid":{"uuid":{"$uuid":"4c6a6339-915f-4ac9-9861-b638899c0ad9"}},"object":{"createIndexes":"tyk_uptime_analytics","v":2,"key":{"timestamp":-1,"orgid":1,"apiid":1,"apikey":1,"responsecode":1},"name":"logBrowserIndex","background":true}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.802+00:00"},"s":"I",  "c":"INDEX",    "id":20345,   "ctx":"conn9","msg":"Index build: done building","attr":{"buildUUID":null,"collectionUUID":{"uuid":{"$uuid":"4c6a6339-915f-4ac9-9861-b638899c0ad9"}},"namespace":"tyk_analytics.tyk_uptime_analytics","index":"logBrowserIndex","ident":"index-11-9037743918137932370","collectionIdent":"collection-7-9037743918137932370","commitTimestamp":null}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.802+00:00"},"s":"I",  "c":"INDEX",    "id":20440,   "ctx":"conn9","msg":"Index build: waiting for index build to complete","attr":{"buildUUID":{"uuid":{"$uuid":"8c0cab61-bee9-4ef5-84b1-c94840884c52"}},"deadline":{"$date":"2025-08-03T18:31:03.795Z"}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.802+00:00"},"s":"I",  "c":"INDEX",    "id":20447,   "ctx":"conn9","msg":"Index build: completed","attr":{"buildUUID":{"uuid":{"$uuid":"8c0cab61-bee9-4ef5-84b1-c94840884c52"}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.993+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.14:43176","uuid":{"uuid":{"$uuid":"b80812ea-60c7-466c-b233-fc82d908c641"}},"connectionId":10,"connectionCount":10}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.993+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn10","msg":"client metadata","attr":{"remote":"172.20.0.14:43176","client":"conn10","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.994+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.14:43184","uuid":{"uuid":{"$uuid":"ef325f04-bba7-4481-98b9-3cca311220ae"}},"connectionId":11,"connectionCount":11}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.994+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.14:43186","uuid":{"uuid":{"$uuid":"2f45163e-c5bf-40c0-a9ba-8474a3829a9f"}},"connectionId":12,"connectionCount":12}}
+kafka-1                  | [2025-08-03 18:31:17,842] INFO [Partition jobs-1 broker=1] Log loaded for partition jobs-1 with initial high watermark 0 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:18,793] INFO [ReplicaFetcherManager on broker 1] Removed fetcher for partitions Set(completed-0, completed-2, completed-1) (kafka.server.ReplicaFetcherManager)
+kafka-1                  | [2025-08-03 18:31:18,795] INFO [LogLoader partition=completed-0, dir=/tmp/kafka-logs] Loading producer state till offset 0 with message format version 2 (kafka.log.UnifiedLog$)
+kafka-1                  | [2025-08-03 18:31:18,795] INFO Created log for partition completed-0 in /tmp/kafka-logs/completed-0 with properties {} (kafka.log.LogManager)
+kafka-1                  | [2025-08-03 18:31:18,795] INFO [Partition completed-0 broker=1] No checkpointed highwatermark is found for partition completed-0 (kafka.cluster.Partition)
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.995+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn11","msg":"client metadata","attr":{"remote":"172.20.0.14:43184","client":"conn11","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.996+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn12","msg":"client metadata","attr":{"remote":"172.20.0.14:43186","client":"conn12","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.996+00:00"},"s":"I",  "c":"NETWORK",  "id":6788700, "ctx":"conn11","msg":"Received first command on ingress connection since session start or auth handshake","attr":{"elapsedMillis":0}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.997+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.14:43190","uuid":{"uuid":{"$uuid":"b82abd61-0047-4372-b2b5-08cc353789df"}},"connectionId":13,"connectionCount":13}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.997+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn13","msg":"client metadata","attr":{"remote":"172.20.0.14:43190","client":"conn13","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.998+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.14:43196","uuid":{"uuid":{"$uuid":"7c7ab68a-8512-4015-a86e-432a9b25ed3e"}},"connectionId":14,"connectionCount":14}}
+kafka-1                  | [2025-08-03 18:31:18,795] INFO [Partition completed-0 broker=1] Log loaded for partition completed-0 with initial high watermark 0 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:18,801] INFO [LogLoader partition=completed-2, dir=/tmp/kafka-logs] Loading producer state till offset 0 with message format version 2 (kafka.log.UnifiedLog$)
+kafka-1                  | [2025-08-03 18:31:18,801] INFO Created log for partition completed-2 in /tmp/kafka-logs/completed-2 with properties {} (kafka.log.LogManager)
+kafka-1                  | [2025-08-03 18:31:18,801] INFO [Partition completed-2 broker=1] No checkpointed highwatermark is found for partition completed-2 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:18,801] INFO [Partition completed-2 broker=1] Log loaded for partition completed-2 with initial high watermark 0 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:18,805] INFO [LogLoader partition=completed-1, dir=/tmp/kafka-logs] Loading producer state till offset 0 with message format version 2 (kafka.log.UnifiedLog$)
+kafka-1                  | [2025-08-03 18:31:18,807] INFO Created log for partition completed-1 in /tmp/kafka-logs/completed-1 with properties {} (kafka.log.LogManager)
+kafka-1                  | [2025-08-03 18:31:18,807] INFO [Partition completed-1 broker=1] No checkpointed highwatermark is found for partition completed-1 (kafka.cluster.Partition)
+kafka-1                  | [2025-08-03 18:31:18,807] INFO [Partition completed-1 broker=1] Log loaded for partition completed-1 with initial high watermark 0 (kafka.cluster.Partition)
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.998+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.14:43204","uuid":{"uuid":{"$uuid":"6ba7168f-4094-4839-a22f-b85d49be1f1f"}},"connectionId":15,"connectionCount":15}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.998+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn14","msg":"client metadata","attr":{"remote":"172.20.0.14:43196","client":"conn14","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.998+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn15","msg":"client metadata","attr":{"remote":"172.20.0.14:43204","client":"conn15","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.998+00:00"},"s":"I",  "c":"NETWORK",  "id":6788700, "ctx":"conn15","msg":"Received first command on ingress connection since session start or auth handshake","attr":{"elapsedMillis":0}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.999+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.14:43220","uuid":{"uuid":{"$uuid":"f231c617-c82c-48e7-8433-9eb9a9a02194"}},"connectionId":16,"connectionCount":16}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.999+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn16","msg":"client metadata","attr":{"remote":"172.20.0.14:43220","client":"conn16","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.999+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.14:43228","uuid":{"uuid":{"$uuid":"d3f4e67d-f3b2-4e13-92ee-6cdad7f206d5"}},"connectionId":17,"connectionCount":17}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.999+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.14:43230","uuid":{"uuid":{"$uuid":"fab51aae-87c9-4d42-ad08-1290e89dc6f4"}},"connectionId":18,"connectionCount":18}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.999+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn17","msg":"client metadata","attr":{"remote":"172.20.0.14:43228","client":"conn17","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:53.999+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn18","msg":"client metadata","attr":{"remote":"172.20.0.14:43230","client":"conn18","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:54.000+00:00"},"s":"I",  "c":"NETWORK",  "id":6788700, "ctx":"conn18","msg":"Received first command on ingress connection since session start or auth handshake","attr":{"elapsedMillis":0}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:54.000+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.14:43232","uuid":{"uuid":{"$uuid":"88e36e25-dc5d-4d16-90a1-6eb3cb47141a"}},"connectionId":19,"connectionCount":19}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:54.000+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn19","msg":"client metadata","attr":{"remote":"172.20.0.14:43232","client":"conn19","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:54.003+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.14:43246","uuid":{"uuid":{"$uuid":"eb2ceadc-93bf-48b4-b669-25a4717f939d"}},"connectionId":20,"connectionCount":20}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:54.003+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.14:43250","uuid":{"uuid":{"$uuid":"e3c19829-590e-4921-8909-56042df10a57"}},"connectionId":21,"connectionCount":21}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:54.003+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn20","msg":"client metadata","attr":{"remote":"172.20.0.14:43246","client":"conn20","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:54.003+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn21","msg":"client metadata","attr":{"remote":"172.20.0.14:43250","client":"conn21","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:54.003+00:00"},"s":"I",  "c":"NETWORK",  "id":6788700, "ctx":"conn21","msg":"Received first command on ingress connection since session start or auth handshake","attr":{"elapsedMillis":0}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:54.009+00:00"},"s":"I",  "c":"STORAGE",  "id":20320,   "ctx":"conn11","msg":"createCollection","attr":{"namespace":"tyk_analytics.tyk_system_stats","uuidDisposition":"generated","uuid":{"uuid":{"$uuid":"c5a7cbdb-edb8-48fb-9730-39679db0a232"}},"options":{}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:54.018+00:00"},"s":"I",  "c":"REPL",     "id":7360102, "ctx":"conn11","msg":"Added oplog entry for create to transaction","attr":{"namespace":"tyk_analytics.$cmd","uuid":{"uuid":{"$uuid":"c5a7cbdb-edb8-48fb-9730-39679db0a232"}},"object":{"create":"tyk_system_stats","idIndex":{"v":2,"key":{"_id":1},"name":"_id_"}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:54.018+00:00"},"s":"I",  "c":"INDEX",    "id":20345,   "ctx":"conn11","msg":"Index build: done building","attr":{"buildUUID":null,"collectionUUID":{"uuid":{"$uuid":"c5a7cbdb-edb8-48fb-9730-39679db0a232"}},"namespace":"tyk_analytics.tyk_system_stats","index":"_id_","ident":"index-13-9037743918137932370","collectionIdent":"collection-12-9037743918137932370","commitTimestamp":null}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.542+00:00"},"s":"I",  "c":"-",        "id":20883,   "ctx":"conn19","msg":"Interrupted operation as its client disconnected","attr":{"opId":51}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.543+00:00"},"s":"I",  "c":"-",        "id":20883,   "ctx":"conn10","msg":"Interrupted operation as its client disconnected","attr":{"opId":34}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.543+00:00"},"s":"I",  "c":"-",        "id":20883,   "ctx":"conn16","msg":"Interrupted operation as its client disconnected","attr":{"opId":44}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.543+00:00"},"s":"I",  "c":"-",        "id":20883,   "ctx":"conn13","msg":"Interrupted operation as its client disconnected","attr":{"opId":39}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.557+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn17","msg":"Connection ended","attr":{"remote":"172.20.0.14:43228","uuid":{"uuid":{"$uuid":"d3f4e67d-f3b2-4e13-92ee-6cdad7f206d5"}},"connectionId":17,"connectionCount":20}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.558+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn12","msg":"Connection ended","attr":{"remote":"172.20.0.14:43186","uuid":{"uuid":{"$uuid":"2f45163e-c5bf-40c0-a9ba-8474a3829a9f"}},"connectionId":12,"connectionCount":19}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.558+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn21","msg":"Connection ended","attr":{"remote":"172.20.0.14:43250","uuid":{"uuid":{"$uuid":"e3c19829-590e-4921-8909-56042df10a57"}},"connectionId":21,"connectionCount":18}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.558+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn20","msg":"Connection ended","attr":{"remote":"172.20.0.14:43246","uuid":{"uuid":{"$uuid":"eb2ceadc-93bf-48b4-b669-25a4717f939d"}},"connectionId":20,"connectionCount":17}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.558+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn18","msg":"Connection ended","attr":{"remote":"172.20.0.14:43230","uuid":{"uuid":{"$uuid":"fab51aae-87c9-4d42-ad08-1290e89dc6f4"}},"connectionId":18,"connectionCount":16}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.558+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn13","msg":"Connection ended","attr":{"remote":"172.20.0.14:43190","uuid":{"uuid":{"$uuid":"b82abd61-0047-4372-b2b5-08cc353789df"}},"connectionId":13,"connectionCount":15}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.558+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn10","msg":"Connection ended","attr":{"remote":"172.20.0.14:43176","uuid":{"uuid":{"$uuid":"b80812ea-60c7-466c-b233-fc82d908c641"}},"connectionId":10,"connectionCount":14}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.558+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn14","msg":"Connection ended","attr":{"remote":"172.20.0.14:43196","uuid":{"uuid":{"$uuid":"7c7ab68a-8512-4015-a86e-432a9b25ed3e"}},"connectionId":14,"connectionCount":13}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.558+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn11","msg":"Connection ended","attr":{"remote":"172.20.0.14:43184","uuid":{"uuid":{"$uuid":"ef325f04-bba7-4481-98b9-3cca311220ae"}},"connectionId":11,"connectionCount":12}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.558+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn15","msg":"Connection ended","attr":{"remote":"172.20.0.14:43204","uuid":{"uuid":{"$uuid":"6ba7168f-4094-4839-a22f-b85d49be1f1f"}},"connectionId":15,"connectionCount":11}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.559+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn16","msg":"Connection ended","attr":{"remote":"172.20.0.14:43220","uuid":{"uuid":{"$uuid":"f231c617-c82c-48e7-8433-9eb9a9a02194"}},"connectionId":16,"connectionCount":10}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.560+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn19","msg":"Connection ended","attr":{"remote":"172.20.0.14:43232","uuid":{"uuid":{"$uuid":"88e36e25-dc5d-4d16-90a1-6eb3cb47141a"}},"connectionId":19,"connectionCount":9}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.788+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.3:56454","uuid":{"uuid":{"$uuid":"50ead834-47f1-4974-ba6c-9ecd365bead9"}},"connectionId":22,"connectionCount":10}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.788+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn22","msg":"client metadata","attr":{"remote":"172.20.0.3:56454","client":"conn22","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.789+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.3:56458","uuid":{"uuid":{"$uuid":"0ffa5dcc-e0b0-4127-8dd3-14ddcb0ca0cc"}},"connectionId":23,"connectionCount":11}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.789+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.3:56470","uuid":{"uuid":{"$uuid":"89a3ec5f-7c72-4222-8165-da49a2a5e2bc"}},"connectionId":24,"connectionCount":12}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.789+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn23","msg":"client metadata","attr":{"remote":"172.20.0.3:56458","client":"conn23","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.789+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn24","msg":"client metadata","attr":{"remote":"172.20.0.3:56470","client":"conn24","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.789+00:00"},"s":"I",  "c":"NETWORK",  "id":6788700, "ctx":"conn24","msg":"Received first command on ingress connection since session start or auth handshake","attr":{"elapsedMillis":0}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.790+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.3:56474","uuid":{"uuid":{"$uuid":"d27a17f9-3f85-4e3f-b3fa-543b26507ef5"}},"connectionId":25,"connectionCount":13}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.790+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn25","msg":"client metadata","attr":{"remote":"172.20.0.3:56474","client":"conn25","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.790+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.3:56478","uuid":{"uuid":{"$uuid":"73d61a31-2f77-488b-9c46-4203c668ae0d"}},"connectionId":26,"connectionCount":14}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.790+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.3:56482","uuid":{"uuid":{"$uuid":"a547948f-d627-4c87-b346-8c5d34cc37c1"}},"connectionId":27,"connectionCount":15}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.790+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn27","msg":"client metadata","attr":{"remote":"172.20.0.3:56482","client":"conn27","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.790+00:00"},"s":"I",  "c":"NETWORK",  "id":6788700, "ctx":"conn27","msg":"Received first command on ingress connection since session start or auth handshake","attr":{"elapsedMillis":0}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.790+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn26","msg":"client metadata","attr":{"remote":"172.20.0.3:56478","client":"conn26","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.791+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.3:56488","uuid":{"uuid":{"$uuid":"b3b7b82e-4764-4efe-910a-cbb44f2e96b5"}},"connectionId":28,"connectionCount":16}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.791+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn28","msg":"client metadata","attr":{"remote":"172.20.0.3:56488","client":"conn28","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.792+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.3:56498","uuid":{"uuid":{"$uuid":"b9043154-8539-4bcc-811f-1b1b049fbd96"}},"connectionId":29,"connectionCount":17}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.792+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.3:56506","uuid":{"uuid":{"$uuid":"7feba7b8-c9d8-4a02-937f-ba8407e2a4fd"}},"connectionId":30,"connectionCount":18}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.792+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn30","msg":"client metadata","attr":{"remote":"172.20.0.3:56506","client":"conn30","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.793+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn29","msg":"client metadata","attr":{"remote":"172.20.0.3:56498","client":"conn29","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.793+00:00"},"s":"I",  "c":"NETWORK",  "id":6788700, "ctx":"conn30","msg":"Received first command on ingress connection since session start or auth handshake","attr":{"elapsedMillis":0}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.793+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.3:56514","uuid":{"uuid":{"$uuid":"228026af-5b46-4b6e-9630-9085154ea0d1"}},"connectionId":31,"connectionCount":19}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.793+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn31","msg":"client metadata","attr":{"remote":"172.20.0.3:56514","client":"conn31","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.793+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.3:56524","uuid":{"uuid":{"$uuid":"3702f93b-ca5b-4558-867b-4080f2c73e6e"}},"connectionId":32,"connectionCount":20}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.793+00:00"},"s":"I",  "c":"NETWORK",  "id":22943,   "ctx":"listener","msg":"Connection accepted","attr":{"remote":"172.20.0.3:56540","uuid":{"uuid":{"$uuid":"20013c26-b726-461a-8fcd-477b93129e5f"}},"connectionId":33,"connectionCount":21}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.793+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn32","msg":"client metadata","attr":{"remote":"172.20.0.3:56524","client":"conn32","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.794+00:00"},"s":"I",  "c":"NETWORK",  "id":51800,   "ctx":"conn33","msg":"client metadata","attr":{"remote":"172.20.0.3:56540","client":"conn33","negotiatedCompressors":[],"doc":{"driver":{"name":"mongo-go-driver","version":"1.17.2"},"os":{"type":"linux","architecture":"arm64"},"platform":"go1.23.10","env":{"container":{"runtime":"docker"}}}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:30:58.794+00:00"},"s":"I",  "c":"NETWORK",  "id":6788700, "ctx":"conn33","msg":"Received first command on ingress connection since session start or auth handshake","attr":{"elapsedMillis":0}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:31:53.683+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"Checkpointer","msg":"WiredTiger message","attr":{"message":{"ts_sec":1754245913,"ts_usec":682671,"thread":"1:0xffff75a0ebc0","session_name":"WT_SESSION.checkpoint","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 61, snapshot max: 61 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 1"}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:32:53.725+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"Checkpointer","msg":"WiredTiger message","attr":{"message":{"ts_sec":1754245973,"ts_usec":725230,"thread":"1:0xffff75a0ebc0","session_name":"WT_SESSION.checkpoint","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 62, snapshot max: 62 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 1"}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:33:53.730+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"Checkpointer","msg":"WiredTiger message","attr":{"message":{"ts_sec":1754246033,"ts_usec":729912,"thread":"1:0xffff75a0ebc0","session_name":"WT_SESSION.checkpoint","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 63, snapshot max: 63 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 1"}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:34:53.735+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"Checkpointer","msg":"WiredTiger message","attr":{"message":{"ts_sec":1754246093,"ts_usec":735756,"thread":"1:0xffff75a0ebc0","session_name":"WT_SESSION.checkpoint","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 64, snapshot max: 64 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 1"}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:35:53.743+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"Checkpointer","msg":"WiredTiger message","attr":{"message":{"ts_sec":1754246153,"ts_usec":743070,"thread":"1:0xffff75a0ebc0","session_name":"WT_SESSION.checkpoint","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 76, snapshot max: 76 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 1"}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:36:53.749+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"Checkpointer","msg":"WiredTiger message","attr":{"message":{"ts_sec":1754246213,"ts_usec":749254,"thread":"1:0xffff75a0ebc0","session_name":"WT_SESSION.checkpoint","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 78, snapshot max: 78 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 1"}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:37:53.757+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"Checkpointer","msg":"WiredTiger message","attr":{"message":{"ts_sec":1754246273,"ts_usec":757201,"thread":"1:0xffff75a0ebc0","session_name":"WT_SESSION.checkpoint","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 79, snapshot max: 79 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 1"}}}
+tyk-mongo-1              | {"t":{"$date":"2025-08-03T18:38:53.766+00:00"},"s":"I",  "c":"WTCHKPT",  "id":22430,   "ctx":"Checkpointer","msg":"WiredTiger message","attr":{"message":{"ts_sec":1754246333,"ts_usec":766790,"thread":"1:0xffff75a0ebc0","session_name":"WT_SESSION.checkpoint","category":"WT_VERB_CHECKPOINT_PROGRESS","category_id":6,"verbose_level":"DEBUG_1","verbose_level_id":1,"msg":"saving checkpoint snapshot min: 80, snapshot max: 80 snapshot count: 0, oldest timestamp: (0, 0) , meta checkpoint timestamp: (0, 0) base write gen: 1"}}}

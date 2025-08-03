@@ -1,0 +1,605 @@
+Sun Aug  3 18:39:57 UTC 2025 Docker Compose version v2.38.2-desktop.1
+Sun Aug  3 18:40:00 UTC 2025 START ▶ Tyk deployment bootstrap
+Sun Aug  3 18:40:00 UTC 2025 Setting global variables
+Sun Aug  3 18:40:00 UTC 2025   Ok
+Sun Aug  3 18:40:00 UTC 2025 Checking Dashboard licence exists
+Sun Aug  3 18:40:00 UTC 2025   Ok
+Sun Aug  3 18:40:00 UTC 2025 Checking Dashboard licence expiry
+Sun Aug  3 18:40:00 UTC 2025   WARNING: Licence DASHBOARD_LICENCE will expire in 5 days
+Sun Aug  3 18:40:00 UTC 2025 Getting Dashboard configuration
+Sun Aug  3 18:40:00 UTC 2025   Dashboard Admin API Credentials = ff8289874f5d45de945a2ea5c02580fe
+Sun Aug  3 18:40:00 UTC 2025 Checking for containerised runner environment
+Sun Aug  3 18:40:00 UTC 2025   Running on host - no further action required
+Sun Aug  3 18:40:00 UTC 2025   Ok
+Sun Aug  3 18:40:00 UTC 2025 Checking for existing OpenSSL container
+Sun Aug  3 18:40:00 UTC 2025   Ok
+Sun Aug  3 18:40:00 UTC 2025 Creating temporary container tyk-demo-openssl for OpenSSL usage
+Sun Aug  3 18:40:01 UTC 2025   Ok
+Sun Aug  3 18:40:01 UTC 2025 Install OpenSSL into container tyk-demo-openssl
+Sun Aug  3 18:40:03 UTC 2025   OpenSSL has been successfully installed
+Sun Aug  3 18:40:03 UTC 2025 OpenSSL version used for generating certs: OpenSSL 3.3.4 1 Jul 2025 (Library: OpenSSL 3.3.4 1 Jul 2025)
+Sun Aug  3 18:40:03 UTC 2025 Generating self-signed certificate for TLS connections to tyk-gateway-2.localhost
+Sun Aug  3 18:40:04 UTC 2025   Ok
+Sun Aug  3 18:40:04 UTC 2025 Flushing writes on OpenSSL container tyk-demo-openssl
+Sun Aug  3 18:40:04 UTC 2025   Ok
+Sun Aug  3 18:40:04 UTC 2025 Checking TLS assets exist
+Sun Aug  3 18:40:04 UTC 2025   Ok
+Sun Aug  3 18:40:04 UTC 2025 Generating private key for secure messaging and signing
+Sun Aug  3 18:40:04 UTC 2025   Ok
+Sun Aug  3 18:40:04 UTC 2025 Flushing writes on OpenSSL container tyk-demo-openssl
+Sun Aug  3 18:40:04 UTC 2025   Ok
+Sun Aug  3 18:40:04 UTC 2025 Checking private key exists
+Sun Aug  3 18:40:04 UTC 2025   Ok
+Sun Aug  3 18:40:04 UTC 2025 Generating public key for secure messaging and signing
+writing RSA key
+Sun Aug  3 18:40:04 UTC 2025   Ok
+Sun Aug  3 18:40:04 UTC 2025 Flushing writes on OpenSSL container tyk-demo-openssl
+Sun Aug  3 18:40:04 UTC 2025   Ok
+Sun Aug  3 18:40:04 UTC 2025 Checking public key exists
+Sun Aug  3 18:40:04 UTC 2025   Ok
+Sun Aug  3 18:40:04 UTC 2025 Setting read and execute permissions on certificate volumes
+Sun Aug  3 18:40:05 UTC 2025   Ok
+Sun Aug  3 18:40:05 UTC 2025 Flushing writes on OpenSSL container tyk-demo-openssl
+Sun Aug  3 18:40:05 UTC 2025   Ok
+Sun Aug  3 18:40:05 UTC 2025 Recreating containers to load new certificates
+Sun Aug  3 18:40:18 UTC 2025   Ok
+Sun Aug  3 18:40:18 UTC 2025 Wait for services to be available after restart
+Sun Aug  3 18:40:18 UTC 2025 Waiting for Gateway, Dashboard and Redis to be up and running
+Sun Aug  3 18:40:18 UTC 2025   Gateway status endpoint: http://tyk-gateway.localhost:8080/hello
+Sun Aug  3 18:40:19 UTC 2025     Attempt 1 unsuccessful: gw status = '', dashboard status = '', redis status = ''
+Sun Aug  3 18:40:21 UTC 2025     Attempt 2 unsuccessful: gw status = 'pass', dashboard status = 'null', redis status = 'null'
+Sun Aug  3 18:40:23 UTC 2025     Attempt 3 unsuccessful: gw status = 'pass', dashboard status = 'null', redis status = 'null'
+Sun Aug  3 18:40:25 UTC 2025     Attempt 4 unsuccessful: gw status = 'pass', dashboard status = 'null', redis status = 'null'
+Sun Aug  3 18:40:27 UTC 2025     Attempt 5 unsuccessful: gw status = 'pass', dashboard status = 'null', redis status = 'null'
+Sun Aug  3 18:40:29 UTC 2025     Attempt 6 unsuccessful: gw status = 'pass', dashboard status = 'null', redis status = 'null'
+Sun Aug  3 18:40:31 UTC 2025     Attempt 7 succeeded: Gateway, Dashboard and Redis all running
+Sun Aug  3 18:40:31 UTC 2025 Removing temporary OpenSSL container tyk-demo-openssl
+Sun Aug  3 18:40:31 UTC 2025   Ok
+Sun Aug  3 18:40:31 UTC 2025 Creating Kafka topics
+Sun Aug  3 18:40:33 UTC 2025   Created topic: tyk-streams-example
+Sun Aug  3 18:40:35 UTC 2025   Created topic: jobs
+Sun Aug  3 18:40:36 UTC 2025   Created topic: completed
+Sun Aug  3 18:40:36 UTC 2025   Ok
+Sun Aug  3 18:40:36 UTC 2025 Checking for Go plugin example-go-plugin.so v5.9.0-rc7 in cache
+Sun Aug  3 18:40:36 UTC 2025   Not found. Building Go plugin /Users/ilijabojanovic/Documents/work/tyk/tyk-demo/deployments/tyk/volumes/tyk-gateway/plugins/go/example/example-go-plugin.so using tag v5.9.0-rc7
+Sun Aug  3 18:40:36 UTC 2025   Current hardware platform: arm64
+Sun Aug  3 18:40:36 UTC 2025   Target Go Platform: linux/arm64
+Sun Aug  3 18:43:40 UTC 2025   Plugin cache used/max: 2/3
+Sun Aug  3 18:43:40 UTC 2025   Ok
+Sun Aug  3 18:43:40 UTC 2025 Checking for Go plugin jwt-go-plugin.so v5.9.0-rc7 in cache
+Sun Aug  3 18:43:40 UTC 2025   Not found. Building Go plugin /Users/ilijabojanovic/Documents/work/tyk/tyk-demo/deployments/tyk/volumes/tyk-gateway/plugins/go/jwt/jwt-go-plugin.so using tag v5.9.0-rc7
+Sun Aug  3 18:43:40 UTC 2025   Current hardware platform: arm64
+Sun Aug  3 18:43:40 UTC 2025   Target Go Platform: linux/arm64
+Sun Aug  3 18:44:58 UTC 2025   Plugin cache used/max: 2/3
+Sun Aug  3 18:44:58 UTC 2025   Ok
+Sun Aug  3 18:44:58 UTC 2025 Checking for Go plugin ip-rate-limit.so v5.9.0-rc7 in cache
+Sun Aug  3 18:44:58 UTC 2025   Not found. Building Go plugin /Users/ilijabojanovic/Documents/work/tyk/tyk-demo/deployments/tyk/volumes/tyk-gateway/plugins/go/ipratelimit/ip-rate-limit.so using tag v5.9.0-rc7
+Sun Aug  3 18:44:58 UTC 2025   Current hardware platform: arm64
+Sun Aug  3 18:44:58 UTC 2025   Target Go Platform: linux/arm64
+Sun Aug  3 18:47:31 UTC 2025   Plugin cache used/max: 2/3
+Sun Aug  3 18:47:31 UTC 2025   Ok
+Sun Aug  3 18:47:31 UTC 2025 Wait for services to be ready before importing data
+Sun Aug  3 18:47:31 UTC 2025 Waiting for Gateway, Dashboard and Redis to be up and running
+Sun Aug  3 18:47:31 UTC 2025   Gateway status endpoint: http://tyk-gateway.localhost:8080/hello
+Sun Aug  3 18:47:31 UTC 2025     Attempt 1 succeeded: Gateway, Dashboard and Redis all running
+Sun Aug  3 18:47:31 UTC 2025 Processing Dashboard Data
+Sun Aug  3 18:47:31 UTC 2025 Processing data in deployments/tyk/data/tyk-dashboard/1
+Sun Aug  3 18:47:31 UTC 2025 Creating Organisation
+Sun Aug  3 18:47:31 UTC 2025   Creating Organisation: Tyk Demo
+Sun Aug  3 18:47:31 UTC 2025   Ok
+Sun Aug  3 18:47:31 UTC 2025     Name: Tyk Demo
+Sun Aug  3 18:47:31 UTC 2025     Id: 5e9d9544a1dcd60001d0ed20
+Sun Aug  3 18:47:31 UTC 2025     Portal Hostname: tyk-portal.localhost:3000
+Sun Aug  3 18:47:31 UTC 2025 Creating Dashboard Users
+Sun Aug  3 18:47:31 UTC 2025   Creating Dashboard User: admin-user@example.org
+Sun Aug  3 18:47:31 UTC 2025   Ok
+Sun Aug  3 18:47:31 UTC 2025     Id: 688faec344ecdf0001891917
+Sun Aug  3 18:47:31 UTC 2025     Email: admin-user@example.org
+Sun Aug  3 18:47:31 UTC 2025     API Key: 851369c7e2034b155e81d6565eb174a6
+Sun Aug  3 18:47:31 UTC 2025     Organisation Id: 5e9d9544a1dcd60001d0ed20
+Sun Aug  3 18:47:31 UTC 2025   Resetting password for admin-user@example.org
+Sun Aug  3 18:47:31 UTC 2025   Ok
+Sun Aug  3 18:47:31 UTC 2025     Password: 3LEsHO1jv1dt9Xgf
+Sun Aug  3 18:47:31 UTC 2025   Creating Dashboard User: multi-org-user@example.org
+Sun Aug  3 18:47:31 UTC 2025   Ok
+Sun Aug  3 18:47:31 UTC 2025     Id: 688faec344ecdf000189191a
+Sun Aug  3 18:47:31 UTC 2025     Email: multi-org-user@example.org
+Sun Aug  3 18:47:32 UTC 2025     API Key: a11045c810794c2967423a0e728120cd
+Sun Aug  3 18:47:32 UTC 2025     Organisation Id: 5e9d9544a1dcd60001d0ed20
+Sun Aug  3 18:47:32 UTC 2025   Resetting password for multi-org-user@example.org
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025     Password: eN6yAZwvXUYk2p9S
+Sun Aug  3 18:47:32 UTC 2025   Dashboard admin user index: 2
+Sun Aug  3 18:47:32 UTC 2025 Creating Dashboard User Groups
+Sun Aug  3 18:47:32 UTC 2025   Creating User Group: Read-only
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025     Id: 688faec444ecdf000189191d
+Sun Aug  3 18:47:32 UTC 2025   Creating User Group: Default
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025     Id: 688faec444ecdf000189191f
+Sun Aug  3 18:47:32 UTC 2025   Creating User Group: Admin
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025     Id: 688faec444ecdf0001891921
+Sun Aug  3 18:47:32 UTC 2025 Creating Webhooks
+Sun Aug  3 18:47:32 UTC 2025   Creating Webhook: Webhook Receiver Post
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025 Creating Certificates
+Sun Aug  3 18:47:32 UTC 2025   Creating Cert: mtls_example
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025 Creating APIs
+Sun Aug  3 18:47:32 UTC 2025   Creating API: GraphQL posts v3
+Sun Aug  3 18:47:32 UTC 2025     Type: Classic
+Sun Aug  3 18:47:32 UTC 2025     ID: 0b2038203a5d4f0c71984b6a290fb24a
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025   Creating API: Go Plugin API
+Sun Aug  3 18:47:32 UTC 2025     Type: Classic
+Sun Aug  3 18:47:32 UTC 2025     ID: 10cc42ff818e4a1b4e17899a3a981613
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025   Creating API: Multiple Listen Paths
+Sun Aug  3 18:47:32 UTC 2025     Type: OAS
+Sun Aug  3 18:47:32 UTC 2025     ID: 146f887972a944dd72facb9653d2b76c
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025   Creating API: Go Custom IP Rate Limiter
+Sun Aug  3 18:47:32 UTC 2025     Type: Classic
+Sun Aug  3 18:47:32 UTC 2025     ID: 20cbad000d654076457fd6745fc1c4fb
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025   Creating API: gRPC API (no TLS)
+Sun Aug  3 18:47:32 UTC 2025     Type: Classic
+Sun Aug  3 18:47:32 UTC 2025     ID: 3d5df1b8307a4ca2777f1ae009031c10
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025   Creating API: bench-uptream
+Sun Aug  3 18:47:32 UTC 2025     Type: Classic
+Sun Aug  3 18:47:32 UTC 2025     ID: 3eb291ec5985490c4970452401fb7bc2
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025   Creating API: Swagger Petstore
+Sun Aug  3 18:47:32 UTC 2025     Type: Classic
+Sun Aug  3 18:47:32 UTC 2025     ID: 42b615355eaf47ca617463503f43300b
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025   Creating API: Streams Authentication
+Sun Aug  3 18:47:32 UTC 2025     Type: Streams
+Sun Aug  3 18:47:32 UTC 2025     ID: 42d23def8d3b47044f45670bf18db9ea
+Sun Aug  3 18:47:32 UTC 2025   Ok
+Sun Aug  3 18:47:32 UTC 2025   Creating API: Plugin Demo API
+Sun Aug  3 18:47:32 UTC 2025     Type: Classic
+Sun Aug  3 18:47:32 UTC 2025     ID: 4692b70056154ccb41e44af0cdd990c3
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: JavaScript Middleware API
+Sun Aug  3 18:47:33 UTC 2025     Type: Classic
+Sun Aug  3 18:47:33 UTC 2025     ID: 47e6f94f988d4e0f51e262ffd15b2954
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: Go Plugin API (No Auth)
+Sun Aug  3 18:47:33 UTC 2025     Type: Classic
+Sun Aug  3 18:47:33 UTC 2025     ID: 4ae0dc21a29143267bf823e26e57bc61
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: JSON Placeholder
+Sun Aug  3 18:47:33 UTC 2025     Type: Classic
+Sun Aug  3 18:47:33 UTC 2025     ID: 546e885199c947147e7f39b7d6e8e984
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: Basic Authentication API
+Sun Aug  3 18:47:33 UTC 2025     Type: Classic
+Sun Aug  3 18:47:33 UTC 2025     ID: 5963f8fdedee405143f5858ea17de422
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: External HTTPbin
+Sun Aug  3 18:47:33 UTC 2025     Type: Classic
+Sun Aug  3 18:47:33 UTC 2025     ID: 627efb71ebae49df7a853b9769b65fce
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: Dynamic Client MTLS
+Sun Aug  3 18:47:33 UTC 2025     Type: OAS
+Sun Aug  3 18:47:33 UTC 2025     ID: 6323a6ed7f7d4fb9473f3ecde19e1477
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: TCP to Redis
+Sun Aug  3 18:47:33 UTC 2025     Type: Classic
+Sun Aug  3 18:47:33 UTC 2025     ID: 665e8463fd1e4bbb62d706a93e21420b
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: Users Response Transform
+Sun Aug  3 18:47:33 UTC 2025     Type: Classic
+Sun Aug  3 18:47:33 UTC 2025     ID: 69a4e6fa47a645df70d2305f47da9561
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: Secret API - Local
+Sun Aug  3 18:47:33 UTC 2025     Type: Classic
+Sun Aug  3 18:47:33 UTC 2025     ID: 6fcf5d386eb94cad74b7e09f07296db4
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: Basic Open API
+Sun Aug  3 18:47:33 UTC 2025     Type: Classic
+Sun Aug  3 18:47:33 UTC 2025     ID: 727dad853a8a45f64ab981154d1ffdad
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: Streams WS
+Sun Aug  3 18:47:33 UTC 2025     Type: Streams
+Sun Aug  3 18:47:33 UTC 2025     ID: 770afa9e87254db94089a3c8f4a3208a
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: gRPC H2C Add Service
+Sun Aug  3 18:47:33 UTC 2025     Type: OAS
+Sun Aug  3 18:47:33 UTC 2025     ID: 77aea798e2c2498473f065f8e173c437
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: Relative Path Examples
+Sun Aug  3 18:47:33 UTC 2025     Type: Classic
+Sun Aug  3 18:47:33 UTC 2025     ID: 7d29ac67565045706a2209ab647ef22a
+Sun Aug  3 18:47:33 UTC 2025   Ok
+Sun Aug  3 18:47:33 UTC 2025   Creating API: Custom Domain
+Sun Aug  3 18:47:33 UTC 2025     Type: Classic
+Sun Aug  3 18:47:33 UTC 2025     ID: 85278a6e6be7475b45d25ba8078c89d9
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: GraphQL Countries
+Sun Aug  3 18:47:34 UTC 2025     Type: Classic
+Sun Aug  3 18:47:34 UTC 2025     ID: 8ba9f26729e041a95f84f01dd0ce6d9b
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: JWT-RSA
+Sun Aug  3 18:47:34 UTC 2025     Type: OAS
+Sun Aug  3 18:47:34 UTC 2025     ID: 92c06a4330904cae6860c39bac57262b
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: Restified-Posts
+Sun Aug  3 18:47:34 UTC 2025     Type: Classic
+Sun Aug  3 18:47:34 UTC 2025     ID: 9ddb13d7462042f27042f4dcfa0645af
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: Load Balanced API
+Sun Aug  3 18:47:34 UTC 2025     Type: Classic
+Sun Aug  3 18:47:34 UTC 2025     ID: 9e2cf89e3a4649425085062d3ef45382
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: Basic Protected API
+Sun Aug  3 18:47:34 UTC 2025     Type: Classic
+Sun Aug  3 18:47:34 UTC 2025     ID: accbdd1b89e84ec97f4f16d4e3197d5c
+Sun Aug  3 18:47:34 UTC 2025   Updating Webhook Reference: Webhook Receiver Post
+Sun Aug  3 18:47:34 UTC 2025     ID: 688faec444ecdf0001891923
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: Echo Server
+Sun Aug  3 18:47:34 UTC 2025     Type: Classic
+Sun Aug  3 18:47:34 UTC 2025     ID: b5d8914fa2204b53627ae40cb0010b6f
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: Detailed Analytics Off
+Sun Aug  3 18:47:34 UTC 2025     Type: Classic
+Sun Aug  3 18:47:34 UTC 2025     ID: b742100081764ff06b00f75733145614
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: OAS HTTPbin
+Sun Aug  3 18:47:34 UTC 2025     Type: OAS
+Sun Aug  3 18:47:34 UTC 2025     ID: b84fe1a04e5648927971c0557971565c
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: Detailed Analytics On
+Sun Aug  3 18:47:34 UTC 2025     Type: Classic
+Sun Aug  3 18:47:34 UTC 2025     ID: b982cec084c44ef56aef1a090b346757
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: Cookie Redirect
+Sun Aug  3 18:47:34 UTC 2025     Type: Classic
+Sun Aug  3 18:47:34 UTC 2025     ID: b9b13f0a2dca460b577a464c59c18279
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: Uptime Test API
+Sun Aug  3 18:47:34 UTC 2025     Type: Classic
+Sun Aug  3 18:47:34 UTC 2025     ID: bf42b28185b541934431f068b8bd616c
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: UDG Countries Enriched
+Sun Aug  3 18:47:34 UTC 2025     Type: Classic
+Sun Aug  3 18:47:34 UTC 2025     ID: c1e983ac96f04cb2745b3962b0f787fc
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: Rate Limit Path API 2
+Sun Aug  3 18:47:34 UTC 2025     Type: Classic
+Sun Aug  3 18:47:34 UTC 2025     ID: c252af6eaf2e43ca5c89465af4f481c1
+Sun Aug  3 18:47:34 UTC 2025   Ok
+Sun Aug  3 18:47:34 UTC 2025   Creating API: Webhook Receiver
+Sun Aug  3 18:47:34 UTC 2025     Type: Classic
+Sun Aug  3 18:47:34 UTC 2025     ID: c33b310e41f944ee590aa41012bdcc9d
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: Cookie Redirect Target 1
+Sun Aug  3 18:47:35 UTC 2025     Type: Classic
+Sun Aug  3 18:47:35 UTC 2025     ID: c42b7e7abf5c4e59709e09b7739df27e
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: JWT API
+Sun Aug  3 18:47:35 UTC 2025     Type: Classic
+Sun Aug  3 18:47:35 UTC 2025     ID: c7c3b826a9ec4c637ae716e00cecc010
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: Version by Path
+Sun Aug  3 18:47:35 UTC 2025     Type: Classic
+Sun Aug  3 18:47:35 UTC 2025     ID: ccc9acdb5b8646f66b2322c337d04f21
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: WAF Protected Api
+Sun Aug  3 18:47:35 UTC 2025     Type: Classic
+Sun Aug  3 18:47:35 UTC 2025     ID: cd36d353758c418955c98979c5faf6f2
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: TLS Multiplex 1
+Sun Aug  3 18:47:35 UTC 2025     Type: Classic
+Sun Aug  3 18:47:35 UTC 2025     ID: d0ab4e97086e4ee865179d3824b816f3
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: TLS Multiplex 2 (bad target URL)
+Sun Aug  3 18:47:35 UTC 2025     Type: Classic
+Sun Aug  3 18:47:35 UTC 2025     ID: d0ab4e97086e4ee865179d3824b816f4
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: Rate Limit Proxy API
+Sun Aug  3 18:47:35 UTC 2025     Type: Classic
+Sun Aug  3 18:47:35 UTC 2025     ID: d1dfc6a927a046c54c0ed470f19757cc
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: Rate Limit Path API 1
+Sun Aug  3 18:47:35 UTC 2025     Type: Classic
+Sun Aug  3 18:47:35 UTC 2025     ID: d371b83b249845a2497ab9a947fd6210
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: gRPC API (TLS)
+Sun Aug  3 18:47:35 UTC 2025     Type: Classic
+Sun Aug  3 18:47:35 UTC 2025     ID: d55b101f9ee54d8344f18b898f9af985
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: gRPC H2C Hello Service
+Sun Aug  3 18:47:35 UTC 2025     Type: OAS
+Sun Aug  3 18:47:35 UTC 2025     ID: d76cfcb7f4d14c38419336a27c6ed9ca
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: Cookie Redirect Target 2
+Sun Aug  3 18:47:35 UTC 2025     Type: Classic
+Sun Aug  3 18:47:35 UTC 2025     ID: da1a299e14234af252896639c3d0004b
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: Streams Kafka
+Sun Aug  3 18:47:35 UTC 2025     Type: Streams
+Sun Aug  3 18:47:35 UTC 2025     ID: dd0720d2cc1d40a453f7506cea5fdaca
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: Versioned Dynamic Looping
+Sun Aug  3 18:47:35 UTC 2025     Type: Classic
+Sun Aug  3 18:47:35 UTC 2025     ID: e22945fc12d949886b91595bd378a640
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: Streams SSE
+Sun Aug  3 18:47:35 UTC 2025     Type: Streams
+Sun Aug  3 18:47:35 UTC 2025     ID: ea999394d4314b5844234472fdd5aedf
+Sun Aug  3 18:47:35 UTC 2025   Ok
+Sun Aug  3 18:47:35 UTC 2025   Creating API: Go Plugin API - JWT Parse
+Sun Aug  3 18:47:36 UTC 2025     Type: Classic
+Sun Aug  3 18:47:36 UTC 2025     ID: ed445bb83a914ad17714378ea601f2ce
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating API: Ngrok Dashboard API
+Sun Aug  3 18:47:36 UTC 2025     Type: Classic
+Sun Aug  3 18:47:36 UTC 2025     ID: edc9b2bd3e7b4cc55c4ff0a7e1529b45
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating API: Strict Routes
+Sun Aug  3 18:47:36 UTC 2025     Type: OAS
+Sun Aug  3 18:47:36 UTC 2025     ID: f96f64e3ab82435a541d3de7a6c5ad89
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating API: OAuth 2.0 API
+Sun Aug  3 18:47:36 UTC 2025     Type: Classic
+Sun Aug  3 18:47:36 UTC 2025     ID: fa0b0268b4124faa70e151a879d3e92c
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025 Waiting for API availability
+Sun Aug  3 18:47:36 UTC 2025   Waiting for API 727dad853a8a45f64ab981154d1ffdad to be available on http://tyk-gateway.localhost:8080
+Sun Aug  3 18:47:36 UTC 2025   Found API 727dad853a8a45f64ab981154d1ffdad on http://tyk-gateway.localhost:8080
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025 Creating Policies
+Sun Aug  3 18:47:36 UTC 2025   Creating Policy: Swagger Petstore Policy
+Sun Aug  3 18:47:36 UTC 2025     ID: 5ead7120575961000181867e
+Sun Aug  3 18:47:36 UTC 2025     Status: OK
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating Policy: Rate Limit Policy
+Sun Aug  3 18:47:36 UTC 2025     ID: 5ead7120575961000181867f
+Sun Aug  3 18:47:36 UTC 2025     Status: OK
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating Policy: Throttling Policy
+Sun Aug  3 18:47:36 UTC 2025     ID: 5ead71205759610001818680
+Sun Aug  3 18:47:36 UTC 2025     Status: OK
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating Policy: Quota Policy
+Sun Aug  3 18:47:36 UTC 2025     ID: 5ead71205759610001818681
+Sun Aug  3 18:47:36 UTC 2025     Status: OK
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating Policy: JWT Policy
+Sun Aug  3 18:47:36 UTC 2025     ID: 5ead72955759610001818688
+Sun Aug  3 18:47:36 UTC 2025     Status: OK
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating Policy: JWT Policy Restricted
+Sun Aug  3 18:47:36 UTC 2025     ID: 5ead73565759610001818689
+Sun Aug  3 18:47:36 UTC 2025     Status: OK
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating Policy: Basic Authentication Policy
+Sun Aug  3 18:47:36 UTC 2025     ID: 5eb6349543f0440001373f5c
+Sun Aug  3 18:47:36 UTC 2025     Status: OK
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating Policy: Basic Protected Policy
+Sun Aug  3 18:47:36 UTC 2025     ID: 5f83cfd378ab040001d3d824
+Sun Aug  3 18:47:36 UTC 2025     Status: OK
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating Policy: OAuth 2.0 Policy
+Sun Aug  3 18:47:36 UTC 2025     ID: 615d2e528bf3980001c7c6c2
+Sun Aug  3 18:47:36 UTC 2025     Status: OK
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating Policy: GraphQL Posts V3
+Sun Aug  3 18:47:36 UTC 2025     ID: 62a0eac392faf50001395814
+Sun Aug  3 18:47:36 UTC 2025     Status: OK
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating Policy: JsonPlaceholder
+Sun Aug  3 18:47:36 UTC 2025     ID: 62a0ec9092faf50001395817
+Sun Aug  3 18:47:36 UTC 2025     Status: OK
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025   Creating Policy: Rate Limit Proxy
+Sun Aug  3 18:47:36 UTC 2025     ID: 641c15dd0fffb800010197bf
+Sun Aug  3 18:47:36 UTC 2025     Status: OK
+Sun Aug  3 18:47:36 UTC 2025   Ok
+Sun Aug  3 18:47:36 UTC 2025 Waiting for Policy availability
+Sun Aug  3 18:47:36 UTC 2025   Waiting for Policy 5ead72955759610001818688 to be available on http://tyk-gateway.localhost:8080
+Sun Aug  3 18:47:36 UTC 2025   Waiting for 5ead72955759610001818688 to become available on http://tyk-gateway.localhost:8080...
+Sun Aug  3 18:47:38 UTC 2025   Found Policy 5ead72955759610001818688 on http://tyk-gateway.localhost:8080
+Sun Aug  3 18:47:38 UTC 2025   Ok
+Sun Aug  3 18:47:38 UTC 2025 Initialising Portal
+Sun Aug  3 18:47:38 UTC 2025   Creating default settings
+Sun Aug  3 18:47:38 UTC 2025   Ok
+Sun Aug  3 18:47:38 UTC 2025   Initialising Catalogue
+Sun Aug  3 18:47:38 UTC 2025   Ok
+Sun Aug  3 18:47:38 UTC 2025     Id: 688faeca44ecdf00018919a3
+Sun Aug  3 18:47:38 UTC 2025 Creating Portal Pages
+Sun Aug  3 18:47:38 UTC 2025   Creating Page: Developer Portal Home
+Sun Aug  3 18:47:38 UTC 2025   Ok
+Sun Aug  3 18:47:38 UTC 2025 Creating Portal Developers
+Sun Aug  3 18:47:38 UTC 2025   Creating Developer: portal-developer@example.org
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025     Password: yrPL6CdeJmSCYv7q
+Sun Aug  3 18:47:39 UTC 2025 Creating Portal Catalogues
+Sun Aug  3 18:47:39 UTC 2025   Creating Documentation: Swagger Petstore
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025     Id: 688faecb44ecdf00018919a9
+Sun Aug  3 18:47:39 UTC 2025   Adding Catalogue Entry: Swagger Petstore
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025   Creating Documentation: JSON Placeholder
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025     Id: 688faecb44ecdf00018919ad
+Sun Aug  3 18:47:39 UTC 2025   Adding Catalogue Entry: Social Media REST
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025   Creating Documentation: Social Media GQL
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025     Id: 688faecb44ecdf00018919b1
+Sun Aug  3 18:47:39 UTC 2025   Adding Catalogue Entry: Social Media GQL
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025 Creating Basic Auth Keys
+Sun Aug  3 18:47:39 UTC 2025   Adding Basic Key: basic_auth_username
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025     Password: basic-auth-password
+Sun Aug  3 18:47:39 UTC 2025 Creating Bearer Token Keys
+Sun Aug  3 18:47:39 UTC 2025   Adding Bearer Token (dash): dynamic_client_mtls
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025     Key: eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImNkMDhhNzVmNTQ0MWMzOTdhNTg2ZGVkN2Y0NWNlYTI2NmZiNjg0ZWI4MmU0OTY5MTM2MmUyODZmOTBiNzMxM2YiLCJoIjoibXVybXVyNjQifQ==
+Sun Aug  3 18:47:39 UTC 2025     Hash: 5cb71f971b81c930
+Sun Aug  3 18:47:39 UTC 2025 Creating OAuth Clients
+Sun Aug  3 18:47:39 UTC 2025   Waiting for API fa0b0268b4124faa70e151a879d3e92c to be available on http://tyk-gateway.localhost:8080
+Sun Aug  3 18:47:39 UTC 2025   Found API fa0b0268b4124faa70e151a879d3e92c on http://tyk-gateway.localhost:8080
+Sun Aug  3 18:47:39 UTC 2025   Adding OAuth Client: my-client-id
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025     Secret: my-client-secret
+Sun Aug  3 18:47:39 UTC 2025 Processing data in deployments/tyk/data/tyk-dashboard/2
+Sun Aug  3 18:47:39 UTC 2025 Creating Organisation
+Sun Aug  3 18:47:39 UTC 2025   Creating Organisation: Acme
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025     Name: Acme
+Sun Aug  3 18:47:39 UTC 2025     Id: 6e9d9544a1dcd60001d0ed21
+Sun Aug  3 18:47:39 UTC 2025     Portal Hostname: acme-portal.localhost:3000
+Sun Aug  3 18:47:39 UTC 2025 Creating Dashboard Users
+Sun Aug  3 18:47:39 UTC 2025   Creating Dashboard User: acme-admin@example.org
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025     Id: 688faecb44ecdf00018919b9
+Sun Aug  3 18:47:39 UTC 2025     Email: acme-admin@example.org
+Sun Aug  3 18:47:39 UTC 2025     API Key: d154c566b6124b466ec6c3d49fa10180
+Sun Aug  3 18:47:39 UTC 2025     Organisation Id: 6e9d9544a1dcd60001d0ed21
+Sun Aug  3 18:47:39 UTC 2025   Resetting password for acme-admin@example.org
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025     Password: R3CAjEY4mLw6vkLH
+Sun Aug  3 18:47:39 UTC 2025   Creating Dashboard User: multi-org-user@example.org
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025     Id: 688faecb44ecdf00018919bc
+Sun Aug  3 18:47:39 UTC 2025     Email: multi-org-user@example.org
+Sun Aug  3 18:47:39 UTC 2025     API Key: bb4bdd1d6b604c78612eb1f2fa063726
+Sun Aug  3 18:47:39 UTC 2025     Organisation Id: 6e9d9544a1dcd60001d0ed21
+Sun Aug  3 18:47:39 UTC 2025   Resetting password for multi-org-user@example.org
+Sun Aug  3 18:47:39 UTC 2025   Ok
+Sun Aug  3 18:47:39 UTC 2025     Password: eN6yAZwvXUYk2p9S
+Sun Aug  3 18:47:39 UTC 2025   Dashboard admin user index: 2
+Sun Aug  3 18:47:39 UTC 2025 Creating Dashboard User Groups
+Sun Aug  3 18:47:39 UTC 2025 Creating Webhooks
+Sun Aug  3 18:47:39 UTC 2025 Creating Certificates
+Sun Aug  3 18:47:39 UTC 2025 Creating APIs
+Sun Aug  3 18:47:40 UTC 2025   Creating API: HTTPbin
+Sun Aug  3 18:47:40 UTC 2025     Type: Classic
+Sun Aug  3 18:47:40 UTC 2025     ID: 93fd5c15961041115974216e7a3e7175
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025 Waiting for API availability
+Sun Aug  3 18:47:40 UTC 2025   Waiting for API 727dad853a8a45f64ab981154d1ffdad to be available on http://tyk-gateway.localhost:8080
+Sun Aug  3 18:47:40 UTC 2025   Found API 727dad853a8a45f64ab981154d1ffdad on http://tyk-gateway.localhost:8080
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025 Creating Policies
+Sun Aug  3 18:47:40 UTC 2025 Waiting for Policy availability
+Sun Aug  3 18:47:40 UTC 2025   Waiting for Policy 5ead72955759610001818688 to be available on http://tyk-gateway.localhost:8080
+Sun Aug  3 18:47:40 UTC 2025   Found Policy 5ead72955759610001818688 on http://tyk-gateway.localhost:8080
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025 Initialising Portal
+Sun Aug  3 18:47:40 UTC 2025   Creating default settings
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025   Initialising Catalogue
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025     Id: 688faecc44ecdf00018919c3
+Sun Aug  3 18:47:40 UTC 2025 Creating Portal Pages
+Sun Aug  3 18:47:40 UTC 2025   Creating Page: Developer Portal Home
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025 Creating Portal Developers
+Sun Aug  3 18:47:40 UTC 2025   Creating Developer: portal-developer@example.org
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025     Password: yrPL6CdeJmSCYv7q
+Sun Aug  3 18:47:40 UTC 2025 Creating Portal Catalogues
+Sun Aug  3 18:47:40 UTC 2025 Creating Basic Auth Keys
+Sun Aug  3 18:47:40 UTC 2025 Creating Bearer Token Keys
+Sun Aug  3 18:47:40 UTC 2025 Creating OAuth Clients
+Sun Aug  3 18:47:40 UTC 2025 Processing Gateway Data
+Sun Aug  3 18:47:40 UTC 2025 Creating Custom Bearer Tokens
+Sun Aug  3 18:47:40 UTC 2025   Adding Bearer Token: analytics_on
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025     Key: eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImFuYWx5dGljc19vbiIsImgiOiJtdXJtdXI2NCJ9
+Sun Aug  3 18:47:40 UTC 2025     Hash: 85238bcb654a73cd
+Sun Aug  3 18:47:40 UTC 2025   Adding Bearer Token: jwt_rsa
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025     Key: eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6Imp3dF9yc2EiLCJoIjoibXVybXVyNjQifQ==
+Sun Aug  3 18:47:40 UTC 2025     Hash: 04b7feaa6ecb6489
+Sun Aug  3 18:47:40 UTC 2025   Adding Bearer Token: streams_authentication
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025     Key: eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6InN0cmVhbXNfYXV0aGVudGljYXRpb24iLCJoIjoibXVybXVyNjQifQ==
+Sun Aug  3 18:47:40 UTC 2025     Hash: 2a51978cfb95cdd2
+Sun Aug  3 18:47:40 UTC 2025   Adding Bearer Token: auth_key
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025     Key: eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImF1dGhfa2V5IiwiaCI6Im11cm11cjY0In0=
+Sun Aug  3 18:47:40 UTC 2025     Hash: 6129dc1e8b64c6b4
+Sun Aug  3 18:47:40 UTC 2025   Adding Bearer Token: go_plugin_key
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025     Key: eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImdvX3BsdWdpbl9rZXkiLCJoIjoibXVybXVyNjQifQ==
+Sun Aug  3 18:47:40 UTC 2025     Hash: 9db60c1116bdbc87
+Sun Aug  3 18:47:40 UTC 2025   Adding Bearer Token: quota
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025     Key: eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6InF1b3RhIiwiaCI6Im11cm11cjY0In0=
+Sun Aug  3 18:47:40 UTC 2025     Hash: 53847b6e6e35a5fe
+Sun Aug  3 18:47:40 UTC 2025   Adding Bearer Token: rate_limit
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025     Key: eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6InJhdGVfbGltaXQiLCJoIjoibXVybXVyNjQifQ==
+Sun Aug  3 18:47:40 UTC 2025     Hash: d7559196a62dbcd3
+Sun Aug  3 18:47:40 UTC 2025   Adding Bearer Token: throttling
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025     Key: eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6InRocm90dGxpbmciLCJoIjoibXVybXVyNjQifQ==
+Sun Aug  3 18:47:40 UTC 2025     Hash: 719589b5b2a59b55
+Sun Aug  3 18:47:40 UTC 2025   Adding Bearer Token: petstore_key
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025     Key: eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6InBldHN0b3JlX2tleSIsImgiOiJtdXJtdXI2NCJ9
+Sun Aug  3 18:47:40 UTC 2025     Hash: 522e618643147543
+Sun Aug  3 18:47:40 UTC 2025   Adding Bearer Token: rate_limit_per_path
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025     Key: eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6InJhdGVfbGltaXRfcGVyX3BhdGgiLCJoIjoibXVybXVyNjQifQ==
+Sun Aug  3 18:47:40 UTC 2025     Hash: 0dc88be08fda2db0
+Sun Aug  3 18:47:40 UTC 2025   Adding Bearer Token: external_httpbin_key
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025     Key: eyJvcmciOiI1ZTlkOTU0NGExZGNkNjAwMDFkMGVkMjAiLCJpZCI6ImV4dGVybmFsX2h0dHBiaW5fa2V5IiwiaCI6Im11cm11cjY0In0=
+Sun Aug  3 18:47:40 UTC 2025     Hash: 86a26ef97ddcb630
+Sun Aug  3 18:47:40 UTC 2025 Restarting Dashboard container to ensure Portal URLs are loaded ok
+ Container tyk-demo-tyk-dashboard-1  Restarting
+ Container tyk-demo-tyk-dashboard-1  Started
+Sun Aug  3 18:47:40 UTC 2025   Ok
+Sun Aug  3 18:47:40 UTC 2025 Reloading Gateways
+Sun Aug  3 18:47:40 UTC 2025   Sending group reload request to http://tyk-gateway.localhost:8080
+Sun Aug  3 18:47:41 UTC 2025     Reload request successfully sent
+Sun Aug  3 18:47:41 UTC 2025 Waiting for Gateway, Dashboard and Redis to be up and running
+Sun Aug  3 18:47:41 UTC 2025   Gateway status endpoint: http://tyk-gateway.localhost:8080/hello
+Sun Aug  3 18:47:41 UTC 2025     Attempt 1 succeeded: Gateway, Dashboard and Redis all running
+Sun Aug  3 18:47:41 UTC 2025 Checking Gateway - Anonymous API access
+Sun Aug  3 18:47:41 UTC 2025   Expecting 200 response from http://tyk-gateway.localhost:8080/basic-open-api/get
+Sun Aug  3 18:47:41 UTC 2025     Attempt 1 succeeded, received '200'
+Sun Aug  3 18:47:41 UTC 2025   Ok
+Sun Aug  3 18:47:41 UTC 2025 Checking Gateway - Authenticated API access (bearer token)
+Sun Aug  3 18:47:41 UTC 2025   Expecting 200 response from http://tyk-gateway.localhost:8080/basic-protected-api/get
+Sun Aug  3 18:47:41 UTC 2025     Attempt 1 succeeded, received '200'
+Sun Aug  3 18:47:41 UTC 2025   Ok
+Sun Aug  3 18:47:41 UTC 2025 Checking Gateway - Authenticated API access (basic)
+Sun Aug  3 18:47:41 UTC 2025   Expecting 200 response from http://tyk-gateway.localhost:8080/basic-authentication-api/get
+Sun Aug  3 18:47:41 UTC 2025     Attempt 1 succeeded, received '200'
+Sun Aug  3 18:47:41 UTC 2025   Ok
+Sun Aug  3 18:47:41 UTC 2025 Checking Gateway - Go plugin
+Sun Aug  3 18:47:41 UTC 2025   Expecting 200 response from http://tyk-gateway.localhost:8080/go-plugin-api-no-auth/get
+Sun Aug  3 18:47:41 UTC 2025     Attempt 1 of 3 unsuccessful, received '500'
+Sun Aug  3 18:47:43 UTC 2025     Attempt 2 of 3 unsuccessful, received '500'
+Sun Aug  3 18:47:45 UTC 2025     Attempt 3 of 3 unsuccessful, received '500'
+Sun Aug  3 18:47:45 UTC 2025     Maximum retry count reached. Aborting.
+Sun Aug  3 18:47:45 UTC 2025   Gateway not returning desired response, attempting hot reload
+Sun Aug  3 18:47:45 UTC 2025   Sending reload request to http://tyk-gateway.localhost:8080
+Sun Aug  3 18:47:46 UTC 2025     Reload request successfully sent
+Sun Aug  3 18:47:48 UTC 2025   Expecting 200 response from http://tyk-gateway.localhost:8080/go-plugin-api-no-auth/get
+Sun Aug  3 18:47:48 UTC 2025     Attempt 1 of 3 unsuccessful, received '500'
+Sun Aug  3 18:47:50 UTC 2025     Attempt 2 of 3 unsuccessful, received '500'
+Sun Aug  3 18:47:52 UTC 2025     Attempt 3 of 3 unsuccessful, received '500'
+Sun Aug  3 18:47:52 UTC 2025     Maximum retry count reached. Aborting.
+Sun Aug  3 18:47:52 UTC 2025   Gateway not returning desired response, attempting hot reload
+Sun Aug  3 18:47:52 UTC 2025   Sending reload request to http://tyk-gateway.localhost:8080
+Sun Aug  3 18:47:53 UTC 2025     Reload request successfully sent
+Sun Aug  3 18:47:55 UTC 2025   Expecting 200 response from http://tyk-gateway.localhost:8080/go-plugin-api-no-auth/get
+Sun Aug  3 18:47:55 UTC 2025     Attempt 1 of 3 unsuccessful, received '500'
+Sun Aug  3 18:47:57 UTC 2025     Attempt 2 of 3 unsuccessful, received '500'
+Sun Aug  3 18:47:59 UTC 2025     Attempt 3 of 3 unsuccessful, received '500'
+Sun Aug  3 18:47:59 UTC 2025     Maximum retry count reached. Aborting.
+Sun Aug  3 18:47:59 UTC 2025   Maximum reload attempt reached
