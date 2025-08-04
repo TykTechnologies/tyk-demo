@@ -5,6 +5,12 @@ deployment="keycloak-dcr"
 log_start_deployment
 bootstrap_progress
 
+log_message "Configuring Keycloak to disable SSL requirement"
+docker exec tyk-demo-keycloak-1 /opt/keycloak/bin/kcadm.sh config credentials --server http://keycloak:8180 --realm master --user admin --password admin
+docker exec tyk-demo-keycloak-1 /opt/keycloak/bin/kcadm.sh update realms/master -s sslRequired=NONE
+log_ok
+bootstrap_progress
+
 dashboard_base_url="http://tyk-dashboard.localhost:3000"
 dashboard_admin_api_credentials=$(cat deployments/tyk/volumes/tyk-dashboard/tyk_analytics.conf | jq -r .admin_secret)
 dashboard_user_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")

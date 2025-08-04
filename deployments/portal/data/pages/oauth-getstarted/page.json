@@ -1,0 +1,7 @@
+{
+  "AllowFormSubmission": false,
+  "Path": "oauth",
+  "Status": "active",
+  "Template": "oauth-getstarted",
+  "Title": "OAuth 2.0"
+}
