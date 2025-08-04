@@ -50,25 +50,137 @@ log_message "Creating DCR Policy"
 create_policy "deployments/keycloak-dcr/data/tyk-dashboard/policy.json" "$dashboard_user_api_key"
 bootstrap_progress
 
-log_message "Importing DCR Portal Catalog"
-catalogue_data_path="deployments/keycloak-dcr/data/tyk-dashboard/catalog.json"
+# Enterprise Portal setup
+portal_base_url="http://tyk-portal.localhost:3100"
+log_message "Waiting for Enterprise Portal to be ready"
+wait_for_response "$portal_base_url/ready" "200" "" "10"
 
-# get the existing catalogue
-existing_catalogue="$(curl $dashboard_base_url/api/portal/catalogue -s \
-    -H "Authorization: $dashboard_user_api_key")"
-
-# Inject initial access token into new catalogue entry
-#new_catalogue=$(jq --arg pol_id "$policy_id" --arg dcr_token "$initial_access_token" '.policy_id = $pol_id | .config.dcr_options.access_token = $dcr_token' $catalogue_data_path)
-new_catalogue=$(jq --arg dcr_token "$initial_access_token" '.config.dcr_options.access_token = $dcr_token' $catalogue_data_path)
-
-# update the catalogue with the new catalogue entry
-updated_catalogue=$(jq --argjson new_catalogue "[$new_catalogue]" '.apis += $new_catalogue' <<< "$existing_catalogue")
-log_message "Updated catalogue: $updated_catalogue"
-
-log_json_result "$(curl -X 'PUT' $dashboard_base_url/api/portal/catalogue -s \
-    -H "Authorization: $dashboard_user_api_key" \
-    -d "$updated_catalogue")"
-bootstrap_progress
+if [ $? -eq 0 ]; then
+    # Get Portal Admin API token
+    portal_admin_api_token=$(get_context_data "1" "enterprise-portal-admin" "1" "api-key")
+    
+    if [ -n "$portal_admin_api_token" ]; then
+        # Create Portal Plan
+        log_message "Creating Enterprise Portal DCR Plan"
+        plan_data=$(cat deployments/keycloak-dcr/data/tyk-portal/plan.json)
+        plan_response=$(curl "$dashboard_base_url/api/portal/policies" -s \
+            -H "authorization: $dashboard_user_api_key" \
+            -d "$plan_data")
+        log_message "Plan Response: $plan_response"
+        plan_id=$(echo $plan_response | jq -r '._id')
+        log_message "Created plan with ID: $plan_id"
+        bootstrap_progress
+        
+        # Create Portal Product
+        log_message "Creating Enterprise Portal DCR Product"
+        product_data=$(cat deployments/keycloak-dcr/data/tyk-portal/product.json)
+        product_response=$(curl "$dashboard_base_url/api/portal/policies" -s \
+            -H "authorization: $dashboard_user_api_key" \
+            -d "$product_data")
+        log_message "Product Response: $product_response"
+        product_id=$(echo $product_response | jq -r '._id')
+        log_message "Created product with ID: $product_id"
+        bootstrap_progress
+        
+        # Synchronize provider to get the latest products
+        log_message "Synchronizing provider to refresh products"
+        provider_id=$(curl --location "$portal_base_url/portal-api/providers" -s \
+            --header "Authorization: $portal_admin_api_token" | jq -r '.[0].ID')
+        
+        curl --location --request PUT "$portal_base_url/portal-api/providers/$provider_id/synchronize" -s \
+            --header "Authorization: $portal_admin_api_token" -o /dev/null
+        bootstrap_progress
+        
+        # Wait for sync to complete
+        sleep 2
+        
+        # Get the product ID in the portal
+        log_message "Getting product from portal"
+        products=$(curl --location "$portal_base_url/portal-api/products" -s \
+            --header "Authorization: $portal_admin_api_token")
+        portal_product_id=$(echo $products | jq -r '.[] | select(.Name == "Keycloak DCR API Product") | .ID')
+        log_message "Portal product ID: $portal_product_id"
+        
+        if [ -n "$portal_product_id" ]; then
+            # Configure OAuth2.0 Provider for DCR first
+            log_message "Configuring OAuth2.0 Provider for Keycloak DCR"
+            oauth_provider_data='{
+                "Name": "Keycloak DCR Provider",
+                "Type": "Keycloak",
+                "WellKnownURL": "http://keycloak:8180/realms/master/.well-known/openid-configuration",
+                "SSLInsecureSkipVerify": true,
+                "RegistrationAccessToken": "'$initial_access_token'"
+            }'
+            
+            oauth_provider_response=$(curl --location "$portal_base_url/portal-api/oauth-providers" -s \
+                --header 'Content-Type: application/json' \
+                --header "Authorization: $portal_admin_api_token" \
+                --data "$oauth_provider_data")
+            log_message "OAuth2 Provider Response: $oauth_provider_response"
+            oauth_provider_id=$(echo $oauth_provider_response | jq -r '.ID')
+            log_message "Created OAuth2 Provider with ID: $oauth_provider_id"
+            bootstrap_progress
+            
+            # Create client type for the OAuth provider
+            log_message "Creating Client Type for OAuth Provider"
+            client_type_data='{
+                "Name": "Confidential Client",
+                "Description": "Client type for confidential applications",
+                "GrantType": ["client_credentials"],
+                "ResponseTypes": ["code"],
+                "TokenEndpointAuthMethod": ["client_secret_post"],
+                "ApplicationType": "confidential"
+            }'
+            
+            client_type_response=$(curl --location "$portal_base_url/portal-api/oauth-providers/$oauth_provider_id/client-types" -s \
+                --header 'Content-Type: application/json' \
+                --header "Authorization: $portal_admin_api_token" \
+                --data "$client_type_data")
+            log_message "Client Type Response: $client_type_response"
+            client_type_id=$(echo $client_type_response | jq -r '.ID')
+            log_message "Created Client Type with ID: $client_type_id"
+            bootstrap_progress
+            
+            # Update product to be visible in catalog, enable DCR, and link OAuth provider
+            log_message "Publishing product to catalog and enabling DCR"
+            product_details=$(curl --location "$portal_base_url/portal-api/products/$portal_product_id" -s \
+                --header "Authorization: $portal_admin_api_token")
+            
+            # Update all settings in one go
+            updated_product=$(echo $product_details | jq -r '.Catalogues = [1, 2]')
+            updated_product=$(echo $updated_product | jq -r '.DCREnabled = true')
+            
+            curl --location --request PUT "$portal_base_url/portal-api/products/$portal_product_id" -s \
+                --header 'Content-Type: application/json' \
+                --header "Authorization: $portal_admin_api_token" \
+                --data "$updated_product" -o /dev/null
+            bootstrap_progress
+            
+            # Link client type to product
+            log_message "Linking client type to product"
+            curl --location --request POST "$portal_base_url/portal-api/products/$portal_product_id/client_types" -s \
+                --header 'Content-Type: application/json' \
+                --header "Authorization: $portal_admin_api_token" \
+                --data "{\"ID\": $client_type_id}" -o /dev/null
+            bootstrap_progress
+            
+            # Final sync to ensure everything is properly configured
+            log_message "Final provider synchronization"
+            curl --location --request PUT "$portal_base_url/portal-api/providers/$provider_id/synchronize" -s \
+                --header "Authorization: $portal_admin_api_token" -o /dev/null
+            log_ok
+        else
+            log_message "ERROR: Could not find product in portal"
+            exit 1
+        fi
+    else
+        log_message "ERROR: Could not get Portal Admin API token"
+        exit 1
+    fi
+else
+    log_message "ERROR: Enterprise Portal is not available. Please ensure portal deployment is running."
+    exit 1
+fi
 
 
 log_message "Hot reloading Gateways"

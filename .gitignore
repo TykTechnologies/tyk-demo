@@ -27,3 +27,6 @@ deployments/ai-studio/volumes/tyk-ai-studio/db/ai-studio.db
 
 # Governance
 deployments/governance/volumes/governance-agent/config.yaml
+
+# Portal saves stuff here during runtime, we can ignore it.
+deployments/portal/volumes/assets/*

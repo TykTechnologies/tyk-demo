@@ -23,6 +23,7 @@ display_help() {
     echo "  --hide-progress       Hide deployment progress meter"
     echo "  --skip-plugin-build   Skip building Go plugins (can also use --spb)"
     echo "  --skip-hostname-check Skip validation of hostnames in /etc/hosts (can also use --shc)"
+    echo "  --seed                Seed 7 days of demo analytics data"
     echo
     echo "Examples:"
     echo "  ./up.sh                       # Bring up default Tyk deployment"
@@ -31,6 +32,8 @@ display_help() {
     echo "  ./up.sh --help                # Show this help message"
     echo "  ./up.sh --persist-log         # Persist logs"
     echo "  ./up.sh --skip-hostname-check # Skip hostname validation"
+    echo "  ./up.sh --seed                # Seed 7 days of demo analytics data"
+    echo "  ./up.sh analytics-kibana --seed # Combine deployment with demo data seeding"
 }
 
 # Check for help flag
@@ -53,6 +56,8 @@ skip_hostname_check=false
 rm .bootstrap/hide_progress 1>/dev/null 2>&1
 # Remove skip_plugin_build file to ensure plugins are built by default
 rm .bootstrap/skip_plugin_build 1>/dev/null 2>&1
+# Remove seed_demo_data file to ensure demo data is not seeded by default
+rm .bootstrap/seed_demo_data 1>/dev/null 2>&1
 
 echo "Bringing Tyk Demo deployment UP"
 
@@ -170,6 +175,10 @@ if (( ${#commands_to_process[@]} != 0 )); then
       "--skip-hostname-check" | "--shc")
         echo "  skip-hostname-check: Hostname validation will be skipped"
         skip_hostname_check=true
+        ;;
+      "--seed")
+        echo "  seed: Demo analytics data (7 days) will be seeded"
+        touch .bootstrap/seed_demo_data
         ;;
       *) 
         echo "Invalid argument: $command"
