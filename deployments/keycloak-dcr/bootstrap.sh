@@ -52,6 +52,10 @@ log_message "Creating DCR API"
 create_api "deployments/keycloak-dcr/data/tyk-dashboard/apis.json" "$dashboard_user_api_key"
 bootstrap_progress
 
+log_message "Creating Keycloak Reverse Proxy API"
+create_api "deployments/keycloak-dcr/data/tyk-dashboard/keycloak-reverse-proxy.json" "$dashboard_user_api_key"
+bootstrap_progress
+
 log_message "Creating DCR Policy"
 create_policy "deployments/keycloak-dcr/data/tyk-dashboard/policy.json" "$dashboard_user_api_key"
 bootstrap_progress

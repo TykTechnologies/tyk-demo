@@ -339,28 +339,28 @@
         "expire_analytics_after": 0,
         "response_processors": [],
         "CORS": {
-            "enable": false,
+            "enable": true,
+            "max_age": 24,
+            "allow_credentials": true,
+            "exposed_headers": [],
+            "allowed_headers": [
+              "Origin",
+              "Accept",
+              "Content-Type",
+              "X-Requested-With",
+              "Authorization"
+            ],
+            "options_passthrough": true,
+            "debug": false,
             "allowed_origins": [
-                "*"
+              "*"
             ],
             "allowed_methods": [
-                "GET",
-                "POST",
-                "HEAD"
-            ],
-            "allowed_headers": [
-                "Origin",
-                "Accept",
-                "Content-Type",
-                "X-Requested-With",
-                "Authorization"
-            ],
-            "exposed_headers": [],
-            "allow_credentials": false,
-            "max_age": 24,
-            "options_passthrough": false,
-            "debug": false
-        },
+              "GET",
+              "POST",
+              "HEAD"
+            ]
+          },
         "domain": "",
         "certificates": [],
         "do_not_track": false,
