@@ -1,7 +1,7 @@
 {
   "AllowFormSubmission": false,
   "Path": "oauth-playground",
-  "Status": "active",
+  "Status": "Published",
   "Template": "oauth-playground",
   "Title": "OAuth Playground"
 }
