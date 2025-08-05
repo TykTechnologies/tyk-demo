@@ -1,7 +1,7 @@
 {
   "AllowFormSubmission": false,
   "Path": "graphql-playground",
-  "Status": "active",
+  "Status": "Published",
   "Template": "graphql-playground",
   "Title": "GraphQL Playground"
 }

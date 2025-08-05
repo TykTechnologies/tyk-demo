@@ -660,6 +660,53 @@ curl $gateway_base_url/basic-protected-api/ -s -H "Authorization: analytics_on" 
 bootstrap_progress
 log_ok
 
+# Seed Demo Analytics Data
+
+# Check if demo data seeding is requested via --seed flag
+if [ -f .bootstrap/seed_demo_data ]; then
+  log_message "Seeding demo analytics data (1 week)"
+# Get the organization ID for demo data
+organisation_id=$(get_context_data "1" "organisation" "1" "id")
+log_message "  Organization ID: $organisation_id"
+
+# Build the tyk-pump binary from source if not already built
+if [ ! -f "../tyk-pump/tyk-pump" ]; then
+  log_message "  Building tyk-pump binary from source"
+  current_dir=$(pwd)
+  cd ../tyk-pump
+  go build -o tyk-pump > /dev/null 2>&1
+  build_status=$?
+  cd "$current_dir"
+  if [ "$build_status" -ne 0 ]; then
+    log_message "  WARNING: Failed to build tyk-pump binary, skipping demo data seeding"
+  fi
+else
+  log_message "  Using existing tyk-pump binary"
+fi
+
+# Run tyk-pump in demo mode if binary exists
+if [ -f "../tyk-pump/tyk-pump" ]; then
+  log_message "  Running tyk-pump demo mode to generate 7 days of data"
+  current_dir=$(pwd)
+  cd ../tyk-pump
+  # Copy the pump.conf from tyk-demo to use correct MongoDB connection
+  cp ../tyk-demo/deployments/tyk/volumes/tyk-pump/pump.conf pump.conf
+  # Run demo mode with 7 days of data
+  ./tyk-pump --demo="$organisation_id" --demo-days=7 > /dev/null 2>&1
+  demo_status=$?
+  cd "$current_dir"
+  if [ "$demo_status" -eq 0 ]; then
+    log_message "  Successfully seeded 7 days of demo analytics data"
+  else
+    log_message "  WARNING: Failed to seed demo analytics data"
+  fi
+else
+  log_message "  WARNING: tyk-pump binary not found, skipping demo data seeding"
+fi
+bootstrap_progress
+log_ok
+fi
+
 # Ngrok
 
 ngrok_available=false

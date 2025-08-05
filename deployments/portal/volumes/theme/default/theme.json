@@ -27,6 +27,16 @@
             "name": "GraphQL Get Started",
             "template": "graphql-getstarted",
             "layout": "portal_layout"
+        },
+        {
+            "name": "OAuth Get Started",
+            "template": "oauth-getstarted",
+            "layout": "portal_layout"
+        },
+        {
+            "name": "OAuth Playground",
+            "template": "oauth-playground",
+            "layout": "portal_layout"
         }
     ]
 }

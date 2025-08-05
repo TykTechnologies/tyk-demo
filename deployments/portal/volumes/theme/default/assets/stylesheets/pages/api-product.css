@@ -191,6 +191,7 @@
 }
 
 .tabs-wrapper .tab{
+  padding-left: 10px;
   width: 171px;
   height: 39px;
   background: var(--tdp-light-gray);

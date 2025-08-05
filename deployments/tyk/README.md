@@ -33,6 +33,28 @@ Import the [Postman collection](deployments/tyk/tyk_demo_tyk.postman_collection.
 
 Run the `./scripts/add-gateway.sh` script to create additional Gateway instances. New instances will use the same configuration as the existing `tyk-gateway` container but will be mapped to random ports to avoid conflicts.
 
+### Demo Analytics Data
+
+You can seed 7 days of demo analytics data to help explore Tyk's analytics features. This optional feature:
+
+- Generates realistic API traffic data for the past week
+- Populates the Dashboard's analytics sections with meaningful data
+- Helps demonstrate analytics features without waiting for real traffic
+
+To enable demo data seeding, use the `--seed` flag when running `up.sh`:
+
+```bash
+./up.sh --seed
+```
+
+You can combine it with other deployments:
+
+```bash
+./up.sh analytics-kibana --seed
+```
+
+**Note**: The demo data generation requires the `tyk-pump` source code to be available in the parent directory (`../tyk-pump`). If the source is not available, the deployment will continue without seeding demo data.
+
 ## Multi-tenancy
 
 The deployment includes two separate organisational tenants:

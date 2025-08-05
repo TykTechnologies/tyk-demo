@@ -1,0 +1,301 @@
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .oauth-playground-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .oauth-playground-container .card {
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        border: none;
+        margin-bottom: 20px;
+    }
+    .oauth-playground-container .card-header {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+    }
+    .oauth-playground-container .form-control:disabled {
+        background-color: #e9ecef;
+    }
+    .oauth-playground-container .code-block {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 15px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        overflow-x: auto;
+    }
+    .oauth-playground-container .copy-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+    .oauth-playground-container .token-display {
+        word-break: break-all;
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+        font-family: monospace;
+        font-size: 13px;
+    }
+    .oauth-playground-container .step-number {
+        background-color: #007bff;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+    .oauth-playground-container .alert-info {
+        background-color: #e7f3ff;
+        border-color: #b3d9ff;
+    }
+</style>
+
+<div class="oauth-playground-container">
+    <h1 class="mb-4">OAuth 2.0 Playground</h1>
+    
+    <div class="card">
+        <div class="card-header">
+            <span class="step-number">1</span>OAuth Client Credentials
+        </div>
+        <div class="card-body">
+            <form id="credentialsForm">
+                <div class="form-group">
+                    <label for="clientId">Client ID</label>
+                    <input type="text" class="form-control" id="clientId" placeholder="Enter your client ID" value="{{if .ClientID}}{{ .ClientID }}{{end}}">
+                </div>
+                <div class="form-group">
+                    <label for="clientSecret">Client Secret</label>
+                    <input type="password" class="form-control" id="clientSecret" placeholder="Enter your client secret" value="{{if .ClientSecret}}{{ .ClientSecret }}{{end}}">
+                </div>
+                <div class="form-group">
+                    <label for="tokenEndpoint">Token Endpoint</label>
+                    <input type="text" class="form-control" id="tokenEndpoint" value="http://tyk-gateway.localhost:8080/oauth-2.0/oauth/token" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="grantType">Grant Type</label>
+                    <select class="form-control" id="grantType">
+                        <option value="client_credentials">Client Credentials</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="step-number">2</span>Generate Access Token
+        </div>
+        <div class="card-body">
+            <button class="btn btn-primary" id="generateToken">Generate Token</button>
+            
+            <div id="tokenSection" style="display: none;" class="mt-4">
+                <h5>Access Token:</h5>
+                <div class="position-relative">
+                    <div class="token-display" id="accessToken"></div>
+                    <button class="btn btn-sm btn-secondary copy-btn" onclick="copyToClipboard('accessToken')">Copy</button>
+                </div>
+                
+                <div class="mt-3">
+                    <h5>Token Details:</h5>
+                    <div id="tokenDetails" class="code-block"></div>
+                </div>
+                
+                <div class="mt-3">
+                    <h5>Expires In:</h5>
+                    <p id="expiresIn"></p>
+                </div>
+            </div>
+            
+            <div id="errorSection" style="display: none;" class="mt-4">
+                <div class="alert alert-danger">
+                    <strong>Error:</strong> <span id="errorMessage"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="step-number">3</span>Use Your Token
+        </div>
+        <div class="card-body">
+            <p>Use your access token to make API requests by including it in the Authorization header:</p>
+            
+            <div class="position-relative">
+                <pre class="code-block" id="curlExample">curl -X GET \
+  http://tyk-gateway.localhost:8080/keycloak-dcr-api/ \
+  -H 'Authorization: Bearer YOUR_ACCESS_TOKEN'</pre>
+                <button class="btn btn-sm btn-secondary copy-btn" onclick="copyCurlExample()">Copy</button>
+            </div>
+            
+            <div class="mt-4">
+                <h5>Test Your Token</h5>
+                <div class="form-group">
+                    <label for="testEndpoint">API Endpoint</label>
+                    <input value="http://tyk-gateway.localhost:8080/keycloak-dcr-api/get" type="text" class="form-control" id="testEndpoint" placeholder="Enter API endpoint to test">
+                </div>
+                <button class="btn btn-success" id="testToken">Test API Call</button>
+                
+                <div id="testResults" style="display: none;" class="mt-3">
+                    <h5>Response:</h5>
+                    <pre class="code-block" id="apiResponse"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-4">
+        <h5>About OAuth 2.0 Client Credentials Flow</h5>
+        <p>The client credentials grant type is used when applications request an access token to access their own resources, not on behalf of a user.</p>
+        <ul>
+            <li>Best suited for machine-to-machine authentication</li>
+            <li>No user interaction required</li>
+            <li>Client authenticates directly with client ID and secret</li>
+            <li>Returns an access token that can be used for API requests</li>
+        </ul>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    // Auto-populate credentials if available
+    $(document).ready(function() {
+        // Check URL parameters first
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlClientId = urlParams.get('client_id');
+        const urlClientSecret = urlParams.get('client_secret');
+        
+        // If URL params exist, use them
+        if (urlClientId) {
+            $('#clientId').val(urlClientId);
+        }
+        if (urlClientSecret) {
+            $('#clientSecret').val(urlClientSecret);
+        }
+        
+        // Check if credentials are populated (either from template or URL)
+        const clientId = $('#clientId').val();
+        const clientSecret = $('#clientSecret').val();
+        
+        if (clientId && clientSecret) {
+            $('#generateToken').addClass('btn-success').text('Generate Token (Credentials Auto-filled)');
+        }
+    });
+
+    // Generate token
+    $('#generateToken').click(function() {
+        const clientId = $('#clientId').val();
+        const clientSecret = $('#clientSecret').val();
+        const tokenEndpoint = $('#tokenEndpoint').val();
+        const grantType = $('#grantType').val();
+        
+        if (!clientId || !clientSecret) {
+            alert('Please enter both Client ID and Client Secret');
+            return;
+        }
+        
+        // Clear previous results
+        $('#tokenSection').hide();
+        $('#errorSection').hide();
+        
+        // Make token request
+        $.ajax({
+            url: tokenEndpoint,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            data: {
+                grant_type: grantType,
+                client_id: clientId,
+                client_secret: clientSecret,
+                scope: 'openid'
+            },
+            success: function(response) {
+                $('#accessToken').text(response.access_token);
+                $('#expiresIn').text(response.expires_in + ' seconds');
+                
+                // Parse and display token details (if JWT)
+                try {
+                    const tokenParts = response.access_token.split('.');
+                    if (tokenParts.length === 3) {
+                        const payload = JSON.parse(atob(tokenParts[1]));
+                        $('#tokenDetails').text(JSON.stringify(payload, null, 2));
+                    } else {
+                        $('#tokenDetails').text('Token is not a JWT');
+                    }
+                } catch (e) {
+                    $('#tokenDetails').text('Token payload cannot be decoded');
+                }
+                
+                $('#tokenSection').show();
+                $('#testToken').prop('disabled', false);
+                updateCurlExample(response.access_token);
+            },
+            error: function(xhr) {
+                const error = xhr.responseJSON || { error: 'Unknown error occurred' };
+                $('#errorMessage').text(error.error_description || error.error || 'Failed to generate token');
+                $('#errorSection').show();
+            }
+        });
+    });
+    
+    // Test token
+    $('#testToken').click(function() {
+        const endpoint = $('#testEndpoint').val();
+        const token = $('#accessToken').text();
+        
+        if (!endpoint) {
+            alert('Please enter an API endpoint to test');
+            return;
+        }
+        
+        $.ajax({
+            url: endpoint,
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            success: function(response) {
+                $('#apiResponse').text(JSON.stringify(response, null, 2));
+                $('#testResults').show();
+            },
+            error: function(xhr) {
+                $('#apiResponse').text('Status: ' + xhr.status + '\n' + xhr.responseText);
+                $('#testResults').show();
+            }
+        });
+    });
+    
+    // Copy functions
+    function copyToClipboard(elementId) {
+        const text = document.getElementById(elementId).textContent;
+        navigator.clipboard.writeText(text).then(function() {
+            alert('Copied to clipboard!');
+        });
+    }
+    
+    function copyCurlExample() {
+        const text = document.getElementById('curlExample').textContent;
+        navigator.clipboard.writeText(text).then(function() {
+            alert('Copied to clipboard!');
+        });
+    }
+    
+    function updateCurlExample(token) {
+        $('#curlExample').text(`curl -X GET \\
+  http://tyk-gateway.localhost:8080/keycloak-dcr-api/ \\
+  -H 'Authorization: Bearer ${token}'`);
+    }
+</script>

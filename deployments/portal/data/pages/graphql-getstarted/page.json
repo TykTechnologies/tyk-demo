@@ -1,7 +1,7 @@
 {
   "AllowFormSubmission": false,
   "Path": "graphql",
-  "Status": "active",
+  "Status": "Published",
   "Template": "graphql-getstarted",
   "Title": "GraphQL"
 }
