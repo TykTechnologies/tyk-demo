@@ -20,6 +20,7 @@ services:
       - PORTAL_STORAGE=fs
       - PORTAL_LICENSEKEY=${DASHBOARD_LICENCE:?Licence missing from Docker environment file .env.}
       - PORTAL_DOCRENDERER=stoplight
+      - PORTAL_TIB_ENABLED=true
     env_file:
       - .env
     ports:
