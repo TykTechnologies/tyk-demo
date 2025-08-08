@@ -1,8 +1,8 @@
 <!-- Main top navigation menu used across the app -->
-<nav class="navbar navbar-expand-lg navbar-light onederful-navbar fixed-top">
+<nav class="navbar navbar-expand-lg navbar-light acme-navbar fixed-top">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="/">
-      <img src="/assets/images/acme_logo.png" alt="Onederful Logo" style="height:36px;width:auto;margin-right:10px;">
+      <img src="/assets/images/acme_logo.png" alt="acme Logo" style="height:36px;width:auto;margin-right:10px;">
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -30,7 +30,7 @@
         <div class="d-flex navbar-cta align-items-center">
           {{if CanCreateOrganisation req }}
             <div>
-                <a id="create-org-btn" class="btn onederful-btn-primary" href="/portal/private/organisation">Create an Organisation</a>
+                <a id="create-org-btn" class="btn acme-btn-primary" href="/portal/private/organisation">Create an Organisation</a>
             </div>
           {{end}}
           {{ $user := CurrentUser req }}
@@ -74,17 +74,17 @@
             {{ end }}
           {{ else }}
             <li class="nav-item">
-              <a class="btn onederful-btn-primary btn-login" href="/auth/password/login">Log in</a>
+              <a class="btn acme-btn-primary btn-login" href="/auth/password/login">Log in</a>
             </li>
             <li class="nav-item">
-              <a class="btn onederful-btn-secondary" href="/auth/password/register">Register</a>
+              <a class="btn acme-btn-secondary" href="/auth/password/register">Register</a>
             </li>
           </div>
         {{ end }}
       </ul>
     </div>
     {{if .previewId}}
-        <a href="?deactivate-preview=true" class="btn onederful-btn-primary" id="deactivate-preview-btn">QUIT PREVIEW </a>
+        <a href="?deactivate-preview=true" class="btn acme-btn-primary" id="deactivate-preview-btn">QUIT PREVIEW </a>
     {{end}}
   </div>
 </nav>

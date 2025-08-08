@@ -167,34 +167,34 @@ body {
   max-width: 1230px;
 }
 
-/* === Onederful Custom Styles === */
-.onederful-navbar {
+/* === Acme Custom Styles === */
+.acme-navbar {
   background: #fff !important;
   box-shadow: 0 2px 8px rgba(79, 140, 255, 0.08);
   font-family: 'Inter', 'Open Sans', Arial, sans-serif;
 }
-.onederful-navbar .navbar-brand {
+.acme-navbar .navbar-brand {
   font-weight: 700;
   font-size: 1.5rem;
   color: #222 !important;
 }
-.onederful-navbar-title {
+.acme-navbar-title {
   color: #222 !important;
   font-size: 1.3rem;
   font-weight: 600;
   letter-spacing: 0.5px;
 }
-.onederful-navbar .nav-link, .onederful-navbar .navbar-nav .nav-link {
+.acme-navbar .nav-link, .acme-navbar .navbar-nav .nav-link {
   color: #222 !important;
   font-weight: 500;
   font-size: 1rem;
   margin-right: 0.5rem;
   transition: color 0.2s;
 }
-.onederful-navbar .nav-link:hover, .onederful-navbar .navbar-nav .nav-link:hover {
+.acme-navbar .nav-link:hover, .acme-navbar .navbar-nav .nav-link:hover {
   color: #4F8CFF !important;
 }
-.onederful-btn-primary {
+.acme-btn-primary {
   background: linear-gradient(93.59deg, #4F8CFF 19.75%, #8F5CFF 81.94%);
   color: #fff !important;
   border: none;
@@ -204,11 +204,11 @@ body {
   box-shadow: 0 2px 8px rgba(79, 140, 255, 0.08);
   transition: background 0.2s, box-shadow 0.2s;
 }
-.onederful-btn-primary:hover {
+.acme-btn-primary:hover {
   background: linear-gradient(93.59deg, #8F5CFF 19.75%, #4F8CFF 81.94%);
   box-shadow: 0 4px 16px rgba(143, 92, 255, 0.12);
 }
-.onederful-btn-secondary {
+.acme-btn-secondary {
   background: #fff;
   color: #4F8CFF !important;
   border: 1.5px solid #4F8CFF;
@@ -218,11 +218,11 @@ body {
   margin-left: 0.5rem;
   transition: background 0.2s, color 0.2s;
 }
-.onederful-btn-secondary:hover {
+.acme-btn-secondary:hover {
   background: #f3f7ff;
   color: #8F5CFF !important;
 }
-.onederful-footer {
+.acme-footer {
   background: linear-gradient(93.59deg, #4F8CFF 19.75%, #8F5CFF 81.94%);
   color: #fff;
   font-family: 'Inter', 'Open Sans', Arial, sans-serif;
@@ -230,12 +230,12 @@ body {
   border-top-right-radius: 16px;
   box-shadow: 0 -2px 8px rgba(143, 92, 255, 0.08);
 }
-.onederful-footer-title {
+.acme-footer-title {
   font-size: 1.2rem;
   font-weight: 700;
   color: #fff;
 }
-.onederful-footer-copyright {
+.acme-footer-copyright {
   font-size: 0.95rem;
   color: #e0e0e0;
 }
