@@ -29,7 +29,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{tyk-gateway.localhost}}/httpbin-acme/get",
+					"raw": "http://{{tyk-gateway.host}}/httpbin-acme/get",
 					"protocol": "http",
 					"host": [
 						"{{tyk-gateway.host}}"
