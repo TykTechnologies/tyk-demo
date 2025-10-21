@@ -28,5 +28,8 @@ deployments/ai-studio/volumes/tyk-ai-studio/db/ai-studio.db
 # Governance
 deployments/governance/volumes/governance-agent/config.yaml
 
+# DCR Curity
+deployments/dcr-curity/volumes/curity/license.json
+
 # Portal saves stuff here during runtime, we can ignore it.
 deployments/portal/volumes/assets/*
