@@ -1,0 +1,16 @@
+{{ define "WelcomeNotification" }}
+Hi {{ .Data.Name }},
+
+Welcome to the Tyk Governance Hub — we’re excited to have you on board!
+
+{{ if .Data.LoginURL }}
+You can log in using the button below to get started:
+{{ .Data.LoginURL }}
+{{ end }}
+
+If you have any questions or need help, feel free to reach out to our team {{ .Data.ContactEmail}}
+We’re here to support you every step of the way.
+
+Thanks,
+The Tyk Team
+{{ end }}
