@@ -1,8 +1,13 @@
 ---
 services:
   tyk-governance-dashboard:
-    image: tykio/governance-api:v0.2.0-rc2
+    image: tykio/governance-api:v0.2.0
+    volumes:
+      - ./deployments/governance/volumes/governance-api/templates/email:/app/templates/email:ro
+      - ./deployments/governance/volumes/governance-api/templates/rulesets:/app/templates/rulesets:ro
     environment:
+      # Rulesets
+      TYK_GOV_RULEENGINECONFIG_TEMPLATES_PATH: "/app/templates/rulesets"
       # Database connection -  MongoDB instance
       TYK_GOV_STORAGE_DATABASEDSN: "mongodb://tyk-mongo:27017/gov"
       # Security configuration
@@ -26,11 +31,16 @@ services:
     networks:
       - tyk
   tyk-governance-agent:
-    image: tykio/governance-agent:v0.2.0-rc2
+    image: tykio/governance-agent:v0.2.0
     volumes:
       - ./deployments/governance/volumes/governance-agent/config.yaml:/app/config.yaml
     environment:
+      # License key (you need to set this)
       TYK_AGENT_LICENSEKEY: "${GOVERNANCE_LICENSE:?Governance license missing from Docker environment file .env}"
+      # For leader election in multi-agent setups
+      POD_NAME: "tyk-governance-agent"
+      POD_NAMESPACE: "default"
+      TYK_AGENT_LEADERELECTION_ENABLED: "false"
     ports:
       - "5959:5959"
     depends_on:

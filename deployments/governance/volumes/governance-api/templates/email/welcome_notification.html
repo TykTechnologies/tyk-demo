@@ -1,0 +1,50 @@
+{{ define "WelcomeNotification" }}
+{{/*
+    Required data:
+        .Data.Name      string  - the recipient's first name
+        .Data.LoginURL  string? - optional login URL shown as a button if provided
+        .Data.ContactEmail string? -contact email for support
+*/}}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Tyk Governance</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        a { color: #1a73e8; }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #1a73e8;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+
+        .credentials {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<p>Hi {{ .Data.Name }},</p>
+
+<p>Welcome to the Tyk Governance Hub — we’re excited to have you on board!</p>
+{{ if .Data.LoginURL }}
+<p>You can log in using the button below to get started:</p>
+<p><a href="{{ .Data.LoginURL }}" class="btn">Log In</a></p>
+{{ end }}
+
+<p>If you have any questions or need help, feel free to reach out to our team {{ .Data.ContactEmail}} </p>
+<p>We’re here to support you every step of the way.</p>
+
+<p>Thanks,<br>The Tyk Team</p>
+</body>
+</html>
+{{ end }}
