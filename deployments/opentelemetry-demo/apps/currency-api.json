@@ -1,0 +1,24 @@
+{
+  "api_definition": {
+    "name": "Currency API #otel-demo",
+    "slug": "currency",
+    "api_id": "currency-api",
+    "org_id": "1",
+    "use_keyless": true,
+    "version_data": {
+      "not_versioned": true,
+      "versions": {
+        "Default": {
+          "name": "Default",
+          "use_extended_paths": true
+        }
+      }
+    },
+    "proxy": {
+      "listen_path": "/api/currency/",
+      "target_url": "env://FRONTEND_URL",
+      "strip_listen_path": false
+    },
+    "active": true
+  }
+}

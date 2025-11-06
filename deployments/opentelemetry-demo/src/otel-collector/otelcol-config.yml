@@ -1,0 +1,248 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: ${env:OTEL_COLLECTOR_HOST}:${env:OTEL_COLLECTOR_PORT_GRPC}
+      http:
+        endpoint: ${env:OTEL_COLLECTOR_HOST}:${env:OTEL_COLLECTOR_PORT_HTTP}
+        cors:
+          allowed_origins:
+            - "http://*"
+            - "https://*"
+  httpcheck/frontend-proxy:
+    targets:
+      - endpoint: http://${env:FRONTEND_PROXY_ADDR}
+  nginx:
+    endpoint: http://${env:IMAGE_PROVIDER_HOST}:${env:IMAGE_PROVIDER_PORT}/status
+    collection_interval: 10s
+  # docker_stats:
+  #   endpoint: unix:///var/run/docker.sock
+  postgresql:
+    endpoint: ${POSTGRES_HOST}:${POSTGRES_PORT}
+    username: root
+    password: ${POSTGRES_PASSWORD}
+    metrics:
+      postgresql.blks_hit:
+        enabled: true
+      postgresql.blks_read:
+        enabled: true
+      postgresql.tup_fetched:
+        enabled: true
+      postgresql.tup_returned:
+        enabled: true
+      postgresql.tup_inserted:
+        enabled: true
+      postgresql.tup_updated:
+        enabled: true
+      postgresql.tup_deleted:
+        enabled: true
+      postgresql.deadlocks:
+        enabled: true
+    tls:
+      insecure: true
+  redis:
+    endpoint: "valkey-cart:6379"
+    username: "valkey"
+    collection_interval: 10s
+  # Host metrics
+  hostmetrics:
+    root_path: /hostfs
+    scrapers:
+      cpu:
+        metrics:
+          system.cpu.utilization:
+            enabled: true
+          system.cpu.logical.count:
+            enabled: true
+      disk:
+      load:
+      filesystem:
+        exclude_mount_points:
+          mount_points:
+            - /dev/*
+            - /proc/*
+            - /sys/*
+            - /run/k3s/containerd/*
+            - /var/lib/docker/*
+            - /var/lib/kubelet/*
+            - /snap/*
+          match_type: regexp
+        exclude_fs_types:
+          fs_types:
+            - autofs
+            - binfmt_misc
+            - bpf
+            - cgroup2
+            - configfs
+            - debugfs
+            - devpts
+            - devtmpfs
+            - fusectl
+            - hugetlbfs
+            - iso9660
+            - mqueue
+            - nsfs
+            - overlay
+            - proc
+            - procfs
+            - pstore
+            - rpc_pipefs
+            - securityfs
+            - selinuxfs
+            - squashfs
+            - sysfs
+            - tracefs
+          match_type: strict
+      memory:
+        metrics:
+          system.memory.utilization:
+            enabled: true
+          system.memory.limit:
+            enabled: true
+      network:
+      paging:
+        metrics:
+          system.paging.usage:
+            enabled: true
+
+      processes:
+      process:
+        mute_process_exe_error: true
+        mute_process_io_error: true
+        mute_process_user_error: true
+      system:
+        metrics:
+          system.uptime:
+            enabled: true
+  # Tyk Pump Metrics
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'tyk-pump'
+          static_configs:
+            - targets: ['tyk-pump:8083']
+          metrics_path: '/metrics'
+          scrape_interval: 30s
+      
+  # Container application logs
+  filelog/tyk-gateway:
+    include: ["/hostfs/var/lib/docker/containers/*/*-json.log"]
+    include_file_name: false
+    include_file_path: true
+    start_at: end  # Only read new logs
+    operators:
+      # Step 1: Container operator parses Docker JSON and extracts metadata
+      - type: container
+        format: docker
+        add_metadata_from_filepath: true
+      
+        # Step 2: Filter for tyk-gateway service only
+      - type: filter
+        expr: 'attributes.attrs == nil or attributes.attrs.tag == nill or attributes.attrs.tag != "tyk-gateway"'
+
+      # Step 3: After container operator, body contains Tyk JSON string
+      # Parse it directly as JSON
+      - type: json_parser
+        parse_from: body
+        parse_to: attributes.tyk
+        timestamp:
+          parse_from: attributes.tyk.time
+          layout: '%Y-%m-%dT%H:%M:%SZ'
+        severity:
+          parse_from: attributes.tyk.level
+          mapping:
+            info: info
+            warn: warn
+            warning: warn
+            error: error
+            fatal: fatal
+            debug: debug
+        on_error: drop_quiet
+      
+      # Step 4: Move Tyk message to body
+      - type: move
+        from: attributes.tyk.msg
+        to: body
+        if: 'attributes.tyk != nil and attributes.tyk.msg != nil'
+      
+      # Step 5: Add OTLP-compliant resource attributes
+      - type: add
+        field: resource["service.name"]
+        value: "tyk-gateway"
+      
+      - type: add
+        field: resource["service.namespace"]
+        value: "tyk"
+      
+      - type: add
+        field: resource["deployment.environment"]
+        value: "demo"
+
+exporters:
+  debug:
+  otlp:
+    endpoint: "jaeger:4317"
+    tls:
+      insecure: true
+  otlphttp/prometheus:
+    endpoint: "http://prometheus:9090/api/v1/otlp"
+    tls:
+      insecure: true
+  opensearch:
+    logs_index: otel-logs
+    logs_index_time_format: "yyyy-MM-dd"
+    http:
+      endpoint: "http://opensearch:9200"
+      tls:
+        insecure: true
+      
+processors:
+  batch:
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 75
+    spike_limit_percentage: 20
+  resourcedetection:
+    detectors: [env, docker, system]
+  transform:
+    error_mode: ignore
+    trace_statements:
+      - context: span
+        statements:
+          # could be removed when https://github.com/vercel/next.js/pull/64852 is fixed upstream
+          - replace_pattern(name, "\\?.*", "")
+          - replace_match(name, "GET /api/products/*", "GET /api/products/{productId}")
+
+connectors:
+  spanmetrics:
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [resourcedetection, memory_limiter, transform, batch]
+      exporters: [otlp, spanmetrics]
+    metrics:
+      # receivers: [docker_stats, httpcheck/frontend-proxy, hostmetrics, nginx, otlp, postgresql, redis, spanmetrics, prometheus]
+      receivers: [httpcheck/frontend-proxy, hostmetrics, nginx, otlp, postgresql, redis, spanmetrics, prometheus]
+      processors: [resourcedetection, memory_limiter, batch]
+      exporters: [otlphttp/prometheus]
+    logs:
+      receivers: [otlp, filelog/tyk-gateway]
+      # receivers: [otlp]
+      processors: [resourcedetection, memory_limiter, batch]
+      exporters: [opensearch]
+  telemetry:
+    metrics:
+      level: detailed
+      readers:
+        - periodic:
+            interval: 10000
+            timeout: 5000
+            exporter:
+              otlp:
+                protocol: http/protobuf
+                endpoint: http://${env:OTEL_COLLECTOR_HOST}:${env:OTEL_COLLECTOR_PORT_HTTP}

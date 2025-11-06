@@ -1,0 +1,6 @@
+{
+  "name": "OpenTelemetry Demo",
+  "description": "Microservices demo application with OpenTelemetry instrumentation",
+  "version": "1.0.0",
+  "dependencies": ["tyk"]
+}
