@@ -15,7 +15,7 @@
       }
     },
     "proxy": {
-      "listen_path": "/api/checkout/",
+      "listen_path": "/api/checkout",
       "target_url": "env://FRONTEND_URL",
       "strip_listen_path": false
     },

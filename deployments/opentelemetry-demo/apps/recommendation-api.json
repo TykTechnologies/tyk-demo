@@ -15,7 +15,7 @@
       }
     },
     "proxy": {
-      "listen_path": "/api/recommendations/",
+      "listen_path": "/api/recommendations",
       "target_url": "env://FRONTEND_URL",
       "strip_listen_path": false
     },
