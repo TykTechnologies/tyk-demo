@@ -94,7 +94,7 @@ services:
     networks:
       - tyk
     volumes:
-      - ./deployments/tyk/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
+      - ${PUMP_CONFIG:-./deployments/tyk/volumes/tyk-pump/pump.conf}:/opt/tyk-pump/pump.conf
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_LOGLEVEL=${PUMP_LOGLEVEL:-info}

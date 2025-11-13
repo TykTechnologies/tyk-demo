@@ -224,17 +224,17 @@ service:
     traces:
       receivers: [otlp]
       processors: [resourcedetection, memory_limiter, transform, batch]
-      exporters: [otlp, spanmetrics]
+      exporters: [otlp, debug, spanmetrics]
     metrics:
       # receivers: [docker_stats, httpcheck/frontend-proxy, hostmetrics, nginx, otlp, postgresql, redis, spanmetrics, prometheus]
       receivers: [httpcheck/frontend-proxy, hostmetrics, nginx, otlp, postgresql, redis, spanmetrics, prometheus]
       processors: [resourcedetection, memory_limiter, batch]
-      exporters: [otlphttp/prometheus]
+      exporters: [otlphttp/prometheus, debug]
     logs:
-      receivers: [otlp, filelog/tyk-gateway]
-      # receivers: [otlp]
+      # receivers: [otlp, filelog/tyk-gateway]
+      receivers: [otlp]
       processors: [resourcedetection, memory_limiter, batch]
-      exporters: [opensearch]
+      exporters: [opensearch, debug]
   telemetry:
     metrics:
       level: detailed

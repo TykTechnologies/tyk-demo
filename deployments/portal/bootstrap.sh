@@ -55,7 +55,7 @@ portal_admin_user_email=$(get_context_data "1" "dashboard-user" "1" "email")
 portal_admin_user_password=$(get_context_data "1" "dashboard-user" "1" "password")
 
 log_message "Waiting for Tyk-Portal container to come online ..."
-wait_for_status "$portal_base_url/ready" "200" ".message" "Success" "10" "1"
+wait_for_status "$portal_base_url/ready" "200" ".message" "Success" "10" "2"
 if [ $? -ne 0 ]; then
   echo "ERROR: Tyk-Portal container failed to come online."
   exit 1

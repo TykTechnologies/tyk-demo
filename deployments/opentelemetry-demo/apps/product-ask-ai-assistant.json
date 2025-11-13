@@ -5,20 +5,30 @@
     "api_id": "product-ask-ai-assistant-api",
     "org_id": "1",
     "use_keyless": true,
-    "version_data": {
-      "not_versioned": true,
-      "versions": {
-        "Default": {
-          "name": "Default",
-          "use_extended_paths": true
-        }
-      }
-    },
     "proxy": {
       "listen_path": "/api/product-ask-ai-assistant/",
       "target_url": "env://FRONTEND_URL",
       "strip_listen_path": false
     },
-    "active": true
+    "active": true,
+    "version_data": {
+      "not_versioned": true,
+      "default_version": "",
+      "versions": {
+        "Default": {
+          "name": "Default",
+          "use_extended_paths": true,
+          "extended_paths": {
+            "track_endpoints": [
+              {
+                "disabled": false,
+                "path": "{id}",
+                "method": "GET"
+              }
+            ]
+          }
+        }
+      }
+    }
   }
 }
