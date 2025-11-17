@@ -25,7 +25,9 @@
 	{{ range $thisProduct.APIDetails }}
 		{{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
 		{{ $oasurl := gt (.OASUrl | trim | length) 0 }}
-		{{ if or $oasfile $oasurl }}
+		{{ $graphqlsdl := gt (.GraphQLSDL.Base.Url | trim | length) 0 }}
+		{{ $isGraphQL := eq .APIType "GraphQL" }}
+		{{ if or $oasfile $oasurl $graphqlsdl $isGraphQL }}
 			{{ $hasDocs = true}}
 		{{ end }}
 	{{ end }}
@@ -153,6 +155,9 @@
 				<div class="labeled-card__title mb-4">
 				    <h3 class="mb-0">{{ $api.Name }}</h3>
 				</div>
+										<div class="pill ml-2 bg-[#fff7cc]">
+											<h5 class="text-os-semibold-12 m-0">{{ $api.APIType }}</h5>
+										</div>
 				<div>
 				    <p class="text-regular-14 listen-path-text"> Listen path:
 					<span class="text-open-sans-semibold">{{ $api.ListenPath }}</span></p>
@@ -304,48 +309,66 @@
 		    <p><a href="/portal/oauth-playground" class="oauth-playground-link">Try OAuth Playground</a></p>
 		    <div class="d-flex flex-row justify-content-between align-items-center mt-1 mb-5 pb-3">
 				<select id="OasApiSelect">
+					<option value="">Select an API</option>
 					{{ $docArray := $thisProduct.APIDetails}}
 					{{ if $thisProduct.IsDocumentationOnly}}
 						{{ range $index, $spec_detail := $thisProduct.SpecDetails }}
 						{{ $oasfile := gt ($spec_detail.OASDocument.Base.Url | trim | length) 0 }}
 						{{ $oasurl := gt ($spec_detail.OASUrl | trim | length) 0 }}
-						{{ if or $oasfile $oasurl }}
+						{{ $graphqlsdl := gt ($spec_detail.GraphQLSDL.Base.Url | trim | length) 0 }}
+						{{ $hasGraphqlEndpoint := gt ($spec_detail.GraphQLServerEndpoint | trim | length) 0 }}
+						{{ $isGraphql := or $graphqlsdl $hasGraphqlEndpoint }}
+						{{ if or $oasfile $oasurl $isGraphql }}
 							{{$url := ""}}
 							{{if $oasfile }}
 								{{$url = .OASDocument.Base.Url}}
-							{{else}}
+							{{else if $oasurl}}
 								{{$url = .OASUrl}}
+							{{else if $graphqlsdl}}
+								{{$url = .GraphQLSDL.Base.Url}}
 							{{end}}
 							{{$template := ProductDocTemplate req $thisProduct.Path $spec_detail.SpecAlias }}
-							<option value="{{$spec_detail.SpecAlias}}-{{$url}}" data-template="{{$template}}">{{$spec_detail.SpecAlias}}</option>
-							{{if eq $initialAPIOasUrl ""}}{{ $initialAPIOasUrl = $url }}{{end}}
-							{{if eq $initialAPIID ""}}{{ $initialAPIID = $spec_detail.SpecAlias }}{{end}}
-							{{if eq $initialTemplate ""}}{{ $initialTemplate = $template }}{{end}}
+							{{if (eq $initialAPIID "")}}
+								{{ $initialAPIOasUrl = $url }}
+								{{ $initialAPIID = $spec_detail.SpecAlias }}
+								{{ $initialTemplate = $template }}
+							{{end}}
+							<option value="{{$spec_detail.SpecAlias}}-{{$url}}" data-template="{{$template}}" {{if eq $initialAPIID $spec_detail.SpecAlias}}selected="selected"{{end}}>
+								{{$spec_detail.SpecAlias}}
+								<span class="pill ml-2 bg-[#fff7cc]">
+								</span>
+							</option>
 						{{end}}
 					{{end}}
 					{{else}}	
 						{{ range $index, $api_detail := $thisProduct.APIDetails }}
 							{{ $oasfile := gt ($api_detail.OASDocument.Base.Url | trim | length) 0 }}
 							{{ $oasurl := gt ($api_detail.OASUrl | trim | length) 0 }}
-							{{ if or $oasfile $oasurl }}
+							{{ $graphqlsdl := gt ($api_detail.GraphQLSDL.Base.Url | trim | length) 0 }}
+							{{ $isGraphQL := or (eq $api_detail.APIType "GraphQL") (eq $api_detail.APIType "UDG") }}
+							{{ if or $oasfile $oasurl $graphqlsdl $isGraphQL }}
 								{{$url := ""}}
 								{{if $oasfile }}
 									{{$url = .OASDocument.Base.Url}}
-								{{else}}
+								{{else if $oasurl}}
 									{{$url = .OASUrl}}
 								{{end}}
 								{{$template := ProductDocTemplate req $thisProduct.Path $api_detail.APIID }}
-								<option value="{{$api_detail.APIID}}-{{$url}}" data-template="{{$template}}">{{$api_detail.Name}}</option>
-								{{if eq $initialAPIOasUrl ""}}{{ $initialAPIOasUrl = $url }}{{end}}
-								{{if eq $initialAPIID ""}}{{ $initialAPIID = $api_detail.APIID }}{{end}}
-								{{if eq $initialTemplate ""}}{{ $initialTemplate = $template }}{{end}}
+								{{if and (not $isGraphQL) (eq $initialAPIID "")}}
+									{{ $initialAPIOasUrl = $url }}
+									{{ $initialAPIID = $api_detail.APIID }}
+									{{ $initialTemplate = $template }}
+								{{end}}
+								<option value="{{$api_detail.APIID}}-{{ $url }}" data-graphqlendpoint="{{ .GraphQLServerEndpoint }}" data-template="{{$template}}" {{if eq $initialAPIID $api_detail.APIID}}selected="selected"{{end}}>
+									{{$api_detail.Name}}
+								</option>
 							{{end}}
 						{{end}}
 					{{end}}
 				</select>
 				<div class="oas-display-content-download-button">
-					<form name="oas_form" method="get" data-path="/portal/catalogue-products/{{$thisProduct.Path}}" id="display-download-button" action="/portal/catalogue-products/{{$thisProduct.Path}}/{{$initialAPIID}}/docs/download">
-					<button class="download-oas-button" type="submit">DOWNLOAD SPEC</button>
+					<form name="oas_form" method="get" data-path="/portal/catalogue-products/{{$thisProduct.Path}}" id="display-download-button" action="{{if ne $initialAPIID ""}}/portal/catalogue-products/{{$thisProduct.Path}}/{{$initialAPIID}}/docs/download{{end}}">
+						<button class="download-oas-button" type="submit" {{if eq $initialAPIID ""}}disabled{{end}}>DOWNLOAD SPEC</button>
 					</form>
 				</div>
 		    </div>
@@ -387,7 +410,11 @@
                     document.getElementById('asyncapi')
                 );
             </script>
-        {{else}}
+		{{else if eq $initialTemplate "product_doc_graphql_playground"}}
+		<div id="graphql-playground-wrapper">
+			<iframe src="/portal/catalogue-products/{{$thisProduct.Path}}/{{$initialAPIID}}/docs?embed=1" width="100%" height="600" frameborder="0"></iframe>
+		</div>
+		{{else if gt (len $initialAPIOasUrl) 0}}
         <div id="oas-display-stoplight">
         <elements-api apiDescriptionUrl="{{$initialAPIOasUrl}}" router="hash" layout="responsive" hideExport="true"/>
         </div>

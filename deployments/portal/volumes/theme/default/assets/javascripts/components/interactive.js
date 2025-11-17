@@ -148,6 +148,10 @@ function isStoplight(value) {
   return value === "product_doc_stoplight_spec";
 }
 
+function isGraphql(value){
+  return value === "product_doc_graphql_playground";
+}
+
 function isAsyncApi(value) {
   return value === "product_doc_asyncapi";
 }
@@ -177,14 +181,20 @@ export function HandleApiSpecSelect({
   let oasTemplate =
     selector?.options[selector.selectedIndex]?.getAttribute("data-template");
   let path = downloadSelector?.getAttribute("data-path");
-  let [, ...docURL] =
+  let [apiID, ...docURL] =
     selector && selector.value ? selector.value.split("-") : [];
   let tmplIsRedoc = isRedoc(oasTemplate);
   let tmplIsAsyncApi = isAsyncApi(oasTemplate);
   let tmplIsStoplight = isStoplight(oasTemplate);
+  let tmplIsGraphql = isGraphql(oasTemplate);
+
+
   let url = getURLValue(docURL);
 
-  if (selector && isOAS(url)) {
+  if (tmplIsGraphql){
+    let serverEndpoint = selector?.options[selector.selectedIndex]?.getAttribute("data-graphqlendpoint")
+    initGraphQL(apiID, serverEndpoint);
+  }else if (selector && isOAS(url)) {
     if (tmplIsRedoc) {
       initRedoc(url);
     } else if (tmplIsAsyncApi) {
@@ -200,19 +210,22 @@ export function HandleApiSpecSelect({
     let tmplIsRedoc = isRedoc(oasTemplate);
     let tmplIsAsyncApi = isAsyncApi(oasTemplate);
     let tmplIsStoplight = isStoplight(oasTemplate);
+    let tmplIsGraphql = isGraphql(oasTemplate);
 
     let [apiID, ...docURL] = e.target.value.split("-");
     let url = getURLValue(docURL);
     downloadSelector.action = `${path}/${apiID}/docs/download`;
-
-    if (!isOAS(url)) return;
-
-    if (tmplIsRedoc) {
-      initRedoc(url);
-    } else if (tmplIsAsyncApi) {
-      initAsyncApi(url);
-    } else if (tmplIsStoplight) {
-      initStoplight(url);
+    if (tmplIsGraphql){
+      let serverEndpoint = selector?.options[selector.selectedIndex]?.getAttribute("data-graphqlendpoint")
+      initGraphQL(apiID, serverEndpoint);
+    } else {
+      if (tmplIsRedoc) {
+        initRedoc(url);
+      } else if (tmplIsAsyncApi) {
+        initAsyncApi(url);
+      } else if (tmplIsStoplight) {
+        initStoplight(url);
+      }
     }
   });
 }
@@ -239,6 +252,26 @@ function getOrCreateWrapper(apiDocWrapper, wrapperId) {
   }
 
   return wrapper;
+}
+
+function initGraphQL(apiID, _endpointUrl) {
+  let apiDocWrapper = document.getElementById("api_doc_wrapper");
+
+  hideAllElements(apiDocWrapper);
+
+  let wrapper = getOrCreateWrapper(apiDocWrapper, "graphql-playground-wrapper");
+
+  // Reuse the same base path used for downloads to build the iframe src
+  let downloadSelector = document.getElementById("display-download-button");
+  let path = downloadSelector?.getAttribute("data-path") || "";
+
+  let iframe = document.createElement("iframe");
+  iframe.setAttribute("src", `${path}/${apiID}/docs?embed=1`);
+  iframe.setAttribute("width", "100%");
+  iframe.setAttribute("height", "600");
+  iframe.setAttribute("frameborder", "0");
+
+  handleContent(wrapper, iframe);
 }
 
 function initRedoc(url) {
@@ -305,6 +338,7 @@ function initAsyncApi(url) {
 }
 
 function initStoplight(url) {
+  console.log("initializing spotlight")
   let apiDocWrapper = document.getElementById("api_doc_wrapper");
 
   hideAllElements(apiDocWrapper);
