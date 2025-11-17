@@ -128,12 +128,24 @@
   min-width: 274px;
   min-height: 166px;
   max-width: 274px;
-  max-height: 166px;
+  max-height: 200px;
   cursor: pointer;
 }
 .labeled-card:hover {
   background: var(--tdp-light-gray);
   border: 1px solid var(--tdp-secondary);
+}
+
+.product-api-details .pill {
+  background-color: #fff7cc;
+  border: none;
+  padding: 5px 10px;
+  color: #505071;
+  margin-bottom: 10px;
+}
+
+.badge-yellow{
+  background-color: #fff7cc;
 }
 
 .labeled-card-plan {
@@ -390,7 +402,6 @@
     width: 181px;
     right: auto;
     min-height: 100%;
-    overflow-y: auto;
     white-space: nowrap;
     height: 100%;
     display: flex;

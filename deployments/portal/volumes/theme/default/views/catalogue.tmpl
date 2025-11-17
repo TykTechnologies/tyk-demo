@@ -67,18 +67,26 @@
         {{ $productLogo := .Logo.URL }}
         {{ $hasDocs := false }}
         {{ if .IsDocumentationOnly}}
-          {{ $hasDocs = true }}
+            {{ range .SpecDetails }}
+                {{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
+                {{ $oasurl := gt (.OASUrl | trim | length) 0 }}
+                {{ $isGraphQL := eq .DocumentationType "graphqlSDL" }}
+                {{ if or $oasfile $oasurl $isGraphQL }}
+                  {{ $hasDocs = true }}
+                {{end}}
+            {{ end }}
         {{else}}
           {{ range .APIDetails }}
             {{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
             {{ $oasurl := gt (.OASUrl | trim | length) 0 }}
-            {{ if or $oasfile $oasurl }}
+            {{ $isGraphQL := or (eq .APIType "GraphQL") (eq .APIType "UDG") }}
+            {{ if or $oasfile $oasurl $isGraphQL }}
               {{ $hasDocs = true }}
             {{end}}
           {{ end }}
         {{end}}
           <div class="col-lg-12 card-container">
-            <div class="card d-flex flex-row {{ if $productLogo }}has-logo{{end}}">
+            <div class="card d-flex flex-row {{ if $productLogo }}has-logo{{end}}" data-productname="{{ .ProductName }}">
             {{ if $productLogo }}
               <img class="card-img-top img-fluid" src='{{$productLogo}}' alt="">
             {{ end }}
@@ -107,10 +115,16 @@
                         {{ range .SpecDetails }}
                           {{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
                           {{ $oasurl := gt (.OASUrl | trim | length) 0 }}
-                          {{ if or $oasfile $oasurl }}
+                            {{ $isGraphQL := or (gt (.GraphQLServerEndpoint | trim | length) 0) (gt (.GraphQLSDL.Base.Url | trim | length) 0)}}
+                          {{ if or $oasfile $oasurl $isGraphQL }}
                             <a href="/portal/catalogue-products/{{$productPath}}/{{.SpecAlias}}/docs" target="_blank">
                               <p class="docs-link">
                                 {{ .SpecAlias }}
+                                {{ if $isGraphQL }}
+                                  <span class="badge badge-info" style="font-size: 0.7em; margin-left: 5px;">GraphQL</span>
+                                    {{ else}}
+                                  <span class="badge badge-yellow" style="font-size: 0.7em; margin-left: 5px;">OpenAPI</span>
+                                {{ end }}
                               </p>
                             </a>
                           {{ end }}
@@ -119,10 +133,12 @@
                         {{ range .APIDetails }}
                           {{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
                           {{ $oasurl := gt (.OASUrl | trim | length) 0 }}
-                          {{ if or $oasfile $oasurl }}
+                          {{ $isGraphQL := or (eq .APIType "GraphQL") (eq .APIType "UDG") }}
+                          {{ if or $oasfile $oasurl $isGraphQL }}
                             <a href="/portal/catalogue-products/{{$productPath}}/{{.APIID}}/docs" target="_blank">
                               <p class="docs-link">
                                 {{ .Name }}
+                                  <span class="badge {{ if $isGraphQL}}badge-info {{ else }} badge-yellow {{end }}" style="font-size: 0.7em; margin-left: 5px;">{{ .APIType }}</span>
                               </p>
                             </a>
                           {{ end }}
