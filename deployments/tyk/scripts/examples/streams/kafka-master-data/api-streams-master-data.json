@@ -1,0 +1,55 @@
+{
+  "components": {},
+  "info": {
+    "title": "Streams Master Data - Producer",
+    "version": "1.0.0",
+    "description": "Master Data Producer API - HTTP to Kafka endpoint for publishing master data from producer systems"
+  },
+  "openapi": "3.0.3",
+  "paths": {},
+  "servers": [
+    {
+      "url": "http://tyk-gateway.localhost:8080/streams-master-data/"
+    }
+  ],
+  "x-tyk-api-gateway": {
+    "info": {
+      "id": "master-data-producer-api",
+      "name": "Streams Master Data Producer",
+      "orgId": "5e9d9544a1dcd60001d0ed20",
+      "state": {
+        "active": true
+      }
+    },
+    "server": {
+      "listenPath": {
+        "strip": true,
+        "value": "/streams-master-data/"
+      }
+    },
+    "upstream": {
+      "url": ""
+    }
+  },
+  "x-tyk-streaming": {
+    "streams": {
+      "producer": {
+        "input": {
+          "http_server": {
+            "path": "/producer"
+          }
+        },
+        "output": {
+          "kafka": {
+            "addresses": [
+              "kafka:9092"
+            ],
+            "target_version": "3.8.0",
+            "topic": "master-data-items"
+          }
+        }
+      }
+    }
+  }
+}
+
