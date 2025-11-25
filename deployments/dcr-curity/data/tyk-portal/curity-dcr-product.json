@@ -1,0 +1,25 @@
+ {
+    "APIDetails": [
+        {
+            "APIID": "4948f8ae1f3b4ed55ffca5beef979fb1",
+            "APIType": "REST",
+            "Description": "Curity DCR API",
+            "ListenPath": "/curity-dcr",
+            "Name": "Curity DCR API",
+            "Status": true,
+            "TargetURL": "http://httpbin/"
+        }
+    ],
+    "AuthType": "jwt",
+    "AuthTypes": [
+        "jwt"
+    ],
+    "Catalogues": [2],
+    "DCREnabled": true,
+    "IsDocumentationOnly": false,
+    "Name": "Curity DCR Product",
+    "Path": "curity-dcr-product-1",
+    "ProviderID": 1,
+    "Scopes": "tyk-product",
+    "Templates": [1]
+}
