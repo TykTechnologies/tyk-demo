@@ -422,7 +422,7 @@
     },
     "domain": "tls-multiplex-1.localhost",
     "certificates": [],
-    "do_not_track": false,
+    "do_not_track": true,
     "enable_context_vars": false,
     "config_data": {},
     "config_data_disabled": false,
