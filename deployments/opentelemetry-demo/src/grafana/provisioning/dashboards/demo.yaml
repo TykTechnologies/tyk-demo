@@ -13,3 +13,12 @@ providers:
     editable: true
     options:
       path: /etc/grafana/provisioning/dashboards/demo
+  - name: 'Tyk Demo'
+    orgId: 1
+    folder: 'Tyk Demo'
+    folderUid: 'tyk-demo'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/tyk-demo

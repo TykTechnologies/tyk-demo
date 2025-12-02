@@ -4,7 +4,7 @@
     "IdentityHandlerConfig": {
         "DashboardCredential": "DASHBOARD_USER_API_CREDENTIALS",
         "TokenAuth": {
-            "BaseAPIID": "accbdd1b89e84ec97f4f16d4e3197d5c"
+            "BaseAPIID": "basic-protected-api"
         }
     },
     "MatchedPolicyID": "5f83cfd378ab040001d3d824",

@@ -1,0 +1,94 @@
+apiVersion: 1
+
+groups:
+  - name: tyk_gateway_alerts
+    folder: Tyk Demo
+    interval: 1m
+    rules:
+      - uid: tyk_high_error_rate
+        title: High Error Rate
+        condition: A
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: '(sum(rate(tyk_http_status_total{code=~"5..|−1"}[5m])) / sum(rate(tyk_http_status_total[5m]))) * 100'
+              refId: A
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          description: 'Error rate is {{ $values.A.Value }}% (threshold: 5%)'
+          summary: High error rate detected in Tyk Gateway
+        labels:
+          severity: critical
+        isPaused: false
+
+      - uid: tyk_connection_errors
+        title: Connection Errors
+        condition: A
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'sum(rate(tyk_http_status_total{code="-1"}[5m]))'
+              refId: A
+        noDataState: NoData
+        execErrState: Error
+        for: 2m
+        annotations:
+          description: 'Connection errors detected: {{ $values.A.Value }} req/s'
+          summary: API connection failures in Tyk Gateway
+        labels:
+          severity: warning
+        isPaused: false
+
+      - uid: tyk_high_latency
+        title: High P95 Latency
+        condition: A
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'histogram_quantile(0.95, sum(rate(tyk_latency_bucket{type="total"}[5m])) by (le))'
+              refId: A
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          description: 'P95 latency is {{ $values.A.Value }}ms (threshold: 5000ms)'
+          summary: High latency detected in Tyk Gateway
+        labels:
+          severity: warning
+        isPaused: false
+
+      - uid: tyk_api_down
+        title: API Not Receiving Traffic
+        condition: A
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'sum(rate(tyk_http_status_total[5m])) == 0'
+              refId: A
+        noDataState: Alerting
+        execErrState: Error
+        for: 5m
+        annotations:
+          description: 'No traffic received for 5 minutes'
+          summary: Tyk Gateway appears to be down
+        labels:
+          severity: critical
+        isPaused: false

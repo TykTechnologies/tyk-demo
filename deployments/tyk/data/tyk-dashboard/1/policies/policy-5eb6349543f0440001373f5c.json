@@ -7,7 +7,7 @@
   "access_rights_array": [
     {
       "api_name": "Basic Authentication API",
-      "api_id": "5963f8fdedee405143f5858ea17de422",
+      "api_id": "basic-auth-api",
       "versions": [
         "Default"
       ],
@@ -33,9 +33,9 @@
   "throttle_retry_limit": -1,
   "max_query_depth": 0,
   "access_rights": {
-    "5963f8fdedee405143f5858ea17de422": {
+    "basic-auth-api": {
       "api_name": "Basic Authentication API",
-      "api_id": "5963f8fdedee405143f5858ea17de422",
+      "api_id": "basic-auth-api",
       "versions": [
         "Default"
       ],

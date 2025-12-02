@@ -126,6 +126,12 @@ receivers:
             - targets: ['tyk-pump:8083']
           metrics_path: '/metrics'
           scrape_interval: 30s
+        - job_name: 'tyk-gateway'
+          static_configs:
+            - targets: ['tyk-gateway:9090']
+            - targets: ['tyk-gateway-2:9090']
+          metrics_path: '/metrics'
+          scrape_interval: 30s
       
   # Container application logs
   filelog/tyk-gateway:
@@ -139,9 +145,10 @@ receivers:
         format: docker
         add_metadata_from_filepath: true
       
-        # Step 2: Filter for tyk-gateway service only
+      # Step 2: Filter for tyk-gateway service only
       - type: filter
-        expr: 'attributes.attrs == nil or attributes.attrs.tag == nill or attributes.attrs.tag != "tyk-gateway"'
+        expr: 'attributes.attrs == nil or attributes.attrs.tag == nil or attributes.attrs.tag != "tyk-gateway"'
+
 
       # Step 3: After container operator, body contains Tyk JSON string
       # Parse it directly as JSON
@@ -160,15 +167,22 @@ receivers:
             error: error
             fatal: fatal
             debug: debug
-        on_error: drop_quiet
+        on_error: send_quiet
       
-      # Step 4: Move Tyk message to body
+      # Step 4: Move Tyk message to body (for non access logs)
       - type: move
         from: attributes.tyk.msg
         to: body
         if: 'attributes.tyk != nil and attributes.tyk.msg != nil'
-      
-      # Step 5: Add OTLP-compliant resource attributes
+
+      # Step 5: Construct access log body when msg is nil (for access logs only)
+      - type: add
+        field: body
+        #value: EXPR(attributes.tyk.client_ip + " - - [" + attributes.tyk.time + '] "' + attributes.tyk.method + " " + attributes.tyk.path + " " + attributes.tyk.protocol + '" ' + attributes.tyk.status + " " + attributes.tyk.latency_total + 'ms "' + attributes.tyk.api_name + '" upstream=' + attributes.tyk.upstream_latency + 'ms gateway=' + attributes.tyk.latency_gateway + 'ms "' + attributes.tyk.user_agent + '"')
+        value: EXPR(attributes.tyk.client_ip + " - - [" + attributes.tyk.time + '] "' + attributes.tyk.method + " " + attributes.tyk.path + " " + attributes.tyk.protocol + ' ' + attributes.tyk.api_name + " " + attributes.tyk.user_agent + '"')
+        if: 'attributes.tyk != nil and attributes.tyk.msg == nil and attributes.tyk.prefix == "access-log" and attributes.tyk.client_ip != nil and attributes.tyk.method != nil'
+
+      # Step 6: Add OTLP-compliant resource attributes
       - type: add
         field: resource["service.name"]
         value: "tyk-gateway"
@@ -231,8 +245,8 @@ service:
       processors: [resourcedetection, memory_limiter, batch]
       exporters: [otlphttp/prometheus, debug]
     logs:
-      # receivers: [otlp, filelog/tyk-gateway]
-      receivers: [otlp]
+      receivers: [otlp, filelog/tyk-gateway]
+      # receivers: [otlp]
       processors: [resourcedetection, memory_limiter, batch]
       exporters: [opensearch, debug]
   telemetry:

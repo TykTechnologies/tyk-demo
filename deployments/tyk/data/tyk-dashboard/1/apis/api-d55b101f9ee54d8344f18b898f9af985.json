@@ -6,7 +6,7 @@
     "listen_port": 9003,
     "protocol": "tcp",
     "enable_proxy_protocol": false,
-    "api_id": "d55b101f9ee54d8344f18b898f9af985",
+    "api_id": "grpc-api-tls",
     "org_id": "5e9d9544a1dcd60001d0ed20",
     "use_keyless": true,
     "use_oauth2": false,

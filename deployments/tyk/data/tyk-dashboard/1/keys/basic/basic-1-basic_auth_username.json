@@ -17,8 +17,8 @@
   "quota_remaining": -1,
   "quota_renewal_rate": -1,
   "access_rights": {
-    "5963f8fdedee405143f5858ea17de422": {
-      "api_id": "5963f8fdedee405143f5858ea17de422",
+    "basic-auth-api": {
+      "api_id": "basic-auth-api",
       "api_name": "Basic Authentication API",
       "versions": [
         "Default"

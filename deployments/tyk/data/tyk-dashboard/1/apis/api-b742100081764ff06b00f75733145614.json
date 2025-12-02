@@ -6,7 +6,7 @@
     "listen_port": 0,
     "protocol": "",
     "enable_proxy_protocol": false,
-    "api_id": "b742100081764ff06b00f75733145614",
+    "api_id": "detailed-analytics-off",
     "org_id": "5e9d9544a1dcd60001d0ed20",
     "use_keyless": true,
     "use_oauth2": false,

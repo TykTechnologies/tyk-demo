@@ -6,7 +6,7 @@
     "listen_port": 9004,
     "protocol": "tcp",
     "enable_proxy_protocol": false,
-    "api_id": "665e8463fd1e4bbb62d706a93e21420b",
+    "api_id": "tcp-to-redis-api",
     "org_id": "5e9d9544a1dcd60001d0ed20",
     "use_keyless": false,
     "use_oauth2": false,

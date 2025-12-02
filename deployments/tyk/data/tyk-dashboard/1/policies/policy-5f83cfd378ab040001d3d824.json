@@ -7,7 +7,7 @@
   "access_rights_array": [
     {
       "api_name": "Basic Protected API",
-      "api_id": "accbdd1b89e84ec97f4f16d4e3197d5c",
+      "api_id": "basic-protected-api",
       "versions": [
         "Default"
       ],
@@ -33,9 +33,9 @@
   "throttle_retry_limit": -1,
   "max_query_depth": -1,
   "access_rights": {
-    "accbdd1b89e84ec97f4f16d4e3197d5c": {
+    "basic-protected-api": {
       "api_name": "Basic Protected API",
-      "api_id": "accbdd1b89e84ec97f4f16d4e3197d5c",
+      "api_id": "basic-protected-api",
       "versions": [
         "Default"
       ],

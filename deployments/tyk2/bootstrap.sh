@@ -50,7 +50,7 @@ bootstrap_progress
 
 log_message "Creating basic example API"
 # this API is used for testing that the deployment is functioning correctly
-create_api "deployments/tyk/data/tyk-dashboard/1/apis/api-727dad853a8a45f64ab981154d1ffdad.json" "$dashboard2_user_api_credentials"
+create_api "deployments/tyk/data/tyk-dashboard/1/apis/api-basic-open-api.json" "$dashboard2_user_api_credentials"
 bootstrap_progress
 
 log_end_deployment

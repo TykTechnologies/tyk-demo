@@ -1,0 +1,1025 @@
+{
+  "title": "Tyk Gateway - Gateway Observability",
+  "uid": "tyk-gateway-observability",
+  "version": 1,
+  "tags": ["tyk", "gateway", "opentelemetry", "observability"],
+  "timezone": "browser",
+  "editable": true,
+  "graphTooltip": 1,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "30s",
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"]
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "datasource_prometheus",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {
+          "text": "Prometheus",
+          "value": "Prometheus"
+        },
+        "hide": 0,
+        "label": "Prometheus"
+      },
+      {
+        "name": "datasource_jaeger",
+        "type": "datasource",
+        "query": "jaeger",
+        "current": {
+          "text": "Jaeger",
+          "value": "Jaeger"
+        },
+        "hide": 0,
+        "label": "Jaeger"
+      },
+      {
+        "name": "datasource_opensearch",
+        "type": "datasource",
+        "query": "grafana-opensearch-datasource",
+        "current": {
+          "text": "OpenSearch",
+          "value": "OpenSearch"
+        },
+        "hide": 0,
+        "label": "OpenSearch"
+      },
+      {
+        "name": "api_id",
+        "type": "query",
+        "datasource": "${datasource_prometheus}",
+        "query": "label_values(tyk_http_status_total, api)",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "label": "API ID",
+        "refresh": 1
+      },
+      {
+        "name": "status_code",
+        "type": "custom",
+        "query": "200,201,204,304,400,401,403,404,500,502,503,-1",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "multi": true,
+        "includeAll": true,
+        "label": "Status Code"
+      },
+      {
+        "name": "portal_app",
+        "type": "query",
+        "datasource": "${datasource_prometheus}",
+        "query": "label_values(tyk_http_status_per_org_and_app_total, portal_app)",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "multi": true,
+        "includeAll": true,
+        "label": "Portal App",
+        "refresh": 1
+      },
+      {
+        "name": "gateway_id",
+        "type": "constant",
+        "query": "tyk-gateway",
+        "current": {
+          "text": "tyk-gateway",
+          "value": "tyk-gateway"
+        },
+        "hide": 2
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "name": "Annotate Gateway Deployments",
+        "datasource": "${datasource_opensearch}",
+        "enable": true,
+        "iconColor": "green",
+        "query": "resource.service.name:\"tyk-gateway\" AND body:*deployment*",
+        "text": "Marks when Tyk Gateway deployments occurred. Use these markers to correlate performance changes with new releases.",
+        "textField": "body",
+        "titleField": "attributes.deployment.version"
+      },
+      {
+        "name": "Annotate API Deployments",
+        "datasource": "${datasource_opensearch}",
+        "enable": true,
+        "iconColor": "green",
+        "query": "resource.service.name:\"tyk-gateway\" AND body:*deployment*",
+        "text": "Marks when Tyk Gateway deployments occurred. Use these markers to correlate performance changes with new releases.",
+        "textField": "body",
+        "titleField": "attributes.deployment.version"
+      }
+    ]
+  },
+  "links": [
+    {
+      "title": "Jaeger UI",
+      "url": "http://localhost:8085/jaeger/ui",
+      "icon": "external link",
+      "type": "link",
+      "targetBlank": true
+    },
+    {
+      "title": "Prometheus",
+      "url": "http://localhost:9090",
+      "icon": "external link",
+      "type": "link",
+      "targetBlank": true
+    }
+  ],
+  "panels": [
+    {
+      "id": 100,
+      "type": "row",
+      "title": "Gateway Health Overview",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false
+    },
+    
+    {
+      "id": 101,
+      "title": "Gateway Status",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 3, "x": 0, "y": 1 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "up{job=\"tyk-gateway\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "none",
+        "colorMode": "background",
+        "textMode": "value_and_name",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "DOWN",
+                  "color": "red",
+                  "index": 0
+                },
+                "1": {
+                  "text": "UP",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "red" },
+              { "value": 1, "color": "green" }
+            ]
+          },
+          "noValue": "NO DATA"
+        }
+      }
+    },
+
+    {
+      "id": 102,
+      "title": "Uptime",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 3, "x": 3, "y": 1 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "time() - process_start_time_seconds{job=\"tyk-gateway\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "textMode": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "red" },
+              { "value": 60, "color": "yellow" },
+              { "value": 3600, "color": "green" }
+            ]
+          }
+        }
+      }
+    },
+
+    {
+      "id": 103,
+      "title": "APIs Loaded",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 3, "x": 6, "y": 1 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "tyk_gateway_gateway_apis_loaded{job=\"tyk-gateway\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "textMode": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "red" },
+              { "value": 1, "color": "green" }
+            ]
+          }
+        }
+      }
+    },
+
+    {
+      "id": 104,
+      "title": "Policies Loaded",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 3, "x": 9, "y": 1 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "tyk_gateway_gateway_policies_loaded{job=\"tyk-gateway\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "textMode": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+
+    {
+      "id": 105,
+      "title": "CPU Usage",
+      "type": "gauge",
+      "gridPos": { "h": 4, "w": 3, "x": 12, "y": 1 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "rate(process_cpu_seconds_total{job=\"tyk-gateway\"}[5m]) * 100",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 60, "color": "yellow" },
+              { "value": 80, "color": "red" }
+            ]
+          }
+        }
+      }
+    },
+
+    {
+      "id": 106,
+      "title": "Memory Usage",
+      "type": "gauge",
+      "gridPos": { "h": 4, "w": 3, "x": 15, "y": 1 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "(tyk_gateway_system_memory_alloc_bytes{job=\"tyk-gateway\"} / tyk_gateway_system_memory_total_bytes{job=\"tyk-gateway\"}) * 100",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 70, "color": "yellow" },
+              { "value": 85, "color": "red" }
+            ]
+          }
+        }
+      }
+    },
+
+    {
+      "id": 107,
+      "title": "Active Goroutines",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 3, "x": 18, "y": 1 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "tyk_gateway_system_goroutines{job=\"tyk-gateway\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "textMode": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 1000, "color": "yellow" },
+              { "value": 5000, "color": "red" }
+            ]
+          }
+        }
+      }
+    },
+
+    {
+      "id": 108,
+      "title": "Open Connections",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 3, "x": 21, "y": 1 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "tyk_gateway_system_open_connections{job=\"tyk-gateway\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "textMode": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 100, "color": "yellow" },
+              { "value": 500, "color": "red" }
+            ]
+          }
+        }
+      }
+    },
+
+    {
+      "id": 109,
+      "type": "row",
+      "title": "Gateway Performance Metrics",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "collapsed": false
+    },
+
+    {
+      "id": 110,
+      "title": "Request Throughput (RPS)",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 6 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "rate(tyk_gateway_gateway_http_requests_total{job=\"tyk-gateway\"}[1m])",
+          "refId": "A",
+          "legendFormat": "{{method}} - {{status_class}}"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "tyk_gateway_processing_throughput_rps{job=\"tyk-gateway\"}",
+          "refId": "B",
+          "legendFormat": "Current RPS (gauge)"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "max", "mean"]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+
+    {
+      "id": 111,
+      "title": "Processing Queue Depth",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 6 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "tyk_gateway_processing_queue_depth{job=\"tyk-gateway\"}",
+          "refId": "A",
+          "legendFormat": "Queue Depth"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "showPoints": "auto"
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 10, "color": "yellow" },
+              { "value": 50, "color": "red" }
+            ]
+          }
+        }
+      },
+      "alert": {
+        "name": "High Queue Depth",
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [10],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": ["A", "5m", "now"]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "message": "Gateway processing queue depth is high. Possible backpressure or resource contention.",
+        "noDataState": "no_data"
+      }
+    },
+
+    {
+      "id": 112,
+      "title": "Network I/O",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 6 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "rate(process_network_receive_bytes_total{job=\"tyk-gateway\"}[1m])",
+          "refId": "A",
+          "legendFormat": "Received"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "rate(process_network_transmit_bytes_total{job=\"tyk-gateway\"}[1m])",
+          "refId": "B",
+          "legendFormat": "Transmitted"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "max", "mean"]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Received" },
+            "properties": [
+              { "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Transmitted" },
+            "properties": [
+              { "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "id": 113,
+      "type": "row",
+      "title": "System Resources & Health",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 12 },
+      "collapsed": false
+    },
+
+    {
+      "id": 114,
+      "title": "Memory Breakdown",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 13 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "tyk_gateway_system_memory_alloc_bytes{job=\"tyk-gateway\"}",
+          "refId": "A",
+          "legendFormat": "Heap Allocated"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "tyk_gateway_system_memory_total_bytes{job=\"tyk-gateway\"}",
+          "refId": "B",
+          "legendFormat": "Total from OS"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "go_memstats_heap_inuse_bytes{job=\"tyk-gateway\"}",
+          "refId": "C",
+          "legendFormat": "Heap In Use"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "go_memstats_heap_idle_bytes{job=\"tyk-gateway\"}",
+          "refId": "D",
+          "legendFormat": "Heap Idle"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "go_memstats_stack_inuse_bytes{job=\"tyk-gateway\"}",
+          "refId": "E",
+          "legendFormat": "Stack In Use"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "max"]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never"
+          }
+        }
+      }
+    },
+
+    {
+      "id": 115,
+      "title": "Garbage Collection Performance",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 13 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "rate(go_gc_duration_seconds_sum{job=\"tyk-gateway\"}[5m]) / rate(go_gc_duration_seconds_count{job=\"tyk-gateway\"}[5m])",
+          "refId": "A",
+          "legendFormat": "Avg GC Duration"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "rate(go_gc_duration_seconds_count{job=\"tyk-gateway\"}[1m]) * 60",
+          "refId": "B",
+          "legendFormat": "GC Frequency (per min)"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "max", "mean"]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Avg GC Duration" },
+            "properties": [
+              { "id": "unit", "value": "s" },
+              { "id": "custom.axisPlacement", "value": "left" },
+              { "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "GC Frequency (per min)" },
+            "properties": [
+              { "id": "unit", "value": "short" },
+              { "id": "custom.axisPlacement", "value": "right" },
+              { "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "id": 116,
+      "title": "File Descriptor Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 13 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "process_open_fds{job=\"tyk-gateway\"}",
+          "refId": "A",
+          "legendFormat": "Open FDs"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "process_max_fds{job=\"tyk-gateway\"}",
+          "refId": "B",
+          "legendFormat": "Max FDs"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "max"]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 0
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Open FDs" },
+            "properties": [
+              { "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Max FDs" },
+            "properties": [
+              { "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } },
+              { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } }
+            ]
+          }
+        ]
+      }
+    },
+
+    {
+      "id": 117,
+      "title": "Gateway Health Score",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 19 },
+      "description": "Composite health score based on CPU, Memory, Goroutines, and Queue Depth",
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "(\n  (100 - (rate(process_cpu_seconds_total{job=\"tyk-gateway\"}[5m]) * 100)) * 0.3 +\n  (100 - ((tyk_gateway_system_memory_alloc_bytes{job=\"tyk-gateway\"} / tyk_gateway_system_memory_total_bytes{job=\"tyk-gateway\"}) * 100)) * 0.3 +\n  (clamp_max(100 - (tyk_gateway_system_goroutines{job=\"tyk-gateway\"} / 10), 100)) * 0.2 +\n  (clamp_max(100 - (tyk_gateway_processing_queue_depth{job=\"tyk-gateway\"} * 10), 100)) * 0.2\n)",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true,
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "red" },
+              { "value": 50, "color": "orange" },
+              { "value": 70, "color": "yellow" },
+              { "value": 85, "color": "green" }
+            ]
+          }
+        }
+      }
+    },
+
+    {
+      "id": 118,
+      "title": "Redis Operation Latency",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 9, "x": 6, "y": 19 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(tyk_gateway_redis_operation_duration_seconds_bucket{job=\"tyk-gateway\"}[5m])))",
+          "refId": "A",
+          "legendFormat": "P95 Redis Latency"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(tyk_gateway_redis_operation_duration_seconds_bucket{job=\"tyk-gateway\"}[5m])))",
+          "refId": "B",
+          "legendFormat": "P99 Redis Latency"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "max", "mean"]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 0.01, "color": "yellow" },
+              { "value": 0.05, "color": "red" }
+            ]
+          }
+        }
+      }
+    },
+
+    {
+      "id": 119,
+      "title": "Resource Summary",
+      "type": "table",
+      "gridPos": { "h": 6, "w": 9, "x": 15, "y": 19 },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "tyk_gateway_system_goroutines{job=\"tyk-gateway\"}",
+          "refId": "A",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "go_threads{job=\"tyk-gateway\"}",
+          "refId": "B",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "tyk_gateway_system_open_connections{job=\"tyk-gateway\"}",
+          "refId": "C",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "process_open_fds{job=\"tyk-gateway\"}",
+          "refId": "D",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "tyk_gateway_gateway_apis_loaded{job=\"tyk-gateway\"}",
+          "refId": "E",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "tyk_gateway_gateway_policies_loaded{job=\"tyk-gateway\"}",
+          "refId": "F",
+          "format": "table",
+          "instant": true
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "instance": true,
+              "job": true,
+              "host_name": true
+            },
+            "renameByName": {
+              "Value #A": "Goroutines",
+              "Value #B": "OS Threads",
+              "Value #C": "Open Connections",
+              "Value #D": "Open File Descriptors",
+              "Value #E": "APIs Loaded",
+              "Value #F": "Policies Loaded"
+            }
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "sortBy": []
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          }
+        },
+        "overrides": []
+      }
+    }
+  ]
+}

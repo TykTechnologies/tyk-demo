@@ -6,7 +6,7 @@
     "org_id": "1",
     "use_keyless": true,
     "proxy": {
-      "listen_path": "/api/products/",
+      "listen_path": "/api/products",
       "target_url": "env://FRONTEND_URL",
       "strip_listen_path": false
     },

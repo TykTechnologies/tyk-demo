@@ -52,7 +52,7 @@ bootstrap_progress
 
 log_message "Waiting for API availability"
 # this api id is for the 'basic open api' called by the next section
-wait_for_api_loaded "727dad853a8a45f64ab981154d1ffdad" "$gateway_base_url" "$gateway_api_credentials"
+wait_for_api_loaded "basic-open-api" "$gateway_base_url" "$gateway_api_credentials"
 # this api id is for the 'httpbin acme' API called by the deployment tests
 wait_for_api_loaded "93fd5c15961041115974216e7a3e7175" "$gateway_base_url" "$gateway_api_credentials"
 log_ok

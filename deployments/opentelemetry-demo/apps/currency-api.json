@@ -15,7 +15,7 @@
       }
     },
     "proxy": {
-      "listen_path": "/api/currency/",
+      "listen_path": "/api/currency",
       "target_url": "env://FRONTEND_URL",
       "strip_listen_path": false
     },

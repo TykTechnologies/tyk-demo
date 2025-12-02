@@ -388,7 +388,7 @@
                 "path": "anything/looping",
                 "method": "GET",
                 "match_pattern": "anything/looping",
-                "rewrite_to": "tyk://727dad853a8a45f64ab981154d1ffdad/get",
+                "rewrite_to": "tyk://basic-open-api/get",
                 "triggers": []
               }
             ],

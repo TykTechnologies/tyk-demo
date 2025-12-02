@@ -1,8 +1,8 @@
 {
   "api_definition": {
-    "name": "Data API #otel-demo",
-    "slug": "data",
-    "api_id": "data-api",
+    "name": "Ad API #otel-demo",
+    "slug": "ad",
+    "api_id": "ad-api",
     "org_id": "1",
     "use_keyless": true,
     "version_data": {
@@ -15,7 +15,7 @@
       }
     },
     "proxy": {
-      "listen_path": "/api/data/",
+      "listen_path": "/api/data",
       "target_url": "env://FRONTEND_URL",
       "strip_listen_path": false
     },

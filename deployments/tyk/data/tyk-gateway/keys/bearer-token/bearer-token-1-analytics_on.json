@@ -11,9 +11,9 @@
 	"quota_remaining": -1,
 	"quota_renewal_rate": -1,
 	"access_rights": {
-		"accbdd1b89e84ec97f4f16d4e3197d5c": {
+		"basic-protected-api": {
 			"api_name": "Basic Protected API",
-			"api_id": "accbdd1b89e84ec97f4f16d4e3197d5c",
+			"api_id": "basic-protected-api",
 			"versions": ["Default"],
 			"allowed_urls": [],
 			"limit": null,

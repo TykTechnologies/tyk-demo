@@ -1922,7 +1922,7 @@
 										"looping"
 									]
 								},
-								"description": "This example shows how the looping functionality can be used to change the API Definition executed by the API Gateway.\n\nLooping requests use the `tyk` URL scheme to efficiently process changes in API Definition context without having to generate additional HTTP requests.\n\nIn this case, the request calls the *Plugin Demo API* endpoint `/anything/looping`, which is configured to rewrite the URL using the `tyk` scheme, the ID of the API Definition to loop to (the *Basic Open API*) and the path `get`: `tyk://727dad853a8a45f64ab981154d1ffdad/get`.\n\nWe can verify the looping effect by checking the response body received:\n- `url` shows `http://httpbin/get` which is the target host of the *Basic Open API* combined with the path from the URL rewrite rule.\n- `headers.X-Req-Id` is a value injected by the *Basic Open API*."
+								"description": "This example shows how the looping functionality can be used to change the API Definition executed by the API Gateway.\n\nLooping requests use the `tyk` URL scheme to efficiently process changes in API Definition context without having to generate additional HTTP requests.\n\nIn this case, the request calls the *Plugin Demo API* endpoint `/anything/looping`, which is configured to rewrite the URL using the `tyk` scheme, the ID of the API Definition to loop to (the *Basic Open API*) and the path `get`: `tyk://basic-open-api/get`.\n\nWe can verify the looping effect by checking the response body received:\n- `url` shows `http://httpbin/get` which is the target host of the *Basic Open API* combined with the path from the URL rewrite rule.\n- `headers.X-Req-Id` is a value injected by the *Basic Open API*."
 							},
 							"response": []
 						},
@@ -4610,7 +4610,7 @@
 											"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
 											"  body: {",
 											"      mode: 'raw',",
-											"      raw: JSON.stringify({\"last_check\":0,\"allowance\":0,\"rate\":2,\"per\":10,\"throttle_interval\":-1,\"throttle_retry_limit\":-1,\"date_created\":\"2020-04-23T04:40:22.3984988Z\",\"expires\":0,\"quota_max\":-1,\"quota_renews\":1587616821,\"quota_remaining\":-1,\"quota_renewal_rate\":-1,\"access_rights\":{\"accbdd1b89e84ec97f4f16d4e3197d5c\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616822\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
+											"      raw: JSON.stringify({\"last_check\":0,\"allowance\":0,\"rate\":2,\"per\":10,\"throttle_interval\":-1,\"throttle_retry_limit\":-1,\"date_created\":\"2020-04-23T04:40:22.3984988Z\",\"expires\":0,\"quota_max\":-1,\"quota_renews\":1587616821,\"quota_remaining\":-1,\"quota_renewal_rate\":-1,\"access_rights\":{\"basic-protected-api\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"basic-protected-api\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616822\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
 											"  }",
 											"};",
 											"",
@@ -4707,7 +4707,7 @@
 											"  header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
 											"  body: {",
 											"      mode: 'raw',",
-											"      raw: JSON.stringify({\"last_check\":0,\"allowance\":2,\"rate\":2,\"per\":5,\"throttle_interval\":5,\"throttle_retry_limit\":2,\"date_created\":\"2020-04-23T04:41:37.0404484Z\",\"expires\":0,\"quota_max\":-1,\"quota_renews\":1587616896,\"quota_remaining\":-1,\"quota_renewal_rate\":-1,\"access_rights\":{\"accbdd1b89e84ec97f4f16d4e3197d5c\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616897\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
+											"      raw: JSON.stringify({\"last_check\":0,\"allowance\":2,\"rate\":2,\"per\":5,\"throttle_interval\":5,\"throttle_retry_limit\":2,\"date_created\":\"2020-04-23T04:41:37.0404484Z\",\"expires\":0,\"quota_max\":-1,\"quota_renews\":1587616896,\"quota_remaining\":-1,\"quota_renewal_rate\":-1,\"access_rights\":{\"basic-protected-api\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"basic-protected-api\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616897\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
 											"  }",
 											"};",
 											"",
@@ -4787,7 +4787,7 @@
 											"    header: 'x-tyk-authorization:28d220fd77974a4facfb07dc1e49c2aa',",
 											"    body: {",
 											"        mode: 'raw',",
-											"        raw: JSON.stringify({\"last_check\":0,\"allowance\":1000,\"rate\":1000,\"per\":60,\"throttle_interval\":-1,\"throttle_retry_limit\":-1,\"date_created\":\"2020-04-23T04:43:07.8812258Z\",\"expires\":0,\"quota_max\":2,\"quota_renews\":1587620587,\"quota_remaining\":2,\"quota_renewal_rate\":3600,\"access_rights\":{\"accbdd1b89e84ec97f4f16d4e3197d5c\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616987\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
+											"        raw: JSON.stringify({\"last_check\":0,\"allowance\":1000,\"rate\":1000,\"per\":60,\"throttle_interval\":-1,\"throttle_retry_limit\":-1,\"date_created\":\"2020-04-23T04:43:07.8812258Z\",\"expires\":0,\"quota_max\":2,\"quota_renews\":1587620587,\"quota_remaining\":2,\"quota_renewal_rate\":3600,\"access_rights\":{\"basic-protected-api\":{\"api_name\":\"Basic Protected API\",\"api_id\":\"basic-protected-api\",\"versions\":[\"Default\"],\"allowed_urls\":[],\"limit\":null,\"allowance_scope\":\"\"}},\"org_id\":\"5e9d9544a1dcd60001d0ed20\",\"oauth_client_id\":\"\",\"oauth_keys\":null,\"certificate\":\"\",\"basic_auth_data\":{\"user\":\"\",\"password\":\"\",\"hash_type\":\"\"},\"jwt_data\":{\"secret\":\"\"},\"hmac_enabled\":false,\"hmac_string\":\"\",\"is_inactive\":false,\"apply_policy_id\":\"\",\"apply_policies\":[],\"data_expires\":0,\"monitor\":{\"trigger_limits\":null},\"enable_detail_recording\":false,\"meta_data\":{},\"tags\":[],\"alias\":\"\",\"last_updated\":\"1587616987\",\"id_extractor_deadline\":0,\"session_lifetime\":0})",
 											"  }",
 											"};",
 											"",
@@ -6001,7 +6001,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"last_check\": 0,\n    \"allowance\": 1000,\n    \"rate\": 1000,\n    \"per\": 60,\n    \"throttle_interval\": -1,\n    \"throttle_retry_limit\": -1,\n    \"expires\": 0,\n    \"quota_max\": -1,\n    \"quota_renews\": 1587521934,\n    \"quota_remaining\": -1,\n    \"quota_renewal_rate\": -1,\n    \"access_rights\": {\n        \"accbdd1b89e84ec97f4f16d4e3197d5c\": {\n            \"api_name\": \"Basic Protected API\",\n            \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\n            \"versions\": [\n                \"Default\"\n            ],\n            \"allowed_urls\": [],\n            \"limit\": null,\n            \"allowance_scope\": \"\"\n        }\n    },\n    \"org_id\": \"5e9d9544a1dcd60001d0ed20\"\n}",
+									"raw": "{\n    \"last_check\": 0,\n    \"allowance\": 1000,\n    \"rate\": 1000,\n    \"per\": 60,\n    \"throttle_interval\": -1,\n    \"throttle_retry_limit\": -1,\n    \"expires\": 0,\n    \"quota_max\": -1,\n    \"quota_renews\": 1587521934,\n    \"quota_remaining\": -1,\n    \"quota_renewal_rate\": -1,\n    \"access_rights\": {\n        \"basic-protected-api\": {\n            \"api_name\": \"Basic Protected API\",\n            \"api_id\": \"basic-protected-api\",\n            \"versions\": [\n                \"Default\"\n            ],\n            \"allowed_urls\": [],\n            \"limit\": null,\n            \"allowance_scope\": \"\"\n        }\n    },\n    \"org_id\": \"5e9d9544a1dcd60001d0ed20\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -7039,7 +7039,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"last_check\": 0,\n\t\"allowance\": 1000,\n\t\"rate\": 1000,\n\t\"per\": 60,\n\t\"throttle_interval\": -1,\n\t\"throttle_retry_limit\": -1,\n\t\"expires\": 0,\n\t\"quota_max\": -1,\n\t\"quota_renews\": 1587524070,\n\t\"quota_remaining\": -1,\n\t\"quota_renewal_rate\": -1,\n\t\"access_rights\": {\n\t\t\"accbdd1b89e84ec97f4f16d4e3197d5c\": {\n\t\t\t\"api_name\": \"Basic Protected API\",\n\t\t\t\"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\n\t\t\t\"versions\": [\"Default\"],\n\t\t\t\"allowed_urls\": [],\n\t\t\t\"limit\": null,\n\t\t\t\"allowance_scope\": \"\"\n\t\t}\n\t},\n\t\"org_id\": \"5e9d9544a1dcd60001d0ed20\"\n}",
+											"raw": "{\n\t\"last_check\": 0,\n\t\"allowance\": 1000,\n\t\"rate\": 1000,\n\t\"per\": 60,\n\t\"throttle_interval\": -1,\n\t\"throttle_retry_limit\": -1,\n\t\"expires\": 0,\n\t\"quota_max\": -1,\n\t\"quota_renews\": 1587524070,\n\t\"quota_remaining\": -1,\n\t\"quota_renewal_rate\": -1,\n\t\"access_rights\": {\n\t\t\"basic-protected-api\": {\n\t\t\t\"api_name\": \"Basic Protected API\",\n\t\t\t\"api_id\": \"basic-protected-api\",\n\t\t\t\"versions\": [\"Default\"],\n\t\t\t\"allowed_urls\": [],\n\t\t\t\"limit\": null,\n\t\t\t\"allowance_scope\": \"\"\n\t\t}\n\t},\n\t\"org_id\": \"5e9d9544a1dcd60001d0ed20\"\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -7125,7 +7125,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"last_check\": 0,\n\t\"allowance\": 1000,\n\t\"rate\": 1000,\n\t\"per\": 60,\n\t\"throttle_interval\": -1,\n\t\"throttle_retry_limit\": -1,\n\t\"expires\": 0,\n\t\"quota_max\": -1,\n\t\"quota_renews\": 1587524070,\n\t\"quota_remaining\": -1,\n\t\"quota_renewal_rate\": -1,\n\t\"access_rights\": {\n\t\t\"accbdd1b89e84ec97f4f16d4e3197d5c\": {\n\t\t\t\"api_name\": \"Basic Protected API\",\n\t\t\t\"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\n\t\t\t\"versions\": [\"Default\"],\n\t\t\t\"allowed_urls\": [],\n\t\t\t\"limit\": null,\n\t\t\t\"allowance_scope\": \"\"\n\t\t}\n\t},\n\t\"org_id\": \"5e9d9544a1dcd60001d0ed20\"\n}",
+											"raw": "{\n\t\"last_check\": 0,\n\t\"allowance\": 1000,\n\t\"rate\": 1000,\n\t\"per\": 60,\n\t\"throttle_interval\": -1,\n\t\"throttle_retry_limit\": -1,\n\t\"expires\": 0,\n\t\"quota_max\": -1,\n\t\"quota_renews\": 1587524070,\n\t\"quota_remaining\": -1,\n\t\"quota_renewal_rate\": -1,\n\t\"access_rights\": {\n\t\t\"basic-protected-api\": {\n\t\t\t\"api_name\": \"Basic Protected API\",\n\t\t\t\"api_id\": \"basic-protected-api\",\n\t\t\t\"versions\": [\"Default\"],\n\t\t\t\"allowed_urls\": [],\n\t\t\t\"limit\": null,\n\t\t\t\"allowance_scope\": \"\"\n\t\t}\n\t},\n\t\"org_id\": \"5e9d9544a1dcd60001d0ed20\"\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -7186,7 +7186,7 @@
 												"exec": [
 													"// create a key so that at least one key exists",
 													"tyk.gatewayApi.keys.create(",
-													"    JSON.stringify({ \"last_check\": 0, \"allowance\": 1000, \"rate\": 1000, \"per\": 60, \"throttle_interval\": -1, \"throttle_retry_limit\": -1, \"expires\": 0, \"quota_max\": -1, \"quota_renews\": 1587524070, \"quota_remaining\": -1, \"quota_renewal_rate\": -1, \"access_rights\": { \"accbdd1b89e84ec97f4f16d4e3197d5c\": { \"api_name\": \"Basic Protected API\", \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\": [\"Default\"], \"allowed_urls\": [], \"limit\": null, \"allowance_scope\": \"\" } }, \"org_id\": \"5e9d9544a1dcd60001d0ed20\" }),",
+													"    JSON.stringify({ \"last_check\": 0, \"allowance\": 1000, \"rate\": 1000, \"per\": 60, \"throttle_interval\": -1, \"throttle_retry_limit\": -1, \"expires\": 0, \"quota_max\": -1, \"quota_renews\": 1587524070, \"quota_remaining\": -1, \"quota_renewal_rate\": -1, \"access_rights\": { \"basic-protected-api\": { \"api_name\": \"Basic Protected API\", \"api_id\": \"basic-protected-api\",\"versions\": [\"Default\"], \"allowed_urls\": [], \"limit\": null, \"allowance_scope\": \"\" } }, \"org_id\": \"5e9d9544a1dcd60001d0ed20\" }),",
 													"    (error, response) => { ",
 													"        pm.expect(response.code).to.eql(200);",
 													"        pm.variables.set(\"key-id\", response.json().key);",
@@ -7236,7 +7236,7 @@
 													"    var jsonData = pm.response.json();",
 													"    pm.expect(jsonData.date_created).to.not.be.empty;",
 													"    pm.expect(jsonData.org_id).to.equal(\"5e9d9544a1dcd60001d0ed20\");",
-													"    pm.expect(jsonData.access_rights.accbdd1b89e84ec97f4f16d4e3197d5c.api_id).to.equal(\"accbdd1b89e84ec97f4f16d4e3197d5c\");",
+													"    pm.expect(jsonData.access_rights.basic-protected-api.api_id).to.equal(\"basic-protected-api\");",
 													"});",
 													"",
 													"// delete temporary key",
@@ -7257,7 +7257,7 @@
 												"exec": [
 													"// create a key so that at we can request it",
 													"tyk.gatewayApi.keys.create(",
-													"    JSON.stringify({ \"last_check\": 0, \"allowance\": 1000, \"rate\": 1000, \"per\": 60, \"throttle_interval\": -1, \"throttle_retry_limit\": -1, \"expires\": 0, \"quota_max\": -1, \"quota_renews\": 1587524070, \"quota_remaining\": -1, \"quota_renewal_rate\": -1, \"access_rights\": { \"accbdd1b89e84ec97f4f16d4e3197d5c\": { \"api_name\": \"Basic Protected API\", \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\": [\"Default\"], \"allowed_urls\": [], \"limit\": null, \"allowance_scope\": \"\" } }, \"org_id\": \"5e9d9544a1dcd60001d0ed20\" }),",
+													"    JSON.stringify({ \"last_check\": 0, \"allowance\": 1000, \"rate\": 1000, \"per\": 60, \"throttle_interval\": -1, \"throttle_retry_limit\": -1, \"expires\": 0, \"quota_max\": -1, \"quota_renews\": 1587524070, \"quota_remaining\": -1, \"quota_renewal_rate\": -1, \"access_rights\": { \"basic-protected-api\": { \"api_name\": \"Basic Protected API\", \"api_id\": \"basic-protected-api\",\"versions\": [\"Default\"], \"allowed_urls\": [], \"limit\": null, \"allowance_scope\": \"\" } }, \"org_id\": \"5e9d9544a1dcd60001d0ed20\" }),",
 													"    (error, response) => { ",
 													"        pm.expect(response.code).to.eql(200);",
 													"        // key id needed for request, and to delete after tests",
@@ -7344,7 +7344,7 @@
 													"// create a key so that at we can request it",
 													"// this key has a rate of 1000, which will be updated to 999 by the request",
 													"tyk.gatewayApi.keys.create(",
-													"    JSON.stringify({ \"last_check\": 0, \"allowance\": 1000, \"rate\": 1000, \"per\": 60, \"throttle_interval\": -1, \"throttle_retry_limit\": -1, \"expires\": 0, \"quota_max\": -1, \"quota_renews\": 1587524070, \"quota_remaining\": -1, \"quota_renewal_rate\": -1, \"access_rights\": { \"accbdd1b89e84ec97f4f16d4e3197d5c\": { \"api_name\": \"Basic Protected API\", \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\": [\"Default\"], \"allowed_urls\": [], \"limit\": null, \"allowance_scope\": \"\" } }, \"org_id\": \"5e9d9544a1dcd60001d0ed20\" }),",
+													"    JSON.stringify({ \"last_check\": 0, \"allowance\": 1000, \"rate\": 1000, \"per\": 60, \"throttle_interval\": -1, \"throttle_retry_limit\": -1, \"expires\": 0, \"quota_max\": -1, \"quota_renews\": 1587524070, \"quota_remaining\": -1, \"quota_renewal_rate\": -1, \"access_rights\": { \"basic-protected-api\": { \"api_name\": \"Basic Protected API\", \"api_id\": \"basic-protected-api\",\"versions\": [\"Default\"], \"allowed_urls\": [], \"limit\": null, \"allowance_scope\": \"\" } }, \"org_id\": \"5e9d9544a1dcd60001d0ed20\" }),",
 													"    (error, response) => { ",
 													"        pm.expect(response.code).to.eql(200);",
 													"        // key id needed for request, and to delete after tests",
@@ -7368,7 +7368,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"last_check\": 0,\n    \"allowance\": 1000,\n    \"rate\": 999,\n    \"per\": 60,\n    \"throttle_interval\": -1,\n    \"throttle_retry_limit\": -1,\n    \"expires\": 0,\n    \"quota_max\": -1,\n    \"quota_renews\": 1587524070,\n    \"quota_remaining\": -1,\n    \"quota_renewal_rate\": -1,\n    \"access_rights\": {\n        \"accbdd1b89e84ec97f4f16d4e3197d5c\": {\n            \"api_name\": \"Basic Protected API\",\n            \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\n            \"versions\": [\n                \"Default\"\n            ],\n            \"allowed_urls\": [],\n            \"limit\": null,\n            \"allowance_scope\": \"\"\n        }\n    },\n    \"org_id\": \"5e9d9544a1dcd60001d0ed20\"\n}",
+											"raw": "{\n    \"last_check\": 0,\n    \"allowance\": 1000,\n    \"rate\": 999,\n    \"per\": 60,\n    \"throttle_interval\": -1,\n    \"throttle_retry_limit\": -1,\n    \"expires\": 0,\n    \"quota_max\": -1,\n    \"quota_renews\": 1587524070,\n    \"quota_remaining\": -1,\n    \"quota_renewal_rate\": -1,\n    \"access_rights\": {\n        \"basic-protected-api\": {\n            \"api_name\": \"Basic Protected API\",\n            \"api_id\": \"basic-protected-api\",\n            \"versions\": [\n                \"Default\"\n            ],\n            \"allowed_urls\": [],\n            \"limit\": null,\n            \"allowance_scope\": \"\"\n        }\n    },\n    \"org_id\": \"5e9d9544a1dcd60001d0ed20\"\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -7430,7 +7430,7 @@
 												"exec": [
 													"// create a key so that at we can request it",
 													"tyk.gatewayApi.keys.create(",
-													"    JSON.stringify({ \"last_check\": 0, \"allowance\": 1000, \"rate\": 1000, \"per\": 60, \"throttle_interval\": -1, \"throttle_retry_limit\": -1, \"expires\": 0, \"quota_max\": -1, \"quota_renews\": 1587524070, \"quota_remaining\": -1, \"quota_renewal_rate\": -1, \"access_rights\": { \"accbdd1b89e84ec97f4f16d4e3197d5c\": { \"api_name\": \"Basic Protected API\", \"api_id\": \"accbdd1b89e84ec97f4f16d4e3197d5c\",\"versions\": [\"Default\"], \"allowed_urls\": [], \"limit\": null, \"allowance_scope\": \"\" } }, \"org_id\": \"5e9d9544a1dcd60001d0ed20\" }),",
+													"    JSON.stringify({ \"last_check\": 0, \"allowance\": 1000, \"rate\": 1000, \"per\": 60, \"throttle_interval\": -1, \"throttle_retry_limit\": -1, \"expires\": 0, \"quota_max\": -1, \"quota_renews\": 1587524070, \"quota_remaining\": -1, \"quota_renewal_rate\": -1, \"access_rights\": { \"basic-protected-api\": { \"api_name\": \"Basic Protected API\", \"api_id\": \"basic-protected-api\",\"versions\": [\"Default\"], \"allowed_urls\": [], \"limit\": null, \"allowance_scope\": \"\" } }, \"org_id\": \"5e9d9544a1dcd60001d0ed20\" }),",
 													"    (error, response) => { ",
 													"        pm.expect(response.code).to.eql(200);",
 													"        // key id needed for request, and to delete after tests",
