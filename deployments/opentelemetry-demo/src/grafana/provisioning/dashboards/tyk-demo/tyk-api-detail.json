@@ -222,7 +222,7 @@
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
-          "expr": "count(count by (key) (rate(tyk_http_status_per_key_total{api=\"$api_id\", instance=~\"$instance\"}[5m]) > 0))",
+          "expr": "count(count by (api_key) (rate(tyk_http_status_per_path_and_org_and_app_total{api_id=\"$api_id\", instance=~\"$instance\"}[5m]) > 0))",
           "refId": "A"
         }
       ],
@@ -413,7 +413,7 @@
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
-          "expr": "(\n  sum(rate(tyk_http_status_total{api=\"$api_id\", instance=~\"$instance\", code=~\"4..|5..|-1\"}[5m]))\n  /\n  sum(rate(tyk_http_status_total{api=\"$api_id\", instance=~\"$instance\"}[5m]))\n) * 100",
+          "expr": "(\n  (sum(rate(tyk_http_status_total{api=\"$api_id\", instance=~\"$instance\", code=~\"4..|5..|-1\"}[5m])) or vector(0))\n  /\n  sum(rate(tyk_http_status_total{api=\"$api_id\", instance=~\"$instance\"}[5m]))\n) * 100",
           "refId": "A",
           "legendFormat": "Error Rate"
         }
@@ -1498,13 +1498,13 @@
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
-          "expr": "topk(20, sum by (key) (rate(tyk_http_status_per_key_total{instance=~\"$instance\"}[5m])))",
+          "expr": "topk(20, sum by (api_key) (rate(tyk_http_status_per_path_and_org_and_app_total{api_id=\"$api_id\", instance=~\"$instance\"}[5m])))",
           "refId": "A",
           "format": "table",
           "instant": true
         },
         {
-          "expr": "topk(20, sum by (key) (rate(tyk_http_status_per_key_total{instance=~\"$instance\", code=~\"4..|5..|-1\"}[5m])))",
+          "expr": "topk(20, sum by (api_key) (rate(tyk_http_status_per_path_and_org_and_app_total{api_id=\"$api_id\", instance=~\"$instance\", code=~\"4..|5..|-1\"}[5m])))",
           "refId": "B",
           "format": "table",
           "instant": true
@@ -1760,7 +1760,7 @@
           "instant": true
         },
         {
-          "expr": "avg by (portal_app) (rate(tyk_latency_per_org_and_app_sum{type=\"total\", instance=~\"$instance\", api_id=\"$api_id\"}[5m]) / rate(tyk_latency_per_org_and_app_count{type=\"total\", instance=~\"$instance\", api_id=\"$api_id\"}[5m]))",
+          "expr": "avg by (portal_app) (rate(tyk_latency_per_path_and_org_and_app_sum{type=\"total\", instance=~\"$instance\", api_id=\"$api_id\"}[5m]) / rate(tyk_latency_per_path_and_org_and_app_count{type=\"total\", instance=~\"$instance\", api_id=\"$api_id\"}[5m]))",
           "refId": "D",
           "format": "table",
           "instant": true
@@ -2956,7 +2956,7 @@
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
-          "expr": "topk(10, avg by (path) (rate(tyk_http_request_duration_seconds_sum{api_id=\"$api_id\", instance=~\"$instance\"}[5m]) / rate(tyk_http_request_duration_seconds_count{api_id=\"$api_id\", instance=~\"$instance\"}[5m])))",
+          "expr": "topk(10, avg by (path) (rate(tyk_latency_per_path_and_org_and_app_sum{type=\"total\", api_id=\"$api_id\", instance=~\"$instance\"}[5m]) / rate(tyk_latency_per_path_and_org_and_app_count{type=\"total\", api_id=\"$api_id\", instance=~\"$instance\"}[5m])))",
           "refId": "A",
           "legendFormat": "{{path}}",
           "instant": true
@@ -2978,8 +2978,8 @@
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "s",
-          "decimals": 3,
+          "unit": "ms",
+          "decimals": 0,
           "min": 0,
           "color": {
             "mode": "thresholds"
@@ -2992,11 +2992,11 @@
                 "color": "green"
               },
               {
-                "value": 0.5,
+                "value": 500,
                 "color": "yellow"
               },
               {
-                "value": 2,
+                "value": 2000,
                 "color": "red"
               }
             ]

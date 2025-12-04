@@ -2177,7 +2177,7 @@
           "instant": true
         },
         {
-          "expr": "avg by (portal_app) (rate(tyk_latency_per_org_and_app_sum{type=\"total\", instance=~\"$instance\", api_id=~\"$api_id\", portal_app=~\"$portal_app\"}[5m]) / rate(tyk_latency_per_org_and_app_count{type=\"total\", instance=~\"$instance\", api_id=~\"$api_id\", portal_app=~\"$portal_app\"}[5m]))",
+          "expr": "avg by (portal_app) (rate(tyk_latency_per_path_and_org_and_app_sum{type=\"total\", instance=~\"$instance\", api_id=~\"$api_id\", portal_app=~\"$portal_app\"}[5m]) / rate(tyk_latency_per_path_and_org_and_app_count{type=\"total\", instance=~\"$instance\", api_id=~\"$api_id\", portal_app=~\"$portal_app\"}[5m]))",
           "refId": "D",
           "format": "table",
           "instant": true
