@@ -2,14 +2,7 @@
   "title": "Tyk Gateway - API Performance & Health",
   "uid": "tyk-api-performance-health",
   "version": 1,
-  "tags": [
-    "tyk",
-    "api",
-    "performance",
-    "health",
-    "opentelemetry",
-    "observability"
-  ],
+  "tags": ["tyk", "api", "performance", "health", "opentelemetry", "observability"],
   "timezone": "browser",
   "editable": true,
   "graphTooltip": 1,
@@ -19,24 +12,7 @@
   },
   "refresh": "30s",
   "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "10s",
-      "30s",
-      "1m",
-      "5m"
-    ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "3h",
-      "6h",
-      "12h",
-      "24h",
-      "7d",
-      "30d"
-    ]
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"]
   },
   "templating": {
     "list": [
@@ -182,56 +158,24 @@
       "icon": "external link",
       "type": "link",
       "targetBlank": true
-    },
-    {
-      "title": "API Detail View",
-      "url": "/d/tyk-api-detail?var-api_id=${api_id}&${__url_time_range}",
-      "icon": "dashboard",
-      "type": "link",
-      "targetBlank": false,
-      "tooltip": "View detailed metrics for a specific API"
     }
   ],
   "panels": [
     {
-      "id": 199,
-      "type": "row",
-      "title": "\ud83d\udd0d API Troubleshooting Guide (Click to expand)",
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "collapsed": true,
-      "panels": [
-        {
-          "id": 200,
-          "type": "text",
-          "title": "API Troubleshooting Guide",
-          "gridPos": {
-            "h": 10,
-            "w": 24,
-            "x": 0,
-            "y": 1
-          },
-          "options": {
-            "mode": "markdown",
-            "content": "# \ud83d\udd0d API Troubleshooting Guide\n\n## 1\ufe0f\u20e3 Start Here: Check System Health\n- **\ud83d\udfe2 Green (Healthy):** All systems operating normally - no action needed\n- **\ud83d\udfe1 Yellow (Degraded):** Some issues detected - review active alerts below \u2b07\ufe0f\n- **\ud83d\udd34 Red (Critical):** Immediate attention required - follow alert guidance immediately\n\n---\n\n## 2\ufe0f\u20e3 Common Issue Patterns - Quick Diagnosis\n\n### \ud83d\udd34 High Error Rate?\n**Steps:** Check Error Traces \u2192 Identify status codes \u2192 See upstream health \u2192 [View API Detail](/d/tyk-api-detail?var-api_id=${api_id})  \n**Panels:** [Error Rate](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=2) | [Error Traces](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=23) | [Upstream Health](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=30)\n\n### \ud83d\udc0c Slow Performance?\n**Steps:** Check Latency Breakdown \u2192 Gateway vs Upstream \u2192 Review slow traces \u2192 [View API Detail](/d/tyk-api-detail?var-api_id=${api_id})  \n**Panels:** [Latency P95](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=3) | [Latency Breakdown](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=13) | [Slow Traces](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=22)\n\n### \ud83d\udcc8 Traffic Anomaly (Spike or Drop)?\n**Steps:** Check Traffic Spike/Drop alerts \u2192 Review client IPs \u2192 Check portal apps \u2192 [View API Detail](/d/tyk-api-detail?var-api_id=${api_id})  \n**Panels:** [Traffic Alert](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=91) | [Client IPs](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=28) | [Portal Apps](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=17)\n\n### \u26a0\ufe0f Connection Errors?\n**Steps:** Check Upstream Connection Failures \u2192 Verify backend services \u2192 Review network \u2192 [View API Detail](/d/tyk-api-detail?var-api_id=${api_id})  \n**Panels:** [Connection Errors](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=96) | [Upstream Health](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=30) | [Error Logs](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=25)\n\n### \ud83d\udd12 Authentication Issues?\n**Steps:** Check Auth Failure panel \u2192 Review API keys \u2192 Check portal app permissions \u2192 [View API Detail](/d/tyk-api-detail?var-api_id=${api_id})  \n**Panels:** [Auth Failures](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=97) | [Top API Keys](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=19) | [Error Logs](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=25)\n\n---\n\n## 3\ufe0f\u20e3 Correlation Tools - Deep Investigation\n\n- **\ud83d\udcca Metrics:** Use filters above to narrow by Gateway Instance, API ID, or Portal App\n- **\ud83d\udd0d Traces:** Click any Trace ID to see full waterfall view in Jaeger UI\n- **\ud83d\udcdd Logs:** Filter access logs by API/status/client for detailed request info\n- **\ud83d\udcc5 Time Range:** Use deployment annotations (green markers) to correlate issues with releases\n- **\ud83c\udfaf API Deep Dive:** Select an API from dropdown above and click [API Detail Dashboard](/d/tyk-api-detail?var-api_id=${api_id}) for focused analysis\n\n---\n\n## \ud83d\udcda Dashboard Sections - Quick Navigation\n\n[\ud83d\udd14 Active Alerts](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=99) | [\ud83d\udcca SLA/SLO](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health) | [\ud83d\udcc8 Golden Signals](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=100) | [\ud83d\udcc8 Traffic Patterns](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=102) | [\ud83d\udd0d Traces](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=103) | [\ud83d\udcdd Logs](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=104)"
-          }
-        }
-      ]
+      "id": 200,
+      "type": "text",
+      "title": "🔍 API Troubleshooting Guide",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "markdown",
+        "content": "# 🔍 API Troubleshooting Guide\n\n## 1️⃣ Start Here: Check System Health\n- **🟢 Green (Healthy):** All systems operating normally - no action needed\n- **🟡 Yellow (Degraded):** Some issues detected - review active alerts below ⬇️\n- **🔴 Red (Critical):** Immediate attention required - follow alert guidance immediately\n\n---\n\n## 2️⃣ Common Issue Patterns - Quick Diagnosis\n\n### 🔴 High Error Rate?\n**Steps:** Check Error Traces → Identify status codes → See upstream health  \n**Panels:** [Error Rate](#) | [Error Traces](#viewPanel=23) | [Upstream Health](#viewPanel=30)\n\n### 🐌 Slow Performance?\n**Steps:** Check Latency Breakdown → Gateway vs Upstream → Review slow traces  \n**Panels:** [Latency P95](#viewPanel=3) | [Latency Breakdown](#viewPanel=13) | [Slow Traces](#viewPanel=22)\n\n### 📈 Traffic Anomaly (Spike or Drop)?\n**Steps:** Check Traffic Spike/Drop alerts → Review client IPs → Check portal apps  \n**Panels:** [Traffic Alert](#viewPanel=91) | [Client IPs](#viewPanel=28) | [Portal Apps](#viewPanel=17)\n\n### ⚠️ Connection Errors?\n**Steps:** Check Upstream Connection Failures → Verify backend services → Review network  \n**Panels:** [Connection Errors](#viewPanel=96) | [Upstream Health](#viewPanel=30) | [Error Logs](#viewPanel=25)\n\n### 🔒 Authentication Issues?\n**Steps:** Check Auth Failure panel → Review API keys → Check portal app permissions  \n**Panels:** [Auth Failures](#viewPanel=97) | [Top API Keys](#viewPanel=19) | [Error Logs](#viewPanel=25)\n\n---\n\n## 3️⃣ Correlation Tools - Deep Investigation\n\n- **📊 Metrics:** Use filters above to narrow by Gateway Instance, API ID, or Portal App\n- **🔍 Traces:** Click any Trace ID to see full waterfall view in Jaeger UI\n- **📝 Logs:** Filter access logs by API/status/client for detailed request info\n- **📅 Time Range:** Use deployment annotations (green markers) to correlate issues with releases\n\n---\n\n## 📚 Dashboard Sections - Quick Navigation\n\n[🔔 Active Alerts](#viewPanel=99) | [📊 SLA/SLO](#) | [📈 Golden Signals](#viewPanel=100) | [📈 Traffic Patterns](#viewPanel=102) | [🔍 Traces](#viewPanel=103) | [📝 Logs](#viewPanel=104)"
+      }
     },
     {
       "id": 99,
       "type": "row",
       "title": "System Health & Active Alerts",
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 1
-      },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 10 },
       "collapsed": false
     },
     {
@@ -239,12 +183,7 @@
       "type": "stat",
       "title": "Overall System Health",
       "description": "Composite health indicator based on multiple signals:\n\n**Healthy**: All systems operating normally\n- Error rate < 1%\n- No traffic anomalies\n- Latency within acceptable range\n- All instances up\n\n**Degraded**: Some issues detected\n- Error rate 1-5%\n- Minor latency degradation\n- Traffic anomalies detected\n- Resource usage elevated\n\n**Critical**: Immediate attention required\n- Error rate > 5%\n- Severe latency issues\n- Major traffic anomalies\n- Instance failures\n\nClick for troubleshooting guide",
-      "gridPos": {
-        "h": 8,
-        "w": 4,
-        "x": 0,
-        "y": 11
-      },
+      "gridPos": { "h": 8, "w": 4, "x": 0, "y": 11 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -259,9 +198,7 @@
         "textMode": "value_and_name",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "text": {
           "titleSize": 16,
@@ -310,25 +247,16 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 20,
-                "color": "yellow"
-              },
-              {
-                "value": 50,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 20, "color": "yellow" },
+              { "value": 50, "color": "red" }
             ]
           }
         }
       },
       "links": [
         {
-          "title": "\ud83d\udd17 View Step-by-Step Troubleshooting Guide",
+          "title": "View Troubleshooting Guide",
           "url": "https://tyk.io/docs/troubleshooting",
           "targetBlank": true
         }
@@ -338,13 +266,8 @@
       "id": 91,
       "type": "stat",
       "title": "Traffic Spike Alert",
-      "description": "**Traffic Spike Alert - Sudden Increase Detected**\n\nDetects sudden traffic increases that may indicate:\n- DDoS attack or bot traffic\n- Viral content or marketing campaign success  \n- Misconfigured client retry logic\n- Load test or synthetic traffic\n\n**Alert Thresholds:**\n- \ud83d\udfe2 Normal: Within expected range\n- \ud83d\udfe1 Warning: >50% increase in last 5 min\n- \ud83d\udd34 Critical: >100% increase (doubled traffic)\n\n---\n\n## \ud83d\udea8 Immediate Actions:\n1. **Check Error Rate panel** \u2192 High errors = likely attack, Low errors = legitimate spike\n2. **Review Top Client IPs** \u2192 Identify traffic source  \n3. **Check Portal Apps** \u2192 Which consumers are affected\n4. **Decision Point:** Enable rate limiting OR scale capacity\n\n## \ud83d\udcca Drill-Down Links:\n- [View Error Rate](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=2)\n- [View Top Client IPs](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=28)  \n- [View Portal Apps](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=17)\n- [View API Error Breakdown](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=15)",
-      "gridPos": {
-        "h": 4,
-        "w": 5,
-        "x": 4,
-        "y": 11
-      },
+      "description": "Detects sudden traffic increases that may indicate:\n- DDoS attack or bot traffic\n- Viral content or marketing campaign\n- Misconfigured client retry logic\n- Load test or synthetic traffic\n\nAlert thresholds:\n- Normal: Within expected range\n- Warning: >50% increase in last 5 min\n- Critical: >100% increase (doubled traffic)\n\nActions if alerted:\n1. Check Error Rate panel - high errors suggest attack\n2. Review Top Client IPs for suspicious sources\n3. Check Portal Apps for unusual consumer behavior\n4. Enable rate limiting if needed\n5. Review recent deployments or campaigns",
+      "gridPos": { "h": 4, "w": 5, "x": 4, "y": 11 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -359,9 +282,7 @@
         "textMode": "value",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "text": {
           "titleSize": 14,
@@ -418,18 +339,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 50,
-                "color": "yellow"
-              },
-              {
-                "value": 100,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 50, "color": "yellow" },
+              { "value": 100, "color": "red" }
             ]
           }
         }
@@ -449,13 +361,8 @@
       "id": 92,
       "type": "stat",
       "title": "Traffic Drop Alert",
-      "description": "**Traffic Drop Alert - Sudden Decrease Detected**\n\nDetects sudden traffic drops that may indicate:\n- Service outage or network issue\n- Client-side failures\n- DNS or routing problems\n- Upstream API dependencies down\n\n**Alert Thresholds:**\n- \ud83d\udfe2 Normal: Within expected range\n- \ud83d\udfe1 Warning: >30% decrease in last 5 min\n- \ud83d\udd34 Critical: >50% decrease (traffic halved)\n\n---\n\n## \ud83d\udea8 Immediate Actions:\n1. **Check Gateway Instance Health** \u2192 Are instances responding?\n2. **Review Connection Errors** \u2192 Backend connectivity issues?\n3. **Check recent deployments** \u2192 Did deployment cause the drop?\n4. **Verify DNS/Network** \u2192 Can clients reach the gateway?\n\n## \ud83d\udcca Drill-Down Links:\n- [View Gateway Instances](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=8)\n- [View Connection Errors](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=96)\n- [View Error Logs](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=25)",
-      "gridPos": {
-        "h": 4,
-        "w": 5,
-        "x": 9,
-        "y": 11
-      },
+      "description": "Detects sudden traffic decreases that may indicate:\n- Service outage or deployment issue\n- Upstream API failure\n- Network connectivity problems\n- DNS resolution issues\n- Client-side failures\n\nAlert thresholds:\n- Normal: Within expected range\n- Warning: >50% decrease in last 5 min\n- Critical: >80% decrease (major disruption)\n\nActions if alerted:\n1. Check Gateway Instances panel - verify all instances up\n2. Review Error Logs for recent failures\n3. Check Connection Errors (Code -1)\n4. Verify upstream service health\n5. Review recent deployments\n6. Check DNS and network connectivity",
+      "gridPos": { "h": 4, "w": 5, "x": 9, "y": 1 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -470,9 +377,7 @@
         "textMode": "value",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "text": {
           "titleSize": 14,
@@ -538,18 +443,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 50,
-                "color": "yellow"
-              },
-              {
-                "value": 80,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 50, "color": "yellow" },
+              { "value": 80, "color": "red" }
             ]
           }
         }
@@ -569,13 +465,8 @@
       "id": 93,
       "type": "stat",
       "title": "Error Rate Surge",
-      "description": "**Error Rate Surge - High Error Percentage**\n\nDetects elevated error rates that may indicate:\n- Backend service failures\n- Invalid API configurations\n- Authentication/authorization issues\n- Gateway overload or resource exhaustion\n\n**Alert Thresholds:**\n- \ud83d\udfe2 Normal: < 1% error rate\n- \ud83d\udfe1 Warning: 1-5% error rate\n- \ud83d\udd34 Critical: > 5% error rate\n\n---\n\n## \ud83d\udea8 Immediate Actions:\n1. **Check Error Traces panel** \u2192 Find affected APIs and error types\n2. **Review Upstream Health** \u2192 Backend issue OR gateway issue?\n3. **Check recent deployments** \u2192 Correlation with changes?\n4. **Examine error patterns** \u2192 Specific status codes (401/403/500/502)?\n\n## \ud83d\udcca Drill-Down Links:\n- [View Error Traces](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=23)\n- [View Upstream Health](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=30)\n- [View Error Logs](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=25)\n- [View Status Code Distribution](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=11)",
-      "gridPos": {
-        "h": 4,
-        "w": 5,
-        "x": 14,
-        "y": 11
-      },
+      "description": "Monitors sudden increases in error rate.\n\nDetects:\n- Backend service degradation\n- API configuration issues\n- Authentication/authorization failures\n- Rate limit violations\n- Upstream connectivity problems\n\nAlert levels:\n- Normal: Error rate stable or decreasing\n- Warning: Error rate increased by >2x\n- Critical: Error rate increased by >5x\n\nActions:\n1. Check Error Breakdown by Type panel\n2. Review Error Traces for patterns\n3. Examine Upstream Health metrics\n4. Check recent API or policy changes\n5. Review Authentication/rate limit configs",
+      "gridPos": { "h": 4, "w": 5, "x": 14, "y": 1 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -590,9 +481,7 @@
         "textMode": "value",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "text": {
           "titleSize": 14,
@@ -648,18 +537,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 2,
-                "color": "yellow"
-              },
-              {
-                "value": 5,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 2, "color": "yellow" },
+              { "value": 5, "color": "red" }
             ]
           }
         }
@@ -679,13 +559,8 @@
       "id": 94,
       "type": "stat",
       "title": "Latency Degradation",
-      "description": "**Latency Degradation - Performance Slowdown**\n\nDetects performance degradation that may indicate:\n- Backend service slowdown\n- Database query performance issues\n- Gateway resource saturation\n- Network latency problems\n\n**Alert Thresholds:**\n- \ud83d\udfe2 Normal: P95 < 500ms\n- \ud83d\udfe1 Warning: P95 500ms-1000ms  \n- \ud83d\udd34 Critical: P95 > 1000ms\n\n---\n\n## \ud83d\udea8 Immediate Actions:\n1. **Check Latency Breakdown** \u2192 Gateway OR Upstream slowdown?\n2. **If Upstream:** Review Upstream Service Health panel\n3. **If Gateway:** Check Saturation panel \u2192 Resource exhaustion?\n4. **Review Slow Traces** \u2192 Identify specific bottleneck operations\n\n## \ud83d\udcca Drill-Down Links:\n- [View Latency Breakdown](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=13)\n- [View Slow Traces](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=22)\n- [View Upstream Health](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=30)\n- [View Saturation](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=4)",
-      "gridPos": {
-        "h": 4,
-        "w": 5,
-        "x": 19,
-        "y": 11
-      },
+      "description": "Monitors P95 latency changes over time.\n\nDetects:\n- Performance regression after deployments\n- Database or upstream service slowdowns\n- Resource saturation (CPU, memory)\n- Network latency increases\n- Inefficient middleware or plugins\n\nAlert levels:\n- Normal: P95 < 1000ms or stable\n- Warning: P95 > 1000ms or +50% increase\n- Critical: P95 > 5000ms or +100% increase\n\nActions:\n1. Check Latency Breakdown panel\n2. Review Slowest Requests\n3. Examine Upstream Health\n4. Check gateway resource usage (Saturation)\n5. Review recent deployments or changes",
+      "gridPos": { "h": 4, "w": 5, "x": 19, "y": 1 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -706,9 +581,7 @@
         "reduceOptions": {
           "values": false,
           "fields": "/^Current P95$/",
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "text": {
           "titleSize": 14,
@@ -724,32 +597,17 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 1000,
-                "color": "yellow"
-              },
-              {
-                "value": 5000,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 1000, "color": "yellow" },
+              { "value": 5000, "color": "red" }
             ]
           }
         },
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Current P95"
-            },
+            "matcher": { "id": "byName", "options": "Current P95" },
             "properties": [
-              {
-                "id": "displayName",
-                "value": "P95 Latency"
-              }
+              { "id": "displayName", "value": "P95 Latency" }
             ]
           }
         ]
@@ -769,13 +627,8 @@
       "id": 95,
       "type": "stat",
       "title": "Gateway Instance Failures",
-      "description": "**Gateway Instance Failures - Instances Down**\n\nDetects gateway instance health issues:\n- Instance crashes or restarts\n- Container/pod failures\n- Node failures in Kubernetes\n- Health check failures\n\n**Alert Thresholds:**\n- \ud83d\udfe2 Normal: All instances healthy\n- \ud83d\udfe1 Warning: 1 instance down\n- \ud83d\udd34 Critical: Multiple instances down\n\n---\n\n## \ud83d\udea8 Immediate Actions:\n1. **Check Gateway Instances panel** \u2192 Which instances are down?\n2. **Review gateway logs** \u2192 Why did instance fail?\n3. **Check infrastructure metrics** \u2192 Resource constraints?\n4. **Verify auto-scaling** \u2192 Are replacements coming up?\n\n## \ud83d\udcca Drill-Down Links:\n- [View Gateway Instances](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=8)\n- [View Gateway Logs](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=24)\n- [View Saturation](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=4)",
-      "gridPos": {
-        "h": 4,
-        "w": 5,
-        "x": 4,
-        "y": 15
-      },
+      "description": "Monitors gateway instance health and availability.\n\nDetects:\n- Gateway crashes or restarts\n- OOM (Out of Memory) kills\n- Pod evictions in Kubernetes\n- Network partitions\n- Health check failures\n\nStatus:\n- All Healthy: All instances responding\n- Degraded: Some instances down\n- Critical: <50% instances available\n\nActions:\n1. Check instance logs for crash reasons\n2. Review resource utilization\n3. Verify network connectivity\n4. Check deployment status\n5. Review recent configuration changes\n6. Verify load balancer health checks",
+      "gridPos": { "h": 4, "w": 5, "x": 4, "y": 5 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -796,9 +649,7 @@
         "reduceOptions": {
           "values": false,
           "fields": "/^Failed Instances$/",
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "text": {
           "titleSize": 14,
@@ -845,18 +696,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 1,
-                "color": "yellow"
-              },
-              {
-                "value": 2,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 1, "color": "yellow" },
+              { "value": 2, "color": "red" }
             ]
           }
         }
@@ -876,13 +718,8 @@
       "id": 96,
       "type": "stat",
       "title": "Upstream Connection Failures",
-      "description": "**Upstream Connection Failures - Backend Unreachable**\n\nDetects backend connectivity issues:\n- Upstream services down or unreachable\n- Network connectivity problems\n- DNS resolution failures\n- Connection timeout issues\n\n**Alert Thresholds:**\n- \ud83d\udfe2 Normal: < 0.1% connection errors\n- \ud83d\udfe1 Warning: 0.1-1% connection errors\n- \ud83d\udd34 Critical: > 1% connection errors (HTTP code -1)\n\n---\n\n## \ud83d\udea8 Immediate Actions:\n1. **Check Upstream Connection Errors panel** \u2192 Which APIs/services affected?\n2. **Review Upstream Service Health** \u2192 Are backends responding?\n3. **Verify network connectivity** \u2192 Can gateway reach backends?\n4. **Check backend logs** \u2192 Are services healthy?\n\n## \ud83d\udcca Drill-Down Links:\n- [View Connection Errors](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=16)\n- [View Upstream Health](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=30)\n- [View Error Logs](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=25)",
-      "gridPos": {
-        "h": 4,
-        "w": 5,
-        "x": 9,
-        "y": 15
-      },
+      "description": "Monitors backend service connectivity issues.\n\nIndicates:\n- Backend service down or unreachable\n- Network connectivity problems\n- DNS resolution failures\n- Connection timeout issues\n- TLS/SSL handshake failures\n\nStatus:\n- Healthy: <0.1% connection errors\n- Warning: 0.1-1% connection errors\n- Critical: >1% connection errors\n\nActions:\n1. Check Upstream Service Health panel\n2. Verify backend service status\n3. Test network connectivity to upstream\n4. Check DNS resolution\n5. Review TLS certificate validity\n6. Examine firewall/security group rules",
+      "gridPos": { "h": 4, "w": 5, "x": 9, "y": 5 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -897,9 +734,7 @@
         "textMode": "value",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "text": {
           "titleSize": 14,
@@ -955,18 +790,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 0.1,
-                "color": "yellow"
-              },
-              {
-                "value": 1,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 0.1, "color": "yellow" },
+              { "value": 1, "color": "red" }
             ]
           }
         }
@@ -986,13 +812,8 @@
       "id": 97,
       "type": "stat",
       "title": "Authentication Failures",
-      "description": "**Authentication Failures - Auth Issues Detected**\n\nDetects authentication/authorization problems:\n- Invalid API keys or tokens\n- Expired credentials\n- Misconfigured auth policies\n- Rate limiting of specific keys\n\n**Alert Thresholds:**\n- \ud83d\udfe2 Normal: < 1% auth failures\n- \ud83d\udfe1 Warning: 1-5% auth failures (401/403)\n- \ud83d\udd34 Critical: > 5% auth failures\n\n---\n\n## \ud83d\udea8 Immediate Actions:\n1. **Check Top API Keys panel** \u2192 Which keys are failing?\n2. **Review auth error patterns** \u2192 401 (invalid) vs 403 (forbidden)?\n3. **Check Portal App permissions** \u2192 Correct access policies?\n4. **Verify key expiration** \u2192 Are credentials still valid?\n\n## \ud83d\udcca Drill-Down Links:\n- [View Top API Keys](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=19)\n- [View Error Logs (filtered for 401/403)](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=25)\n- [View Portal App Performance](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=18)",
-      "gridPos": {
-        "h": 4,
-        "w": 5,
-        "x": 14,
-        "y": 15
-      },
+      "description": "Monitors API authentication and authorization failures.\n\nHigh values may indicate:\n- Invalid or expired API keys\n- Credential stuffing attacks\n- Misconfigured client applications\n- Key rotation issues\n- Policy or ACL misconfigurations\n\n🎯 Status:\n- Normal: <1% auth failures\n- Elevated: 1-5% auth failures\n- Critical: >5% auth failures (potential attack)\n\nActions:\n1. Check Top API Keys panel for failing keys\n2. Review recent key/policy changes\n3. Check IP patterns for suspicious sources\n4. Review authentication logs\n5. Consider rate limiting on auth endpoints\n6. Alert security team if attack suspected",
+      "gridPos": { "h": 4, "w": 5, "x": 14, "y": 5 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -1007,9 +828,7 @@
         "textMode": "value",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "text": {
           "titleSize": 14,
@@ -1065,18 +884,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 1,
-                "color": "yellow"
-              },
-              {
-                "value": 5,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 1, "color": "yellow" },
+              { "value": 5, "color": "red" }
             ]
           }
         }
@@ -1096,13 +906,8 @@
       "id": 98,
       "type": "stat",
       "title": "Rate Limit Violations",
-      "description": "**Rate Limit Violations - Quota Exceeded**\n\nDetects rate limiting activity:\n- Clients exceeding quota limits\n- Potential API abuse\n- Misconfigured rate limits\n- Legitimate high-volume consumers\n\n**Alert Thresholds:**\n- \ud83d\udfe2 Normal: < 0.5% rate limited (429 status)\n- \ud83d\udfe1 Warning: 0.5-2% rate limited\n- \ud83d\udd34 Critical: > 2% rate limited\n\n---\n\n## \ud83d\udea8 Immediate Actions:\n1. **Check Top API Keys panel** \u2192 Which consumers are hitting limits?\n2. **Review Portal Apps** \u2192 Legitimate usage or abuse?\n3. **Check rate limit policies** \u2192 Are limits appropriate?\n4. **Decision:** Adjust limits OR enforce current policy\n\n## \ud83d\udcca Drill-Down Links:\n- [View Top API Keys](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=19)\n- [View Portal App Performance](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=18)\n- [View Error Logs (filtered for 429)](/d/tyk-api-performance-health/tyk-gateway-api-performance-and-health?viewPanel=25)",
-      "gridPos": {
-        "h": 4,
-        "w": 5,
-        "x": 19,
-        "y": 15
-      },
+      "description": "Monitors rate limit enforcement events.\n\nHigh values may indicate:\n- Client integration issues (retry storms)\n- Insufficient quota for legitimate usage\n- Bot or scraper activity\n- Load testing without coordination\n- Quota exhaustion patterns\n\nStatus:\n- Normal: <1% rate limited\n- Moderate: 1-5% rate limited\n- High: >5% rate limited\n\nActions:\n1. Identify top consumers hitting limits\n2. Review quota configurations\n3. Check for retry loop patterns\n4. Assess if quotas need adjustment\n5. Contact affected consumers\n6. Consider implementing backoff guidance",
+      "gridPos": { "h": 4, "w": 5, "x": 19, "y": 5 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -1117,9 +922,7 @@
         "textMode": "value",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "text": {
           "titleSize": 14,
@@ -1175,18 +978,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 1,
-                "color": "yellow"
-              },
-              {
-                "value": 5,
-                "color": "orange"
-              }
+              { "value": null, "color": "green" },
+              { "value": 1, "color": "yellow" },
+              { "value": 5, "color": "orange" }
             ]
           }
         }
@@ -1206,12 +1000,7 @@
       "id": 100,
       "type": "row",
       "title": "Golden Signals - API Health (Gateway: $instance, API: $api_id)",
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 19
-      },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
       "collapsed": false
     },
     {
@@ -1219,12 +1008,7 @@
       "type": "stat",
       "title": "Request Rate (Traffic)",
       "description": "Total requests per second across all selected APIs and gateways. Indicates current API traffic volume. Use this to detect traffic spikes, drops, or normal patterns.",
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 0,
-        "y": 20
-      },
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 10 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -1239,9 +1023,7 @@
         "textMode": "value_and_name",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "text": {
           "titleSize": 16,
@@ -1261,22 +1043,10 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "blue"
-              },
-              {
-                "value": 10,
-                "color": "green"
-              },
-              {
-                "value": 100,
-                "color": "yellow"
-              },
-              {
-                "value": 500,
-                "color": "orange"
-              }
+              { "value": null, "color": "blue" },
+              { "value": 10, "color": "green" },
+              { "value": 100, "color": "yellow" },
+              { "value": 500, "color": "orange" }
             ]
           }
         }
@@ -1287,12 +1057,7 @@
       "type": "stat",
       "title": "Error Rate",
       "description": "Percentage of requests resulting in errors (4xx and 5xx status codes). A healthy API should have <1% error rate. Elevated error rates require immediate investigation.",
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 6,
-        "y": 20
-      },
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 10 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -1307,9 +1072,7 @@
         "textMode": "value_and_name",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "text": {
           "titleSize": 16,
@@ -1331,22 +1094,10 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 1,
-                "color": "yellow"
-              },
-              {
-                "value": 5,
-                "color": "orange"
-              },
-              {
-                "value": 10,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 1, "color": "yellow" },
+              { "value": 5, "color": "orange" },
+              { "value": 10, "color": "red" }
             ]
           }
         }
@@ -1374,12 +1125,7 @@
       "type": "stat",
       "title": "Latency P95",
       "description": "95th percentile response time - 95% of requests complete faster than this value. Use this to understand typical user experience. P95 > 1000ms indicates performance issues.",
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 12,
-        "y": 20
-      },
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 10 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -1405,9 +1151,7 @@
         "reduceOptions": {
           "values": false,
           "fields": "P95 Latency",
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "text": {
           "titleSize": 16,
@@ -1427,36 +1171,18 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 200,
-                "color": "yellow"
-              },
-              {
-                "value": 1000,
-                "color": "orange"
-              },
-              {
-                "value": 5000,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 200, "color": "yellow" },
+              { "value": 1000, "color": "orange" },
+              { "value": 5000, "color": "red" }
             ]
           }
         },
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "P50 Latency"
-            },
+            "matcher": { "id": "byName", "options": "P50 Latency" },
             "properties": [
-              {
-                "id": "displayName",
-                "value": "P50 (Median)"
-              }
+              { "id": "displayName", "value": "P50 (Median)" }
             ]
           }
         ]
@@ -1484,12 +1210,7 @@
       "type": "gauge",
       "title": "Saturation (Capacity)",
       "description": "Composite metric showing gateway resource utilization. Combines CPU, memory, and connection usage. >80% indicates the system is approaching capacity limits.",
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 18,
-        "y": 20
-      },
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 10 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -1503,9 +1224,7 @@
         "showThresholdMarkers": true,
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "text": {
           "titleSize": 16,
@@ -1525,274 +1244,12 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 60,
-                "color": "yellow"
-              },
-              {
-                "value": 80,
-                "color": "orange"
-              },
-              {
-                "value": 90,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 60, "color": "yellow" },
+              { "value": 80, "color": "orange" },
+              { "value": 90, "color": "red" }
             ]
           }
-        }
-      }
-    },
-    {
-      "id": 201,
-      "type": "row",
-      "title": "SLA/SLO Tracking - Service Level Objectives",
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 26
-      },
-      "collapsed": false
-    },
-    {
-      "id": 202,
-      "type": "stat",
-      "title": "Availability SLO (Target: 99.9%)",
-      "description": "**Service Level Objective: 99.9% Availability**\n\nMeasures the percentage of successful requests (non-5xx, non-connection-error responses) over the selected time range.\n\n**Thresholds:**\n- \ud83d\udfe2 Green: > 99.95% (exceeding target)\n- \ud83d\udfe1 Yellow: 99.9% - 99.95% (meeting target)\n- \ud83d\udd34 Red: < 99.9% (SLO breach)\n\n**Current Status:** Shows real-time availability\n\n**Actions if Red:**\n1. Check Error Rate panel for error patterns\n2. Review Upstream Health for backend issues\n3. Check recent deployments (annotations)\n4. Investigate error traces for root cause",
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 0,
-        "y": 27
-      },
-      "datasource": "${datasource_prometheus}",
-      "targets": [
-        {
-          "expr": "(1 - (sum(rate(tyk_http_status_total{instance=~\"$instance\", api=~\"$api_id\", code=~\"5..|\u22121\"}[5m])) / sum(rate(tyk_http_status_total{instance=~\"$instance\", api=~\"$api_id\"}[5m])))) * 100",
-          "refId": "A",
-          "legendFormat": "Availability %"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
-        },
-        "orientation": "auto",
-        "textMode": "value_and_name",
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "decimals": 3,
-          "min": 99,
-          "max": 100,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "value": null,
-                "color": "red"
-              },
-              {
-                "value": 99.9,
-                "color": "yellow"
-              },
-              {
-                "value": 99.95,
-                "color": "green"
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": 203,
-      "type": "stat",
-      "title": "Latency SLO (Target: P95 < 500ms)",
-      "description": "**Service Level Objective: P95 Latency < 500ms**\n\nMeasures the 95th percentile latency - 95% of requests complete faster than this value.\n\n**Thresholds:**\n- \ud83d\udfe2 Green: < 500ms (meeting target)\n- \ud83d\udfe1 Yellow: 500-1000ms (degraded performance)\n- \ud83d\udd34 Red: > 1000ms (SLO breach)\n\n**Current Status:** Real-time P95 latency\n\n**Actions if Yellow/Red:**\n1. Check Latency Breakdown panel (Gateway vs Upstream)\n2. Review Slow Traces (>1000ms) for bottlenecks\n3. Check Saturation panel for resource constraints\n4. Investigate upstream service health",
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 6,
-        "y": 27
-      },
-      "datasource": "${datasource_prometheus}",
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.95, sum(rate(tyk_latency_bucket{type=\"total\", instance=~\"$instance\", api=~\"$api_id\"}[5m])) by (le))",
-          "refId": "A",
-          "legendFormat": "P95 Latency"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
-        },
-        "orientation": "auto",
-        "textMode": "value_and_name",
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "ms",
-          "decimals": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 500,
-                "color": "yellow"
-              },
-              {
-                "value": 1000,
-                "color": "red"
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": 204,
-      "type": "gauge",
-      "title": "Error Budget Remaining",
-      "description": "**Error Budget: 0.1% over 30 days**\n\nBased on 99.9% availability SLO, you have a 0.1% error budget.\n\nThis panel shows:\n- **Percentage remaining** of your monthly error budget\n- How many errors you can afford before breaching SLO\n\n**Interpretation:**\n- \ud83d\udfe2 Green (> 50%): Healthy - plenty of budget remaining\n- \ud83d\udfe1 Yellow (25-50%): Caution - budget depleting\n- \ud83d\udd34 Red (< 25%): Critical - approaching SLO breach\n\n**Actions if Yellow/Red:**\n1. Prioritize fixing error-causing issues\n2. Review deployment practices\n3. Consider adjusting error budgets or SLOs\n4. Implement more aggressive error prevention",
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 12,
-        "y": 27
-      },
-      "datasource": "${datasource_prometheus}",
-      "targets": [
-        {
-          "expr": "(\n  # Error budget = 0.1% of total requests over 30 days\n  # Remaining budget = (0.001 * total_requests) - actual_errors\n  (\n    (0.001 * sum(increase(tyk_http_status_total{instance=~\"$instance\", api=~\"$api_id\"}[30d])))\n    -\n    sum(increase(tyk_http_status_total{instance=~\"$instance\", api=~\"$api_id\", code=~\"5..|\u22121\"}[30d]))\n  )\n  /\n  # Divide by total budget to get percentage remaining\n  (0.001 * sum(increase(tyk_http_status_total{instance=~\"$instance\", api=~\"$api_id\"}[30d])))\n) * 100",
-          "refId": "A",
-          "legendFormat": "Budget Remaining %"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
-        },
-        "orientation": "auto",
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "decimals": 1,
-          "min": 0,
-          "max": 100,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "value": null,
-                "color": "red"
-              },
-              {
-                "value": 25,
-                "color": "yellow"
-              },
-              {
-                "value": 50,
-                "color": "green"
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
-      "id": 205,
-      "type": "stat",
-      "title": "SLO Burn Rate (Current vs Target)",
-      "description": "**SLO Burn Rate Indicator**\n\nCompares current error rate to the acceptable error rate (0.1% for 99.9% SLO).\n\n**Burn Rate Multiplier:**\n- **1x**: Burning budget at expected rate (normal)\n- **> 2x**: Burning budget twice as fast (warning)\n- **> 10x**: Burning budget 10x faster (critical)\n\n**What it means:**\n- If burning at 10x rate, you'll exhaust monthly budget in 3 days\n- If burning at 2x rate, budget depletes in 15 days\n\n**Actions if High Burn Rate:**\n1. Immediate investigation of error sources\n2. Check if incident is ongoing\n3. Consider rolling back recent changes\n4. Alert on-call team if > 10x burn rate",
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 18,
-        "y": 27
-      },
-      "datasource": "${datasource_prometheus}",
-      "targets": [
-        {
-          "expr": "(\n  # Current error rate\n  sum(rate(tyk_http_status_total{instance=~\"$instance\", api=~\"$api_id\", code=~\"5..|\u22121\"}[5m]))\n  /\n  sum(rate(tyk_http_status_total{instance=~\"$instance\", api=~\"$api_id\"}[5m]))\n)\n/\n# Acceptable error rate (0.1% for 99.9% SLO)\n0.001",
-          "refId": "A",
-          "legendFormat": "Burn Rate Multiplier"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
-        },
-        "orientation": "auto",
-        "textMode": "value_and_name",
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "decimals": 1,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 2,
-                "color": "yellow"
-              },
-              {
-                "value": 10,
-                "color": "red"
-              }
-            ]
-          },
-          "mappings": [
-            {
-              "type": "special",
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "No Data",
-                  "color": "gray"
-                }
-              }
-            }
-          ]
         }
       }
     },
@@ -1800,12 +1257,7 @@
       "id": 101,
       "type": "row",
       "title": "Supplementary Gateway Metrics (Gateway: $instance)",
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 31
-      },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 16 },
       "collapsed": false
     },
     {
@@ -1813,12 +1265,7 @@
       "type": "stat",
       "title": "Active APIs",
       "description": "Number of APIs currently loaded and serving traffic. Use this to verify API deployments and track API inventory across gateway instances.",
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 0,
-        "y": 32
-      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 17 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -1879,12 +1326,7 @@
       "type": "stat",
       "title": "Active API Keys",
       "description": "Number of unique API keys making requests. Indicates active consumer count. Use to monitor API adoption and key usage patterns.",
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 4,
-        "y": 32
-      },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 17 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -1899,9 +1341,7 @@
         "textMode": "value_and_name",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         }
       },
       "fieldConfig": {
@@ -1914,18 +1354,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "blue"
-              },
-              {
-                "value": 10,
-                "color": "green"
-              },
-              {
-                "value": 100,
-                "color": "yellow"
-              }
+              { "value": null, "color": "blue" },
+              { "value": 10, "color": "green" },
+              { "value": 100, "color": "yellow" }
             ]
           }
         }
@@ -1936,12 +1367,7 @@
       "type": "stat",
       "title": "Trace Coverage",
       "description": "Percentage of requests with distributed traces. Calculated using span metrics from OpenTelemetry. High coverage (>95%) ensures complete observability.",
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 8,
-        "y": 32
-      },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 17 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -1961,9 +1387,7 @@
         "textMode": "value_and_name",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         }
       },
       "fieldConfig": {
@@ -1978,22 +1402,10 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "red"
-              },
-              {
-                "value": 70,
-                "color": "orange"
-              },
-              {
-                "value": 85,
-                "color": "yellow"
-              },
-              {
-                "value": 95,
-                "color": "green"
-              }
+              { "value": null, "color": "red" },
+              { "value": 70, "color": "orange" },
+              { "value": 85, "color": "yellow" },
+              { "value": 95, "color": "green" }
             ]
           }
         }
@@ -2032,12 +1444,7 @@
       "type": "stat",
       "title": "Gateway Instances",
       "description": "Number of healthy gateway instances currently serving traffic. Use to verify high availability setup and detect instance failures.",
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 12,
-        "y": 32
-      },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 17 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -2097,12 +1504,7 @@
       "type": "stat",
       "title": "Active Errors",
       "description": "Total error count in the last 5 minutes. Spikes indicate issues requiring immediate attention. Click to view error details in logs section below.",
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 16,
-        "y": 32
-      },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 17 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -2117,9 +1519,7 @@
         "textMode": "value_and_name",
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         }
       },
       "fieldConfig": {
@@ -2132,22 +1532,10 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 10,
-                "color": "yellow"
-              },
-              {
-                "value": 50,
-                "color": "orange"
-              },
-              {
-                "value": 100,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 10, "color": "yellow" },
+              { "value": 50, "color": "orange" },
+              { "value": 100, "color": "red" }
             ]
           }
         }
@@ -2163,12 +1551,7 @@
       "id": 102,
       "type": "row",
       "title": "Traffic Patterns & Trends (Gateway: $instance, API: $api_id)",
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 38
-      },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 21 },
       "collapsed": false
     },
     {
@@ -2176,12 +1559,7 @@
       "type": "timeseries",
       "title": "Request Rate Over Time",
       "description": "Traffic patterns per API over time. Use to identify traffic trends, peaks, and anomalies. Grouped by API for easy comparison.",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 39
-      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -2195,11 +1573,7 @@
           "displayMode": "table",
           "placement": "right",
           "showLegend": true,
-          "calcs": [
-            "lastNotNull",
-            "max",
-            "mean"
-          ],
+          "calcs": ["lastNotNull", "max", "mean"],
           "sortBy": "Max",
           "sortDesc": true
         },
@@ -2225,26 +1599,14 @@
             "mode": "palette-classic"
           }
         }
-      },
-      "links": [
-        {
-          "title": "View API Detail Dashboard",
-          "url": "/d/tyk-api-detail?var-api_id=${__series.labels.api}&${__url_time_range}",
-          "targetBlank": false
-        }
-      ]
+      }
     },
     {
       "id": 11,
       "type": "timeseries",
       "title": "Status Code Distribution",
       "description": "HTTP status code breakdown over time. Stacked view shows proportion of successful (2xx), client errors (4xx), and server errors (5xx). Use to spot error patterns.",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 39
-      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -2273,11 +1635,7 @@
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
-          "calcs": [
-            "lastNotNull",
-            "max",
-            "mean"
-          ]
+          "calcs": ["lastNotNull", "max", "mean"]
         },
         "tooltip": {
           "mode": "multi",
@@ -2303,63 +1661,27 @@
         },
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "2xx Success"
-            },
+            "matcher": { "id": "byName", "options": "2xx Success" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
+              { "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "3xx Redirect"
-            },
+            "matcher": { "id": "byName", "options": "3xx Redirect" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
+              { "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "4xx Client Error"
-            },
+            "matcher": { "id": "byName", "options": "4xx Client Error" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "yellow",
-                  "mode": "fixed"
-                }
-              }
+              { "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "5xx Server Error"
-            },
+            "matcher": { "id": "byName", "options": "5xx Server Error" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
+              { "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }
             ]
           }
         ]
@@ -2370,12 +1692,7 @@
       "type": "timeseries",
       "title": "Latency Percentiles Over Time",
       "description": "Response time distribution showing P50 (median), P90, P95, and P99. P50 represents typical performance, P99 shows worst-case scenarios. Use to identify performance degradation and outliers.",
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 47
-      },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 30 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -2404,11 +1721,7 @@
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
-          "calcs": [
-            "lastNotNull",
-            "max",
-            "mean"
-          ],
+          "calcs": ["lastNotNull", "max", "mean"],
           "sortBy": "Mean",
           "sortDesc": true
         },
@@ -2433,109 +1746,34 @@
         },
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "P50 (Median)"
-            },
+            "matcher": { "id": "byName", "options": "P50 (Median)" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 2
-              }
+              { "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } },
+              { "id": "custom.lineWidth", "value": 2 }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "P90"
-            },
+            "matcher": { "id": "byName", "options": "P90" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "yellow",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 2
-              },
-              {
-                "id": "custom.lineStyle",
-                "value": {
-                  "fill": "dash",
-                  "dash": [
-                    10,
-                    5
-                  ]
-                }
-              }
+              { "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } },
+              { "id": "custom.lineWidth", "value": 2 },
+              { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 5] } }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "P95"
-            },
+            "matcher": { "id": "byName", "options": "P95" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 3
-              },
-              {
-                "id": "custom.lineStyle",
-                "value": {
-                  "fill": "dash",
-                  "dash": [
-                    10,
-                    5
-                  ]
-                }
-              }
+              { "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } },
+              { "id": "custom.lineWidth", "value": 3 },
+              { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 5] } }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "P99"
-            },
+            "matcher": { "id": "byName", "options": "P99" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 3
-              },
-              {
-                "id": "custom.lineStyle",
-                "value": {
-                  "fill": "dash",
-                  "dash": [
-                    5,
-                    5
-                  ]
-                }
-              }
+              { "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } },
+              { "id": "custom.lineWidth", "value": 3 },
+              { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [5, 5] } }
             ]
           }
         ]
@@ -2546,12 +1784,7 @@
       "type": "timeseries",
       "title": "Latency Breakdown (P95)",
       "description": "P95 latency split by component: Total (end-to-end), Gateway (middleware processing), and Upstream (backend service). Use to identify where bottlenecks occur - gateway or upstream services.",
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 47
-      },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 30 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -2575,11 +1808,7 @@
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
-          "calcs": [
-            "lastNotNull",
-            "max",
-            "mean"
-          ]
+          "calcs": ["lastNotNull", "max", "mean"]
         },
         "tooltip": {
           "mode": "multi",
@@ -2604,48 +1833,21 @@
         },
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Total Latency"
-            },
+            "matcher": { "id": "byName", "options": "Total Latency" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
+              { "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Upstream Latency"
-            },
+            "matcher": { "id": "byName", "options": "Upstream Latency" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "purple",
-                  "mode": "fixed"
-                }
-              }
+              { "id": "color", "value": { "fixedColor": "purple", "mode": "fixed" } }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Gateway Processing"
-            },
+            "matcher": { "id": "byName", "options": "Gateway Processing" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
+              { "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }
             ]
           }
         ]
@@ -2656,12 +1858,7 @@
       "type": "bargauge",
       "title": "Top 10 APIs by Request Volume (req/s)",
       "description": "APIs ranked by request rate. Click on any bar to access the context menu with drill-down options.\n\nRight-click or click the dots menu on any API to:\n- View API Detail Dashboard\n- Open traces in Jaeger\n- Edit API configuration",
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 55
-      },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 38 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -2697,9 +1894,7 @@
         "minVizHeight": 10,
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         }
       },
       "fieldConfig": {
@@ -2712,10 +1907,7 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              }
+              { "value": null, "color": "green" }
             ]
           },
           "links": [
@@ -2747,13 +1939,8 @@
       "id": 15,
       "type": "bargauge",
       "title": "Top 10 APIs by Error Rate",
-      "description": "APIs with highest error percentages. Identify problematic APIs requiring immediate attention. Red bars indicate critical error rates (>5%). Click any API to view detailed metrics.",
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 55
-      },
+      "description": "APIs with highest error percentages. Identify problematic APIs requiring immediate attention. Red bars indicate critical error rates (>5%).",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 38 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -2787,9 +1974,7 @@
         },
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         }
       },
       "fieldConfig": {
@@ -2804,36 +1989,12 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 1,
-                "color": "yellow"
-              },
-              {
-                "value": 5,
-                "color": "orange"
-              },
-              {
-                "value": 10,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 1, "color": "yellow" },
+              { "value": 5, "color": "orange" },
+              { "value": 10, "color": "red" }
             ]
-          },
-          "links": [
-            {
-              "title": "View API Detail Dashboard for ${__field.labels.api}",
-              "url": "/d/tyk-api-detail?var-api_id=${__field.labels.api}&${__url_time_range}&var-instance=${instance}",
-              "targetBlank": false
-            },
-            {
-              "title": "View ${__field.labels.api} Traces in Jaeger",
-              "url": "http://localhost:8085/jaeger/ui/search?service=tyk-gateway&tags=%7B%22tyk.api.id%22%3A%22${__field.labels.api}%22%7D",
-              "targetBlank": true
-            }
-          ]
+          }
         }
       }
     },
@@ -2842,12 +2003,7 @@
       "type": "timeseries",
       "title": "Upstream Connection Errors (Code: -1)",
       "description": "Failed upstream connections over time. Spikes indicate backend service unavailability or network issues. Code -1 represents connection failures before any HTTP response.",
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 47
-      },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 30 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -2861,11 +2017,7 @@
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
-          "calcs": [
-            "lastNotNull",
-            "max",
-            "sum"
-          ]
+          "calcs": ["lastNotNull", "max", "sum"]
         },
         "tooltip": {
           "mode": "multi",
@@ -2890,18 +2042,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 0.1,
-                "color": "yellow"
-              },
-              {
-                "value": 1,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 0.1, "color": "yellow" },
+              { "value": 1, "color": "red" }
             ]
           }
         }
@@ -2911,20 +2054,14 @@
         "conditions": [
           {
             "evaluator": {
-              "params": [
-                1
-              ],
+              "params": [1],
               "type": "gt"
             },
             "operator": {
               "type": "and"
             },
             "query": {
-              "params": [
-                "A",
-                "5m",
-                "now"
-              ]
+              "params": ["A", "5m", "now"]
             },
             "reducer": {
               "params": [],
@@ -2938,26 +2075,14 @@
         "frequency": "1m",
         "message": "Connection errors detected for APIs: Check upstream service health",
         "noDataState": "no_data"
-      },
-      "links": [
-        {
-          "title": "View API Detail Dashboard",
-          "url": "/d/tyk-api-detail?var-api_id=${__series.labels.api}&${__url_time_range}",
-          "targetBlank": false
-        }
-      ]
+      }
     },
     {
       "id": 17,
       "type": "table",
       "title": "Requests by Portal App",
       "description": "Traffic distribution across portal applications. Use to understand which applications consume most API resources and identify heavy users.",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 63
-      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 46 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -3014,27 +2139,12 @@
         },
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Total Requests"
-            },
+            "matcher": { "id": "byName", "options": "Total Requests" },
             "properties": [
-              {
-                "id": "custom.displayMode",
-                "value": "gradient-gauge"
-              },
-              {
-                "id": "custom.width",
-                "value": 200
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 0
-              }
+              { "id": "custom.displayMode", "value": "gradient-gauge" },
+              { "id": "custom.width", "value": 200 },
+              { "id": "unit", "value": "short" },
+              { "id": "decimals", "value": 0 }
             ]
           }
         ]
@@ -3045,12 +2155,7 @@
       "type": "table",
       "title": "Portal App Performance Summary (Requests, Errors, Latency)",
       "description": "Comprehensive view of portal app metrics: request rate, error rate, and average latency. Sort by any column to identify problematic applications. Red highlighting indicates apps exceeding error thresholds.",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 63
-      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 46 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -3116,12 +2221,8 @@
         ],
         "footer": {
           "show": false,
-          "reducer": [
-            "sum"
-          ],
-          "fields": [
-            "Request Rate"
-          ]
+          "reducer": ["sum"],
+          "fields": ["Request Rate"]
         }
       },
       "fieldConfig": {
@@ -3134,74 +2235,35 @@
         },
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Total Requests"
-            },
+            "matcher": {"id": "byName", "options": "Total Requests"},
             "properties": [
-              {
-                "id": "custom.displayMode",
-                "value": "gradient-gauge"
-              },
-              {
-                "id": "custom.width",
-                "value": 200
-              }
+              {"id": "custom.displayMode", "value": "gradient-gauge"},
+              {"id": "custom.width", "value": 200}
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "% of Total"
-            },
+            "matcher": {"id": "byName", "options": "% of Total"},
             "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "custom.displayMode",
-                "value": "basic"
-              }
+              {"id": "unit", "value": "percent"},
+              {"id": "custom.displayMode", "value": "basic"}
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Trend"
-            },
+            "matcher": {"id": "byName", "options": "Trend"},
             "properties": [
-              {
-                "id": "custom.displayMode",
-                "value": "sparkline"
-              },
-              {
-                "id": "custom.width",
-                "value": 150
-              }
+              {"id": "custom.displayMode", "value": "sparkline"},
+              {"id": "custom.width", "value": 150}
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Request Rate"
-            },
+            "matcher": { "id": "byName", "options": "Request Rate" },
             "properties": [
-              {
-                "id": "unit",
-                "value": "reqps"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              }
+              { "id": "unit", "value": "reqps" },
+              { "id": "decimals", "value": 2 }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Error %"
-            },
+            "matcher": { "id": "byName", "options": "Error %" },
             "properties": [
               {
                 "id": "custom.displayMode",
@@ -3212,18 +2274,9 @@
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    {
-                      "value": null,
-                      "color": "green"
-                    },
-                    {
-                      "value": 1,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 5,
-                      "color": "red"
-                    }
+                    { "value": null, "color": "green" },
+                    { "value": 1, "color": "yellow" },
+                    { "value": 5, "color": "red" }
                   ]
                 }
               },
@@ -3238,10 +2291,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Avg Latency (ms)"
-            },
+            "matcher": { "id": "byName", "options": "Avg Latency (ms)" },
             "properties": [
               {
                 "id": "unit",
@@ -3260,28 +2310,16 @@
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    {
-                      "value": null,
-                      "color": "green"
-                    },
-                    {
-                      "value": 500,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 2000,
-                      "color": "red"
-                    }
+                    { "value": null, "color": "green" },
+                    { "value": 500, "color": "yellow" },
+                    { "value": 2000, "color": "red" }
                   ]
                 }
               }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Portal App"
-            },
+            "matcher": { "id": "byName", "options": "Portal App" },
             "properties": [
               {
                 "id": "links",
@@ -3308,12 +2346,7 @@
       "type": "table",
       "title": "Top API Keys by Traffic",
       "description": "Most active API keys ranked by request volume and error rate. Keys are partially masked for security. Use to identify high-volume consumers and detect problematic integrations.",
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 55
-      },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 38 },
       "datasource": "${datasource_prometheus}",
       "targets": [
         {
@@ -3366,35 +2399,17 @@
         },
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Request Rate"
-            },
+            "matcher": { "id": "byName", "options": "Request Rate" },
             "properties": [
-              {
-                "id": "unit",
-                "value": "reqps"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              }
+              { "id": "unit", "value": "reqps" },
+              { "id": "decimals", "value": 2 }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Error Rate"
-            },
+            "matcher": { "id": "byName", "options": "Error Rate" },
             "properties": [
-              {
-                "id": "unit",
-                "value": "reqps"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
+              { "id": "unit", "value": "reqps" },
+              { "id": "decimals", "value": 2 },
               {
                 "id": "custom.displayMode",
                 "value": "color-background"
@@ -3404,18 +2419,9 @@
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    {
-                      "value": null,
-                      "color": "green"
-                    },
-                    {
-                      "value": 0.1,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 1,
-                      "color": "red"
-                    }
+                    { "value": null, "color": "green" },
+                    { "value": 0.1, "color": "yellow" },
+                    { "value": 1, "color": "red" }
                   ]
                 }
               }
@@ -3428,12 +2434,7 @@
       "id": 103,
       "type": "row",
       "title": "Distributed Tracing - Recent Traces",
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 79
-      },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 62 },
       "collapsed": false
     },
     {
@@ -3441,12 +2442,7 @@
       "type": "table",
       "title": "Recent Traces",
       "description": "Recent distributed traces from Jaeger. This table shows basic trace information for all APIs and gateways. To filter by API ID or Gateway Instance, click the 'Open in Jaeger (with filters)' link to open the Jaeger UI with your current dashboard selections pre-filled. Click any Trace ID to view full trace details including API metadata, HTTP method, path, status code, and timing breakdown.",
-      "gridPos": {
-        "h": 12,
-        "w": 24,
-        "x": 0,
-        "y": 80
-      },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 63 },
       "datasource": "${datasource_jaeger}",
       "targets": [
         {
@@ -3522,10 +2518,7 @@
         },
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Trace ID"
-            },
+            "matcher": { "id": "byName", "options": "Trace ID" },
             "properties": [
               {
                 "id": "links",
@@ -3555,10 +2548,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Status"
-            },
+            "matcher": { "id": "byName", "options": "Status" },
             "properties": [
               {
                 "id": "custom.displayMode",
@@ -3620,10 +2610,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Duration (ms)"
-            },
+            "matcher": { "id": "byName", "options": "Duration (ms)" },
             "properties": [
               {
                 "id": "unit",
@@ -3642,22 +2629,10 @@
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    {
-                      "value": null,
-                      "color": "green"
-                    },
-                    {
-                      "value": 500,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 2000,
-                      "color": "orange"
-                    },
-                    {
-                      "value": 5000,
-                      "color": "red"
-                    }
+                    { "value": null, "color": "green" },
+                    { "value": 500, "color": "yellow" },
+                    { "value": 2000, "color": "orange" },
+                    { "value": 5000, "color": "red" }
                   ]
                 }
               },
@@ -3676,10 +2651,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Spans"
-            },
+            "matcher": { "id": "byName", "options": "Spans" },
             "properties": [
               {
                 "id": "custom.width",
@@ -3688,10 +2660,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Timestamp"
-            },
+            "matcher": { "id": "byName", "options": "Timestamp" },
             "properties": [
               {
                 "id": "unit",
@@ -3704,10 +2673,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Path"
-            },
+            "matcher": { "id": "byName", "options": "Path" },
             "properties": [
               {
                 "id": "custom.width",
@@ -3723,12 +2689,7 @@
       "type": "histogram",
       "title": "Trace Duration Distribution",
       "description": "Distribution of request durations from Jaeger traces. Shows how response times are spread across all requests. Most requests should cluster in lower buckets (<500ms). Long tail indicates outliers requiring investigation. Use to understand performance characteristics and identify patterns.",
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 92
-      },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 75 },
       "datasource": "${datasource_jaeger}",
       "targets": [
         {
@@ -3771,11 +2732,7 @@
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true,
-          "calcs": [
-            "count",
-            "mean",
-            "max"
-          ]
+          "calcs": ["count", "mean", "max"]
         },
         "tooltip": {
           "mode": "single"
@@ -3801,22 +2758,10 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "value": null,
-                "color": "green"
-              },
-              {
-                "value": 500,
-                "color": "yellow"
-              },
-              {
-                "value": 2000,
-                "color": "orange"
-              },
-              {
-                "value": 5000,
-                "color": "red"
-              }
+              { "value": null, "color": "green" },
+              { "value": 500, "color": "yellow" },
+              { "value": 2000, "color": "orange" },
+              { "value": 5000, "color": "red" }
             ]
           },
           "links": [
@@ -3833,13 +2778,8 @@
       "id": 22,
       "type": "table",
       "title": "Slowest Traces (>1000ms)",
-      "description": "Traces exceeding 1 second response time from Jaeger. These represent poor user experience and require optimization. Click trace ID to investigate root cause in Jaeger waterfall view - identify slow database queries, external API calls, or middleware bottlenecks. Sorted by duration (slowest first). Use the panel menu (\u22ee) to view all slow traces in Jaeger.",
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 92
-      },
+      "description": "Traces exceeding 1 second response time from Jaeger. These represent poor user experience and require optimization. Click trace ID to investigate root cause in Jaeger waterfall view - identify slow database queries, external API calls, or middleware bottlenecks. Sorted by duration (slowest first). Use the panel menu (⋮) to view all slow traces in Jaeger.",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 75 },
       "datasource": "${datasource_jaeger}",
       "targets": [
         {
@@ -3918,12 +2858,8 @@
         ],
         "footer": {
           "show": true,
-          "reducer": [
-            "count"
-          ],
-          "fields": [
-            "Trace ID"
-          ]
+          "reducer": ["count"],
+          "fields": ["Trace ID"]
         },
         "filterable": true
       },
@@ -3938,10 +2874,7 @@
         },
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Trace ID"
-            },
+            "matcher": { "id": "byName", "options": "Trace ID" },
             "properties": [
               {
                 "id": "links",
@@ -3971,10 +2904,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Duration (ms)"
-            },
+            "matcher": { "id": "byName", "options": "Duration (ms)" },
             "properties": [
               {
                 "id": "unit",
@@ -3993,22 +2923,10 @@
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    {
-                      "value": null,
-                      "color": "green"
-                    },
-                    {
-                      "value": 1000,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 3000,
-                      "color": "orange"
-                    },
-                    {
-                      "value": 5000,
-                      "color": "red"
-                    }
+                    { "value": null, "color": "green" },
+                    { "value": 1000, "color": "yellow" },
+                    { "value": 3000, "color": "orange" },
+                    { "value": 5000, "color": "red" }
                   ]
                 }
               },
@@ -4027,10 +2945,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Upstream (ms)"
-            },
+            "matcher": { "id": "byName", "options": "Upstream (ms)" },
             "properties": [
               {
                 "id": "unit",
@@ -4049,18 +2964,9 @@
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    {
-                      "value": null,
-                      "color": "green"
-                    },
-                    {
-                      "value": 500,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 2000,
-                      "color": "red"
-                    }
+                    { "value": null, "color": "green" },
+                    { "value": 500, "color": "yellow" },
+                    { "value": 2000, "color": "red" }
                   ]
                 }
               },
@@ -4071,10 +2977,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Status"
-            },
+            "matcher": { "id": "byName", "options": "Status" },
             "properties": [
               {
                 "id": "custom.displayMode",
@@ -4088,9 +2991,7 @@
                     "options": {
                       "from": 200,
                       "to": 299,
-                      "result": {
-                        "color": "green"
-                      }
+                      "result": { "color": "green" }
                     }
                   },
                   {
@@ -4098,9 +2999,7 @@
                     "options": {
                       "from": 300,
                       "to": 399,
-                      "result": {
-                        "color": "blue"
-                      }
+                      "result": { "color": "blue" }
                     }
                   },
                   {
@@ -4108,9 +3007,7 @@
                     "options": {
                       "from": 400,
                       "to": 499,
-                      "result": {
-                        "color": "yellow"
-                      }
+                      "result": { "color": "yellow" }
                     }
                   },
                   {
@@ -4118,9 +3015,7 @@
                     "options": {
                       "from": 500,
                       "to": 599,
-                      "result": {
-                        "color": "red"
-                      }
+                      "result": { "color": "red" }
                     }
                   }
                 ]
@@ -4132,10 +3027,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Spans"
-            },
+            "matcher": { "id": "byName", "options": "Spans" },
             "properties": [
               {
                 "id": "custom.width",
@@ -4144,10 +3036,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Time"
-            },
+            "matcher": { "id": "byName", "options": "Time" },
             "properties": [
               {
                 "id": "unit",
@@ -4160,10 +3049,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Method"
-            },
+            "matcher": { "id": "byName", "options": "Method" },
             "properties": [
               {
                 "id": "custom.width",
@@ -4172,10 +3058,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Path"
-            },
+            "matcher": { "id": "byName", "options": "Path" },
             "properties": [
               {
                 "id": "custom.width",
@@ -4197,13 +3080,8 @@
       "id": 23,
       "type": "table",
       "title": "Error Traces (4xx/5xx)",
-      "description": "Recent traces with error status codes from Jaeger. Yellow rows indicate client errors (4xx - bad requests, auth failures, not found). Red rows indicate server errors (5xx - backend failures, timeouts, internal errors). Click trace ID to investigate full error context in Jaeger waterfall view. Use the panel menu (\u22ee) to view all error traces in Jaeger.",
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 92
-      },
+      "description": "Recent traces with error status codes from Jaeger. Yellow rows indicate client errors (4xx - bad requests, auth failures, not found). Red rows indicate server errors (5xx - backend failures, timeouts, internal errors). Click trace ID to investigate full error context in Jaeger waterfall view. Use the panel menu (⋮) to view all error traces in Jaeger.",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 75 },
       "datasource": "${datasource_jaeger}",
       "targets": [
         {
@@ -4300,12 +3178,8 @@
         ],
         "footer": {
           "show": true,
-          "reducer": [
-            "count"
-          ],
-          "fields": [
-            "Trace ID"
-          ],
+          "reducer": ["count"],
+          "fields": ["Trace ID"],
           "countRows": false
         },
         "filterable": true
@@ -4321,10 +3195,7 @@
         },
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Trace ID"
-            },
+            "matcher": { "id": "byName", "options": "Trace ID" },
             "properties": [
               {
                 "id": "links",
@@ -4354,10 +3225,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Status"
-            },
+            "matcher": { "id": "byName", "options": "Status" },
             "properties": [
               {
                 "id": "custom.displayMode",
@@ -4478,10 +3346,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Duration (ms)"
-            },
+            "matcher": { "id": "byName", "options": "Duration (ms)" },
             "properties": [
               {
                 "id": "unit",
@@ -4500,18 +3365,9 @@
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    {
-                      "value": null,
-                      "color": "green"
-                    },
-                    {
-                      "value": 1000,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 5000,
-                      "color": "red"
-                    }
+                    { "value": null, "color": "green" },
+                    { "value": 1000, "color": "yellow" },
+                    { "value": 5000, "color": "red" }
                   ]
                 }
               },
@@ -4522,10 +3378,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Time"
-            },
+            "matcher": { "id": "byName", "options": "Time" },
             "properties": [
               {
                 "id": "unit",
@@ -4538,10 +3391,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Method"
-            },
+            "matcher": { "id": "byName", "options": "Method" },
             "properties": [
               {
                 "id": "custom.width",
@@ -4550,10 +3400,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Path"
-            },
+            "matcher": { "id": "byName", "options": "Path" },
             "properties": [
               {
                 "id": "custom.width",
@@ -4562,10 +3409,7 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Error Message"
-            },
+            "matcher": { "id": "byName", "options": "Error Message" },
             "properties": [
               {
                 "id": "custom.width",
@@ -4598,12 +3442,7 @@
       "id": 104,
       "type": "row",
       "title": "Log Analysis - Gateway Access & Error Logs",
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 96
-      },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 79 },
       "collapsed": false
     },
     {
@@ -4611,12 +3450,7 @@
       "type": "logs",
       "title": "Gateway Access Logs",
       "description": "Real-time gateway access logs for all gateways and APIs. Shows all request details: timestamp, API, method, path, status, latency, client IP. Use the panel's built-in search and filters to investigate specific requests, APIs, or gateways. Use for detailed troubleshooting and audit trails.",
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 97
-      },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 80 },
       "datasource": "${datasource_opensearch}",
       "targets": [
         {
@@ -4648,12 +3482,7 @@
       "type": "table",
       "title": "Error Logs (4xx/5xx)",
       "description": "Recent error logs for all gateways and APIs, filtered by HTTP status codes 4xx (client errors) and 5xx (server errors). Use the table's search and filters to narrow down to specific APIs or gateways. Review error messages and patterns to identify root causes. Common issues: authentication failures, rate limits, upstream timeouts.",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 107
-      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 90 },
       "datasource": "${datasource_opensearch}",
       "targets": [
         {
@@ -4781,10 +3610,7 @@
       "fieldConfig": {
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Status"
-            },
+            "matcher": { "id": "byName", "options": "Status" },
             "properties": [
               {
                 "id": "custom.displayMode",
@@ -4798,9 +3624,7 @@
                     "options": {
                       "from": 400,
                       "to": 499,
-                      "result": {
-                        "color": "yellow"
-                      }
+                      "result": { "color": "yellow" }
                     }
                   },
                   {
@@ -4808,9 +3632,7 @@
                     "options": {
                       "from": 500,
                       "to": 599,
-                      "result": {
-                        "color": "red"
-                      }
+                      "result": { "color": "red" }
                     }
                   }
                 ]
@@ -4818,27 +3640,15 @@
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Latency"
-            },
+            "matcher": { "id": "byName", "options": "Latency" },
             "properties": [
-              {
-                "id": "unit",
-                "value": "ms"
-              }
+              { "id": "unit", "value": "ms" }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Time"
-            },
+            "matcher": { "id": "byName", "options": "Time" },
             "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeFromNow"
-              }
+              { "id": "unit", "value": "dateTimeFromNow" }
             ]
           }
         ]
@@ -4849,12 +3659,7 @@
       "type": "table",
       "title": "Slow Request Logs (>1000ms)",
       "description": "Requests exceeding 1 second total latency for all gateways and APIs. Use the table's search and filters to narrow down to specific APIs or gateways. Compare Total Latency vs Upstream Latency to determine if slowness is in gateway processing or backend services. High gateway latency indicates middleware bottlenecks.",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 107
-      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 90 },
       "datasource": "${datasource_opensearch}",
       "targets": [
         {
@@ -4916,15 +3721,9 @@
       "fieldConfig": {
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Total Latency"
-            },
+            "matcher": { "id": "byName", "options": "Total Latency" },
             "properties": [
-              {
-                "id": "unit",
-                "value": "ms"
-              },
+              { "id": "unit", "value": "ms" },
               {
                 "id": "custom.displayMode",
                 "value": "color-background"
@@ -4934,49 +3733,25 @@
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    {
-                      "value": null,
-                      "color": "green"
-                    },
-                    {
-                      "value": 1000,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 3000,
-                      "color": "orange"
-                    },
-                    {
-                      "value": 5000,
-                      "color": "red"
-                    }
+                    { "value": null, "color": "green" },
+                    { "value": 1000, "color": "yellow" },
+                    { "value": 3000, "color": "orange" },
+                    { "value": 5000, "color": "red" }
                   ]
                 }
               }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Upstream Latency"
-            },
+            "matcher": { "id": "byName", "options": "Upstream Latency" },
             "properties": [
-              {
-                "id": "unit",
-                "value": "ms"
-              }
+              { "id": "unit", "value": "ms" }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Time"
-            },
+            "matcher": { "id": "byName", "options": "Time" },
             "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeFromNow"
-              }
+              { "id": "unit", "value": "dateTimeFromNow" }
             ]
           }
         ]
@@ -4987,12 +3762,7 @@
       "type": "timeseries",
       "title": "Latency Breakdown: Gateway vs Upstream Processing Time",
       "description": "Average latency breakdown from access logs: Total (end-to-end), Upstream (backend), and Gateway (calculated as Total - Upstream). Use to identify whether performance issues originate from gateway or upstream services.",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 115
-      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 98 },
       "datasource": "${datasource_opensearch}",
       "targets": [
         {
@@ -5051,11 +3821,7 @@
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
-          "calcs": [
-            "lastNotNull",
-            "max",
-            "mean"
-          ]
+          "calcs": ["lastNotNull", "max", "mean"]
         },
         "tooltip": {
           "mode": "multi",
@@ -5077,48 +3843,21 @@
         },
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Total Latency"
-            },
+            "matcher": { "id": "byName", "options": "Total Latency" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
+              { "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Upstream Latency"
-            },
+            "matcher": { "id": "byName", "options": "Upstream Latency" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "purple",
-                  "mode": "fixed"
-                }
-              }
+              { "id": "color", "value": { "fixedColor": "purple", "mode": "fixed" } }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Gateway Latency"
-            },
+            "matcher": { "id": "byName", "options": "Gateway Latency" },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
+              { "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }
             ]
           }
         ]
@@ -5144,12 +3883,7 @@
       "type": "table",
       "title": "Top Client IPs by Traffic (from Logs)",
       "description": "Most active client IP addresses ranked by request volume and average latency. Use to identify heavy users, detect bot traffic, or investigate suspicious activity. High request rates from single IPs may indicate abuse.",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 115
-      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 98 },
       "datasource": "${datasource_opensearch}",
       "targets": [
         {
@@ -5205,15 +3939,9 @@
       "fieldConfig": {
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Avg Latency (ms)"
-            },
+            "matcher": { "id": "byName", "options": "Avg Latency (ms)" },
             "properties": [
-              {
-                "id": "unit",
-                "value": "ms"
-              },
+              { "id": "unit", "value": "ms" },
               {
                 "id": "custom.displayMode",
                 "value": "color-background"
@@ -5223,58 +3951,28 @@
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    {
-                      "value": null,
-                      "color": "green"
-                    },
-                    {
-                      "value": 500,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 2000,
-                      "color": "red"
-                    }
+                    { "value": null, "color": "green" },
+                    { "value": 500, "color": "yellow" },
+                    { "value": 2000, "color": "red" }
                   ]
                 }
               }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Requests"
-            },
+            "matcher": {"id": "byName", "options": "Requests"},
             "properties": [
-              {
-                "id": "custom.displayMode",
-                "value": "lcd-gauge"
-              },
-              {
-                "id": "custom.width",
-                "value": 180
-              },
+              {"id": "custom.displayMode", "value": "lcd-gauge"},
+              {"id": "custom.width", "value": 180},
               {
                 "id": "thresholds",
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    {
-                      "value": null,
-                      "color": "green"
-                    },
-                    {
-                      "value": 1000,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 10000,
-                      "color": "orange"
-                    },
-                    {
-                      "value": 50000,
-                      "color": "red"
-                    }
+                    {"value": null, "color": "green"},
+                    {"value": 1000, "color": "yellow"},
+                    {"value": 10000, "color": "orange"},
+                    {"value": 50000, "color": "red"}
                   ]
                 }
               }
@@ -5288,12 +3986,7 @@
       "type": "barchart",
       "title": "User Agent Distribution (from Logs)",
       "description": "Breakdown of traffic by user agent (browser, mobile app, API client). Use to understand client distribution and detect unusual traffic patterns. Unknown/bot user agents may indicate automated abuse.",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 123
-      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 106 },
       "datasource": "${datasource_opensearch}",
       "targets": [
         {
@@ -5341,12 +4034,7 @@
       "type": "table",
       "title": "Upstream Service Health (from Logs)",
       "description": "Health metrics for backend upstream services: total requests, average latency, error count, and error rate. Use to identify problematic backend services. High error rates or latencies indicate upstream service issues requiring investigation.",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 123
-      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 106 },
       "datasource": "${datasource_opensearch}",
       "targets": [
         {
@@ -5456,19 +4144,10 @@
       "fieldConfig": {
         "overrides": [
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Error %"
-            },
+            "matcher": { "id": "byName", "options": "Error %" },
             "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
+              { "id": "unit", "value": "percent" },
+              { "id": "decimals", "value": 2 },
               {
                 "id": "custom.displayMode",
                 "value": "color-background"
@@ -5478,49 +4157,25 @@
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    {
-                      "value": null,
-                      "color": "green"
-                    },
-                    {
-                      "value": 1,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 5,
-                      "color": "red"
-                    }
+                    { "value": null, "color": "green" },
+                    { "value": 1, "color": "yellow" },
+                    { "value": 5, "color": "red" }
                   ]
                 }
               }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Avg Latency (ms)"
-            },
+            "matcher": { "id": "byName", "options": "Avg Latency (ms)" },
             "properties": [
-              {
-                "id": "unit",
-                "value": "ms"
-              },
-              {
-                "id": "decimals",
-                "value": 0
-              }
+              { "id": "unit", "value": "ms" },
+              { "id": "decimals", "value": 0 }
             ]
           },
           {
-            "matcher": {
-              "id": "byName",
-              "options": "Error Rate"
-            },
+            "matcher": { "id": "byName", "options": "Error Rate" },
             "properties": [
-              {
-                "id": "custom.hidden",
-                "value": true
-              }
+              { "id": "custom.hidden", "value": true }
             ]
           }
         ]
