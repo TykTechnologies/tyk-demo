@@ -10,6 +10,60 @@ This directory contains scripts and examples for a master data streaming archite
    
 Both patterns support format transformation (JSON to XML) and data filtering capabilities.
 
+## Quick Start
+
+Follow these three steps to get the Kafka Master Data Streaming system up and running:
+
+### Step 1: Import API Definitions into Tyk Gateway
+
+Before you can use the system, you need to import the API definitions into Tyk Gateway. This includes the Producer API and all Consumer APIs (both SSE and HTTP POST patterns).
+
+**Quick command:**
+```bash
+# Copy all API definitions to Tyk Dashboard data directory
+cp api-streams-master-data*.json ../../../../data/tyk-dashboard/1/apis/
+```
+
+For detailed instructions including Dashboard UI import method, see the **[Importing API Definitions into Tyk Gateway](#importing-api-definitions-into-tyk-gateway)** section below.
+
+### Step 2: Start Fake ERP Servers
+
+If you want to test HTTP POST consumers, you'll need to start the fake ERP servers. These servers simulate downstream ERP systems that receive HTTP POST requests from Tyk Streams.
+
+**Quick command:**
+```bash
+./start_erp_servers.sh
+```
+
+The servers will listen on:
+- **JSON ERP**: `http://localhost:8001/erp/json/receive`
+- **XML ERP**: `http://localhost:8002/erp/xml/receive`
+- **Filtered ERP**: `http://localhost:8003/erp/filtered/receive`
+
+For detailed instructions including individual server startup, log viewing, and Docker networking notes, see the **[ERP Server Setup](#erp-server-setup)** section below.
+
+### Step 3: Start Web UI Server (Optional but Recommended)
+
+The Web UI provides a convenient dashboard for posting data, viewing SSE streams, and monitoring ERP logs all in one place.
+
+**Quick command:**
+```bash
+./start_web_ui.sh
+```
+
+Then open your browser to: `http://localhost:8888`
+
+For more information about the Web UI features, see the **[WEB_UI.md](./WEB_UI.md)** file.
+
+---
+
+**Once you've completed these steps, you're ready to:**
+- Post master data using the Producer API (see **[Scripts](#scripts)** section)
+- Connect to SSE consumer streams for real-time data (see the **[Consumer Scripts](#consumer-scripts)** section)
+- Monitor HTTP POST consumers delivering data to ERP servers (check ERP server logs)
+
+For complete workflow examples, see the **[Example Workflows](#example-workflows)** section.
+
 ## Quick Reference: SSE vs HTTP POST
 
 | Feature | SSE (Server-Sent Events) | HTTP POST |
@@ -66,48 +120,6 @@ Both patterns support format transformation (JSON to XML) and data filtering cap
     - XML: Automatically POSTs to `http://host.docker.internal:8002/erp/xml/receive`
     - Filtered: Automatically POSTs to `http://host.docker.internal:8003/erp/filtered/receive`
 - Python 3.x for running the fake ERP servers (for HTTP POST consumer testing)
-
-## Key Findings and Improvements
-
-During implementation and testing, several important issues were identified and resolved:
-
-### 1. Batch Data Handling
-**Issue**: ERP servers initially expected only single JSON objects, but Tyk Streams can send both single items and batch arrays, causing `AttributeError: 'list' object has no attribute 'get'`.
-
-**Solution**: Updated all three ERP handlers (JSON, XML, Filtered) to automatically detect and handle both formats:
-- Single items: `{"itemId": "...", "name": "..."}`
-- Batch arrays: `[{"itemId": "..."}, {"itemId": "..."}]`
-
-The handlers now iterate through items and process each one individually, making the system robust to both data formats.
-
-### 2. Log Visibility
-**Issue**: Python's output buffering prevented real-time log visibility when servers were started in the background.
-
-**Solution**: 
-- Added unbuffered output configuration to `fake_erp_servers.py`
-- Updated `start_erp_servers.sh` to use `python3 -u` flag (unbuffered mode)
-- Logs now appear in real-time in `/tmp/erp_*.log` files
-
-### 3. Consumer API Configuration
-**Issue**: Consumer API definitions need to be in the Tyk Dashboard data directory for the gateway to load them.
-
-**Solution**: Provided clear instructions and script to copy all consumer API definitions:
-```bash
-cp api-streams-master-data*.json ../../../../data/tyk-dashboard/1/apis/
-```
-
-### 4. Docker Networking
-**Issue**: When Tyk Gateway runs in Docker, it cannot reach `localhost` on the host machine.
-
-**Solution**: Consumer API configurations use `host.docker.internal` instead of `localhost` for HTTP client outputs, allowing Docker containers to reach host services.
-
-### 5. Diagnostic Tools
-**Enhancement**: Created comprehensive diagnostic scripts:
-- `diagnose_http_consumers.sh` - Full system health check
-- `test_http_consumers.sh` - End-to-end flow testing
-- `check_kafka_messages.sh` - Kafka topic verification
-
-These tools help quickly identify issues in the data flow pipeline.
 
 ## Importing API Definitions into Tyk Gateway
 
@@ -317,18 +329,9 @@ This will connect to `http://tyk-gateway.localhost:8080/streams-master-data-filt
 
 #### HTTP POST Consumer Setup (Push-Based Delivery)
 
-For production ERP systems that only accept HTTP POST requests, use the HTTP POST consumer APIs. Tyk Streams automatically pushes data to your ERP servers - no client connection needed:
+For production ERP systems that only accept HTTP POST requests, use the HTTP POST consumer APIs. Tyk Streams automatically pushes data to your ERP servers - no client connection needed.
 
-#### Starting Fake ERP Servers
-```bash
-# Start all servers
-./start_erp_servers.sh
-
-# Or start individually
-python3 -u fake_erp_servers.py json > /tmp/erp_json.log 2>&1 &
-python3 -u fake_erp_servers.py xml > /tmp/erp_xml.log 2>&1 &
-python3 -u fake_erp_servers.py filtered > /tmp/erp_filtered.log 2>&1 &
-```
+**Note:** Make sure you've started the fake ERP servers first (see "Quick Start: Starting Fake ERP Servers" section above).
 
 #### Testing HTTP POST Consumers
 ```bash
@@ -497,6 +500,13 @@ This example uses separate Kafka consumer groups for each consumer type to ensur
 - SSE and HTTP POST consumers use different groups, so both receive all messages
 - Multiple instances of the same consumer type can process messages in parallel within the same consumer group
 
+**Critical for SSE Streams: Consumer Group Offsets**
+- Kafka consumer groups track message offsets, which means:
+  - ✅ Messages posted **AFTER** you connect the stream will be received
+  - ❌ Messages posted **BEFORE** you connect the stream will **NOT** be received (they were already consumed/processed)
+- **Correct usage pattern**: Connect the SSE stream FIRST, then post new data
+- If you don't see messages, try disconnecting and reconnecting the stream, then posting fresh data
+
 ## Tyk Streams Configuration Notes
 
 The Tyk Gateway and Tyk Streams must be configured to:
@@ -558,24 +568,7 @@ The Tyk Gateway and Tyk Streams must be configured to:
 
 This example includes fake ERP servers (`fake_erp_servers.py`) that simulate downstream systems receiving HTTP POST requests from Tyk Streams consumers.
 
-### Starting ERP Servers
-
-**Option 1: Start all servers at once**
-```bash
-./start_erp_servers.sh
-```
-
-**Option 2: Start servers individually**
-```bash
-# Terminal 1: JSON ERP Server (port 8001)
-python3 -u fake_erp_servers.py json > /tmp/erp_json.log 2>&1 &
-
-# Terminal 2: XML ERP Server (port 8002)
-python3 -u fake_erp_servers.py xml > /tmp/erp_xml.log 2>&1 &
-
-# Terminal 3: Filtered ERP Server (port 8003)
-python3 -u fake_erp_servers.py filtered > /tmp/erp_filtered.log 2>&1 &
-```
+**Note:** For quick start instructions, see the "Quick Start: Starting Fake ERP Servers" section near the beginning of this README.
 
 **Important:** Always use the `-u` flag (unbuffered output) when starting servers to ensure real-time log visibility.
 
@@ -709,6 +702,30 @@ The ERP servers (`fake_erp_servers.py`) are configured to handle both formats au
   # Restart Tyk Dashboard or trigger reload
   ```
 
+#### 9. SSE Stream "Connection timeout" or no messages appearing
+- **Cause**: SSE streams keep connections open waiting for data - "timeout" messages are often misleading
+- **Check**: Connection is actually established (check browser DevTools Network tab for HTTP 200)
+- **Solution**: 
+  1. Connect the stream FIRST (click "Start" on consumer)
+  2. THEN post new data using the Producer form
+  3. Remember: Consumer groups track offsets - messages posted before connecting won't appear
+- **Test direct connection** (bypass web UI proxy):
+  ```bash
+  # Terminal 1: Connect to stream
+  ./consume_json.sh
+  
+  # Terminal 2: Post data while stream is connected
+  ./post_data.sh '{"itemId":"TEST","name":"Test Item","category":"Electronics","price":29.99}'
+  ```
+- **Check web UI server logs**: `tail -f /tmp/web_ui_server.log`
+- **Verify proxy endpoint**: `curl -N http://localhost:8888/api/stream/json` (will hang - that's normal, it's waiting for data)
+
+#### 10. SSE Stream "ReadyState: 0" (CONNECTING)
+- **Cause**: Connection isn't completing
+- **Check**: Tyk Gateway is running: `curl http://tyk-gateway.localhost:8080/`
+- **Check**: Web UI server logs for errors
+- **Verify**: APIs are loaded: `./verify_apis_loaded.sh`
+
 ### Diagnostic Tools
 
 #### `diagnose_http_consumers.sh`
@@ -772,3 +789,44 @@ docker logs $(docker ps --format '{{.Names}}' | grep -i gateway | head -1) | gre
 
 Or if running locally, check the gateway log file for Streams-related messages.
 
+## Key Findings and Improvements
+
+During implementation and testing, several important issues were identified and resolved:
+
+### 1. Batch Data Handling
+**Issue**: ERP servers initially expected only single JSON objects, but Tyk Streams can send both single items and batch arrays, causing `AttributeError: 'list' object has no attribute 'get'`.
+
+**Solution**: Updated all three ERP handlers (JSON, XML, Filtered) to automatically detect and handle both formats:
+- Single items: `{"itemId": "...", "name": "..."}`
+- Batch arrays: `[{"itemId": "..."}, {"itemId": "..."}]`
+
+The handlers now iterate through items and process each one individually, making the system robust to both data formats.
+
+### 2. Log Visibility
+**Issue**: Python's output buffering prevented real-time log visibility when servers were started in the background.
+
+**Solution**: 
+- Added unbuffered output configuration to `fake_erp_servers.py`
+- Updated `start_erp_servers.sh` to use `python3 -u` flag (unbuffered mode)
+- Logs now appear in real-time in `/tmp/erp_*.log` files
+
+### 3. Consumer API Configuration
+**Issue**: Consumer API definitions need to be in the Tyk Dashboard data directory for the gateway to load them.
+
+**Solution**: Provided clear instructions and script to copy all consumer API definitions:
+```bash
+cp api-streams-master-data*.json ../../../../data/tyk-dashboard/1/apis/
+```
+
+### 4. Docker Networking
+**Issue**: When Tyk Gateway runs in Docker, it cannot reach `localhost` on the host machine.
+
+**Solution**: Consumer API configurations use `host.docker.internal` instead of `localhost` for HTTP client outputs, allowing Docker containers to reach host services.
+
+### 5. Diagnostic Tools
+**Enhancement**: Created comprehensive diagnostic scripts:
+- `diagnose_http_consumers.sh` - Full system health check
+- `test_http_consumers.sh` - End-to-end flow testing
+- `check_kafka_messages.sh` - Kafka topic verification
+
+These tools help quickly identify issues in the data flow pipeline.

@@ -29,6 +29,36 @@
     },
     "upstream": {
       "url": ""
+    },
+    "middleware": {
+      "global": {
+        "trafficLogs": {
+          "enabled": true
+        },
+        "contextVariables": {
+          "enabled": true
+        },
+        "cors": {
+          "enabled": true,
+          "allowedOrigins": [
+            "*"
+          ],
+          "allowedMethods": [
+            "GET",
+            "POST",
+            "OPTIONS"
+          ],
+          "allowedHeaders": [
+            "Content-Type",
+            "Accept",
+            "Cache-Control"
+          ],
+          "exposedHeaders": [],
+          "allowCredentials": false,
+          "maxAge": 86400,
+          "optionsPassthrough": false
+        }
+      }
     }
   },
   "x-tyk-streaming": {

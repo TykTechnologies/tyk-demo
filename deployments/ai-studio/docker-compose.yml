@@ -2,9 +2,9 @@
 services:
   tyk-ai-studio:
     platform: linux/${TARGETARCH:-arm64}
-    image: tykio/tyk-ai-studio:latest
+    image: tykio/tyk-ai-studio:v1.0.1
     volumes:
-      - ./deployments/ai-studio/volumes/tyk-ai-studio/db:/app/db # Map the database directory
+      - ${PWD}/deployments/ai-studio/volumes/tyk-ai-studio/db:/app/db # Map the database directory
     ports:
       - "3011:8080" # Frontend
       - "9090:9090" # Proxy
@@ -17,7 +17,7 @@ services:
       - DEVMODE=true
       - DEBUG_HTTP=false
       - DEBUG_HTTP_PROXY=false
-      - DATABASE_URL=db/ai-studio.db # Ensure this matches the filename
+      - DATABASE_URL=/app/db/ai-studio.db # Use absolute path
       - DATABASE_TYPE=sqlite
       - ECHO_CONVERSATION=true
       - TYK_AI_SECRET_KEY=top-secret

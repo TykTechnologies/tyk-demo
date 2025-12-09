@@ -29,6 +29,16 @@
     },
     "upstream": {
       "url": ""
+    },
+    "middleware": {
+      "global": {
+        "trafficLogs": {
+          "enabled": true
+        },
+        "contextVariables": {
+          "enabled": true
+        }
+      }
     }
   },
   "x-tyk-streaming": {
