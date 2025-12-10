@@ -1,7 +1,7 @@
 ---
 services:
   tyk-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.8.9-rc5}
+    image: tykio/tyk-dashboard-fips:${DASHBOARD_VERSION:-v5.8.9-rc5}
     ports:
       - 3000:3000
     networks:
