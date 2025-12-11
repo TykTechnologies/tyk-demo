@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kafka Master Data Streaming - Web UI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Kafka Master Data Streaming</h1>
+            <p>Producer & Consumer Dashboard</p>
+        </header>
+
+        <section class="producer-section">
+            <h2>📤 Producer - Post Master Data</h2>
+            <div class="form-container">
+                <form id="producerForm">
+                    <div class="form-row">
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="itemId">Item ID:</label>
+                                <input type="text" id="itemId" name="itemId" value="12345" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Name:</label>
+                                <input type="text" id="name" name="name" value="Widget" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="category">Category:</label>
+                                <select id="category" name="category" required>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Accessories">Accessories</option>
+                                    <option value="Furniture">Furniture</option>
+                                    <option value="Clothing">Clothing</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="price">Price:</label>
+                                <input type="number" id="price" name="price" step="0.01" value="29.99" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description (optional):</label>
+                                <textarea id="description" name="description" rows="1"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="status">Status (optional):</label>
+                                <input type="text" id="status" name="status" value="active">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" id="submitBtn">Post to Producer</button>
+                        <button type="button" id="formatBtn">Show JSON</button>
+                    </div>
+                </form>
+                <div id="producerStatus" class="status-message"></div>
+                <div id="jsonPreview" class="json-preview" style="display: none;">
+                    <h3>JSON Preview:</h3>
+                    <pre id="jsonOutput"></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="consumers-section">
+            <h2>📥 SSE Consumers - Real-Time Streams</h2>
+            <div class="consumers-grid">
+                <div class="consumer-panel">
+                    <div class="panel-header">
+                        <h3>JSON Consumer</h3>
+                        <div class="status-indicator" id="jsonStatus">
+                            <span class="status-dot"></span>
+                            <span>Disconnected</span>
+                        </div>
+                        <button class="toggle-btn" onclick="toggleConsumer('json')">Start</button>
+                    </div>
+                    <div class="stream-output" id="jsonStream">
+                        <p class="placeholder">Click "Start" to begin streaming...<br><small>Note: Stream will wait for data. Post items using the Producer form to see them appear here.</small></p>
+                    </div>
+                </div>
+                <div class="consumer-panel">
+                    <div class="panel-header">
+                        <h3>XML Consumer</h3>
+                        <div class="status-indicator" id="xmlStatus">
+                            <span class="status-dot"></span>
+                            <span>Disconnected</span>
+                        </div>
+                        <button class="toggle-btn" onclick="toggleConsumer('xml')">Start</button>
+                    </div>
+                    <div class="stream-output" id="xmlStream">
+                        <p class="placeholder">Click "Start" to begin streaming...<br><small>Note: Stream will wait for data. Post items using the Producer form to see them appear here.</small></p>
+                    </div>
+                </div>
+                <div class="consumer-panel">
+                    <div class="panel-header">
+                        <h3>Filtered Consumer</h3>
+                        <div class="status-indicator" id="filteredStatus">
+                            <span class="status-dot"></span>
+                            <span>Disconnected</span>
+                        </div>
+                        <button class="toggle-btn" onclick="toggleConsumer('filtered')">Start</button>
+                    </div>
+                    <div class="stream-output" id="filteredStream">
+                        <p class="placeholder">Click "Start" to begin streaming...<br><small>Note: Stream will wait for data. Post items using the Producer form to see them appear here.</small></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="logs-section">
+            <h2>📋 ERP Server Logs - Real-Time Tails</h2>
+            <div class="logs-grid">
+                <div class="log-panel">
+                    <div class="panel-header">
+                        <h3>JSON ERP Log</h3>
+                        <div class="log-status" id="jsonLogStatus">
+                            <span class="status-dot"></span>
+                            <span>Waiting...</span>
+                        </div>
+                        <button class="toggle-btn" onclick="toggleLog('json')">Start</button>
+                        <button class="clear-btn" onclick="clearLog('json')">Clear</button>
+                    </div>
+                    <div class="log-output" id="jsonLog">
+                        <p class="placeholder">Click "Start" to view logs...</p>
+                    </div>
+                </div>
+                <div class="log-panel">
+                    <div class="panel-header">
+                        <h3>XML ERP Log</h3>
+                        <div class="log-status" id="xmlLogStatus">
+                            <span class="status-dot"></span>
+                            <span>Waiting...</span>
+                        </div>
+                        <button class="toggle-btn" onclick="toggleLog('xml')">Start</button>
+                        <button class="clear-btn" onclick="clearLog('xml')">Clear</button>
+                    </div>
+                    <div class="log-output" id="xmlLog">
+                        <p class="placeholder">Click "Start" to view logs...</p>
+                    </div>
+                </div>
+                <div class="log-panel">
+                    <div class="panel-header">
+                        <h3>Filtered ERP Log</h3>
+                        <div class="log-status" id="filteredLogStatus">
+                            <span class="status-dot"></span>
+                            <span>Waiting...</span>
+                        </div>
+                        <button class="toggle-btn" onclick="toggleLog('filtered')">Start</button>
+                        <button class="clear-btn" onclick="clearLog('filtered')">Clear</button>
+                    </div>
+                    <div class="log-output" id="filteredLog">
+                        <p class="placeholder">Click "Start" to view logs...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
