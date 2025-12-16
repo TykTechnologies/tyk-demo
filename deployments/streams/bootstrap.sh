@@ -47,11 +47,5 @@ log_end_deployment
 echo -e "\033[2K
 ▼ Streams
  
-  ▽ ERP JSON
-                    URL : http://localhost:8001/erp/json/receive
-  ▽ ERP XML
-                    URL : http://localhost:8002/erp/xml/receive
-  ▽ ERP Filtered
-                    URL : http://localhost:8003/erp/filtered/receive            
   ▽ Master Data UI
                     URL : http://localhost:8888"
