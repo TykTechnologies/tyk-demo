@@ -13,12 +13,12 @@ footer .footer-menu__link {
 
 .navbar-dark .navbar-nav .nav-link {
   color: var(--tdp-nav-link-color);
-  font-family: 'OpenSans-Semibold';
+  font-family: Inter-SemiBold, sans-serif;
 }
 
 .navbar-dark .navbar-nav .nav-link:focus,
 .navbar-dark .navbar-nav .nav-link:hover {
-  color: var(--tdp-link-color);
+  color: var(--tdp-primary);
 }
 
 .navbar {
@@ -51,7 +51,6 @@ footer .footer-menu__link {
 .navbar .nav-link,
 .navbar .navbar-brand {
   color: var(--tdp-nav-link-color);
-  text-transform: uppercase;
 }
 
 .navbar .nav-link {
@@ -62,7 +61,6 @@ footer .footer-menu__link {
 .navbar .navbar-brand {
   font-size: 20px;
   margin-right: 40px;
-  font-family: 'OpenSans-Bold';
 }
 
 .btn-login {
@@ -75,7 +73,8 @@ footer .footer-menu__link {
 }
 
 .badge {
-  border-radius: 9px;
+  border-radius: 6px;
+  color: var(--tdp-text-color-extra-dark);;
 }
 
 .cart__item-count {
@@ -90,9 +89,9 @@ footer .footer-menu__link {
 
 /* Submenu */
 .submenu {
-  background: var(--tdp-secondary-dark);
-  padding: 0;
-  margin: 0;
+  background: white;
+  border: 1px solid var(--border-neutral-default);
+  border-radius: 8px;
 }
 
 .submenu .dropdown-item {
@@ -108,18 +107,17 @@ footer .footer-menu__link {
 }
 
 .submenu .dropdown-item {
-  color: white;
+  color: var(--tdb-text-default-subdue);
 }
 
 .dropdown-item:focus,
 .dropdown-item:hover {
-  background-color: var(--tdp-extra-dark);
-  color: var(--tdp-primary);
+  background-color: var(--surface-neutral-hover);
+  color: var(--tdp-text-color-extra-dark);
 }
 
 .admin-dash {
   text-decoration: underline;
-  font-family: 'OpenSans-SemiBold';
 }
 
 .side-menu-container{
@@ -161,16 +159,16 @@ footer .footer-menu__link {
   color: #43435B;
 }
 .sidebar-active {
-  background-color: #EBEDF4;
+  background-color: var(--tdp-tab-active);
 }
 .sidebar-nav li:hover{
-  background-color: #EBEDF4;
+  background-color: var(--tdp-tab-active);
 }
 .sidebar-nav li:target{
-  background-color: #EBEDF4;
+  background-color: var(--tdp-tab-active);
 }
 .sidebar-nav li:focus{
-  background-color: #EBEDF4;
+  background-color: var(--tdp-tab-active);
 }
 .sidebar-nav i{
   margin-bottom: 5px;

@@ -1,0 +1,480 @@
+<!-- Template used for viewing a particular Product -->
+
+{{ $thisProduct := .product }}
+{{ $user := CurrentUser req }}
+{{$catalogues_for_product := GetCataloguesForProduct req $user $thisProduct.ID}}
+{{ $allCatalogues := .catalogues }}
+{{ $cataloguesLength := len $allCatalogues}}
+{{ $hasDocs := false }}
+{{ if $thisProduct.IsDocumentationOnly}}
+	{{ if gt (len $thisProduct.SpecDetails) 0 }}
+		{{ $initialAPI := index $thisProduct.SpecDetails 0}}
+	{{ end }}
+{{else}}
+	{{ if gt (len $thisProduct.APIDetails) 0 }}
+		{{ $initialAPI := index $thisProduct.APIDetails 0}}
+	{{ end }}
+{{end}}
+{{ $initialAPIOasUrl := ""}}
+{{ $initialAPIID := ""}}
+{{ $initialTemplate := ""}}
+{{ if $thisProduct.IsDocumentationOnly}}
+	{{ $hasDocs = true}}
+
+{{else}}
+	{{ range $thisProduct.APIDetails }}
+		{{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
+		{{ $oasurl := gt (.OASUrl | trim | length) 0 }}
+		{{ $graphqlsdl := gt (.GraphQLSDL.Base.Url | trim | length) 0 }}
+		{{ $isGraphQL := eq .APIType "GraphQL" }}
+		{{ if or $oasfile $oasurl $graphqlsdl $isGraphQL }}
+			{{ $hasDocs = true}}
+		{{ end }}
+	{{ end }}
+{{end}}
+{{ $redoc := "product_doc_redoc" }}
+{{ $asyncapi := "product_doc_asyncapi" }}
+
+<div class="api-product-page-wrapper">
+    <div class="container">
+	<p class="mb-3">
+	    <a href="/portal/catalogue-products" class="breadcrumb-link">
+		< Back to catalogue overview </a>
+	</p>
+	{{ if .errors }}
+	<div class="alert alert-danger" role="alert">
+	    {{ range $category, $messages := .errors }}
+            <i class="tyk-icon tykon tykon-warning "></i>
+            {{ range $i, $message := $messages }}
+            <br/>
+            <div class="alert__content">{{ $message }}</div>
+            {{ end }}
+	</div>
+	{{end}}
+	{{ end }}
+	{{ if .added }}
+	<div class="alert alert-success" role="alert">
+	    <i class="tyk-icon tykon tykon-check "></i>
+	    <div class="alert__content">Success! This API Product was added to cart. <a href="/portal/private/cart/provision">Go to cart</a> to complete the request.</div>
+	</div>
+	{{ end }}
+    </div>
+    <div class="api-detail-background-color">
+	<div class="api-product-page__header w-100 mt-5">
+            <div class="maxh-268 minh-268 api-detail-background-color card d-flex flex-row {{ if $thisProduct.Logo.URL }}has-logo{{end}} container justify-content-between">
+		<div class="left-side-card-body">
+		    <div class="card-title mt-35 d-flex flex-row align-items-center">
+			<h1 class="heading-medium">{{.product.ProductName}}</h1>
+			<div class="pill-container {{ if not $thisProduct.Logo.URL }}ml-2 align-self-start{{end}} mb-2">
+			    <div class="pill">
+				<h5 class="body-medium-default m-0">{{ .product.AuthType }}</h5>
+			    </div>
+			</div>
+		    </div>
+		    <div class="minh-95 pr-4">
+			{{if .product.Description }}
+			<p class="text-regular-14 maxh-95 m-0">{{ .product.Description }}</p>
+			{{end}}
+		    </div>
+		    <div class="api-product-page__header card__action-buttons">
+			<!--	Not displaying access button for Products with Basic Auth or Documentation Only products 	-->
+			{{if and (ne $.product.AuthType "ba") (ne $.product.AuthType "custom") (not $thisProduct.IsDocumentationOnly)}}
+				{{ if $user }}
+					<button type="button" class="btn btn-primary" id="access-button">
+						<a href="#available-plans" class="access-btn-link">Access this product</a>
+					</button>
+				{{end}}
+			{{end}}
+		    </div>
+		</div>
+		{{ if $thisProduct.Logo.URL }}
+		<img class="card-img-top img-fluid" src='{{$thisProduct.Logo.URL}}' alt="">
+		{{ end }}
+            </div>
+	</div>
+    </div>
+    <div class="container mb-45">
+	<div class="step-wrapper tabs-wrapper d-flex flex-row">
+	    <span class="step active tab">Overview</span>
+	    <span class="step tab">API specification</span>
+	    <span class="step tab">Get started</span>
+	</div>
+    </div>
+    <div class="content-wrapper">
+	   <div class="content-wrapper__content d-block container">
+	    <div class="api-product-page__details">
+		{{if .product.Content }}
+		<div class="api-product-page__info">
+		    <div class="api-product-page__info-title">
+			<h2 class="heading-large">More info</h2>
+		    </div>
+		    <div class="api-product-page__info-description more-info-text">
+			<p>{{ safe .product.Content }}</p>
+		    </div>
+		</div>
+		{{end}}
+		{{if len .product.Scopes }}
+		<div class="api-product-page__info">
+		    <div class="api-product-page__info-title">
+			<h2 class="heading-large">Scopes</h2>
+		    </div>
+		    <div class="api-product-page__info-description">
+			<ul class="pl-3">
+			    {{ range .scopes }}
+			    <li> {{ . }} </li>
+			    {{end}}
+			</ul>
+		    </div>
+		</div>
+		{{end}}
+		{{ $upstreamURL := ProviderUpstreamURL req $thisProduct.ProviderID }}
+		{{if $upstreamURL }}
+		<div class="api-product-page__info">
+		    <div class="api-product-page__info-title">
+			<h2>Base URL</h2>
+		    </div>
+		    <div class="api-product-page__info-description">
+			<p class="api-product-page__info-description__base-url copy">
+			    {{ $upstreamURL }}
+			    <i class="tyk-icon tykon tykon-copy ml-3" data-copy-value="{{ $upstreamURL }}"></i>
+			</p>
+		    </div>
+		</div>
+		{{end}}
+		{{ $apisLength := len .product.APIDetails}}
+		{{$lastApi := sub $apisLength 1}}
+		{{ if gt $apisLength 0}}
+		<div class="api-product-page__info">
+		    <div class="api-product-page__info-title">
+			<h2 class="heading-large">APIs available in this product</h2>
+		    </div>
+		    <div class="api-product-page__info-description text-default-subdue flex-column">
+			<div class="row m-0 justify-content-center">
+			    {{ range $index, $api := .product.APIDetails }}
+			    <div class="product-api-details col-xl-3 labeled-card d-flex flex-column align-items-center {{if and (ge $index 0) (lt $index $lastApi)}}mr-35{{end}}">
+				<div class="labeled-card__title heading-large text-default-subdue mb-4">
+				    <h3 class="mb-0">{{ $api.Name }}</h3>
+				</div>
+										<div class="pill ml-2 bg-[#fff7cc]">
+											<h5 class="body-medium-default m-0">{{ $api.APIType }}</h5>
+										</div>
+				<div>
+				    <p class="text-regular-14 listen-path-text"> Listen path:
+					<span class="heading-small">{{ $api.ListenPath }}</span></p>
+				</div>
+				<div class="mt-12">
+				    {{if not (eq $api.Description "")}}
+				    <span class="m-0 body-large-bold">Description:</span>
+				    <p class="api-description-text text-regular-14" data-description="{{$api.Description}}">{{safe (TruncateString $api.Description 60)}}</p>
+				    {{end}}
+				</div>
+			    </div>
+			    {{ end }}
+			</div>
+		    </div>
+		</div>
+		{{end}}
+<!--	Not displaying plans for Products with Basic Auth or Documentation Only products 	-->
+		{{if and (ne $.product.AuthType "ba") (ne $.product.AuthType "custom") (not $thisProduct.IsDocumentationOnly)}}
+		<div class="api-product-page__info">
+		    <div class="api-product-page__info-title">
+			<h2 class="heading-large" id="available-plans">Plans available for subscription</h2>
+			<p class="text-regular-14 text-default-subdue">These different plans are available to subscribe this product to.</p>
+		    </div>
+		    <div class="api-product-page__info-description flex-column">
+			<div class="row m-0 justify-content-center">
+			    {{ $plansLength := len .unique_plans }}
+			    {{$lastPlan := sub $plansLength 1}}
+                            {{ if eq $plansLength 0 }}
+                            <i>no plans available</i>
+                            {{ else }}
+                            {{ range $index,$plan := .unique_plans }}
+                            {{$plan_id := .ID}}
+                            <div class="col-xl-3 labeled-card-plan {{if and (ge $index 0) (lt $index $lastPlan)}}mr-4{{end}} mb-3">
+				<div class="mt-43">
+                                    <h2 class="heading-large text-default-subdue">{{$plan.PlanName}}</h2>
+				</div>
+				<div class="mt-3 rate-limit-and-quota">
+                                    <p class="text-regular-14 m-0">Quota: {{ $plan.FormatQuota }}</p>
+                                    <p class="text-regular-14 m-0">Rate: {{ $plan.FormatRateLimit }}</p>
+				</div>
+				<div class="mt-4">
+                                    {{ if $user }}
+                                    {{if eq (len $catalogues_for_product) 1}}
+                                    {{range $catalogues_for_product}}
+                                    <form method="post" id="add-to-cart-form-b">
+                                        <input type="hidden" name="product_id" value={{$thisProduct.ID}}>
+                                        <input type="hidden" name="catalogue_id" value="{{ .ID }}">
+                                        <input type="hidden" name="plan_id" value="{{$plan_id}}">
+                                        <button type="submit" class="btn btn-secondary" id="add-to-cart-btn" data-single-catalogue="true">Access with this plan</button>
+                                    </form>
+                                    {{end}}
+                                    {{else}}
+                                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#selectCatalogueForPlan{{$plan_id}}">Access with this plan</button>
+                                    <form method="post" id="add-to-cart-form-b">
+					<div class="modal fade" id="selectCatalogueForPlan{{$plan_id}}" tabindex="-1" role="dialog" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+						<div class="modal-content p-2">
+						    <div class="modal-header justify-content-center">
+							<h2 class="modal-title">Select a Catalogue</h2>
+						    </div>
+						    <div class="modal-footer">
+							<div class="table-wrapper">
+							    <table class="table">
+								<thead>
+								    <tr>
+									<th>Catalogue</th>
+									<th class="actions-cell"></th>
+								    </tr>
+								</thead>
+								<tbody>
+								    {{ range $catalogues_for_product }}
+								    <tr>
+									<td> {{ .Name }}</td>
+									<td class="text-center">
+									    <input type="radio" product-id="{{$thisProduct.ID}}" class="catalogue-input-radio" name="catalogue_id" value="{{ .ID }}" />
+									</td>
+								    </tr>
+								    {{ end }}
+								    <input type="hidden" name="product_id" value="{{$thisProduct.ID}}" class="product-input-radio" />
+								    <input type="hidden" name="plan_id" value="{{$plan_id}}">
+								</tbody>
+							    </table>
+							</div>
+							<div class="pt-2">
+							    <button type="button" class="btn btn-secondary-outline" data-dismiss="modal">Cancel</button>
+							    <button type="submit" class="btn btn-primary" id="add-to-cart-btn">Add to cart</button>
+							</div>
+						    </div>
+						</div>
+                                            </div>
+					</div>
+                                    </form>
+                                    {{end}}
+                                    {{end}}
+				</div>
+                            </div>
+                            {{end}}
+                            {{ end }}
+			</div>
+		    </div>
+		</div>
+		{{end}}
+
+		<!-- Related Blog posts -->
+		{{if .posts}}
+		<div class="api-product-page__info">
+		    <div class="api-product-page__info-title">
+				<h2 class="heading-large">Related Blog Content</h2>
+		    </div>
+		    <div class="api-product-page__posts d-flex flex-column">
+				<div class="row m-0 justify-content-center">
+					{{$postsLength := len .posts}}
+					{{$lastPost := sub $postsLength 1}}
+					{{ if eq $postsLength 0 }}
+						<i>no posts available</i>
+					{{ else }}
+						{{ range $index, $post := .posts }}
+							{{$post_id := .ID}}
+							<div class="p-4 labeled-card-post {{if and (ge $index 0) (lt $index $lastPost)}}mr-4{{end}} mb-3 d-flex flex-column align-items-center">
+								<div class="text-uppercase text-regular-16 text-default-subdue m-0 text-center mb-3">
+									{{.CreatedAt | date "2 Jan, 2006" }} - {{.Author.DisplayName}}
+								</div>
+								<div class="text-center mb-4">
+									<h2 class="heading-large text-default-subdue labeled-card-post-title m-0">{{.Title}}</h2>
+								</div>
+								<div class="d-flex flex-wrap justify-content-center mb-4">
+									{{range $indx, $category := .Categories}}
+										<div class="text-regular-14 pill m-0 mr-2 mb-2">{{.Name}}</div>
+									{{end}}
+								</div>
+								<div class="mt-auto">
+									<a href="{{.URL}}" class="btn btn-secondary-outline">Keep reading</a>
+								</div>
+							</div>
+						{{end}}
+					{{end}}
+				</div>
+		    </div>
+		</div>
+		{{end}}
+		<!-- End Related blog posts -->
+            </div>
+	</div>
+	<div>
+	    <div class="content-wrapper__content d-none">
+		{{if $hasDocs}}
+		<div class="container api-product-page_spec">
+		    <p>Select an API</p>
+		    <div class="d-flex flex-row justify-content-between align-items-center mt-1 mb-5 pb-3">
+				<select id="OasApiSelect">
+					<option value="">Select an API</option>
+					{{ $docArray := $thisProduct.APIDetails}}
+					{{ if $thisProduct.IsDocumentationOnly}}
+						{{ range $index, $spec_detail := $thisProduct.SpecDetails }}
+						{{ $oasfile := gt ($spec_detail.OASDocument.Base.Url | trim | length) 0 }}
+						{{ $oasurl := gt ($spec_detail.OASUrl | trim | length) 0 }}
+						{{ $graphqlsdl := gt ($spec_detail.GraphQLSDL.Base.Url | trim | length) 0 }}
+						{{ $hasGraphqlEndpoint := gt ($spec_detail.GraphQLServerEndpoint | trim | length) 0 }}
+						{{ $isGraphql := or $graphqlsdl $hasGraphqlEndpoint }}
+						{{ if or $oasfile $oasurl $isGraphql }}
+							{{$url := ""}}
+							{{if $oasfile }}
+								{{$url = .OASDocument.Base.Url}}
+							{{else if $oasurl}}
+								{{$url = .OASUrl}}
+							{{else if $graphqlsdl}}
+								{{$url = .GraphQLSDL.Base.Url}}
+							{{end}}
+							{{$template := ProductDocTemplate req $thisProduct.Path $spec_detail.SpecAlias }}
+							{{if (eq $initialAPIID "")}}
+								{{ $initialAPIOasUrl = $url }}
+								{{ $initialAPIID = $spec_detail.SpecAlias }}
+								{{ $initialTemplate = $template }}
+							{{end}}
+							<option value="{{$spec_detail.SpecAlias}}-{{$url}}" data-template="{{$template}}" {{if eq $initialAPIID $spec_detail.SpecAlias}}selected="selected"{{end}}>
+								{{$spec_detail.SpecAlias}}
+								<span class="pill ml-2 bg-[#fff7cc]">
+								</span>
+							</option>
+						{{end}}
+					{{end}}
+					{{else}}
+						{{ range $index, $api_detail := $thisProduct.APIDetails }}
+							{{ $oasfile := gt ($api_detail.OASDocument.Base.Url | trim | length) 0 }}
+							{{ $oasurl := gt ($api_detail.OASUrl | trim | length) 0 }}
+							{{ $graphqlsdl := gt ($api_detail.GraphQLSDL.Base.Url | trim | length) 0 }}
+							{{ $isGraphQL := or (eq $api_detail.APIType "GraphQL") (eq $api_detail.APIType "UDG") }}
+							{{ if or $oasfile $oasurl $graphqlsdl $isGraphQL }}
+								{{$url := ""}}
+								{{if $oasfile }}
+									{{$url = .OASDocument.Base.Url}}
+								{{else if $oasurl}}
+									{{$url = .OASUrl}}
+								{{else if $graphqlsdl}}
+									{{$url = .GraphQLSDL.Base.Url}}
+								{{end}}
+								{{$template := ProductDocTemplate req $thisProduct.Path $api_detail.APIID }}
+								{{if and (not $isGraphQL) (eq $initialAPIID "")}}
+									{{ $initialAPIOasUrl = $url }}
+									{{ $initialAPIID = $api_detail.APIID }}
+									{{ $initialTemplate = $template }}
+								{{end}}
+								<option value="{{$api_detail.APIID}}-{{ $url }}" data-graphqlendpoint="{{ .GraphQLServerEndpoint }}" data-template="{{$template}}" {{if eq $initialAPIID $api_detail.APIID}}selected="selected"{{end}}>
+									{{$api_detail.Name}}
+								</option>
+							{{end}}
+						{{end}}
+					{{end}}
+				</select>
+				<div class="oas-display-content-download-button">
+					<form name="oas_form" method="get" data-path="/portal/catalogue-products/{{$thisProduct.Path}}" id="display-download-button" action="{{if ne $initialAPIID ""}}/portal/catalogue-products/{{$thisProduct.Path}}/{{$initialAPIID}}/docs/download{{end}}">
+						<button class="download-oas-button" type="submit" {{if eq $initialAPIID ""}}disabled{{end}}>DOWNLOAD SPEC</button>
+					</form>
+				</div>
+		    </div>
+		</div>
+        {{ if $thisProduct.WebhooksEnabled }}
+        	{{ $oas_template = $asyncapi }}
+        {{ end }}
+        <div id="api_doc_wrapper">
+		{{if eq $initialTemplate $redoc}}
+            <div id="redoc-wrapper">
+            <redoc hide-download-button></redoc>
+            </div>
+        {{else if eq $initialTemplate $asyncapi}}
+            <script src="https://unpkg.com/@asyncapi/react-component@latest/browser/standalone/index.js"></script>
+            <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@latest/styles/default.min.css">
+
+            <div id="asyncapi"></div>
+
+            <script>
+                AsyncApiStandalone.render({
+                    schema: {
+                        url: '{{$initialAPIOasUrl}}',
+                        options: { method: "GET", mode: "cors" },
+                    },
+                    config: {
+                        "show": {
+                            "sidebar": false,
+                            "info": true,
+                            "operations": true,
+                            "servers": true,
+                            "messages": true,
+                            "schemas": true,
+                            "errors": true
+                        },
+                        "expand":{
+                            "messageExamples": false
+                        },
+                        "sidebar": {
+                            "showServers": "byDefault",
+                            "showOperations": "byDefault"
+                        }
+                        },
+                    },
+                    document.getElementById('asyncapi')
+                );
+            </script>
+		{{else if eq $initialTemplate "product_doc_graphql_playground"}}
+		<div id="graphql-playground-wrapper">
+			<iframe src="/portal/catalogue-products/{{$thisProduct.Path}}/{{$initialAPIID}}/docs?embed=1" width="100%" height="600" frameborder="0"></iframe>
+		</div>
+		{{else if gt (len $initialAPIOasUrl) 0}}
+        <div id="oas-display-stoplight">
+        <elements-api apiDescriptionUrl="{{$initialAPIOasUrl}}" router="hash" layout="responsive" hideExport="true"/>
+        </div>
+        {{end}}
+        </div>
+		{{else}}
+		<div class="container">
+		    <div class="alert alert-warning mt-5" role="alert">
+			<i class="tyk-icon tykon tykon-warning "></i>
+			<div class="alert__content">
+			    There's no specifications attached
+			</div>
+		    </div>
+		</div>
+		{{end}}
+	    </div>
+
+
+	    <div class="content-wrapper__content d-none container">
+		{{if gt (len $thisProduct.Docs) 0}}
+		<div class="container d-flex d-row mt-60">
+          <div class="step-wrapper-api-docs d-flex flex-column">
+            {{range $index,$doc := $thisProduct.Docs}}
+              <span class="step text-regular-14 {{if eq $index 0}}active{{end}}">{{$doc.Title}}</span>
+            {{end}}
+          </div>
+          <div class="content-wrapper-api-docs ml-110">
+            {{range $index,$doc := $thisProduct.Docs}}
+              <div class="content-wrapper__content-api-docs {{if eq $index 0}}d-block{{else}}d-none{{end}}">
+                <h3 class="dark mb-50">{{$doc.Title}}</h3>
+              {{if and $doc.MarkdownEnabled (gt (len $doc.MarkdownContent) 0)}}
+                <div id="set-markdown-content-{{$index}}" class="api-docs-text">
+				 {{safe_md $doc.MarkdownContent}}
+                </div>
+              {{else}}
+                <div class="api-docs-text">
+                 {{safe $doc.Content}}
+                </div>
+              {{end}}
+              </div>
+            {{end}}
+          </div>
+        </div>
+		{{else}}
+		<div class="alert alert-warning mt-5" role="alert">
+		    <i class="tyk-icon tykon tykon-warning "></i>
+		    <div class="alert__content">
+			There are currently no API Products documentation available
+		    </div>
+		</div>
+		{{end}}
+	    </div>
+
+	</div>
+    </div>
+    <div class="d-none" id="success-msg">Value has been copied successfully</div>
+</div>

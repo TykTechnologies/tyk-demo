@@ -15,7 +15,7 @@ services:
       - PORTAL_DATABASE_CONNECTIONSTRING=host=tyk-portal-postgres port=5432 dbname=portal user=admin password=secr3t sslmode=disable
       - PORTAL_DATABASE_MAXRETRIES=5
       - PORTAL_DATABASE_RETRYDELAY=5000
-      - PORTAL_THEMING_THEME=default
+      - PORTAL_THEMING_THEME=${PORTAL_THEMING_THEME:-default}
       - PORTAL_THEMING_PATH=/opt/portal/themes
       - PORTAL_STORAGE=fs
       - PORTAL_LICENSEKEY=${DASHBOARD_LICENCE:?Licence missing from Docker environment file .env.}

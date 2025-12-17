@@ -5,18 +5,18 @@
 <div class="home-page-wrapper">
   <header class="dark-to-light-bg">
     <div class="container">
-      <div class="row align-items-center">
+      <div class="row">
         <div class="col-sm-6">
           <div class="text-container">
-            <h1 class="hero-title">{{.page.Title}}</h1>
-            <p class="hero-description">
+            <h1>{{.page.Title}}</h1>
+            <p>
             {{if .blocks.HeaderDescription.MarkdownEnabled}}
               {{safe_md .blocks.HeaderDescription.MarkdownContent}}
             {{else}}
               {{safe .blocks.HeaderDescription.Content}}
             {{end}}
             </p>
-            <a href="{{.blocks.HeaderButtonLink.Content}}" class="btn btn-primary hero-cta">{{ safe .blocks.HeaderButtonLabel.Content}}</a>
+            <a href="{{.blocks.HeaderButtonLink.Content}}" class="btn btn-primary">{{ safe .blocks.HeaderButtonLabel.Content}}</a>
           </div>
         </div>
         <div class="col-sm-6 image-container" style="background: url('/assets/images/tyk-portal-silhouette.png') no-repeat left center;">
@@ -27,19 +27,17 @@
 
   {{ if .blocks.UseCasesTitle.Content }}
     <div class="container text-center use-cases">
-      <h2 class="section-title">{{ safe .blocks.UseCasesTitle.Content}}</h2>
-      <p class="section-description">
+      <h2>{{ safe .blocks.UseCasesTitle.Content}}</h2>
+      <p>
         {{if .blocks.UseCasesDescription.MarkdownEnabled}}
           {{ safe_md .blocks.UseCasesDescription.MarkdownContent}}
         {{else}}
           {{ safe .blocks.UseCasesDescription.Content}}
         {{end}}
       </p>
-      <div class="row use-cases-cards">
-        <div class="col-sm-4 mt-4 use-case-card">
-          <div class="card-icon mb-3 m-auto">
-            <img src="/assets/images/use-cases/consumers.svg"/>
-          </div>
+      <div class="row">
+        <div class="col-sm-4 mt-4">
+          <img class="mb-3 m-auto" src="/assets/images/use-cases/consumers.svg"/>
           <h3 class="mb-4">{{ safe .blocks.UseCase1Title.Content}}</h3>
           <p class="pr-3">
             {{if .blocks.UseCase1Description.MarkdownEnabled}}
@@ -49,10 +47,8 @@
             {{end}}
           </p>
         </div>
-        <div class="col-sm-4 mt-4 use-case-card">
-          <div class="card-icon mb-3 m-auto">
-            <img src="/assets/images/use-cases/business.svg"/>
-          </div>
+        <div class="col-sm-4 mt-4">
+          <img class="mb-3 m-auto" src="/assets/images/use-cases/business.svg"/>
           <h3 class="mb-4">{{ safe .blocks.UseCase2Title.Content}}</h3>
           <p class="pr-3">
             {{if .blocks.UseCase2Description.MarkdownEnabled}}
@@ -62,10 +58,8 @@
             {{end}}
           </p>
         </div>
-        <div class="col-sm-4 mt-4 use-case-card">
-          <div class="card-icon mb-3 m-auto">
-            <img src="/assets/images/use-cases/research.svg"/>
-          </div>
+        <div class="col-sm-4 mt-4">
+          <img class="mb-3 m-auto" src="/assets/images/use-cases/research.svg"/>
           <h3 class="mb-4">{{ safe .blocks.UseCase3Title.Content}}</h3>
           <p class="pr-3">
             {{if .blocks.UseCase3Description.MarkdownEnabled}}
@@ -208,56 +202,7 @@
       <div class="container">
         <div class="row justify-content-center">
           {{ range $featured_products }}
-          {{ $productPath := .Path}}
-          {{ $hasDocs := false }}
-            <div class="col-lg-4 card-container">
-              <div class="card d-flex flex-column {{ if .Logo }}has-logo{{end}}">
-                {{ if .Logo }}
-                  <img class="card-image-border-card-view" src="{{ safe .Logo.URL}}" alt="">
-                {{ end }}
-                <div class="home-card-body align-self-center w-100">
-                  <div class="card-title d-flex flex-column justify-content-end">
-                    <div class="pill-container mb-4 align-self-end">
-                      <div class="pill">{{ .AuthType }} </div>
-                    </div>
-                    <h2>{{ safe .ProductName}}</h2>
-                  </div>
-                  <p class="card-text">{{ .Description }}</p>
-                </div>
-                <div class="home-card-cta d-flex flex-row align-self-center justify-content-between w-100">
-                  <a href="/portal/catalogue-products/{{ .Path }}" class="btn btn-secondary-outline">More Info</a>
-                  <div class="api-product-page__header card__action-buttons d-flex align-self-center">
-                  {{ range .APIDetails }}
-                    {{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
-                    {{ $oasurl := gt (.OASUrl | trim | length) 0 }}
-                      {{ if or $oasfile $oasurl }}
-                        {{ $hasDocs = true }}
-                      {{end}}
-                    {{end}}
-                    {{if $hasDocs }}
-                      <div class="dropdown mr-2">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          View Docs
-                        </button>
-                        <div class="view-docs-dropdown dropdown-menu" aria-labelledby="dropdownMenuButton">
-                          {{ range .APIDetails }}
-                            {{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
-                            {{ $oasurl := gt (.OASUrl | trim | length) 0 }}
-                            {{ if or $oasfile $oasurl }}
-                              <a href="/portal/catalogue-products/{{$productPath}}/{{ safe .APIID}}/docs" target="_blank">
-                                <p class="docs-link">
-                                  {{ .Name }}
-                                </p>
-                              </a>
-                            {{ end }}
-                          {{ end }}
-                        </div>
-                      </div>
-                    {{end}}
-                  </div>
-                </div>
-              </div>
-            </div>
+            {{ render "catalogue_card" . }}
           {{ end }}
         </div>
         <div class="col-12 text-center mt-3">

@@ -1,0 +1,626 @@
+/* ==========================================================================
+   Catalogue Page Header
+   ========================================================================== */
+
+.catalogue-header {
+  display: block;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--tdp-primary-light, #E8E8F0);
+}
+
+.catalogue-header__title h1 {
+  margin: 0 0 4px 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--tdp-text-color-extra-dark, #03031C);
+}
+
+.catalogue-header__subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--tdp-text-color, #414160);
+}
+
+.catalogue-controls__view-toggle {
+  display: flex;
+  gap: 0;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.catalogue-controls__view-toggle button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--tdp-primary-light, #E8E8F0);
+  background: white;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.catalogue-controls__view-toggle button:first-child {
+  border-radius: 6px 0 0 6px;
+  border-right: none;
+}
+
+.catalogue-controls__view-toggle button:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+.catalogue-controls__view-toggle button svg {
+  fill: var(--tdp-secondary-dark);
+  transition: fill 0.15s ease;
+}
+
+.catalogue-controls__view-toggle button:hover {
+  background: var(--tdp-primary-light, #F5F5FA);
+}
+
+.catalogue-controls__view-toggle button.active {
+  background: var(--tdp-primary);
+  border-color: var(--tdp-primary);
+}
+
+.catalogue-controls__view-toggle button.active svg {
+  fill: white;
+}
+
+/* ==========================================================================
+   Catalogue Controls (Search & Filter)
+   ========================================================================== */
+
+.catalogue-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Search container - original styling with 42px height */
+.catalogue-controls .search-container {
+  flex: 1;
+  max-width: 400px;
+  position: relative;
+}
+
+.catalogue-controls .search-container .form-control.search-input {
+  height: 42px;
+  padding-right: 50px;
+}
+
+.catalogue-controls .search-container .input-group-append {
+  position: absolute;
+  right: 12px;
+  height: 42px;
+  background: transparent;
+  top: 0;
+  display: flex;
+  align-items: center;
+}
+
+.catalogue-controls .search-container .input-group-append .input-group-text {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Filter container - original styling with 42px height */
+.catalogue-controls .filter-container {
+  min-width: 180px;
+}
+
+.catalogue-controls .filter-container .form-select {
+  height: 42px;
+}
+
+/* Search button - outline style with 42px height */
+.catalogue-controls .btn-primary-outline {
+  height: 42px;
+  padding: 0 20px;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Badge Styles (shared between grid and list views)
+   ========================================================================== */
+
+.catalogue-page-wrapper .badge-api-type {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.catalogue-page-wrapper .badge-rest {
+  background-color: #fff7cc;
+  color: #505071;
+}
+
+.catalogue-page-wrapper .badge-graphql {
+  background-color: #E535AB;
+  color: white;
+}
+
+/* ==========================================================================
+   Product Card - Grid View (Default)
+   ========================================================================== */
+
+.catalogue-page-wrapper .catalog-apis-container > .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.catalogue-page-wrapper .card-container {
+  display: flex;
+}
+
+.catalogue-page-wrapper .card-container .product-card,
+.catalogue-page-wrapper .card.flex-column.product-card {
+  width: 100%;
+  min-height: 380px !important; /* Override card.css 300px - consistent height across all cards */
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  position: relative;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.catalogue-page-wrapper .product-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Elevate card z-index when dropdown is open */
+.catalogue-page-wrapper .card-container:has(.dropdown.show) {
+  z-index: 100;
+}
+
+/* Card Image Section - Grid View */
+.catalogue-page-wrapper .card-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  background-color: var(--surface-default-subdued, #F5F5FA);
+  border-top-left-radius: var(--tdp-card-border-radius);
+  border-top-right-radius: var(--tdp-card-border-radius);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Grid View: Hide image wrapper for cards WITHOUT images */
+.catalogue-page-wrapper .product-card:not(.has-image) .card-img-wrapper {
+  display: none;
+}
+
+.catalogue-page-wrapper .card-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Card Badges - Grid View: inline below image (or at top if no image) */
+.catalogue-page-wrapper .product-card .card-badges {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.catalogue-page-wrapper .card-badges__api-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.catalogue-page-wrapper .card-badges__auth-type {
+  flex-shrink: 0;
+}
+
+/* Card Body - Grid View */
+.catalogue-page-wrapper .product-card .card-body {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch !important; /* Override Bootstrap align-self-start */
+  width: 100%;
+}
+
+.catalogue-page-wrapper .product-card .card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  color: var(--tdp-text-color, #36364C);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.catalogue-page-wrapper .product-card .card-text {
+  font-size: 0.875rem;
+  color: var(--tdp-secondary);
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Handle HTML content in description */
+.catalogue-page-wrapper .product-card .card-text p {
+  margin: 0;
+  display: inline;
+}
+
+.catalogue-page-wrapper .product-card .card-text strong {
+  font-weight: 600;
+}
+
+/* Card CTA / Footer - Grid View */
+.catalogue-page-wrapper .product-card .card-cta {
+  padding: 16px 20px;
+  background: transparent;
+  border-top: none;
+  margin-top: auto;
+}
+
+.catalogue-page-wrapper .product-card .card-cta .btn {
+  font-size: 0.875rem;
+  padding: 8px 16px;
+}
+
+.catalogue-page-wrapper .product-card .card-cta .dropdown {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.catalogue-page-wrapper .product-card .card-cta .dropdown.show {
+  z-index: 100;
+}
+
+.catalogue-page-wrapper .product-card .card-cta .dropdown-menu {
+  z-index: 1000;
+}
+
+.catalogue-page-wrapper .product-card .card-cta .dropdown-toggle {
+  font-size: 0.875rem;
+  padding: 8px 16px;
+}
+
+/* ==========================================================================
+   Product Card - List View
+   ========================================================================== */
+
+/* List view container - full width */
+.catalogue-page-wrapper .card-container.col-lg-12 {
+  max-width: 100%;
+  flex: 0 0 100%;
+}
+
+/* List view card base - override grid view styles */
+/* Note: In list view, JS toggles card to .flex-row class */
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card,
+.catalogue-page-wrapper .card-container.col-lg-12 .card.flex-row.product-card {
+  flex-direction: row !important;
+  min-height: 140px !important;
+  height: 140px !important;
+}
+
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card:hover {
+  transform: none;
+}
+
+/* List view - Hide image wrapper for cards WITHOUT images */
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card:not(.has-image) .card-img-wrapper {
+  display: none;
+}
+
+/* List view - Image wrapper for cards WITH images */
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card.has-image .card-img-wrapper {
+  width: 200px;
+  min-width: 200px;
+  height: 100%;
+  border-radius: var(--tdp-card-border-radius) 0 0 var(--tdp-card-border-radius);
+  flex-shrink: 0;
+}
+
+/* List view - Badges: inline in content area */
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-badges {
+  position: static;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+  width: auto;
+}
+
+.catalogue-page-wrapper .card-container.col-lg-12 .card-badges__api-types {
+  display: flex;
+  gap: 8px;
+}
+
+.catalogue-page-wrapper .card-container.col-lg-12 .card-badges__auth-type {
+  margin-left: 0;
+}
+
+/* List view - Badge styling overrides (must override Bootstrap .badge) */
+.catalogue-page-wrapper .card-container.col-lg-12 .badge.badge-api-type,
+.catalogue-page-wrapper .card-container.col-lg-12 span.badge-api-type {
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  padding: 4px 10px !important;
+  border-radius: 4px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+}
+
+.catalogue-page-wrapper .card-container.col-lg-12 .badge.badge-rest,
+.catalogue-page-wrapper .card-container.col-lg-12 span.badge-rest {
+  background-color: #fff7cc !important;
+  background: #fff7cc !important;
+  color: #505071 !important;
+}
+
+.catalogue-page-wrapper .card-container.col-lg-12 .badge.badge-graphql,
+.catalogue-page-wrapper .card-container.col-lg-12 span.badge-graphql {
+  background-color: #E535AB !important;
+  background: #E535AB !important;
+  color: white !important;
+}
+
+/* List view - Card body */
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-body {
+  flex: 1;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start !important; /* Override JS align-self-center */
+  align-self: stretch !important; /* Full height */
+  min-width: 0;
+}
+
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-title {
+  margin-bottom: 4px;
+}
+
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-title h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-text {
+  -webkit-line-clamp: 1;
+  margin-top: 4px;
+}
+
+/* List view - Card CTA / Actions */
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-cta {
+  display: flex !important;
+  flex-direction: column !important;
+  width: auto !important;
+  border-top: none !important;
+  border-left: 1px solid var(--tdp-primary-light, #E8E8F0);
+  padding: 20px 24px;
+  justify-content: center;
+  align-items: stretch;
+  gap: 10px;
+  min-width: 130px;
+  flex-shrink: 0;
+  margin-top: 0 !important;
+}
+
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-cta .dropdown {
+  margin: 0;
+}
+
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-cta .dropdown .dropdown-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-cta .btn {
+  margin: 0 !important;
+  width: 100%;
+  text-align: center;
+}
+
+.catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-cta .learn-more-cta {
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Legacy Styles (backwards compatibility)
+   ========================================================================== */
+
+.catalogue-page-wrapper .card:not(.product-card) {
+  margin: 5px;
+}
+
+.catalogue-page-wrapper .card:not(.product-card) .card-body,
+.catalogue-page-wrapper .card:not(.product-card) .card-cta {
+  padding: 20px;
+}
+
+/* Legacy sorting container - hidden, replaced by catalogue-header__view-toggle */
+.sorting-container {
+  display: none;
+}
+
+.catalog-apis-container .card-text {
+  padding: 0;
+}
+
+.card.d-flex.flex-row .dropdown,
+.card.d-flex.flex-row .dropdown .dropdown-toggle {
+  width: 100%;
+}
+
+.active#view-as-list,
+.active#view-as-cards {
+  background-color: var(--tdp-primary);
+  color: white;
+}
+
+#view-as-list,
+#view-as-cards {
+  padding: 7px;
+  background-color: var(--tdp-neutral-lighter);
+}
+
+#view-as-list:focus,
+#view-as-cards:focus {
+  outline: none;
+}
+
+#view-as-list {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  padding-left: 20px;
+}
+
+#view-as-cards {
+  padding-right: 20px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+#grid-svg,
+#list-svg {
+  fill: var(--tdp-secondary-dark);
+}
+
+.active#grid-svg,
+.active#list-svg {
+  fill: white;
+}
+
+.catalogue-input-radio {
+  opacity: 1 !important;
+}
+
+/* ==========================================================================
+   Responsive Styles
+   ========================================================================== */
+
+@media (max-width: 991px) {
+  /* Tablet - stack filter below search */
+  .catalogue-controls {
+    flex-wrap: wrap;
+  }
+
+  .catalogue-controls .search-container {
+    flex: 1 1 100%;
+    max-width: none;
+    margin-bottom: 12px;
+  }
+
+  .catalogue-controls .filter-container {
+    flex: 1;
+  }
+
+  /* Tablet list view adjustments */
+  .catalogue-page-wrapper .card-container.col-lg-12 .product-card.has-image .card-img-wrapper {
+    width: 200px;
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Mobile header adjustments */
+  .catalogue-header__title h1 {
+    font-size: 1.5rem;
+  }
+
+  /* Mobile controls - stack everything */
+  .catalogue-controls {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .catalogue-controls__view-toggle {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+
+  .catalogue-controls .search-container {
+    max-width: none;
+    margin-bottom: 0;
+    width: 100%;
+  }
+
+  .catalogue-controls .filter-container {
+    width: 100%;
+  }
+
+  .catalogue-controls .filter-container .form-select {
+    width: 100%;
+  }
+
+  .catalogue-controls .btn-primary-outline {
+    width: 100%;
+  }
+
+  /* Mobile card adjustments */
+  .catalogue-page-wrapper .card-img-wrapper {
+    height: 140px;
+  }
+
+  .catalogue-page-wrapper .product-card .card-body {
+    padding: 16px;
+  }
+
+  .catalogue-page-wrapper .product-card .card-cta {
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .catalogue-page-wrapper .product-card .card-cta .dropdown,
+  .catalogue-page-wrapper .product-card .card-cta .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .catalogue-page-wrapper .product-card .card-cta .dropdown .dropdown-toggle {
+    width: 100%;
+  }
+
+  /* Badges smaller on mobile */
+  .catalogue-page-wrapper .badge-api-type {
+    font-size: 0.65rem;
+    padding: 3px 8px;
+  }
+
+  /* Mobile list view - stack vertically */
+  .catalogue-page-wrapper .card-container.col-lg-12 .product-card {
+    flex-direction: column !important;
+  }
+
+  .catalogue-page-wrapper .card-container.col-lg-12 .product-card.has-image .card-img-wrapper {
+    width: 100%;
+    min-width: 100%;
+    height: 140px;
+    border-radius: var(--tdp-card-border-radius) var(--tdp-card-border-radius) 0 0;
+  }
+
+  .catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-cta {
+    border-left: none;
+    border-top: 1px solid var(--tdp-primary-light, #E8E8F0);
+    width: 100%;
+  }
+}

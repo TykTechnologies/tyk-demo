@@ -1,0 +1,62 @@
+{{ $id := .id }}
+{{ $title := .title }}
+{{ $body := .body }}
+{{ $confirmText := .confirmText }}
+{{ $confirmClass := .confirmClass }}
+{{ $showIcon := .showIcon }}
+{{ $icon := .icon }}
+{{ $cancelText := .cancelText }}
+{{ $cancelClass := .cancelClass }}
+{{ $formAction := .formAction }}
+{{ $formMethod := .formMethod }}
+{{ $hiddenFields := .hiddenFields }}
+{{ $useForm := .useForm }}
+
+{{ if not $icon }}
+  {{ $icon = "tykon-delete" }}
+{{ end }}
+{{ if not $cancelText }}
+  {{ $cancelText = "Cancel" }}
+{{ end }}
+{{ if not $cancelClass }}
+  {{ $cancelClass = "btn-secondary-outline" }}
+{{ end }}
+{{ if not $formMethod }}
+  {{ $formMethod = "post" }}
+{{ end }}
+
+{{ if or $formAction $useForm }}
+<form method="{{ $formMethod }}"{{ if $formAction }} action="{{ $formAction }}"{{ end }}>
+{{ end }}
+
+  <div class="modal fade" id="{{ $id }}" tabindex="-1" role="dialog" aria-labelledby="{{ $id }}Title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered flex-column justify-content-center align-items-center" role="document">
+      {{ if $showIcon }}
+      <div class="modal-top-border">
+        <i class="tyk-icon tykon {{ $icon }}"></i>
+      </div>
+      {{ end }}
+      <div class="modal-content">
+        {{ if $showIcon }}
+        <div class="top-border"></div>
+        {{ end }}
+        <div class="modal-body">
+          <h3 class="heading-medium text-default mb-3">{{ $title }}</h3>
+          {{ $body }}
+        </div>
+        <div class="modal-footer m-2 py-1 px-0">
+          <button type="button" class="btn {{ $cancelClass }}" data-dismiss="modal">{{ $cancelText }}</button>
+          {{ if $hiddenFields }}
+            {{ range $name, $value := $hiddenFields }}
+          <input type="hidden" name="{{ $name }}" value="{{ $value }}">
+            {{ end }}
+          {{ end }}
+          <input type="submit" class="btn {{ $confirmClass }}" value="{{ $confirmText }}">
+        </div>
+      </div>
+    </div>
+  </div>
+
+{{ if or $formAction $useForm }}
+</form>
+{{ end }}

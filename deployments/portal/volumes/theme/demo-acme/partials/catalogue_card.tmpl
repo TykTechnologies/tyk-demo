@@ -1,0 +1,151 @@
+{{/* Catalogue Product Card Partial
+     Expects: Product object from GetProducts range
+     Usage: {{ render "catalogue_card" . }}
+*/}}
+{{ $productName := .Name }}
+{{ if .DisplayName }}
+  {{ $productName = .DisplayName }}
+{{ end }}
+{{ $productPath := .Path }}
+{{ $productLogo := .Logo.URL }}
+{{ $productPreview := .Preview.URL }}
+{{ $hasImage := or $productPreview $productLogo }}
+{{ $hasDocs := false }}
+{{ $hasAPIs := false }}
+
+{{/* Determine if product has APIs/specs and documentation */}}
+{{ if .IsDocumentationOnly}}
+    {{ range .SpecDetails }}
+        {{ $hasAPIs = true }}
+        {{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
+        {{ $oasurl := gt (.OASUrl | trim | length) 0 }}
+        {{ $isGraphQL := eq .DocumentationType "graphqlSDL" }}
+        {{ if or $oasfile $oasurl $isGraphQL }}
+          {{ $hasDocs = true }}
+        {{end}}
+    {{ end }}
+{{else}}
+  {{ range .APIDetails }}
+    {{ $hasAPIs = true }}
+    {{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
+    {{ $oasurl := gt (.OASUrl | trim | length) 0 }}
+    {{ $isGraphQL := or (eq .APIType "GraphQL") (eq .APIType "UDG") }}
+    {{ if or $oasfile $oasurl $isGraphQL }}
+      {{ $hasDocs = true }}
+    {{end}}
+  {{ end }}
+{{end}}
+
+<div class="col-lg-4 col-md-6 col-sm-12 card-container mb-4">
+  <div class="card d-flex flex-column product-card {{ if $hasImage }}has-image{{ end }}" data-productname="{{ $productName }}">
+    {{/* Card image section */}}
+    {{ if or $productPreview $productLogo }}
+    <div class="card-img-wrapper">
+      {{ if $productPreview }}
+        <img class="card-img-top card-image-border-card-view" src='{{$productPreview}}' alt="{{$productName}}">
+      {{ else }}
+        <img class="card-img-top card-image-border-card-view" src='{{$productLogo}}' alt="{{$productName}}">
+      {{ end }}
+    </div>
+    {{ end }}
+
+    {{/* Card body - contains badges + title + description */}}
+    <div class="card-body">
+      {{/* Badges - only show if product has APIs/specs */}}
+      {{ if $hasAPIs }}
+      <div class="card-badges">
+        <div class="card-badges__api-types">
+          {{/* Show API type badges */}}
+          {{ if .IsDocumentationOnly }}
+            {{ $seenTypes := dict }}
+            {{ range .SpecDetails }}
+              {{ $apiType := "REST" }}
+              {{ $isGraphQL := or (gt (.GraphQLServerEndpoint | trim | length) 0) (gt (.GraphQLSDL.Base.Url | trim | length) 0) }}
+              {{ if $isGraphQL }}
+                {{ $apiType = "GraphQL" }}
+              {{ end }}
+              {{ if not (index $seenTypes $apiType) }}
+                {{ $seenTypes = merge $seenTypes (dict $apiType true) }}
+                <span class="badge badge-api-type {{ if eq $apiType "GraphQL" }}badge-graphql{{ else }}badge-rest{{ end }}">{{ $apiType }}</span>
+              {{ end }}
+            {{ end }}
+          {{ else }}
+            {{ $seenTypes := dict }}
+            {{ range .APIDetails }}
+              {{ $apiType := .APIType }}
+              {{ if eq $apiType "" }}
+                {{ $apiType = "REST" }}
+              {{ end }}
+              {{ if not (index $seenTypes $apiType) }}
+                {{ $seenTypes = merge $seenTypes (dict $apiType true) }}
+                <span class="badge badge-api-type {{ if or (eq $apiType "GraphQL") (eq $apiType "UDG") }}badge-graphql{{ else }}badge-rest{{ end }}">{{ $apiType }}</span>
+              {{ end }}
+            {{ end }}
+          {{ end }}
+        </div>
+        {{ if not .IsDocumentationOnly }}
+        <div class="card-badges__auth-type">
+          <span class="pill">{{ .AuthType }}</span>
+        </div>
+        {{ end }}
+      </div>
+      {{ end }}
+
+      <div class="card-title d-flex flex-column">
+        <h2>{{ $productName }}</h2>
+      </div>
+      {{if .Description }}
+        <div class="card-text">{{ safe .Description }}</div>
+      {{end}}
+    </div>
+
+    {{/* Card footer with actions */}}
+    <div class="card-cta d-flex flex-row w-100 justify-content-between align-items-center">
+      {{if $hasDocs}}
+        <div class="dropdown mr-2 mb-0">
+          <button class="btn btn-secondary-outline dropdown-toggle" type="button" id="dropdownMenuButton-{{ $productPath }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Docs
+          </button>
+          <div class="view-docs-dropdown dropdown-menu" aria-labelledby="dropdownMenuButton-{{ $productPath }}">
+            {{ if .IsDocumentationOnly}}
+              {{ range .SpecDetails }}
+                {{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
+                {{ $oasurl := gt (.OASUrl | trim | length) 0 }}
+                {{ $isGraphQL := or (gt (.GraphQLServerEndpoint | trim | length) 0) (gt (.GraphQLSDL.Base.Url | trim | length) 0)}}
+                {{ if or $oasfile $oasurl $isGraphQL }}
+                  <a href="/portal/catalogue-products/{{$productPath}}/{{.SpecAlias}}/docs" target="_blank">
+                    <p class="docs-link">
+                      {{ .SpecAlias }}
+                      {{ if $isGraphQL }}
+                        <span class="badge badge-info" style="font-size: 0.7em; margin-left: 5px;">GraphQL</span>
+                      {{ else }}
+                        <span class="badge badge-yellow" style="font-size: 0.7em; margin-left: 5px;">OpenAPI</span>
+                      {{ end }}
+                    </p>
+                  </a>
+                {{ end }}
+              {{ end }}
+            {{else}}
+              {{ range .APIDetails }}
+                {{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
+                {{ $oasurl := gt (.OASUrl | trim | length) 0 }}
+                {{ $isGraphQL := or (eq .APIType "GraphQL") (eq .APIType "UDG") }}
+                {{ if or $oasfile $oasurl $isGraphQL }}
+                  <a href="/portal/catalogue-products/{{$productPath}}/{{.APIID}}/docs" target="_blank">
+                    <p class="docs-link">
+                      {{ .Name }}
+                      <span class="badge {{ if $isGraphQL}}badge-info {{ else }} badge-yellow {{end }}" style="font-size: 0.7em; margin-left: 5px;">{{ .APIType }}</span>
+                    </p>
+                  </a>
+                {{ end }}
+              {{ end }}
+            {{ end }}
+          </div>
+        </div>
+      {{ else }}
+        <div></div>
+      {{ end }}
+      <a href="/portal/catalogue-products/{{ $productPath }}" class="btn btn-secondary learn-more-cta mb-0 mr-0">More info</a>
+    </div>
+  </div>
+</div>

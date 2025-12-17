@@ -2,11 +2,18 @@
   width: 100%;
   margin-top: 1.25rem;
   padding: 0;
+  padding-top: 2%;
 }
 
 .card {
   border-radius: var(--tdp-card-border-radius);
   color: var(--tdp-text-color);
+  border: 2px solid var(--tdp-primary-light);
+}
+
+.card-header {
+  border: none;
+  background-color: transparent;
 }
 
 .card .row {
@@ -40,7 +47,6 @@
 .card-text {
   font-size: var(--tdp-size-sm);
   word-break: break-word;
-  margin-top: 10px;
 }
 
 .card-title .pill {
@@ -83,12 +89,59 @@
 }
 
 .pill {
-  border: 2px solid var(--tdp-light-blue);
-  color: var(--tdp-light-blue);
-  border-radius: 5px;
-  font-size: var(--tdp-size-md);
-  padding-block: 5px;
-  padding-inline: 15px;
+  background-color: var(--surface-default-subdued);
+  border-radius: 6px;
+  font-size: var(--tdp-size-sm);
+  color: var(--tdp-text-color-extra-dark);
+  padding: 4px;
+  width: fit-content;
+}
+
+/* API Type Badges - shared styles matching .pill */
+.badge-api-type {
+  font-size: var(--tdp-size-sm);
+  font-weight: normal;
+  padding: 4px;
+  border-radius: 6px;
+  text-transform: none;
+  letter-spacing: normal;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.badge-graphql {
+  background-color: var(--tdp-warning-pressed);
+}
+
+.badge-rest {
+  background-color: var(--surface-brand-hover);
+}
+
+.badge-streams {
+  background-color: var(--tdp-primary-danger-light);
+}
+
+.badge-tcp {
+  background-color: var(--tdp-success-pressed);
+}
+
+/* Card Badges Container */
+.card-badges {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.card-badges__api-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.card-badges__auth-type {
+  flex-shrink: 0;
 }
 
 .card-title .pill-container__product-type {
@@ -106,7 +159,7 @@
 /* Blog cards  */
 
 .card.dark-background {
-  background-color: var(--tdp-secondary-dark);
+  background-color: var(--tdp-link-dark);
   color: white;
 }
 
@@ -211,4 +264,30 @@ ul.card-ul {
 }
 ul.card-ul li::marker {
   font-size: 12px;
+}
+
+/* Credential card collapsible chevron */
+.card-header[aria-expanded="false"] .credential-chevron {
+  transform: rotate(0deg);
+  transition: transform 0.3s ease;
+}
+
+.card-header[aria-expanded="true"] .credential-chevron {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+.card-section {
+  background-color: var(--surface-neutral-hover);
+  color: var(--tdb-text-default-subdue);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.basic-card {
+  border: 1px solid var(--tdp-secondary-btn-hover-color);
+  border-radius: 10px;
+}
+.basic-card.disabled {
+  opacity: 0.7;
 }
