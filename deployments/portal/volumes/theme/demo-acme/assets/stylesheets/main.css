@@ -1,0 +1,276 @@
+@import './components/select.css';
+@import './components/buttons.css';
+@import './components/card.css';
+@import './components/input.css';
+@import './components/table.css';
+@import './components/alert.css';
+@import './components/modal.css';
+@import './components/tooltip.css';
+
+@import './pages/catalogue.css';
+@import './pages/login.css';
+@import './pages/landing.css';
+@import './pages/home.css';
+@import './pages/api-product.css';
+@import './pages/cart.css';
+@import './pages/flip-flop.css';
+@import './pages/blog.css';
+@import './pages/app.css';
+@import './pages/users.css';
+@import './pages/analytics.css';
+
+@import './common/form.css';
+@import './common/navigation.css';
+@import './common/typography.css';
+@import './common/tyk-icons.css';
+@import './common/texts.css';
+@import './common/layout.css';
+
+/*
+  Global Variables
+*/
+
+:root {
+  /* Modern color palette - ACME COLORS (PRESERVED) */
+  --tdp-primary: #3498db;           /* Bright blue (ACME) */
+  --tdp-primary-dark: #2980b9;      /* Darker blue (ACME) */
+  --tdp-primary-light: #a9cce3;     /* Light blue (ACME) */
+  --tdp-primary-success-light: #d5f5e3; /* Light mint green (ACME) */
+  --tdp-secondary: #6c7a89;         /* Modern slate gray (ACME) */
+  --tdp-secondary-dark: #4a5568;    /* Darker slate (ACME) */
+  --tdp-light-blue: #5dade2;        /* Refreshed light blue (ACME) */
+  --tdp-light-gray: #f5f7fa;        /* Cleaner light gray (ACME) */
+  --tdp-light-purple: #9b59b6;      /* Modern purple (ACME) */
+  --tdp-primary-danger-light: #fadbd8; /* Light red (ACME) */
+  --tdp-danger-light: #e74c3c;      /* Modern red (ACME) */
+  --tdp-danger-dark: #c0392b;       /* Darker red (ACME) */
+  --tdp-danger-darker: #8B1D12;     /* Even darker red (NEW from v1.16.0) */
+  --tdp-primary-warning-light: #fef9e7; /* Light yellow (ACME) */
+  --tdp-warning-light: #f39c12;     /* Modern orange (ACME) */
+  --tdp-warning-dark: #d35400;      /* Darker orange (ACME) */
+  --tdp-light-border: 1px solid #dfe4ea; /* Subtle border (ACME) */
+  --tdp-extra-dark: #2c3e50;        /* Modern dark blue-gray (ACME) */
+  --tdp-dark: #4F8CFF;              /* ACME gradient start color (PRESERVED) */
+  --tdp-text-on-red-background: #ffffff; /* White text on red (ACME) */
+  --tdp-border-green: #27ae60;      /* Modern green (ACME) */
+
+  /* NEW v1.16.0 variables (non-conflicting) */
+  --tdp-neutral: #D8D8DF;
+  --tdp-neutral-light: #E6E6EA;
+  --tdp-neutral-lighter: #EDEDF0;
+  --tdp-neutral-dark: #9D9DAF;
+  --tdp-brand-darker: #223EAC;
+  --tdp-brand-dark: #2A4DD0;
+
+  /* Font sizes */
+  --tdp-size-xs: 12px;
+  --tdp-size-sm: 14px;
+  --tdp-size-md: 16px;
+  --tdp-size-lg: 18px;
+  --tdp-size-xl: 24px;
+
+  /* Background colors - ACME PRESERVED */
+  --tdp-nav-bg-color: #2c3e50;      /* Modern dark blue-gray (ACME) */
+  --tdp-body-bg-color: #ffffff;     /* Clean white (ACME) */
+  --tdp-tab-active: #f1f2f6;        /* Subtle gray for active tabs (ACME) */
+  --tdp-light-green: #d5f5e3;       /* Light mint green (ACME) */
+  --tdp-light-red: #fadbd8;         /* Light red (ACME) */
+  --tdp-login-form: rgba(241, 242, 246, 0.9); /* Semi-transparent light gray (ACME) */
+
+  /* Text colors - ACME PRESERVED */
+  --tdp-text-color: #4a5568;        /* Modern dark gray for text (ACME) */
+  --tdp-link-color: #3498db;        /* Bright blue for links (ACME) */
+  --tdp-link-dark: #025281;         /* NEW from v1.16.0 */
+  --tdp-nav-link-color: #ffffff;    /* White for nav links (ACME) */
+  --tdb-text-color-dark: #2d3436;   /* Very dark gray, almost black (ACME) */
+  --tdp-text-color-extra-dark: #1e272e; /* Even darker for emphasis (ACME) */
+  --tdb-text-color-gray: #7f8c8d;   /* Medium gray (ACME) */
+  --tbd-text-colot-gray-mid: #636e72; /* Slightly darker gray (ACME) */
+  --tdb-text-color-gray-lighter: #95a5a6; /* Lighter gray (ACME) */
+  --tdb-text-default-subdue: var(--tdp-text-color); /* NEW from v1.16.0 */
+  --tdb-text-alert-default: #473717; /* NEW from v1.16.0 */
+
+  /* Borders - ACME PRESERVED */
+  --tdp-card-border-radius: 8px;    /* Slightly smaller, more modern radius (ACME) */
+  --tdp-border-radius: 8px;         /* More modern, smaller radius (ACME) */
+  --tdp-dropdown-menu-radius: 15px; /* NEW from v1.16.0 */
+  --tdp-login-form-border-radius: 8px; /* Consistent radius (ACME) */
+  --tdp-border-color-on-error: #e74c3c; /* Modern red (ACME) */
+  --tdp-table-border-color: #dfe4ea; /* Subtle table borders (ACME) */
+  --tdp-primary-border: 1px solid #2d3436; /* Dark border (ACME) */
+  --tdp-form-element-border: 1px solid #dfe4ea; /* Thinner, more subtle border (ACME) */
+  --tpd-gray-200-border: 1px solid #dfe4ea; /* Consistent subtle border (ACME) */
+  --tdp-border-graph: 1px solid #f1f2f6; /* Subtle graph border (ACME) */
+  --tdp-analytics-select-border: 1px solid #4a5568; /* Thinner border (ACME) */
+  --default-border-radius: 8px;     /* More modern, smaller radius (ACME) */
+
+  /* Buttons - ACME PRESERVED */
+  --tdp-primary-btn-color: #3498db; /* Bright blue (ACME) */
+  --tdp-primary-btn-border: 1px solid #3498db; /* Thinner border (ACME) */
+  --tdp-primary-btn-hover-color: var(--tdp-primary-dark); /* NEW from v1.16.0 */
+  --tdp-primary-btn-hover-border: var(--tdp-primary-dark); /* NEW from v1.16.0 */
+  --tdp-secondary-btn-color: #6c7a89; /* Modern slate (ACME) */
+  --tdp-secondary-btn-border: 1px solid #6c7a89; /* Thinner border (ACME) */
+  --tdp-secondary-btn-hover-color: var(--tdp-neutral-light); /* NEW from v1.16.0 */
+  --tdp-secondary-btn-hover-border: var(--tdp-neutral-dark); /* NEW from v1.16.0 */
+  --tdp-danger-btn-color: #e74c3c;  /* Modern red (ACME) */
+  --tdp-danger-btn-border: 1px solid #e74c3c; /* Thinner border (ACME) */
+  --tdp-danger-btn-hover-border: 1.2px solid var(--tdp-danger-darker); /* NEW from v1.16.0 */
+  --tdp-danger-outline-btn-border: 1px solid #c0392b; /* Thinner border (ACME) */
+  --tdp-warning-btn-color: #f39c12; /* Modern orange (ACME) */
+  --tdp-warning-btn-border: 1px solid #f39c12; /* Thinner border (ACME) */
+  --tdp-warning-outline-btn-border: 1px solid #d35400; /* Thinner border (ACME) */
+  --action-brand-default: #3498db;  /* Consistent blue (ACME) */
+  --border-brand-default: #2980b9;  /* Darker blue (ACME) */
+  --border-brand-hover: #1c6ca1;    /* Even darker blue for hover (ACME) */
+  --border-neutral-default: var(--tdp-neutral); /* NEW from v1.16.0 */
+  --link-default: #3498db;          /* Consistent blue for links (ACME) */
+  --surface-brand-hover: #DEE5FE;   /* NEW from v1.16.0 */
+  --surface-neutral-hover: #F8F8F9; /* NEW from v1.16.0 */
+  --surface-default-subdued: var(--tdp-table-border-color); /* NEW from v1.16.0 */
+
+  /* Alert boxes - ACME PRESERVED */
+  --tdp-alert-success-bg-color: #d5f5e3; /* Light green (ACME) */
+  --tdp-alert-success-border-color: #27ae60; /* Modern green (ACME) */
+  --tdp-alert-sucess-icon-color: #2BA84A; /* NEW from v1.16.0 */
+  --tdp-alert-success-text-color: #27ae60; /* Green text (ACME) */
+  --tdp-alert-info-bg-color: #ebf5fb;    /* Light blue (ACME) */
+  --tdp-alert-info-border-color: #3498db; /* Blue (ACME) */
+  --tdp-alert-info-text-color: #2980b9;  /* Darker blue text (ACME) */
+  --tdp-alert-warning-bg-color: #fef9e7;  /* Light yellow (ACME) */
+  --tdp-alert-warning-border-color: #f39c12; /* Orange (ACME) */
+  --tdp-alert-warning-text-color: #d35400; /* Darker orange text (ACME) */
+  --tdp-alert-danger-bg-color: #fadbd8;   /* Light red (ACME) */
+  --tdp-alert-danger-border-color: #e74c3c; /* Red (ACME) */
+  --tdp-alert-danger-text-color: #c0392b;  /* Darker red text (ACME) */
+  --tdp-alert-danger-icon-color: #D82C0D; /* NEW from v1.16.0 */
+
+  /* Icons */
+  --tdp-icon-success-dark: #27ae60; /* Modern green (ACME) */
+}
+
+html {
+  scroll-padding-top: 70px;
+}
+
+body {
+  padding-top: 55px;
+  height: 100vh;
+  color: var(--tdp-text-color);
+  background-color: var(--tdp-body-bg-color);
+}
+
+.page-wrapper {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+/* Gradient backgrounds */
+.dark-to-light-bg {
+  background: linear-gradient(90deg, #4F8CFF 0%, #8F5CFF 100%);
+  color: #fff;
+  padding: 3rem 0 3rem 0;
+  border-radius: 0 0 32px 32px;
+  font-family: 'Inter', 'Open Sans', Arial, sans-serif;
+}
+
+.light-to-dark-bg {
+  background: linear-gradient(90deg, #4F8CFF 0%, #8F5CFF 100%);
+  color: #fff;
+  padding: 3rem 0 3rem 0;
+  border-radius: 0 0 32px 32px;
+  font-family: 'Inter', 'Open Sans', Arial, sans-serif;
+}
+
+.container {
+  max-width: 1230px;
+}
+
+/* === Acme Custom Styles === */
+.acme-navbar {
+  background: #fff !important;
+  box-shadow: 0 2px 8px rgba(79, 140, 255, 0.08);
+  font-family: 'Inter', 'Open Sans', Arial, sans-serif;
+}
+.acme-navbar .navbar-brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #222 !important;
+}
+.acme-navbar-title {
+  color: #222 !important;
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.acme-navbar .nav-link, .acme-navbar .navbar-nav .nav-link {
+  color: #222 !important;
+  font-weight: 500;
+  font-size: 1rem;
+  margin-right: 0.5rem;
+  transition: color 0.2s;
+}
+.acme-navbar .nav-link:hover, .acme-navbar .navbar-nav .nav-link:hover {
+  color: #4F8CFF !important;
+}
+.acme-btn-primary {
+  background: linear-gradient(93.59deg, #4F8CFF 19.75%, #8F5CFF 81.94%);
+  color: #fff !important;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  box-shadow: 0 2px 8px rgba(79, 140, 255, 0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.acme-btn-primary:hover {
+  background: linear-gradient(93.59deg, #8F5CFF 19.75%, #4F8CFF 81.94%);
+  box-shadow: 0 4px 16px rgba(143, 92, 255, 0.12);
+}
+.acme-btn-secondary {
+  background: #fff;
+  color: #4F8CFF !important;
+  border: 1.5px solid #4F8CFF;
+  border-radius: 6px;
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  margin-left: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+}
+.acme-btn-secondary:hover {
+  background: #f3f7ff;
+  color: #8F5CFF !important;
+}
+.acme-footer {
+  background: linear-gradient(93.59deg, #4F8CFF 19.75%, #8F5CFF 81.94%);
+  color: #fff;
+  font-family: 'Inter', 'Open Sans', Arial, sans-serif;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -2px 8px rgba(143, 92, 255, 0.08);
+}
+.acme-footer-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+}
+.acme-footer-copyright {
+  font-size: 0.95rem;
+  color: #e0e0e0;
+}
+.footer-menu__link {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+.footer-menu__link:hover {
+  color: #ffe7b2;
+  text-decoration: underline;
+}
+/* Use Inter or Open Sans for all body text */
+body, html {
+  font-family: 'Inter', 'Open Sans', Arial, sans-serif;
+}

@@ -20,7 +20,7 @@
 {{ $initialTemplate := ""}}
 {{ if $thisProduct.IsDocumentationOnly}}
 	{{ $hasDocs = true}}
-	
+
 {{else}}
 	{{ range $thisProduct.APIDetails }}
 		{{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
@@ -64,12 +64,14 @@
             <div class="maxh-268 minh-268 api-detail-background-color card d-flex flex-row {{ if $thisProduct.Logo.URL }}has-logo{{end}} container justify-content-between">
 		<div class="left-side-card-body">
 		    <div class="card-title mt-35 d-flex flex-row align-items-center">
-			<h1 class="title-h1-bold">{{.product.ProductName}}</h1>
+			<h1 class="heading-medium">{{.product.ProductName}}</h1>
+			{{ if not $thisProduct.IsDocumentationOnly }}
 			<div class="pill-container {{ if not $thisProduct.Logo.URL }}ml-2 align-self-start{{end}} mb-2">
 			    <div class="pill">
-				<h5 class="text-os-semibold-12 m-0">{{ .product.AuthType }}</h5>
+				<h5 class="body-medium-default m-0">{{ .product.GetAuthTypeBadgeFormatted }}</h5>
 			    </div>
 			</div>
+			{{ end }}
 		    </div>
 		    <div class="minh-95 pr-4">
 			{{if .product.Description }}
@@ -77,8 +79,8 @@
 			{{end}}
 		    </div>
 		    <div class="api-product-page__header card__action-buttons">
-			<!--	Not displaying access button for Products with Basic Auth 	-->
-			{{if and (ne $.product.AuthType "ba") (ne $.product.AuthType "custom")}}
+			<!--	Not displaying access button for Products with Basic Auth or Documentation Only products 	-->
+			{{if and (ne $.product.AuthType "ba") (ne $.product.AuthType "custom") (not $thisProduct.IsDocumentationOnly)}}
 				{{ if $user }}
 					<button type="button" class="btn btn-primary" id="access-button">
 						<a href="#available-plans" class="access-btn-link">Access this product</a>
@@ -95,9 +97,9 @@
     </div>
     <div class="container mb-45">
 	<div class="step-wrapper tabs-wrapper d-flex flex-row">
-	    <span class="step active tab">OVERVIEW</span>
-	    <span class="step tab">API SPECIFICATIONS</span>
-	    <span class="step tab">GET STARTED</span>
+	    <span class="step active tab">Overview</span>
+	    <span class="step tab">API specification</span>
+	    <span class="step tab">Get started</span>
 	</div>
     </div>
     <div class="content-wrapper">
@@ -106,7 +108,7 @@
 		{{if .product.Content }}
 		<div class="api-product-page__info">
 		    <div class="api-product-page__info-title">
-			<h2 class="title-bold">More info</h2>
+			<h2 class="heading-large">More info</h2>
 		    </div>
 		    <div class="api-product-page__info-description more-info-text">
 			<p>{{ safe .product.Content }}</p>
@@ -116,7 +118,7 @@
 		{{if len .product.Scopes }}
 		<div class="api-product-page__info">
 		    <div class="api-product-page__info-title">
-			<h2 class="title-bold">Scopes</h2>
+			<h2 class="heading-large">Scopes</h2>
 		    </div>
 		    <div class="api-product-page__info-description">
 			<ul class="pl-3">
@@ -146,25 +148,24 @@
 		{{ if gt $apisLength 0}}
 		<div class="api-product-page__info">
 		    <div class="api-product-page__info-title">
-			<h2 class="title-bold">APIs available in this product</h2>
+			<h2 class="heading-large">APIs available in this product</h2>
 		    </div>
-		    <div class="api-product-page__info-description flex-column">
+		    <div class="api-product-page__info-description text-default-subdue flex-column">
 			<div class="row m-0 justify-content-center">
 			    {{ range $index, $api := .product.APIDetails }}
-			    <div class="product-api-details col-xl-3 labeled-card d-flex flex-column align-items-center {{if and (ge $index 0) (lt $index $lastApi)}}mr-35{{end}}">
-				<div class="labeled-card__title mb-4">
+			    <div class="product-api-details col-xl-3 labeled-card d-flex flex-column align-items-center {{if and (ge $index 0) (lt $index $lastApi)}}mr-35{{end}} mb-4">
+				<div class="labeled-card__title heading-large text-default-subdue mb-4">
 				    <h3 class="mb-0">{{ $api.Name }}</h3>
 				</div>
-										<div class="pill ml-2 bg-[#fff7cc]">
-											<h5 class="text-os-semibold-12 m-0">{{ $api.APIType }}</h5>
-										</div>
+				{{ $formattedType := $api.GetAPITypeFormatted }}
+				<span class="badge badge-api-type badge-{{ lower $formattedType }}">{{ $formattedType }}</span>
 				<div>
 				    <p class="text-regular-14 listen-path-text"> Listen path:
-					<span class="text-open-sans-semibold">{{ $api.ListenPath }}</span></p>
+					<span class="heading-small">{{ $api.ListenPath }}</span></p>
 				</div>
 				<div class="mt-12">
 				    {{if not (eq $api.Description "")}}
-				    <span class="m-0 text-open-sans-bold">Description:</span>
+				    <span class="m-0 body-large-bold">Description:</span>
 				    <p class="api-description-text text-regular-14" data-description="{{$api.Description}}">{{safe (TruncateString $api.Description 60)}}</p>
 				    {{end}}
 				</div>
@@ -174,12 +175,12 @@
 		    </div>
 		</div>
 		{{end}}
-<!--	Not displaying plans for Products with Basic Auth 	-->
-		{{if and (ne $.product.AuthType "ba") (ne $.product.AuthType "custom")}}
+<!--	Not displaying plans for Products with Basic Auth or Documentation Only products 	-->
+		{{if and (ne $.product.AuthType "ba") (ne $.product.AuthType "custom") (not $thisProduct.IsDocumentationOnly)}}
 		<div class="api-product-page__info">
 		    <div class="api-product-page__info-title">
-			<h2 class="title-bold" id="available-plans">Plans available for subscription</h2>
-			<p class="text-regular-14">These different plans are available to subscribe this product to.</p>
+			<h2 class="heading-large" id="available-plans">Plans available for subscription</h2>
+			<p class="text-regular-14 text-default-subdue">These different plans are available to subscribe this product to.</p>
 		    </div>
 		    <div class="api-product-page__info-description flex-column">
 			<div class="row m-0 justify-content-center">
@@ -192,7 +193,7 @@
                             {{$plan_id := .ID}}
                             <div class="col-xl-3 labeled-card-plan {{if and (ge $index 0) (lt $index $lastPlan)}}mr-4{{end}} mb-3">
 				<div class="mt-43">
-                                    <h2 class=".text-open-sans-bold-20 dark">{{$plan.PlanName}}</h2>
+                                    <h2 class="heading-large text-default-subdue">{{$plan.PlanName}}</h2>
 				</div>
 				<div class="mt-3 rate-limit-and-quota">
                                     <p class="text-regular-14 m-0">Quota: {{ $plan.FormatQuota }}</p>
@@ -206,11 +207,11 @@
                                         <input type="hidden" name="product_id" value={{$thisProduct.ID}}>
                                         <input type="hidden" name="catalogue_id" value="{{ .ID }}">
                                         <input type="hidden" name="plan_id" value="{{$plan_id}}">
-                                        <button type="submit" class="access-with-plan" id="add-to-cart-btn" data-single-catalogue="true">ACCESS WITH THIS PLAN</button>
+                                        <button type="submit" class="btn btn-secondary" id="add-to-cart-btn" data-single-catalogue="true">Access with this plan</button>
                                     </form>
                                     {{end}}
                                     {{else}}
-                                    <button type="button" class="access-with-plan" data-toggle="modal" data-target="#selectCatalogueForPlan{{$plan_id}}">ACCESS WITH THIS PLAN</button>
+                                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#selectCatalogueForPlan{{$plan_id}}">Access with this plan</button>
                                     <form method="post" id="add-to-cart-form-b">
 					<div class="modal fade" id="selectCatalogueForPlan{{$plan_id}}" tabindex="-1" role="dialog" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -265,9 +266,9 @@
 		{{if .posts}}
 		<div class="api-product-page__info">
 		    <div class="api-product-page__info-title">
-				<h2 class="title-bold">Related Blog Content</h2>
+				<h2 class="heading-large">Related Blog Content</h2>
 		    </div>
-		    <div class="api-product-page__posts flex-column">
+		    <div class="api-product-page__posts d-flex flex-column">
 				<div class="row m-0 justify-content-center">
 					{{$postsLength := len .posts}}
 					{{$lastPost := sub $postsLength 1}}
@@ -276,20 +277,20 @@
 					{{ else }}
 						{{ range $index, $post := .posts }}
 							{{$post_id := .ID}}
-							<div class="col-xl-3 shadow-lg labeled-card-post {{if and (ge $index 0) (lt $index $lastPost)}}mr-4{{end}} mb-3">
-								<div class="text-uppercase text-regular-16 m-0 product-post-header">
+							<div class="p-4 labeled-card-post {{if and (ge $index 0) (lt $index $lastPost)}}mr-4{{end}} mb-3 d-flex flex-column align-items-center">
+								<div class="text-uppercase text-regular-16 text-default-subdue m-0 text-center mb-3">
 									{{.CreatedAt | date "2 Jan, 2006" }} - {{.Author.DisplayName}}
 								</div>
-								<div class="mt-20">
-									<h2 class="title-h2-bold dark labeled-card-post-title">{{.Title}}</h2>
+								<div class="text-center mb-4">
+									<h2 class="heading-large text-default-subdue labeled-card-post-title m-0">{{.Title}}</h2>
 								</div>
-								<div class="mt-3 rate-limit-and-quota product-category">
+								<div class="d-flex flex-wrap justify-content-center mb-4">
 									{{range $indx, $category := .Categories}}
-										<div class="text-regular-14 m-0">{{.Name}}</div>
+										<div class="text-regular-14 pill m-0 mr-2 mb-2">{{.Name}}</div>
 									{{end}}
 								</div>
-								<div class="mt-4 keep-reading">
-									<a href="{{.URL}}" class="btn keep-reading-btn">KEEP READING</a>
+								<div class="mt-auto">
+									<a href="{{.URL}}" class="btn btn-secondary-outline">Keep reading</a>
 								</div>
 							</div>
 						{{end}}
@@ -306,7 +307,6 @@
 		{{if $hasDocs}}
 		<div class="container api-product-page_spec">
 		    <p>Select an API</p>
-		    <p><a href="/portal/oauth-playground" class="oauth-playground-link">Try OAuth Playground</a></p>
 		    <div class="d-flex flex-row justify-content-between align-items-center mt-1 mb-5 pb-3">
 				<select id="OasApiSelect">
 					<option value="">Select an API</option>
@@ -340,7 +340,7 @@
 							</option>
 						{{end}}
 					{{end}}
-					{{else}}	
+					{{else}}
 						{{ range $index, $api_detail := $thisProduct.APIDetails }}
 							{{ $oasfile := gt ($api_detail.OASDocument.Base.Url | trim | length) 0 }}
 							{{ $oasurl := gt ($api_detail.OASUrl | trim | length) 0 }}
@@ -352,6 +352,8 @@
 									{{$url = .OASDocument.Base.Url}}
 								{{else if $oasurl}}
 									{{$url = .OASUrl}}
+								{{else if $graphqlsdl}}
+									{{$url = .GraphQLSDL.Base.Url}}
 								{{end}}
 								{{$template := ProductDocTemplate req $thisProduct.Path $api_detail.APIID }}
 								{{if and (not $isGraphQL) (eq $initialAPIID "")}}
@@ -373,13 +375,18 @@
 				</div>
 		    </div>
 		</div>
-
+        {{ if $thisProduct.WebhooksEnabled }}
+        	{{ $oas_template = $asyncapi }}
+        {{ end }}
         <div id="api_doc_wrapper">
 		{{if eq $initialTemplate $redoc}}
             <div id="redoc-wrapper">
             <redoc hide-download-button></redoc>
             </div>
         {{else if eq $initialTemplate $asyncapi}}
+            <script src="https://unpkg.com/@asyncapi/react-component@latest/browser/standalone/index.js"></script>
+            <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@latest/styles/default.min.css">
+
             <div id="asyncapi"></div>
 
             <script>
@@ -444,7 +451,7 @@
           <div class="content-wrapper-api-docs ml-110">
             {{range $index,$doc := $thisProduct.Docs}}
               <div class="content-wrapper__content-api-docs {{if eq $index 0}}d-block{{else}}d-none{{end}}">
-                <h3 class="text-os-bold-17 dark mb-50">{{$doc.Title}}</h3>
+                <h3 class="dark mb-50">{{$doc.Title}}</h3>
               {{if and $doc.MarkdownEnabled (gt (len $doc.MarkdownContent) 0)}}
                 <div id="set-markdown-content-{{$index}}" class="api-docs-text">
 				 {{safe_md $doc.MarkdownContent}}

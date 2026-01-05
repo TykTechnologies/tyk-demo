@@ -1,0 +1,44 @@
+.page-wrapper .blog-page-wrapper {
+  padding-top: 0;
+}
+
+.blog-page-wrapper .text-container {
+  padding-block: 8rem;
+}
+
+.blog-page-wrapper .search-container .input-group-append {
+  right: 5px;
+}
+
+.card.blog {
+  padding: 0;
+}
+
+.blog-detail-page-wrapper .blog-content p {
+  line-height: 26px;
+}
+
+.pagination .page-link {
+  border: none;
+  color: var(--tdp-secondary);
+  font-size: 24px;
+  font-family: 'Smoolthan-Bold';
+  padding-top: 2px;
+  padding-bottom: 0;
+  padding-inline: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.pagination .page-link:hover,
+.pagination .current-page .page-link {
+  color: white;
+  border-radius: var(--tdp-border-radius);
+  background-color: var(--tdp-secondary);
+}
+
+.video-tag {
+  position: absolute;
+  top: -1px;
+  left: 10px;
+}

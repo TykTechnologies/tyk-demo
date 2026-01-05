@@ -1,0 +1,118 @@
+{{ $cred := .cred }}
+{{ $isPending := .isPending }}
+
+{{ if not $isPending }}
+<div class="col-lg-12 p-3 requests-row-section">
+  <div class="d-flex flex-row justify-content-between align-items-start p-3"
+       data-toggle="collapse"
+       data-target="#type-details-{{ $cred.ID }}"
+       aria-expanded="false"
+       aria-controls="type-details-{{ $cred.ID }}"
+       style="cursor: pointer;">
+    <div>
+      <h5 class="heading-small text-default m-0">Client type details</h5>
+      <p class="text-regular-14 m-0">The Client Type defines how your app will authenticate when calling secured APIs</p>
+    </div>
+    <i class="tyk-icon tykon tykon-arrowdown credential-chevron"></i>
+  </div>
+
+  <div id="type-details-{{ $cred.ID }}" class="collapse">
+    <div class="p-3">
+      <div class="col-lg-12">
+          <div class="d-flex flex-row justify-content-between align-items-start flex-wrap p-3 requests-row-section__info">
+            <div class="d-flex flex-column pr-3">
+              <h6 class="heading-small text-default mr-4 mb-1">Client type name:</h6>
+            </div>
+            <div class="text-regular-14 mb-1">
+              {{ if not (eq (GetClientName $cred.ID) "" )}}
+                {{ GetClientName $cred.ID}}
+              {{ else }}
+                Not defined
+              {{ end }}
+            </div>
+          </div>
+
+          <div class="d-flex flex-row justify-content-between align-items-start flex-wrap p-3 requests-row-section__info">
+            <div class="d-flex flex-column pr-3">
+              <h6 class="heading-small text-default mr-4 mb-1">Client type description:</h6>
+            </div>
+            <div class="text-regular-14 mb-1">
+              {{ if not (eq (GetClientDescription $cred.ID) "" )}}
+                {{ GetClientDescription $cred.ID}}
+              {{ else }}
+                Not defined
+              {{ end }}
+            </div>
+          </div>
+
+          <div class="d-flex flex-row justify-content-between align-items-start flex-wrap p-3 requests-row-section__info">
+            <div class="d-flex flex-column pr-3">
+              <h6 class="heading-small text-default mr-4 mb-1">Grant types:</h6>
+            </div>
+            <div class="text-regular-14 mb-1">
+              {{ if not (eq $cred.GrantType "") }}
+                {{ range SplitStrings $cred.GrantType "," }}
+                  <div class="d-flex align-items-center">
+                    <span class="client-type-tick mr-2"><img src="/assets/images/icons/tick.svg"></span>
+                    <span>{{ . }}</span>
+                  </div>
+                {{ end }}
+              {{ else }}
+                Not defined
+              {{ end }}
+            </div>
+          </div>
+
+          <div class="d-flex flex-row justify-content-between align-items-start flex-wrap p-3 requests-row-section__info">
+            <div class="d-flex flex-column pr-3">
+              <h6 class="heading-small text-default mr-4 mb-1">Response types:</h6>
+            </div>
+            <div class="text-regular-14 mb-1">
+              {{ if not (eq $cred.ResponseType "") }}
+                {{ range SplitStrings $cred.ResponseType "," }}
+                  <div class="d-flex align-items-center">
+                    <span class="client-type-tick mr-2"><img src="/assets/images/icons/tick.svg"></span>
+                    <span>{{ . }}</span>
+                  </div>
+                {{ end }}
+              {{ else }}
+                Not defined
+              {{ end }}
+            </div>
+          </div>
+
+          <div class="d-flex flex-row justify-content-between align-items-startflex-wrap p-3 requests-row-section__info">
+            <div class="d-flex flex-column pr-3">
+              <h6 class="heading-small text-default mr-4 mb-1">Token endpoint auth method:</h6>
+            </div>
+            <div class="text-regular-14 mb-1">
+              {{ if not (eq $cred.TokenEndpoints "" )}}
+                {{ $cred.TokenEndpoints }}
+              {{ else }}
+                Not defined
+              {{ end }}
+            </div>
+          </div>
+
+          <div class="d-flex flex-row justify-content-between align-items-start flex-wrap p-3 requests-row-section__info">
+            <div class="d-flex flex-column pr-3">
+              <h6 class="heading-small text-default mr-4 mb-1">Scope permission:</h6>
+            </div>
+            <div class="text-regular-14 mb-1">
+              {{ if not (eq $cred.Scope "") }}
+                {{ range SplitStrings $cred.Scope " " }}
+                  <div class="d-flex align-items-center">
+                    <span class="client-type-tick mr-2"><img src="/assets/images/icons/tick.svg"></span>
+                    <span>{{ . }}</span>
+                  </div>
+                {{ end }}
+              {{ else }}
+                Not defined
+              {{ end }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{{ end }}
