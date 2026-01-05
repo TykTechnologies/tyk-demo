@@ -1,0 +1,22 @@
+There is a new user request pending please approve it from the admin console<br/>
+Id: {{ .user.ID }}<br/>
+User: {{ .user.DisplayName }} ({{ .user.Email }})<br/>
+Role: {{ .user.Role }} <br/>
+
+{{ if gt .user.OrganisationID 0 }}
+        Organisation: {{ .user.Organisation.Name }} <br/>
+{{ else }}
+        Organisation: Administrators' organisation <br/>
+{{end}}
+
+
+{{ if gt (len .user.Teams) 0 }}
+Teams: <br/>
+<ul>
+    {{ range .user.Teams }}
+        <li>{{.Name}}</li>
+    {{ end }}
+</ul>
+{{ else }}
+Teams: none
+{{end}}

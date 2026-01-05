@@ -1,0 +1,139 @@
+{{ $cred := .cred }}
+{{ $app := .app }}
+{{ $isPending := .isPending }}
+{{ $accessRequest := "" }}
+{{ if $isPending }}
+  {{ $accessRequest = $cred }}
+{{ else }}
+  {{ $accessRequest = $cred.AccessRequest }}
+{{ end }}
+
+<div class="col-lg-12 requests-row-section p-3">
+  <div class="d-flex justify-content-between align-items-center p-3">
+    <div>
+      <h5 class="heading-small text-default m-0">Webhooks</h5>
+      <p class="text-regular-14">Configure webhook subscriptions for this credential</p>
+    </div>
+  </div>
+
+  {{ if $accessRequest.CurrentlySubscribed }}
+    <div class="p-3">
+      <div class="d-flex flex-row justify-content-between align-items-center flex-wrap requests-row-section__info">
+        <div class="d-flex flex-column pr-3">
+          <h6 class="heading-small text-default mr-4 text-uppercase">URL:</h6>
+        </div>
+        <div class="text-regular-14">
+          <a href="{{ $accessRequest.WebhookURL }}">{{ $accessRequest.WebhookURL }}</a>
+        </div>
+      </div>
+
+      <div class="d-flex flex-row justify-content-between align-items-center flex-wrap requests-row-section__info">
+        <div class="d-flex flex-column pr-3">
+          <h6 class="heading-small text-default mr-6 text-uppercase">SECRET:</h6>
+        </div>
+        <div class="text-regular-14">
+          <input type="password" class="input-as-span content-field" value="{{ $accessRequest.WebhookSecret }}" disabled="">
+          <i class="tyk-icon tykon tykon-copy" data-copy-value="{{ $accessRequest.WebhookSecret }}"></i>
+        </div>
+      </div>
+
+      <div class="d-flex flex-row justify-content-between align-items-center flex-wrap requests-row-section__info">
+        <div class="d-flex flex-column pr-3">
+          <h6 class="heading-small text-default mr-4 text-uppercase">EVENTS:</h6>
+        </div>
+        <div class="text-regular-14">
+          <i>{{ $accessRequest.WebhookEventTypes }}</i>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary pass-id mt-3" data-toggle="modal" data-target="#edit-webhook-{{$accessRequest.ID}}" data-app-id="{{$app.ID}}">Update subscription</button>
+    </div>
+
+    <form method="post" action="/portal/private/apps/{{ $app.ID }}/access-requests/{{ $accessRequest.ID }}/webhooks">
+      <div class="modal fade" id="edit-webhook-{{ $accessRequest.ID }}" tabindex="-1" role="dialog" aria-labelledby="editWebhookModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered flex-column justify-content-center align-items-center" role="document">
+          <div class="modal-content">
+            <div class="modal-body">
+              <h3 class="modal-h3">Update webhook subscription</h3>
+              <div class="row">
+                <label class="heading-small text-default">Webhook URL:</label>
+                <input name="webhook-url" class="form-control" placeholder="Webhook URL" value="{{$accessRequest.WebhookURL}}" required/>
+              </div>
+              <div class="row mb-4">
+                <label class="heading-small text-default">Secret:</label>
+                <input type="password" name="webhook-secret" class="form-control" placeholder="Secret" value="{{$accessRequest.WebhookSecret}}"/>
+              </div>
+              <div class="row mb-4">
+                <div class="form-group">
+                  <label class="heading-small text-default">Events:</label>
+                  <div class="row">
+                    <div class="col-12">
+                      {{ range $accessRequest.EventTypes }}
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" name="webhook-event-types[]" value="{{ . }}" id="edit-{{ . }}-{{ $accessRequest.ID }}" {{if StringsContains $accessRequest.WebhookEventTypes . }}checked{{end}}>
+                          <label class="text-regular-14 d-block mt-1" for="edit-{{ . }}-{{ $accessRequest.ID }}">
+                            {{ . }}
+                          </label>
+                        </div>
+                      {{ end }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary-outline" data-dismiss="modal">Cancel</button>
+              <input type="submit" class="btn btn-primary" value="Save">
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  {{ else }}
+    <div class="p-3 d-flex justify-content-between">
+      <p class="text-regular-14 mb-0">Webhooks are enabled for one or more products.</p>
+      <button type="button" class="btn btn-secondary-outline pass-id" data-toggle="modal" data-target="#webhookSubscribe-{{ $accessRequest.ID }}" data-app-id="{{$app.ID}}">Subscribe</button>
+    </div>
+  {{ end }}
+</div>
+
+<form method="post" action="/portal/private/apps/{{ $app.ID }}/access-requests/{{ $accessRequest.ID }}/webhooks">
+  <div class="modal fade" id="webhookSubscribe-{{ $accessRequest.ID }}" tabindex="-1" role="dialog" aria-labelledby="webhookSubscribeModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered flex-column justify-content-center align-items-center" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <h3 class="modal-h3 text-default">Subscribe to webhook</h3>
+          <div class="row">
+            <label class="heading-small text-default">Webhook URL:</label>
+            <input name="webhook-url" class="form-control" placeholder="Webhook URL" required/>
+          </div>
+          <div class="row mb-4">
+            <label class="heading-small text-default">Secret:</label>
+            <input type="password" name="webhook-secret" class="form-control" placeholder="Secret"/>
+          </div>
+          <div class="row mb-4">
+            <div class="form-group">
+              <label class="heading-small text-default">Events:</label>
+              <div class="row">
+                <div class="col-12">
+                  {{ range $accessRequest.EventTypes }}
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" name="webhook-event-types[]" value="{{ . }}" id="subscribe-{{ . }}-{{ $accessRequest.ID }}">
+                      <label class="text-regular-14 d-block mt-1" for="subscribe-{{ . }}-{{ $accessRequest.ID }}">
+                        {{ . }}
+                      </label>
+                    </div>
+                  {{ end }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary-outline" data-dismiss="modal">Cancel</button>
+          <input type="submit" class="btn btn-primary" value="Save">
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,516 @@
+<!-- Template used for the product cart/checkout page -->
+
+{{ $apps := .apps}}
+{{ $catalogueCount := .catalogue_count}}
+{{ $templates := .templates}}
+{{ $certs := .certs}}
+{{ $authType := ""}}
+{{ $isDefaultOrgUser := .isDefaultOrgUser}}
+{{ $isDirectCheckout := .isDirectCheckout}}
+
+{{/* Credentials data as JSON for client-side rendering - safe, pre-processed by Go */}}
+<script id="credentials-data" type="application/json">
+{{ .credentialsVM.ToJSON }}
+</script>
+
+<div class="cart-wrapper">
+  <div class="container">
+    <p class="mb-3 mt-3"> <a href="/portal/catalogue-products" class="breadcrumb-link">< Back to catalogue overview</a></p>
+    {{ if .errors }}
+      {{ range $key, $errs := .errors }}
+        <div class="alert alert-warning cart-error" role="alert">
+          <i class="tyk-icon tykon tykon-warning "></i>
+          <div class="alert__content">
+            <strong>{{$key}}</strong>
+            <ul>
+              {{ range $errs }}
+                <li>{{.}}</li>
+              {{ end }}
+            </ul>
+          </div>
+        </div>
+      {{ end }}
+    {{ end }}
+    {{ if .provisioned }}
+      <div class="provisioned-credentials-wrapper text-center mt-5">
+        <h1 class="heading-xlarge my-4">Your request has been sent</h1>
+        <p class="text-regular-14">You can view the App status in 'My Apps'.</p>
+        <p>
+          <a class="btn btn-primary" href="/portal/private/dashboard">Go to My Apps</a>
+        </p>
+      </div>
+    {{ else }}
+      {{if eq $catalogueCount 0}}
+        <div class="empty-cart-wrapper text-center mt-5">
+          <h1 class="heading-large">Your cart is empty</h1>
+          <p class="text-regular-14">
+            Go the <a href="/portal/catalogue-products" class="breadcrumb-link">catalogues</a> and browse API products.
+          </p>
+        </div>
+      {{else}}
+        <h1 class="mb-4 heading-xlarge text-center mt-5">
+          {{ if not $isDirectCheckout }}Cart - {{ end }}Submit an access request
+        </h1>
+      {{end}}
+      {{ if gt $catalogueCount 1 }}
+        <div class="cart-wrapper__card-section">
+          <div class="alert alert-info" role="alert">
+            <i class="tyk-icon tykon tykon-warning "></i>
+            <div class="alert__content">
+              Your cart is containing API products from different catalogues, you will need to submit 2 or more requests separately.
+            </div>
+          </div>
+        </div>
+      {{ end }}
+      {{ range $index, $request := .cart }}
+        {{$authType = $request.AuthType}}
+        {{ if $request.Products }}
+          {{ $templatesLength := len $request.AppTemplates }}
+          <form method="POST" enctype="multipart/form-data" id="{{ if gt $catalogueCount 1 }}request-{{$index}}{{end}}" class="{{ if gt $catalogueCount 1 }}collapse multi-collapse{{end}}">
+            <input type="hidden" name="catalogue-id" value="{{ .Catalogue.ID }}" />
+            <div class="cart-wrapper__card-section">
+              <div class="card cart-card">
+                <div class="card-body">
+                  <h2 class="card-title heading-medium text-default">
+                    <span class="card-number">1</span>
+                    Selected Products
+                  </h2>
+                  <p class="card-text text-regular-14 mt-3">You can add more than one API product to the cart, if you want to request access to more than one product, go to the <a href="/portal/catalogue-products" class="breadcrumb-link">catalogue</a> and add another product to the cart.</p>
+                </div>
+                <div class="card-footer mt-4">
+                  <ul class="list-group">
+                    {{ range $request.Products }}
+                      <li class="list-group-item">
+                        <span class="product-name">{{.ProductName}}</span>
+                        {{ if not $isDirectCheckout }}
+                        <a class="product-remove-cta" type="button" href="/portal/private/cart/remove/{{$index}}/{{.ID}}">
+                          <i class="tyk-icon tykon tykon-delete"></i>
+                        </a>
+                        {{ end }}
+                      </li>
+                    {{ end }}
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="cart-wrapper__card-section">
+              <div class="card cart-card">
+                <div class="card-body">
+                  <h2 class="card-title heading-medium text-default">
+                    <span class="card-number">2</span>
+                    Selected Plan
+                  </h2>
+                  <p class="card-text text-regular-14 mt-3">The access request will be created with the following plan</p>
+                </div>
+                <div class="card-footer mt-4">
+                  {{ if $request.Products }}
+                    {{$plan := $request.Plan}}
+                    <input type="hidden" name="plan-for-{{$index}}" value="{{$plan.ID}}"/>
+                    <div class="form-control w-75"> {{$plan.PlanName}} &nbsp;&nbsp;|&nbsp;&nbsp; Quota: {{ $plan.FormatQuota }},  Rate limit: {{ $plan.FormatRateLimit }}</div>
+                  {{ end }}
+                </div>
+              </div>
+            </div>
+            <div class="cart-wrapper__card-section">
+              <div class="card cart-card">
+                <div class="card-body">
+                  <h2 class="card-title heading-medium text-default">
+                    <span class="card-number">3</span>
+                    Select an App
+                  </h2>
+                  <p class="card-text text-regular-14 mt-3">An app serves as a container for one or multiple sets of credentials and in the future, different apps can have different ownerships. We recommend thinking about the use case when setting up a new app.</p>
+                </div>
+                <div class="card-footer mt-4">
+                  {{ if $apps }}
+                  <div class="form-group">
+                    <div class="step-wrapper">
+                      <div class="form-check-inline mx-n3">
+                        <input id="new-app" class="form-check-input step active dcr-visibility" type="radio" name="app-action" value="create" checked >
+                        <label for="new-app" class="form-check-label text-regular-14">
+                          Create a new app
+                        </label>
+                      </div>
+                      <div class="form-check-inline ml-3">
+                        <input id="existing-app" class="form-check-input step dcr-visibility" type="radio" name="app-action" value="existing">
+                        <label for="existing-app" class="form-check-label text-regular-14">
+                          Existing app
+                        </label>
+                      </div>
+                    </div>
+                    <div class="content-wrapper">
+                      <div class="content-wrapper__content d-block mt-3">
+                        <div class="mb-3">
+                          <label class="heading-small text-default">App name</label>
+                          <input type="text" name="client_name" class="form-control" placeholder="App Name"/>
+                          <small id="clientHelp" class="form-text text-regular-14 with-info-icon"> Make sure it is a descriptive name</small>
+                        </div>
+                        {{ if not $isDefaultOrgUser }}
+                        <div class="mb-3">
+                          <label class="heading-small text-default">Visibility</label>
+                          <select name="client_visibility" class="form-control">
+                            <option value="organisation" selected>Organisation (default)</option>
+                            <option value="team">Team</option>
+                            <option value="personal">Personal</option>
+                          </select>
+                          <small class="form-text text-regular-14 text-muted">Controls who can see and use this app.</small>
+                        </div>
+                        {{ else }}
+                        <input type="hidden" name="client_visibility" value="personal" />
+                        {{ end }}
+                        <div class="mb-3">
+                          <label class="heading-small text-default">Description</label>
+                          <textarea rows="3" name="description" class="form-control" placeholder="App Description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                          <label class="heading-small text-default">Redirect URLs(optional)</label>
+                          <input name="redirect_urls" class="form-control" placeholder="Redirect URLs"/>
+                          <small id="redirectHelp" class="form-text text-regular-14 with-info-icon">Separate URLs with commas</small>
+                        </div>
+                      </div>
+                      <div class="content-wrapper__content d-none mt-3">
+                       <select class="form-control w-50" id="appsControlSelect" name="selected-app">
+                          {{ if $apps }}
+                            {{ range $apps }}
+                              <option value="{{.ID}}">{{.Name}}</option>
+                            {{ end }}
+                          {{ else }}
+                            <option selected value="">No apps created</option>
+                          {{ end }}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  {{ else }}
+                  <div class="form-group">
+                    <div class="step-wrapper">
+                      <div class="content-wrapper__content d-block mt-3">
+                        <input type="hidden" name="app-action" value="create" />
+                        <label class="heading-small text-default">
+                          Create a new app
+                        </label>
+                      </div>
+                    </div>
+                    <div class="content-wrapper">
+                      <div class="content-wrapper__content d-block mt-3">
+                        <div class="mb-3">
+                          <label class="heading-small text-default">App name</label>
+                          <input type="text" name="client_name" class="form-control" placeholder="App Name"/>
+                          <small id="clientHelp" class="form-text text-regular-14 with-info-icon"> Make sure it is a descriptive name</small>
+                        </div>
+                        {{ if not $isDefaultOrgUser }}
+                        <div class="mb-3">
+                          <label class="heading-small text-default">Visibility</label>
+                          <select name="client_visibility" class="form-control">
+                            <option value="organisation" selected>Organisation (default)</option>
+                            <option value="team">Team</option>
+                            <option value="personal">Personal</option>
+                          </select>
+                          <small class="form-text text-regular-14 text-muted">Controls who can see and use this app.</small>
+                        </div>
+                        {{ else }}
+                        <input type="hidden" name="client_visibility" value="personal" />
+                        {{ end }}
+                        <div class="mb-3">
+                          <label class="heading-small text-default">Description</label>
+                          <textarea rows="3" name="description" class="form-control" placeholder="App Description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                          <label class="heading-small text-default">Redirect URLs(optional)</label>
+                          <input name="redirect_urls" class="form-control" placeholder="Redirect URLs"/>
+                          <small id="redirectHelp" class="form-text text-regular-14 with-info-icon">Separate URLs with commas</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {{ end }}
+                </div>
+              </div>
+            </div>
+            {{/* Step 4: Credential Selection */}}
+            {{if not $apps}}
+              {{/* No apps exist - show simple credential generation info */}}
+              <div class="cart-wrapper__card-section credential-selection-section">
+                <div class="card cart-card">
+                  <div class="card-body">
+                    <h2 class="card-title heading-medium text-default">
+                      <span class="card-number">4</span>
+                      Generate API credential
+                    </h2>
+                    <p class="card-text text-regular-14 mt-3">Your credential are unique identifiers that will be used to authenticate requests to the selected API products.</p>
+                  </div>
+                  <div class="card-footer mt-4">
+                    <div class="alert alert-info mb-0" role="alert">
+                      <i class="tyk-icon tykon tykon-info"></i>
+                      <div class="alert__content">
+                        A new credential will be generated automatically.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {{end}}
+            {{if $apps}}
+              <div class="cart-wrapper__card-section credential-selection-section">
+                <div class="card cart-card">
+                  <div class="card-body">
+                    <h2 class="card-title heading-medium text-default">
+                      <span class="card-number">4</span>
+                      Create an API credential
+                    </h2>
+                    <p class="card-text text-regular-14 mt-3">Your credential are unique identifiers that will be used to authenticate requests to the selected API products.</p>
+                  </div>
+                  <div class="card-footer mt-4">
+                    {{/* Show this when creating a new app - no existing credentials */}}
+                    <div class="new-app-credentials" style="display: block;">
+                      <div class="alert alert-info mb-0" role="alert">
+                        <i class="tyk-icon tykon tykon-info"></i>
+                        <div class="alert__content">
+                          A new credential will be generated automatically.
+                        </div>
+                      </div>
+                    </div>
+
+                    {{/* Per-app credential sections - server-rendered from view model */}}
+                    {{ range $app := $apps }}
+                      {{ $state := $.credentialsVM.GetState $app.ID $index }}
+                      {{ if $state }}
+                      <div class="app-credentials" data-app-id="{{ $app.ID }}" data-request-id="{{ $index }}" style="display: none;">
+
+                        {{/* No compatible credentials - show alert */}}
+                        {{ if $state.ShowAlert }}
+                          <div class="alert alert-info mb-0 no-compatible-credentials-alert" role="alert">
+                            <i class="tyk-icon tykon tykon-info"></i>
+                            <div class="alert__content">
+                              <strong>{{ $state.Messages.NoCredentialsTitle }}</strong><br>
+                              {{ $state.Messages.NoCredentialsBody }}
+                            </div>
+                          </div>
+                        {{ end }}
+
+                        {{/* Has compatible credentials - show radio buttons and dropdown */}}
+                        {{ if $state.ShowRadio }}
+                          <div class="form-group">
+                            <div class="mb-3">
+                              <div class="form-check-inline mx-n3">
+                                <input id="new-cred-{{ $index }}-app-{{ $app.ID }}"
+                                       class="form-check-input" type="radio"
+                                       name="credential_action" value="create_new" checked>
+                                <label for="new-cred-{{ $index }}-app-{{ $app.ID }}" class="form-check-label text-regular-14">
+                                  {{ $state.Messages.GenerateNewLabel }}
+                                </label>
+                              </div>
+                              <div class="form-check-inline ml-3">
+                                <input id="existing-cred-{{ $index }}-app-{{ $app.ID }}"
+                                       class="form-check-input" type="radio"
+                                       name="credential_action" value="reuse_existing">
+                                <label for="existing-cred-{{ $index }}-app-{{ $app.ID }}" class="form-check-label text-regular-14">
+                                  {{ $state.Messages.ReuseExistingLabel }}
+                                </label>
+                              </div>
+                            </div>
+
+                            {{/* New credential info - shown when "Generate new" is selected */}}
+                            <div id="new-credential-info-{{ $index }}-app-{{ $app.ID }}" class="d-block mt-3">
+                              <div class="alert alert-info mb-0" role="alert">
+                                <i class="tyk-icon tykon tykon-info"></i>
+                                <div class="alert__content">{{ $state.Messages.NewCredentialInfo }}</div>
+                              </div>
+                            </div>
+
+                            {{/* Credential dropdown - shown when "Existing" is selected */}}
+                            <div id="credential-select-{{ $index }}-app-{{ $app.ID }}" class="d-none mt-3">
+                              <label class="form-label heading-small text-default">Credential</label>
+                              <div class="dropdown credential-dropdown w-50">
+                                <button class="form-control dropdown-toggle" type="button"
+                                        id="credential-dropdown-{{ $index }}-app-{{ $app.ID }}"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>
+                                  <span class="placeholder-text">{{ $state.Messages.SelectPlaceholder }}</span>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="credential-dropdown-{{ $index }}-app-{{ $app.ID }}">
+                                  {{ range $cred := $state.Credentials }}
+                                    <a class="dropdown-item" href="#"
+                                       data-value="{{ $cred.ID }}"
+                                       data-display-name="{{ $cred.DisplayName }}"
+                                       data-plan="{{ $cred.PlanName }}"
+                                       data-auth="{{ $cred.AuthType }}">
+                                      <span class="credential-label">Credential - {{ $cred.DisplayName }} | {{ $cred.PlanName }}</span>
+                                      <span class="pill">{{ $cred.AuthType }}</span>
+                                    </a>
+                                  {{ end }}
+                                </div>
+                                <input type="hidden" name="credential_id" value="">
+                              </div>
+                              <div class="alert alert-info mt-3" role="alert">
+                                <i class="tyk-icon tykon tykon-info"></i>
+                                <div class="alert__content">{{ $state.Messages.SelectCredentialHelp }}</div>
+                              </div>
+                            </div>
+                          </div>
+                        {{ end }}
+
+                      </div>
+                      {{ end }}
+                    {{ end }}
+                  </div>
+                </div>
+              </div>
+            {{end}}
+            {{if and (eq $authType "multiAuth") (or (eq $request.AuthTypeMode "mtls_self-serve") (eq $request.AuthTypeMode ""))}}
+            <div class="cart-wrapper__card-section">
+              <div class="card cart-card">
+                <div class="card-body">
+                  <h2 class="card-title heading-medium text-default">
+                    <span class="card-number">4</span>
+                    Upload a certificate
+                  </h2>
+                  <p class="card-text text-regular-14 mt-3">
+                    This product is secured with Mutual TLS. You need to upload a certificate to use it.
+                  </p>
+                </div>
+                <div class="card-footer mt-4">
+                  <div class="step-wrapper">
+                    <div class="form-check-inline mx-n3">
+                      <input id="new-cert" class="form-check-input step active dcr-visibility" type="radio" name="cert-action" value="create" checked >
+                      <label for="new-cert" class="form-check-label text-regular-14">
+                        Upload a new certificate
+                      </label>
+                    </div>
+                    <div class="form-check-inline ml-3">
+                      <input id="existing-cert" class="form-check-input step dcr-visibility" type="radio" name="cert-action" value="existing">
+                      <label for="existing-cert" class="form-check-label text-regular-14">
+                        Existing certificate
+                      </label>
+                    </div>
+                  </div>
+                  <div class="content-wrapper">
+                    <div class="content-wrapper__content d-block mt-3 mb-3">
+                      <div class="mb-3 mt-4">
+                        <label class="heading-small text-default">Certificate name</label>
+                        <input type="text" name="certificate_name" class="form-control"/>
+                      </div>
+                      <div class="d-flex flex-row mt-4">
+                        <label for="fileInput" class="btn btn-secondary mb-1" id="upload-cert">Upload certificate</label>
+                        <input class="d-none" type="file" id="fileInput" name="certificate_file"/>
+                        <div class="d-flex flex-row ml-3 align-items-center text-regular-14">
+                          <i id="certificate-name">No certificate selected</i>
+                        </div>
+                      </div>
+                      <div class="card-footer mt-3">
+                        <div class="toggle-collapsible d-flex flex-row align-items-center mt-1" data-toggle="collapse" href="#type-details-{{ $templatesLength }}" role="button" aria-expanded="false" aria-controls="type-details-{{ $templatesLength }}">
+                          <span class="arrow-up-tyk d-inline"><img src="/assets/images/icons/arrow-up.svg"></span>
+                          <span class="arrow-down-tyk d-none"><img src="/assets/images/icons/arrow-down.svg"></span>
+                          <span class="heading-small ml-3">View instructions how to create a pem file using SSL</span>
+                        </div>
+                        <div class="collapse" id="type-details-{{ $templatesLength }}">
+                          <div class="mt-4 ml-4 mb-3">
+                            <h6 class="heading-xsmall">Run these commands in Terminal, or use any other service to create a certificate.</h6>
+                            <div class="mt-3">
+                              <h6 class="heading-xsmall mb-0">Step 1. Create certificates using OpenSSL</h6>
+                              <span class="courier-new-regular">openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout key.pem -out cert.pem</span>
+                            </div>
+                            <div class="mt-3">
+                              <h6 class="heading-xsmall mb-0">Step 2. Combine key.pem and cert.pem into a signle file:</h6>
+                              <span class="courier-new-regular">   cat key.key >> server.pem</span>
+                            </div>
+                            <div class="mt-3">
+                              <h6 class="heading-xsmall mb-0">Step 3. Do the same for any third-party certificate chain files, bundles, etc:</h6>
+                              <span class="courier-new-regular">   cat intermediate.crt >> server.pem</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="content-wrapper__content d-none mt-3">
+                      <select class="form-control w-50" id="certsControlSelect" name="certificate_id">
+                        <option value="" disabled selected>Select a certificate</option>
+                        {{ range $cert := $certs}}
+                        <option value="{{$cert.ID}}">
+                          {{$cert.Name}}
+                        </option>
+                        {{end}}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {{end}}
+            {{ if $request.DCREnabled }}
+              <div class="cart-wrapper__card-section dcr-templates">
+                <div class="card cart-card">
+                  <div class="card-body">
+                    <h2 class="card-title heading-medium text-default">
+                      <span class="card-number">5</span>
+                      Select a client type
+                    </h2>
+                    <p class="card-text text-regular-14 mt-3">To access this product(s) you need to select one of following client types with following pre-configured options.</p>
+                  </div>
+                  <div class="card-footer mt-4">
+                    <div class="d-flex flex-row flex-wrap justify-content-between">
+                      {{ range $index, $t := $request.AppTemplates }}
+                        <div class="labeled-card d-flex flex-column mb-4 pb-2 pl-3">
+                          <div class="labeled-card__title align-self-center mb-4">
+                            <h3 class="heading-small mb-0">{{ $t.Name }}</h3>
+                          </div>
+                          {{if not (eq $t.Description "")}}
+                          <div class="client-type-description">
+                            <div class="heading-small text-default">Description:</div>
+                            <div class="text-regular-14">{{ $t.Description }}</div>
+                          </div>
+                          {{end}}
+                          <div class="d-flex flex-row mx-n2">
+                            <input id="client-type-{{$index}}" type="radio" name="app-action-template" value="{{ $t.ID }}" {{if eq $templatesLength 1}}checked{{end}}>
+                            <label for="client-type-{{$index}}" class="form-check-label mr-3">
+                            </label>
+                            <div class="d-flex flex-column">
+                              <div class="toggle-collapsible d-flex flex-row align-items-center mx-n3" data-toggle="collapse" href="#type-details-{{ $index }}" role="button" aria-expanded="false" aria-controls="type-details-{{ $index }}">
+                                <span class="arrow-up-tyk d-inline"><img src="/assets/images/icons/arrow-up.svg"></span>
+                                <span class="arrow-down-tyk d-none"><img src="/assets/images/icons/arrow-down.svg"></span>
+                                <span class="heading-small ml-1">View client type details</span>
+                              </div>
+                              <div class="collapse" id="type-details-{{ $index }}">
+                                <div>
+                                  <span class="heading-small text-default"> Grant types </span>
+                                  <ul class="body-medium-default">
+                                    {{ range $t.GrantTypes }}
+                                      <li> {{ . }}
+                                    {{ end }}
+                                  </ul>
+                                </div>
+                                <div>
+                                  <span class="heading-small text-default"> Response types</span>
+                                  <ul class="body-medium-default">
+                                    {{ range $t.ResponseTypes }}
+                                      <li> {{ . }}
+                                    {{ end }}
+                                  </ul>
+                                </div>
+                                <div>
+                                  <span class="heading-small text-default"> Token endpoints auth methods </span>
+                                  <ul class="body-medium-default">
+                                    {{ range $t.TokenEndpoints }}
+                                      <li> {{ . }}
+                                    {{ end }}
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      {{ end }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {{ end }}
+
+            <div class="text-center mt-4 mb-5">
+              {{ if $request.Products }}
+                <button type="submit" class="btn btn-primary">Submit request</button>
+              {{ end}}
+            </div>
+          </form>
+        {{ end }}
+    {{ end }}
+  {{ end }}
+</div>

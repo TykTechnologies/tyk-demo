@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="GraphQL API Documentation">
+    <meta name="author" content="">
+
+    <title>{{.Name}} - GraphQL Playground</title>
+
+    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/stylesheets/fonts.css" rel="stylesheet">
+    <link href="/assets/stylesheets/main.css" rel="stylesheet">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/graphiql@3.0.10/graphiql.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" onerror="this.onerror=null;this.href='/assets/vendor/graphiql/graphiql.min.css'">
+    <script>
+        function loadFallbackScript(src) {
+            let script = document.createElement('script');
+            script.src = src;
+            script.async = true;
+            document.head.appendChild(script);
+        }
+    </script>
+    <script>
+        (function () {
+            try {
+                var params = new URLSearchParams(window.location.search);
+                if (params.get('embed') === '1') {
+                    var style = document.createElement('style');
+                    style.innerHTML = '.navbar{display:none!important;} body{padding-top:0!important;} #graphiql-container{height:100vh!important;padding-top:0!important;}';
+                    document.head.appendChild(style);
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <style>
+        html, body { height: 100%; margin: 0; }
+        #graphiql-container { height: calc(100vh); padding-top: 63px; }
+        .graphiql-container .topBar { background:#f5f5f5; border-bottom:1px solid #e0e0e0; }
+        .graphiql-container .execute-button { background:#4CAF50; border:none; }
+        .graphiql-container .execute-button:hover { background:#45a049; }
+        .error { padding: 16px; color: #b00020; font-family: ui-sans-serif, system-ui, -apple-system; }
+    </style>
+
+    <style>
+        /* Remove padding/margin for full-height GraphiQL */
+        .main-content {
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Ensure GraphiQL takes full height */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #content-wrapper {
+            height: calc(100vh);
+            overflow: hidden;
+        }
+
+        /* Banner styles */
+        #endpoint-banner {
+            margin-top: 63px;
+            display: none;
+        }
+
+        #graphiql-container.with-banner {
+            height: calc(100vh - 64px);
+            padding-top: 0;
+        }
+
+        /* Style for disabled execute button */
+        .graphiql-container .execute-button-disabled {
+            background: #cccccc !important;
+            cursor: not-allowed !important;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+{{ render "top_nav" . }}
+<!-- Page Content -->
+<div id="content-wrapper">
+    <div id="endpoint-banner" class="alert alert-warning" role="alert">
+        <i class="tyk-icon tykon tykon-warning"></i>
+        <div class="alert__content">GraphQL server URL is not available. This playground is in read-only mode.</div>
+    </div>
+    {{ yield }}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js" onerror="loadFallbackScript('/assets/vendor/graphiql/react.production.min.js')"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js" onerror="loadFallbackScript('/assets/vendor/graphiql/react-dom.production.min.js')"></script>
+<script src="https://cdn.jsdelivr.net/npm/graphiql@3.0.10/graphiql.min.js" onerror="loadFallbackScript('/assets/vendor/graphiql/graphiql.min.js')"></script>
+
+<script type="module">
+    let graphqlModule;
+    try {
+        graphqlModule = await import("https://cdn.jsdelivr.net/npm/graphql@16.9.0/+esm");
+    } catch (e) {
+        graphqlModule = await import("/assets/vendor/graphiql/graphql.min.js");
+    }
+
+    const {
+        buildSchema,
+        getIntrospectionQuery,
+        graphql: runGraphQL
+    } = graphqlModule;
+
+    const graphqlEndpoint = {{.Url | js}};
+    const productName = {{.Name | js}};
+    const productDescription = {{.Description | js}};
+    const schemaSDL = {{if .Schema}}{{.Schema }}{{else}}null{{end}};
+
+    const defaultQuery = `# Welcome to ${productName} GraphQL API
+# ${productDescription || 'Explore the GraphQL API using this interactive playground'}
+# Introspection is disabled server-side; this UI serves a local schema snapshot from SDL.
+`;
+
+    // Check if graphqlEndpoint is available and show banner if not
+    if (!graphqlEndpoint) {
+        const banner = document.getElementById('endpoint-banner');
+        if (banner) {
+            banner.style.display = 'flex';
+            const graphiqlContainer = document.getElementById('graphiql-container');
+            if (graphiqlContainer) {
+                graphiqlContainer.classList.add('with-banner');
+            }
+        }
+    }
+
+    let localIntrospection = null;
+    if (schemaSDL) {
+        try {
+            const serverSchema = buildSchema(schemaSDL);
+            const introspectionSource = getIntrospectionQuery({ descriptions: true });
+            const result = await runGraphQL({
+                schema: serverSchema,
+                source: introspectionSource
+            });
+            if (result.errors) {
+                console.error("Introspection generation errors:", result.errors);
+            } else {
+                localIntrospection = result.data;
+            }
+        } catch (e) {
+            console.error("Failed generating introspection from SDL:", e);
+        }
+    }
+
+    function fetcher(graphQLParams, options) {
+        const headers = { Accept: "application/json", "Content-Type": "application/json" };
+        if (options?.headers) Object.assign(headers, options.headers);
+
+        const q = (graphQLParams?.query || "").toString();
+        const isIntrospection =
+            q.includes("__schema") ||
+            q.includes("__type") ||
+            q.includes("IntrospectionQuery");
+
+        if (isIntrospection && localIntrospection) {
+            return Promise.resolve({ data: localIntrospection });
+        }
+
+        // Check if graphqlEndpoint is empty or undefined
+        if (!graphqlEndpoint) {
+            return Promise.resolve({
+                errors: [{
+                    message: "Live querying is not allowed. This GraphQL playground is in read-only mode.",
+                    extensions: { code: "LIVE_QUERYING_DISABLED" }
+                }]
+            });
+        }
+
+        return fetch(graphqlEndpoint, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(graphQLParams),
+            mode: "cors",
+            credentials: "include"
+        }).then(async (res) => {
+            const text = await res.text();
+            try { return JSON.parse(text); }
+            catch {
+                return { errors: [{ message: "Non-JSON response", httpStatus: res.status, body: text }] };
+            }
+        });
+    }
+
+    const props = {
+        fetcher,
+        defaultQuery,
+        query: localStorage.getItem("graphql_query_" + encodeURIComponent(productName)) || defaultQuery,
+        onEditQuery: (q) => q && localStorage.setItem("graphql_query_" + encodeURIComponent(productName), q),
+        defaultEditorToolsVisibility: true,
+        shouldPersistHeaders: true
+    };
+
+    const root = window.ReactDOM.createRoot(document.getElementById("graphiql-container"));
+    root.render(window.React.createElement(window.GraphiQL, props));
+
+    // Disable execute button if graphqlEndpoint is empty
+    if (!graphqlEndpoint) {
+        // Wait for GraphiQL to fully initialize
+        setTimeout(() => {
+            const executeButton = document.querySelector('.graphiql-container .graphiql-execute-button');
+            if (executeButton) {
+                executeButton.disabled = true;
+                executeButton.classList.add('execute-button-disabled');
+                executeButton.title = 'Execution is disabled in read-only mode';
+                // Remove any click handlers
+                const newButton = executeButton.cloneNode(true);
+                executeButton.parentNode.replaceChild(newButton, executeButton);
+            }
+        }, 1000); // Give GraphiQL time to render
+    }
+</script>
+</body>
+</html>

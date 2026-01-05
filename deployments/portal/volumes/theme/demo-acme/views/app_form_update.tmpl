@@ -1,0 +1,345 @@
+<!-- Template used for viewing & managing an App and its Credentials -->
+{{ $currentUser := .currentUser }}
+{{ $app := .app }}
+{{ $hasPending := false }}
+{{ $hasApproved := false }}
+{{ $approvedReqsLength := len $app.Credentials }}
+{{$appCerts := .appCerts}}
+{{$allCerts := .allCerts}}
+{{ if gt $approvedReqsLength 0 }}
+  {{ $hasApproved = true }}
+{{end}}
+{{ $authType := .authType }}
+<div class="apps-wrapper container">
+		<p class="mb-3 mt-3">
+			<a href="/portal/private/dashboard" class="breadcrumb-link">
+				< Back to Apps overview </a>
+    </p>
+    {{ render "messages" . }}
+    {{ if .errors }}
+      {{ range $key, $errs := .errors }}
+        <div class="alert alert-warning cart-error" role="alert">
+          <i class="tyk-icon tykon tykon-warning "></i>
+          <div class="alert__content">
+            <strong>{{$key}}</strong>
+            <ul>
+              {{ range $errs }}
+                <li>{{.}}</li>
+              {{ end }}
+            </ul>
+          </div>
+        </div>
+      {{ end }}
+    {{ end }}
+    {{ if $app }}
+      {{ if .error }}
+      <div class="alert alert-danger" role="alert">
+        <i class="tyk-icon tykon tykon-warning "></i>
+        <div class="alert__content">{{ .error }}</div>
+      </div>
+      {{ end }}
+      <div class="apps-wrapper__card-section mt-5">
+        <h1 class="heading-xlarge">App overview: {{$app.Name}}</h1>
+        <form method="post" id="app-form">
+          <div class="d-flex flex-row justify-content-between align-items-center flex-wrap mb-2 mt-4">
+            <h2 class="m-0 heading-large">App details</h2>
+            <div class="cta-btns-wrapper">
+              {{ if or (eq $currentUser.ID $app.UserID) (eq $currentUser.Role "consumer-admin") }}
+              <button type="button" class="btn btn-primary-outline enable-editing d-block" data-action="edit">
+                Edit details
+              </button>
+              {{ end }}
+              <div class="edit-cta d-none disable-editing">
+                <button type="button" class="btn btn-secondary-outline" data-action="cancel">
+                  Cancel
+                </button>
+                <button type="submit" name="submit" class="btn btn-primary" value="Update" data-action="save" data-submit-mode="update">Save</button>
+                <input type="hidden" name="mode" value="update">
+                <input type="hidden" value="{{ $app.ID}}">
+              </div>
+            </div>
+          </div>
+          <div class="d-flex flex-row justify-content-between pb-2 align-items-center w-100">
+              <div class="card p-0 mb-4 w-100">
+                <div class="d-flex flex-row justify-content-between flex-wrap w-100">
+                    <div class="card-footer__static-data d-block no-border w-100">
+                      <div class="col-lg-12">
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <h6 class="heading-small text-default mr-4 mb-1">APP ID:</h6>
+                            <span class="text-regular-14">This is your app's internal unique ID</span>
+                          </div>
+                          <div class="text-regular-14">
+                            {{$app.ID}}
+                            <i class="tyk-icon tykon tykon-copy ml-2" data-copy-value="{{$app.ID}}"></i>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-12 requests-row-section">
+                        <div class="d-flex flex-row justify-content-between align-items-start flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <h6 class="heading-small text-default mr-4">Name:</h6>
+                          </div>
+                          <div class="text-regular-14">
+                            {{ $app.Name }}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-12">
+                        <div class="d-flex flex-row justify-content-between align-items-start flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <h6 class="heading-small text-default mr-4">Description:</h6>
+                          </div>
+                          <div class="text-regular-14">
+                            {{if $app.Description }} {{ $app.Description }} {{else}} <i>No description set</i> {{end}}
+                          </div>
+                        </div>
+                      </div>
+                      {{ if not .isDefaultOrgUser }}
+                      <div class="col-lg-12">
+                        <div class="d-flex flex-row justify-content-between align-items-start flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <h6 class="heading-small text-default mr-4">Visibility:</h6>
+                          </div>
+                          <div class="text-regular-14">
+                            {{ $app.VisibilityLabel }}
+                          </div>
+                        </div>
+                      </div>
+                      {{ end }}
+                      <div class="col-lg-12">
+                        <div class="d-flex flex-row justify-content-between align-items-center flex-wrap p-3 requests-row-section__info">
+                          <div class="d-flex flex-column pr-3">
+                            <h6 class="heading-small text-default mr-4">Redirect URLs:</h6>
+                          </div>
+                          <div class="text-regular-14">
+                            {{if $app.RedirectURLs }} {{ $app.RedirectURLs }} {{else}} <i>No redirect URLs set</i> {{end}}
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="card-footer__dynamic-data d-none w-100 p-3">
+                      <div class="mb-4">
+                        <label class="heading-small text-default">App name:</label>
+                        <input type="text" name="name" class="form-control" placeholder="App Name" autofocus value="{{ $app.Name}}">
+                      </div>
+                      <div class="mb-4">
+                        <label class="heading-small text-default">Description:</label>
+                        <textarea rows="3" name="description" class="form-control" placeholder="App Description">{{ $app.Description}}</textarea>
+                      </div>
+                      {{ if not .isDefaultOrgUser }}
+                      <div class="mb-4">
+                        <label class="heading-small text-default">Visibility:</label>
+                        <select name="visibility" class="form-control">
+                          <option value="personal" {{ if eq $app.Visibility "personal" }}selected{{ end }}>Personal</option>
+                          <option value="team" {{ if eq $app.Visibility "team" }}selected{{ end }}>Team</option>
+                          <option value="organisation" {{ if eq $app.Visibility "organisation" }}selected{{ end }}>Organisation</option>
+                        </select>
+                      </div>
+                      {{ else }}
+                      <input type="hidden" name="visibility" value="personal" />
+                      {{ end }}
+                      <div class="mb-4">
+                        <label class="heading-small text-default">Default Redirect URLs:</label>
+                        <input name="redirectURLs" class="form-control" placeholder="Redirect URLs" value="{{ $app.RedirectURLs }}">
+                        <small id="redirectHelp" class="form-text with-info-icon">Separate URLs with commas.  This is the default redirect URL for the app and will be applied to all newly created credentials.</small>
+                      </div>
+                    </div>
+                </div>
+              </div>
+          </div>
+        </form>
+        {{ if or $app.AccessRequests $app.Credentials}}
+          {{ if $app.AccessRequests}}
+            {{ range $app.AccessRequests }}
+              {{ if eq .Status "pending" }}
+                {{ $hasPending = true }}
+              {{ end }}
+            {{ end }}
+          {{ end }}
+          <h2 class="heading-large">Credential management</h2>
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item px-0">
+              <a class="nav-link px-4 pb-0 {{ if $hasApproved }}active{{end}}" id="approved-tab" data-toggle="tab" href="#approved" role="tab" aria-controls="approved" aria-selected="{{ if $hasApproved }}true{{end}}">
+                <h6 class="body-medium-default text-default mb-1">Approved access</h6>
+              </a>
+            </li>
+            <li class="nav-item px-0">
+              <a class="nav-link px-4 pb-0 {{ if not $hasApproved }}active{{end}}" id="pending-tab" data-toggle="tab" href="#pending" role="tab" aria-controls="pending" aria-selected="{{ if $hasApproved }}false{{end}}">
+                <h6 class="body-medium-default text-default mb-1">Pending access</h6>
+              </a>
+            </li>
+          </ul>
+          <div class="tab-content mt-4">
+            <div class="tab-pane fade {{ if $hasApproved }}show active{{end}}" id="approved" role="tabpanel" aria-labelledby="approved-tab">
+              {{ if lt $approvedReqsLength 1 }}
+                <div class="alert alert-info" role="alert">
+                  <i class="tyk-icon tykon tykon-warning "></i>
+                  <div class="alert__content heading-small">There are no approved requests yet</div>
+                </div>
+              {{end}}
+              {{ range $index, $cred := $app.Credentials }}
+                {{ $availablePlansKey := printf "availablePlans_%d" $cred.ID }}
+                {{ $availablePlans := index $ $availablePlansKey }}
+                {{ $pendingPlanKey := printf "pendingPlan_%d" $cred.ID }}
+                {{ $pendingPlan := index $ $pendingPlanKey }}
+                {{ $hasPendingKey := printf "hasPendingPlanChange_%d" $cred.ID }}
+                {{ $hasPending := index $ $hasPendingKey }}
+                {{ render "credential_card" (dict
+                  "cred" $cred
+                  "app" $app
+                  "isPending" false
+                  "appCerts" $appCerts
+                  "allCerts" $allCerts
+                  "index" $index
+                  "availablePlans" $availablePlans
+                  "pendingPlan" $pendingPlan
+                  "hasPending" $hasPending
+                ) }}
+              {{end}}
+            </div>
+            <div class="tab-pane fade {{ if not $hasApproved }}show active{{end}}" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+              {{ if not $hasPending }}
+                <div class="alert alert-info" role="alert">
+                  <i class="tyk-icon tykon tykon-warning "></i>
+                  <div class="alert__content heading-small">There are no pending requests yet</div>
+                </div>
+              {{ else }}
+                {{ $pendingIndex := 0 }}
+                {{ range $app.AccessRequests }}
+                  {{ if eq .Status "pending" }}
+                    {{ render "credential_card" (dict
+                      "cred" .
+                      "app" $app
+                      "isPending" true
+                      "appCerts" $appCerts
+                      "allCerts" $allCerts
+                      "index" $pendingIndex
+                    ) }}
+                    {{ $pendingIndex = add $pendingIndex 1 }}
+                  {{ end }}
+                {{ end }}
+              {{ end }}
+            </div>
+          </div>
+        {{end}}
+        {{ if or (eq $currentUser.ID $app.UserID) (eq $currentUser.Role "consumer-admin") }}
+        <h2 class="heading-large mb-3">Advanced Settings</h2>
+        <div class="card p-0 mb-4">
+          <div class="card-footer m-0 p-4 d-flex flex-row w-100 justify-content-between">
+            <div>
+              <h4 class="heading-medium text-default">Delete this APP</h4>
+              <h5 class="body-xlarge-default">Deleting this app means all access credentials will also be deleted. </h5>
+            </div>
+            <div>
+              <button type="button" class="btn btn-danger-outline pass-id" data-toggle="modal" data-target="#deleteAppModal" data-app-id="{{$app.ID}}">Delete this app</button>
+            </div>
+          </div>
+        </div>
+        {{ end }}
+      </div>
+  {{ end }}
+  </div>
+  <div class="d-none" id="success-msg">Value has been copied successfully</div>
+</div>
+
+{{ render "confirmation_modal" (dict
+  "id" "deleteAppModal"
+  "title" "Delete app?"
+  "body" (raw "<p class='body-xlarge-default'>If deleting this app, all the access credentials will also be revoked. This action cannot be undone.</p><p class='body-xlarge-default'>Do you wish to continue?</p>")
+  "confirmText" "Delete"
+  "confirmClass" "btn-danger"
+  "showIcon" true
+  "useForm" true
+  "hiddenFields" (dict "mode" "delete")
+) }}
+
+<!-- JavaScript for credential editing -->
+<script>
+function enableCredentialEdit(credId) {
+  // Hide static display and show edit fields
+  document.querySelectorAll('.enable-credential-editing-' + credId).forEach(el => el.classList.add('d-none'));
+  document.querySelectorAll('.disable-credential-editing-' + credId).forEach(el => el.classList.remove('d-none'));
+  
+  // Find the credential section and toggle redirect URL fields
+  const credSection = document.querySelector('input[name="credential_redirect_url_' + credId + '"]');
+  if (credSection) {
+    const parent = credSection.closest('.requests-row-section__info');
+    if (parent) {
+      parent.querySelector('.credential-redirect-url-static').classList.add('d-none');
+      parent.querySelector('.credential-redirect-url-edit').classList.remove('d-none');
+    }
+  }
+}
+
+function cancelCredentialEdit(credId) {
+  // Show static display and hide edit fields
+  document.querySelectorAll('.enable-credential-editing-' + credId).forEach(el => el.classList.remove('d-none'));
+  document.querySelectorAll('.disable-credential-editing-' + credId).forEach(el => el.classList.add('d-none'));
+  
+  // Find the credential section and toggle redirect URL fields
+  const credSection = document.querySelector('input[name="credential_redirect_url_' + credId + '"]');
+  if (credSection) {
+    const parent = credSection.closest('.requests-row-section__info');
+    if (parent) {
+      parent.querySelector('.credential-redirect-url-static').classList.remove('d-none');
+      parent.querySelector('.credential-redirect-url-edit').classList.add('d-none');
+    }
+  }
+}
+
+function saveCredentialEdit(credId) {
+  const redirectUrlInput = document.querySelector('input[name="credential_redirect_url_' + credId + '"]');
+  if (redirectUrlInput) {
+    // Find or create the update form
+    let form = document.getElementById('credential-update-form-' + credId);
+    if (!form) {
+      // Create a hidden form similar to how rotate/delete work
+      form = document.createElement('form');
+      form.id = 'credential-update-form-' + credId;
+      form.method = 'POST';
+      form.action = '/portal/private/credentials';
+      form.style.display = 'none';
+      document.body.appendChild(form);
+    }
+    
+    // Clear and populate the form
+    form.innerHTML = '';
+    
+    const modeInput = document.createElement('input');
+    modeInput.type = 'hidden';
+    modeInput.name = 'mode';
+    modeInput.value = 'update';
+    form.appendChild(modeInput);
+    
+    const credIdInput = document.createElement('input');
+    credIdInput.type = 'hidden';
+    credIdInput.name = 'cred_id';
+    credIdInput.value = credId;
+    form.appendChild(credIdInput);
+    
+    const redirectInput = document.createElement('input');
+    redirectInput.type = 'hidden';
+    redirectInput.name = 'redirect_url';
+    redirectInput.value = redirectUrlInput.value;
+    form.appendChild(redirectInput);
+    
+    // Add CSRF token from meta tag (not cookie!)
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    const csrfToken = meta ? meta.getAttribute('content') : '';
+    if (csrfToken) {
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = 'csrf_token';
+      csrfInput.value = csrfToken;
+      form.appendChild(csrfInput);
+    } else {
+      console.error('CSRF token not found in meta tag!');
+    }
+    
+    // Submit the form
+    form.submit();
+  }
+}
+</script>

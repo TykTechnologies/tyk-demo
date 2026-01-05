@@ -1,0 +1,135 @@
+{{ $cred := .cred }}
+{{ $app := .app }}
+{{ $credID := .credID }}
+{{ $availablePlans := .availablePlans }}
+{{ $currentPlanID := 0 }}
+{{ if $cred.AccessRequest }}
+  {{ if $cred.AccessRequest.Plan }}
+    {{ $currentPlanID = $cred.AccessRequest.Plan.ID }}
+  {{ end }}
+{{ end }}
+
+<form method="POST" action="/portal/private/apps/{{ $app.ID }}/credentials/{{ $credID }}/change-plan">
+  <div class="modal fade" id="change-plan-{{ $credID }}" tabindex="-1" role="dialog" aria-labelledby="changePlanModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl flex-column justify-content-center align-items-center" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <h3 class="modal-h3 text-default">Change plan for these credentials</h3>
+          <p class="text-regular-14 text-default-subdue mb-2">You are about to update the plan for these credentials:</p>
+          <ul class="text-regular-14 text-default-subdue mb-3" style="list-style: disc; padding-left: 20px;">
+            <li>Rate limits and quotas will be updated.</li>
+            <li>Usage exceeding the new limits may be affected.</li>
+          </ul>
+
+          <hr class="my-3">
+
+          <h5 class="heading-small text-default mb-3">Plans available:</h5>
+
+          <div class="plans-grid mb-5" id="plans-grid-{{ $credID }}">
+            {{ if $availablePlans }}
+              {{ range $plan := $availablePlans }}
+                {{ $isCurrent := eq $plan.ID $currentPlanID }}
+                <div class="plan-card basic-card p-4 {{ if $isCurrent }} current disabled{{ end }}" data-plan-id="{{ $plan.ID }}"{{ if $isCurrent }} data-is-current="true"{{ end }} style="min-width: 250px;">
+                  {{ if $isCurrent }}
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <h4 class="heading-medium mb-0 text-default">{{ $plan.Name }}</h4>
+                      <span class="pill text-regular-12">Current</span>
+                    </div>
+                    <h6 class="heading-xsmall mb-0">Quota: {{ $plan.FormatQuota }}</h6>
+                    <h6 class="heading-xsmall">Rate limit: {{ $plan.FormatRateLimit }}</h6>
+                  {{else}}
+                    <div class="d-flex">
+                      <div class="plan-check mt-1">✓</div>
+                      <div class="ml-2">
+                        <h4 class="heading-medium mb-2 text-default">{{ $plan.Name }}</h4>
+                        <h6 class="heading-xsmall mb-0">Quota: {{ $plan.FormatQuota }}</h6>
+                        <h6 class="heading-xsmall">Rate limit: {{ $plan.FormatRateLimit }}</h6>
+                      </div>
+                    </div>
+                  {{end}}
+                </div>
+              {{ end }}
+            {{ else }}
+              <div class="text-center py-4 text-muted">No plans available (debug: availablePlans is nil/empty)</div>
+            {{ end }}
+          </div>
+
+          <input type="hidden" name="new_plan_id" id="selected-plan-{{ $credID }}" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary-outline" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submit-change-plan-{{ $credID }}" disabled>Change plan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<style>
+#change-plan-{{ $credID }} .modal-dialog {
+  max-width: 1000px;
+}
+
+#change-plan-{{ $credID }} .plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+#change-plan-{{ $credID }} .plan-card {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#change-plan-{{ $credID }} .plan-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#change-plan-{{ $credID }} .plan-card.selected {
+  border: var(--tdp-border-neutral-pressed);
+}
+
+#change-plan-{{ $credID }} .plan-card.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+#change-plan-{{ $credID }} .plan-card.disabled:hover {
+  box-shadow: none;
+}
+
+#change-plan-{{ $credID }} .plan-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #28a745;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+#change-plan-{{ $credID }} .plan-card.selected .plan-check {
+  display: flex;
+}
+
+#change-plan-{{ $credID }} .plan-card.selected .plan-badge {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  #change-plan-{{ $credID }} .plans-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  #change-plan-{{ $credID }} .plans-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

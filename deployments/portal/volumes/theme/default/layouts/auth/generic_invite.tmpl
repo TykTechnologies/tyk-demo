@@ -35,7 +35,7 @@
       </div>
       {{if .done}}
         <p class="text-center mt-4">
-          <a class="btn btn-primary" href="/auth/password/login">GO TO LOGIN</a>
+          <a class="btn btn-primary" href="{{LoginURL}}">GO TO LOGIN</a>
         </p>
       {{end}}
     {{ else }}
@@ -93,7 +93,7 @@
           <input type="submit" name="submit" class="btn btn-primary" value="Register to developer portal" />
         </div>
         <div class="form-group text-center">
-          Already a member ? <a href="/auth/password/login" class="breadcrumb-link">Login.</a>
+          Already a member ? <a href="{{LoginURL}}" class="breadcrumb-link">Login.</a>
         </div>
       </form>
     {{ end }}

@@ -1,0 +1,110 @@
+{{ $accessRequest := .accessRequest }}
+{{ $appCerts := .appCerts }}
+{{ $allCerts := .allCerts }}
+{{ $appID := .appID }}
+{{ $isPending := .isPending }}
+
+<div class="apps-wrapper__card-section-certs">
+  <form method="POST" id="app-form-cert-update" action="{{ $appID }}/cert/{{ $accessRequest.CertificateID }}" class="col-lg-12 requests-row-section">
+    <div class="d-flex flex-row justify-content-between align-items-start flex-wrap requests-row-section__info p-3">
+      {{ if and $isPending (eq $accessRequest.CertificateID 0) }}
+        <div class="mt-2 d-flex flex-column w-100">
+          <h5 class="heading-small text-default m-0 mb-2">Mutual TLS certificates</h5>
+          <div class="alert alert-info" role="alert">
+            <i class="tyk-icon tykon tykon-warning"></i>
+            <div class="alert__content heading-small">No certificate selected for this request</div>
+          </div>
+        </div>
+      {{ else if eq (len $allCerts) 0 }}
+        <div class="mt-2 d-flex flex-column">
+          <h5 class="heading-small text-default m-0">Mutual TLS certificates</h5>
+          <i class="pt-3 mb-1">You haven't uploaded any certificates yet.</i>
+          <span class="mb-3">To add and manage certificates please go to <a class="breadcrumb-link" href="">Certificates</a> on your dashboard.</span>
+        </div>
+      {{else}}
+        {{ with index $appCerts $accessRequest.ID}}
+          <div class="card-footer__static-data d-block mt-2 mb-3">
+            <h5 class="heading-small text-default m-0">Mutual TLS certificates</h5>
+            <h6 class="heading-small text-default mr-4 mt-2 mb-0">Certificate name:</h6>
+            <p class="text-regular-14">{{.Name}}</p>
+            <h6 class="heading-small text-default mb-0">Status:</h6>
+            {{if .IsValid}}
+              <i class="bi bi-check-circle-fill status-registered mr-1"></i>
+              <span class="text-regular-14">Valid</span>
+            {{else}}
+              <i class="bi bi-x-circle-fill text-danger mr-1"></i>
+              <span class="text-regular-14">Expired</span>
+            {{end}}
+            <h6 class="heading-small text-default mt-2 mb-0">Certificate info:</h6>
+            <p class="body-medium-default mb-2">File name: {{.Name}}</p>
+            <p class="body-medium-default mb-2">Signature Algorithm: {{.SignatureAlgorithm}}</p>
+            <p class="body-medium-default mb-2">Issuer: {{.Issuer}}</p>
+            <p class="body-medium-default mb-2">Expiration: {{if .IsValid}}your certificate is valid{{else}}your certificate is expired{{end}}</p>
+            <p class="body-medium-default mb-2">Validity: </p>
+            <ul class="ml-3 card-ul">
+              <li class="body-medium-default">Not Before: {{.ValidNotBefore}}</li>
+              <li class="body-medium-default">Not After: {{.ValidNotAfter}}</li>
+            </ul>
+            <p class="body-medium-default">Subject: {{.Subject}}</p>
+          </div>
+          <div class="card-footer__dynamic-data d-none mt-2 mb-3 col-8 p-0">
+            <h5 class="heading-small text-default m-0">Replace Mutual TLS certificate</h5>
+            <select class="form-control w-100 mt-5 mb-3" name="selected-cert">
+              <option disabled selected value="">Select a certificate</option>
+              {{ range $key, $cert := $allCerts }}
+                {{ if ne $key (printf "%d" $accessRequest.ID)}}
+                  <option value="{{$cert.ID}}">{{$cert.Name}}</option>
+                {{end}}
+              {{end}}
+            </select>
+          </div>
+          {{ if not $isPending }}
+          <div class="d-flex justify-content-end mt-4 cta-btns-wrapper col-4 p-0">
+            <button type="button" class="btn btn-danger-outline ml-2 enable-editing d-block" data-toggle="modal" data-target="#detachCertificateModal">Detach Certificate</button>
+            <button type="button" class="btn btn-secondary d-block" data-action="edit">Replace Certificate</button>
+            <div class="edit-cta d-none disable-editing">
+              <button type="button" class="btn btn-secondary-outline" data-action="cancel">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">Save</button>
+              <input type="hidden" name="access-request" value="{{ $accessRequest.ID }}">
+              <input type="hidden" name="provider" value="{{ $accessRequest.ProviderID }}">
+              <input type="hidden" name="cert-mode" value="update">
+            </div>
+          </div>
+        {{else}}
+          <div class="mt-2 mb-3 col-8 p-0">
+            <h6 class="heading-small text-default mr-4 text-uppercase mb-1">attach mutual tls certificate</h6>
+            <select class="form-control w-100 mt-5 mb-3" name="selected-cert">
+              <option disabled selected value="">Select a certificate</option>
+              {{ range $key, $cert := $allCerts }}
+                {{ if ne $key (printf "%d" $accessRequest.ID)}}
+                  <option value="{{$cert.ID}}">{{$cert.Name}}</option>
+                {{end}}
+              {{end}}
+            </select>
+          </div>
+          <div class="d-flex justify-content-end mt-4 col-4 p-0">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <input type="hidden" name="access-request" value="{{ $accessRequest.ID }}">
+            <input type="hidden" name="provider" value="{{ $accessRequest.ProviderID }}">
+            <input type="hidden" name="cert-mode" value="update">
+          </div>
+        {{end}}
+      {{end}}
+    </div>
+  </form>
+</div>
+{{ if not $isPending }}
+{{ render "confirmation_modal" (dict
+  "id" "detachCertificateModal"
+  "title" "Detach certificate?"
+  "body" (raw "<p>Detaching the certificate will result in losing access to the APIs.</p><p>If you detach the certificate, it is advised to promptly replace with a new one to maintain access to the API Product(s).</p><p>Do you wish to continue?</p>")
+  "confirmText" "Remove certificate"
+  "confirmClass" "btn-danger"
+  "showIcon" true
+  "formAction" (printf "%s/cert/%d" $appID $accessRequest.CertificateID)
+  "hiddenFields" (dict "cert-mode" "delete" "access-request" $accessRequest.ID "provider" $accessRequest.ProviderID)
+) }}
+{{ end }}
+{{ end }}

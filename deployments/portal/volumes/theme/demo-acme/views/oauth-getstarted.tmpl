@@ -1,0 +1,115 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-9 page-title-wrapper">
+      <h1>OAuth 2.0 APIs</h1>
+    </div>
+    <div class="col-md-3 d-flex align-items-center justify-content-end">
+      <a href="/portal/catalogue-products" class="btn btn-primary">REST APIs</a>
+    </div>
+  </div>
+
+  <div class="row mt-2 mb-4">
+    <div class="col-12 mb-4">
+        <div class="mb-4">
+            <a href="/oauth-playground" class="btn btn-primary">Try OAuth Playground</a>
+            <a href="/portal/private/dashboard" class="btn btn-primary ml-2">My Apps</a>
+            <a href="/portal/oauth/docs" class="btn btn-secondary ml-2">View Documentation</a>
+        </div>
+
+          <h2>Overview</h2>
+          <p>
+            OAuth 2.0 provides secure delegated access, allowing applications to access resources on behalf of users without exposing credentials. 
+            Our OAuth implementation supports industry-standard flows for secure authentication and authorization.
+          </p>
+          
+          <h2 class="mt-4">Key Features</h2>
+          <ul>
+            <li>Support for Client Credentials flow for machine-to-machine authentication</li>
+            <li>Dynamic Client Registration (DCR) for automated client management</li>
+            <li>JWT access tokens with customizable claims</li>
+            <li>Token introspection and revocation capabilities</li>
+            <li>Secure token storage and rotation</li>
+          </ul>
+
+          <h2 class="mt-4">OAuth 2.0 Endpoints</h2>
+          <p>Our OAuth 2.0 implementation provides the following endpoints:</p>
+          
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Endpoint</th>
+                  <th>URL</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>Token</code></td>
+                  <td><code>http://tyk-gateway.localhost:8080/oauth-2.0/oauth/token</code></td>
+                  <td>Request access tokens</td>
+                </tr>
+                <tr>
+                  <td><code>Authorize</code></td>
+                  <td><code>http://tyk-gateway.localhost:8080/oauth-2.0/oauth/authorize</code></td>
+                  <td>Authorization endpoint for user consent</td>
+                </tr>
+                <tr>
+                  <td><code>Revoke</code></td>
+                  <td><code>http://tyk-gateway.localhost:8080/oauth-2.0/oauth/revoke</code></td>
+                  <td>Revoke access tokens</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 class="mt-4">Client Credentials Flow</h2>
+          <p>
+            The Client Credentials flow is used for server-to-server authentication where no user interaction is required:
+          </p>
+          
+          <h4>1. Request an Access Token</h4>
+          <pre><code>POST /oauth-2.0/oauth/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+&client_id=YOUR_CLIENT_ID
+&client_secret=YOUR_CLIENT_SECRET</code></pre>
+
+          <h4>2. Token Response</h4>
+          <pre><code>{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}</code></pre>
+
+          <h4>3. Use the Access Token</h4>
+          <pre><code>GET /api/resource
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...</code></pre>
+
+          <h2 class="mt-4">Getting Started</h2>
+          <ol>
+            <li>Create an application in your dashboard to obtain client credentials</li>
+            <li>Use the OAuth Playground to test token generation</li>
+            <li>Implement the OAuth flow in your application</li>
+            <li>Make authenticated API requests using your access token</li>
+          </ol>
+
+          <h2 class="mt-4">Security Best Practices</h2>
+          <ul>
+            <li>Never expose your client secret in client-side code</li>
+            <li>Always use HTTPS for OAuth endpoints in production</li>
+            <li>Implement token rotation for enhanced security</li>
+            <li>Store tokens securely and never log them</li>
+            <li>Validate token expiration before making API calls</li>
+          </ul>
+
+          <div class="mt-4">
+            <a href="/oauth-playground" class="btn btn-primary">OAuth Playground</a>
+            <a href="/portal/private/dashboard" class="btn btn-primary ml-2">My Apps</a>
+            <a href="/portal/oauth/docs" class="btn btn-secondary ml-2">View Documentation</a>
+          </div>
+        </div>  
+
+  </div>
+</div>

@@ -1,0 +1,93 @@
+<!-- Template used for generic content -->
+<div class="flip-flop-wrapper">
+  <header class="dark-to-light-bg">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="text-container">
+            <h1>{{.page.Title}}</h1>
+            <p>
+            {{if .blocks.HeaderDescription.MarkdownEnabled}}
+              {{safe_md .blocks.HeaderDescription.MarkdownContent}}
+            {{else}}
+              {{safe .blocks.HeaderDescription.Content}}
+            {{end}}
+            </p>
+            {{if .blocks.HeaderButtonLabel.Content}}
+              <a href="{{.blocks.HeaderButtonLink.Content}}" class="btn btn-primary">{{.blocks.HeaderButtonLabel.Content}}</a>
+            {{end}}
+          </div>
+        </div>
+        <div class="col-sm-6 image-container" style="background: url('/assets/images/tyk-portal-silhouette.png') no-repeat left center;">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  {{if .blocks.NoImageSectionTitle.Content}}
+    <div>
+      <div class="container">
+        <div>
+          <div class="text-center">
+            <h2 class="pb-3 pt-5">{{safe .blocks.NoImageSectionTitle.Content}}</h2>
+          </div>
+          <p>
+            {{if .blocks.NoImageSectionDescription.MarkdownEnabled}}
+              {{safe_md .blocks.NoImageSectionDescription.MarkdownContent}}
+            {{else}}
+              {{safe .blocks.NoImageSectionDescription.Content}}
+            {{end}}
+          </p>
+        </div>
+      </div>
+    </div>
+  {{end}}
+
+  {{ if .blocks.FlipFlopRightImageTitle.Content }}
+    <div class="dark-to-light-bg">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="text-container">
+              <h2 class="pb-3">{{safe .blocks.FlipFlopRightImageTitle.Content}}</h2>
+              <p>
+                {{if .blocks.FlipFlopRightImageDescription.MarkdownEnabled}}
+                  {{safe_md .blocks.FlipFlopRightImageDescription.MarkdownContent}}
+                {{else}}
+                  {{safe .blocks.FlipFlopRightImageDescription.Content}}
+                {{end}}
+              </p>
+              </div>
+          </div>
+          <div class="col-sm-6 image-container" style="background: url('/assets/images/tyk-portal-silhouette.png') no-repeat left center;">
+          </div>
+        </div>
+      </div>
+    </div>
+  {{ end }}
+
+  {{ if .blocks.FlipFlopLeftImageTitle.Content }}
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-6 image-container" style="background: url('/assets/images/about-us.png') no-repeat right center;">{{.blocks.FlipFlopLeftImage.Image.URL}}</div>
+        <div class="col-sm-6">
+          <div class="row align-items-center my-5">
+            <div class="text-container w-100 text-left">
+              <h2 class="pb-3">{{safe .blocks.FlipFlopLeftImageTitle.Content}}</h2>
+              <p>
+                {{if .blocks.FlipFlopLeftImageDescription.MarkdownEnabled}}
+                  {{safe_md .blocks.FlipFlopLeftImageDescription.MarkdownContent}}
+                {{else}}
+                  {{safe .blocks.FlipFlopLeftImageDescription.Content}}
+                {{end}}
+              </p>
+              {{if .blocks.FlipFlopLeftImageButtonLabel.Content}}
+                <a href="{{.blocks.FlipFlopLeftImageButtonLink.Content}}" class="btn btn-secondary-outline">{{.blocks.FlipFlopLeftImageButtonLabel.Content}}</a>
+              {{end}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {{ end }}
+</div>
