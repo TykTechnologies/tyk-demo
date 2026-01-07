@@ -1,0 +1,30 @@
+[
+  {
+    "itemId": "ITEM-001",
+    "name": "Electronic Widget",
+    "category": "Electronics",
+    "price": 49.99,
+    "description": "A high-quality electronic widget",
+    "status": "active",
+    "lastUpdated": "2024-01-15T10:30:00Z"
+  },
+  {
+    "itemId": "ITEM-002",
+    "name": "Premium Accessory",
+    "category": "Accessories",
+    "price": 29.99,
+    "description": "A premium accessory item",
+    "status": "active",
+    "lastUpdated": "2024-01-15T10:31:00Z"
+  },
+  {
+    "itemId": "ITEM-003",
+    "name": "Smart Device",
+    "category": "Electronics",
+    "price": 99.99,
+    "description": "An advanced smart device",
+    "status": "active",
+    "lastUpdated": "2024-01-15T10:32:00Z"
+  }
+]
+

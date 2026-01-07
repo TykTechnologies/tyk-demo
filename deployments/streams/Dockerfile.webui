@@ -1,0 +1,30 @@
+# Use official Python 3 slim image
+FROM python:3.11-slim
+
+# Add metadata labels
+LABEL maintainer="lheritagetyk"
+LABEL description="Web UI Server for Kafka Master Data Streaming Demo"
+
+# Set working directory
+WORKDIR /app
+
+# Install Python dependencies
+RUN pip3 install --no-cache-dir flask flask-cors requests
+
+# Copy web UI server script
+COPY web_ui_server.py .
+
+# Copy web UI static files
+COPY web_ui/ ./web_ui/
+
+# Create directory for shared logs (will be mounted as volume)
+RUN mkdir -p /tmp
+
+# Expose port for web UI
+EXPOSE 8888
+
+# Set environment variable for Tyk Gateway (can be overridden)
+ENV TYK_GATEWAY_URL=http://tyk-gateway.localhost:8080
+
+# Run the web UI server
+CMD ["python3", "-u", "web_ui_server.py"]
