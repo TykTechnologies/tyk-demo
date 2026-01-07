@@ -1,0 +1,81 @@
+{
+  "components": {},
+  "info": {
+    "title": "Streams Master Data - XML Consumer (HTTP POST)",
+    "version": "1.0.0",
+    "description": "Master Data XML Consumer API - Kafka to HTTP POST endpoint with JSON to XML transformation that sends XML format to downstream ERP systems via HTTP POST requests"
+  },
+  "openapi": "3.0.3",
+  "paths": {},
+  "servers": [
+    {
+      "url": "http://tyk-gateway.localhost:8080/streams-master-data-xml-http/"
+    }
+  ],
+  "x-tyk-api-gateway": {
+    "info": {
+      "id": "master-data-xml-consumer-http-api",
+      "name": "Streams Master Data XML Consumer (HTTP POST)",
+      "orgId": "5e9d9544a1dcd60001d0ed20",
+      "state": {
+        "active": true
+      }
+    },
+    "server": {
+      "listenPath": {
+        "strip": true,
+        "value": "/streams-master-data-xml-http/"
+      }
+    },
+    "upstream": {
+      "url": ""
+    },
+    "middleware": {
+      "global": {
+        "trafficLogs": {
+          "enabled": true
+        },
+        "contextVariables": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "x-tyk-streaming": {
+    "streams": {
+      "consumer": {
+        "input": {
+          "kafka": {
+            "addresses": [
+              "kafka:9092"
+            ],
+            "checkpoint_limit": 1,
+            "client_id": "master-data-xml-consumer-http",
+            "consumer_group": "xml-consumers-http",
+            "target_version": "3.8.0",
+            "topics": [
+              "master-data-items"
+            ]
+          }
+        },
+        "pipeline": {
+          "processors": [
+            {
+              "bloblang": "root = this.format_xml()"
+            }
+          ]
+        },
+        "output": {
+          "http_client": {
+            "url": "http://erp-servers:8002/erp/xml/receive",
+            "verb": "POST",
+            "headers": {
+              "Content-Type": "application/xml"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

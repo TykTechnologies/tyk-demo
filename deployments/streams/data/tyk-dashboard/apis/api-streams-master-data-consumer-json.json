@@ -1,0 +1,90 @@
+{
+  "components": {},
+  "info": {
+    "title": "Streams Master Data - JSON Consumer",
+    "version": "1.0.0",
+    "description": "Master Data JSON Consumer API - Kafka to HTTP endpoint that delivers canonical JSON format to downstream ERP systems"
+  },
+  "openapi": "3.0.3",
+  "paths": {},
+  "servers": [
+    {
+      "url": "http://tyk-gateway.localhost:8080/streams-master-data-json/"
+    }
+  ],
+  "x-tyk-api-gateway": {
+    "info": {
+      "id": "master-data-json-consumer-api",
+      "name": "Streams Master Data JSON Consumer",
+      "orgId": "5e9d9544a1dcd60001d0ed20",
+      "state": {
+        "active": true
+      }
+    },
+    "server": {
+      "listenPath": {
+        "strip": true,
+        "value": "/streams-master-data-json/"
+      }
+    },
+    "upstream": {
+      "url": ""
+    },
+    "middleware": {
+      "global": {
+        "trafficLogs": {
+          "enabled": true
+        },
+        "contextVariables": {
+          "enabled": true
+        },
+        "cors": {
+          "enabled": true,
+          "allowedOrigins": [
+            "*"
+          ],
+          "allowedMethods": [
+            "GET",
+            "POST",
+            "OPTIONS"
+          ],
+          "allowedHeaders": [
+            "Content-Type",
+            "Accept",
+            "Cache-Control"
+          ],
+          "exposedHeaders": [],
+          "allowCredentials": false,
+          "maxAge": 86400,
+          "optionsPassthrough": false
+        }
+      }
+    }
+  },
+  "x-tyk-streaming": {
+    "streams": {
+      "consumer": {
+        "input": {
+          "kafka": {
+            "addresses": [
+              "kafka:9092"
+            ],
+            "checkpoint_limit": 1,
+            "client_id": "master-data-json-consumer",
+            "consumer_group": "json-consumers",
+            "target_version": "3.8.0",
+            "topics": [
+              "master-data-items"
+            ]
+          }
+        },
+        "output": {
+          "http_server": {
+            "stream_path": "/stream"
+          }
+        }
+      }
+    }
+  }
+}
+

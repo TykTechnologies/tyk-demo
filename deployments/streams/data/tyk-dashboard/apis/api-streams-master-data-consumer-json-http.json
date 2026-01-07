@@ -1,0 +1,74 @@
+{
+  "components": {},
+  "info": {
+    "title": "Streams Master Data - JSON Consumer (HTTP POST)",
+    "version": "1.0.0",
+    "description": "Master Data JSON Consumer API - Kafka to HTTP POST endpoint that sends canonical JSON format to downstream ERP systems via HTTP POST requests"
+  },
+  "openapi": "3.0.3",
+  "paths": {},
+  "servers": [
+    {
+      "url": "http://tyk-gateway.localhost:8080/streams-master-data-json-http/"
+    }
+  ],
+  "x-tyk-api-gateway": {
+    "info": {
+      "id": "master-data-json-consumer-http-api",
+      "name": "Streams Master Data JSON Consumer (HTTP POST)",
+      "orgId": "5e9d9544a1dcd60001d0ed20",
+      "state": {
+        "active": true
+      }
+    },
+    "server": {
+      "listenPath": {
+        "strip": true,
+        "value": "/streams-master-data-json-http/"
+      }
+    },
+    "upstream": {
+      "url": ""
+    },
+    "middleware": {
+      "global": {
+        "trafficLogs": {
+          "enabled": true
+        },
+        "contextVariables": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "x-tyk-streaming": {
+    "streams": {
+      "consumer": {
+        "input": {
+          "kafka": {
+            "addresses": [
+              "kafka:9092"
+            ],
+            "checkpoint_limit": 1,
+            "client_id": "master-data-json-consumer-http",
+            "consumer_group": "json-consumers-http",
+            "target_version": "3.8.0",
+            "topics": [
+              "master-data-items"
+            ]
+          }
+        },
+        "output": {
+          "http_client": {
+            "url": "http://erp-servers:8001/erp/json/receive",
+            "verb": "POST",
+            "headers": {
+              "Content-Type": "application/json"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
