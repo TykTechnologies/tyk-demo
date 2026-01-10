@@ -339,7 +339,7 @@ services:
 
   # Frontend Proxy (Envoy)
   frontend-proxy:
-    image: ${OTEL_DEMO_IMAGE_NAME}:${OTEL_DEMO_DEMO_VERSION}-frontend-proxy
+    image: caroltyk/tyk-demo-frontend-proxy:${OTEL_DEMO_DEMO_VERSION}
     container_name: otel-demo-frontend-proxy
     networks:
       - tyk

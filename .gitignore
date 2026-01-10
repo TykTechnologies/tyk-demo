@@ -27,3 +27,12 @@ deployments/governance/volumes/governance-agent/config.yaml
 
 # Portal saves stuff here during runtime, we can ignore it.
 deployments/portal/volumes/assets/*
+
+# OpenTelemetry Demo
+deployments/opentelemetry-demo/src/ad/.gradle
+deployments/opentelemetry-demo/src/ad/bin
+deployments/opentelemetry-demo/src/ad/build/reports/problems/problems-report.html
+deployments/opentelemetry-demo/src/fraud-detection/.gradle
+deployments/opentelemetry-demo/src/fraud-detection/bin
+deployments/opentelemetry-demo/src/fraud-detection/build/reports/problems/problems-report.html
+deployments/opentelemetry-demo/src/flagd/demo.flagd.json
