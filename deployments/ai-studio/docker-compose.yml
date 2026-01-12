@@ -1,30 +1,51 @@
----
+networks:
+  tyk-network:
+
 services:
-  tyk-ai-studio:
-    platform: linux/${TARGETARCH:-arm64}
-    image: tykio/tyk-ai-studio:v1.0.1
+  midsommar:
+    networks:
+      - tyk-network
+    image: tykio/tyk-ai-studio:pre-release-latest-ent
     volumes:
+      - ${PWD}/deployments/ai-studio/confs/midsommar-ent.env:/app/.env
+      - ${PWD}/deployments/ai-studio/keys/plugin-live.pub:/app/keys/plugins/plugin-live.pub:ro
+      - ${PWD}/deployments/ai-studio/data/cache/plugins:/app/data/cache/plugins
       - ${PWD}/deployments/ai-studio/volumes/tyk-ai-studio/db:/app/db # Map the database directory
     ports:
       - "3011:8080" # Frontend
-      - "9090:9090" # Proxy
+      - "9090:9090" # Embedded Proxy
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
     environment:
       - TYK_AI_LICENSE=${AI_STUDIO_LICENSE:?License missing from Docker environment file .env.}
       - CHOKIDAR_USEPOLLING=true
-      - ALLOW_REGISTRATIONS=true
-      - SITE_URL=http://localhost:8080
-      - FROM_EMAIL=noreply@tyk.io
-      - DEVMODE=true
-      - DEBUG_HTTP=false
-      - DEBUG_HTTP_PROXY=false
-      - DATABASE_URL=/app/db/ai-studio.db # Use absolute path
-      - DATABASE_TYPE=sqlite
-      - ECHO_CONVERSATION=true
-      - TYK_AI_SECRET_KEY=top-secret
-      - DOCS_URL=http://localhost:8989
-      - PROXY_URL=http://localhost:9090
-      - FILTER_SIGNUP_DOMAINS=tyk.io
-      - DEFAULT_SIGNUP_MODE="both"
-      - TIB_ENABLED=true
-    stdin_open: true
-    tty: true
+  mgw:
+    networks:
+      - tyk-network
+    image: tykio/microgateway:pre-release-latest-ent
+    volumes:
+      - ${PWD}/deployments/ai-studio/confs/mgw-ent.env:/app/.env
+      - ${PWD}/deployments/ai-studio/confs/mgw-analytics.yaml:/app/mgw-analytics.yaml
+      - ${PWD}/deployments/ai-studio/data/mgw:/app/data
+      - ${PWD}/deployments/ai-studio/data/cache/plugins:/data/cache/plugins
+    ports:
+      - 9091:9091 # mgw proxy port
+    restart: always
+    depends_on:
+      midsommar:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9091/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    environment:
+      - TYK_AI_LICENSE=${AI_STUDIO_LICENSE:?License missing from Docker environment file .env.}
+      - GATEWAY_MODE=edge
+      - CHOKIDAR_USEPOLLING=true
