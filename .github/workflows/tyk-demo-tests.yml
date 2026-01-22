@@ -2,6 +2,13 @@
 name: Tyk Demo Tests
 on:
   push:
+  workflow_dispatch:
+    inputs:
+      use_fips_images:
+        description: 'Use FIPS images from different Docker Hub repository'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   # First job to collect all the deployments to test
@@ -69,6 +76,33 @@ jobs:
         run: |
           echo "DEPLOYMENT_DIR=$(pwd)/deployments/${{ matrix.deployment }}" >> $GITHUB_ENV
           echo "BASE_DIR=$(pwd)" >> $GITHUB_ENV
+
+      - name: Configure FIPS Docker Hub repository
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.use_fips_images == 'true'
+        run: |
+          echo "::group::Configuring FIPS Docker Hub repository"
+          # Set FIPS repositories (defaults can be overridden via secrets)
+          # Gateway repo is the repository prefix (e.g., tykio-fips)
+          # Dashboard repo is the full image path (e.g., tykio-fips/tyk-dashboard-fips)
+          FIPS_GATEWAY_REPO="${FIPS_GATEWAY_DOCKER_HUB_REPO:-tykio-fips}"
+          FIPS_DASHBOARD_REPO="${FIPS_DASHBOARD_DOCKER_HUB_REPO:-tykio-fips/tyk-dashboard-fips}"
+          
+          echo "Using FIPS Gateway Docker Hub repository prefix: ${FIPS_GATEWAY_REPO}"
+          echo "Using FIPS Dashboard Docker Hub repository: ${FIPS_DASHBOARD_REPO}"
+          
+          # Replace gateway images (tykio/${GATEWAY_IMAGE_REPO} pattern)
+          # This replaces tykio/ with the FIPS gateway repo prefix
+          find deployments -name "docker-compose.yml" -type f -exec sed -i "s|tykio/\${GATEWAY_IMAGE_REPO}|${FIPS_GATEWAY_REPO}/\${GATEWAY_IMAGE_REPO}|g" {} \;
+          
+          # Replace dashboard images (tykio/tyk-dashboard-fips pattern)
+          find deployments -name "docker-compose.yml" -type f -exec sed -i "s|tykio/tyk-dashboard-fips|${FIPS_DASHBOARD_REPO}|g" {} \;
+          
+          echo "✅ Updated Gateway Docker Hub repository references to ${FIPS_GATEWAY_REPO}"
+          echo "✅ Updated Dashboard Docker Hub repository references to ${FIPS_DASHBOARD_REPO}"
+          echo "::endgroup::"
+        env:
+          FIPS_GATEWAY_DOCKER_HUB_REPO: ${{ secrets.FIPS_GATEWAY_DOCKER_HUB_REPO }}
+          FIPS_DASHBOARD_DOCKER_HUB_REPO: ${{ secrets.FIPS_DASHBOARD_DOCKER_HUB_REPO }}
 
       - name: Prepare file system
         run: |
