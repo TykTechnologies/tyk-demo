@@ -24,7 +24,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.webui
-    image: lheritagetyk/web-ui:latest
     container_name: web-ui
     networks:
       - tyk
