@@ -3,7 +3,7 @@
 services:
   erp-servers:
     build:
-      context: .
+      context: ./deployments/streams
       dockerfile: Dockerfile
     container_name: erp-servers
     networks:
@@ -24,7 +24,7 @@ services:
 
   web-ui:
     build:
-      context: .
+      context: ./deployments/streams
       dockerfile: Dockerfile.webui
     container_name: web-ui
     networks:
