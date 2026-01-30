@@ -2,9 +2,7 @@
 
 services:
   erp-servers:
-    build:
-      context: ./deployments/streams
-      dockerfile: Dockerfile
+    build: ./deployments/streams
     container_name: erp-servers
     networks:
       - tyk
