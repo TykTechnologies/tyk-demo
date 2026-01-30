@@ -2,7 +2,7 @@
 
 services:
   erp-servers:
-    image: lheritagetyk/erp-servers:latest
+    build: ./deployments/streams
     container_name: erp-servers
     networks:
       - tyk
@@ -14,7 +14,7 @@ services:
       - erp-logs:/tmp  # Share logs directory with web-ui
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/erp/json/receive', timeout=1)"]
+      test: [ "CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/erp/json/receive', timeout=1)" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -22,9 +22,8 @@ services:
 
   web-ui:
     build:
-      context: .
+      context: ./deployments/streams
       dockerfile: Dockerfile.webui
-    image: lheritagetyk/web-ui:latest
     container_name: web-ui
     networks:
       - tyk
@@ -38,7 +37,7 @@ services:
       - erp-servers
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8888/api/health', timeout=1)"]
+      test: [ "CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8888/api/health', timeout=1)" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -48,4 +47,4 @@ networks:
   tyk:
 
 volumes:
-  erp-logs:  # Named volume for sharing logs between containers
+  erp-logs: # Named volume for sharing logs between containers
