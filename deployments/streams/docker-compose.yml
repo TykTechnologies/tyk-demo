@@ -2,7 +2,9 @@
 
 services:
   erp-servers:
-    image: lheritagetyk/erp-servers:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: erp-servers
     networks:
       - tyk
