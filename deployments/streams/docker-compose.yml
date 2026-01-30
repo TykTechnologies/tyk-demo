@@ -45,7 +45,6 @@ services:
 
 networks:
   tyk:
-    external: true
 
 volumes:
   erp-logs: # Named volume for sharing logs between containers
