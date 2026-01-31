@@ -1,7 +1,7 @@
 ---
 services:
   tyk-dashboard:
-    image: tykio/tyk-dashboard:${DASHBOARD_VERSION:-v5.9.2}
+    image: tykio/${DASHBOARD_IMAGE_REPO:-tyk-dashboard}:${DASHBOARD_VERSION:-v5.9.2}
     ports:
       - 3000:3000
     networks:
@@ -22,7 +22,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-gateway:
-    image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY_VERSION:-v5.9.2}
+    image: tykio/${GATEWAY_IMAGE_REPO:-tyk-gateway}:${GATEWAY_VERSION:-v5.9.2}
     ports:
       - 8080:8080
       - 8086:8086
@@ -60,7 +60,7 @@ services:
       - tyk-redis
       - tyk-dashboard
   tyk-gateway-2:
-    image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY2_VERSION:-v5.9.2}
+    image: tykio/${GATEWAY_IMAGE_REPO:-tyk-gateway}:${GATEWAY2_VERSION:-v5.9.2}
     ports:
       - 8081:8080
       - 9005:9005
