@@ -392,7 +392,16 @@ build_go_plugin () {
       goarch=$platform
     fi
     log_message "  Target Go Platform: $goos/$goarch"
-    docker run --rm -v $go_plugin_directory:/plugin-source -e GOOS=$goos -e GOARCH=$goarch --platform linux/amd64 tykio/tyk-plugin-compiler:$gateway_image_tag $go_plugin_filename
+    
+    # Build docker run command with optional GOEXPERIMENT for FIPS
+    local docker_cmd="docker run --rm -v $go_plugin_directory:/plugin-source -e GOOS=$goos -e GOARCH=$goarch"
+    if [ -n "$GOEXPERIMENT" ]; then
+      log_message "  Using GOEXPERIMENT=$GOEXPERIMENT for FIPS build"
+      docker_cmd="$docker_cmd -e GOEXPERIMENT=$GOEXPERIMENT"
+    fi
+    docker_cmd="$docker_cmd --platform linux/amd64 tykio/tyk-plugin-compiler:$gateway_image_tag $go_plugin_filename"
+    
+    eval $docker_cmd
     local plugin_container_exit_code="$?"
     if [[ "$plugin_container_exit_code" -ne "0" ]]; then
       log_message "  ERROR: Tyk Plugin Compiler container returned error code: $plugin_container_exit_code"
