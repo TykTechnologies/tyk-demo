@@ -166,12 +166,21 @@ jobs:
           echo "::group::Set Docker image repositories and versions"
           echo "GATEWAY_IMAGE_REPO=${{ needs.discover-deployments.outputs.gateway-repo }}" >> .env
           echo "DASHBOARD_IMAGE_REPO=${{ needs.discover-deployments.outputs.dashboard-repo }}" >> .env
+
+          # Set all gateway version variables
           echo "GATEWAY_VERSION=${{ needs.discover-deployments.outputs.gateway-tag }}" >> .env
+          echo "GATEWAY2_VERSION=${{ needs.discover-deployments.outputs.gateway-tag }}" >> .env
+          echo "TYK2_GATEWAY_VERSION=${{ needs.discover-deployments.outputs.gateway-tag }}" >> .env
+          echo "GATEWAY_WORKER_VERSION=${{ needs.discover-deployments.outputs.gateway-tag }}" >> .env
+
+          # Set all dashboard version variables
           echo "DASHBOARD_VERSION=${{ needs.discover-deployments.outputs.dashboard-tag }}" >> .env
+          echo "DASHBOARD_SSO_VERSION=${{ needs.discover-deployments.outputs.dashboard-tag }}" >> .env
+
           echo "✅ GATEWAY_IMAGE_REPO set to ${{ needs.discover-deployments.outputs.gateway-repo }}"
           echo "✅ DASHBOARD_IMAGE_REPO set to ${{ needs.discover-deployments.outputs.dashboard-repo }}"
-          echo "✅ GATEWAY_VERSION set to ${{ needs.discover-deployments.outputs.gateway-tag }}"
-          echo "✅ DASHBOARD_VERSION set to ${{ needs.discover-deployments.outputs.dashboard-tag }}"
+          echo "✅ Gateway versions set to ${{ needs.discover-deployments.outputs.gateway-tag }}"
+          echo "✅ Dashboard versions set to ${{ needs.discover-deployments.outputs.dashboard-tag }}"
 
           # Set GOEXPERIMENT=boringcrypto for FIPS builds
           if [[ "${{ needs.discover-deployments.outputs.gateway-repo }}" == *"-fips"* ]]; then
