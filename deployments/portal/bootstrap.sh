@@ -241,6 +241,11 @@ for page_data_dir_path in deployments/portal/data/pages/*; do
   fi
 done
 
+log_message "Setting API product access flow to direct"
+docker exec tyk-demo-tyk-portal-postgres-1 psql -U admin -d portal -c "UPDATE configuration_tables SET api_product_access_flow = 'direct' WHERE api_product_access_flow != 'direct';" 1>/dev/null 2>>logs/bootstrap.log
+log_ok
+bootstrap_progress
+
 # Store API token in env var file, for use by test scripts
 echo "jwt=$portal_admin_api_token" > deployments/portal/dynamic-test-vars.env
 
