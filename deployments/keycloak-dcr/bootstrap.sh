@@ -193,6 +193,11 @@ else
 fi
 
 
+log_message "Setting API product access flow to direct"
+docker exec tyk-demo-tyk-portal-postgres-1 psql -U admin -d portal -c "UPDATE configuration_tables SET api_product_access_flow = 'direct' WHERE api_product_access_flow != 'direct';" 1>/dev/null 2>>logs/bootstrap.log
+log_ok
+bootstrap_progress
+
 log_message "Hot reloading Gateways"
 hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
 log_ok
