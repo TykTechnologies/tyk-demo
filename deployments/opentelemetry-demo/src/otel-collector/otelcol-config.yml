@@ -118,24 +118,19 @@ receivers:
           system.uptime:
             enabled: true
   # Tyk Pump Metrics
+  # Note: tyk-gateway metrics are received via OTLP push (TYK_GW_OPENTELEMETRY_METRICS_ENABLED=true)
+  # and handled by the otlp receiver in the metrics pipeline below.
   prometheus:
     config:
       scrape_configs:
         - job_name: 'tyk-pump'
           static_configs:
-            - targets: ['tyk-pump:8083']
+            - targets: [ 'tyk-pump:8083' ]
           metrics_path: '/metrics'
           scrape_interval: 30s
-        - job_name: 'tyk-gateway'
-          static_configs:
-            - targets: ['tyk-gateway:9090']
-            - targets: ['tyk-gateway-2:9090']
-          metrics_path: '/metrics'
-          scrape_interval: 30s
-      
   # Container application logs
   filelog/tyk-gateway:
-    include: ["/hostfs/var/lib/docker/containers/*/*-json.log"]
+    include: [ "/hostfs/var/lib/docker/containers/*/*-json.log" ]
     include_file_name: false
     include_file_path: true
     start_at: end  # Only read new logs
@@ -144,7 +139,6 @@ receivers:
       - type: container
         format: docker
         add_metadata_from_filepath: true
-      
       # Step 2: Filter for tyk-gateway service only
       - type: filter
         expr: 'attributes.attrs == nil or attributes.attrs.tag == nil or attributes.attrs.tag != "tyk-gateway"'
@@ -168,7 +162,6 @@ receivers:
             fatal: fatal
             debug: debug
         on_error: send_quiet
-      
       # Step 4: Move Tyk message to body (for non access logs)
       - type: move
         from: attributes.tyk.msg
@@ -186,11 +179,9 @@ receivers:
       - type: add
         field: resource["service.name"]
         value: "tyk-gateway"
-      
       - type: add
         field: resource["service.namespace"]
         value: "tyk"
-      
       - type: add
         field: resource["deployment.environment"]
         value: "demo"
@@ -212,7 +203,6 @@ exporters:
       endpoint: "http://opensearch:9200"
       tls:
         insecure: true
-      
 processors:
   batch:
   memory_limiter:
@@ -220,7 +210,7 @@ processors:
     limit_percentage: 75
     spike_limit_percentage: 20
   resourcedetection:
-    detectors: [env, docker, system]
+    detectors: [ env, docker, system ]
   transform:
     error_mode: ignore
     trace_statements:
@@ -236,19 +226,19 @@ connectors:
 service:
   pipelines:
     traces:
-      receivers: [otlp]
-      processors: [resourcedetection, memory_limiter, transform, batch]
-      exporters: [otlp, debug, spanmetrics]
+      receivers: [ otlp ]
+      processors: [ resourcedetection, memory_limiter, transform, batch ]
+      exporters: [ otlp, debug, spanmetrics ]
     metrics:
       # receivers: [docker_stats, httpcheck/frontend-proxy, hostmetrics, nginx, otlp, postgresql, redis, spanmetrics, prometheus]
-      receivers: [httpcheck/frontend-proxy, hostmetrics, nginx, otlp, postgresql, redis, spanmetrics, prometheus]
-      processors: [resourcedetection, memory_limiter, batch]
-      exporters: [otlphttp/prometheus, debug]
+      receivers: [ httpcheck/frontend-proxy, hostmetrics, nginx, otlp, postgresql, redis, spanmetrics, prometheus ]
+      processors: [ resourcedetection, memory_limiter, batch ]
+      exporters: [ otlphttp/prometheus, debug ]
     logs:
-      receivers: [otlp, filelog/tyk-gateway]
+      receivers: [ otlp, filelog/tyk-gateway ]
       # receivers: [otlp]
-      processors: [resourcedetection, memory_limiter, batch]
-      exporters: [opensearch, debug]
+      processors: [ resourcedetection, memory_limiter, batch ]
+      exporters: [ opensearch, debug ]
   telemetry:
     metrics:
       level: detailed

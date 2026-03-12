@@ -12,6 +12,8 @@ deployments/tyk/volumes/tyk-gateway/plugins/go/example/vendor
 deployments/tyk/volumes/tyk-gateway/middleware/bundles
 deployments/tyk/volumes/tyk-gateway/plugins/go/jwt/vendor
 
+reports/*
+
 # Dynamic environment variables for tests
 deployments/**/dynamic-test-vars.env
 
