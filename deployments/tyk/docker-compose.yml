@@ -25,7 +25,7 @@ services:
     image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY_VERSION:-v5.13.0-alpha2}
     ports:
       - 8080:8080
-      - 9091:9090
+      - 9093:9090
       - 8086:8086
       - 9002:9002
       - 9003:9003
@@ -143,7 +143,7 @@ services:
           memory: 256M
     # Add health check
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -212,7 +212,7 @@ services:
       OTEL_RESOURCE_ATTRIBUTES: ${OTEL_RESOURCE_ATTRIBUTES:-}
       OTEL_SERVICE_NAME: kafka
     healthcheck:
-      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list"]
+      test: [ "CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list" ]
       start_period: 10s
       interval: 5s
       timeout: 10s
