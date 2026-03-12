@@ -118,18 +118,14 @@ receivers:
           system.uptime:
             enabled: true
   # Tyk Pump Metrics
+  # Note: tyk-gateway metrics are received via OTLP push (TYK_GW_OPENTELEMETRY_METRICS_ENABLED=true)
+  # and handled by the otlp receiver in the metrics pipeline below.
   prometheus:
     config:
       scrape_configs:
         - job_name: 'tyk-pump'
           static_configs:
             - targets: ['tyk-pump:8083']
-          metrics_path: '/metrics'
-          scrape_interval: 30s
-        - job_name: 'tyk-gateway'
-          static_configs:
-            - targets: ['tyk-gateway:9090']
-            - targets: ['tyk-gateway-2:9090']
           metrics_path: '/metrics'
           scrape_interval: 30s
       

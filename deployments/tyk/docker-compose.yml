@@ -22,8 +22,7 @@ services:
       - tyk-redis
       - tyk-mongo
   tyk-gateway:
-    # image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY_VERSION:-v5.9.2}
-    image: caroltyk/otel-demo-tyk-gateway:${GATEWAY_VERSION:-v5.9.2}
+    image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY_VERSION:-v5.13.0-alpha2}
     ports:
       - 8080:8080
       - 9091:9090
@@ -68,8 +67,7 @@ services:
         max-size: "10m"
         max-file: "3"
   tyk-gateway-2:
-    # image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY2_VERSION:-v5.9.2}
-    image: caroltyk/otel-demo-tyk-gateway:${GATEWAY2_VERSION:-v5.9.2}
+    image: tykio/${GATEWAY_IMAGE_REPO}:${GATEWAY2_VERSION:-v5.13.0-alpha2}
     ports:
       - 8081:8080
       - 9092:9090
