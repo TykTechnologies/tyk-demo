@@ -1,3 +1,4 @@
+---
 x-logging: &logging
   driver: json-file
   options:
@@ -848,7 +849,7 @@ services:
     user: 0:0
     volumes:
       - ${HOST_FILESYSTEM:-/}:/hostfs:ro
-      - ${DOCKER_SOCK}:/var/run/docker.sock:ro
+      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock:ro
       - ${OTEL_COLLECTOR_CONFIG}:/etc/otelcol-config.yml
       - ${OTEL_COLLECTOR_CONFIG_EXTRAS}:/etc/otelcol-config-extras.yml
     ports:
