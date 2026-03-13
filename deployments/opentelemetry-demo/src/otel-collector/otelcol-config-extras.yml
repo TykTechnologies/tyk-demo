@@ -8,7 +8,7 @@
 ## Note: the spanmetrics exporter must be included in the exporters array
 ## if overriding the traces pipeline.
 ##
-# 
+#
 # exporters:
 #   otlphttp/grafana_cloud:
 #     # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlphttpexporter
@@ -90,7 +90,7 @@
 #     metrics:
 #       processors:
 #         [
-#           resourcedetection, memory_limiter, 
+#           resourcedetection, memory_limiter,
 #           transform/drop_unneeded_resource_attributes,
 #           transform/add_resource_attributes_as_metric_attributes,
 #           batch

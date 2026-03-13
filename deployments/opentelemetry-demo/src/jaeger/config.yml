@@ -1,13 +1,14 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+---
 service:
-  extensions: [jaeger_storage, jaeger_query, healthcheckv2]
+  extensions: [ jaeger_storage, jaeger_query, healthcheckv2 ]
   pipelines:
     traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [jaeger_storage_exporter]
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ jaeger_storage_exporter ]
   telemetry:
     resource:
       service.name: jaeger-query
