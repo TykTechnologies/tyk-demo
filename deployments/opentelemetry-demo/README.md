@@ -35,7 +35,6 @@ Please include these in your `.env` file.
 ```sh
 INSTRUMENTATION_ENABLED=0
 OPENTELEMETRY_ENABLED=true
-PUMP_CONFIG=./deployments/opentelemetry-demo/volumes/tyk-pump/pump.conf
 OPENTELEMETRY_ENDPOINT=otel-collector:4317
 GATEWAY_IMAGE_REPO=tyk-gateway-ee
 TYK_GW_LOGFORMAT=json
