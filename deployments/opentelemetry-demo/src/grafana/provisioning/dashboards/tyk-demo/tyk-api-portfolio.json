@@ -1,0 +1,684 @@
+{
+  "uid": "tyk-api-portfolio",
+  "title": "Tyk Gateway - API Portfolio Overview",
+  "description": "Daily API health: RED metrics, error analysis, SLO tracking, multi-tenancy, and consumer identity. Audience: API platform team leads, SRE on-call.",
+  "tags": ["tyk", "api", "portfolio", "slo", "opentelemetry", "observability"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "schemaVersion": 39,
+  "version": 1,
+  "templating": {
+    "list": [
+      {
+        "name": "datasource_prometheus",
+        "type": "datasource",
+        "query": "prometheus",
+        "label": "Prometheus",
+        "hide": 0,
+        "current": {}
+      },
+      {
+        "name": "service_name",
+        "type": "query",
+        "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+        "query": "label_values(tyk_api_requests_total, service_name)",
+        "label": "Service",
+        "multi": false,
+        "includeAll": false,
+        "current": { "text": "tyk-gateway", "value": "tyk-gateway" },
+        "refresh": 2,
+        "sort": 1,
+        "hide": 0
+      },
+      {
+        "name": "api_id",
+        "type": "query",
+        "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+        "query": "label_values(tyk_api_requests_total{service_name=~\"$service_name\"}, tyk_api_id)",
+        "label": "API",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {},
+        "refresh": 2,
+        "sort": 1,
+        "hide": 0
+      },
+      {
+        "name": "method",
+        "type": "query",
+        "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+        "query": "label_values(tyk_api_requests_total{service_name=~\"$service_name\"}, http_request_method)",
+        "label": "Method",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {},
+        "refresh": 2,
+        "sort": 1,
+        "hide": 0
+      },
+      {
+        "name": "org_id",
+        "type": "query",
+        "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+        "query": "label_values(tyk_requests_by_org_total{service_name=~\"$service_name\"}, org_id)",
+        "label": "Org",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {},
+        "refresh": 2,
+        "sort": 1,
+        "hide": 0
+      },
+      {
+        "name": "tenant_id",
+        "type": "query",
+        "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+        "query": "label_values(tyk_requests_by_tenant_total{service_name=~\"$service_name\"}, tenant_id)",
+        "label": "Tenant",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {},
+        "refresh": 2,
+        "sort": 1,
+        "hide": 0
+      },
+      {
+        "name": "slo_availability_target",
+        "type": "custom",
+        "label": "Availability SLO (%)",
+        "query": "99,99.5,99.9,99.95,99.99",
+        "current": { "text": "99.9", "value": "99.9" },
+        "options": [
+          { "text": "99", "value": "99" },
+          { "text": "99.5", "value": "99.5" },
+          { "text": "99.9", "value": "99.9" },
+          { "text": "99.95", "value": "99.95" },
+          { "text": "99.99", "value": "99.99" }
+        ],
+        "hide": 0,
+        "multi": false,
+        "includeAll": false
+      },
+      {
+        "name": "slo_latency_ms",
+        "type": "custom",
+        "label": "Latency SLO (ms)",
+        "query": "200,500,1000,2000",
+        "current": { "text": "500", "value": "500" },
+        "options": [
+          { "text": "200", "value": "200" },
+          { "text": "500", "value": "500" },
+          { "text": "1000", "value": "1000" },
+          { "text": "2000", "value": "2000" }
+        ],
+        "hide": 0,
+        "multi": false,
+        "includeAll": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 100,
+      "type": "row",
+      "title": "Portfolio KPI Bar",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Request Rate",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 1, "w": 4, "h": 4 },
+      "targets": [{ "refId": "A", "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))", "instant": true }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "area", "textMode": "auto" },
+      "fieldConfig": { "defaults": { "unit": "reqps", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } } }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "5xx Error Rate",
+      "description": "Server errors as % of total. Green <1%, Amber 1-5%, Red >5%.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 4, "y": 1, "w": 3, "h": 4 },
+      "targets": [{ "refId": "A", "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) / sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) * 100 or vector(0)", "instant": true }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area", "textMode": "auto" },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 5 }] } } }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "4xx Error Rate",
+      "description": "Client errors as % of total. Green <5%, Amber 5-15%, Red >15%.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 7, "y": 1, "w": 3, "h": 4 },
+      "targets": [{ "refId": "A", "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"4..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) / sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) * 100 or vector(0)", "instant": true }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area", "textMode": "auto" },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 5 }, { "color": "red", "value": 15 }] } } }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "P95 Total Latency",
+      "description": "End-to-end P95 latency seen by clients. Green <500ms, Amber 500-1000ms, Red >1s.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 10, "y": 1, "w": 4, "h": 4 },
+      "targets": [{ "refId": "A", "expr": "histogram_quantile(0.95, sum by(le)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000", "instant": true }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "auto" },
+      "fieldConfig": { "defaults": { "unit": "ms", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 500 }, { "color": "red", "value": 1000 }] } } }
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "P95 Gateway Latency",
+      "description": "Tyk's own processing overhead at P95. High value indicates policy execution or plugin issues.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 14, "y": 1, "w": 3, "h": 4 },
+      "targets": [{ "refId": "A", "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_gateway_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000", "instant": true }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "auto" },
+      "fieldConfig": { "defaults": { "unit": "ms", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 100 }, { "color": "red", "value": 300 }] } } }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "P95 Upstream Latency",
+      "description": "Backend service P95 latency. High value = backend is slow, not Tyk.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 17, "y": 1, "w": 3, "h": 4 },
+      "targets": [{ "refId": "A", "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_upstream_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000", "instant": true }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "auto" },
+      "fieldConfig": { "defaults": { "unit": "ms", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 500 }, { "color": "red", "value": 1000 }] } } }
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Active APIs",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 20, "y": 1, "w": 4, "h": 4 },
+      "targets": [{ "refId": "A", "expr": "count(count by(tyk_api_id)(tyk_api_requests_total{service_name=~\"$service_name\"}))", "instant": true }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "none", "textMode": "auto" },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } } }
+    },
+    {
+      "id": 200,
+      "type": "row",
+      "title": "Traffic Trends",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 5, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Request Rate by Status Class",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 6, "w": 8, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"2..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))", "legendFormat": "2xx" },
+        { "refId": "B", "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"3..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))", "legendFormat": "3xx" },
+        { "refId": "C", "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"4..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))", "legendFormat": "4xx" },
+        { "refId": "D", "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))", "legendFormat": "5xx" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Top 10 APIs by Traffic",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 8, "y": 6, "w": 8, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "topk(10, sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])))", "legendFormat": "{{tyk_api_id}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Latency Trend: Total vs Gateway vs Upstream (P95)",
+      "description": "The hero panel. If gateway latency is flat and upstream spikes, the backend is the culprit — 5-second diagnosis.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 16, "y": 6, "w": 8, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.95, sum by(le)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000", "legendFormat": "Total P95" },
+        { "refId": "B", "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_gateway_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000", "legendFormat": "Gateway P95" },
+        { "refId": "C", "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_upstream_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000", "legendFormat": "Upstream P95" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms", "custom": { "lineWidth": 2, "fillOpacity": 8 } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 300,
+      "type": "row",
+      "title": "Error Analysis",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 14, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 21,
+      "type": "timeseries",
+      "title": "Error Rate by API",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 15, "w": 8, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) * 100", "legendFormat": "{{tyk_api_id}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 22,
+      "type": "bargauge",
+      "title": "Top 10 APIs by Error Rate",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 8, "y": 15, "w": 6, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "topk(10, sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) * 100)", "legendFormat": "{{tyk_api_id}}", "instant": true }
+      ],
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "color": { "mode": "continuous-RdYlGr" } } }
+    },
+    {
+      "id": 23,
+      "type": "piechart",
+      "title": "Response Flag Distribution",
+      "description": "URS = upstream 5xx, BD = bad destination, RL = rate limited, AUTH = auth failure. Fastest path to error cause.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 14, "y": 15, "w": 5, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "sum by(tyk_response_flag)(increase(http_server_request_duration_seconds_count{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__range]))", "legendFormat": "{{tyk_response_flag}}" }
+      ],
+      "options": { "pieType": "donut", "displayLabels": ["percent", "name"], "legend": { "displayMode": "list", "placement": "bottom" } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "palette-classic" } } }
+    },
+    {
+      "id": 24,
+      "type": "barchart",
+      "title": "Status Code Distribution",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 19, "y": 15, "w": 5, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "sort_desc(sum by(http_response_status_code)(increase(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__range])))", "legendFormat": "{{http_response_status_code}}", "instant": true, "format": "table" }
+      ],
+      "options": { "xField": "http_response_status_code", "orientation": "vertical" },
+      "fieldConfig": { "defaults": { "unit": "short", "displayName": "Requests", "color": { "mode": "palette-classic" } } }
+    },
+    {
+      "id": 25,
+      "type": "timeseries",
+      "title": "429 Rate Over Time",
+      "description": "Rate limiting pressure — leading indicator of customer impact.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 23, "w": 12, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=\"429\", tyk_api_id=~\"$api_id\"}[$__rate_interval]))", "legendFormat": "{{tyk_api_id}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 26,
+      "type": "bargauge",
+      "title": "Top APIs by 429 Rejections",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 12, "y": 23, "w": 12, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "topk(10, sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=\"429\", tyk_api_id=~\"$api_id\"}[$__rate_interval])))", "legendFormat": "{{tyk_api_id}}", "instant": true }
+      ],
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "reqps", "color": { "mode": "palette-classic" } } }
+    },
+    {
+      "id": 400,
+      "type": "row",
+      "title": "API Leaderboards",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 30, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 31,
+      "type": "bargauge",
+      "title": "Top 10 APIs by Request Rate",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 31, "w": 8, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "topk(10, sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])))", "legendFormat": "{{tyk_api_id}}", "instant": true }
+      ],
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "reqps", "color": { "mode": "continuous-BlYlRd" } } }
+    },
+    {
+      "id": 32,
+      "type": "bargauge",
+      "title": "Top 10 APIs by P95 Latency",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 8, "y": 31, "w": 8, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "topk(10, histogram_quantile(0.95, sum by(le, tyk_api_id)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000)", "legendFormat": "{{tyk_api_id}}", "instant": true }
+      ],
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "ms", "color": { "mode": "continuous-GrYlRd" } } }
+    },
+    {
+      "id": 33,
+      "type": "bargauge",
+      "title": "Top 10 APIs by Error Rate",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 16, "y": 31, "w": 8, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "topk(10, sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) * 100)", "legendFormat": "{{tyk_api_id}}", "instant": true }
+      ],
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "color": { "mode": "continuous-RdYlGr" } } }
+    },
+    {
+      "id": 34,
+      "type": "table",
+      "title": "Latency by API (P50 / P95 / P99) — Total, Gateway, Upstream",
+      "description": "Full percentile breakdown. Starting point for investigation into a slow or error-prone API.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 39, "w": 24, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.50, sum by(le, tyk_api_id)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000", "legendFormat": "{{tyk_api_id}}", "instant": true, "format": "table" },
+        { "refId": "B", "expr": "histogram_quantile(0.95, sum by(le, tyk_api_id)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000", "legendFormat": "{{tyk_api_id}}", "instant": true, "format": "table" },
+        { "refId": "C", "expr": "histogram_quantile(0.99, sum by(le, tyk_api_id)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000", "legendFormat": "{{tyk_api_id}}", "instant": true, "format": "table" },
+        { "refId": "D", "expr": "histogram_quantile(0.95, sum by(le, tyk_api_id)(rate(tyk_gateway_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000", "legendFormat": "{{tyk_api_id}}", "instant": true, "format": "table" },
+        { "refId": "E", "expr": "histogram_quantile(0.95, sum by(le, tyk_api_id)(rate(tyk_upstream_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000", "legendFormat": "{{tyk_api_id}}", "instant": true, "format": "table" },
+        { "refId": "F", "expr": "sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))", "legendFormat": "{{tyk_api_id}}", "instant": true, "format": "table" }
+      ],
+      "options": { "sortBy": [{ "displayName": "Total P95 (ms)", "desc": true }] },
+      "transformations": [
+        { "id": "merge", "options": {} },
+        { "id": "organize", "options": { "renameByName": { "Value #A": "Total P50 (ms)", "Value #B": "Total P95 (ms)", "Value #C": "Total P99 (ms)", "Value #D": "Gateway P95 (ms)", "Value #E": "Upstream P95 (ms)", "Value #F": "Req/s", "tyk_api_id": "API" } } }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [{ "matcher": { "id": "byName", "options": "Req/s" }, "properties": [{ "id": "unit", "value": "reqps" }] }] }
+    },
+    {
+      "id": 500,
+      "type": "row",
+      "title": "Multi-Tenancy View",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 47, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 41,
+      "type": "timeseries",
+      "title": "Traffic by Organisation",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 48, "w": 8, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "sum by(org_id)(rate(tyk_requests_by_org_total{service_name=~\"$service_name\", org_id=~\"$org_id\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval]))", "legendFormat": "{{org_id}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 42,
+      "type": "timeseries",
+      "title": "Per-Tenant Request Rate",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 8, "y": 48, "w": 8, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "sum by(tenant_id)(rate(tyk_requests_by_tenant_total{service_name=~\"$service_name\", tenant_id=~\"$tenant_id\", api_id=~\"$api_id\"}[$__rate_interval]))", "legendFormat": "{{tenant_id}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 43,
+      "type": "timeseries",
+      "title": "Tenant Error Rate",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 16, "y": 48, "w": 8, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "sum by(tenant_id)(rate(tyk_requests_by_tenant_total{service_name=~\"$service_name\", response_code=~\"5..\", tenant_id=~\"$tenant_id\", api_id=~\"$api_id\"}[$__rate_interval])) / sum by(tenant_id)(rate(tyk_requests_by_tenant_total{service_name=~\"$service_name\", tenant_id=~\"$tenant_id\", api_id=~\"$api_id\"}[$__rate_interval])) * 100", "legendFormat": "{{tenant_id}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 44,
+      "type": "table",
+      "title": "Tenant SLO Table",
+      "description": "Per-tenant: request rate, error %, P50 latency, P95 latency. Mini SLO view at a glance.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 55, "w": 16, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "sum by(tenant_id)(rate(tyk_requests_by_tenant_total{service_name=~\"$service_name\", api_id=~\"$api_id\", tenant_id=~\"$tenant_id\"}[$__rate_interval]))", "instant": true, "format": "table", "legendFormat": "{{tenant_id}}" },
+        { "refId": "B", "expr": "sum by(tenant_id)(rate(tyk_requests_by_tenant_total{service_name=~\"$service_name\", response_code=~\"5..\", api_id=~\"$api_id\", tenant_id=~\"$tenant_id\"}[$__rate_interval])) / sum by(tenant_id)(rate(tyk_requests_by_tenant_total{service_name=~\"$service_name\", api_id=~\"$api_id\", tenant_id=~\"$tenant_id\"}[$__rate_interval])) * 100", "instant": true, "format": "table", "legendFormat": "{{tenant_id}}" },
+        { "refId": "C", "expr": "histogram_quantile(0.50, sum by(le, tenant_id)(rate(tyk_latency_by_tenant_seconds_bucket{service_name=~\"$service_name\", api_id=~\"$api_id\", tenant_id=~\"$tenant_id\"}[$__rate_interval]))) * 1000", "instant": true, "format": "table", "legendFormat": "{{tenant_id}}" },
+        { "refId": "D", "expr": "histogram_quantile(0.95, sum by(le, tenant_id)(rate(tyk_latency_by_tenant_seconds_bucket{service_name=~\"$service_name\", api_id=~\"$api_id\", tenant_id=~\"$tenant_id\"}[$__rate_interval]))) * 1000", "instant": true, "format": "table", "legendFormat": "{{tenant_id}}" }
+      ],
+      "transformations": [
+        { "id": "merge", "options": {} },
+        { "id": "organize", "options": { "renameByName": { "tenant_id": "Tenant", "Value #A": "Req/s", "Value #B": "5xx %", "Value #C": "P50 (ms)", "Value #D": "P95 (ms)" } } }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [{ "matcher": { "id": "byName", "options": "Req/s" }, "properties": [{ "id": "unit", "value": "reqps" }] }, { "matcher": { "id": "byName", "options": "5xx %" }, "properties": [{ "id": "unit", "value": "percent" }, { "id": "custom.displayMode", "value": "color-background" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 5 }] } }] }] }
+    },
+    {
+      "id": 45,
+      "type": "bargauge",
+      "title": "Top Tenants by Traffic",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 16, "y": 55, "w": 8, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "topk(10, sum by(tenant_id)(rate(tyk_requests_by_tenant_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval])))", "legendFormat": "{{tenant_id}}", "instant": true }
+      ],
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "reqps", "color": { "mode": "palette-classic" } } }
+    },
+    {
+      "id": 600,
+      "type": "row",
+      "title": "Consumer Identity",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 63, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 51,
+      "type": "timeseries",
+      "title": "API Key Traffic Over Time",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 64, "w": 8, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "sum by(api_key_suffix)(rate(tyk_requests_by_apikey_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]))", "legendFormat": "...{{api_key_suffix}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 52,
+      "type": "bargauge",
+      "title": "Top API Keys by Traffic",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 8, "y": 64, "w": 8, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "topk(10, sum by(api_key_suffix)(rate(tyk_requests_by_apikey_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval])))", "legendFormat": "...{{api_key_suffix}}", "instant": true }
+      ],
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "reqps", "color": { "mode": "palette-classic" } } }
+    },
+    {
+      "id": 53,
+      "type": "timeseries",
+      "title": "OAuth Client Traffic",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 16, "y": 64, "w": 8, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "sum by(oauth_client_id)(rate(tyk_requests_by_oauth_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]))", "legendFormat": "{{oauth_client_id}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 54,
+      "type": "piechart",
+      "title": "Portal App Usage Share",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 71, "w": 8, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "sum by(portal_app)(increase(tyk_requests_by_portal_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__range]))", "legendFormat": "{{portal_app}}" }
+      ],
+      "options": { "pieType": "pie", "displayLabels": ["percent", "name"], "legend": { "displayMode": "list", "placement": "right" } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "palette-classic" } } }
+    },
+    {
+      "id": 55,
+      "type": "timeseries",
+      "title": "Subscription Tier Traffic",
+      "description": "Free vs Pro vs Enterprise traffic split.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 8, "y": 71, "w": 16, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "sum by(subscription_tier)(rate(tyk_requests_by_tier_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]))", "legendFormat": "{{subscription_tier}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 700,
+      "type": "row",
+      "title": "Service Level Objectives",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 78, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 61,
+      "type": "gauge",
+      "title": "Availability SLO",
+      "description": "1 - (5xx rate / total rate). Target: $slo_availability_target%.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 79, "w": 6, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "(1 - sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\"}[$__rate_interval])) / sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\"}[$__rate_interval]))) * 100 or vector(100)", "instant": true }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "showThresholdLabels": true, "showThresholdMarkers": true },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 95, "max": 100, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 99 }, { "color": "green", "value": 99.9 }] } } }
+    },
+    {
+      "id": 62,
+      "type": "gauge",
+      "title": "Latency SLO",
+      "description": "% of requests completing within $slo_latency_ms ms.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 6, "y": 79, "w": 6, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", le=\"1\"}[$__rate_interval])) / sum(rate(http_server_request_duration_seconds_count{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\"}[$__rate_interval])) * 100 or vector(100)", "instant": true }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "showThresholdLabels": true, "showThresholdMarkers": true },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 80, "max": 100, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 90 }, { "color": "green", "value": 99 }] } } }
+    },
+    {
+      "id": 63,
+      "type": "stat",
+      "title": "Error Budget Remaining",
+      "description": "30-day rolling error budget. Budget consumed = actual error rate / allowed error rate (0.1% for 99.9% SLO). Turns red when budget is burning fast.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 12, "y": 79, "w": 4, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "(1 - (sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\"}[30d])) / sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\"}[30d]))) / (1 - $slo_availability_target/100)) * 100 or vector(100)", "instant": true }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "auto" },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 25 }, { "color": "green", "value": 50 }] } } }
+    },
+    {
+      "id": 64,
+      "type": "timeseries",
+      "title": "SLO Burn Rate (1h and 6h windows)",
+      "description": ">14.4× on 1h window = burns 100% of monthly budget in 1h = critical page.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 16, "y": 79, "w": 8, "h": 8 },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\"}[1h])) / sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\"}[1h])) / (1 - $slo_availability_target/100) or vector(0)", "legendFormat": "1h burn rate" },
+        { "refId": "B", "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\"}[6h])) / sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\"}[6h])) / (1 - $slo_availability_target/100) or vector(0)", "legendFormat": "6h burn rate" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short", "custom": { "lineWidth": 2, "fillOpacity": 10 }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 14.4 }] } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 65,
+      "type": "timeseries",
+      "title": "P95 Latency vs SLO Threshold",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 87, "w": 24, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.95, sum by(le)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000", "legendFormat": "P95 Total Latency" },
+        { "refId": "B", "expr": "$slo_latency_ms + 0", "legendFormat": "SLO Threshold (${slo_latency_ms}ms)" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms", "custom": { "lineWidth": 2, "fillOpacity": 8 } }, "overrides": [{ "matcher": { "id": "byName", "options": "SLO Threshold (${slo_latency_ms}ms)" }, "properties": [{ "id": "custom.lineStyle", "value": { "dash": [10, 10], "fill": "dash" } }, { "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }] },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 800,
+      "type": "row",
+      "title": "Cache & Backend Intelligence",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 94, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 71,
+      "type": "stat",
+      "title": "Cache Hit Rate",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 95, "w": 4, "h": 4 },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(tyk_requests_with_cache_total{service_name=~\"$service_name\", cache_status=\"1\", api_id=~\"$api_id\"}[$__rate_interval])) / sum(rate(tyk_requests_with_cache_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval])) * 100 or vector(0)", "instant": true }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "none", "textMode": "auto" },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 40 }, { "color": "green", "value": 70 }] } } }
+    },
+    {
+      "id": 72,
+      "type": "timeseries",
+      "title": "Cache Status Over Time",
+      "description": "Drop in cache hits often precedes latency spikes.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 4, "y": 95, "w": 8, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "sum by(cache_status)(rate(tyk_requests_with_cache_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]))", "legendFormat": "cache={{cache_status}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 73,
+      "type": "piechart",
+      "title": "Cache Status Breakdown",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 12, "y": 95, "w": 6, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "sum by(cache_status)(increase(tyk_requests_with_cache_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__range]))", "legendFormat": "cache={{cache_status}}" }
+      ],
+      "options": { "pieType": "donut", "displayLabels": ["percent", "name"], "legend": { "displayMode": "list", "placement": "right" } },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "palette-classic" } } }
+    },
+    {
+      "id": 74,
+      "type": "timeseries",
+      "title": "Backend Version Distribution",
+      "description": "Canary and blue-green rollout visibility — correlate latency with version changes.",
+      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+      "gridPos": { "x": 18, "y": 95, "w": 6, "h": 7 },
+      "targets": [
+        { "refId": "A", "expr": "label_replace(sum by(backend_version)(rate(tyk_requests_by_backend_version_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval])), \"backend_version\", \"No version\", \"backend_version\", \"^$\")", "legendFormat": "{{backend_version}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+    }
+  ]
+}
