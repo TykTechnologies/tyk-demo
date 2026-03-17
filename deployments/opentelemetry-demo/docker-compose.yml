@@ -860,6 +860,8 @@ services:
         condition: service_started
       opensearch:
         condition: service_healthy
+      loki:
+        condition: service_healthy
     logging: *logging
     environment:
       - FRONTEND_PROXY_ADDR
@@ -940,5 +942,29 @@ services:
       start_period: 10s
       interval: 5s
       timeout: 10s
+      retries: 10
+    logging: *logging
+
+  # Loki
+  loki:
+    image: ${LOKI_IMAGE}
+    container_name: otel-demo-loki
+    networks:
+      - tyk
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - ./deployments/opentelemetry-demo/src/loki/loki-config.yaml:/etc/loki/loki-config.yaml
+    ports:
+      - "3100"
+    healthcheck:
+      test: wget --quiet --tries=1 --output-document=- http://localhost:3100/ready | grep -q ready
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
       retries: 10
     logging: *logging

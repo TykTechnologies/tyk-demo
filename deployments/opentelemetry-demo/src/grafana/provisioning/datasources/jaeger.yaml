@@ -16,7 +16,7 @@ datasources:
         datasourceUid: webstore-logs
         spanStartTimeShift: "-20m"
         spanEndTimeShift: "20m"
-        filterByTraceID: true
-        filterBySpanID: true
+        filterByTraceID: false
+        filterBySpanID: false
         customQuery: true
-        query: traceId:"$${__trace.traceId}" AND spanId:"$${__span.spanId}"
+        query: '{service_name="tyk-gateway"} |= `"traceID":"$${__trace.traceId}"`'

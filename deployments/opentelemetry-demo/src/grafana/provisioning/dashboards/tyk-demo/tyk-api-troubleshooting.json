@@ -27,10 +27,10 @@
         "current": {}
       },
       {
-        "name": "datasource_opensearch",
+        "name": "datasource_loki",
         "type": "datasource",
-        "query": "grafana-opensearch-datasource",
-        "label": "OpenSearch",
+        "query": "loki",
+        "label": "Loki",
         "hide": 0,
         "current": {}
       },
@@ -583,16 +583,13 @@
       "type": "logs",
       "title": "Access Logs (via tyk-gateway)",
       "description": "Envoy access logs for requests routed through tyk-gateway. Set $trace_id to a specific trace ID (copied from Row 7) to filter to a single request.",
-      "datasource": "${datasource_opensearch}",
+      "datasource": "${datasource_loki}",
       "gridPos": { "x": 0, "y": 88, "w": 24, "h": 9 },
       "targets": [
         {
           "refId": "A",
-          "query": "tyk-gateway",
-          "queryType": "lucene",
-          "metrics": [{ "id": "1", "type": "logs" }],
-          "timeField": "observedTimestamp",
-          "luceneQueryType": "Logs"
+          "queryType": "range",
+          "expr": "{service_name=\"tyk-gateway\"} | tyk_prefix=`access-log`"
         }
       ],
       "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showTime": true, "showLabels": false, "showCommonLabels": false, "wrapLogMessage": false, "sortOrder": "Descending" },
@@ -603,16 +600,13 @@
       "type": "logs",
       "title": "Error Logs (tyk-gateway)",
       "description": "Logs mentioning tyk-gateway as upstream. Filter for 4xx/5xx by searching the log line manually.",
-      "datasource": "${datasource_opensearch}",
+      "datasource": "${datasource_loki}",
       "gridPos": { "x": 0, "y": 97, "w": 12, "h": 9 },
       "targets": [
         {
           "refId": "A",
-          "query": "tyk-gateway",
-          "queryType": "lucene",
-          "metrics": [{ "id": "1", "type": "logs" }],
-          "timeField": "observedTimestamp",
-          "luceneQueryType": "Logs"
+          "queryType": "range",
+          "expr": "{service_name=\"tyk-gateway\"} | detected_level=~`error|warn|fatal`"
         }
       ],
       "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showTime": true, "sortOrder": "Descending" },
@@ -623,16 +617,13 @@
       "type": "logs",
       "title": "All Recent Logs (trace correlation)",
       "description": "Full log stream. Paste a trace_id from Row 7 into the $trace_id variable above — when set, this panel filters to log lines containing that ID, enabling cross-service correlation.",
-      "datasource": "${datasource_opensearch}",
+      "datasource": "${datasource_loki}",
       "gridPos": { "x": 12, "y": 97, "w": 12, "h": 9 },
       "targets": [
         {
           "refId": "A",
-          "query": "tyk-gateway",
-          "queryType": "lucene",
-          "metrics": [{ "id": "1", "type": "logs" }],
-          "timeField": "observedTimestamp",
-          "luceneQueryType": "Logs"
+          "queryType": "range",
+          "expr": "{service_name=\"tyk-gateway\"}"
         }
       ],
       "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showTime": true, "sortOrder": "Descending" },
