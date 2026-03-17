@@ -76,3 +76,34 @@ To calculate the SLO and the displayed error budget remaining, we use the follow
 *  SLO: 95% successful requests
 
 In [slos.rules.yml](./volumes/prometheus/slos.rules.yml) we calculate the rate of error per requests for the last 10 minute in `job:slo_errors_per_request:ratio_rate10m`. With `job:error_budget:remaining` we calculate the error budget remaining in percent. This is what we display in the Grafana dashboard. We use a threshold of 95% in the dashboard (every value below 95% is red).
+
+## Log Aggregation with Loki and Promtail
+
+This deployment now includes [Loki](https://grafana.com/oss/loki/) and 
+[Promtail](https://grafana.com/docs/loki/latest/send-data/promtail/) for 
+container log aggregation alongside the existing Prometheus metrics setup.
+
+### How it works
+```
+Tyk containers → Docker log files → Promtail scrapes → ships to Loki → Grafana queries Loki
+```
+
+* **Loki** runs on port `3100` as the log storage backend
+* **Promtail** scrapes all Docker container logs and ships them to Loki
+* **Grafana** can now use Loki as a datasource alongside Prometheus, enabling 
+unified observability — metrics and logs in the same place
+
+### Adding Loki as a Grafana datasource
+
+1. Go to [Grafana](http://localhost:3020/) in your browser
+2. Navigate to **Connections → Data Sources → Add new datasource**
+3. Select **Loki**
+4. Set the URL to `http://loki:3100`
+5. Click **Save & Test**
+
+<img width="1548" alt="Loki datasource configuration" src="https://github.com/user-attachments/assets/1831bba3-0ad1-4df8-8995-5d4551c4b1d4" />
+
+<img width="1490" alt="Loki connected in Grafana" src="https://github.com/user-attachments/assets/138a3daf-4e70-444f-acb0-1b1331cfb0d2" />
+
+You can now explore logs from all Tyk containers (Gateway, Pump, Dashboard) 
+in Grafana's **Explore** view alongside your SLO metrics.
