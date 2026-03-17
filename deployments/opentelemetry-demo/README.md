@@ -76,6 +76,7 @@ JAEGERTRACING_IMAGE=jaegertracing/jaeger:2.10.0
 # must also update version field in src/grafana/provisioning/datasources/opensearch.yaml
 OPENSEARCH_IMAGE=opensearchproject/opensearch:3.2.0
 OPENSEARCH_DOCKERFILE=./deployments/opentelemetry-demo/src/opensearch/Dockerfile
+LOKI_IMAGE=grafana/loki:3.5.0
 POSTGRES_IMAGE=postgres:17.6 # used only for TraceTest
 PROMETHEUS_IMAGE=quay.io/prometheus/prometheus:v3.5.0
 VALKEY_IMAGE=valkey/valkey:8.1.3-alpine
