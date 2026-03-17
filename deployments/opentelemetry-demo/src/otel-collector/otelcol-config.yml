@@ -197,6 +197,10 @@ exporters:
     endpoint: "http://prometheus:9090/api/v1/otlp"
     tls:
       insecure: true
+  otlphttp/loki:
+    endpoint: "http://loki:3100/otlp"
+    tls:
+      insecure: true
   opensearch:
     logs_index: otel-logs
     logs_index_time_format: "yyyy-MM-dd"
@@ -212,6 +216,15 @@ processors:
     spike_limit_percentage: 20
   resourcedetection:
     detectors: [ env, docker, system ]
+  transform/tyk_gw_resource_attrs:
+    error_mode: ignore
+    metric_statements:
+      - context: datapoint
+        statements:
+          - set(attributes["tyk_gw_group_id"], resource.attributes["tyk.gw.group.id"]) where resource.attributes["tyk.gw.group.id"] != nil
+          - set(attributes["tyk_gw_id"], resource.attributes["tyk.gw.id"]) where resource.attributes["tyk.gw.id"] != nil
+          - set(attributes["tyk_gw_tags"], resource.attributes["tyk.gw.tags"]) where resource.attributes["tyk.gw.tags"] != nil
+          - set(attributes["tyk_gw_dataplane"], resource.attributes["tyk.gw.dataplane"]) where resource.attributes["tyk.gw.dataplane"] != nil
   transform:
     error_mode: ignore
     trace_statements:
@@ -233,13 +246,13 @@ service:
     metrics:
       # receivers: [docker_stats, httpcheck/frontend-proxy, hostmetrics, nginx, otlp, postgresql, redis, spanmetrics, prometheus]
       receivers: [ httpcheck/frontend-proxy, hostmetrics, nginx, otlp, postgresql, redis, spanmetrics, prometheus ]
-      processors: [ resourcedetection, memory_limiter, batch ]
+      processors: [ resourcedetection, memory_limiter, transform/tyk_gw_resource_attrs, batch ]
       exporters: [ otlphttp/prometheus, debug ]
     logs:
       receivers: [ otlp, filelog/tyk-gateway ]
       # receivers: [otlp]
       processors: [ resourcedetection, memory_limiter, batch ]
-      exporters: [ opensearch, debug ]
+      exporters: [ opensearch, otlphttp/loki, debug ]
   telemetry:
     metrics:
       level: detailed
