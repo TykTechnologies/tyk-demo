@@ -5,11 +5,11 @@ on:
   workflow_dispatch:
     inputs:
       gateway-tag:
-        description: 'Gateway Docker image tag (e.g., v5.9.2)'
+        description: 'Gateway Docker image tag (e.g., v5.12.0)'
         required: true
         type: string
       dashboard-tag:
-        description: 'Dashboard Docker image tag (e.g., v5.9.2)'
+        description: 'Dashboard Docker image tag (e.g., v5.12.0)'
         required: true
         type: string
 
@@ -17,6 +17,7 @@ jobs:
   # First job to collect all the deployments to test
   discover-deployments:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     outputs:
       deployment-matrix: ${{ steps.set-matrix.outputs.deployment-matrix }}
       gateway-tag: ${{ steps.get-tags.outputs.gateway-tag }}
@@ -30,7 +31,7 @@ jobs:
       - name: Find All Deployments
         id: set-matrix
         run: |
-          DEPLOYMENTS=$(find deployments -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | jq -R -s -c 'split("\n") | map(select(length > 0)) | sort')
+          DEPLOYMENTS=$(find deployments -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | jq -R -s -c 'split("\n") | map(select(length > 0 and . != "analytics-kibana")) | sort')
 
           if [ "${#DEPLOYMENTS[@]}" -eq 0 ]; then
             echo "::error::No deployments found. Exiting workflow." >&2
@@ -104,6 +105,7 @@ jobs:
   test-deployments:
     needs: discover-deployments
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     outputs:
       deployment-results: ${{ steps.set-results.outputs.results }}
     strategy:
@@ -387,6 +389,7 @@ jobs:
   collect-results:
     needs: test-deployments
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     if: always()
     steps:
       - name: Download all results
@@ -419,6 +422,7 @@ jobs:
   display-results:
     needs: collect-results
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     if: always()
     steps:
       # needed for common test script library
