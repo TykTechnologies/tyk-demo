@@ -19,6 +19,14 @@
         "current": {}
       },
       {
+        "name": "datasource_loki",
+        "type": "datasource",
+        "query": "loki",
+        "label": "Loki",
+        "hide": 0,
+        "current": {}
+      },
+      {
         "name": "tyk_gw_id",
         "type": "query",
         "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
@@ -44,14 +52,6 @@
         "refresh": 2,
         "sort": 1,
         "hide": 0
-      },
-      {
-        "name": "datasource_loki",
-        "type": "datasource",
-        "query": "loki",
-        "label": "Loki",
-        "hide": 0,
-        "current": {}
       }
     ]
   },

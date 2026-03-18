@@ -63,6 +63,23 @@ else
   set_docker_environment_value "NGROK_MDCB_TUNNEL_URL" "$ngrok_mdcb_tunnel_url"
 fi
 
+# set node_is_segmented based on whether gateway tags are configured
+log_message "Setting node segmentation flags based on gateway tags"
+gateway_worker_tags=$(grep "^GATEWAY_WORKER_TAGS=" .env 2>/dev/null | cut -d'=' -f2-)
+if [ -n "$gateway_worker_tags" ]; then
+  set_docker_environment_value "GATEWAY_WORKER_NODE_IS_SEGMENTED" "true"
+else
+  set_docker_environment_value "GATEWAY_WORKER_NODE_IS_SEGMENTED" "false"
+fi
+gateway_worker_ngrok_tags=$(grep "^GATEWAY_WORKER_NGROK_TAGS=" .env 2>/dev/null | cut -d'=' -f2-)
+if [ -n "$gateway_worker_ngrok_tags" ]; then
+  set_docker_environment_value "GATEWAY_WORKER_NGROK_NODE_IS_SEGMENTED" "true"
+else
+  set_docker_environment_value "GATEWAY_WORKER_NGROK_NODE_IS_SEGMENTED" "false"
+fi
+log_ok
+bootstrap_progress
+
 # recreate containers to use updated environment variables
 log_message "Recreating MDCB deployment containers, so that they use updated MDCB user API credentials (tyk-mdcb, tyk-worker-gateway tyk-worker-gateway-ngrok)"
 eval $(generate_docker_compose_command) up -d --no-deps --force-recreate tyk-mdcb tyk-worker-gateway tyk-worker-gateway-ngrok 2> /dev/null
