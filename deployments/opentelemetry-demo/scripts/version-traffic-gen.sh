@@ -60,7 +60,7 @@ API_DEF=$(cat <<EOF
     "use_oauth2": false,
     "proxy": {
       "listen_path": "$LISTEN_PATH/",
-      "target_url": "http://httpbin.org/",
+      "target_url": "http://httpbin/",
       "strip_listen_path": true
     },
     "active": true,

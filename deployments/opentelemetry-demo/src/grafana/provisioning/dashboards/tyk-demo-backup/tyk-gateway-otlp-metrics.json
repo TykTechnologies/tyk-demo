@@ -3245,47 +3245,6 @@
       ]
     },
     {
-      "id": 174,
-      "type": "timeseries",
-      "title": "Traffic by Quota Tier",
-      "description": "Requests grouped by the X-RateLimit-Limit quota ceiling per key/policy. Shows which quota tiers are active. quota_limit='0' (keyless/no quota) filtered out. Requires tyk.requests.by.quota_limit counter with response_header X-RateLimit-Limit dimension.",
-      "gridPos": {
-        "x": 0,
-        "y": 173,
-        "w": 24,
-        "h": 8
-      },
-      "datasource": "${datasource_prometheus}",
-      "fieldConfig": {
-        "defaults": {
-          "unit": "reqps",
-          "custom": {
-            "lineWidth": 2,
-            "fillOpacity": 10
-          },
-          "noValue": "Configure tyk.requests.by.quota_limit metric"
-        }
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": "${datasource_prometheus}",
-          "expr": "sum by(quota_limit)(rate(tyk_requests_by_quota_limit_total{service_name=~\"$service_name\", quota_limit!=\"0\", api_id=~\"$api_id\"}[$__rate_interval]))",
-          "legendFormat": "Quota: {{quota_limit}} req/period",
-          "refId": "A"
-        }
-      ]
-    },
-    {
       "id": 150,
       "type": "row",
       "title": "Context Variable Dimensions \u2014 Business Logic Segmentation (Tier, Plan, Region)",
