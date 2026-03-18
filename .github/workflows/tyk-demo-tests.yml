@@ -5,11 +5,11 @@ on:
   workflow_dispatch:
     inputs:
       gateway-tag:
-        description: 'Gateway Docker image tag (e.g., v5.12.0-rc6)'
+        description: 'Gateway Docker image tag (e.g., v5.12.0)'
         required: true
         type: string
       dashboard-tag:
-        description: 'Dashboard Docker image tag (e.g., v5.12.0-rc6)'
+        description: 'Dashboard Docker image tag (e.g., v5.12.0)'
         required: true
         type: string
 
