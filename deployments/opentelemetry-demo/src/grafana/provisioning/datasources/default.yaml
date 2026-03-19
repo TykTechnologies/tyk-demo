@@ -21,3 +21,10 @@ datasources:
         - url: http://localhost:8080/jaeger/ui/trace/$${__value.raw}
           name: trace_id
           urlDisplayLabel: View in Jaeger UI
+
+        - datasourceUid: webstore-tempo
+          name: trace_id
+
+        - url: /grafana/explore?left={"datasource":"webstore-tempo","queries":[{"refId":"A","queryType":"traceql","query":"$${__value.raw}"}],"range":{"from":"now-1h","to":"now"}}
+          name: trace_id
+          urlDisplayLabel: View in Tempo

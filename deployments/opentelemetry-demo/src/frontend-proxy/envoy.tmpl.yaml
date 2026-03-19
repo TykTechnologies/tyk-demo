@@ -47,6 +47,10 @@ static_resources:
                           redirect: { path_redirect: "/jaeger/" }
                         - match: { prefix: "/jaeger/" }
                           route: { cluster: jaeger }
+                        - match: { path: "/tempo" }
+                          redirect: { path_redirect: "/tempo/" }
+                        - match: { prefix: "/tempo/" }
+                          route: { cluster: tempo, prefix_rewrite: "/" }
                         - match: { path: "/grafana" }
                           redirect: { path_redirect: "/grafana/" }
                         - match: { prefix: "/grafana/" }
@@ -258,6 +262,18 @@ static_resources:
                     socket_address:
                       address: ${JAEGER_HOST}
                       port_value: ${JAEGER_UI_PORT}
+    - name: tempo
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: tempo
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: ${TEMPO_HOST}
+                      port_value: ${TEMPO_HTTP_PORT}
 admin:
   address:
     socket_address:

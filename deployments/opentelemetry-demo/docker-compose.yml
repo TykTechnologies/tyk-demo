@@ -366,6 +366,8 @@ services:
       - GRAFANA_HOST
       - JAEGER_UI_PORT
       - JAEGER_HOST
+      - TEMPO_HTTP_PORT
+      - TEMPO_HOST
       - OTEL_COLLECTOR_HOST
       - IMAGE_PROVIDER_HOST
       - IMAGE_PROVIDER_PORT
@@ -386,6 +388,8 @@ services:
       load-generator:
         condition: service_started
       jaeger:
+        condition: service_started
+      tempo:
         condition: service_started
       grafana:
         condition: service_started
@@ -812,6 +816,26 @@ services:
       - ./deployments/opentelemetry-demo/src/jaeger/config.yml:/etc/jaeger/config.yml
     logging: *logging
 
+  # Tempo
+  tempo:
+    image: ${TEMPO_IMAGE}
+    user: "0"
+    container_name: otel-demo-tempo
+    networks:
+      - tyk
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./deployments/opentelemetry-demo/src/tempo/tempo.yaml:/etc/tempo.yaml
+      - tempo-data:/tmp/tempo
+    ports:
+      - "${TEMPO_HTTP_PORT}"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    logging: *logging
+
   # Grafana
   grafana:
     image: ${GRAFANA_IMAGE}
@@ -857,6 +881,8 @@ services:
       - "${OTEL_COLLECTOR_PORT_HTTP}"
     depends_on:
       jaeger:
+        condition: service_started
+      tempo:
         condition: service_started
       opensearch:
         condition: service_healthy
@@ -968,3 +994,6 @@ services:
       timeout: 5s
       retries: 10
     logging: *logging
+
+volumes:
+  tempo-data:
