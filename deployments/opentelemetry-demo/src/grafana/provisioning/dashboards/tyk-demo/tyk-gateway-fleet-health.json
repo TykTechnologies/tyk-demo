@@ -2,10 +2,19 @@
   "uid": "tyk-gateway-fleet-health",
   "title": "Tyk Gateway - Fleet Health",
   "description": "Gateway node health, deployment config state, Go runtime metrics, and load distribution across the fleet. Audience: Platform Engineers / DevOps.",
-  "tags": ["tyk", "fleet", "gateway", "opentelemetry", "observability"],
+  "tags": [
+    "tyk",
+    "fleet",
+    "gateway",
+    "opentelemetry",
+    "observability"
+  ],
   "timezone": "browser",
   "refresh": "30s",
-  "time": { "from": "now-1h", "to": "now" },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "schemaVersion": 39,
   "version": 1,
   "templating": {
@@ -29,7 +38,10 @@
       {
         "name": "tyk_gw_id",
         "type": "query",
-        "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+        "datasource": {
+          "uid": "${datasource_prometheus}",
+          "type": "prometheus"
+        },
         "query": "label_values(tyk_gateway_apis_loaded{tyk_gw_group_id=~\"$tyk_gw_group_id\"}, tyk_gw_id)",
         "label": "Gateway Node",
         "multi": true,
@@ -42,7 +54,10 @@
       {
         "name": "tyk_gw_group_id",
         "type": "query",
-        "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
+        "datasource": {
+          "uid": "${datasource_prometheus}",
+          "type": "prometheus"
+        },
         "query": "label_values(tyk_gateway_apis_loaded, tyk_gw_group_id)",
         "label": "Group / Cluster",
         "multi": true,
@@ -57,11 +72,49 @@
   },
   "panels": [
     {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 9001,
+      "panels": [
+        {
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 1
+          },
+          "id": 9002,
+          "options": {
+            "content": "## \ud83d\uddfa How to use this dashboard\n\n**Target audience**: Platform engineers, DevOps, SREs  \n**Use when**: Checking deployment health, investigating gateway node divergence\n\n| Symptom | What to look at | Next step |\n|---------|----------------|-----------|\n| \ud83d\udd34 APIs Loaded dropped on a node | \"APIs Loaded per Node\" \u2014 look for the node that diverged | Check Config Reload Rate; compare to other nodes |\n| \ud83d\udfe0 Config Reload Rate is sustained | \"Config Reload Rate\" timeseries | Gateway may be stuck in a reload loop \u2014 check tyk.conf or K8s rollout |\n| \ud83d\udd34 Go memory near limit | \"Go Memory Usage\" panel | Risk of OOM \u2014 check for memory leaks or traffic spike |\n| \u2705 Fleet healthy but users reporting issues | Nothing red here | Jump to \u2192 [API Portfolio](/grafana/d/tyk-api-portfolio) |",
+            "mode": "markdown"
+          },
+          "title": "How to use this dashboard",
+          "type": "text"
+        }
+      ],
+      "title": "\u2139\ufe0f How to use this dashboard",
+      "type": "row"
+    },
+    {
       "id": 100,
       "type": "row",
       "title": "Fleet-at-a-Glance KPIs",
       "collapsed": false,
-      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 1 },
+      "gridPos": {
+        "x": 0,
+        "y": 1,
+        "w": 24,
+        "h": 1
+      },
       "panels": []
     },
     {
@@ -69,8 +122,16 @@
       "type": "stat",
       "title": "Gateway Nodes",
       "description": "Number of distinct gateway nodes currently reporting metrics.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 0, "y": 1, "w": 4, "h": 4 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
       "targets": [
         {
           "refId": "A",
@@ -79,15 +140,29 @@
         }
       ],
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "value",
         "graphMode": "none",
         "textMode": "auto"
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
           "unit": "short"
         }
       }
@@ -96,13 +171,21 @@
       "id": 2,
       "type": "bargauge",
       "title": "APIs Loaded per Gateway",
-      "description": "API definitions loaded per gateway node. All nodes in the same group should show the same count — a divergence indicates a config sync issue.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 4, "y": 1, "w": 4, "h": 4 },
+      "description": "API definitions loaded per gateway node. All nodes in the same group should show the same count \u2014 a divergence indicates a config sync issue.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 4,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
       "targets": [
         {
           "refId": "A",
-          "expr": "tyk_gateway_apis_loaded{tyk_gw_id=~\"$tyk_gw_id\"}",
+          "expr": "tyk_gateway_apis_loaded{tyk_gw_group_id=~\"$tyk_gw_group_id\", tyk_gw_id=~\"$tyk_gw_id\"}",
           "instant": true,
           "legendFormat": "{{tyk_gw_id}}"
         }
@@ -110,27 +193,49 @@
       "options": {
         "orientation": "horizontal",
         "displayMode": "basic",
-        "reduceOptions": { "calcs": ["lastNotNull"] }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "unit": "short",
-          "min": 0
+          "min": 0,
+          "links": [
+            {
+              "title": "View in API Portfolio",
+              "url": "/grafana/d/tyk-api-portfolio?var-tyk_gw_id=${__field.labels.tyk_gw_id}&from=${__from}&to=${__to}",
+              "targetBlank": false
+            }
+          ]
         }
-      }
+      },
+      "transformations": []
     },
     {
       "id": 3,
       "type": "bargauge",
       "title": "Policies Loaded per Gateway",
-      "description": "Security policies loaded per gateway node. All nodes in the same group should show the same count — a divergence indicates a policy sync issue.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 8, "y": 1, "w": 4, "h": 4 },
+      "description": "Security policies loaded per gateway node. All nodes in the same group should show the same count \u2014 a divergence indicates a policy sync issue.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
       "targets": [
         {
           "refId": "A",
-          "expr": "tyk_gateway_policies_loaded{tyk_gw_id=~\"$tyk_gw_id\"}",
+          "expr": "tyk_gateway_policies_loaded{tyk_gw_group_id=~\"$tyk_gw_group_id\", tyk_gw_id=~\"$tyk_gw_id\"}",
           "instant": true,
           "legendFormat": "{{tyk_gw_id}}"
         }
@@ -138,23 +243,45 @@
       "options": {
         "orientation": "horizontal",
         "displayMode": "basic",
-        "reduceOptions": { "calcs": ["lastNotNull"] }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "unit": "short",
-          "min": 0
+          "min": 0,
+          "links": [
+            {
+              "title": "View in API Portfolio",
+              "url": "/grafana/d/tyk-api-portfolio?var-tyk_gw_id=${__field.labels.tyk_gw_id}&from=${__from}&to=${__to}",
+              "targetBlank": false
+            }
+          ]
         }
-      }
+      },
+      "transformations": []
     },
     {
       "id": 4,
       "type": "stat",
       "title": "Config Reload Rate",
       "description": "Rate of config reloads per second. Sustained high value indicates a deployment loop.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 12, "y": 1, "w": 4, "h": 4 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
       "targets": [
         {
           "refId": "A",
@@ -163,20 +290,35 @@
         }
       ],
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "value",
         "graphMode": "area",
         "textMode": "auto"
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 0.1 },
-              { "color": "red", "value": 1 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.1
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
             ]
           },
           "unit": "reqps"
@@ -188,8 +330,16 @@
       "type": "stat",
       "title": "Gateway Request Rate",
       "description": "Total requests per second across the fleet.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 16, "y": 1, "w": 4, "h": 4 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
       "targets": [
         {
           "refId": "A",
@@ -198,15 +348,29 @@
         }
       ],
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "value",
         "graphMode": "area",
         "textMode": "auto"
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
           "unit": "reqps"
         }
       }
@@ -216,8 +380,16 @@
       "type": "stat",
       "title": "HTTP Error Rate",
       "description": "5xx responses as % of total traffic. Red threshold at 5%.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 20, "y": 1, "w": 4, "h": 4 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 20,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
       "targets": [
         {
           "refId": "A",
@@ -226,20 +398,35 @@
         }
       ],
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "background",
         "graphMode": "area",
         "textMode": "auto"
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 1 },
-              { "color": "red", "value": 5 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
             ]
           },
           "unit": "percent",
@@ -253,7 +440,12 @@
       "type": "row",
       "title": "Deployment & Config State",
       "collapsed": false,
-      "gridPos": { "x": 0, "y": 5, "w": 24, "h": 1 },
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 24,
+        "h": 1
+      },
       "panels": []
     },
     {
@@ -261,8 +453,16 @@
       "type": "timeseries",
       "title": "APIs Loaded Per Gateway",
       "description": "API definition count per node over time. A drop on one node during a rolling deploy indicates a config propagation failure.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 0, "y": 6, "w": 8, "h": 7 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 7,
+        "w": 8,
+        "h": 7
+      },
       "targets": [
         {
           "refId": "A",
@@ -273,18 +473,38 @@
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
         }
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "transformations": []
     },
     {
       "id": 22,
       "type": "timeseries",
       "title": "Policies Loaded Per Gateway",
       "description": "Policy count per node. Divergence confirms uneven policy distribution after a push.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 8, "y": 6, "w": 8, "h": 7 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 7,
+        "w": 8,
+        "h": 7
+      },
       "targets": [
         {
           "refId": "A",
@@ -295,18 +515,38 @@
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
         }
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "transformations": []
     },
     {
       "id": 23,
       "type": "stat",
       "title": "Config Drift",
       "description": "Difference between the node with the most APIs loaded and the least. Green = 0 (all nodes in sync). Non-zero means at least one node is out of step.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 16, "y": 6, "w": 4, "h": 7 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 7,
+        "w": 4,
+        "h": 7
+      },
       "targets": [
         {
           "refId": "A",
@@ -315,7 +555,11 @@
         }
       ],
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "background",
         "graphMode": "none",
         "textMode": "auto",
@@ -323,12 +567,20 @@
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "red", "value": 1 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
             ]
           },
           "unit": "short",
@@ -341,8 +593,16 @@
       "type": "bargauge",
       "title": "Per-Node API Count",
       "description": "Snapshot of API count per node. A mismatched bar means a node is out of sync with the fleet.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 20, "y": 6, "w": 4, "h": 7 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 20,
+        "y": 7,
+        "w": 4,
+        "h": 7
+      },
       "targets": [
         {
           "refId": "A",
@@ -354,22 +614,37 @@
       "options": {
         "orientation": "horizontal",
         "displayMode": "gradient",
-        "reduceOptions": { "calcs": ["lastNotNull"] }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "palette-classic" }
+          "color": {
+            "mode": "palette-classic"
+          }
         }
-      }
+      },
+      "transformations": []
     },
     {
       "id": 25,
       "type": "timeseries",
       "title": "Config Reload Events",
       "description": "Rate of config reloads per node. Correlate reload spikes with traffic anomalies.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 0, "y": 13, "w": 12, "h": 7 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 12,
+        "h": 7
+      },
       "targets": [
         {
           "refId": "A",
@@ -380,18 +655,38 @@
       "fieldConfig": {
         "defaults": {
           "unit": "reqps",
-          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
         }
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "transformations": []
     },
     {
       "id": 26,
       "type": "timeseries",
       "title": "Config Reload Duration P95",
       "description": "P95 reload duration in milliseconds. Slow reloads (>30s) during high traffic can cause brief request failures.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 12, "y": 13, "w": 12, "h": 7 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 14,
+        "w": 12,
+        "h": 7
+      },
       "targets": [
         {
           "refId": "A",
@@ -402,25 +697,51 @@
       "fieldConfig": {
         "defaults": {
           "unit": "ms",
-          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 10000 },
-              { "color": "red", "value": 30000 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10000
+              },
+              {
+                "color": "red",
+                "value": 30000
+              }
             ]
           }
         }
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "transformations": []
     },
     {
       "id": 300,
       "type": "row",
       "title": "Go Runtime Health",
       "collapsed": false,
-      "gridPos": { "x": 0, "y": 20, "w": 24, "h": 1 },
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 24,
+        "h": 1
+      },
       "panels": []
     },
     {
@@ -428,8 +749,16 @@
       "type": "timeseries",
       "title": "Memory: Used / GC Goal / Limit",
       "description": "Three memory boundaries overlaid per gateway: used (runtime-tracked heap), gc_goal (heap size that will trigger GC), and limit (GOMEMLIMIT hard ceiling). Used approaching gc_goal means GC is about to run; used approaching limit means OOM risk.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 0, "y": 21, "w": 14, "h": 8 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 22,
+        "w": 14,
+        "h": 8
+      },
       "targets": [
         {
           "refId": "A",
@@ -450,35 +779,84 @@
       "fieldConfig": {
         "defaults": {
           "unit": "bytes",
-          "custom": { "lineWidth": 2, "fillOpacity": 5 }
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 5
+          }
         },
         "overrides": [
           {
-            "matcher": { "id": "byFrameRefID", "options": "B" },
-            "properties": [{ "id": "custom.lineStyle", "value": { "dash": [8, 4], "fill": "dash" } }]
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    8,
+                    4
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byFrameRefID", "options": "C" },
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
             "properties": [
-              { "id": "custom.lineStyle", "value": { "dash": [2, 4], "fill": "dot" } },
-              { "id": "custom.fillOpacity", "value": 0 }
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    2,
+                    4
+                  ],
+                  "fill": "dot"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
             ]
           }
         ]
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "transformations": []
     },
     {
       "id": 33,
       "type": "gauge",
-      "title": "Memory vs Limit",
-      "description": "Memory used as % of the GOMEMLIMIT hard ceiling per gateway. Alert threshold: 80%.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 14, "y": 21, "w": 5, "h": 8 },
+      "title": "Heap Pressure (% of GC Goal)",
+      "description": "Heap in use as a percentage of the GC trigger threshold per gateway. Values above 80% mean GC will trigger soon. Spikes indicate allocation bursts.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 14,
+        "y": 22,
+        "w": 5,
+        "h": 8
+      },
       "targets": [
         {
           "refId": "A",
-          "expr": "go_memory_used_bytes{service_name=\"tyk-gateway\", tyk_gw_id=~\"$tyk_gw_id\"} / go_memory_limit_bytes{service_name=\"tyk-gateway\", tyk_gw_id=~\"$tyk_gw_id\"} * 100",
+          "expr": "sum by(tyk_gw_id)(go_memory_used_bytes{service_name=\"tyk-gateway\", tyk_gw_id=~\"$tyk_gw_id\"}) / on(tyk_gw_id) go_memory_gc_goal_bytes{service_name=\"tyk-gateway\", tyk_gw_id=~\"$tyk_gw_id\"} * 100",
           "instant": true,
           "legendFormat": "{{tyk_gw_id}}"
         }
@@ -491,26 +869,48 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 60 },
-              { "color": "red", "value": 80 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
             ]
           }
         }
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "showThresholdLabels": false,
         "showThresholdMarkers": true
-      }
+      },
+      "transformations": []
     },
     {
       "id": 34,
       "type": "bargauge",
       "title": "Goroutine Fleet Snapshot",
       "description": "Instant goroutine count per node. Outliers indicate a goroutine leak on that specific gateway.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 19, "y": 21, "w": 5, "h": 8 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 19,
+        "y": 22,
+        "w": 5,
+        "h": 8
+      },
       "targets": [
         {
           "refId": "A",
@@ -522,22 +922,37 @@
       "options": {
         "orientation": "horizontal",
         "displayMode": "gradient",
-        "reduceOptions": { "calcs": ["lastNotNull"] }
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "palette-classic" }
+          "color": {
+            "mode": "palette-classic"
+          }
         }
-      }
+      },
+      "transformations": []
     },
     {
       "id": 31,
       "type": "timeseries",
       "title": "Goroutines vs GOMAXPROCS",
       "description": "Goroutine count per gateway overlaid with GOMAXPROCS (processor limit). Goroutines far exceeding GOMAXPROCS indicate heavy scheduler contention. Steady upward drift in goroutines indicates a leak.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 0, "y": 29, "w": 8, "h": 7 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 8,
+        "h": 7
+      },
       "targets": [
         {
           "refId": "A",
@@ -553,80 +968,142 @@
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
         },
         "overrides": [
           {
-            "matcher": { "id": "byFrameRefID", "options": "B" },
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
             "properties": [
-              { "id": "custom.lineStyle", "value": { "dash": [8, 4], "fill": "dash" } },
-              { "id": "custom.fillOpacity", "value": 0 }
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    8,
+                    4
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
             ]
           }
         ]
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "transformations": []
     },
     {
       "id": 36,
       "type": "timeseries",
       "title": "Allocation Rate",
-      "description": "Rate of bytes allocated by the Go runtime per second. Allocation spikes often precede GC spikes by a few seconds — useful for root-cause analysis of latency blips.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 8, "y": 29, "w": 8, "h": 7 },
+      "description": "Rate of bytes allocated by the Go runtime per second. Allocation spikes often precede GC spikes by a few seconds \u2014 useful for root-cause analysis of latency blips.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 30,
+        "w": 8,
+        "h": 7
+      },
       "targets": [
         {
           "refId": "A",
-          "expr": "rate(go_memory_allocations_bytes_total{service_name=\"tyk-gateway\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])",
+          "expr": "rate(go_memory_allocated_bytes_total{service_name=\"tyk-gateway\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])",
           "legendFormat": "{{tyk_gw_id}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "Bps",
-          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
         }
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "transformations": []
     },
     {
       "id": 35,
       "type": "timeseries",
-      "title": "Goroutine Scheduling Latency (P50/P95/P99)",
-      "description": "Goroutine scheduling latency percentiles in milliseconds. Elevated P99 indicates runtime scheduler pressure — caused by GC stop-the-world pauses, goroutine starvation, or CPU saturation.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 16, "y": 29, "w": 8, "h": 7 },
+      "title": "Object Allocation Rate",
+      "description": "Heap objects allocated per second per gateway. High object count with low byte rate indicates many small short-lived allocations, which increases GC frequency. Complements the byte allocation rate panel.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 30,
+        "w": 8,
+        "h": 7
+      },
       "targets": [
         {
           "refId": "A",
-          "expr": "histogram_quantile(0.50, sum by(le, tyk_gw_id)(rate(go_schedule_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
-          "legendFormat": "P50 {{tyk_gw_id}}"
-        },
-        {
-          "refId": "B",
-          "expr": "histogram_quantile(0.95, sum by(le, tyk_gw_id)(rate(go_schedule_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
-          "legendFormat": "P95 {{tyk_gw_id}}"
-        },
-        {
-          "refId": "C",
-          "expr": "histogram_quantile(0.99, sum by(le, tyk_gw_id)(rate(go_schedule_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
-          "legendFormat": "P99 {{tyk_gw_id}}"
+          "expr": "rate(go_memory_allocations_total{service_name=\"tyk-gateway\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])",
+          "legendFormat": "{{tyk_gw_id}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "ms",
-          "custom": { "lineWidth": 2, "fillOpacity": 5 }
+          "unit": "short",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 5
+          }
         }
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "transformations": []
     },
     {
       "id": 400,
       "type": "row",
       "title": "Gateway Traffic & Load Distribution",
       "collapsed": false,
-      "gridPos": { "x": 0, "y": 36, "w": 24, "h": 1 },
+      "gridPos": {
+        "x": 0,
+        "y": 37,
+        "w": 24,
+        "h": 1
+      },
       "panels": []
     },
     {
@@ -634,8 +1111,16 @@
       "type": "timeseries",
       "title": "Request Rate by Gateway",
       "description": "Requests per second per node. Uneven load distribution is immediately visible.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 0, "y": 36, "w": 12, "h": 7 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 37,
+        "w": 12,
+        "h": 7
+      },
       "targets": [
         {
           "refId": "A",
@@ -646,18 +1131,45 @@
       "fieldConfig": {
         "defaults": {
           "unit": "reqps",
-          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "links": [
+            {
+              "title": "View in API Portfolio",
+              "url": "/grafana/d/tyk-api-portfolio?${__url.params}&var-tyk_gw_id=${__series.name}",
+              "targetBlank": false
+            }
+          ]
         }
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "transformations": []
     },
     {
       "id": 42,
       "type": "timeseries",
       "title": "Error Rate by Gateway",
       "description": "5xx error rate per node. A node with elevated errors indicates infra or config issue on that node.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 12, "y": 36, "w": 12, "h": 7 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 37,
+        "w": 12,
+        "h": 7
+      },
       "targets": [
         {
           "refId": "A",
@@ -669,18 +1181,45 @@
         "defaults": {
           "unit": "percent",
           "min": 0,
-          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "links": [
+            {
+              "title": "View in API Portfolio",
+              "url": "/grafana/d/tyk-api-portfolio?${__url.params}&var-tyk_gw_id=${__series.name}",
+              "targetBlank": false
+            }
+          ]
         }
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "transformations": []
     },
     {
       "id": 43,
       "type": "timeseries",
       "title": "P95 Latency by Gateway",
       "description": "P95 total request latency per node in ms. A slow node points to infra or resource contention.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 0, "y": 43, "w": 12, "h": 7 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 44,
+        "w": 12,
+        "h": 7
+      },
       "targets": [
         {
           "refId": "A",
@@ -691,18 +1230,58 @@
       "fieldConfig": {
         "defaults": {
           "unit": "ms",
-          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 200
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
+            ]
+          }
         }
       },
-      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "transformations": []
     },
     {
       "id": 44,
       "type": "piechart",
       "title": "Traffic Share by Gateway Node",
       "description": "Percentage of total fleet traffic handled by each node. Uneven slices indicate load balancer misconfiguration.",
-      "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-      "gridPos": { "x": 12, "y": 43, "w": 12, "h": 7 },
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 44,
+        "w": 12,
+        "h": 7
+      },
       "targets": [
         {
           "refId": "A",
@@ -712,30 +1291,52 @@
       ],
       "options": {
         "pieType": "pie",
-        "displayLabels": ["percent", "name"],
-        "legend": { "displayMode": "list", "placement": "right" }
+        "displayLabels": [
+          "percent",
+          "name"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "right"
+        }
       },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "palette-classic" }
+          "color": {
+            "mode": "palette-classic"
+          }
         }
-      }
+      },
+      "transformations": []
     },
     {
       "id": 500,
       "type": "row",
       "title": "Edge & Multi-Region (Tyk Cloud / Distributed)",
       "collapsed": true,
-      "gridPos": { "x": 0, "y": 50, "w": 24, "h": 1 },
+      "gridPos": {
+        "x": 0,
+        "y": 51,
+        "w": 24,
+        "h": 1
+      },
       "panels": [
         {
           "id": 51,
           "type": "piechart",
           "title": "Dataplane vs Control Plane Traffic",
           "description": "Traffic split between dataplane (edge) nodes and control plane nodes.",
-          "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-          "gridPos": { "x": 0, "y": 51, "w": 8, "h": 7 },
+          "datasource": {
+            "uid": "${datasource_prometheus}",
+            "type": "prometheus"
+          },
+          "gridPos": {
+            "x": 0,
+            "y": 52,
+            "w": 8,
+            "h": 7
+          },
           "targets": [
             {
               "refId": "A",
@@ -745,18 +1346,39 @@
           ],
           "options": {
             "pieType": "pie",
-            "displayLabels": ["percent", "name"],
-            "legend": { "displayMode": "list", "placement": "right" }
+            "displayLabels": [
+              "percent",
+              "name"
+            ],
+            "legend": {
+              "displayMode": "list",
+              "placement": "right"
+            }
           },
-          "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "palette-classic" } } }
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "palette-classic"
+              }
+            }
+          }
         },
         {
           "id": 52,
           "type": "timeseries",
           "title": "Traffic by Edge Cluster",
           "description": "Request rate per cluster/group. Useful for multi-region and Tyk Cloud deployments.",
-          "datasource": { "uid": "${datasource_prometheus}", "type": "prometheus" },
-          "gridPos": { "x": 8, "y": 51, "w": 16, "h": 7 },
+          "datasource": {
+            "uid": "${datasource_prometheus}",
+            "type": "prometheus"
+          },
+          "gridPos": {
+            "x": 8,
+            "y": 52,
+            "w": 16,
+            "h": 7
+          },
           "targets": [
             {
               "refId": "A",
@@ -764,8 +1386,24 @@
               "legendFormat": "{{tyk_gw_group_id}}"
             }
           ],
-          "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
-          "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } }
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps",
+              "custom": {
+                "lineWidth": 2,
+                "fillOpacity": 10
+              }
+            }
+          },
+          "options": {
+            "tooltip": {
+              "mode": "multi"
+            },
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            }
+          }
         }
       ]
     },
@@ -774,7 +1412,12 @@
       "type": "row",
       "title": "Gateway Health Events",
       "collapsed": false,
-      "gridPos": { "x": 0, "y": 51, "w": 24, "h": 1 },
+      "gridPos": {
+        "x": 0,
+        "y": 52,
+        "w": 24,
+        "h": 1
+      },
       "panels": []
     },
     {
@@ -782,34 +1425,85 @@
       "type": "timeseries",
       "title": "Gateway Error Rate (from logs)",
       "description": "Count of error/warn/fatal operational log events over time. Spikes indicate gateway-internal issues: OTLP export failures, connection errors, or panics.",
-      "datasource": { "uid": "${datasource_loki}", "type": "loki" },
-      "gridPos": { "x": 0, "y": 52, "w": 12, "h": 8 },
+      "datasource": {
+        "uid": "${datasource_loki}",
+        "type": "loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 53,
+        "w": 8,
+        "h": 8
+      },
       "targets": [
         {
           "refId": "A",
           "queryType": "range",
-          "instant": false,
-          "range": true,
-          "expr": "sum(count_over_time({service_name=\"tyk-gateway\"} | detected_level=~`error|warn|fatal` [5m]))",
-          "legendFormat": "errors"
+          "expr": "sum(count_over_time({service_name=~\".+\"} | service_name=\"tyk-gateway\" | detected_level=\"error\" [$__interval]))",
+          "legendFormat": "error"
+        },
+        {
+          "refId": "B",
+          "queryType": "range",
+          "expr": "sum(count_over_time({service_name=~\".+\"} | service_name=\"tyk-gateway\" | detected_level=\"warn\" [$__interval]))",
+          "legendFormat": "warn"
+        },
+        {
+          "refId": "C",
+          "queryType": "range",
+          "expr": "sum(count_over_time({service_name=~\".+\"} | service_name=\"tyk-gateway\" | detected_level=\"info\" [$__interval]))",
+          "legendFormat": "info"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "custom": { "lineWidth": 2, "fillOpacity": 20 },
-          "color": { "mode": "fixed", "fixedColor": "red" }
-        }
+          "custom": {
+            "drawStyle": "bars",
+            "barAlignment": 0,
+            "lineWidth": 1,
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": { "mode": "normal", "group": "A" }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "error" },
+            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "warn" },
+            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "orange" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "info" },
+            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } }]
+          }
+        ]
       },
-      "options": { "tooltip": { "mode": "single" }, "legend": { "displayMode": "hidden" } }
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      }
     },
     {
       "id": 62,
       "type": "table",
       "title": "Upstream Failures by API",
       "description": "Individual 5xx responses from gateway access logs. Each row is one failed request showing the API, response flag, and status code.",
-      "datasource": { "uid": "${datasource_loki}", "type": "loki" },
-      "gridPos": { "x": 12, "y": 52, "w": 12, "h": 8 },
+      "datasource": {
+        "uid": "${datasource_loki}",
+        "type": "loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 61,
+        "w": 24,
+        "h": 10
+      },
       "targets": [
         {
           "refId": "A",
@@ -819,10 +1513,26 @@
           "expr": "{service_name=\"tyk-gateway\"} | tyk_prefix=`access-log` | tyk_status=~`5..`"
         }
       ],
-      "options": { "sortBy": [{ "displayName": "Time", "desc": true }] },
-      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "options": {
+        "sortBy": [
+          {
+            "displayName": "Time",
+            "desc": true
+          }
+        ]
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "transformations": [
-        { "id": "extractFields", "options": { "source": "labels", "format": "json" } },
+        {
+          "id": "extractFields",
+          "options": {
+            "source": "labels",
+            "format": "json"
+          }
+        },
         {
           "id": "organize",
           "options": {
@@ -853,8 +1563,16 @@
       "type": "logs",
       "title": "Recent Gateway Errors",
       "description": "Live stream of error, warn, and fatal log entries from gateway operational logs. Expand an entry to see full JSON context including component, message, and error details.",
-      "datasource": { "uid": "${datasource_loki}", "type": "loki" },
-      "gridPos": { "x": 0, "y": 60, "w": 24, "h": 10 },
+      "datasource": {
+        "uid": "${datasource_loki}",
+        "type": "loki"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 53,
+        "w": 16,
+        "h": 8
+      },
       "targets": [
         {
           "refId": "A",
@@ -863,7 +1581,7 @@
         }
       ],
       "options": {
-        "dedupStrategy": "none",
+        "dedupStrategy": "signature",
         "enableLogDetails": true,
         "prettifyLogMessage": false,
         "showTime": true,
@@ -872,6 +1590,29 @@
         "wrapLogMessage": true,
         "sortOrder": "Descending"
       }
+    }
+  ],
+  "links": [
+    {
+      "title": "\ud83d\udda5 Fleet Health",
+      "url": "/grafana/d/tyk-gateway-fleet-health",
+      "type": "link",
+      "targetBlank": false,
+      "icon": "external link"
+    },
+    {
+      "title": "\ud83d\udcca API Portfolio",
+      "url": "/grafana/d/tyk-api-portfolio",
+      "type": "link",
+      "targetBlank": false,
+      "icon": "external link"
+    },
+    {
+      "title": "\ud83d\udd0d API Troubleshooting",
+      "url": "/grafana/d/tyk-api-troubleshooting",
+      "type": "link",
+      "targetBlank": false,
+      "icon": "external link"
     }
   ]
 }

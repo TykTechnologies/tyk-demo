@@ -246,6 +246,117 @@ PROMETHEUS_HOST=prometheus
 PROMETHEUS_ADDR=${PROMETHEUS_HOST}:${PROMETHEUS_PORT}
 ```
 
+## Grafana Dashboards
+
+Grafana is available at **http://localhost:8085/grafana** (no login required).
+
+The deployment ships four pre-configured dashboards that together give a complete picture of Tyk Gateway in production. They cross-link to each other so you can navigate seamlessly during a demo.
+
+---
+
+### 1. Fleet Health — `tyk-gateway-fleet-health`
+
+**Who it's for**: Platform engineers and DevOps teams managing multiple gateway instances.
+
+**What it shows**:
+- How many gateway instances are running and how many APIs/policies each has loaded
+- Config drift — whether all gateways have the same number of APIs loaded (a sign of a sync problem)
+- Go runtime health: heap memory pressure, GC goal, goroutine count
+- Per-gateway request rate and traffic distribution
+- Gateway error log histogram (error / warn / info stacked bars, last N minutes)
+- Recent error log stream and upstream failure breakdown by API
+
+**Demo talking points**:
+- Open the Fleet Health dashboard and point out the KPI bar at the top — gateway count, total APIs loaded, fleet request rate.
+- Show the Config Drift gauge: if all gateways are in sync it reads 0. Explain this catches split-brain scenarios where a reload didn't propagate.
+- Scroll to Go Runtime Health — show heap pressure gauge. Explain this gives ops teams early warning before a gateway OOM-kills.
+- Show the log histogram at the bottom. This is Loki-backed — no log agent needed on the gateway side, just structured JSON logs over OTLP.
+
+---
+
+### 2. API Portfolio Overview — `tyk-api-portfolio`
+
+**Who it's for**: API platform leads and SRE on-call. The single-pane view across all APIs.
+
+**What it shows**:
+- Portfolio KPIs: total request rate, error rate, P95 latency, active API count
+- Traffic trends over time and per-API breakdown
+- Error analysis: error rate by API, error type distribution, top 10 APIs by error rate
+- API Leaderboards: top 10 APIs by traffic, P95 latency, and error rate — showing API names, not raw UUIDs
+- Multi-tenancy: traffic by organisation and tenant
+- Consumer identity: traffic by API key, OAuth client, developer portal app
+- SLO tracking: availability SLO gauge, error budget remaining, burn rate (1h and 6h), P95 latency vs threshold
+
+**Demo talking points**:
+- Start at the Portfolio KPI bar — these four numbers tell you the health of your entire API estate at a glance.
+- Scroll to the API Leaderboards. Point out that bar labels show API names. Clicking a bar links directly into the Troubleshooting dashboard for that API — no copy-pasting IDs.
+- Show the SLO section. Explain that `slo_availability_target` and `slo_latency_ms` are dashboard variables — you can change the target on the fly to model different SLO commitments.
+- Show the Multi-Tenancy and Consumer Identity rows. These come from Tyk's custom OTLP instruments and require no code changes in the upstream services — they're derived from request metadata, headers, and session context.
+
+**Filter interactions**: Clicking an API ID in the Latency by API table applies it as a dashboard filter, scoping all panels to that API.
+
+---
+
+### 3. API Troubleshooting — `tyk-api-troubleshooting`
+
+**Who it's for**: Backend engineers and SRE on-call investigating a specific API.
+
+**What it shows**:
+- API-scoped KPIs: request rate, error rate, P95 latency, cache hit rate
+- Latency attribution: how much of the end-to-end latency is the gateway vs the upstream
+- Error breakdown: error rate over time with response flag detail (e.g. `URS` = upstream 5xx, `UT` = upstream timeout)
+- Traffic patterns by gateway instance
+- Upstream health: isolation of upstream-related response flags
+- Distributed traces via Grafana Tempo: recent traces and error traces for the selected API
+- Structured log analysis: access logs, error/warn logs, all logs with trace ID correlation
+
+**Demo talking points**:
+- Select a specific API from the `api_id` variable at the top.
+- Show the Latency Attribution pie chart — it immediately answers "is the slowness in Tyk or in the backend?" without digging through logs.
+- Open the Distributed Tracing row. Click a trace row — it links to the full trace in Tempo showing every span across all microservices. This is end-to-end visibility from the gateway to the upstream service, all correlated by trace ID.
+- Show the Log Analysis row. Highlight the trace ID correlation: clicking a trace in Tempo gives you a trace ID, which you can paste into the `trace_id` variable to filter all log panels to that exact request.
+- For the error traces table, trigger a 5xx by toggling a feature flag (http://localhost:8085/feature/) then show the error appearing in real time.
+
+**Best entry point**: Arrive here from the API Portfolio Leaderboard by clicking "Troubleshoot this API" on any API bar.
+
+---
+
+### 4. Native OTLP Metrics Explorer — `tyk-gateway-otlp-metrics`
+
+**Who it's for**: Engineers and solution architects exploring what Tyk's custom OTLP instrumentation can produce.
+
+**What it shows**: All 19 OTLP instruments (4 default + 15 custom) across 13 rows covering traffic, latency, error analysis, method breakdown, and every available dimension source:
+- Metadata dimensions: route, API version, organisation, scheme
+- Session dimensions: API key (last 6 chars), OAuth client, developer portal app/org
+- Header dimensions: tenant ID (`X-Tenant-ID`), customer ID (`X-Customer-ID`)
+- Response header dimensions: cache status, backend version, content type
+- Context dimensions: subscription tier, region (requires middleware to populate)
+- Quota/rate-limit tracking via `X-RateLimit-Limit` response header
+
+**Demo talking points**:
+- This dashboard is the "what's possible" showcase. Open it after explaining that all these dimensions come for free from the gateway — no changes to upstream services.
+- Scroll through the rows and explain each dimension source type: metadata (built-in request fields), session (auth session data), headers (any request/response header), context (Tyk middleware-set variables).
+- Show the Session Dimensions row — API key traffic and OAuth client traffic are derived from Tyk's auth layer, zero instrumentation in application code.
+- The Context Dimensions row (tier, region) shows placeholder values by default because it needs middleware to set context variables. Explain this as a pattern for custom enrichment — a Go plugin can inject any value and it flows through to metrics automatically.
+
+---
+
+### Suggested Demo Flow
+
+For a **15-minute demo** to an audience unfamiliar with Tyk:
+
+1. **Fleet Health** (2 min) — "Here's how platform ops see the gateway fleet."
+2. **API Portfolio** (5 min) — "Here's the API estate view. Show SLOs, leaderboards, click through to troubleshooting."
+3. **API Troubleshooting** (5 min) — "Here's how an SRE investigates a specific API. Show latency attribution, then drill into a trace."
+4. **OTLP Metrics Explorer** (3 min) — "And here's everything you can measure out of the box, across 13 dimension categories."
+
+For a **deep-dive demo** focused on a specific persona:
+- **Platform ops**: Focus on Fleet Health — config drift, Go runtime, log histogram.
+- **API product manager**: Focus on Portfolio — SLOs, error budget, consumer identity rows.
+- **Backend engineer**: Focus on Troubleshooting — latency attribution + trace + log correlation.
+
+---
+
 ## Configuration
 
 This deployment demonstrates several key observability features:
