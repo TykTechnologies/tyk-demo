@@ -26,7 +26,7 @@ All files are under `deployments/opentelemetry-demo/src/grafana/provisioning/das
 - **File**: `tyk-demo-backup/tyk-gateway-otlp-metrics.json`
 - **Refresh**: 30s | **Default range**: now-1h
 
-#### Panel Index (56 data panels)
+#### Panel Index (51 data panels)
 
 | ID | Type | Title | Row |
 |----|------|-------|-----|
@@ -79,12 +79,6 @@ All files are under `deployments/opentelemetry-demo/src/grafana/provisioning/das
 | 172 | timeseries | 429 Rejections Over Time | 12 |
 | 173 | bargauge | Top APIs by 429 Rejections | 12 |
 | 174 | timeseries | Traffic by Quota Tier | 12 |
-| 151 | timeseries | Traffic by Subscription Tier | 13 – Context Dimensions |
-| 152 | piechart | Tier Traffic Share | 13 |
-| 153 | bargauge | Per-Tier P95 Latency | 13 |
-| 154 | timeseries | Tier Error Rate | 13 |
-| 155 | timeseries | Request Rate by Region | 13 |
-
 Row 8 is a text/markdown explanation panel (no data panels). There is no standalone Quota Monitoring row — quota panels (171–174) live under Row 12 (Response Header Dims).
 
 ### tyk-gateway-fleet-health
@@ -166,10 +160,6 @@ Row 8 is a text/markdown explanation panel (no data panels). There is no standal
 | `tyk_requests_with_cache_total` | response_header X-Cache-Status | `cache_status`, `api_id` |
 | `tyk_requests_by_backend_version_total` | response_header X-Backend-Version | `backend_version`, `api_id` |
 | `tyk_requests_by_content_type_total` | response_header Content-Type | `content_type`, `api_id` |
-| `tyk_requests_by_tier_total` | context `tier` | `subscription_tier`, `api_id`, `response_code` |
-| `tyk_latency_by_tier_seconds` | context `tier` | `subscription_tier`, `api_id` |
-| `tyk_requests_by_region_total` | context `region` | `region`, `api_id` |
-
 Histogram suffixes: `_bucket`, `_count`, `_sum`
 
 `tyk_response_flag` values: Tyk error codes (e.g. `URS` = upstream 5xx, `BD` = bad destination) or HTTP status string (`"200"`, `"404"`) on success.
@@ -184,12 +174,9 @@ Histogram suffixes: `_bucket`, `_count`, `_sum`
 | `session` | Auth session data, validated at startup | `api_key` (truncated last 6), `oauth_id`, `alias`, `portal_app`, `portal_org` |
 | `header` | Any request header key | e.g. `X-Tenant-ID`, `X-Customer-ID` |
 | `response_header` | Any response header key | e.g. `X-Cache-Status`, `Content-Type` |
-| `context` | Tyk context variables (set by middleware) | e.g. `tier`, `region`, `plan` |
-
 **Caveats:**
 - `session`: only populated on authenticated requests; histograms with session labels log a warning at startup
 - `response_header`: only populated on success path — errors use the `default` fallback
-- `context`: requires explicit middleware (Go plugin, virtual endpoint) to set the variable
 - Max 10 dimensions per instrument (OTel SDK fast path limit)
 - Always specify `"default"` for header/response_header/context sources to avoid empty-label cardinality explosion
 
@@ -343,7 +330,6 @@ mcp: query_prometheus(datasourceUid="prometheus", expr='{service_name="tyk-gatew
 | Latency includes non-Tyk services | Missing `service_name=~"$service_name"` filter | Add filter to all PromQL exprs |
 | Custom metric panels show "No data" | Env var not set or metric name typo | Check `.env` line ~39; `query_prometheus` to confirm |
 | `histogram_quantile` returns `NaN` | No samples in rate window | Increase time range, generate traffic |
-| Context dimension panels always show default value | Middleware not setting context variables | Context vars need explicit middleware (Go plugin, virtual endpoint) |
 | `response_header` labels are empty/default on errors | Error path doesn't populate response headers | By design; use `"default"` to handle gracefully |
 | "Value" legend on Status Code Distribution (id=23) | `instant: true, format: "table"` ignores legendFormat | Add `"displayName": "Requests"` to `fieldConfig.defaults` |
 | Loki `count_over_time` metric query returns no data for gateway logs | `{service_name="tyk-gateway"}` matches 0 indexed streams — all logs share one stream, `service_name` is structured metadata (unindexed) | Use `{service_name=~".+"}` as stream selector, then `\| service_name="tyk-gateway"` as post-filter |
@@ -382,7 +368,7 @@ mcp: query_prometheus(datasourceUid="prometheus", expr='{service_name="tyk-gatew
 - `service_name` is auto-promoted by Prometheus OTLP receiver from `service.name` resource attribute — not a configurable dimension
 - OTel name dots become underscores: `tyk.requests.by.route` → `tyk_requests_by_route_total`
 
-**Total instruments**: 19 (4 defaults + 15 custom)
+**Total instruments**: 16 (4 defaults + 12 custom)
 **Gateway source**: `internal/otel/apimetrics/registry.go` (lines 73, 84), `defaults.go`
 
 ---
