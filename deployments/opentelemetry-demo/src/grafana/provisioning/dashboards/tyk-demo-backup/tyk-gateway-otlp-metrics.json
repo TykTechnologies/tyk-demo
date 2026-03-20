@@ -508,7 +508,7 @@
       "id": 8,
       "type": "timeseries",
       "title": "Request Rate by Status Class",
-      "description": "Request throughput broken down by HTTP status class. Powered by tyk_api_requests_total with http_response_status_code label \u2014 a new capability vs legacy Pump metrics.",
+      "description": "Request throughput broken down by HTTP status class. Powered by tyk_api_requests_total with http_response_status_code label — a new capability vs legacy Pump metrics.",
       "gridPos": {
         "x": 0,
         "y": 5,
@@ -629,7 +629,7 @@
       "id": 9,
       "type": "timeseries",
       "title": "Request Rate by API",
-      "description": "Per-API request throughput over time. Use the API ID variable above to filter. tyk_api_id is a native OTel attribute \u2014 no Tyk Pump required.",
+      "description": "Per-API request throughput over time. Use the API ID variable above to filter. tyk_api_id is a native OTel attribute — no Tyk Pump required.",
       "gridPos": {
         "x": 12,
         "y": 5,
@@ -669,7 +669,7 @@
     {
       "id": 10,
       "type": "row",
-      "title": "Latency Attribution \u2014 Gateway vs Upstream",
+      "title": "Latency Attribution — Gateway vs Upstream",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -682,7 +682,7 @@
       "id": 11,
       "type": "timeseries",
       "title": "Latency Breakdown: Total vs Gateway vs Upstream (P95)",
-      "description": "NEW: Native OTLP metrics enable precise latency attribution. Total \u2248 Gateway + Upstream. When Total spikes but Gateway stays flat \u2192 upstream issue. When Gateway spikes \u2192 Tyk processing bottleneck. Previously impossible with Tyk Pump alone.",
+      "description": "NEW: Native OTLP metrics enable precise latency attribution. Total ≈ Gateway + Upstream. When Total spikes but Gateway stays flat → upstream issue. When Gateway spikes → Tyk processing bottleneck. Previously impossible with Tyk Pump alone.",
       "gridPos": {
         "x": 0,
         "y": 14,
@@ -902,7 +902,7 @@
     {
       "id": 13,
       "type": "table",
-      "title": "Latency by API (P50 / P95 / P99) \u2014 Total, Gateway, Upstream",
+      "title": "Latency by API (P50 / P95 / P99) — Total, Gateway, Upstream",
       "description": "Per-API latency breakdown across all three dimensions. Identify APIs with high upstream latency (upstream-side issue) vs high gateway latency (Tyk processing issue).",
       "gridPos": {
         "x": 0,
@@ -1502,7 +1502,7 @@
       "id": 51,
       "type": "timeseries",
       "title": "Gateway Total Request Counter (tyk_http_requests_total)",
-      "description": "Raw gateway-wide request counter with no labels \u2014 the simplest possible OTLP metric. Useful for high-level throughput comparison with no cardinality overhead. Compare against tyk_api_requests_total sum to verify accounting.",
+      "description": "Raw gateway-wide request counter with no labels — the simplest possible OTLP metric. Useful for high-level throughput comparison with no cardinality overhead. Compare against tyk_api_requests_total sum to verify accounting.",
       "gridPos": {
         "x": 0,
         "y": 62,
@@ -1621,7 +1621,7 @@
     {
       "id": 100,
       "type": "row",
-      "title": "\u2726 Custom Dimensions \u2014 Configure Extra Labels from Any Source",
+      "title": "✦ Custom Dimensions — Configure Extra Labels from Any Source",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -1643,13 +1643,13 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "## Custom Metric Dimensions in Tyk Gateway OTLP Metrics\n\nTyk Gateway lets you define **custom metric instruments** via `opentelemetry.metrics.api_metrics` in the gateway config. Each instrument can attach labels from **5 dimension sources** \u2014 enabling rich observability without modifying backend services.\n\n| Source | What it provides | Example keys |\n|---|---|---|\n| `metadata` | Built-in request/response fields (11 keys) | `route`, `api_name`, `org_id`, `api_version`, `host`, `scheme`, `ip_address` |\n| `session` | Auth session data (5 keys) | `api_key` (last 6 chars \u26a0\ufe0f), `oauth_id`, `alias`, `portal_app`, `portal_org` |\n| `header` | Any HTTP **request** header | `X-Tenant-ID`, `X-Customer-ID`, `X-Forwarded-For` |\n| `context` | Tyk context variables set by middleware | `tier`, `plan`, `region` (from JWT, Go Plugin, etc.) |\n| `response_header` | Any HTTP **response** header (success path only) | `X-Cache-Status`, `X-Server-Version`, `Content-Type` |\n\n**Max 10 dimensions per instrument** (OTel SDK fast path). High-cardinality sources (session/headers on histograms) emit a startup warning.\n\n```json\n// Example: opentelemetry.metrics.api_metrics in tyk.conf\n[\n  {\n    \"name\": \"tyk.requests.by.tenant\",\n    \"type\": \"counter\",\n    \"dimensions\": [\n      { \"source\": \"header\",   \"key\": \"X-Tenant-ID\",  \"label\": \"tenant_id\",  \"default\": \"unknown\" },\n      { \"source\": \"metadata\", \"key\": \"api_id\",       \"label\": \"api_id\" },\n      { \"source\": \"metadata\", \"key\": \"response_code\",\"label\": \"response_code\" }\n    ]\n  },\n  {\n    \"name\": \"tyk.latency.by.tier\",\n    \"type\": \"histogram\",\n    \"histogram_source\": \"total\",\n    \"dimensions\": [\n      { \"source\": \"context\",  \"key\": \"tier\",   \"label\": \"subscription_tier\", \"default\": \"standard\" },\n      { \"source\": \"metadata\", \"key\": \"api_id\", \"label\": \"api_id\" }\n    ]\n  }\n]\n```\n\n> **Panels in the sections below will show \"No data\" until custom instruments are configured in the gateway.** Each section includes the exact config snippet needed to populate it."
+        "content": "## Custom Metric Dimensions in Tyk Gateway OTLP Metrics\n\nTyk Gateway lets you define **custom metric instruments** via `opentelemetry.metrics.api_metrics` in the gateway config. Each instrument can attach labels from **5 dimension sources** — enabling rich observability without modifying backend services.\n\n| Source | What it provides | Example keys |\n|---|---|---|\n| `metadata` | Built-in request/response fields (11 keys) | `route`, `api_name`, `org_id`, `api_version`, `host`, `scheme`, `ip_address` |\n| `session` | Auth session data (5 keys) | `api_key` (last 6 chars ⚠️), `oauth_id`, `alias`, `portal_app`, `portal_org` |\n| `header` | Any HTTP **request** header | `X-Tenant-ID`, `X-Customer-ID`, `X-Forwarded-For` |\n| `context` | Tyk context variables set by middleware | `tier`, `plan`, `region` (from JWT, Go Plugin, etc.) |\n| `response_header` | Any HTTP **response** header (success path only) | `X-Cache-Status`, `X-Server-Version`, `Content-Type` |\n\n**Max 10 dimensions per instrument** (OTel SDK fast path). High-cardinality sources (session/headers on histograms) emit a startup warning.\n\n```json\n// Example: opentelemetry.metrics.api_metrics in tyk.conf\n[\n  {\n    \"name\": \"tyk.requests.by.tenant\",\n    \"type\": \"counter\",\n    \"dimensions\": [\n      { \"source\": \"header\",   \"key\": \"X-Tenant-ID\",  \"label\": \"tenant_id\",  \"default\": \"unknown\" },\n      { \"source\": \"metadata\", \"key\": \"api_id\",       \"label\": \"api_id\" },\n      { \"source\": \"metadata\", \"key\": \"response_code\",\"label\": \"response_code\" }\n    ]\n  },\n  {\n    \"name\": \"tyk.latency.by.tier\",\n    \"type\": \"histogram\",\n    \"histogram_source\": \"total\",\n    \"dimensions\": [\n      { \"source\": \"context\",  \"key\": \"tier\",   \"label\": \"subscription_tier\", \"default\": \"standard\" },\n      { \"source\": \"metadata\", \"key\": \"api_id\", \"label\": \"api_id\" }\n    ]\n  }\n]\n```\n\n> **Panels in the sections below will show \"No data\" until custom instruments are configured in the gateway.** Each section includes the exact config snippet needed to populate it."
       }
     },
     {
       "id": 110,
       "type": "row",
-      "title": "Metadata Dimensions \u2014 Route, Org, API Version, Scheme",
+      "title": "Metadata Dimensions — Route, Org, API Version, Scheme",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -1787,7 +1787,7 @@
       "id": 114,
       "type": "piechart",
       "title": "Traffic Share by API Version",
-      "description": "Request distribution across API versions. Helps track migration from v1\u2192v2. Requires tyk.requests.by.version counter with api_version dimension from metadata.",
+      "description": "Request distribution across API versions. Helps track migration from v1→v2. Requires tyk.requests.by.version counter with api_version dimension from metadata.",
       "gridPos": {
         "x": 0,
         "y": 92,
@@ -2070,7 +2070,7 @@
     {
       "id": 120,
       "type": "row",
-      "title": "Session Dimensions \u2014 Identity & Auth Tracking (api_key, oauth_id, portal)",
+      "title": "Session Dimensions — Identity & Auth Tracking (api_key, oauth_id, portal)",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -2358,7 +2358,7 @@
     {
       "id": 130,
       "type": "row",
-      "title": "Request Header Dimensions \u2014 Multi-Tenancy (X-Tenant-ID, X-Customer-ID)",
+      "title": "Request Header Dimensions — Multi-Tenancy (X-Tenant-ID, X-Customer-ID)",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -2412,7 +2412,7 @@
       "id": 132,
       "type": "timeseries",
       "title": "Tenant Error Rate",
-      "description": "5xx error rate per tenant. Enables per-tenant SLO monitoring from a single gateway metric \u2014 no backend instrumentation required. Requires tyk.requests.by.tenant with tenant_id + response_code.",
+      "description": "5xx error rate per tenant. Enables per-tenant SLO monitoring from a single gateway metric — no backend instrumentation required. Requires tyk.requests.by.tenant with tenant_id + response_code.",
       "gridPos": {
         "x": 12,
         "y": 121,
@@ -2727,7 +2727,7 @@
       "id": 136,
       "type": "bargauge",
       "title": "Top Customers by Traffic",
-      "description": "Top 10 customers by total request volume over the selected time range. Extracted from X-Customer-ID request header \u2014 no backend changes needed. Requires tyk.requests.by.customer instrument.",
+      "description": "Top 10 customers by total request volume over the selected time range. Extracted from X-Customer-ID request header — no backend changes needed. Requires tyk.requests.by.customer instrument.",
       "gridPos": {
         "x": 12,
         "y": 139,
@@ -2786,7 +2786,7 @@
     {
       "id": 140,
       "type": "row",
-      "title": "Response Header Dimensions \u2014 Backend Intelligence (Cache, Version, Content-Type)",
+      "title": "Response Header Dimensions — Backend Intelligence (Cache, Version, Content-Type)",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -3245,305 +3245,9 @@
       ]
     },
     {
-      "id": 150,
-      "type": "row",
-      "title": "Context Variable Dimensions \u2014 Business Logic Segmentation (Tier, Plan, Region)",
-      "collapsed": false,
-      "gridPos": {
-        "x": 0,
-        "y": 181,
-        "w": 24,
-        "h": 1
-      }
-    },
-    {
-      "id": 151,
-      "type": "timeseries",
-      "title": "Traffic by Subscription Tier",
-      "description": "Request volume split by subscription tier (free/standard/premium). Context variables are set by Go Plugins, Virtual Endpoints, or JWT claim extraction middleware. Requires: {\"name\":\"tyk.requests.by.tier\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"context\",\"key\":\"tier\",\"label\":\"subscription_tier\",\"default\":\"standard\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"},{\"source\":\"metadata\",\"key\":\"response_code\",\"label\":\"response_code\"}]}",
-      "gridPos": {
-        "x": 0,
-        "y": 182,
-        "w": 12,
-        "h": 9
-      },
-      "datasource": "${datasource_prometheus}",
-      "fieldConfig": {
-        "defaults": {
-          "unit": "reqps",
-          "custom": {
-            "lineWidth": 2,
-            "fillOpacity": 20,
-            "stacking": {
-              "mode": "normal",
-              "group": "A"
-            }
-          },
-          "noValue": "Configure tyk.requests.by.tier metric"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "premium"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "gold"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "standard"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "blue"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "free"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "green"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": "${datasource_prometheus}",
-          "expr": "sum by(subscription_tier)(rate(tyk_requests_by_tier_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]))",
-          "legendFormat": "{{subscription_tier}}",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 152,
-      "type": "piechart",
-      "title": "Tier Traffic Share",
-      "description": "Proportion of total traffic from each subscription tier. Understand your premium vs free traffic split. Requires tyk.requests.by.tier counter.",
-      "gridPos": {
-        "x": 12,
-        "y": 182,
-        "w": 6,
-        "h": 9
-      },
-      "datasource": "${datasource_prometheus}",
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "noValue": "Configure tyk.requests.by.tier metric"
-        }
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "sum"
-          ]
-        },
-        "pieType": "donut",
-        "displayLabels": [
-          "name",
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "targets": [
-        {
-          "datasource": "${datasource_prometheus}",
-          "expr": "sum by(subscription_tier)(increase(tyk_requests_by_tier_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__range]))",
-          "legendFormat": "{{subscription_tier}}",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 153,
-      "type": "bargauge",
-      "title": "Per-Tier P95 Latency",
-      "description": "P95 latency comparison across subscription tiers. Verify premium tier gets better latency SLAs. Requires: {\"name\":\"tyk.latency.by.tier\",\"type\":\"histogram\",\"histogram_source\":\"total\",\"dimensions\":[{\"source\":\"context\",\"key\":\"tier\",\"label\":\"subscription_tier\",\"default\":\"standard\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"}]}",
-      "gridPos": {
-        "x": 18,
-        "y": 182,
-        "w": 6,
-        "h": 9
-      },
-      "datasource": "${datasource_prometheus}",
-      "fieldConfig": {
-        "defaults": {
-          "unit": "ms",
-          "color": {
-            "mode": "thresholds"
-          },
-          "noValue": "Configure tyk.latency.by.tier metric",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 200
-              },
-              {
-                "color": "orange",
-                "value": 500
-              },
-              {
-                "color": "red",
-                "value": 1000
-              }
-            ]
-          }
-        }
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
-        },
-        "orientation": "horizontal",
-        "displayMode": "lcd",
-        "showUnfilled": true,
-        "legend": {
-          "displayMode": "hidden"
-        }
-      },
-      "targets": [
-        {
-          "datasource": "${datasource_prometheus}",
-          "expr": "topk(5, histogram_quantile(0.95, sum by(le, subscription_tier)(rate(tyk_latency_by_tier_seconds_bucket{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]))) * 1000)",
-          "legendFormat": "{{subscription_tier}}",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 154,
-      "type": "timeseries",
-      "title": "Tier Error Rate",
-      "description": "5xx error rate per subscription tier. Premium tiers should have lower error rates or faster circuit-breaking. Requires tyk.requests.by.tier counter with response_code dimension.",
-      "gridPos": {
-        "x": 0,
-        "y": 191,
-        "w": 12,
-        "h": 9
-      },
-      "datasource": "${datasource_prometheus}",
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "custom": {
-            "lineWidth": 2,
-            "fillOpacity": 10
-          },
-          "noValue": "Configure tyk.requests.by.tier metric"
-        }
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": "${datasource_prometheus}",
-          "expr": "sum by(subscription_tier)(rate(tyk_requests_by_tier_total{service_name=~\"$service_name\", response_code=~\"5..\", api_id=~\"$api_id\"}[$__rate_interval])) / sum by(subscription_tier)(rate(tyk_requests_by_tier_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval])) * 100",
-          "legendFormat": "{{subscription_tier}}",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 155,
-      "type": "timeseries",
-      "title": "Request Rate by Region",
-      "description": "Traffic distribution across geographic regions. Requires: {\"name\":\"tyk.requests.by.region\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"context\",\"key\":\"region\",\"label\":\"region\",\"default\":\"unknown\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"}]}. The 'region' context variable is set by a Tyk middleware reading X-Forwarded-For or by a Go plugin.",
-      "gridPos": {
-        "x": 12,
-        "y": 191,
-        "w": 12,
-        "h": 9
-      },
-      "datasource": "${datasource_prometheus}",
-      "fieldConfig": {
-        "defaults": {
-          "unit": "reqps",
-          "custom": {
-            "lineWidth": 2,
-            "fillOpacity": 10
-          },
-          "noValue": "Configure tyk.requests.by.region metric"
-        }
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": "${datasource_prometheus}",
-          "expr": "sum by(region)(rate(tyk_requests_by_region_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]))",
-          "legendFormat": "{{region}}",
-          "refId": "A"
-        }
-      ]
-    },
-    {
       "id": 160,
       "type": "row",
-      "title": "Gateway Config Snippets \u2014 Copy-Paste to Enable Custom Dimension Panels Above",
+      "title": "Gateway Config Snippets — Copy-Paste to Enable Custom Dimension Panels Above",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -3581,14 +3285,14 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "### Response Header Dimension Config\n\nAdd to `opentelemetry.metrics.api_metrics` in `tyk.conf`:\n\n> \u26a0\ufe0f `response_header` dimensions are **only populated on the success path**. Error responses (upstream failures, bad destinations) will use the configured `default` value.\n\n```json\n[\n  {\n    \"name\": \"tyk.requests.with.cache\",\n    \"type\": \"counter\",\n    \"description\": \"Requests tracked by cache status (from X-Cache-Status response header)\",\n    \"dimensions\": [\n      {\n        \"source\": \"response_header\",\n        \"key\": \"X-Cache-Status\",\n        \"label\": \"cache_status\",\n        \"default\": \"MISS\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.backend.version\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per backend version (from X-Server-Version response header)\",\n    \"dimensions\": [\n      {\n        \"source\": \"response_header\",\n        \"key\": \"X-Server-Version\",\n        \"label\": \"backend_version\",\n        \"default\": \"unknown\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.content.type\",\n    \"type\": \"counter\",\n    \"description\": \"Requests tracked by response Content-Type\",\n    \"dimensions\": [\n      {\n        \"source\": \"response_header\",\n        \"key\": \"Content-Type\",\n        \"label\": \"content_type\",\n        \"default\": \"unknown\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      }\n    ]\n  }\n]\n```\n\n**Use case examples:**\n- Cache hit rate monitoring: backend sets `X-Cache-Status: HIT` or `MISS`\n- Canary deploys: backend sets `X-Server-Version: v2.1.0` \u2014 track traffic shift from v1\u2192v2\n- Content negotiation: detect when APIs unexpectedly return `text/html` instead of `application/json`"
+        "content": "### Response Header Dimension Config\n\nAdd to `opentelemetry.metrics.api_metrics` in `tyk.conf`:\n\n> ⚠️ `response_header` dimensions are **only populated on the success path**. Error responses (upstream failures, bad destinations) will use the configured `default` value.\n\n```json\n[\n  {\n    \"name\": \"tyk.requests.with.cache\",\n    \"type\": \"counter\",\n    \"description\": \"Requests tracked by cache status (from X-Cache-Status response header)\",\n    \"dimensions\": [\n      {\n        \"source\": \"response_header\",\n        \"key\": \"X-Cache-Status\",\n        \"label\": \"cache_status\",\n        \"default\": \"MISS\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.backend.version\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per backend version (from X-Server-Version response header)\",\n    \"dimensions\": [\n      {\n        \"source\": \"response_header\",\n        \"key\": \"X-Server-Version\",\n        \"label\": \"backend_version\",\n        \"default\": \"unknown\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.content.type\",\n    \"type\": \"counter\",\n    \"description\": \"Requests tracked by response Content-Type\",\n    \"dimensions\": [\n      {\n        \"source\": \"response_header\",\n        \"key\": \"Content-Type\",\n        \"label\": \"content_type\",\n        \"default\": \"unknown\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      }\n    ]\n  }\n]\n```\n\n**Use case examples:**\n- Cache hit rate monitoring: backend sets `X-Cache-Status: HIT` or `MISS`\n- Canary deploys: backend sets `X-Server-Version: v2.1.0` — track traffic shift from v1→v2\n- Content negotiation: detect when APIs unexpectedly return `text/html` instead of `application/json`"
       }
     },
     {
       "id": 163,
       "type": "text",
-      "title": "Context Variable + Metadata Config",
-      "description": "Copy-paste config to enable tier, region, route, org, and API version panels",
+      "title": "Metadata Dimension Config",
+      "description": "Copy-paste config to enable route, org, and API version panels",
       "gridPos": {
         "x": 16,
         "y": 201,
@@ -3597,7 +3301,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "### Context Variable & Metadata Dimension Config\n\nAdd to `opentelemetry.metrics.api_metrics` in `tyk.conf`:\n\n> Context variables (`source: \"context\"`) are set by Tyk middleware. Use a **Go Plugin** or **Virtual Endpoint** to extract values from JWT claims, session data, or request attributes and store them as context variables.\n\n```json\n[\n  {\n    \"name\": \"tyk.requests.by.tier\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per subscription tier (context variable)\",\n    \"dimensions\": [\n      {\n        \"source\": \"context\",\n        \"key\": \"tier\",\n        \"label\": \"subscription_tier\",\n        \"default\": \"standard\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"response_code\",\n        \"label\": \"response_code\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.latency.by.tier\",\n    \"type\": \"histogram\",\n    \"histogram_source\": \"total\",\n    \"description\": \"End-to-end latency per subscription tier\",\n    \"dimensions\": [\n      {\n        \"source\": \"context\",\n        \"key\": \"tier\",\n        \"label\": \"subscription_tier\",\n        \"default\": \"standard\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.region\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per geographic region\",\n    \"dimensions\": [\n      {\n        \"source\": \"context\",\n        \"key\": \"region\",\n        \"label\": \"region\",\n        \"default\": \"unknown\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.route\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per API route path\",\n    \"dimensions\": [\n      {\n        \"source\": \"metadata\",\n        \"key\": \"route\",\n        \"label\": \"route\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_name\",\n        \"label\": \"api_name\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"method\",\n        \"label\": \"method\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"response_code\",\n        \"label\": \"response_code\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"scheme\",\n        \"label\": \"scheme\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.org\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per organization\",\n    \"dimensions\": [\n      {\n        \"source\": \"metadata\",\n        \"key\": \"org_id\",\n        \"label\": \"org_id\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_name\",\n        \"label\": \"api_name\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"method\",\n        \"label\": \"method\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.version\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per API version\",\n    \"dimensions\": [\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_version\",\n        \"label\": \"api_version\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"response_code\",\n        \"label\": \"response_code\"\n      }\n    ]\n  }\n]\n```"
+        "content": "### Metadata Dimension Config\n\nAdd to `opentelemetry.metrics.api_metrics` in `tyk.conf`:\n\n\n```json\n[\n  {\n    \"name\": \"tyk.requests.by.route\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per API route path\",\n    \"dimensions\": [\n      {\n        \"source\": \"metadata\",\n        \"key\": \"route\",\n        \"label\": \"route\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_name\",\n        \"label\": \"api_name\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"method\",\n        \"label\": \"method\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"response_code\",\n        \"label\": \"response_code\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"scheme\",\n        \"label\": \"scheme\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.org\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per organization\",\n    \"dimensions\": [\n      {\n        \"source\": \"metadata\",\n        \"key\": \"org_id\",\n        \"label\": \"org_id\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_name\",\n        \"label\": \"api_name\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"method\",\n        \"label\": \"method\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.version\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per API version\",\n    \"dimensions\": [\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_version\",\n        \"label\": \"api_version\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"response_code\",\n        \"label\": \"response_code\"\n      }\n    ]\n  }\n]\n```"
       }
     }
   ]
