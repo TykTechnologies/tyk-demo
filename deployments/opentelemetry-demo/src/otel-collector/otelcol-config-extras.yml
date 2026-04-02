@@ -1,18 +1,32 @@
-# Copyright The OpenTelemetry Authors
-# SPDX-License-Identifier: Apache-2.0
+# # Copyright The OpenTelemetry Authors
+# # SPDX-License-Identifier: Apache-2.0
 
-# extra settings to be merged into OpenTelemetry Collector configuration
-# do not delete this file
+# # extra settings to be merged into OpenTelemetry Collector configuration
+# # do not delete this file
 
-## Example configuration for sending data to your own OTLP HTTP backend
-## Note: the spanmetrics exporter must be included in the exporters array
-## if overriding the traces pipeline.
-##
-#
+# # Grafana Cloud Integration
+# # -------------------------
+# # To forward all telemetry (traces, metrics, logs) to Grafana Cloud:
+# #
+# #   1. Set the following environment variables (in .env or demo.env):
+# #        GRAFANA_CLOUD_OTLP_ENDPOINT=https://otlp-gateway-prod-<region>.grafana.net/otlp
+# #        GRAFANA_CLOUD_INSTANCE_ID=<your numeric instance ID>
+# #        GRAFANA_CLOUD_API_KEY=<your Grafana Cloud API token>
+# #
+# #      Find these in Grafana Cloud: Home → Connections → Add new connection → OpenTelemetry
+# #      Regions: prod-eu-west-2 (EU), prod-us-east-0 (US East), prod-ap-southeast-1 (AP)
+# #
+# #   2. Uncomment all sections below (exporters, processors, extensions, connectors, service).
+# #
+# #   3. Restart the deployment: ./up.sh opentelemetry-demo
+# #
+# # Note: local backends (Jaeger, Tempo, Prometheus, Loki, OpenSearch) continue to receive
+# # telemetry — Grafana Cloud is added as an additional destination.
+
 # exporters:
 #   otlphttp/grafana_cloud:
 #     # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlphttpexporter
-#     endpoint: "https://otlp-gateway-prod-eu-west-2.grafana.net/otlp"
+#     endpoint: ${env:GRAFANA_CLOUD_OTLP_ENDPOINT}
 #     auth:
 #       authenticator: basicauth/grafana_cloud
 
@@ -69,8 +83,8 @@
 #   basicauth/grafana_cloud:
 #     # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/basicauthextension
 #     client_auth:
-#       username: ""
-#       password: ""
+#       username: ${env:GRAFANA_CLOUD_INSTANCE_ID}
+#       password: ${env:GRAFANA_CLOUD_API_KEY}
 
 # connectors:
 #   grafanacloud:
@@ -86,11 +100,12 @@
 #     traces:
 #       processors:
 #         [resourcedetection, memory_limiter, transform, transform/drop_unneeded_resource_attributes, batch]
-#       exporters: [otlp, debug, spanmetrics, otlphttp/grafana_cloud, grafanacloud]
+#       exporters: [otlp, otlp/tempo, debug, spanmetrics, otlphttp/grafana_cloud, grafanacloud]
 #     metrics:
 #       processors:
 #         [
 #           resourcedetection, memory_limiter,
+#           transform/tyk_gw_resource_attrs,
 #           transform/drop_unneeded_resource_attributes,
 #           transform/add_resource_attributes_as_metric_attributes,
 #           batch
@@ -102,4 +117,4 @@
 #       exporters: [otlphttp/grafana_cloud]
 #     logs:
 #       processors: [resourcedetection, memory_limiter, transform/drop_unneeded_resource_attributes, batch]
-#       exporters: [opensearch, debug, otlphttp/grafana_cloud]
+#       exporters: [opensearch, otlphttp/loki, debug, otlphttp/grafana_cloud]

@@ -32,6 +32,50 @@ All configuration defaults for this deployment — demo app settings, service po
 
 To modify any setting, either edit [`demo.env`](./demo.env) directly or add the variable to your `.env` file. Variables in `.env` take precedence over `demo.env`.
 
+## Grafana Cloud Integration
+
+All telemetry can be forwarded to Grafana Cloud alongside the local backends. Local services (Jaeger, Tempo, Prometheus, Loki, OpenSearch) continue running — Grafana Cloud is an additional destination.
+
+### Prerequisites
+
+You need three values from your Grafana Cloud stack:
+
+| Variable | Description | Where to find it |
+| -------- | ----------- | ---------------- |
+| `GRAFANA_CLOUD_OTLP_ENDPOINT` | OTLP gateway URL for your region | Home → Connections → Add new connection → OpenTelemetry |
+| `GRAFANA_CLOUD_INSTANCE_ID` | Your numeric Grafana Cloud instance ID | Same page — listed as "Instance ID" or "Username" |
+| `GRAFANA_CLOUD_API_KEY` | A Grafana Cloud API token with MetricsPublisher + LogsPublisher + TracesPublisher scopes | Home → Administration → Service accounts → Add service account token |
+
+Region endpoints:
+- EU: `https://otlp-gateway-prod-eu-west-2.grafana.net/otlp`
+- US East: `https://otlp-gateway-prod-us-east-0.grafana.net/otlp`
+- AP Southeast: `https://otlp-gateway-prod-ap-southeast-1.grafana.net/otlp`
+
+### Setup
+
+**Step 1** — Set the environment variables in your `.env` file (takes precedence over `demo.env`):
+
+```
+GRAFANA_CLOUD_OTLP_ENDPOINT=https://otlp-gateway-prod-<region>.grafana.net/otlp
+GRAFANA_CLOUD_INSTANCE_ID=<your instance ID>
+GRAFANA_CLOUD_API_KEY=<your API token>
+```
+
+**Step 2** — Uncomment all sections in [`src/otel-collector/otelcol-config-extras.yml`](./src/otel-collector/otelcol-config-extras.yml):
+remove the leading `# ` from every line in the `exporters`, `processors`, `extensions`, `connectors`, and `service` blocks.
+
+**Step 3** — Restart the deployment:
+
+```
+./up.sh opentelemetry-demo
+```
+
+To verify, check the collector logs for any authentication errors:
+
+```
+docker logs otel-collector 2>&1 | grep -i "grafana\|export\|error"
+```
+
 ## Grafana Dashboards
 
 Grafana is available at **http://localhost:8085/grafana** (no login required).
