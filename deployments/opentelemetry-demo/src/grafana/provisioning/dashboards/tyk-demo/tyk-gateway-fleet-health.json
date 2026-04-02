@@ -17,6 +17,11 @@
   },
   "schemaVersion": 39,
   "version": 1,
+  "__requires__": [
+    { "type": "grafana", "id": "grafana", "name": "Grafana", "version": "10.0.0" },
+    { "type": "datasource", "id": "prometheus", "name": "Prometheus", "version": "1.0.0" },
+    { "type": "datasource", "id": "loki", "name": "Loki", "version": "1.0.0" }
+  ],
   "templating": {
     "list": [
       {
