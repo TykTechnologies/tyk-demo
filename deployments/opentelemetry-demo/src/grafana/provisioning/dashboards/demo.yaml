@@ -22,12 +22,3 @@ providers:
     editable: true
     options:
       path: /etc/grafana/provisioning/dashboards/tyk-demo
-  - name: 'Tyk Demo - Backup'
-    orgId: 1
-    folder: 'Backup'
-    folderUid: 'tyk-demo-backup'
-    type: file
-    disableDeletion: false
-    editable: true
-    options:
-      path: /etc/grafana/provisioning/dashboards/tyk-demo-backup
