@@ -995,5 +995,13 @@ services:
       retries: 10
     logging: *logging
 
+# Extend tyk-gateway with demo.env so env://FRONTEND_URL resolves correctly in API definitions
+  tyk-gateway:
+    env_file:
+      - deployments/opentelemetry-demo/demo.env
+  tyk-gateway-2:
+    env_file:
+      - deployments/opentelemetry-demo/demo.env
+
 volumes:
   tempo-data:

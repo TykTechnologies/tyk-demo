@@ -4,6 +4,8 @@
 .context-data
 .bootstrap
 .idea/
+.playwright-mcp/*
+.claude/**
 logs/*
 **/*.so
 deployments/cicd/volumes/jenkins/bootstrap-import/credentials-global.xml

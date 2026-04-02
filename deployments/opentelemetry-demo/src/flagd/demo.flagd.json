@@ -2,7 +2,7 @@
   "$schema": "https://flagd.dev/schema/v0/flags.json",
   "flags": {
     "adFailure": {
-      "defaultVariant": "on",
+      "defaultVariant": "off",
       "description": "Fail ad service",
       "state": "ENABLED",
       "variants": {
@@ -102,7 +102,7 @@
       }
     },
     "productCatalogFailure": {
-      "defaultVariant": "on",
+      "defaultVariant": "off",
       "description": "Fail product catalog service on a specific product",
       "state": "ENABLED",
       "variants": {
