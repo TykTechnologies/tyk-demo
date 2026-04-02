@@ -901,6 +901,9 @@ services:
       - POSTGRES_PORT
       - POSTGRES_PASSWORD
       - GOMEMLIMIT=400MiB
+      - GRAFANA_CLOUD_OTLP_ENDPOINT
+      - GRAFANA_CLOUD_INSTANCE_ID
+      - GRAFANA_CLOUD_API_KEY
 
   # Prometheus
   prometheus:
