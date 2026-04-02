@@ -1199,7 +1199,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 42,
+        "y": 50,
         "w": 24,
         "h": 1
       }
@@ -1211,7 +1211,7 @@
       "description": "APIs with highest traffic volume. Identify hotspots using native tyk_api_id label.",
       "gridPos": {
         "x": 0,
-        "y": 43,
+        "y": 51,
         "w": 8,
         "h": 9
       },
@@ -1265,7 +1265,7 @@
       "description": "APIs with highest tail latency. Candidates for optimization or upstream investigation.",
       "gridPos": {
         "x": 8,
-        "y": 43,
+        "y": 51,
         "w": 8,
         "h": 9
       },
@@ -1329,7 +1329,7 @@
       "description": "APIs with highest 5xx error rates. Use for SLO breach investigation.",
       "gridPos": {
         "x": 16,
-        "y": 43,
+        "y": 51,
         "w": 8,
         "h": 9
       },
@@ -1393,7 +1393,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 52,
+        "y": 60,
         "w": 24,
         "h": 1
       }
@@ -1405,7 +1405,7 @@
       "description": "Traffic distribution across HTTP methods. http_request_method is a native OTel semantic convention attribute included in all Tyk OTLP metrics.",
       "gridPos": {
         "x": 0,
-        "y": 53,
+        "y": 61,
         "w": 12,
         "h": 8
       },
@@ -1446,7 +1446,7 @@
       "description": "Latency percentiles split by HTTP method. Helps identify if specific methods (e.g. POST with large payloads) have higher latency than GET requests.",
       "gridPos": {
         "x": 12,
-        "y": 53,
+        "y": 61,
         "w": 12,
         "h": 8
       },
@@ -1493,7 +1493,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 61,
+        "y": 69,
         "w": 24,
         "h": 1
       }
@@ -1505,7 +1505,7 @@
       "description": "Raw gateway-wide request counter with no labels — the simplest possible OTLP metric. Useful for high-level throughput comparison with no cardinality overhead. Compare against tyk_api_requests_total sum to verify accounting.",
       "gridPos": {
         "x": 0,
-        "y": 62,
+        "y": 70,
         "w": 12,
         "h": 7
       },
@@ -1554,7 +1554,7 @@
       "description": "Overlay of request rate and error rate to identify if errors spike with traffic (capacity issue) or independently (service/config issue).",
       "gridPos": {
         "x": 12,
-        "y": 62,
+        "y": 70,
         "w": 12,
         "h": 7
       },
@@ -1625,7 +1625,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 69,
+        "y": 77,
         "w": 24,
         "h": 1
       }
@@ -1637,23 +1637,23 @@
       "description": "Explains the opentelemetry.metrics.api_metrics gateway config schema for custom metric dimensions",
       "gridPos": {
         "x": 0,
-        "y": 70,
+        "y": 78,
         "w": 24,
         "h": 12
       },
       "options": {
         "mode": "markdown",
-        "content": "## Custom Metric Dimensions in Tyk Gateway OTLP Metrics\n\nTyk Gateway lets you define **custom metric instruments** via `opentelemetry.metrics.api_metrics` in the gateway config. Each instrument can attach labels from **5 dimension sources** — enabling rich observability without modifying backend services.\n\n| Source | What it provides | Example keys |\n|---|---|---|\n| `metadata` | Built-in request/response fields (11 keys) | `route`, `api_name`, `org_id`, `api_version`, `host`, `scheme`, `ip_address` |\n| `session` | Auth session data (5 keys) | `api_key` (last 6 chars ⚠️), `oauth_id`, `alias`, `portal_app`, `portal_org` |\n| `header` | Any HTTP **request** header | `X-Tenant-ID`, `X-Customer-ID`, `X-Forwarded-For` |\n| `context` | Tyk context variables set by middleware | `tier`, `plan`, `region` (from JWT, Go Plugin, etc.) |\n| `response_header` | Any HTTP **response** header (success path only) | `X-Cache-Status`, `X-Server-Version`, `Content-Type` |\n\n**Max 10 dimensions per instrument** (OTel SDK fast path). High-cardinality sources (session/headers on histograms) emit a startup warning.\n\n```json\n// Example: opentelemetry.metrics.api_metrics in tyk.conf\n[\n  {\n    \"name\": \"tyk.requests.by.tenant\",\n    \"type\": \"counter\",\n    \"dimensions\": [\n      { \"source\": \"header\",   \"key\": \"X-Tenant-ID\",  \"label\": \"tenant_id\",  \"default\": \"unknown\" },\n      { \"source\": \"metadata\", \"key\": \"api_id\",       \"label\": \"api_id\" },\n      { \"source\": \"metadata\", \"key\": \"response_code\",\"label\": \"response_code\" }\n    ]\n  },\n  {\n    \"name\": \"tyk.latency.by.tier\",\n    \"type\": \"histogram\",\n    \"histogram_source\": \"total\",\n    \"dimensions\": [\n      { \"source\": \"context\",  \"key\": \"tier\",   \"label\": \"subscription_tier\", \"default\": \"standard\" },\n      { \"source\": \"metadata\", \"key\": \"api_id\", \"label\": \"api_id\" }\n    ]\n  }\n]\n```\n\n> **Panels in the sections below will show \"No data\" until custom instruments are configured in the gateway.** Each section includes the exact config snippet needed to populate it."
+        "content": "## Custom Metric Dimensions in Tyk Gateway OTLP Metrics\n\nTyk Gateway lets you define **custom metric instruments** via `opentelemetry.metrics.api_metrics` in the gateway config. Each instrument can attach labels from **7 dimension sources** — enabling rich observability without modifying backend services.\n\n| Source | What it provides | Example keys |\n|---|---|---|\n| `metadata` | Built-in request fields (12 keys) | `method`, `response_code`, `api_id`, `api_name`, `org_id`, `response_flag`, `ip_address`, `api_version`, `host`, `scheme`, `listen_path`, `endpoint` |\n| `session` | Authenticated session fields (5 keys) | `api_key` (last 6 chars ⚠️), `oauth_id`, `alias`, `portal_app`, `portal_org` |\n| `header` | Any HTTP **request** header | `X-Customer-ID`, `X-Tenant-ID`, `Authorization` |\n| `context` | Tyk [context variables](https://tyk.io/docs/api-management/traffic-transformation/request-context-variables) | `jwt_claims_tier`, `request_id`, `path_parts` |\n| `response_header` | Any upstream **response** header (success path only) | `X-Cache-Status`, `X-Backend-Version` |\n| `gateway` | Gateway instance metadata (set at startup) | `node_id`, `node_version`, `group_id`, `tags` |\n| `config_data` | API definition metadata from the `config_data` map | Any key set on the API definition |\n\n**Max 10 dimensions per instrument** (OTel SDK fast path). High-cardinality sources (session/headers on histograms) emit a startup warning.\n\n```json\n// Example: opentelemetry.metrics.api_metrics in tyk.conf\n[\n  {\n    \"name\": \"tyk.requests.by_customer\",\n    \"type\": \"counter\",\n    \"description\": \"Request count by customer and subscription tier\",\n    \"dimensions\": [\n      { \"source\": \"header\",   \"key\": \"X-Customer-ID\",   \"label\": \"customer_id\", \"default\": \"unknown\" },\n      { \"source\": \"context\",  \"key\": \"jwt_claims_tier\", \"label\": \"tier\",        \"default\": \"standard\" },\n      { \"source\": \"metadata\", \"key\": \"api_id\",          \"label\": \"api_id\" }\n    ],\n    \"filters\": { \"api_ids\": [\"payments-api\", \"orders-api\"] }\n  },\n  {\n    \"name\": \"tyk.latency.premium_tier\",\n    \"type\": \"histogram\",\n    \"histogram_source\": \"total\",\n    \"histogram_buckets\": [0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5],\n    \"dimensions\": [\n      { \"source\": \"context\",  \"key\": \"jwt_claims_tier\", \"label\": \"tier\" },\n      { \"source\": \"metadata\", \"key\": \"api_id\",          \"label\": \"api_id\" }\n    ],\n    \"filters\": { \"methods\": [\"POST\", \"PUT\"], \"status_codes\": [\"2xx\"] }\n  }\n]\n```\n\n> **Panels in the sections below will show \"No data\" until custom instruments are configured in the gateway.** Each section includes the exact config snippet needed to populate it."
       }
     },
     {
       "id": 110,
       "type": "row",
-      "title": "Metadata Dimensions — Route, Org, API Version, Scheme",
+      "title": "Metadata Dimensions — Path, Org, API Version, Scheme",
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 82,
+        "y": 90,
         "w": 24,
         "h": 1
       }
@@ -1661,11 +1661,11 @@
     {
       "id": 111,
       "type": "bargauge",
-      "title": "Top Routes by Traffic",
+      "title": "Top Paths by Traffic",
       "description": "Requires custom metric: {\"name\":\"tyk.requests.by.route\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"metadata\",\"key\":\"route\",\"label\":\"route\"},{\"source\":\"metadata\",\"key\":\"api_name\",\"label\":\"api_name\"},{\"source\":\"metadata\",\"key\":\"method\",\"label\":\"method\"},{\"source\":\"metadata\",\"key\":\"response_code\",\"label\":\"response_code\"}]}",
       "gridPos": {
         "x": 0,
-        "y": 83,
+        "y": 91,
         "w": 8,
         "h": 9
       },
@@ -1695,8 +1695,8 @@
       "targets": [
         {
           "datasource": "${datasource_prometheus}",
-          "expr": "topk(10, sum by(route, api_name)(rate(tyk_requests_by_route_total{service_name=~\"$service_name\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval])))",
-          "legendFormat": "{{api_name}} {{route}}",
+          "expr": "topk(10, sum by(listen_path, endpoint)(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval])))",
+          "legendFormat": "{{listen_path}} {{endpoint}}",
           "refId": "A"
         }
       ]
@@ -1704,11 +1704,11 @@
     {
       "id": 112,
       "type": "timeseries",
-      "title": "Route Error Rate Over Time",
+      "title": "Path Error Rate Over Time",
       "description": "4xx/5xx error rate per route. Requires tyk.requests.by.route custom counter with route and response_code dimensions.",
       "gridPos": {
         "x": 8,
-        "y": 83,
+        "y": 91,
         "w": 8,
         "h": 9
       },
@@ -1736,8 +1736,8 @@
       "targets": [
         {
           "datasource": "${datasource_prometheus}",
-          "expr": "sum by(route)(rate(tyk_requests_by_route_total{service_name=~\"$service_name\", response_code=~\"[45]..\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval])) / sum by(route)(rate(tyk_requests_by_route_total{service_name=~\"$service_name\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval])) * 100",
-          "legendFormat": "{{route}}",
+          "expr": "sum by(listen_path, endpoint)(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", response_code=~\"[45]..\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval])) / sum by(listen_path, endpoint)(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval])) * 100",
+          "legendFormat": "{{listen_path}} {{endpoint}}",
           "refId": "A"
         }
       ]
@@ -1749,7 +1749,7 @@
       "description": "Per-org request rate. Requires tyk.requests.by.org custom counter with org_id and api_name dimensions from metadata source.",
       "gridPos": {
         "x": 16,
-        "y": 83,
+        "y": 91,
         "w": 8,
         "h": 9
       },
@@ -1790,7 +1790,7 @@
       "description": "Request distribution across API versions. Helps track migration from v1→v2. Requires tyk.requests.by.version counter with api_version dimension from metadata.",
       "gridPos": {
         "x": 0,
-        "y": 92,
+        "y": 100,
         "w": 8,
         "h": 9
       },
@@ -1836,7 +1836,7 @@
       "description": "Error rate and request count per API version. Requires tyk.requests.by.version counter with api_version and response_code dimensions.",
       "gridPos": {
         "x": 8,
-        "y": 92,
+        "y": 100,
         "w": 8,
         "h": 9
       },
@@ -1945,7 +1945,7 @@
       "description": "Percentage of requests using HTTPS vs HTTP. Requires tyk.requests.by.route counter with scheme dimension from metadata source.",
       "gridPos": {
         "x": 16,
-        "y": 92,
+        "y": 100,
         "w": 8,
         "h": 4
       },
@@ -1989,7 +1989,7 @@
       "targets": [
         {
           "datasource": "${datasource_prometheus}",
-          "expr": "sum(rate(tyk_requests_by_route_total{service_name=~\"$service_name\", scheme=\"https\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval]))\n/ (sum(rate(tyk_requests_by_route_total{service_name=~\"$service_name\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval])) > 0)\n* 100\nor vector(0)",
+          "expr": "sum(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", scheme=\"https\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval]))\n/ (sum(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval])) > 0)\n* 100\nor vector(0)",
           "legendFormat": "HTTPS %",
           "refId": "A"
         }
@@ -2002,7 +2002,7 @@
       "description": "Traffic volume split between HTTP and HTTPS. Requires tyk.requests.by.route counter with scheme dimension from metadata.",
       "gridPos": {
         "x": 16,
-        "y": 96,
+        "y": 104,
         "w": 8,
         "h": 5
       },
@@ -2061,7 +2061,7 @@
       "targets": [
         {
           "datasource": "${datasource_prometheus}",
-          "expr": "sum by(scheme)(rate(tyk_requests_by_route_total{service_name=~\"$service_name\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval]))",
+          "expr": "sum by(scheme)(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval]))",
           "legendFormat": "{{scheme}}",
           "refId": "A"
         }
@@ -2074,7 +2074,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 101,
+        "y": 109,
         "w": 24,
         "h": 1
       }
@@ -2086,7 +2086,7 @@
       "description": "Requires: {\"name\":\"tyk.requests.by.apikey\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"session\",\"key\":\"api_key\",\"label\":\"api_key_suffix\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"}]}. Note: api_key is auto-truncated to last 6 characters by Tyk to control cardinality.",
       "gridPos": {
         "x": 0,
-        "y": 102,
+        "y": 110,
         "w": 8,
         "h": 9
       },
@@ -2129,7 +2129,7 @@
       "description": "Per-API-key request volume over time. Shows traffic distribution across your API consumer base. Requires tyk.requests.by.apikey counter with session api_key dimension.",
       "gridPos": {
         "x": 8,
-        "y": 102,
+        "y": 110,
         "w": 8,
         "h": 9
       },
@@ -2170,7 +2170,7 @@
       "description": "Per-OAuth-client request rate. Identifies which OAuth applications are most active. Requires: {\"name\":\"tyk.requests.by.oauth\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"session\",\"key\":\"oauth_id\",\"label\":\"oauth_client_id\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"}]}",
       "gridPos": {
         "x": 16,
-        "y": 102,
+        "y": 110,
         "w": 8,
         "h": 9
       },
@@ -2211,7 +2211,7 @@
       "description": "OAuth clients with highest 5xx error rates. Detect misbehaving integrations early. Requires tyk.requests.by.oauth counter with oauth_client_id and response_code dimensions.",
       "gridPos": {
         "x": 0,
-        "y": 111,
+        "y": 119,
         "w": 8,
         "h": 9
       },
@@ -2275,7 +2275,7 @@
       "description": "Request distribution across Developer Portal applications. Requires: {\"name\":\"tyk.requests.by.portal\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"session\",\"key\":\"portal_app\",\"label\":\"portal_app\"},{\"source\":\"session\",\"key\":\"portal_org\",\"label\":\"portal_org\"}]}",
       "gridPos": {
         "x": 8,
-        "y": 111,
+        "y": 119,
         "w": 8,
         "h": 9
       },
@@ -2321,7 +2321,7 @@
       "description": "Request rates per portal organization. Enables per-org usage reporting for multi-org portal deployments. Requires tyk.requests.by.portal counter with portal_org dimension.",
       "gridPos": {
         "x": 16,
-        "y": 111,
+        "y": 119,
         "w": 8,
         "h": 9
       },
@@ -2362,7 +2362,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 120,
+        "y": 128,
         "w": 24,
         "h": 1
       }
@@ -2374,7 +2374,7 @@
       "description": "Request volume per tenant extracted from X-Tenant-ID request header. Zero backend changes needed. Requires: {\"name\":\"tyk.requests.by.tenant\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"header\",\"key\":\"X-Tenant-ID\",\"label\":\"tenant_id\",\"default\":\"unknown\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"},{\"source\":\"metadata\",\"key\":\"response_code\",\"label\":\"response_code\"}]}",
       "gridPos": {
         "x": 0,
-        "y": 121,
+        "y": 129,
         "w": 12,
         "h": 9
       },
@@ -2415,7 +2415,7 @@
       "description": "5xx error rate per tenant. Enables per-tenant SLO monitoring from a single gateway metric — no backend instrumentation required. Requires tyk.requests.by.tenant with tenant_id + response_code.",
       "gridPos": {
         "x": 12,
-        "y": 121,
+        "y": 129,
         "w": 12,
         "h": 9
       },
@@ -2456,7 +2456,7 @@
       "description": "P95 latency ranked by tenant. Identify tenants experiencing degraded performance. Requires: {\"name\":\"tyk.latency.by.tenant\",\"type\":\"histogram\",\"histogram_source\":\"total\",\"dimensions\":[{\"source\":\"header\",\"key\":\"X-Tenant-ID\",\"label\":\"tenant_id\",\"default\":\"unknown\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"}]}",
       "gridPos": {
         "x": 0,
-        "y": 130,
+        "y": 138,
         "w": 12,
         "h": 9
       },
@@ -2520,7 +2520,7 @@
       "description": "Per-tenant SLO summary: request rate, error rate, P50 and P95 latency. One row per tenant extracted from X-Tenant-ID header. The definitive multi-tenant observability panel.",
       "gridPos": {
         "x": 12,
-        "y": 130,
+        "y": 138,
         "w": 12,
         "h": 9
       },
@@ -2689,7 +2689,7 @@
       "description": "Request rate per customer extracted from X-Customer-ID request header. Zero backend changes needed. Requires: {\"name\":\"tyk.requests.by.customer\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"header\",\"key\":\"X-Customer-ID\",\"label\":\"customer_id\",\"default\":\"unknown\"},{\"source\":\"header\",\"key\":\"X-Tenant-ID\",\"label\":\"tenant_id\",\"default\":\"unknown\"}]}",
       "gridPos": {
         "x": 0,
-        "y": 139,
+        "y": 147,
         "w": 12,
         "h": 9
       },
@@ -2730,7 +2730,7 @@
       "description": "Top 10 customers by total request volume over the selected time range. Extracted from X-Customer-ID request header — no backend changes needed. Requires tyk.requests.by.customer instrument.",
       "gridPos": {
         "x": 12,
-        "y": 139,
+        "y": 147,
         "w": 12,
         "h": 9
       },
@@ -2790,7 +2790,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 148,
+        "y": 156,
         "w": 24,
         "h": 1
       }
@@ -2802,7 +2802,7 @@
       "description": "Percentage of requests served from cache. Requires: {\"name\":\"tyk.requests.with.cache\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"response_header\",\"key\":\"X-Tyk-Cached-Response\",\"label\":\"cache_status\",\"default\":\"0\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"}]}. cache_status=\"1\" = cached, \"0\" = not cached. Note: response_header dims only populated on success path.",
       "gridPos": {
         "x": 0,
-        "y": 149,
+        "y": 157,
         "w": 6,
         "h": 8
       },
@@ -2859,7 +2859,7 @@
       "description": "Cached (1) vs uncached (0) request rates over time. Track caching efficiency trends. Requires tyk.requests.with.cache counter with response_header X-Tyk-Cached-Response dimension.",
       "gridPos": {
         "x": 6,
-        "y": 149,
+        "y": 157,
         "w": 10,
         "h": 8
       },
@@ -2940,7 +2940,7 @@
       "description": "Total distribution of cache statuses over the selected time range. Requires tyk.requests.with.cache counter.",
       "gridPos": {
         "x": 16,
-        "y": 149,
+        "y": 157,
         "w": 8,
         "h": 8
       },
@@ -3026,7 +3026,7 @@
       "description": "Tracks which backend versions are serving traffic. Enables canary/blue-green deploy monitoring without code changes. Requires: {\"name\":\"tyk.requests.by.backend.version\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"response_header\",\"key\":\"X-Server-Version\",\"label\":\"backend_version\",\"default\":\"unknown\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"}]}",
       "gridPos": {
         "x": 0,
-        "y": 157,
+        "y": 165,
         "w": 12,
         "h": 8
       },
@@ -3067,7 +3067,7 @@
       "description": "Distribution of response content types. Detect unexpected content types that may indicate errors or misrouting. Requires: {\"name\":\"tyk.requests.by.content.type\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"response_header\",\"key\":\"Content-Type\",\"label\":\"content_type\",\"default\":\"unknown\"}]}",
       "gridPos": {
         "x": 12,
-        "y": 157,
+        "y": 165,
         "w": 12,
         "h": 8
       },
@@ -3113,7 +3113,7 @@
       "description": "Percentage of requests rejected with HTTP 429. 429s occur when quota is exhausted OR per-second rate limit is breached. X-RateLimit-* headers carry quota state (period-based budget); per-second rate limit has no response header.",
       "gridPos": {
         "x": 0,
-        "y": 165,
+        "y": 173,
         "w": 4,
         "h": 8
       },
@@ -3172,7 +3172,7 @@
       "description": "Rate of HTTP 429 responses per API over time. Indicates quota exhaustion or per-second rate limit breaches.",
       "gridPos": {
         "x": 4,
-        "y": 165,
+        "y": 173,
         "w": 12,
         "h": 8
       },
@@ -3212,7 +3212,7 @@
       "description": "Top 10 APIs generating 429 responses (quota exhaustion or rate limit breach).",
       "gridPos": {
         "x": 16,
-        "y": 165,
+        "y": 173,
         "w": 8,
         "h": 8
       },
@@ -3245,64 +3245,85 @@
       ]
     },
     {
-      "id": 160,
-      "type": "row",
-      "title": "Gateway Config Snippets — Copy-Paste to Enable Custom Dimension Panels Above",
-      "collapsed": false,
+      "id": 9001,
+      "type": "timeseries",
+      "title": "Error Rate by Flag (4xx+5xx)",
+      "description": "Rate of error responses (4xx+5xx) broken down by Tyk response flag. Uses http.server.request.duration histogram — pre-existing metric, no extra cardinality.",
+      "datasource": "${datasource_prometheus}",
       "gridPos": {
+        "h": 8,
+        "w": 12,
         "x": 0,
-        "y": 200,
-        "w": 24,
-        "h": 1
-      }
-    },
-    {
-      "id": 161,
-      "type": "text",
-      "title": "Session + Header Config",
-      "description": "Copy-paste config to enable API key, OAuth, portal, and tenant panels",
-      "gridPos": {
-        "x": 0,
-        "y": 201,
-        "w": 8,
-        "h": 20
+        "y": 42
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 10,
+            "lineWidth": 2
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
       },
       "options": {
-        "mode": "markdown",
-        "content": "### Session & Header Dimension Config\n\nAdd to `opentelemetry.metrics.api_metrics` in `tyk.conf`:\n\n```json\n[\n  {\n    \"name\": \"tyk.requests.by.apikey\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per API key (last 6 chars)\",\n    \"dimensions\": [\n      {\n        \"source\": \"session\",\n        \"key\": \"api_key\",\n        \"label\": \"api_key_suffix\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.oauth\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per OAuth client\",\n    \"dimensions\": [\n      {\n        \"source\": \"session\",\n        \"key\": \"oauth_id\",\n        \"label\": \"oauth_client_id\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"response_code\",\n        \"label\": \"response_code\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.portal\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per portal app/org\",\n    \"dimensions\": [\n      {\n        \"source\": \"session\",\n        \"key\": \"portal_app\",\n        \"label\": \"portal_app\"\n      },\n      {\n        \"source\": \"session\",\n        \"key\": \"portal_org\",\n        \"label\": \"portal_org\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.tenant\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per tenant (from X-Tenant-ID header)\",\n    \"dimensions\": [\n      {\n        \"source\": \"header\",\n        \"key\": \"X-Tenant-ID\",\n        \"label\": \"tenant_id\",\n        \"default\": \"unknown\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"response_code\",\n        \"label\": \"response_code\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.latency.by.tenant\",\n    \"type\": \"histogram\",\n    \"histogram_source\": \"total\",\n    \"description\": \"End-to-end latency per tenant\",\n    \"dimensions\": [\n      {\n        \"source\": \"header\",\n        \"key\": \"X-Tenant-ID\",\n        \"label\": \"tenant_id\",\n        \"default\": \"unknown\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      }\n    ]\n  }\n]\n```"
-      }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(tyk_response_flag) (rate(http_server_request_duration_seconds_count{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\", http_response_status_code=~\"4..|5..\"}[$__rate_interval]))",
+          "legendFormat": "{{tyk_response_flag}}",
+          "refId": "A"
+        }
+      ]
     },
     {
-      "id": 162,
-      "type": "text",
-      "title": "Response Header Config",
-      "description": "Copy-paste config to enable cache, backend version, and content-type panels",
+      "id": 9002,
+      "type": "bargauge",
+      "title": "Top APIs by Error Flag Count",
+      "description": "Top API + flag combinations by error count over the selected time range. Uses http.server.request.duration histogram count.",
+      "datasource": "${datasource_prometheus}",
       "gridPos": {
-        "x": 8,
-        "y": 201,
-        "w": 8,
-        "h": 20
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 42
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "min": 0
+        },
+        "overrides": []
       },
       "options": {
-        "mode": "markdown",
-        "content": "### Response Header Dimension Config\n\nAdd to `opentelemetry.metrics.api_metrics` in `tyk.conf`:\n\n> ⚠️ `response_header` dimensions are **only populated on the success path**. Error responses (upstream failures, bad destinations) will use the configured `default` value.\n\n```json\n[\n  {\n    \"name\": \"tyk.requests.with.cache\",\n    \"type\": \"counter\",\n    \"description\": \"Requests tracked by cache status (from X-Cache-Status response header)\",\n    \"dimensions\": [\n      {\n        \"source\": \"response_header\",\n        \"key\": \"X-Cache-Status\",\n        \"label\": \"cache_status\",\n        \"default\": \"MISS\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.backend.version\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per backend version (from X-Server-Version response header)\",\n    \"dimensions\": [\n      {\n        \"source\": \"response_header\",\n        \"key\": \"X-Server-Version\",\n        \"label\": \"backend_version\",\n        \"default\": \"unknown\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.content.type\",\n    \"type\": \"counter\",\n    \"description\": \"Requests tracked by response Content-Type\",\n    \"dimensions\": [\n      {\n        \"source\": \"response_header\",\n        \"key\": \"Content-Type\",\n        \"label\": \"content_type\",\n        \"default\": \"unknown\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      }\n    ]\n  }\n]\n```\n\n**Use case examples:**\n- Cache hit rate monitoring: backend sets `X-Cache-Status: HIT` or `MISS`\n- Canary deploys: backend sets `X-Server-Version: v2.1.0` — track traffic shift from v1→v2\n- Content negotiation: detect when APIs unexpectedly return `text/html` instead of `application/json`"
-      }
-    },
-    {
-      "id": 163,
-      "type": "text",
-      "title": "Metadata Dimension Config",
-      "description": "Copy-paste config to enable route, org, and API version panels",
-      "gridPos": {
-        "x": 16,
-        "y": 201,
-        "w": 8,
-        "h": 20
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
       },
-      "options": {
-        "mode": "markdown",
-        "content": "### Metadata Dimension Config\n\nAdd to `opentelemetry.metrics.api_metrics` in `tyk.conf`:\n\n\n```json\n[\n  {\n    \"name\": \"tyk.requests.by.route\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per API route path\",\n    \"dimensions\": [\n      {\n        \"source\": \"metadata\",\n        \"key\": \"route\",\n        \"label\": \"route\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_name\",\n        \"label\": \"api_name\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"method\",\n        \"label\": \"method\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"response_code\",\n        \"label\": \"response_code\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"scheme\",\n        \"label\": \"scheme\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.org\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per organization\",\n    \"dimensions\": [\n      {\n        \"source\": \"metadata\",\n        \"key\": \"org_id\",\n        \"label\": \"org_id\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_name\",\n        \"label\": \"api_name\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"method\",\n        \"label\": \"method\"\n      }\n    ]\n  },\n  {\n    \"name\": \"tyk.requests.by.version\",\n    \"type\": \"counter\",\n    \"description\": \"Requests per API version\",\n    \"dimensions\": [\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_version\",\n        \"label\": \"api_version\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"api_id\",\n        \"label\": \"api_id\"\n      },\n      {\n        \"source\": \"metadata\",\n        \"key\": \"response_code\",\n        \"label\": \"response_code\"\n      }\n    ]\n  }\n]\n```"
-      }
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sort_desc(sum by(tyk_api_id, tyk_response_flag) (increase(http_server_request_duration_seconds_count{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\", http_response_status_code=~\"4..|5..\"}[$__range])))",
+          "instant": true,
+          "legendFormat": "{{tyk_api_id}} — {{tyk_response_flag}}",
+          "refId": "A"
+        }
+      ]
     }
   ]
 }

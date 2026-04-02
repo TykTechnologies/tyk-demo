@@ -140,7 +140,7 @@ services:
     networks:
       - tyk
   www-ngrok:
-    image: ngrok/ngrok:3.12.0-alpine
+    image: ngrok/ngrok:3.37.2-alpine
     networks:
       - tyk
     command:

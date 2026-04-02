@@ -28,223 +28,9 @@ The deployment provides access to multiple observability dashboards and the demo
 
 ## Environment
 
-The following environment variables are used by this deployment.
+All configuration defaults for this deployment — demo app settings, service ports, and Tyk OTLP instrumentation — are provided by [`demo.env`](./demo.env). 
 
-Please include these in your `.env` file.
-
-```sh
-INSTRUMENTATION_ENABLED=0
-OPENTELEMETRY_ENABLED=true
-OPENTELEMETRY_ENDPOINT=otel-collector:4317
-GATEWAY_IMAGE_REPO=tyk-gateway-ee
-TYK_GW_LOGFORMAT=json
-TYK_GW_LOGLEVEL=warn
-TYK_GW_OPENTELEMETRY_RESOURCENAME=tyk-gateway
-TYK_GW_OPENTELEMETRY_SAMPLING_TYPE=TraceIDRatioBased
-TYK_GW_OPENTELEMETRY_SAMPLING_RATE=0.5
-TYK_GW_ACCESSLOGS_ENABLED=true
-TYK_GW_PROMETHEUS_ENABLED=true
-TYK_GW_PROMETHEUS_LISTENADDRESS=:9090
-TYK_GW_PROMETHEUS_PATH=/metrics
-TYK_GW_PROMETHEUS_METRICPREFIX=tyk_gateway
-TYK_GW_PROMETHEUS_ENABLEGOCOLLECTOR=true
-TYK_GW_PROMETHEUS_ENABLEPROCESSCOLLECTOR=true
-TYK_GW_PROMETHEUS_ENABLEPERAPIMETRICS=false
-
-TYK_GW_ENABLECONFIGINSPECTION=true
-
-# Otel Metrics
-TYK_GW_OPENTELEMETRY_METRICS_ENABLED=true
-TYK_GW_OPENTELEMETRY_METRICS_EXPORTINTERVAL=5
-TYK_GW_OPENTELEMETRY_METRICS_APIMETRICS=[{"name":"http.server.request.duration","type":"histogram","description":"End-to-end request latency","histogram_source":"total","dimensions":[{"source":"metadata","key":"method","label":"http.request.method"},{"source":"metadata","key":"response_code","label":"http.response.status_code"},{"source":"metadata","key":"api_id","label":"tyk.api.id"},{"source":"metadata","key":"response_flag","label":"tyk.response_flag"}]},{"name":"tyk.gateway.request.duration","type":"histogram","description":"Gateway processing time","histogram_source":"gateway","dimensions":[{"source":"metadata","key":"method","label":"http.request.method"},{"source":"metadata","key":"api_id","label":"tyk.api.id"},{"source":"metadata","key":"response_flag","label":"tyk.response_flag"}]},{"name":"tyk.upstream.request.duration","type":"histogram","description":"Upstream response time","histogram_source":"upstream","dimensions":[{"source":"metadata","key":"method","label":"http.request.method"},{"source":"metadata","key":"api_id","label":"tyk.api.id"},{"source":"metadata","key":"response_flag","label":"tyk.response_flag"}]},{"name":"tyk.api.requests.total","type":"counter","description":"Request count with identity dimensions","dimensions":[{"source":"metadata","key":"method","label":"http.request.method"},{"source":"metadata","key":"response_code","label":"http.response.status_code"},{"source":"metadata","key":"api_id","label":"tyk.api.id"}]},{"name":"tyk.requests.by.route","type":"counter","description":"Request count by route path and API name (metadata)","dimensions":[{"source":"metadata","key":"route","label":"route"},{"source":"metadata","key":"api_id","label":"api_id"},{"source":"metadata","key":"api_name","label":"api_name"},{"source":"metadata","key":"method","label":"method"},{"source":"metadata","key":"response_code","label":"response_code"},{"source":"metadata","key":"scheme","label":"scheme","default":"http"}]},{"name":"tyk.requests.by.org","type":"counter","description":"Request count per organization (metadata)","dimensions":[{"source":"metadata","key":"org_id","label":"org_id"},{"source":"metadata","key":"api_id","label":"api_id"},{"source":"metadata","key":"api_name","label":"api_name"},{"source":"metadata","key":"method","label":"method"}]},{"name":"tyk.requests.by.version","type":"counter","description":"Request count per API version (metadata)","dimensions":[{"source":"metadata","key":"api_version","label":"api_version"},{"source":"metadata","key":"api_id","label":"api_id"},{"source":"metadata","key":"response_code","label":"response_code"}]},{"name":"tyk.requests.by.apikey","type":"counter","description":"Request count per API key suffix - last 6 chars (session)","dimensions":[{"source":"session","key":"api_key","label":"api_key_suffix"},{"source":"metadata","key":"api_id","label":"api_id"}]},{"name":"tyk.requests.by.oauth","type":"counter","description":"Request count per OAuth client ID (session)","dimensions":[{"source":"session","key":"oauth_id","label":"oauth_client_id"},{"source":"metadata","key":"api_id","label":"api_id"},{"source":"metadata","key":"response_code","label":"response_code"}]},{"name":"tyk.requests.by.portal","type":"counter","description":"Request count per developer portal app and org (session)","dimensions":[{"source":"session","key":"portal_app","label":"portal_app"},{"source":"session","key":"portal_org","label":"portal_org"},{"source":"metadata","key":"api_id","label":"api_id"}]},{"name":"tyk.requests.by.tenant","type":"counter","description":"Request count per tenant from X-Tenant-ID request header","dimensions":[{"source":"header","key":"X-Tenant-ID","label":"tenant_id","default":"unknown"},{"source":"metadata","key":"api_id","label":"api_id"},{"source":"metadata","key":"response_code","label":"response_code"}]},{"name":"tyk.latency.by.tenant","type":"histogram","description":"End-to-end latency per tenant from X-Tenant-ID request header","histogram_source":"total","dimensions":[{"source":"header","key":"X-Tenant-ID","label":"tenant_id","default":"unknown"},{"source":"metadata","key":"api_id","label":"api_id"}]},{"name":"tyk.requests.by.customer","type":"counter","description":"Request count per customer from X-Customer-ID request header","dimensions":[{"source":"header","key":"X-Customer-ID","label":"customer_id","default":"unknown"},{"source":"header","key":"X-Tenant-ID","label":"tenant_id","default":"unknown"}]},{"name":"tyk.requests.with.cache","type":"counter","description":"Request count by cache status from X-Tyk-Cached-Response response header","dimensions":[{"source":"response_header","key":"X-Tyk-Cached-Response","label":"cache_status","default":"0"},{"source":"metadata","key":"api_id","label":"api_id"}]},{"name":"tyk.requests.by.backend.version","type":"counter","description":"Request count by backend version from X-Backend-Version response header","dimensions":[{"source":"response_header","key":"X-Backend-Version","label":"backend_version","default":"unknown"},{"source":"metadata","key":"api_id","label":"api_id"}]},{"name":"tyk.requests.by.content.type","type":"counter","description":"Request count by Content-Type response header","dimensions":[{"source":"response_header","key":"Content-Type","label":"content_type","default":"unknown"},{"source":"metadata","key":"api_id","label":"api_id"}]},{"name":"tyk.requests.by.tier","type":"counter","description":"Request count per subscription tier from context variable","dimensions":[{"source":"context","key":"tier","label":"subscription_tier","default":"standard"},{"source":"metadata","key":"api_id","label":"api_id"},{"source":"metadata","key":"response_code","label":"response_code"}]},{"name":"tyk.latency.by.tier","type":"histogram","description":"End-to-end latency per subscription tier from context variable","histogram_source":"total","dimensions":[{"source":"context","key":"tier","label":"subscription_tier","default":"standard"},{"source":"metadata","key":"api_id","label":"api_id"}]},{"name":"tyk.requests.by.region","type":"counter","description":"Request count per region from context variable","dimensions":[{"source":"context","key":"region","label":"region","default":"unknown"},{"source":"metadata","key":"api_id","label":"api_id"}]},{"name":"tyk.requests.by.quota_limit","type":"counter","description":"Request count per quota tier, from X-RateLimit-Limit response header (quota ceiling, not per-second rate limit)","dimensions":[{"source":"response_header","key":"X-RateLimit-Limit","label":"quota_limit","default":"0"},{"source":"metadata","key":"api_id","label":"api_id"}]}]
-
-# Demo App version
-IMAGE_VERSION=2.1.3
-OTEL_DEMO_IMAGE_NAME=ghcr.io/open-telemetry/demo
-OTEL_DEMO_DEMO_VERSION=2.1.3
-
-# Build Args
-TRACETEST_IMAGE_VERSION=v1.7.1
-OTEL_JAVA_AGENT_VERSION=2.21.0
-OPENTELEMETRY_CPP_VERSION=1.23.0
-
-# Dependent images
-COLLECTOR_CONTRIB_IMAGE=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.133.0
-FLAGD_IMAGE=ghcr.io/open-feature/flagd:v0.12.8
-GRAFANA_IMAGE=grafana/grafana:12.2.0
-JAEGERTRACING_IMAGE=jaegertracing/jaeger:2.10.0
-# must also update version field in src/grafana/provisioning/datasources/opensearch.yaml
-OPENSEARCH_IMAGE=opensearchproject/opensearch:3.2.0
-OPENSEARCH_DOCKERFILE=./deployments/opentelemetry-demo/src/opensearch/Dockerfile
-LOKI_IMAGE=grafana/loki:3.5.0
-POSTGRES_IMAGE=postgres:17.6 # used only for TraceTest
-PROMETHEUS_IMAGE=quay.io/prometheus/prometheus:v3.5.0
-VALKEY_IMAGE=valkey/valkey:8.1.3-alpine
-TRACETEST_IMAGE=kubeshop/tracetest:${TRACETEST_IMAGE_VERSION}
-
-# Demo Platform
-ENV_PLATFORM=local
-
-# IPv6 Flag control
-IPV6_ENABLED=false
-
-# OpenTelemetry Collector
-HOST_FILESYSTEM=/
-DOCKER_SOCK=/var/run/docker.sock
-OTEL_COLLECTOR_HOST=otel-collector
-OTEL_COLLECTOR_PORT_GRPC=4317
-OTEL_COLLECTOR_PORT_HTTP=4318
-OTEL_COLLECTOR_CONFIG=./deployments/opentelemetry-demo/src/otel-collector/otelcol-config.yml
-OTEL_COLLECTOR_CONFIG_EXTRAS=./deployments/opentelemetry-demo/src/otel-collector/otelcol-config-extras.yml
-OTEL_EXPORTER_OTLP_ENDPOINT=http://${OTEL_COLLECTOR_HOST}:${OTEL_COLLECTOR_PORT_GRPC}
-PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:8085/otlp-http/v1/traces
-
-# OpenTelemetry Resource Definitions
-OTEL_RESOURCE_ATTRIBUTES=service.namespace=opentelemetry-demo,service.version=${IMAGE_VERSION}
-
-# Metrics Temporality
-OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=cumulative
-
-# ******************
-# Core Demo Services
-# ******************
-# Accounting Service
-ACCOUNTING_DOCKERFILE=./deployments/opentelemetry-demo/src/accounting/Dockerfile
-
-# Ad Service
-AD_PORT=9555
-AD_ADDR=ad:${AD_PORT}
-AD_DOCKERFILE=./deployments/opentelemetry-demo/src/ad/Dockerfile
-
-# Cart Service
-CART_PORT=7070
-CART_ADDR=cart:${CART_PORT}
-CART_DOCKERFILE=./deployments/opentelemetry-demo/src/cart/src/Dockerfile
-
-# Checkout Service
-CHECKOUT_PORT=5050
-CHECKOUT_ADDR=checkout:${CHECKOUT_PORT}
-CHECKOUT_DOCKERFILE=./deployments/opentelemetry-demo/src/checkout/Dockerfile
-
-# Currency Service
-CURRENCY_PORT=7001
-CURRENCY_ADDR=currency:${CURRENCY_PORT}
-CURRENCY_DOCKERFILE=./deployments/opentelemetry-demo/src/currency/Dockerfile
-
-# Email Service
-EMAIL_PORT=6060
-EMAIL_ADDR=http://email:${EMAIL_PORT}
-EMAIL_DOCKERFILE=./deployments/opentelemetry-demo/src/email/Dockerfile
-
-# Fraud Service
-FRAUD_DOCKERFILE=./deployments/opentelemetry-demo/src/fraud-detection/Dockerfile
-
-# Frontend
-FRONTEND_PORT=8082
-FRONTEND_ADDR=frontend:${FRONTEND_PORT}
-FRONTEND_URL=http://${FRONTEND_ADDR}
-FRONTEND_DOCKERFILE=./deployments/opentelemetry-demo/src/frontend/Dockerfile
-
-# Frontend Proxy (Envoy)
-ENVOY_ADDR=0.0.0.0
-ENVOY_PORT=8085
-ENVOY_ADMIN_PORT=10000
-FRONTEND_HOST=frontend
-FRONTEND_PROXY_ADDR=frontend-proxy:${ENVOY_PORT}
-FRONTEND_PROXY_DOCKERFILE=./deployments/opentelemetry-demo/src/frontend-proxy/Dockerfile
-
-# Image Provider
-IMAGE_PROVIDER_HOST=image-provider
-IMAGE_PROVIDER_PORT=8081
-IMAGE_PROVIDER_DOCKERFILE=./deployments/opentelemetry-demo/src/image-provider/Dockerfile
-
-# Load Generator
-LOCUST_WEB_PORT=8089
-LOCUST_USERS=5
-LOCUST_HOST=http://${FRONTEND_PROXY_ADDR}
-LOCUST_WEB_HOST=load-generator
-LOCUST_AUTOSTART=true
-LOCUST_HEADLESS=false
-LOAD_GENERATOR_DOCKERFILE=./deployments/opentelemetry-demo/src/load-generator/Dockerfile
-
-# Payment Service
-PAYMENT_PORT=50051
-PAYMENT_ADDR=payment:${PAYMENT_PORT}
-PAYMENT_DOCKERFILE=./deployments/opentelemetry-demo/src/payment/Dockerfile
-
-# Product Catalog Service
-PRODUCT_CATALOG_RELOAD_INTERVAL=10
-PRODUCT_CATALOG_PORT=3550
-PRODUCT_CATALOG_ADDR=product-catalog:${PRODUCT_CATALOG_PORT}
-PRODUCT_CATALOG_DOCKERFILE=./deployments/opentelemetry-demo/src/product-catalog/Dockerfile
-
-# Quote Service
-QUOTE_PORT=8090
-QUOTE_ADDR=http://quote:${QUOTE_PORT}
-QUOTE_DOCKERFILE=./deployments/opentelemetry-demo/src/quote/Dockerfile
-
-# Recommendation Service
-RECOMMENDATION_PORT=9001
-RECOMMENDATION_ADDR=recommendation:${RECOMMENDATION_PORT}
-RECOMMENDATION_DOCKERFILE=./deployments/opentelemetry-demo/src/recommendation/Dockerfile
-
-# Shipping Service
-SHIPPING_PORT=50050
-SHIPPING_ADDR=http://shipping:${SHIPPING_PORT}
-SHIPPING_DOCKERFILE=./deployments/opentelemetry-demo/src/shipping/Dockerfile
-
-# ******************
-# Dependent Services
-# ******************
-# Flagd
-FLAGD_HOST=flagd
-FLAGD_PORT=8013
-FLAGD_OFREP_PORT=8016
-
-# Flagd UI
-FLAGD_UI_HOST=flagd-ui
-FLAGD_UI_PORT=4000
-FLAGD_UI_DOCKERFILE=./deployments/opentelemetry-demo/src/flagd-ui/Dockerfile
-
-# Kafka
-KAFKA_PORT=9092
-KAFKA_HOST=kafka
-KAFKA_ADDR=${KAFKA_HOST}:${KAFKA_PORT}
-# KAFKA_DOCKERFILE=./deployments/opentelemetry-demo/src/kafka/Dockerfile
-
-# Valkey
-VALKEY_PORT=6379
-VALKEY_ADDR=valkey-cart:${VALKEY_PORT}
-
-# Postgres
-POSTGRES_HOST=postgresql
-POSTGRES_PORT=5432
-POSTGRES_DB=otel
-POSTGRES_PASSWORD=otel
-POSTGRES_DOCKERFILE=./deployments/opentelemetry-demo/src/postgres/Dockerfile
-
-# ********************
-# Telemetry Components
-# ********************
-# Grafana
-GRAFANA_PORT=3000
-GRAFANA_HOST=grafana
-
-# Jaeger
-JAEGER_HOST=jaeger
-JAEGER_UI_PORT=16686
-JAEGER_GRPC_PORT=4317
-
-# Tempo
-TEMPO_IMAGE=grafana/tempo:2.7.2
-TEMPO_HOST=tempo
-TEMPO_HTTP_PORT=3200
-
-# Prometheus
-PROMETHEUS_PORT=9090
-PROMETHEUS_HOST=prometheus
-PROMETHEUS_ADDR=${PROMETHEUS_HOST}:${PROMETHEUS_PORT}
-```
+To modify any setting, either edit [`demo.env`](./demo.env) directly or add the variable to your `.env` file. Variables in `.env` take precedence over `demo.env`.
 
 ## Grafana Dashboards
 
@@ -354,6 +140,115 @@ For a **deep-dive demo** focused on a specific persona:
 - **Platform ops**: Focus on Fleet Health — config drift, Go runtime, log histogram.
 - **API product manager**: Focus on Portfolio — SLOs, error budget, consumer identity rows.
 - **Backend engineer**: Focus on Troubleshooting — latency attribution + trace + log correlation.
+
+---
+
+## Generating Traffic
+
+The deployment ships several scripts to populate the Grafana dashboards with realistic signal data. The built-in Locust load generator (accessible at `http://localhost:8085/loadgen/`) produces baseline traffic for the demo app services; the scripts below target Tyk-specific dimensions such as tenants, OAuth clients, backend versions, and quota tiers.
+
+All scripts read credentials from `logs/bootstrap.log` and require the stack to be running.
+
+---
+
+### Continuous Load — `continuous-traffic-gen.js` (recommended)
+
+Runs six traffic scenarios in parallel for a configurable duration using [k6](https://k6.io/). This is the recommended way to populate all dashboards in one step.
+
+**Prerequisites**: k6 installed (`brew install k6` on macOS).
+
+```bash
+USER_API_KEY=$(grep "API Key:" logs/bootstrap.log | head -1 | awk '{print $NF}')
+k6 run --env USER_API_KEY=$USER_API_KEY \
+  deployments/opentelemetry-demo/scripts/continuous-traffic-gen.js
+```
+
+**Optional environment variables:**
+
+| Variable | Default | Description |
+| -------- | ------- | ----------- |
+| `GATEWAY_URL` | `http://tyk-gateway.localhost:8080` | Gateway base URL |
+| `DURATION` | `30m` | How long to run |
+| `CLEANUP` | `false` | Set `true` to delete created resources on teardown |
+
+**Scenarios run concurrently:**
+
+| Scenario | Rate | What it demonstrates |
+| -------- | ---- | -------------------- |
+| Tenant traffic | 1 req/2 s | Per-tenant request rate and latency (`X-Tenant-ID`, `X-Customer-ID`) |
+| Version traffic | 1 req/3 s | Backend version distribution (v1/v2/v3 ratio 4:3:2) |
+| OAuth traffic | 1 req/4 s | Per-OAuth-client request rate with token refresh |
+| Cache traffic | 1 req/2 s | Cache hit/miss ratio (90 % hits) |
+| Quota traffic | 1 req/3 s | Quota tier distribution (low/mid/high, includes 429s) |
+| Rate limit burst | 5 req/1 s | Deliberate rate-limit exhaustion (~60 % 429 responses) |
+
+---
+
+### One-Shot Bash Scripts
+
+Use these when you want to quickly populate a specific dashboard row without running k6.
+
+#### Tenant & Customer Traffic — `tenant-traffic-gen.sh`
+
+Generates 75 requests across three tenants (`tenant-alpha`, `tenant-beta`, `tenant-gamma`) with `X-Tenant-ID` and `X-Customer-ID` headers. Populates the **Multi-Tenancy** rows in the API Portfolio dashboard.
+
+```bash
+bash deployments/opentelemetry-demo/scripts/tenant-traffic-gen.sh
+```
+
+Runtime: ~75 seconds.
+
+#### OAuth Client Traffic — `oauth-traffic-gen.sh`
+
+Creates three OAuth 2.0 clients and generates 75 requests (60 success + 15 errors). Populates the **Consumer Identity — OAuth** panels.
+
+```bash
+bash deployments/opentelemetry-demo/scripts/oauth-traffic-gen.sh
+```
+
+Runtime: ~75 seconds.
+
+#### Backend Version & Content-Type Traffic — `version-traffic-gen.sh`
+
+Generates 90 requests routed to three mock backend versions in a 4:3:2 ratio. Populates the **Backend Version Distribution** and **Response Content-Type Mix** panels.
+
+```bash
+bash deployments/opentelemetry-demo/scripts/version-traffic-gen.sh
+```
+
+Runtime: ~45 seconds.
+
+#### Cache, Quota & Rate-Limit Traffic — `traffic-control-demo.sh`
+
+Runs four sequential scenarios: cache hit/miss, quota tier distribution, quota exhaustion (429s), and rate-limit burst. Populates the **Cache**, **Quota**, and **Rate Limit** panels.
+
+```bash
+bash deployments/opentelemetry-demo/scripts/traffic-control-demo.sh
+```
+
+Runtime: ~14 seconds.
+
+---
+
+### Diagnostic & Report Scripts
+
+These scripts capture a snapshot of gateway telemetry (metrics, logs, traces) into a timestamped Markdown report in the `reports/` directory. Useful for verifying instrumentation or sharing signal samples.
+
+#### Gateway Signals Report — `gateway-signals-report.sh`
+
+Provisions a test API, runs auth and error scenarios, then queries Prometheus metrics, gateway container logs, and Jaeger traces. Output: `reports/gateway-signals-report-YYYYMMDD-HHMMSS.md`.
+
+```bash
+bash deployments/opentelemetry-demo/scripts/gateway-signals-report.sh
+```
+
+#### Path Signals Report — `path-signals-report.sh`
+
+Tests path-dimension telemetry across metrics (`listen_path`, `endpoint`), access logs, and trace span attributes (`http.url`, `http.target`, `http.route`). Output: `reports/path-signals-report-YYYYMMDD-HHMMSS.md`.
+
+```bash
+bash deployments/opentelemetry-demo/scripts/path-signals-report.sh
+```
 
 ---
 

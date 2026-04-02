@@ -223,14 +223,14 @@
           },
           "id": 9004,
           "options": {
-            "content": "## \ud83d\uddfa How to use this dashboard\n\n**Target audience**: On-call SRE, API Platform Team Leads  \n**Use when**: Daily health check, on-call triage, SLO review\n\n| Symptom | What to look at | Next step |\n|---------|----------------|-----------|\n| \ud83d\udd34 Error rate elevated | Error Analysis row (top of page) | Click the API name \u2192 Troubleshoot |\n| \ud83d\udfe0 Error budget <20% remaining | SLO / Error Budget row | Incident likely in progress \u2014 escalate |\n| \ud83d\udd34 Latency regression | \"Top 10 APIs by P95 Latency\" | Click the API name \u2192 Troubleshoot |\n| \ud83d\udfe0 One tenant impacted | Multi-Tenancy row | Filter by `tenant_id` variable |\n| \ud83d\udd34 Gateway infra issue | Everything looks red | Check \u2192 [Fleet Health](/grafana/d/tyk-gateway-fleet-health) first |",
+            "content": "## 🗺 How to use this dashboard\n\n**Target audience**: On-call SRE, API Platform Team Leads  \n**Use when**: Daily health check, on-call triage, SLO review\n\n| Symptom | What to look at | Next step |\n|---------|----------------|-----------|\n| 🔴 Error rate elevated | Error Analysis row (top of page) | Click the API name → Troubleshoot |\n| 🟠 Error budget <20% remaining | SLO / Error Budget row | Incident likely in progress — escalate |\n| 🔴 Latency regression | \"Top 10 APIs by P95 Latency\" | Click the API name → Troubleshoot |\n| 🟠 One tenant impacted | Multi-Tenancy row | Filter by `tenant_id` variable |\n| 🔴 Gateway infra issue | Everything looks red | Check → [Fleet Health](/grafana/d/tyk-gateway-fleet-health) first |",
             "mode": "markdown"
           },
           "title": "How to use this dashboard",
           "type": "text"
         }
       ],
-      "title": "\u2139\ufe0f How to use this dashboard",
+      "title": "ℹ️ How to use this dashboard",
       "type": "row"
     },
     {
@@ -723,7 +723,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(10, sum by(api_name)(rate(tyk_requests_by_route_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", api_id=~\"$api_id\", method=~\"$method\"}[$__rate_interval])))",
+          "expr": "topk(10, sum by(api_name)(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", api_id=~\"$api_id\", method=~\"$method\"}[$__rate_interval])))",
           "legendFormat": "{{api_name}}"
         }
       ],
@@ -750,7 +750,7 @@
       "id": 13,
       "type": "timeseries",
       "title": "Latency Trend: Total vs Gateway vs Upstream (P95)",
-      "description": "The hero panel. If gateway latency is flat and upstream spikes, the backend is the culprit \u2014 5-second diagnosis.",
+      "description": "The hero panel. If gateway latency is flat and upstream spikes, the backend is the culprit — 5-second diagnosis.",
       "datasource": {
         "uid": "${datasource_prometheus}",
         "type": "prometheus"
@@ -847,7 +847,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(\n  sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n  / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n  * 100\n)\n* on(tyk_api_id) group_left(api_name)\n  label_replace(\n    max by(api_id, api_name)(tyk_requests_by_route_total{service_name=~\"$service_name\"}),\n    \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n  )",
+          "expr": "(\n  sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n  / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n  * 100\n)\n* on(tyk_api_id) group_left(api_name)\n  label_replace(\n    max by(api_id, api_name)(tyk_requests_by_path_total{service_name=~\"$service_name\"}),\n    \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n  )",
           "legendFormat": "{{api_name}}"
         }
       ],
@@ -861,7 +861,7 @@
           },
           "links": [
             {
-              "title": "\ud83d\udd0d Troubleshoot this API",
+              "title": "🔍 Troubleshoot this API",
               "url": "/grafana/d/tyk-api-troubleshooting?${__url.params}&var-api_id=${__field.labels.tyk_api_id}",
               "targetBlank": false
             }
@@ -895,7 +895,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(10,\n  (\n    sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    * 100\n  )\n  * on(tyk_api_id) group_left(api_name)\n    label_replace(\n      max by(api_id, api_name)(tyk_requests_by_route_total{service_name=~\"$service_name\"}),\n      \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n    )\n)",
+          "expr": "topk(10,\n  (\n    sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    * 100\n  )\n  * on(tyk_api_id) group_left(api_name)\n    label_replace(\n      max by(api_id, api_name)(tyk_requests_by_path_total{service_name=~\"$service_name\"}),\n      \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n    )\n)",
           "legendFormat": "{{api_name}}",
           "instant": true
         }
@@ -918,7 +918,7 @@
           },
           "links": [
             {
-              "title": "\ud83d\udd0d Troubleshoot this API",
+              "title": "🔍 Troubleshoot this API",
               "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__field.labels.tyk_api_id}&from=${__from}&to=${__to}",
               "targetBlank": false
             }
@@ -1009,7 +1009,7 @@
       "id": 25,
       "type": "timeseries",
       "title": "429 Rate Over Time",
-      "description": "Rate limiting pressure \u2014 leading indicator of customer impact.",
+      "description": "Rate limiting pressure — leading indicator of customer impact.",
       "datasource": {
         "uid": "${datasource_prometheus}",
         "type": "prometheus"
@@ -1093,7 +1093,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 36,
+        "y": 44,
         "w": 24,
         "h": 1
       },
@@ -1109,14 +1109,14 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 37,
+        "y": 45,
         "w": 8,
         "h": 8
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(10, sum by(api_id, api_name)(rate(tyk_requests_by_route_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", api_id=~\"$api_id\", http_method=~\"$method\"}[$__rate_interval])))",
+          "expr": "topk(10, sum by(api_id, api_name)(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", api_id=~\"$api_id\", http_method=~\"$method\"}[$__rate_interval])))",
           "legendFormat": "{{api_name}}",
           "instant": true
         }
@@ -1138,7 +1138,7 @@
           },
           "links": [
             {
-              "title": "\ud83d\udd0d Troubleshoot this API",
+              "title": "🔍 Troubleshoot this API",
               "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__field.labels.api_id}&from=${__from}&to=${__to}",
               "targetBlank": false
             }
@@ -1156,14 +1156,14 @@
       },
       "gridPos": {
         "x": 8,
-        "y": 37,
+        "y": 45,
         "w": 8,
         "h": 8
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(10,\n  histogram_quantile(0.95, sum by(le, tyk_api_id)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000\n  * on(tyk_api_id) group_left(api_name)\n    label_replace(\n      max by(api_id, api_name)(tyk_requests_by_route_total{service_name=~\"$service_name\"}),\n      \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n    )\n)",
+          "expr": "topk(10,\n  histogram_quantile(0.95, sum by(le, tyk_api_id)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000\n  * on(tyk_api_id) group_left(api_name)\n    label_replace(\n      max by(api_id, api_name)(tyk_requests_by_path_total{service_name=~\"$service_name\"}),\n      \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n    )\n)",
           "legendFormat": "{{api_name}}",
           "instant": true
         }
@@ -1185,7 +1185,7 @@
           },
           "links": [
             {
-              "title": "\ud83d\udd0d Troubleshoot this API",
+              "title": "🔍 Troubleshoot this API",
               "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__field.labels.tyk_api_id}&from=${__from}&to=${__to}",
               "targetBlank": false
             }
@@ -1220,14 +1220,14 @@
       },
       "gridPos": {
         "x": 16,
-        "y": 37,
+        "y": 45,
         "w": 8,
         "h": 8
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(10,\n  (\n    sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    * 100\n  )\n  * on(tyk_api_id) group_left(api_name)\n    label_replace(\n      max by(api_id, api_name)(tyk_requests_by_route_total{service_name=~\"$service_name\"}),\n      \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n    )\n)",
+          "expr": "topk(10,\n  (\n    sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    * 100\n  )\n  * on(tyk_api_id) group_left(api_name)\n    label_replace(\n      max by(api_id, api_name)(tyk_requests_by_path_total{service_name=~\"$service_name\"}),\n      \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n    )\n)",
           "legendFormat": "{{api_name}}",
           "instant": true
         }
@@ -1250,7 +1250,7 @@
           },
           "links": [
             {
-              "title": "\ud83d\udd0d Troubleshoot this API",
+              "title": "🔍 Troubleshoot this API",
               "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__field.labels.tyk_api_id}&from=${__from}&to=${__to}",
               "targetBlank": false
             }
@@ -1261,7 +1261,7 @@
     {
       "id": 34,
       "type": "table",
-      "title": "Latency by API (P50 / P95 / P99) \u2014 Total, Gateway, Upstream",
+      "title": "Latency by API (P50 / P95 / P99) — Total, Gateway, Upstream",
       "description": "Full percentile breakdown. Starting point for investigation into a slow or error-prone API.",
       "datasource": {
         "uid": "${datasource_prometheus}",
@@ -1269,7 +1269,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 45,
+        "y": 53,
         "w": 24,
         "h": 8
       },
@@ -1318,7 +1318,7 @@
         },
         {
           "refId": "G",
-          "expr": "sum by(tyk_api_id, api_name)(label_replace(tyk_requests_by_route_total{service_name=~\"$service_name\"},\"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"))",
+          "expr": "sum by(tyk_api_id, api_name)(label_replace(tyk_requests_by_path_total{service_name=~\"$service_name\"},\"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"))",
           "legendFormat": "{{api_name}}",
           "instant": true,
           "format": "table"
@@ -1366,7 +1366,7 @@
               "options": {
                 "match": "nan",
                 "result": {
-                  "text": "\u2014",
+                  "text": "—",
                   "color": "text"
                 }
               }
@@ -1396,7 +1396,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "\ud83d\udd0d Troubleshoot this API",
+                    "title": "🔍 Troubleshoot this API",
                     "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__value.text}&${__url.params}",
                     "targetBlank": false
                   }
@@ -1414,7 +1414,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 53,
+        "y": 61,
         "w": 24,
         "h": 1
       },
@@ -1430,7 +1430,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 54,
+        "y": 62,
         "w": 8,
         "h": 7
       },
@@ -1470,7 +1470,7 @@
       },
       "gridPos": {
         "x": 8,
-        "y": 54,
+        "y": 62,
         "w": 8,
         "h": 7
       },
@@ -1510,7 +1510,7 @@
       },
       "gridPos": {
         "x": 16,
-        "y": 54,
+        "y": 62,
         "w": 8,
         "h": 7
       },
@@ -1552,7 +1552,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 61,
+        "y": 69,
         "w": 16,
         "h": 8
       },
@@ -1613,7 +1613,7 @@
               "options": {
                 "match": "nan",
                 "result": {
-                  "text": "\u2014",
+                  "text": "—",
                   "color": "text"
                 }
               }
@@ -1682,7 +1682,7 @@
       },
       "gridPos": {
         "x": 16,
-        "y": 61,
+        "y": 69,
         "w": 8,
         "h": 8
       },
@@ -1719,7 +1719,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 69,
+        "y": 77,
         "w": 24,
         "h": 1
       },
@@ -1735,7 +1735,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 70,
+        "y": 78,
         "w": 8,
         "h": 7
       },
@@ -1775,7 +1775,7 @@
       },
       "gridPos": {
         "x": 8,
-        "y": 70,
+        "y": 78,
         "w": 8,
         "h": 7
       },
@@ -1815,7 +1815,7 @@
       },
       "gridPos": {
         "x": 16,
-        "y": 70,
+        "y": 78,
         "w": 8,
         "h": 7
       },
@@ -1855,7 +1855,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 77,
+        "y": 85,
         "w": 8,
         "h": 7
       },
@@ -1897,7 +1897,7 @@
       },
       "gridPos": {
         "x": 8,
-        "y": 77,
+        "y": 85,
         "w": 16,
         "h": 7
       },
@@ -1934,7 +1934,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 84,
+        "y": 92,
         "w": 24,
         "h": 1
       },
@@ -1951,7 +1951,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 85,
+        "y": 93,
         "w": 6,
         "h": 8
       },
@@ -2007,7 +2007,7 @@
       },
       "gridPos": {
         "x": 6,
-        "y": 85,
+        "y": 93,
         "w": 6,
         "h": 8
       },
@@ -2063,7 +2063,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 85,
+        "y": 93,
         "w": 4,
         "h": 8
       },
@@ -2116,14 +2116,14 @@
       "id": 64,
       "type": "timeseries",
       "title": "SLO Burn Rate (1h and 6h windows)",
-      "description": ">14.4\u00d7 on 1h window = burns 100% of monthly budget in 1h = critical page.",
+      "description": ">14.4× on 1h window = burns 100% of monthly budget in 1h = critical page.",
       "datasource": {
         "uid": "${datasource_prometheus}",
         "type": "prometheus"
       },
       "gridPos": {
         "x": 16,
-        "y": 85,
+        "y": 93,
         "w": 8,
         "h": 8
       },
@@ -2185,7 +2185,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 93,
+        "y": 101,
         "w": 24,
         "h": 7
       },
@@ -2254,7 +2254,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 100,
+        "y": 108,
         "w": 24,
         "h": 1
       },
@@ -2270,7 +2270,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 101,
+        "y": 109,
         "w": 4,
         "h": 4
       },
@@ -2330,7 +2330,7 @@
       },
       "gridPos": {
         "x": 4,
-        "y": 101,
+        "y": 109,
         "w": 8,
         "h": 7
       },
@@ -2370,7 +2370,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 101,
+        "y": 109,
         "w": 6,
         "h": 7
       },
@@ -2405,14 +2405,14 @@
       "id": 74,
       "type": "timeseries",
       "title": "Backend Version Distribution",
-      "description": "Canary and blue-green rollout visibility \u2014 correlate latency with version changes.",
+      "description": "Canary and blue-green rollout visibility — correlate latency with version changes.",
       "datasource": {
         "uid": "${datasource_prometheus}",
         "type": "prometheus"
       },
       "gridPos": {
         "x": 18,
-        "y": 101,
+        "y": 109,
         "w": 6,
         "h": 7
       },
@@ -2448,7 +2448,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 31
+        "y": 39
       },
       "id": 9006,
       "panels": [],
@@ -2464,34 +2464,77 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 31
+        "y": 39
       },
       "id": 9005,
       "options": {
-        "content": "[Error classification docs \u2192](https://tyk.io/docs/api-management/logs#error-classification)\n\n**Upstream and Proxy Errors**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `TLE` | TLS Certificate Expired | 502 | Upstream TLS certificate has expired |\n| `TLI` | TLS Certificate Invalid | 502 | Upstream TLS certificate failed validation |\n| `TLM` | TLS Hostname Mismatch | 502 | Certificate CN/SAN does not match hostname |\n| `TLN` | TLS Not Trusted | 502 | Certificate issued by unknown authority |\n| `TLH` | TLS Handshake Failure | 502 | TLS handshake failed |\n| `TLP` | TLS Protocol Error | 502 | TLS protocol or version mismatch |\n| `TLA` | TLS Alert | 502 | TLS alert received from upstream |\n| `UCF` | Connection Refused | 502 | Upstream refused the TCP connection |\n| `UCT` | Connection Timeout | 502 | TCP connection to upstream timed out |\n| `URR` | Connection Reset | 502 | Connection reset by upstream server |\n| `EPI` | Broken Pipe | 502 | Connection closed unexpectedly (EPIPE) |\n| `URT` | Response Timeout | 504 | Upstream did not respond in time |\n| `DNS` | DNS Resolution Failure | 502 | Upstream hostname could not be resolved |\n| `NRH` | No Route to Host | 502 | Upstream host or network unreachable |\n| `NHU` | No Healthy Upstreams | 503 | All targets in load balancer are unhealthy |\n| `CBO` | Circuit Breaker Open | 503 | Circuit breaker is open |\n| `URS` | Upstream Response 5XX | 5XX | Upstream returned a 5XX status code |\n| `UPE` | Upstream Error | 5XX | Generic upstream error |\n\n**Authentication Errors**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `AMF` | Auth Field Missing | 400/401 | Authorization header or parameter missing |\n| `AKI` | API Key Invalid | 403 | API key not found or invalid |\n| `TKE` | Token Expired | 403 | JWT, OAuth token, or client cert has expired |\n| `TKI` | Token Invalid | 403 | JWT or OAuth token malformed or bad signature |\n| `TCV` | Token Claims Invalid | 401 | JWT claims validation failed |\n| `EAD` | External Auth Denied | 403 | External auth service denied the request |\n\n**Rate Limiting**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `RLT` | Rate Limited | 429 | Request rejected due to rate limit |\n| `QEX` | Quota Exceeded | 403 | Client usage quota exhausted |\n\n**Request Validation**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `BTL` | Body Too Large | 400 | Request body exceeds configured size limit |\n| `CLM` | Content-Length Missing | 411 | Required Content-Length header missing |\n| `BIV` | Body Invalid | 400/422 | Request body malformed or fails schema validation |\n| `IHD` | Invalid Header | 400 | Required request header malformed or invalid |\n\n**Client Connection**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `CDC` | Client Disconnected | 499 | Client closed connection before response sent |",
+        "content": "[Error classification docs →](https://tyk.io/docs/api-management/logs#error-classification)\n\n**Upstream and Proxy Errors**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `TLE` | TLS Certificate Expired | 502 | Upstream TLS certificate has expired |\n| `TLI` | TLS Certificate Invalid | 502 | Upstream TLS certificate failed validation |\n| `TLM` | TLS Hostname Mismatch | 502 | Certificate CN/SAN does not match hostname |\n| `TLN` | TLS Not Trusted | 502 | Certificate issued by unknown authority |\n| `TLH` | TLS Handshake Failure | 502 | TLS handshake failed |\n| `TLP` | TLS Protocol Error | 502 | TLS protocol or version mismatch |\n| `TLA` | TLS Alert | 502 | TLS alert received from upstream |\n| `UCF` | Connection Refused | 502 | Upstream refused the TCP connection |\n| `UCT` | Connection Timeout | 502 | TCP connection to upstream timed out |\n| `URR` | Connection Reset | 502 | Connection reset by upstream server |\n| `EPI` | Broken Pipe | 502 | Connection closed unexpectedly (EPIPE) |\n| `URT` | Response Timeout | 504 | Upstream did not respond in time |\n| `DNS` | DNS Resolution Failure | 502 | Upstream hostname could not be resolved |\n| `NRH` | No Route to Host | 502 | Upstream host or network unreachable |\n| `NHU` | No Healthy Upstreams | 503 | All targets in load balancer are unhealthy |\n| `CBO` | Circuit Breaker Open | 503 | Circuit breaker is open |\n| `URS` | Upstream Response 5XX | 5XX | Upstream returned a 5XX status code |\n| `UPE` | Upstream Error | 5XX | Generic upstream error |\n\n**Authentication Errors**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `AMF` | Auth Field Missing | 400/401 | Authorization header or parameter missing |\n| `AKI` | API Key Invalid | 403 | API key not found or invalid |\n| `TKE` | Token Expired | 403 | JWT, OAuth token, or client cert has expired |\n| `TKI` | Token Invalid | 403 | JWT or OAuth token malformed or bad signature |\n| `TCV` | Token Claims Invalid | 401 | JWT claims validation failed |\n| `EAD` | External Auth Denied | 403 | External auth service denied the request |\n\n**Rate Limiting**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `RLT` | Rate Limited | 429 | Request rejected due to rate limit |\n| `QEX` | Quota Exceeded | 403 | Client usage quota exhausted |\n\n**Request Validation**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `BTL` | Body Too Large | 400 | Request body exceeds configured size limit |\n| `CLM` | Content-Length Missing | 411 | Required Content-Length header missing |\n| `BIV` | Body Invalid | 400/422 | Request body malformed or fails schema validation |\n| `IHD` | Invalid Header | 400 | Required request header malformed or invalid |\n\n**Client Connection**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `CDC` | Client Disconnected | 499 | Client closed connection before response sent |",
         "mode": "markdown"
       },
       "title": "Tyk Response Flag Reference",
       "type": "text"
+    },
+    {
+      "id": 9007,
+      "type": "piechart",
+      "title": "Error Flag Distribution (4xx+5xx)",
+      "description": "Flag distribution for error responses only (4xx+5xx). Uses http.server.request.duration histogram count. Complements the general flag chart above which covers all traffic.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prometheus}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 31
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayLabels": [
+          "percent",
+          "name"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "pieType": "donut"
+      },
+      "targets": [
+        {
+          "expr": "sum by(tyk_response_flag) (increase(http_server_request_duration_seconds_count{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\", http_response_status_code=~\"4..|5..\"}[$__range]))",
+          "legendFormat": "{{tyk_response_flag}}",
+          "refId": "A"
+        }
+      ]
     }
   ],
   "links": [
     {
-      "title": "\ud83d\udda5 Fleet Health",
+      "title": "🖥 Fleet Health",
       "url": "/grafana/d/tyk-gateway-fleet-health",
       "type": "link",
       "targetBlank": false,
       "icon": "external link"
     },
     {
-      "title": "\ud83d\udcca API Portfolio",
+      "title": "📊 API Portfolio",
       "url": "/grafana/d/tyk-api-portfolio",
       "type": "link",
       "targetBlank": false,
       "icon": "external link"
     },
     {
-      "title": "\ud83d\udd0d API Troubleshooting",
+      "title": "🔍 API Troubleshooting",
       "url": "/grafana/d/tyk-api-troubleshooting",
       "type": "link",
       "targetBlank": false,
