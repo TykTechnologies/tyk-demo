@@ -2,7 +2,12 @@
   "title": "Tyk Gateway - Native OTLP Metrics",
   "uid": "tyk-gateway-otlp-metrics",
   "version": 1,
-  "description": "Showcases native OTLP metrics exported directly from Tyk Gateway (TT-16688). Key differentiator: latency attribution splitting Total = Gateway + Upstream, eliminating the need for Tyk Pump for metrics use cases.",
+  "schemaVersion": 39,
+  "__requires__": [
+    { "type": "grafana", "id": "grafana", "name": "Grafana", "version": "10.0.0" },
+    { "type": "datasource", "id": "prometheus", "name": "Prometheus", "version": "1.0.0" }
+  ],
+  "description": "Showcases native OTLP metrics exported directly from Tyk Gateway. Key differentiator: latency attribution splitting Total = Gateway + Upstream, eliminating the need for Tyk Pump for metrics use cases.",
   "tags": [
     "tyk",
     "gateway",
@@ -39,10 +44,7 @@
         "name": "datasource_prometheus",
         "type": "datasource",
         "query": "prometheus",
-        "current": {
-          "text": "Prometheus",
-          "value": "Prometheus"
-        },
+        "current": {},
         "hide": 0,
         "label": "Prometheus"
       },
