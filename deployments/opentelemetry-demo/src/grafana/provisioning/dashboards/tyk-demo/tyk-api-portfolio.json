@@ -851,7 +851,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(\n  sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n  / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n  * 100\n)\n* on(tyk_api_id) group_left(api_name)\n  label_replace(\n    max by(api_id, api_name)(tyk_requests_by_path_total{service_name=~\"$service_name\"}),\n    \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n  )",
+          "expr": "(\n  sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n  / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n  * 100\n)\n* on(tyk_api_id) group_left(api_name)\n  (0 * label_replace(\n    max by(api_id, api_name)(tyk_requests_by_path_total{service_name=~\"$service_name\"}),\n    \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n  ) + 1)",
           "legendFormat": "{{api_name}}"
         }
       ],
@@ -899,7 +899,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(10,\n  (\n    sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    * 100\n  )\n  * on(tyk_api_id) group_left(api_name)\n    label_replace(\n      max by(api_id, api_name)(tyk_requests_by_path_total{service_name=~\"$service_name\"}),\n      \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n    )\n)",
+          "expr": "topk(10,\n  (\n    sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    * 100\n  )\n  * on(tyk_api_id) group_left(api_name)\n    (0 * label_replace(\n      max by(api_id, api_name)(tyk_requests_by_path_total{service_name=~\"$service_name\"}),\n      \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n    ) + 1)\n)",
           "legendFormat": "{{api_name}}",
           "instant": true
         }
@@ -1231,7 +1231,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(10,\n  (\n    sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    * 100\n  )\n  * on(tyk_api_id) group_left(api_name)\n    label_replace(\n      max by(api_id, api_name)(tyk_requests_by_path_total{service_name=~\"$service_name\"}),\n      \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n    )\n)",
+          "expr": "topk(10,\n  (\n    sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_gw_id=~\"$tyk_gw_id\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))\n    * 100\n  )\n  * on(tyk_api_id) group_left(api_name)\n    (0 * label_replace(\n      max by(api_id, api_name)(tyk_requests_by_path_total{service_name=~\"$service_name\"}),\n      \"tyk_api_id\", \"$1\", \"api_id\", \"(.*)\"\n    ) + 1)\n)",
           "legendFormat": "{{api_name}}",
           "instant": true
         }

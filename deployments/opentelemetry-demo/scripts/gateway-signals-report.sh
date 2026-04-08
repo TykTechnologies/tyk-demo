@@ -389,8 +389,8 @@ run_and_capture_scenario() {
        s_desc="5 requests with \`x-api-key: invalid-key-xyz\`. Expected: all **403** (\`response_flag: AKI\`)." ;;
     3) s_name="S3 · R04: Quota Exhaustion (QEX)"
        s_desc="35 requests with key-low (quota=30). Expected: first 30 → **200**, last 5 → **403** (\`response_flag: QEX\`)." ;;
-    4) s_name="S4 · R05: Rate Limit Rejections (TRL)"
-       s_desc="20 rapid requests with key-mid (rate=10/s). Expected: at least one **429** (\`response_flag: TRL\`)." ;;
+    4) s_name="S4 · R05: Rate Limit Rejections (RLT)"
+       s_desc="20 rapid requests with key-mid (rate=10/s). Expected: at least one **429** (\`response_flag: RLT\`)." ;;
     5) s_name="S5 · R01: High Error Rate"
        s_desc="20 requests: 5 valid (key-mid) + 15 with no key. Expected: ~75% error rate (≥15 × **401**)." ;;
     6) s_name="S6 · R02: Upstream Latency Spike"
