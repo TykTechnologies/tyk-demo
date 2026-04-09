@@ -24,6 +24,7 @@ display_help() {
     echo "  --skip-plugin-build   Skip building Go plugins (can also use --spb)"
     echo "  --skip-hostname-check Skip validation of hostnames in /etc/hosts (can also use --shc)"
     echo "  --seed                Seed 7 days of demo analytics data"
+    echo "  --portal-direct-access    Enable Direct API product access in portal (can also use --pda)"  # *** ADDED ***
     echo
     echo "Examples:"
     echo "  ./up.sh                       # Bring up default Tyk deployment"
@@ -58,6 +59,7 @@ rm .bootstrap/hide_progress 1>/dev/null 2>&1
 rm .bootstrap/skip_plugin_build 1>/dev/null 2>&1
 # Remove seed_demo_data file to ensure demo data is not seeded by default
 rm .bootstrap/seed_demo_data 1>/dev/null 2>&1
+rm .bootstrap/portal_direct_access 1>/dev/null 2>&1  # *** ADDED ***
 
 echo "Bringing Tyk Demo deployment UP"
 
@@ -158,7 +160,7 @@ fi
 # display commands to process
 echo "Commands to process:"
 if (( ${#commands_to_process[@]} != 0 )); then
-  for command in "${commands_to_process[@]}"; do    
+  for command in "${commands_to_process[@]}"; do
     case $command in
       "--persist-log")
         echo "  persist-log: Logs will be persisted"
@@ -180,11 +182,15 @@ if (( ${#commands_to_process[@]} != 0 )); then
         echo "  seed: Demo analytics data (7 days) will be seeded"
         touch .bootstrap/seed_demo_data
         ;;
-      *) 
+      "--portal-direct-access" | "--pda")  # *** ADDED ***
+        echo "  portal-direct-access: Portal will be configured with Direct API access flow"  # *** ADDED ***
+        touch .bootstrap/portal_direct_access  # *** ADDED ***
+        ;;  # *** ADDED ***
+      *)
         echo "Invalid argument: $command"
         display_help
         exit 1
-        ;; 
+        ;;
     esac
   done
 else
@@ -251,6 +257,21 @@ for deployment in "${deployments_to_create[@]}"; do
     exit 1
   fi
 done
+
+# *** ADDED START ***
+# Apply portal direct access configuration if flagged
+if [ -f ".bootstrap/portal_direct_access" ]; then
+  echo "Applying portal direct access configuration..."
+  docker exec tyk-demo-tyk-portal-postgres-1 psql -U admin -d portal \
+    -c "UPDATE configuration_tables SET api_product_access_flow = 'direct';"
+  if [ $? -eq 0 ]; then
+    echo "Portal direct access configuration applied successfully"
+  else
+    echo "ERROR: Failed to apply portal direct access configuration"
+    exit 1
+  fi
+fi
+# *** ADDED END ***
 
 # log deployed services
 log_message "Deployed service images:"
