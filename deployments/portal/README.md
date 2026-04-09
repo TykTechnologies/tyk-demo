@@ -24,6 +24,14 @@ This install comes bootstrapped with an admin user, an external api consumer use
 The Portal will spin up a Postgres database containing portal configurations as well as assets. 
 There is an exposed logfile in the directory `./deployments/portal/volumes/portal.log` for debugging purposes.
 
+To enable "Direct Access Flow" on Portal programatically, changes in DB table can be made by running the following below which uses `up.sh` script with `portal` parameter and the additional flag:
+
+```shell
+./up.sh portal --portal-direct-access
+```
+
+After running the flag, you will need to restart the Portal container, so the changes takes affect for "Direct Access Flow"
+
 ### Testing
 In order to test the endpoints of this deployment, run the standard test script:
 
