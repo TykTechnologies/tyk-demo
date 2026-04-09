@@ -21,7 +21,7 @@
  */
 
 import http from 'k6/http';
-import { check } from 'k6';
+import { check, sleep } from 'k6';
 import encoding from 'k6/encoding';
 
 // ─── Config ────────────────────────────────────────────────────────────────────
@@ -305,9 +305,10 @@ export function setup() {
     hook_references: [], is_site: false, sort_by: 0, user_group_owners: [], user_owners: [],
   });
 
-  // 4. Reload gateway so APIs are registered
+  // 4. Reload gateway so APIs are registered; sleep to allow propagation
   console.log('Reloading gateway after API creation...');
   reloadGateway();
+  sleep(3);
 
   // 5. Create OAuth access policy
   console.log('Creating policies...');
@@ -351,9 +352,10 @@ export function setup() {
     },
   });
 
-  // 7. Reload gateway to sync new policies
+  // 7. Reload gateway to sync new policies; sleep to allow policy propagation
   console.log('Reloading gateway to sync policies...');
   reloadGateway();
+  sleep(5);
 
   // 8. Create quota API keys
   console.log('Creating keys...');
@@ -382,7 +384,7 @@ export function setup() {
       }),
       { headers: authHeaders() }
     );
-    console.log(`  OAuth client: ${resp.json('client_id')}`);
+    console.log(`  OAuth client: ${client.id} (${resp.json('Message') || resp.status})`);
   }
 
   // 10. Get initial access tokens for each OAuth client

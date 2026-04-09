@@ -214,7 +214,7 @@
           "links": [
             {
               "title": "View in API Portfolio",
-              "url": "/grafana/d/tyk-api-portfolio?var-tyk_gw_id=${__field.labels.tyk_gw_id}&from=${__from}&to=${__to}",
+              "url": "/grafana/d/tyk-api-portfolio?var-tyk_gw_id=${__field.labels.tyk_gw_id}",
               "targetBlank": false
             }
           ]
@@ -264,7 +264,7 @@
           "links": [
             {
               "title": "View in API Portfolio",
-              "url": "/grafana/d/tyk-api-portfolio?var-tyk_gw_id=${__field.labels.tyk_gw_id}&from=${__from}&to=${__to}",
+              "url": "/grafana/d/tyk-api-portfolio?var-tyk_gw_id=${__field.labels.tyk_gw_id}",
               "targetBlank": false
             }
           ]
