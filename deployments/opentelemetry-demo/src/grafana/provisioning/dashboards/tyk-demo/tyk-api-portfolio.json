@@ -866,7 +866,7 @@
           "links": [
             {
               "title": "🔍 Troubleshoot this API",
-              "url": "/grafana/d/tyk-api-troubleshooting?${__url.params}&var-api_id=${__field.labels.tyk_api_id}",
+              "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__field.labels.tyk_api_id}",
               "targetBlank": false
             }
           ]
@@ -923,7 +923,7 @@
           "links": [
             {
               "title": "🔍 Troubleshoot this API",
-              "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__field.labels.tyk_api_id}&from=${__from}&to=${__to}",
+              "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__field.labels.tyk_api_id}",
               "targetBlank": false
             }
           ]
@@ -1143,7 +1143,7 @@
           "links": [
             {
               "title": "🔍 Troubleshoot this API",
-              "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__field.labels.api_id}&from=${__from}&to=${__to}",
+              "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__field.labels.api_id}",
               "targetBlank": false
             }
           ]
@@ -1190,7 +1190,7 @@
           "links": [
             {
               "title": "🔍 Troubleshoot this API",
-              "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__field.labels.tyk_api_id}&from=${__from}&to=${__to}",
+              "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__field.labels.tyk_api_id}",
               "targetBlank": false
             }
           ],
@@ -1255,7 +1255,7 @@
           "links": [
             {
               "title": "🔍 Troubleshoot this API",
-              "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__field.labels.tyk_api_id}&from=${__from}&to=${__to}",
+              "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__field.labels.tyk_api_id}",
               "targetBlank": false
             }
           ]
@@ -1401,7 +1401,7 @@
                 "value": [
                   {
                     "title": "🔍 Troubleshoot this API",
-                    "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__value.text}&${__url.params}",
+                    "url": "/grafana/d/tyk-api-troubleshooting?var-api_id=${__value.text}",
                     "targetBlank": false
                   }
                 ]

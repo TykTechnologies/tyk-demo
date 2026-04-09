@@ -849,6 +849,7 @@ services:
     restart: unless-stopped
     environment:
       - "GF_INSTALL_PLUGINS=grafana-opensearch-datasource"
+      - TYK_ALERTING_WEBHOOK_URL
     volumes:
       - ./deployments/opentelemetry-demo/src/grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./deployments/opentelemetry-demo/src/grafana/provisioning/:/etc/grafana/provisioning/

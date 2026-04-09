@@ -1,0 +1,473 @@
+---
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: tyk-gateway
+    folder: tyk-demo
+    interval: 1m
+    rules:
+
+      # Error rate > 10% over 5 minutes
+      - uid: tyk-high-error-rate
+        title: TykHighErrorRate
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: webstore-metrics
+            model:
+              editorMode: code
+              expr: |-
+                rate(tyk_api_requests_total{http_response_status_code!~"2.."}[5m])
+                /
+                rate(tyk_api_requests_total[5m])
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    params:
+                      - 0.10
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: "Error rate > 10% for {{ $labels.tyk_api_id }}"
+          description: >-
+            The non-2xx error rate has exceeded 10% for 5 minutes.
+            Check response flag breakdown in the Tyk API dashboard to identify the error source.
+        labels:
+          severity: warning
+        isPaused: false
+        notification_settings:
+          receiver: tyk-webhook
+
+      # p95 latency > 1 second over 5 minutes
+      - uid: tyk-high-latency
+        title: TykHighLatency
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: webstore-metrics
+            model:
+              editorMode: code
+              expr: |-
+                histogram_quantile(0.95,
+                  rate(http_server_request_duration_seconds_bucket[5m])
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    params:
+                      - 1
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: "p95 latency > 1s for {{ $labels.tyk_api_id }}"
+          description: >-
+            p95 end-to-end latency has exceeded 1 second for 5 minutes.
+            If gateway-only latency (tyk_gateway_request_duration_seconds) is < 10ms, the bottleneck is upstream.
+        labels:
+          severity: warning
+        isPaused: false
+        notification_settings:
+          receiver: tyk-webhook
+
+      # Auth failure surge (AMF or AKI) > 0.1/s for 2 minutes
+      - uid: tyk-auth-failure-surge
+        title: TykAuthFailureSurge
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: webstore-metrics
+            model:
+              editorMode: code
+              expr: |-
+                rate(http_server_request_duration_seconds_count{tyk_response_flag=~"AMF|AKI"}[5m])
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    params:
+                      - 0.1
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+        noDataState: NoData
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: "Auth failures > 6/min — client misconfiguration or credential attack"
+          description: >-
+            AMF (missing auth header) or AKI (invalid key) rate exceeds 0.1/s.
+            Single source IP suggests misconfigured client; wide IP spread suggests credential stuffing.
+        labels:
+          severity: warning
+        isPaused: false
+        notification_settings:
+          receiver: tyk-webhook
+
+      # Quota exhaustion (QEX) — any sustained for 1 minute
+      - uid: tyk-quota-exhaustion
+        title: TykQuotaExhaustion
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: webstore-metrics
+            model:
+              editorMode: code
+              expr: |-
+                rate(http_server_request_duration_seconds_count{tyk_response_flag="QEX"}[5m])
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: "Consumers hitting quota limits (QEX)"
+          description: >-
+            One or more consumers have exhausted their quota window.
+            Identify the consumer via the api_key field in logs and consider raising their quota or inviting a tier upgrade.
+        labels:
+          severity: info
+        isPaused: false
+        notification_settings:
+          receiver: tyk-webhook
+
+      # Rate limit rejections (RLT) — any sustained for 1 minute
+      - uid: tyk-rate-limit-rejections
+        title: TykRateLimitRejections
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: webstore-metrics
+            model:
+              editorMode: code
+              expr: |-
+                rate(http_server_request_duration_seconds_count{tyk_response_flag="RLT"}[1m])
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: "Rate limit rejections (RLT)"
+          description: >-
+            Requests are being rejected by the rate limiter.
+            If RLT rate is climbing alongside overall request rate, clients may be retrying 429s without backoff (retry storm).
+        labels:
+          severity: info
+        isPaused: false
+        notification_settings:
+          receiver: tyk-webhook
+
+      # Upstream 5xx errors (URS) — any sustained for 3 minutes
+      - uid: tyk-upstream-errors
+        title: TykUpstreamErrors
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: webstore-metrics
+            model:
+              editorMode: code
+              expr: |-
+                rate(http_server_request_duration_seconds_count{tyk_response_flag="URS"}[5m])
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+        noDataState: NoData
+        execErrState: Error
+        for: 3m
+        annotations:
+          summary: "Upstream returning 5xx for {{ $labels.tyk_api_id }}"
+          description: >-
+            The upstream service is returning 5xx errors (URS flag).
+            Extract error_target and upstream_addr from logs and escalate to the backend team.
+        labels:
+          severity: critical
+        isPaused: false
+        notification_settings:
+          receiver: tyk-webhook
+
+      # Goroutine count > 5,000 for 10 minutes
+      - uid: tyk-goroutine-growth
+        title: TykGoroutineGrowth
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: webstore-metrics
+            model:
+              editorMode: code
+              expr: |-
+                go_goroutine_count{job="tyk-gateway"}
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    params:
+                      - 5000
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+        dashboardUid: tyk-gateway-fleet-health
+        noDataState: NoData
+        execErrState: Error
+        for: 10m
+        annotations:
+          summary: "Goroutine count elevated — possible leak"
+          description: >-
+            go_goroutine_count has exceeded 5,000 for 10 minutes on {{ $labels.service_instance_id }}.
+            A healthy gateway at moderate load runs 500–2,000 goroutines.
+            Enable http_profiler and capture a goroutine profile to investigate.
+        labels:
+          severity: warning
+        isPaused: false
+        notification_settings:
+          receiver: tyk-webhook
+
+      # API definition count dropped > 10% in 2 minutes
+      - uid: tyk-apis-loaded-drop
+        title: TykApisLoadedDrop
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: webstore-metrics
+            model:
+              editorMode: code
+              expr: |-
+                (tyk_gateway_apis_loaded - tyk_gateway_apis_loaded offset 2m)
+                  / tyk_gateway_apis_loaded offset 2m
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    params:
+                      - -0.1
+                    type: lt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+        dashboardUid: tyk-gateway-fleet-health
+        noDataState: NoData
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: "API definition count dropped > 10% — possible sync failure"
+          description: >-
+            tyk_gateway_apis_loaded dropped more than 10% in a 2-minute window.
+            This typically indicates a failed sync from the Dashboard or an accidental bulk delete.
+            Check gateway logs for config sync errors.
+        labels:
+          severity: critical
+        isPaused: false
+        notification_settings:
+          receiver: tyk-webhook
