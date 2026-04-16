@@ -16,12 +16,11 @@ bootstrap_progress
 
 log_message "Resetting AI Studio database"
 # this ensures that the AI Studio database is reset to a clean state on each bootstrap
-# Todo: keep existing DB as I mess wit it
-# cp deployments/ai-studio/data/tyk-ai-studio/ai-studio.db deployments/ai-studio/volumes/tyk-ai-studio/db
-# if [ $? -ne 0 ]; then
-#     echo "ERROR: Failed to reset AI Studio database"
-#     exit 1
-# fi
+cp deployments/ai-studio/data/tyk-ai-studio/ai-studio.db deployments/ai-studio/volumes/tyk-ai-studio/db
+if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to reset AI Studio database"
+    exit 1
+fi
 log_ok
 bootstrap_progress
 
