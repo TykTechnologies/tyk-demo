@@ -1,0 +1,33 @@
+services:
+  mcp-mock-server:
+    image: tyk-mock-mcp-server:local
+    build:
+      context: https://github.com/TykTechnologies/tyk-mock-mcp-server.git#main
+    ports:
+      - "7878:7878"
+    environment:
+      - PORT=7878
+    networks:
+      - tyk
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7878/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  mcp-inspector:
+    image: node:22-alpine
+    command: sh -c "npx -y @modelcontextprotocol/inspector"
+    ports:
+      - "6274:6274"
+      - "6277:6277"
+    environment:
+      - HOST=0.0.0.0
+      - DANGEROUSLY_OMIT_AUTH=true
+      - ALLOWED_ORIGINS=http://localhost:6274
+    networks:
+      - tyk
+    depends_on:
+      mcp-mock-server:
+        condition: service_healthy

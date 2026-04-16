@@ -4,6 +4,7 @@
 
 source scripts/common.sh
 deployment="AI Studio"
+ai_studio_url="https://ai-studio.localhost:4000"
 log_start_deployment
 bootstrap_progress
 
@@ -15,11 +16,12 @@ bootstrap_progress
 
 log_message "Resetting AI Studio database"
 # this ensures that the AI Studio database is reset to a clean state on each bootstrap
-cp deployments/ai-studio/data/tyk-ai-studio/ai-studio.db deployments/ai-studio/volumes/tyk-ai-studio/db
-if [ $? -ne 0 ]; then
-    echo "ERROR: Failed to reset AI Studio database"
-    exit 1
-fi
+# Todo: keep existing DB as I mess wit it
+# cp deployments/ai-studio/data/tyk-ai-studio/ai-studio.db deployments/ai-studio/volumes/tyk-ai-studio/db
+# if [ $? -ne 0 ]; then
+#     echo "ERROR: Failed to reset AI Studio database"
+#     exit 1
+# fi
 log_ok
 bootstrap_progress
 
@@ -35,6 +37,7 @@ echo -e "\033[2K
   ▽ AI Gateway
                     URL : http://localhost:9090
   ▽ AI Portal
-                    URL : http://localhost:3011
+                    URL : $ai_studio_url
                Username : dev@tyk.io
-               Password : T0pSecR3t!"
+               Password : T0pSecR3t!
+                   Note : Accept the self-signed certificate warning the first time you visit the site."

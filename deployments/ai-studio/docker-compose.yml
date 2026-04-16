@@ -2,29 +2,46 @@
 services:
   tyk-ai-studio:
     platform: linux/${TARGETARCH:-arm64}
-    image: tykio/tyk-ai-studio:v1.0.1
+    image: tykio/tyk-ai-studio-enterprise:d6e202d8e7f572fa6b2d3e388e5a47209d6d5433
     volumes:
       - ${PWD}/deployments/ai-studio/volumes/tyk-ai-studio/db:/app/db # Map the database directory
+      - ${PWD}/deployments/ai-studio/volumes/tyk-ai-studio/oci:/app/data/oci-cache # Marketplace plugin OCI image cache
+      - ${PWD}/deployments/ai-studio/volumes/tyk-ai-studio/marketplace:/app/.marketplace-cache # Marketplace index cache
+      - ${PWD}/deployments/ai-studio/volumes/tyk-ai-studio/certs:/app/certs # TLS certificate and key
     ports:
-      - "3011:8080" # Frontend
+      - "4000:8080" # Frontend (HTTPS)
       - "9090:9090" # Proxy
     environment:
       - TYK_AI_LICENSE=${AI_STUDIO_LICENSE:?License missing from Docker environment file .env.}
       - CHOKIDAR_USEPOLLING=true
       - ALLOW_REGISTRATIONS=true
-      - SITE_URL=http://localhost:8080
+      - SITE_URL=https://ai-studio.localhost:4000
       - FROM_EMAIL=noreply@tyk.io
-      - DEVMODE=true
+      - TEST_MODE=true
       - DEBUG_HTTP=false
+      - AUTH_SERVER_URL=https://ai-studio.localhost:4000
       - DEBUG_HTTP_PROXY=false
       - DATABASE_URL=/app/db/ai-studio.db # Use absolute path
       - DATABASE_TYPE=sqlite
       - ECHO_CONVERSATION=true
       - TYK_AI_SECRET_KEY=top-secret
+      - CERT_FILE=/app/certs/tls-certificate.pem
+      - KEY_FILE=/app/certs/tls-private-key.pem
       - DOCS_URL=http://localhost:8989
       - PROXY_URL=http://localhost:9090
       - FILTER_SIGNUP_DOMAINS=tyk.io
       - DEFAULT_SIGNUP_MODE="both"
       - TIB_ENABLED=true
+      # Plugin Marketplace
+      - MARKETPLACE_ENABLED=true
+      - MARKETPLACE_INDEX_URL=https://raw.githubusercontent.com/TykTechnologies/tyk-ai-studio-plugins-ce/main/index.yaml
+      - MARKETPLACE_SYNC_INTERVAL=1h
+      - MARKETPLACE_CACHE_DIR=/app/.marketplace-cache
+      - AI_STUDIO_OCI_CACHE_DIR=/app/data/oci-cache
     stdin_open: true
     tty: true
+    networks:
+      - tyk
+
+networks:
+  tyk:
