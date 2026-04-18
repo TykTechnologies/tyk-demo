@@ -16,15 +16,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tar \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
-RUN pip install --no-cache-dir --no-deps poetry==1.8.5
-
-# Copy project files
-COPY pyproject.toml poetry.lock ./
-
-# Install dependencies
-RUN poetry export --dev -f requirements.txt --output requirements.txt && \
-    pip install --no-cache-dir -r requirements.txt
+# Copy and install pinned dependencies
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --no-deps -r requirements.txt
 
 # Download repository as a tarball using the provided release version
 RUN curl -L "https://github.com/TykTechnologies/tyk/archive/refs/tags/${GATEWAY_VERSION}.tar.gz" -o tyk.tar.gz && \
