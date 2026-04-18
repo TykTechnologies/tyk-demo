@@ -3,18 +3,23 @@ name: Run linters
 on: # yamllint disable-line rule:truthy
   - push
 
+permissions:
+  contents: read
+
 jobs:
   yamllint:
     name: Yamllint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Git - checkout pull request branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
         with:
           fetch-depth: 1
 
       - name: Run yaml linter
-        uses: karancode/yamllint-github-action@master
+        uses: karancode/yamllint-github-action@4052d365f09b8d34eb552c363d1141fd60e2aeb2  # master
         with:
           yamllint_file_or_dir: .
           yamllint_config_datapath: .yamllint.yaml

@@ -1,4 +1,4 @@
-FROM node:18.20-slim
+FROM node:18.20-slim@sha256:f9ab18e354e6855ae56ef2b290dd225c1e51a564f87584b9bd21dd651838830e
 
 ARG BACKSTAGE_NPM_TOKEN
 
@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     python3
 
 # Install the create-app package first
-RUN npm install -g @backstage/create-app@0.5.18
+RUN npm install --ignore-scripts -g @backstage/create-app@0.5.18
 
 # Install Backstage using npx
 RUN echo "backstage" | npx @backstage/create-app@0.5.18
