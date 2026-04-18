@@ -13,11 +13,16 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   # First job to collect all the deployments to test
   discover-deployments:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
     outputs:
       deployment-matrix: ${{ steps.set-matrix.outputs.deployment-matrix }}
       gateway-tag: ${{ steps.get-tags.outputs.gateway-tag }}
@@ -26,7 +31,7 @@ jobs:
       dashboard-repo: ${{ steps.get-tags.outputs.dashboard-repo }}
     steps:
       - name: Check Out Repository Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
 
       - name: Find All Deployments
         id: set-matrix
@@ -39,7 +44,7 @@ jobs:
           fi
 
           echo "deployment-matrix=${DEPLOYMENTS}" >> $GITHUB_OUTPUT
-          echo "✅ Found deployments: ${DEPLOYMENTS}"
+          echo "Found deployments: ${DEPLOYMENTS}"
       - name: Get Docker Image Tags and Repositories
         id: get-tags
         run: |
@@ -50,10 +55,10 @@ jobs:
             GATEWAY_REPO="tyk-gateway-fips"
             DASHBOARD_REPO="tyk-dashboard-fips"
 
-            echo "✅ Manual workflow dispatch detected"
-            echo "✅ Using FIPS repositories"
-            echo "✅ Gateway tag: $GATEWAY_TAG"
-            echo "✅ Dashboard tag: $DASHBOARD_TAG"
+            echo "Manual workflow dispatch detected"
+            echo "Using FIPS repositories"
+            echo "Gateway tag: $GATEWAY_TAG"
+            echo "Dashboard tag: $DASHBOARD_TAG"
           else
             # Push trigger: extract from docker-compose.yml and use standard repositories
             GATEWAY_TAG=$(awk '/tyk-gateway:/ { in_gateway=1 }
@@ -91,9 +96,9 @@ jobs:
             GATEWAY_REPO="tyk-gateway"
             DASHBOARD_REPO="tyk-dashboard"
 
-            echo "✅ Push trigger detected"
-            echo "✅ Extracted gateway tag: $GATEWAY_TAG"
-            echo "✅ Extracted dashboard tag: $DASHBOARD_TAG"
+            echo "Push trigger detected"
+            echo "Extracted gateway tag: $GATEWAY_TAG"
+            echo "Extracted dashboard tag: $DASHBOARD_TAG"
           fi
 
           echo "gateway-tag=$GATEWAY_TAG" >> "$GITHUB_OUTPUT"
@@ -106,6 +111,8 @@ jobs:
     needs: discover-deployments
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
     outputs:
       deployment-results: ${{ steps.set-results.outputs.results }}
     strategy:
@@ -115,7 +122,7 @@ jobs:
 
     steps:
       - name: Check Out Repository Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
 
       - name: Set global env vars
         run: |
@@ -179,22 +186,22 @@ jobs:
           echo "DASHBOARD_VERSION=${{ needs.discover-deployments.outputs.dashboard-tag }}" >> .env
           echo "DASHBOARD_SSO_VERSION=${{ needs.discover-deployments.outputs.dashboard-tag }}" >> .env
 
-          echo "✅ GATEWAY_IMAGE_REPO set to ${{ needs.discover-deployments.outputs.gateway-repo }}"
-          echo "✅ DASHBOARD_IMAGE_REPO set to ${{ needs.discover-deployments.outputs.dashboard-repo }}"
-          echo "✅ Gateway versions set to ${{ needs.discover-deployments.outputs.gateway-tag }}"
-          echo "✅ Dashboard versions set to ${{ needs.discover-deployments.outputs.dashboard-tag }}"
+          echo "GATEWAY_IMAGE_REPO set to ${{ needs.discover-deployments.outputs.gateway-repo }}"
+          echo "DASHBOARD_IMAGE_REPO set to ${{ needs.discover-deployments.outputs.dashboard-repo }}"
+          echo "Gateway versions set to ${{ needs.discover-deployments.outputs.gateway-tag }}"
+          echo "Dashboard versions set to ${{ needs.discover-deployments.outputs.dashboard-tag }}"
 
           # Set GOEXPERIMENT=boringcrypto for FIPS builds
           if [[ "${{ needs.discover-deployments.outputs.gateway-repo }}" == *"-fips"* ]]; then
             echo "GOEXPERIMENT=boringcrypto" >> .env
-            echo "✅ GOEXPERIMENT set to boringcrypto for FIPS build"
+            echo "GOEXPERIMENT set to boringcrypto for FIPS build"
           fi
           echo "::endgroup::"
 
           echo "::group::Default to debug logs for Gateway and Dashboard"
           echo "GATEWAY_LOGLEVEL=debug" >> .env
           echo "DASHBOARD_LOGLEVEL=debug" >> .env
-          echo "✅ Gateway and Dashboard log levels set to debug 🐛"
+          echo "Gateway and Dashboard log levels set to debug"
           echo "::endgroup::"
 
           echo "::group::Set licences"
@@ -207,25 +214,25 @@ jobs:
             exit 1
           fi
           echo "DASHBOARD_LICENCE=${{ secrets.DASH_LICENSE }}" >> .env
-          echo "✅ DASHBOARD_LICENCE added to .env"
+          echo "DASHBOARD_LICENCE added to .env"
           echo "MDCB_LICENCE=${{ secrets.MDCB_LICENSE }}" >> .env
-          echo "✅ MDCB_LICENCE added to .env"
+          echo "MDCB_LICENCE added to .env"
           echo "AI_STUDIO_LICENSE=${{ secrets.DASH_LICENSE }}" >> .env
-          echo "✅ AI_STUDIO_LICENSE added to .env"
+          echo "AI_STUDIO_LICENSE added to .env"
           echo "GOVERNANCE_LICENSE=${{ secrets.DASH_LICENSE }}" >> .env
-          echo "✅ GOVERNANCE_LICENSE added to .env"
+          echo "GOVERNANCE_LICENSE added to .env"
           echo "::endgroup::"
 
       - name: Cache Go Plugins
         if: steps.read-manifest.outputs.skip-deployment != 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830  # v4
         with:
           path: .bootstrap/plugin-cache/${{ needs.discover-deployments.outputs.gateway-tag }}
           key: tyk-go-plugins-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
 
       - name: Cache Jenkins Plugins
         if: steps.read-manifest.outputs.skip-deployment != 'true' && matrix.deployment == 'cicd'
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830  # v4
         with:
           path: deployments/cicd/volumes/jenkins/plugins
           key: jenkins-plugins-${{ hashFiles('deployments/cicd/volumes/jenkins/plugins.txt') }}
@@ -237,7 +244,7 @@ jobs:
           COMPOSE_ARG="${{ steps.read-manifest.outputs.compose-argument }}"
 
           if ./up.sh ${COMPOSE_ARG:-${{ matrix.deployment }}} --hide-progress --skip-hostname-check; then
-            echo "✅ Deployment created successfully"
+            echo "Deployment created successfully"
           else
             echo "::error::Deployment creation failed for ${{ matrix.deployment }}"
             exit 1
@@ -253,22 +260,22 @@ jobs:
 
           echo "::group::Checking for Postman tests"
           if validate_postman_collection "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
-            echo "✅ Found Postman tests"
+            echo "Found Postman tests"
             echo "postman-tests-found=true" >> $GITHUB_OUTPUT
             tests_found=true
           else
-            echo "❌ No Postman tests found"
+            echo "No Postman tests found"
             echo "postman-tests-found=false" >> $GITHUB_OUTPUT
           fi
           echo "::endgroup::"
 
           echo "::group::Checking for custom tests"
           if validate_test_scripts "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
-            echo "✅ Found custom tests"
+            echo "Found custom tests"
             echo "custom-tests-found=true" >> $GITHUB_OUTPUT
             tests_found=true
           else
-            echo "❌ No custom tests found"
+            echo "No custom tests found"
             echo "custom-tests-found=false" >> $GITHUB_OUTPUT
           fi
           echo "::endgroup::"
@@ -284,9 +291,9 @@ jobs:
           TEST_RESULT=0
 
           if run_postman_test "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
-            echo "✅ Postman tests passed"
+            echo "Postman tests passed"
           else
-            echo "❌ Postman tests failed"
+            echo "Postman tests failed"
             TEST_RESULT=1
           fi
 
@@ -303,9 +310,9 @@ jobs:
 
           # Run custom tests
           if run_test_scripts "${{ matrix.deployment }}" "${DEPLOYMENT_DIR}"; then
-            echo "✅ Custom tests passed"
+            echo "Custom tests passed"
           else
-            echo "❌ Custom tests failed"
+            echo "Custom tests failed"
             exit 1
           fi
 
@@ -336,7 +343,7 @@ jobs:
 
       - name: Upload Logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
           name: logs-${{ matrix.deployment }}
           path: logs/
@@ -381,7 +388,7 @@ jobs:
 
       - name: Store result
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
           name: result-${{ matrix.deployment }}
           path: result.json
@@ -390,10 +397,12 @@ jobs:
     needs: test-deployments
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
     if: always()
     steps:
       - name: Download all results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
         with:
           pattern: 'result-*'
           path: results/
@@ -414,7 +423,7 @@ jobs:
           done
 
       - name: Upload combined results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
         with:
           name: combined-results
           path: results.json
@@ -423,14 +432,16 @@ jobs:
     needs: collect-results
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
     if: always()
     steps:
       # needed for common test script library
       - name: Check Out Repository Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
 
       - name: Download combined results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
         with:
           name: combined-results
 

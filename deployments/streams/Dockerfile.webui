@@ -1,5 +1,5 @@
 # Use official Python 3 slim image
-FROM python:3.11-slim
+FROM python:3.11-slim@sha256:233de06753d30d120b1a3ce359d8d3be8bda78524cd8f520c99883bfe33964cf
 
 # Add metadata labels
 LABEL maintainer="lheritagetyk"
@@ -9,7 +9,7 @@ LABEL description="Web UI Server for Kafka Master Data Streaming Demo"
 WORKDIR /app
 
 # Install Python dependencies
-RUN pip3 install --no-cache-dir flask flask-cors requests
+RUN pip3 install --no-cache-dir --no-deps flask flask-cors requests
 
 # Copy web UI server script
 COPY web_ui_server.py .

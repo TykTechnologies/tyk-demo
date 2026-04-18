@@ -1,5 +1,5 @@
 # Define the base image
-FROM python:3.12-slim AS builder
+FROM python:3.12-slim@sha256:804ddf3251a60bbf9c92e73b7566c40428d54d0e79d3428194edf40da6521286 AS builder
 
 # Set the build argument for the release version
 # Example: v5.3.1
@@ -17,14 +17,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
-RUN pip install --no-cache-dir poetry==1.8.5
+RUN pip install --no-cache-dir --no-deps poetry==1.8.5
 
 # Copy project files
 COPY pyproject.toml poetry.lock ./
 
 # Install dependencies
 RUN poetry export --dev -f requirements.txt --output requirements.txt && \
-    pip install --no-cache-dir -r requirements.txt 
+    pip install --no-cache-dir -r requirements.txt
 
 # Download repository as a tarball using the provided release version
 RUN curl -L "https://github.com/TykTechnologies/tyk/archive/refs/tags/${GATEWAY_VERSION}.tar.gz" -o tyk.tar.gz && \
@@ -37,7 +37,7 @@ RUN curl -L "https://github.com/TykTechnologies/tyk/archive/refs/tags/${GATEWAY_
 RUN python -m grpc_tools.protoc --proto_path=. --python_out=. --grpc_python_out=. *.proto
 
 # Define the base image
-FROM python:3.12-slim
+FROM python:3.12-slim@sha256:804ddf3251a60bbf9c92e73b7566c40428d54d0e79d3428194edf40da6521286
 
 # Define working directory
 WORKDIR /app
