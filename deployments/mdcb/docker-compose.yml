@@ -1,7 +1,7 @@
 ---
 services:
   tyk-mdcb:
-    image: tykio/tyk-mdcb-docker:${MDCB_VERSION:-v2.9.1}
+    image: tykio/tyk-mdcb-docker:${MDCB_VERSION:-v2.9.0}
     ports:
       - 9091:9091
       - 8181:8181
