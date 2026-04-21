@@ -4,8 +4,8 @@ services:
     build:
       context: ./deployments/plugin-python-grpc
       args:
-        GATEWAY_VERSION: ${GATEWAY_VERSION:-v5.12.1-rc5}
-    image: tykio/python-grpc-server:${GATEWAY_VERSION:-v5.12.1-rc5}
+        GATEWAY_VERSION: ${GATEWAY_VERSION:-v5.12.1-rc6}
+    image: tykio/python-grpc-server:${GATEWAY_VERSION:-v5.12.1-rc6}
     ports:
       - 50051:50051
     networks:
