@@ -17,7 +17,7 @@ services:
       - ALLOW_REGISTRATIONS=true
       - SITE_URL=https://ai-studio.localhost:4000
       - FROM_EMAIL=noreply@tyk.io
-      - TEST_MODE=true
+      - DEV_MODE=true
       - DEBUG_HTTP=false
       - AUTH_SERVER_URL=https://ai-studio.localhost:4000
       - DEBUG_HTTP_PROXY=false

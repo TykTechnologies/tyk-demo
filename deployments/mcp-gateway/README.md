@@ -42,6 +42,7 @@ When bootstrap completes you should have:
 
 1. Log in to the Dashboard at http://localhost:3000.
 2. Open MCP Inspector at http://localhost:6274 in a separate tab.
+2. A) access the running MCP directly via url: `http://mcp-mock-server:7878/mcp`
 3. Create a new **MCP Proxy** in the Dashboard pointing at `http://mcp-mock-server:7878` (use the Docker service name so the Tyk Gateway can reach the upstream on the internal network).
 4. Copy the Gateway-exposed proxy URL, append `/mcp`, and connect from Inspector. The Inspector container is on the same Docker network as the Gateway, so the Gateway URL works directly.
 
