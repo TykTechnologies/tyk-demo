@@ -59,12 +59,6 @@ services:
     depends_on:
       - tyk-redis
       - tyk-dashboard
-    logging:
-      driver: "json-file"
-      options:
-        tag: "tyk-gateway"
-        max-size: "10m"
-        max-file: "3"
   tyk-gateway-2:
     image: tykio/${GATEWAY_IMAGE_REPO:-tyk-gateway}:${GATEWAY2_VERSION:-v5.12.0}
     ports:
@@ -140,7 +134,7 @@ services:
     networks:
       - tyk
   www-ngrok:
-    image: ngrok/ngrok:3.37.2-alpine
+    image: ngrok/ngrok:3.12.0-alpine
     networks:
       - tyk
     command:
@@ -175,17 +169,6 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_NUM_PARTITIONS: 3
-      # Add OpenTelemetry environment variables when opentelemetry-demo is deployed
-      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
-      OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE: ${OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE:-}
-      OTEL_RESOURCE_ATTRIBUTES: ${OTEL_RESOURCE_ATTRIBUTES:-}
-      OTEL_SERVICE_NAME: kafka
-    healthcheck:
-      test: [ "CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list" ]
-      start_period: 10s
-      interval: 5s
-      timeout: 10s
-      retries: 10
     volumes:
       - tyk-kafka-data:/opt/kafka/data
   countries-rest-api:
