@@ -4,8 +4,6 @@
 .context-data
 .bootstrap
 .idea/
-.playwright-mcp/*
-.claude/**
 logs/*
 **/*.so
 deployments/cicd/volumes/jenkins/bootstrap-import/credentials-global.xml
@@ -13,8 +11,6 @@ deployments/cicd/volumes/jenkins/plugins/*.jpi
 deployments/tyk/volumes/tyk-gateway/plugins/go/example/vendor
 deployments/tyk/volumes/tyk-gateway/middleware/bundles
 deployments/tyk/volumes/tyk-gateway/plugins/go/jwt/vendor
-
-reports/*
 
 # Dynamic environment variables for tests
 deployments/**/dynamic-test-vars.env

@@ -25,9 +25,6 @@ services:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-0}
       - TYK_GW_SLAVEOPTIONS_APIKEY=${MDCB_USER_API_CREDENTIALS:-placeholder}
-      - TYK_GW_SLAVEOPTIONS_GROUPID=${GATEWAY_WORKER_GROUPID:-gw-internal}
-      - TYK_GW_DBAPPCONFOPTIONS_TAGS=${GATEWAY_WORKER_TAGS:-}
-      - TYK_GW_DBAPPCONFOPTIONS_NODEISSEGMENTED=${GATEWAY_WORKER_NODE_IS_SEGMENTED:-false}
       - TYK_GW_OPENTELEMETRY_ENABLED=${OPENTELEMETRY_ENABLED:-false}
       - TYK_GW_OPENTELEMETRY_ENDPOINT=${OPENTELEMETRY_ENDPOINT:-false}
       - TYK_DB_STREAMING_ENABLED=true
@@ -36,8 +33,6 @@ services:
       - tyk-gateway-certs:/opt/tyk-gateway/certs
       - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
       - ./deployments/tyk/volumes/tyk-gateway/plugins:/opt/tyk-gateway/plugins
-    env_file:
-      - .env
     depends_on:
       - tyk-worker-redis
       - tyk-mdcb
@@ -52,22 +47,16 @@ services:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_GW_TRACER_ENABLED=${TRACING_ENABLED:-0}
       - TYK_GW_SLAVEOPTIONS_APIKEY=${MDCB_USER_API_CREDENTIALS:-placeholder}
-      - TYK_GW_SLAVEOPTIONS_GROUPID=${GATEWAY_WORKER_NGROK_GROUPID:-gw-external}
-      - TYK_GW_DBAPPCONFOPTIONS_TAGS=${GATEWAY_WORKER_NGROK_TAGS:-}
-      - TYK_GW_DBAPPCONFOPTIONS_NODEISSEGMENTED=${GATEWAY_WORKER_NGROK_NODE_IS_SEGMENTED:-false}
       - TYK_GW_OPENTELEMETRY_ENABLED=${OPENTELEMETRY_ENABLED:-false}
       - TYK_GW_OPENTELEMETRY_ENDPOINT=${OPENTELEMETRY_ENDPOINT:-false}
       - TYK_GW_SLAVEOPTIONS_CONNECTIONSTRING=${NGROK_MDCB_TUNNEL_URL:-placeholder}
-      - TYK_GW_STORAGE_HOST=tyk-worker-redis-ngrok
     volumes:
       - ./deployments/mdcb/volumes/tyk-worker-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
       - tyk-gateway-certs:/opt/tyk-gateway/certs
       - ./deployments/tyk/volumes/tyk-gateway/middleware:/opt/tyk-gateway/middleware
       - ./deployments/tyk/volumes/tyk-gateway/plugins:/opt/tyk-gateway/plugins
-    env_file:
-      - .env
     depends_on:
-      - tyk-worker-redis-ngrok
+      - tyk-worker-redis
       - tyk-mdcb
       - tyk-dashboard
   tyk-worker-redis:
@@ -78,15 +67,6 @@ services:
       - "63791:6379"
     networks:
       - tyk
-  tyk-worker-redis-ngrok:
-    image: redis:7.2.0
-    volumes:
-      - tyk-worker-redis-ngrok-data:/data
-    ports:
-      - "63792:6379"
-    networks:
-      - tyk
 
 volumes:
   tyk-worker-redis-data:
-  tyk-worker-redis-ngrok-data:
