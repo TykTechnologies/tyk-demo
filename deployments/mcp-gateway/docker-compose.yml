@@ -1,3 +1,4 @@
+---
 services:
   mcp-mock-server:
     image: tyk-mock-mcp-server:local
@@ -10,7 +11,7 @@ services:
     networks:
       - tyk
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7878/health"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7878/health" ]
       interval: 10s
       timeout: 3s
       retries: 3
