@@ -5,7 +5,7 @@ deployment="Kubernetes Operator"
 
 log_start_deployment
 
-tyk_operator_install_version="1.2.0"
+tyk_operator_install_version="1.4.0-rc1"
 
 log_message "Checking kubectl exists"
 if ! command -v kubectl >/dev/null; then

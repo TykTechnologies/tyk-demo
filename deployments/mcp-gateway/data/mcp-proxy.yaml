@@ -1,0 +1,23 @@
+---
+info:
+  title: mock-mcp
+  version: 1.0.0
+openapi: 3.0.3
+servers:
+  - url: /mock-mcp
+security:
+  - authToken: []
+paths: {}
+components:
+x-tyk-api-gateway:
+  middleware:
+    global:
+      contextVariables:
+        enabled: true
+      trafficLogs:
+        enabled: true
+  server:
+    detailedTracing:
+      enabled: true
+  upstream:
+    url: http://mcp-mock-server:7878

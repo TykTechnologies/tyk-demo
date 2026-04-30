@@ -4,6 +4,7 @@
 
 source scripts/common.sh
 deployment="AI Studio"
+ai_studio_url="https://ai-studio.localhost:4000"
 log_start_deployment
 bootstrap_progress
 
@@ -35,6 +36,7 @@ echo -e "\033[2K
   ▽ AI Gateway
                     URL : http://localhost:9090
   ▽ AI Portal
-                    URL : http://localhost:3011
+                    URL : $ai_studio_url
                Username : dev@tyk.io
-               Password : T0pSecR3t!"
+               Password : T0pSecR3t!
+                   Note : Accept the self-signed certificate warning the first time you visit the site."
