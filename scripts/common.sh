@@ -263,7 +263,12 @@ get_service_image_tag () {
 
 generate_docker_compose_command () {
   # create the docker compose command
-  local command_docker_compose="docker compose --env-file `pwd`/.env"
+  # demo.env provides defaults for the opentelemetry-demo deployment; user .env takes precedence
+  local command_docker_compose="docker compose"
+  if grep -Fxq "opentelemetry-demo" .bootstrap/bootstrapped_deployments 2>/dev/null; then
+    command_docker_compose="$command_docker_compose --env-file `pwd`/deployments/opentelemetry-demo/demo.env"
+  fi
+  command_docker_compose="$command_docker_compose --env-file `pwd`/.env"
   while read deployment; do
     command_docker_compose="$command_docker_compose -f deployments/$deployment/docker-compose.yml"
   done < .bootstrap/bootstrapped_deployments

@@ -1,0 +1,3331 @@
+{
+  "title": "Tyk Gateway - Native OTLP Metrics",
+  "uid": "tyk-gateway-otlp-metrics",
+  "version": 1,
+  "schemaVersion": 39,
+  "__requires__": [
+    { "type": "grafana", "id": "grafana", "name": "Grafana", "version": "10.0.0" },
+    { "type": "datasource", "id": "prometheus", "name": "Prometheus", "version": "1.0.0" }
+  ],
+  "description": "Showcases native OTLP metrics exported directly from Tyk Gateway. Key differentiator: latency attribution splitting Total = Gateway + Upstream, eliminating the need for Tyk Pump for metrics use cases.",
+  "tags": [
+    "tyk",
+    "gateway",
+    "opentelemetry",
+    "otlp",
+    "metrics",
+    "red"
+  ],
+  "timezone": "browser",
+  "editable": true,
+  "graphTooltip": 1,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "30s",
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "datasource_prometheus",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {},
+        "hide": 0,
+        "label": "Prometheus"
+      },
+      {
+        "name": "service_name",
+        "type": "query",
+        "datasource": "${datasource_prometheus}",
+        "query": "label_values(tyk_api_requests_total, service_name)",
+        "current": {
+          "text": "tyk-gateway",
+          "value": "tyk-gateway"
+        },
+        "multi": false,
+        "includeAll": false,
+        "label": "Service",
+        "refresh": 2,
+        "sort": 1
+      },
+      {
+        "name": "api_id",
+        "type": "query",
+        "datasource": "${datasource_prometheus}",
+        "query": "label_values(tyk_api_requests_total{service_name=~\"$service_name\"}, tyk_api_id)",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "label": "API ID",
+        "refresh": 2,
+        "sort": 1
+      },
+      {
+        "name": "method",
+        "type": "query",
+        "datasource": "${datasource_prometheus}",
+        "query": "label_values(tyk_api_requests_total{service_name=~\"$service_name\"}, http_request_method)",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "label": "HTTP Method",
+        "refresh": 2,
+        "sort": 1
+      },
+      {
+        "name": "org_id",
+        "type": "query",
+        "datasource": "${datasource_prometheus}",
+        "query": "label_values(tyk_requests_by_org_total{service_name=~\"$service_name\"}, org_id)",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "label": "Org ID",
+        "refresh": 2,
+        "sort": 1
+      },
+      {
+        "name": "tenant_id",
+        "type": "query",
+        "datasource": "${datasource_prometheus}",
+        "query": "label_values(tyk_requests_by_tenant_total{service_name=~\"$service_name\"}, tenant_id)",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "label": "Tenant ID",
+        "refresh": 2,
+        "sort": 1
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Request Rate",
+      "description": "Current request rate across all APIs (from native OTLP counter tyk_api_requests_total)",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 100
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))",
+          "legendFormat": "req/s",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "HTTP Error Rate",
+      "description": "Percentage of requests returning 5xx status codes",
+      "gridPos": {
+        "x": 4,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "orange",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) / sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) * 100",
+          "legendFormat": "Error %",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "P95 Total Latency",
+      "description": "95th percentile end-to-end request duration (http_server_request_duration_seconds). This covers the full round-trip through Tyk to upstream and back.",
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 500
+              },
+              {
+                "color": "orange",
+                "value": 1000
+              },
+              {
+                "color": "red",
+                "value": 5000
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P95 Total",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "P95 Gateway Latency",
+      "description": "95th percentile time spent processing within Tyk Gateway (tyk_gateway_request_duration_seconds). Excludes upstream call time.",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "orange",
+                "value": 100
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_gateway_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P95 Gateway",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "P95 Upstream Latency",
+      "description": "95th percentile time spent waiting for upstream service response (tyk_upstream_request_duration_seconds). High values indicate slow upstream services.",
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 200
+              },
+              {
+                "color": "orange",
+                "value": 500
+              },
+              {
+                "color": "red",
+                "value": 2000
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_upstream_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P95 Upstream",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Active APIs",
+      "description": "Number of distinct APIs receiving traffic (counted from tyk_api_id label)",
+      "gridPos": {
+        "x": 20,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "count(count by(tyk_api_id)(tyk_api_requests_total{service_name=~\"$service_name\"}))",
+          "legendFormat": "APIs",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "row",
+      "title": "Traffic Overview",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Request Rate by Status Class",
+      "description": "Request throughput broken down by HTTP status class. Powered by tyk_api_requests_total with http_response_status_code label — a new capability vs legacy Pump metrics.",
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "spanNulls": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "2xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "3xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "4xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "5xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"2..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))",
+          "legendFormat": "2xx",
+          "refId": "A"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"3..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))",
+          "legendFormat": "3xx",
+          "refId": "B"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"4..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))",
+          "legendFormat": "4xx",
+          "refId": "C"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))",
+          "legendFormat": "5xx",
+          "refId": "D"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Request Rate by API",
+      "description": "Per-API request throughput over time. Use the API ID variable above to filter. tyk_api_id is a native OTel attribute — no Tyk Pump required.",
+      "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 5,
+            "spanNulls": false
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))",
+          "legendFormat": "{{tyk_api_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "row",
+      "title": "Latency Attribution — Gateway vs Upstream",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Latency Breakdown: Total vs Gateway vs Upstream (P95)",
+      "description": "NEW: Native OTLP metrics enable precise latency attribution. Total ≈ Gateway + Upstream. When Total spikes but Gateway stays flat → upstream issue. When Gateway spikes → Tyk processing bottleneck. Previously impossible with Tyk Pump alone.",
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 16,
+        "h": 10
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "spanNulls": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "P95 Total"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#5794F2"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 3
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "P95 Gateway"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#FF780A"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "P95 Upstream"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#37872D"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "P50 Total"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#5794F2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    4,
+                    4
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P95 Total",
+          "refId": "A"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_gateway_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P95 Gateway",
+          "refId": "B"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_upstream_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P95 Upstream",
+          "refId": "C"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.50, sum by(le)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P50 Total",
+          "refId": "D"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "piechart",
+      "title": "Latency Attribution: Gateway vs Upstream",
+      "description": "Average proportion of latency attributable to Gateway processing vs Upstream service. Helps identify where optimization effort should focus.",
+      "gridPos": {
+        "x": 16,
+        "y": 14,
+        "w": 8,
+        "h": 10
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": {
+            "mode": "fixed"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Gateway"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#FF780A"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Upstream"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#37872D"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "pieType": "donut",
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_gateway_request_duration_seconds_sum{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) / sum(rate(http_server_request_duration_seconds_sum{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) * 100",
+          "legendFormat": "Gateway",
+          "refId": "A"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_upstream_request_duration_seconds_sum{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) / sum(rate(http_server_request_duration_seconds_sum{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) * 100",
+          "legendFormat": "Upstream",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "type": "table",
+      "title": "Latency by API (P50 / P95 / P99) — Total, Gateway, Upstream",
+      "description": "Per-API latency breakdown across all three dimensions. Identify APIs with high upstream latency (upstream-side issue) vs high gateway latency (Tyk processing issue).",
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 24,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "displayMode": "auto"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "API ID"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 200
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "P95.*"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-background-solid"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 500
+                    },
+                    {
+                      "color": "red",
+                      "value": 2000
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "frameIndex": 0,
+        "showHeader": true,
+        "sortBy": [
+          {
+            "displayName": "P95 Total (ms)",
+            "desc": true
+          }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.50, sum by(le, tyk_api_id)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P50 Total",
+          "refId": "A",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.95, sum by(le, tyk_api_id)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P95 Total",
+          "refId": "B",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.99, sum by(le, tyk_api_id)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P99 Total",
+          "refId": "C",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.95, sum by(le, tyk_api_id)(rate(tyk_gateway_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P95 Gateway",
+          "refId": "D",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.95, sum by(le, tyk_api_id)(rate(tyk_upstream_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P95 Upstream",
+          "refId": "E",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))",
+          "legendFormat": "Rate (req/s)",
+          "refId": "F",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "tyk_api_id": "API ID",
+              "Value #A": "P50 Total (ms)",
+              "Value #B": "P95 Total (ms)",
+              "Value #C": "P99 Total (ms)",
+              "Value #D": "P95 Gateway (ms)",
+              "Value #E": "P95 Upstream (ms)",
+              "Value #F": "Rate (req/s)"
+            },
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "type": "row",
+      "title": "Error Analysis",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 33,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 21,
+      "type": "timeseries",
+      "title": "Error Rate Over Time by Status Code",
+      "description": "4xx and 5xx error rates over time. Stacked by status code to pinpoint which errors are dominant.",
+      "gridPos": {
+        "x": 0,
+        "y": 34,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(http_response_status_code)(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"[45]..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))",
+          "legendFormat": "HTTP {{http_response_status_code}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "type": "piechart",
+      "title": "Response Flag Distribution",
+      "description": "NEW: tyk_response_flag label reveals WHY a request failed, not just the HTTP code. 'URS' = Upstream 5xx, 'BD' = Bad Destination, '200'/'404' = successful codes. Enables precise error categorization.",
+      "gridPos": {
+        "x": 12,
+        "y": 34,
+        "w": 6,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ]
+        },
+        "pieType": "pie",
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(tyk_response_flag)(increase(http_server_request_duration_seconds_count{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__range]))",
+          "legendFormat": "{{tyk_response_flag}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "type": "barchart",
+      "title": "Status Code Distribution",
+      "description": "Total request count by HTTP status code over the selected time range.",
+      "gridPos": {
+        "x": 18,
+        "y": 34,
+        "w": 6,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "displayName": "Requests",
+          "custom": {
+            "fillOpacity": 80
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        },
+        "xField": "http_response_status_code"
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sort_desc(sum by(http_response_status_code)(increase(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__range])))",
+          "legendFormat": "{{http_response_status_code}}",
+          "refId": "A",
+          "instant": true,
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "type": "row",
+      "title": "Per-API Leaderboards",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 50,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 31,
+      "type": "bargauge",
+      "title": "Top 10 APIs by Request Rate",
+      "description": "APIs with highest traffic volume. Identify hotspots using native tyk_api_id label.",
+      "gridPos": {
+        "x": 0,
+        "y": 51,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "valueMode": "color",
+        "showUnfilled": true,
+        "minVizWidth": 10,
+        "minVizHeight": 10,
+        "legend": {
+          "displayMode": "hidden"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "topk(10, sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])))",
+          "legendFormat": "{{tyk_api_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "type": "bargauge",
+      "title": "Top 10 APIs by P95 Latency",
+      "description": "APIs with highest tail latency. Candidates for optimization or upstream investigation.",
+      "gridPos": {
+        "x": 8,
+        "y": 51,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 500
+              },
+              {
+                "color": "orange",
+                "value": 1000
+              },
+              {
+                "color": "red",
+                "value": 3000
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "displayMode": "lcd",
+        "valueMode": "color",
+        "showUnfilled": true,
+        "legend": {
+          "displayMode": "hidden"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "topk(10, histogram_quantile(0.95, sum by(le, tyk_api_id)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000)",
+          "legendFormat": "{{tyk_api_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "type": "bargauge",
+      "title": "Top 10 APIs by Error Rate",
+      "description": "APIs with highest 5xx error rates. Use for SLO breach investigation.",
+      "gridPos": {
+        "x": 16,
+        "y": 51,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "orange",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "displayMode": "lcd",
+        "valueMode": "color",
+        "showUnfilled": true,
+        "legend": {
+          "displayMode": "hidden"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "topk(10, sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) / sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) * 100)",
+          "legendFormat": "{{tyk_api_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "type": "row",
+      "title": "HTTP Method Breakdown",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 60,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 41,
+      "type": "timeseries",
+      "title": "Request Rate by HTTP Method",
+      "description": "Traffic distribution across HTTP methods. http_request_method is a native OTel semantic convention attribute included in all Tyk OTLP metrics.",
+      "gridPos": {
+        "x": 0,
+        "y": 61,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "spanNulls": false
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(http_request_method)(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))",
+          "legendFormat": "{{http_request_method}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "type": "timeseries",
+      "title": "P95 Latency by HTTP Method",
+      "description": "Latency percentiles split by HTTP method. Helps identify if specific methods (e.g. POST with large payloads) have higher latency than GET requests.",
+      "gridPos": {
+        "x": 12,
+        "y": 61,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 5,
+            "spanNulls": false
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.95, sum by(le, http_request_method)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P95 {{http_request_method}}",
+          "refId": "A"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.50, sum by(le, http_request_method)(rate(http_server_request_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P50 {{http_request_method}}",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "type": "row",
+      "title": "Gateway-Wide Counters",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 69,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 51,
+      "type": "timeseries",
+      "title": "Gateway Total Request Counter (tyk_http_requests_total)",
+      "description": "Raw gateway-wide request counter with no labels — the simplest possible OTLP metric. Useful for high-level throughput comparison with no cardinality overhead. Compare against tyk_api_requests_total sum to verify accounting.",
+      "gridPos": {
+        "x": 0,
+        "y": 70,
+        "w": 12,
+        "h": 7
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 15
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#5794F2"
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "rate(tyk_http_requests_total{service_name=~\"$service_name\"}[$__rate_interval])",
+          "legendFormat": "Gateway Total (all APIs)",
+          "refId": "A"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\"}[$__rate_interval]))",
+          "legendFormat": "Sum of Per-API Counters",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "type": "timeseries",
+      "title": "Request Rate vs Error Rate Correlation",
+      "description": "Overlay of request rate and error rate to identify if errors spike with traffic (capacity issue) or independently (service/config issue).",
+      "gridPos": {
+        "x": 12,
+        "y": 70,
+        "w": 12,
+        "h": 7
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 5
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Error Rate %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval]))",
+          "legendFormat": "Request Rate",
+          "refId": "A"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=~\"5..\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) / sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\"}[$__rate_interval])) * 100",
+          "legendFormat": "Error Rate %",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 100,
+      "type": "row",
+      "title": "✦ Custom Dimensions — Configure Extra Labels from Any Source",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 77,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 101,
+      "type": "text",
+      "title": "How to Configure Custom Metric Dimensions",
+      "description": "Explains the opentelemetry.metrics.api_metrics gateway config schema for custom metric dimensions",
+      "gridPos": {
+        "x": 0,
+        "y": 78,
+        "w": 24,
+        "h": 12
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "## Custom Metric Dimensions in Tyk Gateway OTLP Metrics\n\nTyk Gateway lets you define **custom metric instruments** via `opentelemetry.metrics.api_metrics` in the gateway config. Each instrument can attach labels from **7 dimension sources** — enabling rich observability without modifying backend services.\n\n| Source | What it provides | Example keys |\n|---|---|---|\n| `metadata` | Built-in request fields (12 keys) | `method`, `response_code`, `api_id`, `api_name`, `org_id`, `response_flag`, `ip_address`, `api_version`, `host`, `scheme`, `listen_path`, `endpoint` |\n| `session` | Authenticated session fields (5 keys) | `api_key` (last 6 chars ⚠️), `oauth_id`, `alias`, `portal_app`, `portal_org` |\n| `header` | Any HTTP **request** header | `X-Customer-ID`, `X-Tenant-ID`, `Authorization` |\n| `context` | Tyk [context variables](https://tyk.io/docs/api-management/traffic-transformation/request-context-variables) | `jwt_claims_tier`, `request_id`, `path_parts` |\n| `response_header` | Any upstream **response** header (success path only) | `X-Cache-Status`, `X-Backend-Version` |\n| `gateway` | Gateway instance metadata (set at startup) | `node_id`, `node_version`, `group_id`, `tags` |\n| `config_data` | API definition metadata from the `config_data` map | Any key set on the API definition |\n\n**Max 10 dimensions per instrument** (OTel SDK fast path). High-cardinality sources (session/headers on histograms) emit a startup warning.\n\n```json\n// Example: opentelemetry.metrics.api_metrics in tyk.conf\n[\n  {\n    \"name\": \"tyk.requests.by_customer\",\n    \"type\": \"counter\",\n    \"description\": \"Request count by customer and subscription tier\",\n    \"dimensions\": [\n      { \"source\": \"header\",   \"key\": \"X-Customer-ID\",   \"label\": \"customer_id\", \"default\": \"unknown\" },\n      { \"source\": \"context\",  \"key\": \"jwt_claims_tier\", \"label\": \"tier\",        \"default\": \"standard\" },\n      { \"source\": \"metadata\", \"key\": \"api_id\",          \"label\": \"api_id\" }\n    ],\n    \"filters\": { \"api_ids\": [\"payments-api\", \"orders-api\"] }\n  },\n  {\n    \"name\": \"tyk.latency.premium_tier\",\n    \"type\": \"histogram\",\n    \"histogram_source\": \"total\",\n    \"histogram_buckets\": [0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5],\n    \"dimensions\": [\n      { \"source\": \"context\",  \"key\": \"jwt_claims_tier\", \"label\": \"tier\" },\n      { \"source\": \"metadata\", \"key\": \"api_id\",          \"label\": \"api_id\" }\n    ],\n    \"filters\": { \"methods\": [\"POST\", \"PUT\"], \"status_codes\": [\"2xx\"] }\n  }\n]\n```\n\n> **Panels in the sections below will show \"No data\" until custom instruments are configured in the gateway.** Each section includes the exact config snippet needed to populate it."
+      }
+    },
+    {
+      "id": 110,
+      "type": "row",
+      "title": "Metadata Dimensions — Path, Org, API Version, Scheme",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 90,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 111,
+      "type": "bargauge",
+      "title": "Top Paths by Traffic",
+      "description": "Requires custom metric: {\"name\":\"tyk.requests.by.route\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"metadata\",\"key\":\"route\",\"label\":\"route\"},{\"source\":\"metadata\",\"key\":\"api_name\",\"label\":\"api_name\"},{\"source\":\"metadata\",\"key\":\"method\",\"label\":\"method\"},{\"source\":\"metadata\",\"key\":\"response_code\",\"label\":\"response_code\"}]}",
+      "gridPos": {
+        "x": 0,
+        "y": 91,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "noValue": "Configure tyk.requests.by.route metric"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true,
+        "legend": {
+          "displayMode": "hidden"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "topk(10, sum by(listen_path, endpoint)(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval])))",
+          "legendFormat": "{{listen_path}} {{endpoint}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 112,
+      "type": "timeseries",
+      "title": "Path Error Rate Over Time",
+      "description": "4xx/5xx error rate per route. Requires tyk.requests.by.route custom counter with route and response_code dimensions.",
+      "gridPos": {
+        "x": 8,
+        "y": 91,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "noValue": "Configure tyk.requests.by.route metric"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(listen_path, endpoint)(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", response_code=~\"[45]..\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval])) / sum by(listen_path, endpoint)(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval])) * 100",
+          "legendFormat": "{{listen_path}} {{endpoint}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 113,
+      "type": "timeseries",
+      "title": "Traffic by Organization",
+      "description": "Per-org request rate. Requires tyk.requests.by.org custom counter with org_id and api_name dimensions from metadata source.",
+      "gridPos": {
+        "x": 16,
+        "y": 91,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "noValue": "Configure tyk.requests.by.org metric"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(org_id)(rate(tyk_requests_by_org_total{service_name=~\"$service_name\", org_id=~\"$org_id\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval]))",
+          "legendFormat": "Org: {{org_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 114,
+      "type": "piechart",
+      "title": "Traffic Share by API Version",
+      "description": "Request distribution across API versions. Helps track migration from v1→v2. Requires tyk.requests.by.version counter with api_version dimension from metadata.",
+      "gridPos": {
+        "x": 0,
+        "y": 100,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Configure tyk.requests.by.version metric"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ]
+        },
+        "pieType": "donut",
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(api_version)(\n  label_replace(\n    increase(tyk_requests_by_version_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__range]),\n    \"api_version\", \"No version\", \"api_version\", \"^$\"\n  )\n)",
+          "legendFormat": "{{api_version}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 115,
+      "type": "table",
+      "title": "API Version Error Rate & Traffic",
+      "description": "Error rate and request count per API version. Requires tyk.requests.by.version counter with api_version and response_code dimensions.",
+      "gridPos": {
+        "x": 8,
+        "y": 100,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Configure tyk.requests.by.version metric"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Error Rate %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background-solid"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 1
+                    },
+                    {
+                      "color": "red",
+                      "value": 5
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Rate (req/s)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "reqps"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(api_version)(\n  label_replace(\n    rate(tyk_requests_by_version_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]),\n    \"api_version\", \"No version\", \"api_version\", \"^$\"\n  )\n)",
+          "legendFormat": "Rate (req/s)",
+          "refId": "A",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "(\n  sum by(api_version)(label_replace(rate(tyk_requests_by_version_total{service_name=~\"$service_name\", api_id=~\"$api_id\", response_code=~\"5..\"}[$__rate_interval]), \"api_version\", \"No version\", \"api_version\", \"^$\"))\n  /\n  (sum by(api_version)(label_replace(rate(tyk_requests_by_version_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]), \"api_version\", \"No version\", \"api_version\", \"^$\")) > 0)\n  * 100\n)\nor\n(\n  sum by(api_version)(label_replace(rate(tyk_requests_by_version_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]) * 0, \"api_version\", \"No version\", \"api_version\", \"^$\"))\n)",
+          "legendFormat": "Error Rate %",
+          "refId": "B",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "api_version": "API Version",
+              "Value #A": "Rate (req/s)",
+              "Value #B": "Error Rate %"
+            },
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 116,
+      "type": "stat",
+      "title": "HTTPS Traffic %",
+      "description": "Percentage of requests using HTTPS vs HTTP. Requires tyk.requests.by.route counter with scheme dimension from metadata source.",
+      "gridPos": {
+        "x": 16,
+        "y": 100,
+        "w": 8,
+        "h": 4
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "noValue": "Configure tyk.requests.by.route (scheme dim)",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 99
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", scheme=\"https\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval]))\n/ (sum(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval])) > 0)\n* 100\nor vector(0)",
+          "legendFormat": "HTTPS %",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 117,
+      "type": "timeseries",
+      "title": "Requests by Scheme (HTTP vs HTTPS)",
+      "description": "Traffic volume split between HTTP and HTTPS. Requires tyk.requests.by.route counter with scheme dimension from metadata.",
+      "gridPos": {
+        "x": 16,
+        "y": 104,
+        "w": 8,
+        "h": 5
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 15
+          },
+          "noValue": "Configure tyk.requests.by.route (scheme dim)"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "https"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "http"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(scheme)(rate(tyk_requests_by_path_total{service_name=~\"$service_name\", method=~\"$method\", api_id=~\"$api_id\"}[$__rate_interval]))",
+          "legendFormat": "{{scheme}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 120,
+      "type": "row",
+      "title": "Session Dimensions — Identity & Auth Tracking (api_key, oauth_id, portal)",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 109,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 121,
+      "type": "bargauge",
+      "title": "Top API Keys by Traffic (last 6 chars)",
+      "description": "Requires: {\"name\":\"tyk.requests.by.apikey\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"session\",\"key\":\"api_key\",\"label\":\"api_key_suffix\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"}]}. Note: api_key is auto-truncated to last 6 characters by Tyk to control cardinality.",
+      "gridPos": {
+        "x": 0,
+        "y": 110,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "noValue": "Configure tyk.requests.by.apikey metric"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true,
+        "legend": {
+          "displayMode": "hidden"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "topk(10, sum by(api_key_suffix)(rate(tyk_requests_by_apikey_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval])))",
+          "legendFormat": "...{{api_key_suffix}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 122,
+      "type": "timeseries",
+      "title": "API Key Traffic Over Time",
+      "description": "Per-API-key request volume over time. Shows traffic distribution across your API consumer base. Requires tyk.requests.by.apikey counter with session api_key dimension.",
+      "gridPos": {
+        "x": 8,
+        "y": 110,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "noValue": "Configure tyk.requests.by.apikey metric"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(api_key_suffix)(rate(tyk_requests_by_apikey_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]))",
+          "legendFormat": "Key ...{{api_key_suffix}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 123,
+      "type": "timeseries",
+      "title": "OAuth Client Traffic",
+      "description": "Per-OAuth-client request rate. Identifies which OAuth applications are most active. Requires: {\"name\":\"tyk.requests.by.oauth\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"session\",\"key\":\"oauth_id\",\"label\":\"oauth_client_id\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"}]}",
+      "gridPos": {
+        "x": 16,
+        "y": 110,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "noValue": "Configure tyk.requests.by.oauth metric"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(oauth_client_id)(rate(tyk_requests_by_oauth_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]))",
+          "legendFormat": "{{oauth_client_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 124,
+      "type": "bargauge",
+      "title": "OAuth Client Error Rate (Top 10)",
+      "description": "OAuth clients with highest 5xx error rates. Detect misbehaving integrations early. Requires tyk.requests.by.oauth counter with oauth_client_id and response_code dimensions.",
+      "gridPos": {
+        "x": 0,
+        "y": 119,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": {
+            "mode": "thresholds"
+          },
+          "noValue": "Configure tyk.requests.by.oauth metric",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "orange",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "displayMode": "lcd",
+        "showUnfilled": true,
+        "legend": {
+          "displayMode": "hidden"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "topk(10, sum by(oauth_client_id)(rate(tyk_requests_by_oauth_total{service_name=~\"$service_name\", response_code=~\"5..\", api_id=~\"$api_id\"}[$__rate_interval])) / sum by(oauth_client_id)(rate(tyk_requests_by_oauth_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval])) * 100)",
+          "legendFormat": "{{oauth_client_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 125,
+      "type": "piechart",
+      "title": "Portal App Usage Share",
+      "description": "Request distribution across Developer Portal applications. Requires: {\"name\":\"tyk.requests.by.portal\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"session\",\"key\":\"portal_app\",\"label\":\"portal_app\"},{\"source\":\"session\",\"key\":\"portal_org\",\"label\":\"portal_org\"}]}",
+      "gridPos": {
+        "x": 8,
+        "y": 119,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Configure tyk.requests.by.portal metric"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ]
+        },
+        "pieType": "donut",
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(portal_app)(increase(tyk_requests_by_portal_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__range]))",
+          "legendFormat": "{{portal_app}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 126,
+      "type": "timeseries",
+      "title": "Portal Org Traffic Trends",
+      "description": "Request rates per portal organization. Enables per-org usage reporting for multi-org portal deployments. Requires tyk.requests.by.portal counter with portal_org dimension.",
+      "gridPos": {
+        "x": 16,
+        "y": 119,
+        "w": 8,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "noValue": "Configure tyk.requests.by.portal metric"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(portal_org)(rate(tyk_requests_by_portal_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]))",
+          "legendFormat": "Org: {{portal_org}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 130,
+      "type": "row",
+      "title": "Request Header Dimensions — Multi-Tenancy (X-Tenant-ID, X-Customer-ID)",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 128,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 131,
+      "type": "timeseries",
+      "title": "Per-Tenant Request Rate",
+      "description": "Request volume per tenant extracted from X-Tenant-ID request header. Zero backend changes needed. Requires: {\"name\":\"tyk.requests.by.tenant\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"header\",\"key\":\"X-Tenant-ID\",\"label\":\"tenant_id\",\"default\":\"unknown\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"},{\"source\":\"metadata\",\"key\":\"response_code\",\"label\":\"response_code\"}]}",
+      "gridPos": {
+        "x": 0,
+        "y": 129,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "noValue": "Configure tyk.requests.by.tenant metric"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(tenant_id)(rate(tyk_requests_by_tenant_total{service_name=~\"$service_name\", tenant_id=~\"$tenant_id\", api_id=~\"$api_id\"}[$__rate_interval]))",
+          "legendFormat": "Tenant: {{tenant_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 132,
+      "type": "timeseries",
+      "title": "Tenant Error Rate",
+      "description": "5xx error rate per tenant. Enables per-tenant SLO monitoring from a single gateway metric — no backend instrumentation required. Requires tyk.requests.by.tenant with tenant_id + response_code.",
+      "gridPos": {
+        "x": 12,
+        "y": 129,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "noValue": "Configure tyk.requests.by.tenant metric"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(tenant_id)(rate(tyk_requests_by_tenant_total{service_name=~\"$service_name\", response_code=~\"5..\", tenant_id=~\"$tenant_id\", api_id=~\"$api_id\"}[$__rate_interval])) / sum by(tenant_id)(rate(tyk_requests_by_tenant_total{service_name=~\"$service_name\", tenant_id=~\"$tenant_id\", api_id=~\"$api_id\"}[$__rate_interval])) * 100",
+          "legendFormat": "Tenant: {{tenant_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 133,
+      "type": "bargauge",
+      "title": "Per-Tenant P95 Latency",
+      "description": "P95 latency ranked by tenant. Identify tenants experiencing degraded performance. Requires: {\"name\":\"tyk.latency.by.tenant\",\"type\":\"histogram\",\"histogram_source\":\"total\",\"dimensions\":[{\"source\":\"header\",\"key\":\"X-Tenant-ID\",\"label\":\"tenant_id\",\"default\":\"unknown\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"}]}",
+      "gridPos": {
+        "x": 0,
+        "y": 138,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "thresholds"
+          },
+          "noValue": "Configure tyk.latency.by.tenant metric",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 200
+              },
+              {
+                "color": "orange",
+                "value": 500
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "displayMode": "lcd",
+        "showUnfilled": true,
+        "legend": {
+          "displayMode": "hidden"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "topk(10, histogram_quantile(0.95, sum by(le, tenant_id)(rate(tyk_latency_by_tenant_seconds_bucket{service_name=~\"$service_name\", api_id=~\"$api_id\", tenant_id=~\"$tenant_id\"}[$__rate_interval]))) * 1000)",
+          "legendFormat": "Tenant: {{tenant_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 134,
+      "type": "table",
+      "title": "Tenant SLO Dashboard",
+      "description": "Per-tenant SLO summary: request rate, error rate, P50 and P95 latency. One row per tenant extracted from X-Tenant-ID header. The definitive multi-tenant observability panel.",
+      "gridPos": {
+        "x": 12,
+        "y": 138,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Configure tyk.requests.by.tenant + tyk.latency.by.tenant"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Rate (req/s)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "reqps"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Error Rate %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background-solid"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 1
+                    },
+                    {
+                      "color": "red",
+                      "value": 5
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "P.*ms"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background-solid"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 200
+                    },
+                    {
+                      "color": "red",
+                      "value": 500
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "displayName": "Rate (req/s)",
+            "desc": true
+          }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(tenant_id)(rate(tyk_requests_by_tenant_total{service_name=~\"$service_name\", api_id=~\"$api_id\", tenant_id=~\"$tenant_id\"}[$__rate_interval]))",
+          "legendFormat": "Rate (req/s)",
+          "refId": "A",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(tenant_id)(rate(tyk_requests_by_tenant_total{service_name=~\"$service_name\", response_code=~\"5..\", api_id=~\"$api_id\", tenant_id=~\"$tenant_id\"}[$__rate_interval])) / sum by(tenant_id)(rate(tyk_requests_by_tenant_total{service_name=~\"$service_name\", api_id=~\"$api_id\", tenant_id=~\"$tenant_id\"}[$__rate_interval])) * 100",
+          "legendFormat": "Error Rate %",
+          "refId": "B",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.50, sum by(le, tenant_id)(rate(tyk_latency_by_tenant_seconds_bucket{service_name=~\"$service_name\", api_id=~\"$api_id\", tenant_id=~\"$tenant_id\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P50ms",
+          "refId": "C",
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.95, sum by(le, tenant_id)(rate(tyk_latency_by_tenant_seconds_bucket{service_name=~\"$service_name\", api_id=~\"$api_id\", tenant_id=~\"$tenant_id\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P95ms",
+          "refId": "D",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "tenant_id": "Tenant",
+              "Value #A": "Rate (req/s)",
+              "Value #B": "Error Rate %",
+              "Value #C": "P50ms",
+              "Value #D": "P95ms"
+            },
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 135,
+      "type": "timeseries",
+      "title": "Per-Customer Request Rate",
+      "description": "Request rate per customer extracted from X-Customer-ID request header. Zero backend changes needed. Requires: {\"name\":\"tyk.requests.by.customer\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"header\",\"key\":\"X-Customer-ID\",\"label\":\"customer_id\",\"default\":\"unknown\"},{\"source\":\"header\",\"key\":\"X-Tenant-ID\",\"label\":\"tenant_id\",\"default\":\"unknown\"}]}",
+      "gridPos": {
+        "x": 0,
+        "y": 147,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "noValue": "Configure tyk.requests.by.customer metric"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(customer_id)(rate(tyk_requests_by_customer_total{service_name=~\"$service_name\"}[$__rate_interval]))",
+          "legendFormat": "Customer: {{customer_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 136,
+      "type": "bargauge",
+      "title": "Top Customers by Traffic",
+      "description": "Top 10 customers by total request volume over the selected time range. Extracted from X-Customer-ID request header — no backend changes needed. Requires tyk.requests.by.customer instrument.",
+      "gridPos": {
+        "x": 12,
+        "y": 147,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "noValue": "Configure tyk.requests.by.customer metric",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 100
+              },
+              {
+                "color": "purple",
+                "value": 1000
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "displayMode": "lcd",
+        "showUnfilled": true,
+        "legend": {
+          "displayMode": "hidden"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "topk(10, sum by(customer_id)(increase(tyk_requests_by_customer_total{service_name=~\"$service_name\"}[$__range])))",
+          "legendFormat": "{{customer_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 140,
+      "type": "row",
+      "title": "Response Header Dimensions — Backend Intelligence (Cache, Version, Content-Type)",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 156,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 141,
+      "type": "stat",
+      "title": "Cache Hit Rate",
+      "description": "Percentage of requests served from cache. Requires: {\"name\":\"tyk.requests.with.cache\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"response_header\",\"key\":\"X-Tyk-Cached-Response\",\"label\":\"cache_status\",\"default\":\"0\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"}]}. cache_status=\"1\" = cached, \"0\" = not cached. Note: response_header dims only populated on success path.",
+      "gridPos": {
+        "x": 0,
+        "y": 157,
+        "w": 6,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "noValue": "Configure tyk.requests.with.cache metric",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_requests_with_cache_total{service_name=~\"$service_name\", cache_status=\"1\", api_id=~\"$api_id\"}[$__rate_interval])) / sum(rate(tyk_requests_with_cache_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval])) * 100\nor vector(0)",
+          "legendFormat": "Cache Hit %",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 142,
+      "type": "timeseries",
+      "title": "Cache Status Over Time",
+      "description": "Cached (1) vs uncached (0) request rates over time. Track caching efficiency trends. Requires tyk.requests.with.cache counter with response_header X-Tyk-Cached-Response dimension.",
+      "gridPos": {
+        "x": 6,
+        "y": 157,
+        "w": 10,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 15
+          },
+          "noValue": "Configure tyk.requests.with.cache metric"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "1"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Hit"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "0"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Miss"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(cache_status)(rate(tyk_requests_with_cache_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval]))",
+          "legendFormat": "{{cache_status}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 143,
+      "type": "piechart",
+      "title": "Cache Status Breakdown",
+      "description": "Total distribution of cache statuses over the selected time range. Requires tyk.requests.with.cache counter.",
+      "gridPos": {
+        "x": 16,
+        "y": 157,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Configure tyk.requests.with.cache metric"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "1"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Hit"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "0"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Miss"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ]
+        },
+        "pieType": "pie",
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(cache_status)(increase(tyk_requests_with_cache_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__range]))",
+          "legendFormat": "{{cache_status}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 144,
+      "type": "timeseries",
+      "title": "Backend Version Distribution Over Time",
+      "description": "Tracks which backend versions are serving traffic. Enables canary/blue-green deploy monitoring without code changes. Requires: {\"name\":\"tyk.requests.by.backend.version\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"response_header\",\"key\":\"X-Server-Version\",\"label\":\"backend_version\",\"default\":\"unknown\"},{\"source\":\"metadata\",\"key\":\"api_id\",\"label\":\"api_id\"}]}",
+      "gridPos": {
+        "x": 0,
+        "y": 165,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "noValue": "Configure tyk.requests.by.backend.version metric"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "label_replace(sum by(backend_version)(rate(tyk_requests_by_backend_version_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__rate_interval])), \"backend_version\", \"No version\", \"backend_version\", \"^$\")",
+          "legendFormat": "{{backend_version}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 145,
+      "type": "piechart",
+      "title": "Response Content-Type Mix",
+      "description": "Distribution of response content types. Detect unexpected content types that may indicate errors or misrouting. Requires: {\"name\":\"tyk.requests.by.content.type\",\"type\":\"counter\",\"dimensions\":[{\"source\":\"response_header\",\"key\":\"Content-Type\",\"label\":\"content_type\",\"default\":\"unknown\"}]}",
+      "gridPos": {
+        "x": 12,
+        "y": 165,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "noValue": "Configure tyk.requests.by.content.type metric"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ]
+        },
+        "pieType": "donut",
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(content_type)(increase(tyk_requests_by_content_type_total{service_name=~\"$service_name\", api_id=~\"$api_id\"}[$__range]))",
+          "legendFormat": "{{content_type}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 171,
+      "type": "stat",
+      "title": "429 Rejection %",
+      "description": "Percentage of requests rejected with HTTP 429. 429s occur when quota is exhausted OR per-second rate limit is breached. X-RateLimit-* headers carry quota state (period-based budget); per-second rate limit has no response header.",
+      "gridPos": {
+        "x": 0,
+        "y": 173,
+        "w": 4,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "noValue": "0%",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=\"429\", tyk_api_id=~\"$api_id\"}[$__rate_interval]))\n/ sum(rate(tyk_api_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\"}[$__rate_interval])) * 100\nor vector(0)",
+          "legendFormat": "429 Rejection %",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 172,
+      "type": "timeseries",
+      "title": "429 Rejections Over Time",
+      "description": "Rate of HTTP 429 responses per API over time. Indicates quota exhaustion or per-second rate limit breaches.",
+      "gridPos": {
+        "x": 4,
+        "y": 173,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 15
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=\"429\", tyk_api_id=~\"$api_id\"}[$__rate_interval]))",
+          "legendFormat": "{{tyk_api_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 173,
+      "type": "bargauge",
+      "title": "Top APIs by 429 Rejections",
+      "description": "Top 10 APIs generating 429 responses (quota exhaustion or rate limit breach).",
+      "gridPos": {
+        "x": 16,
+        "y": 173,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "continuous-RdYlGr"
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "displayMode": "gradient",
+        "valueMode": "color"
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "topk(10, sum by(tyk_api_id)(rate(tyk_api_requests_total{service_name=~\"$service_name\", http_response_status_code=\"429\", tyk_api_id=~\"$api_id\"}[$__rate_interval])))",
+          "legendFormat": "{{tyk_api_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 9001,
+      "type": "timeseries",
+      "title": "Error Rate by Flag (4xx+5xx)",
+      "description": "Rate of error responses (4xx+5xx) broken down by Tyk response flag. Uses http.server.request.duration histogram — pre-existing metric, no extra cardinality.",
+      "datasource": "${datasource_prometheus}",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 42
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 10,
+            "lineWidth": 2
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(tyk_response_flag) (rate(http_server_request_duration_seconds_count{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\", http_response_status_code=~\"4..|5..\"}[$__rate_interval]))",
+          "legendFormat": "{{tyk_response_flag}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 9002,
+      "type": "bargauge",
+      "title": "Top APIs by Error Flag Count",
+      "description": "Top API + flag combinations by error count over the selected time range. Uses http.server.request.duration histogram count.",
+      "datasource": "${datasource_prometheus}",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 42
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sort_desc(sum by(tyk_api_id, tyk_response_flag) (increase(http_server_request_duration_seconds_count{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", http_request_method=~\"$method\", http_response_status_code=~\"4..|5..\"}[$__range])))",
+          "instant": true,
+          "legendFormat": "{{tyk_api_id}} — {{tyk_response_flag}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}
