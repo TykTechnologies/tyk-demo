@@ -60,7 +60,7 @@ services:
       - tyk-redis
       - tyk-dashboard
   tyk-gateway-2:
-    image: tykio/${GATEWAY_IMAGE_REPO:-tyk-gateway}:${GATEWAY2_VERSION:-v5.12.0}
+    image: tykio/${GATEWAY_IMAGE_REPO:-tyk-gateway}:${GATEWAY2_VERSION:-v5.13.0-rc1}
     ports:
       - 8081:8080
       - 9005:9005
