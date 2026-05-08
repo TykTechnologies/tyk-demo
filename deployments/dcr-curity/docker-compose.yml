@@ -1,0 +1,20 @@
+services:
+  curity:
+    image: curity.azurecr.io/curity/idsvr:latest
+    networks:
+      - tyk
+    ports:
+      - 6749:6749 #admin
+      - 8443:8443 #runtime
+      - 4465:4465 #healthcheck
+    volumes:
+      - ./deployments/dcr-curity/volumes/curity/license.json:/opt/idsvr/etc/init/license/license.json
+      - ./deployments/dcr-curity/volumes/curity/curity-config.xml:/opt/idsvr/etc/init/curity-config.xml
+      #- ./volumes/curity/cdb:/opt/idsvr/var/cdb
+    environment:
+      #PASSWORD: 'Password1'
+      ADMIN: 'true'
+      CONFIG_ENCRYPTION_KEY: ''
+    depends_on:
+      - tyk-dashboard
+      - tyk-portal
