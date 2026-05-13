@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 golang:1.22.6-bookworm AS build
+FROM --platform=linux/x86_64 golang:1.22.6-bookworm@sha256:d31e093e3aeaee68ccee6c4c96e554ef0f192ea37ae684d91b206bec17377f19 AS build
 
 ARG TYK_VERSION=5.7.1
 
@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/root/go/pkg/mod \
       -ldflags "-linkmode external -extldflags -static-pie" \
       -tags netgo;
 
-FROM alpine:3 AS sys
+FROM alpine:3@sha256:5b10f432ef3da1b8d4c7eb6c487f2f5a8f096bc91145e68878dd4a5019afde11 AS sys
 
 RUN set -xe; \
     mkdir -p /target/etc; \

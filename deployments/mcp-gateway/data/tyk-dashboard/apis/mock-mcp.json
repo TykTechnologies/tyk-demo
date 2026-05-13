@@ -1,0 +1,55 @@
+{
+  "info": {
+    "title": "mock-mcp",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.3",
+  "servers": [
+    {
+      "url": "/mock-mcp"
+    }
+  ],
+  "security": [],
+  "paths": {},
+  "components": {
+    "securitySchemes": {}
+  },
+  "x-tyk-api-gateway": {
+    "info": {
+      "dbId": "69f39f582a6a0c00013d85a1",
+      "id": "0bae6e8a59df489558a960b82364ad1a",
+      "orgId": "5e9d9544a1dcd60001d0ed20",
+      "name": "mock-mcp",
+      "state": {
+        "active": true,
+        "internal": false
+      }
+    },
+    "middleware": {
+      "global": {
+        "contextVariables": {
+          "enabled": true
+        },
+        "trafficLogs": {
+          "enabled": true
+        }
+      }
+    },
+    "server": {
+      "detailedTracing": {
+        "enabled": true
+      },
+      "listenPath": {
+        "strip": true,
+        "value": "/mock-mcp/"
+      }
+    },
+    "upstream": {
+      "proxy": {
+        "enabled": false,
+        "url": ""
+      },
+      "url": "http://mcp-mock-server:7878"
+    }
+  }
+}
