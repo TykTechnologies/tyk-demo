@@ -1,0 +1,2158 @@
+{
+  "uid": "tyk-api-troubleshooting",
+  "title": "Tyk Gateway - API Troubleshooting",
+  "description": "Single-API deep dive: metrics → traces → logs. Progressive disclosure from symptom to root cause. Audience: Backend engineers, SRE on-call.",
+  "tags": [
+    "tyk",
+    "api",
+    "troubleshooting",
+    "traces",
+    "logs",
+    "opentelemetry"
+  ],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "schemaVersion": 39,
+  "version": 1,
+  "__requires__": [
+    { "type": "grafana", "id": "grafana", "name": "Grafana", "version": "10.0.0" },
+    { "type": "datasource", "id": "prometheus", "name": "Prometheus", "version": "1.0.0" },
+    { "type": "datasource", "id": "tempo", "name": "Tempo", "version": "1.0.0" },
+    { "type": "datasource", "id": "loki", "name": "Loki", "version": "1.0.0" }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "datasource_prometheus",
+        "type": "datasource",
+        "query": "prometheus",
+        "label": "Prometheus",
+        "hide": 0,
+        "current": {}
+      },
+      {
+        "name": "datasource_tempo",
+        "type": "datasource",
+        "query": "tempo",
+        "label": "Tempo",
+        "hide": 0,
+        "current": {}
+      },
+      {
+        "name": "datasource_loki",
+        "type": "datasource",
+        "query": "loki",
+        "label": "Loki",
+        "hide": 0,
+        "current": {}
+      },
+      {
+        "name": "api_id",
+        "type": "query",
+        "datasource": {
+          "uid": "${datasource_prometheus}",
+          "type": "prometheus"
+        },
+        "query": "label_values(tyk_api_requests_total{service_name=\"tyk-gateway\"}, tyk_api_id)",
+        "label": "API",
+        "multi": false,
+        "includeAll": false,
+        "current": {},
+        "refresh": 2,
+        "sort": 1,
+        "hide": 0
+      },
+      {
+        "name": "tyk_gw_id",
+        "type": "query",
+        "datasource": {
+          "uid": "${datasource_prometheus}",
+          "type": "prometheus"
+        },
+        "query": "label_values(tyk_api_requests_total{service_name=\"tyk-gateway\"}, tyk_gw_id)",
+        "label": "Gateway Node",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {},
+        "refresh": 2,
+        "sort": 1,
+        "hide": 0
+      },
+      {
+        "name": "trace_id",
+        "type": "textbox",
+        "label": "Trace ID",
+        "query": ".*",
+        "current": {
+          "text": ".*",
+          "value": ".*"
+        },
+        "hide": 0
+      }
+    ]
+  },
+  "panels": [
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 9007,
+      "panels": [
+        {
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 24,
+            "x": 0,
+            "y": 1
+          },
+          "id": 1,
+          "options": {
+            "content": "## 🗺 How to use this dashboard\n\n**Target audience**: Backend engineers, on-call SREs  \n**Use when**: Investigating a specific API incident\n\n**Step 1**: Set `api_id` variable (top of page) to the API under investigation  \n**Step 2**: Set time range to the incident window  \n**Step 3**: Follow the signal chain:\n\n1. **Latency spike?** → Latency Attribution row → Is it Gateway overhead or Upstream slowness?\n   - Gateway overhead → check middleware config, rate limiting, auth plugin\n   - Upstream slowness → upstream service issue, not Tyk\n2. **Error spike?** → Error Analysis row → What status codes? What response flags?\n   - `AKI` = auth key invalid | `URS` = upstream 5xx | `BD` = bad destination | `RL` = rate limited\n3. **Need the trace?** → Click a dot on the latency chart → Tempo trace opens\n4. **Need the logs?** → Click \"View gateway logs\" on any error panel → Loki",
+            "mode": "markdown"
+          },
+          "title": "How to use this dashboard",
+          "type": "text"
+        }
+      ],
+      "title": "ℹ️ How to use this dashboard",
+      "type": "row"
+    },
+    {
+      "id": 100,
+      "type": "row",
+      "title": "API Health KPIs",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 1,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 11,
+      "type": "stat",
+      "title": "Request Rate",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))",
+          "instant": true
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "5xx Error Rate",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 4,
+        "y": 2,
+        "w": 3,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", http_response_status_code=~\"5..\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])) / sum(rate(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])) * 100 or vector(0)",
+          "instant": true
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background",
+        "graphMode": "area",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 13,
+      "type": "stat",
+      "title": "P95 Total Latency",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 7,
+        "y": 2,
+        "w": 3,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(http_server_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
+          "instant": true
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 200
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 14,
+      "type": "stat",
+      "title": "P95 Gateway Latency",
+      "description": "Tyk's own processing overhead for this API.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 10,
+        "y": 2,
+        "w": 3,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_gateway_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
+          "instant": true
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 200
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 15,
+      "type": "stat",
+      "title": "P95 Upstream Latency",
+      "description": "This API's backend service latency.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 13,
+        "y": 2,
+        "w": 3,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_upstream_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
+          "instant": true
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 200
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 16,
+      "type": "stat",
+      "title": "Success Rate",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", http_response_status_code=~\"2..\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])) / sum(rate(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])) * 100 or vector(0)",
+          "instant": true
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 90
+              },
+              {
+                "color": "green",
+                "value": 99
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": "stat",
+      "title": "Cache Hit Rate",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 20,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(tyk_requests_with_cache_total{service_name=\"tyk-gateway\", cache_status=\"1\", api_id=\"$api_id\"}[$__rate_interval])) / sum(rate(tyk_requests_with_cache_total{service_name=\"tyk-gateway\", api_id=\"$api_id\"}[$__rate_interval])) * 100",
+          "instant": true
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 40
+              },
+              {
+                "color": "green",
+                "value": 70
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 200,
+      "type": "row",
+      "title": "Latency Attribution",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 21,
+      "type": "timeseries",
+      "title": "Latency Breakdown: Total / Gateway / Upstream (P95 + P50)",
+      "description": "The most powerful troubleshooting panel. If gateway latency is flat and upstream spikes, the backend is the culprit — no log diving needed.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 7,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(http_server_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])))",
+          "legendFormat": "Total P95",
+          "exemplar": true
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.50, sum by(le)(rate(http_server_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])))",
+          "legendFormat": "Total P50",
+          "exemplar": true
+        },
+        {
+          "refId": "C",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_gateway_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])))",
+          "legendFormat": "Gateway P95",
+          "exemplar": true
+        },
+        {
+          "refId": "D",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_upstream_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])))",
+          "legendFormat": "Upstream P95",
+          "exemplar": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 8,
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.2
+              },
+              {
+                "color": "red",
+                "value": 0.5
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 22,
+      "type": "piechart",
+      "title": "Gateway vs Upstream Latency Share",
+      "description": "Visual attribution: what % of total latency is Tyk's processing vs backend? Shifts immediately when upstream degrades.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 7,
+        "w": 6,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(tyk_gateway_request_duration_seconds_sum{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])) / sum(rate(http_server_request_duration_seconds_sum{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])) * 100",
+          "legendFormat": "Gateway %"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(tyk_upstream_request_duration_seconds_sum{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])) / sum(rate(http_server_request_duration_seconds_sum{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])) * 100",
+          "legendFormat": "Upstream %"
+        }
+      ],
+      "options": {
+        "pieType": "pie",
+        "displayLabels": [
+          "percent",
+          "name"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "right"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+    {
+      "id": 23,
+      "type": "table",
+      "title": "Latency Percentile Table",
+      "description": "P50 / P95 / P99 × Total / Gateway / Upstream — full picture in one row.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 7,
+        "w": 6,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.50, sum by(le)(rate(http_server_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
+          "instant": true,
+          "format": "table",
+          "legendFormat": "Total P50"
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(http_server_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
+          "instant": true,
+          "format": "table",
+          "legendFormat": "Total P95"
+        },
+        {
+          "refId": "C",
+          "expr": "histogram_quantile(0.99, sum by(le)(rate(http_server_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
+          "instant": true,
+          "format": "table",
+          "legendFormat": "Total P99"
+        },
+        {
+          "refId": "D",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_gateway_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
+          "instant": true,
+          "format": "table",
+          "legendFormat": "GW P95"
+        },
+        {
+          "refId": "E",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_upstream_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
+          "instant": true,
+          "format": "table",
+          "legendFormat": "US P95"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "Value #A": "Total P50 (ms)",
+              "Value #B": "Total P95 (ms)",
+              "Value #C": "Total P99 (ms)",
+              "Value #D": "Gateway P95 (ms)",
+              "Value #E": "Upstream P95 (ms)"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "nan",
+                "result": {
+                  "text": "—",
+                  "color": "text"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 24,
+      "type": "timeseries",
+      "title": "P95 Latency by HTTP Method",
+      "description": "POST latency 3× GET? Likely a request body processing issue.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by(le, http_request_method)(rate(http_server_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "{{http_request_method}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 8
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 300,
+      "type": "row",
+      "title": "Error Analysis",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 23,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 31,
+      "type": "timeseries",
+      "title": "Error Rate Over Time (5xx + 4xx)",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", http_response_status_code=~\"5..\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])) / sum(rate(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])) * 100",
+          "legendFormat": "5xx %"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", http_response_status_code=~\"4..\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])) / sum(rate(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval])) * 100",
+          "legendFormat": "4xx %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "links": [
+            {
+              "title": "📋 View gateway logs for this API",
+              "url": "/grafana/explore?left=%7B%22datasource%22%3A%22loki%22%2C%22queries%22%3A%5B%7B%22expr%22%3A%22%7Bservice_name%3D%5C%22tyk-gateway%5C%22%7D+%7C+json+%7C+tyk_api_id%3D%5C%22${api_id}%5C%22%22%7D%5D%7D&${__url.params}",
+              "targetBlank": true
+            }
+          ]
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 32,
+      "type": "piechart",
+      "title": "Response Flag Distribution",
+      "description": "Fastest path to error cause: URS = upstream 5xx, BD = bad destination, RL = rate limited, AUTH = auth failure, KEY = key not found.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 24,
+        "w": 6,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(tyk_response_flag)(increase(http_server_request_duration_seconds_count{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__range]))",
+          "legendFormat": "{{tyk_response_flag}}"
+        }
+      ],
+      "options": {
+        "pieType": "donut",
+        "displayLabels": [
+          "percent",
+          "name"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+    {
+      "id": 33,
+      "type": "barchart",
+      "title": "Status Code Distribution",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 14,
+        "y": 24,
+        "w": 5,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sort_desc(sum by(http_response_status_code)(increase(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__range])))",
+          "legendFormat": "{{http_response_status_code}}",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "options": {
+        "xField": "http_response_status_code",
+        "orientation": "vertical"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "displayName": "Requests",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+    {
+      "id": 34,
+      "type": "timeseries",
+      "title": "Error Rate by Path",
+      "description": "Which endpoint is failing — /checkout or /products?",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 19,
+        "y": 24,
+        "w": 5,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(listen_path)(rate(tyk_requests_by_path_total{service_name=\"tyk-gateway\", response_code=~\"5..\", api_id=\"$api_id\"}[$__rate_interval]))",
+          "legendFormat": "{{listen_path}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 35,
+      "type": "timeseries",
+      "title": "Error Rate by HTTP Method",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(http_request_method)(rate(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", http_response_status_code=~\"5..\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))",
+          "legendFormat": "{{http_request_method}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 36,
+      "type": "bargauge",
+      "title": "Top Paths by Error Rate",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 32,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(10, sum by(listen_path)(rate(tyk_requests_by_path_total{service_name=\"tyk-gateway\", response_code=~\"5..\", api_id=\"$api_id\"}[$__rate_interval])) / sum by(listen_path)(rate(tyk_requests_by_path_total{service_name=\"tyk-gateway\", api_id=\"$api_id\"}[$__rate_interval])) * 100)",
+          "legendFormat": "{{listen_path}}",
+          "instant": true
+        }
+      ],
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "color": {
+            "mode": "continuous-RdYlGr"
+          }
+        }
+      }
+    },
+    {
+      "id": 400,
+      "type": "row",
+      "title": "Traffic Patterns",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 52,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 41,
+      "type": "timeseries",
+      "title": "Request Rate Over Time",
+      "description": "Is the error rate spike correlated with a traffic surge?",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 53,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))",
+          "legendFormat": "Total req/s"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 42,
+      "type": "timeseries",
+      "title": "Request Rate by Path",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 53,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(endpoint)(rate(tyk_requests_by_path_total{service_name=\"tyk-gateway\", api_id=\"$api_id\"}[$__rate_interval]))",
+          "legendFormat": "{{endpoint}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 43,
+      "type": "timeseries",
+      "title": "Request Rate by Method",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 53,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(http_request_method)(rate(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))",
+          "legendFormat": "{{http_request_method}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 44,
+      "type": "timeseries",
+      "title": "Request Rate by API Key",
+      "description": "Is one consumer driving the load?",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 60,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by(api_key_suffix)(rate(tyk_requests_by_apikey_total{service_name=\"tyk-gateway\", api_id=\"$api_id\"}[$__rate_interval]))",
+          "legendFormat": "...{{api_key_suffix}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 45,
+      "type": "timeseries",
+      "title": "429 Rate (Rate Limiting)",
+      "description": "Leading cause of 'API suddenly slow' support tickets.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 60,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(tyk_api_requests_total{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", http_response_status_code=\"429\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))",
+          "legendFormat": "429 Rate"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 500,
+      "type": "row",
+      "title": "Upstream Health",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 67,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 51,
+      "type": "timeseries",
+      "title": "Upstream P95 Latency",
+      "description": "Backend service health over time for this API.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 68,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by(le)(rate(tyk_upstream_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "Upstream P95"
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.50, sum by(le)(rate(tyk_upstream_request_duration_seconds_bucket{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "Upstream P50"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 52,
+      "type": "timeseries",
+      "title": "Upstream Error Flags (URS)",
+      "description": "URS = upstream-originated 5xx, isolated from Tyk errors. When this rises, the backend is the culprit.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 68,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_response_flag=\"URS\", tyk_gw_id=~\"$tyk_gw_id\"}[$__rate_interval]))",
+          "legendFormat": "URS (upstream 5xx) rate"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "red"
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 53,
+      "type": "timeseries",
+      "title": "Backend Version Distribution",
+      "description": "Did latency increase after a backend version change? Correlate with canary rollouts.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 68,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace(sum by(backend_version)(rate(tyk_requests_by_backend_version_total{service_name=\"tyk-gateway\", api_id=\"$api_id\"}[$__rate_interval])), \"backend_version\", \"No version\", \"backend_version\", \"^$\")",
+          "legendFormat": "{{backend_version}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 600,
+      "type": "row",
+      "title": "Gateway Config State (R2)",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 76,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 61,
+      "type": "timeseries",
+      "title": "APIs Loaded on Serving Nodes",
+      "description": "Did a node silently drop this API's config during a rolling deploy?",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 77,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "tyk_gateway_apis_loaded{service_instance_id=~\"$tyk_gw_id\"}",
+          "legendFormat": "{{service_instance_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 62,
+      "type": "timeseries",
+      "title": "Config Reload Events",
+      "description": "Correlate reload timing with when errors started.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 77,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "rate(tyk_gateway_config_reload_total{service_instance_id=~\"$tyk_gw_id\"}[$__rate_interval])",
+          "legendFormat": "{{service_instance_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 63,
+      "type": "timeseries",
+      "title": "Config Reload Duration",
+      "description": "Slow reload (>30s) during high traffic can cause brief request failures.",
+      "datasource": {
+        "uid": "${datasource_prometheus}",
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 77,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by(le, service_instance_id)(rate(tyk_gateway_config_reload_duration_seconds_bucket{service_instance_id=~\"$tyk_gw_id\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "P95 {{service_instance_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 700,
+      "type": "row",
+      "title": "Distributed Tracing via Tempo (Signal Correlation Entry Point)",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 84,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 71,
+      "type": "table",
+      "title": "Recent Traces",
+      "description": "Recent traces for this API. Click Trace ID to open in Tempo. Use '+ Filter logs by this trace' to correlate with Row 8 logs.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "${datasource_tempo}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 85,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "${datasource_tempo}"
+          },
+          "queryType": "traceqlSearch",
+          "query": "",
+          "limit": 20,
+          "filters": [
+            {
+              "id": "service-name",
+              "operator": "=",
+              "scope": "resource",
+              "tag": "service.name",
+              "value": [
+                "tyk-gateway"
+              ],
+              "valueType": "string"
+            },
+            {
+              "id": "tyk-api-id",
+              "operator": "=",
+              "scope": "span",
+              "tag": "tyk.api.id",
+              "value": [
+                "$api_id"
+              ],
+              "valueType": "string"
+            }
+          ]
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "rootServiceName": true
+            },
+            "renameByName": {
+              "traceID": "Trace ID",
+              "startTime": "Time",
+              "duration": "Duration (ms)",
+              "spanCount": "Spans",
+              "rootTraceName": "Operation"
+            },
+            "indexByName": {
+              "Time": 0,
+              "Trace ID": 1,
+              "Operation": 2,
+              "Duration (ms)": 3,
+              "Spans": 4
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Time",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "filterable": true,
+        "footer": {
+          "show": false
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "filterable": true
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "nan",
+                "result": {
+                  "text": "—",
+                  "color": "text"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Trace ID"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "View in Tempo",
+                    "url": "/grafana/explore?left={\"datasource\":\"webstore-tempo\",\"queries\":[{\"refId\":\"A\",\"queryType\":\"traceql\",\"query\":\"${__value.raw}\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}",
+                    "targetBlank": true
+                  },
+                  {
+                    "title": "+ Filter logs by this trace",
+                    "url": "/grafana/d/tyk-api-troubleshooting?from=${__from}&to=${__to}&var-api_id=${api_id}&var-tyk_gw_id=${tyk_gw_id}&var-trace_id=${__value.raw}",
+                    "targetBlank": false
+                  },
+                  {
+                    "title": "− Clear trace filter",
+                    "url": "/grafana/d/tyk-api-troubleshooting?from=${__from}&to=${__to}&var-api_id=${api_id}&var-tyk_gw_id=${tyk_gw_id}&var-trace_id=.*",
+                    "targetBlank": false
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 280
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 72,
+      "type": "table",
+      "title": "Error Traces",
+      "description": "Traces with error status for this API. Click Trace ID to investigate root cause in Tempo.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "${datasource_tempo}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 85,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "${datasource_tempo}"
+          },
+          "queryType": "traceqlSearch",
+          "query": "",
+          "limit": 20,
+          "filters": [
+            {
+              "id": "service-name",
+              "operator": "=",
+              "scope": "resource",
+              "tag": "service.name",
+              "value": [
+                "tyk-gateway"
+              ],
+              "valueType": "string"
+            },
+            {
+              "id": "tyk-api-id",
+              "operator": "=",
+              "scope": "span",
+              "tag": "tyk.api.id",
+              "value": [
+                "$api_id"
+              ],
+              "valueType": "string"
+            },
+            {
+              "id": "status",
+              "operator": "=",
+              "scope": "intrinsic",
+              "tag": "status",
+              "value": [
+                "error"
+              ],
+              "valueType": "keyword"
+            }
+          ]
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "rootServiceName": true
+            },
+            "renameByName": {
+              "traceID": "Trace ID",
+              "startTime": "Time",
+              "duration": "Duration (ms)",
+              "spanCount": "Spans",
+              "rootTraceName": "Operation"
+            },
+            "indexByName": {
+              "Time": 0,
+              "Trace ID": 1,
+              "Operation": 2,
+              "Duration (ms)": 3,
+              "Spans": 4
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Time",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "filterable": true,
+        "footer": {
+          "show": false
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "filterable": true
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "nan",
+                "result": {
+                  "text": "—",
+                  "color": "text"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Trace ID"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "View in Tempo",
+                    "url": "/grafana/explore?left={\"datasource\":\"webstore-tempo\",\"queries\":[{\"refId\":\"A\",\"queryType\":\"traceql\",\"query\":\"${__value.raw}\"}],\"range\":{\"from\":\"now-1h\",\"to\":\"now\"}}",
+                    "targetBlank": true
+                  },
+                  {
+                    "title": "+ Filter logs by this trace",
+                    "url": "/grafana/d/tyk-api-troubleshooting?from=${__from}&to=${__to}&var-api_id=${api_id}&var-tyk_gw_id=${tyk_gw_id}&var-trace_id=${__value.raw}",
+                    "targetBlank": false
+                  },
+                  {
+                    "title": "− Clear trace filter",
+                    "url": "/grafana/d/tyk-api-troubleshooting?from=${__from}&to=${__to}&var-api_id=${api_id}&var-tyk_gw_id=${tyk_gw_id}&var-trace_id=.*",
+                    "targetBlank": false
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 280
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 800,
+      "type": "row",
+      "title": "Log Analysis (Signal Correlation Destination)",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 94,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 81,
+      "type": "logs",
+      "title": "Access Logs (via tyk-gateway)",
+      "description": "Envoy access logs for requests routed through tyk-gateway. Set $trace_id to a specific trace ID (copied from Row 7) to filter to a single request.",
+      "datasource": "${datasource_loki}",
+      "gridPos": {
+        "x": 0,
+        "y": 95,
+        "w": 24,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "range",
+          "expr": "{service_name=\"tyk-gateway\"} | tyk_prefix=`access-log` | tyk_trace_id=~\"$trace_id\" | tyk_api_id=~\"$api_id\""
+        }
+      ],
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": false,
+        "sortOrder": "Descending"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    },
+    {
+      "id": 82,
+      "type": "logs",
+      "title": "Error Logs (tyk-gateway)",
+      "description": "Logs mentioning tyk-gateway as upstream. Filter for 4xx/5xx by searching the log line manually.",
+      "datasource": "${datasource_loki}",
+      "gridPos": {
+        "x": 0,
+        "y": 104,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "range",
+          "expr": "{service_name=\"tyk-gateway\"} | detected_level=~`error|warn|fatal` | tyk_trace_id=~\"$trace_id\""
+        }
+      ],
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showTime": true,
+        "sortOrder": "Descending"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    },
+    {
+      "id": 83,
+      "type": "logs",
+      "title": "All Recent Logs (trace correlation)",
+      "description": "Full log stream. Paste a trace_id from Row 7 into the $trace_id variable above — when set, this panel filters to log lines containing that ID, enabling cross-service correlation.",
+      "datasource": "${datasource_loki}",
+      "gridPos": {
+        "x": 12,
+        "y": 104,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "range",
+          "expr": "{service_name=\"tyk-gateway\"} | tyk_trace_id=~\"$trace_id\""
+        }
+      ],
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showTime": true,
+        "sortOrder": "Descending"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 47
+      },
+      "id": 9008,
+      "panels": [],
+      "title": "Tyk Response Flag Reference",
+      "type": "row"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 47
+      },
+      "id": 9006,
+      "options": {
+        "content": "[Error classification docs →](https://tyk.io/docs/api-management/logs#error-classification)\n\n**Upstream and Proxy Errors**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `TLE` | TLS Certificate Expired | 502 | Upstream TLS certificate has expired |\n| `TLI` | TLS Certificate Invalid | 502 | Upstream TLS certificate failed validation |\n| `TLM` | TLS Hostname Mismatch | 502 | Certificate CN/SAN does not match hostname |\n| `TLN` | TLS Not Trusted | 502 | Certificate issued by unknown authority |\n| `TLH` | TLS Handshake Failure | 502 | TLS handshake failed |\n| `TLP` | TLS Protocol Error | 502 | TLS protocol or version mismatch |\n| `TLA` | TLS Alert | 502 | TLS alert received from upstream |\n| `UCF` | Connection Refused | 502 | Upstream refused the TCP connection |\n| `UCT` | Connection Timeout | 502 | TCP connection to upstream timed out |\n| `URR` | Connection Reset | 502 | Connection reset by upstream server |\n| `EPI` | Broken Pipe | 502 | Connection closed unexpectedly (EPIPE) |\n| `URT` | Response Timeout | 504 | Upstream did not respond in time |\n| `DNS` | DNS Resolution Failure | 502 | Upstream hostname could not be resolved |\n| `NRH` | No Route to Host | 502 | Upstream host or network unreachable |\n| `NHU` | No Healthy Upstreams | 503 | All targets in load balancer are unhealthy |\n| `CBO` | Circuit Breaker Open | 503 | Circuit breaker is open |\n| `URS` | Upstream Response 5XX | 5XX | Upstream returned a 5XX status code |\n| `UPE` | Upstream Error | 5XX | Generic upstream error |\n\n**Authentication Errors**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `AMF` | Auth Field Missing | 400/401 | Authorization header or parameter missing |\n| `AKI` | API Key Invalid | 403 | API key not found or invalid |\n| `TKE` | Token Expired | 403 | JWT, OAuth token, or client cert has expired |\n| `TKI` | Token Invalid | 403 | JWT or OAuth token malformed or bad signature |\n| `TCV` | Token Claims Invalid | 401 | JWT claims validation failed |\n| `EAD` | External Auth Denied | 403 | External auth service denied the request |\n\n**Rate Limiting**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `RLT` | Rate Limited | 429 | Request rejected due to rate limit |\n| `QEX` | Quota Exceeded | 403 | Client usage quota exhausted |\n\n**Request Validation**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `BTL` | Body Too Large | 400 | Request body exceeds configured size limit |\n| `CLM` | Content-Length Missing | 411 | Required Content-Length header missing |\n| `BIV` | Body Invalid | 400/422 | Request body malformed or fails schema validation |\n| `IHD` | Invalid Header | 400 | Required request header malformed or invalid |\n\n**Client Connection**\n\n| Flag | Name | HTTP | Description |\n|------|------|------|-------------|\n| `CDC` | Client Disconnected | 499 | Client closed connection before response sent |",
+        "mode": "markdown"
+      },
+      "title": "Tyk Response Flag Reference",
+      "type": "text"
+    },
+    {
+      "id": 9009,
+      "type": "timeseries",
+      "title": "Error Flag Rate Over Time (4xx+5xx)",
+      "description": "Rate of 4xx+5xx errors broken down by Tyk response flag — shows the WHY behind each error class. Uses http.server.request.duration histogram count.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prometheus}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 39
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 10,
+            "lineWidth": 2
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by(tyk_response_flag) (rate(http_server_request_duration_seconds_count{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"4..|5..\"}[$__rate_interval]))",
+          "legendFormat": "{{tyk_response_flag}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 9010,
+      "type": "table",
+      "title": "Error Flag × Status Code Breakdown",
+      "description": "Cross-breakdown of error flags, status codes, and APIs over the selected time range. Uses http.server.request.duration histogram count.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource_prometheus}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 39
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "sortBy": [
+          {
+            "displayName": "Errors",
+            "desc": true
+          }
+        ],
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "sort_desc(sum by(tyk_response_flag, http_response_status_code, tyk_api_id) (increase(http_server_request_duration_seconds_count{service_name=\"tyk-gateway\", tyk_api_id=\"$api_id\", tyk_gw_id=~\"$tyk_gw_id\", http_response_status_code=~\"4..|5..\"}[$__range])))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "tyk_response_flag": "Flag",
+              "http_response_status_code": "Status",
+              "tyk_api_id": "API ID",
+              "Value": "Errors"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "title": "🖥 Fleet Health",
+      "url": "/grafana/d/tyk-gateway-fleet-health",
+      "type": "link",
+      "targetBlank": false,
+      "icon": "external link"
+    },
+    {
+      "title": "📊 API Portfolio",
+      "url": "/grafana/d/tyk-api-portfolio",
+      "type": "link",
+      "targetBlank": false,
+      "icon": "external link"
+    },
+    {
+      "title": "🔍 API Troubleshooting",
+      "url": "/grafana/d/tyk-api-troubleshooting",
+      "type": "link",
+      "targetBlank": false,
+      "icon": "external link"
+    }
+  ]
+}

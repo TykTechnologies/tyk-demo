@@ -1,0 +1,10 @@
+---
+apiVersion: 1
+contactPoints:
+  - orgId: 1
+    name: tyk-webhook
+    receivers:
+      - uid: tyk-webhook
+        type: webhook
+        settings:
+          url: ${TYK_ALERTING_WEBHOOK_URL}

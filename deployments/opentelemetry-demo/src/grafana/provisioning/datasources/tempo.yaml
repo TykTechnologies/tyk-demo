@@ -1,0 +1,36 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+---
+apiVersion: 1
+
+datasources:
+  - name: Tempo
+    uid: webstore-tempo
+    type: tempo
+    url: http://tempo:3200
+    editable: true
+    isDefault: false
+    jsonData:
+      tracesToLogsV2:
+        datasourceUid: webstore-logs
+        spanStartTimeShift: "-20m"
+        spanEndTimeShift: "20m"
+        filterByTraceID: false
+        filterBySpanID: false
+        customQuery: true
+        query: '{service_name="tyk-gateway"} |= `"traceID":"${__trace.traceId}"`'
+      tracesToMetrics:
+        datasourceUid: webstore-metrics
+        queries:
+          - name: "Request rate"
+            query: "sum(rate(tyk_api_requests_total{service_name=\"$__tags.service.name\"}[$__rate_interval]))"
+      nodeGraph:
+        enabled: true
+      search:
+        hide: false
+      lokiSearch:
+        datasourceUid: webstore-logs
+      streamingEnabled:
+        search: false
+        metrics: false

@@ -30,3 +30,12 @@ deployments/portal/volumes/assets/*
 
 # Demo venvs
 .venv*/
+
+# OpenTelemetry Demo
+deployments/opentelemetry-demo/src/ad/.gradle
+deployments/opentelemetry-demo/src/ad/bin
+deployments/opentelemetry-demo/src/ad/build/reports/problems/problems-report.html
+deployments/opentelemetry-demo/src/fraud-detection/.gradle
+deployments/opentelemetry-demo/src/fraud-detection/bin
+deployments/opentelemetry-demo/src/fraud-detection/build/reports/problems/problems-report.html
+deployments/opentelemetry-demo/src/flagd/demo.flagd.json
