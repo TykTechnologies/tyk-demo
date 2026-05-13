@@ -823,7 +823,7 @@ services:
     container_name: otel-demo-tempo
     networks:
       - tyk
-    command: ["-config.file=/etc/tempo.yaml"]
+    command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
       - ./deployments/opentelemetry-demo/src/tempo/tempo.yaml:/etc/tempo.yaml
       - tempo-data:/tmp/tempo
