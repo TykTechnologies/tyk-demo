@@ -946,14 +946,14 @@ services:
     deploy:
       resources:
         limits:
-          memory: 800M
+          memory: 2G
     restart: unless-stopped
     environment:
       - cluster.name=demo-cluster
       - node.name=demo-node
       - bootstrap.memory_lock=true
       - discovery.type=single-node
-      - OPENSEARCH_JAVA_OPTS=-Xms400m -Xmx400m
+      - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
       - DISABLE_INSTALL_DEMO_CONFIG=true
       - DISABLE_SECURITY_PLUGIN=true
       # Workaround on OSX for https://bugs.openjdk.org/browse/JDK-8345296
@@ -1000,12 +1000,25 @@ services:
     logging: *logging
 
 # Extend tyk-gateway with demo.env so env://FRONTEND_URL resolves correctly in API definitions
+# and tag the docker logs so the otel-collector's filelog/tyk-gateway receiver picks them up.
   tyk-gateway:
     env_file:
       - deployments/opentelemetry-demo/demo.env
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "tyk-gateway"
   tyk-gateway-2:
     env_file:
       - deployments/opentelemetry-demo/demo.env
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "tyk-gateway"
 
 volumes:
   tempo-data:
