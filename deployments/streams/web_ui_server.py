@@ -203,10 +203,18 @@ def proxy_sse_stream(stream_type):
     
     def generate():
         """Generator function to stream SSE data from Tyk Gateway"""
+        # Flush a 'connected' event first so Flask sends HTTP 200 + SSE headers
+        # to the browser immediately. Tyk's http_server output only flushes its
+        # own response headers when the first Kafka message arrives, so without
+        # this the browser would hang in EventSource.CONNECTING on any reconnect
+        # where the consumer-group offset has already moved past existing data.
+        yield f"data: {{\"status\": \"connected\", \"stream\": \"{stream_type}\"}}\n\n".encode('utf-8')
+
         if REQUESTS_AVAILABLE:
             # Use requests library for better streaming support
             try:
-                # Stream from Tyk Gateway using requests with stream=True
+                # Stream from Tyk Gateway using requests with stream=True.
+                # connect_timeout=10s, read_timeout=None (long-running stream).
                 with requests.get(
                     stream_url,
                     headers={
@@ -214,12 +222,11 @@ def proxy_sse_stream(stream_type):
                         'Cache-Control': 'no-cache'
                     },
                     stream=True,
-                    timeout=30  # Initial connection timeout
+                    timeout=(10, None)
                 ) as r:
-                    r.raise_for_status()
-                    
-                    # Send initial connection confirmation
-                    yield f"data: {{\"status\": \"connected\", \"stream\": \"{stream_type}\"}}\n\n".encode('utf-8')
+                    if r.status_code != 200:
+                        yield f"data: {{\"error\": \"Upstream returned HTTP {r.status_code}\"}}\n\n".encode('utf-8')
+                        return
                     
                     # Stream data from Tyk Gateway - forward as-is
                     try:
@@ -282,7 +289,7 @@ def proxy_sse_stream(stream_type):
                 )
                 
                 response = urllib.request.urlopen(req, timeout=None)
-                yield f"data: {{\"status\": \"connected\", \"stream\": \"{stream_type}\"}}\n\n".encode('utf-8')
+                # 'connected' event already yielded at the top of generate()
                 
                 chunk_size = 1024
                 while True:

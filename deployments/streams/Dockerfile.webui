@@ -9,7 +9,7 @@ LABEL description="Web UI Server for Kafka Master Data Streaming Demo"
 WORKDIR /app
 
 # Install Python dependencies
-RUN pip3 install --no-cache-dir --no-deps flask flask-cors requests
+RUN pip3 install --no-cache-dir flask flask-cors requests
 
 # Copy web UI server script
 COPY web_ui_server.py .
