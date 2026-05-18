@@ -845,7 +845,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 120M
+          memory: 512M
     restart: unless-stopped
     environment:
       - "GF_INSTALL_PLUGINS=grafana-opensearch-datasource"
@@ -929,8 +929,6 @@ services:
         limits:
           memory: 300M
     restart: unless-stopped
-    ports:
-      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
     logging: *logging
 
   # OpenSearch
