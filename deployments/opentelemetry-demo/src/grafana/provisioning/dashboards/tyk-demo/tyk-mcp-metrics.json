@@ -1,0 +1,429 @@
+{
+  "title": "Tyk Gateway - MCP Metrics",
+  "uid": "tyk-mcp-metrics",
+  "version": 1,
+  "schemaVersion": 39,
+  "description": "MCP traffic on Tyk Gateway from native OTLP metrics: tyk_mcp_requests_total, tyk_mcp_primitive_duration_seconds, and MCP-tagged http_server_request_duration_seconds. Requires the MCP entries in TYK_GW_OPENTELEMETRY_METRICS_APIMETRICS (see demo.env).",
+  "tags": ["tyk", "mcp", "otel"],
+  "timezone": "",
+  "editable": true,
+  "graphTooltip": 1,
+  "time": { "from": "now-30m", "to": "now" },
+  "refresh": "10s",
+  "timepicker": {},
+  "templating": {
+    "list": [
+      {
+        "name": "datasource_prometheus",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {},
+        "hide": 0,
+        "label": "Prometheus"
+      },
+      {
+        "name": "service_name",
+        "type": "query",
+        "datasource": "${datasource_prometheus}",
+        "query": "label_values(tyk_mcp_requests_total, service_name)",
+        "current": { "text": "tyk-gateway", "value": "tyk-gateway" },
+        "multi": false,
+        "includeAll": false,
+        "label": "Service",
+        "refresh": 2,
+        "sort": 1
+      },
+      {
+        "name": "api_id",
+        "type": "query",
+        "datasource": "${datasource_prometheus}",
+        "query": "label_values(tyk_mcp_requests_total{service_name=~\"$service_name\"}, tyk_api_id)",
+        "current": { "text": "All", "value": "$__all" },
+        "multi": true,
+        "includeAll": true,
+        "label": "MCP API",
+        "description": "MCP API IDs, sourced from tyk_mcp_requests_total so only APIs that actually serve MCP traffic appear. 'All' expands to the enumerated list (regex OR) — non-MCP APIs are excluded.",
+        "refresh": 2,
+        "sort": 1
+      },
+      {
+        "name": "mcp_method",
+        "type": "query",
+        "datasource": "${datasource_prometheus}",
+        "query": "label_values(tyk_mcp_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\"}, mcp_method_name)",
+        "current": { "text": "All", "value": "$__all" },
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "label": "JSON-RPC Method",
+        "refresh": 2,
+        "sort": 1
+      },
+      {
+        "name": "primitive_type",
+        "type": "query",
+        "datasource": "${datasource_prometheus}",
+        "query": "label_values(tyk_mcp_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\"}, mcp_primitive_type)",
+        "current": { "text": "All", "value": "$__all" },
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "label": "Primitive Type",
+        "refresh": 2,
+        "sort": 1
+      },
+      {
+        "name": "datasource_tempo",
+        "type": "datasource",
+        "query": "tempo",
+        "current": { "text": "Tempo", "value": "webstore-tempo" },
+        "hide": 0,
+        "label": "Tempo"
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "MCP Request Rate",
+      "description": "Total MCP requests/sec across selected APIs, methods and primitive types.",
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "unit": "reqps", "decimals": 2, "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "textMode": "auto", "colorMode": "value", "graphMode": "area", "justifyMode": "auto" },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum(rate(tyk_mcp_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_method_name=~\"$mcp_method\", mcp_primitive_type=~\"$primitive_type\"}[$__rate_interval]))",
+          "legendFormat": "req/s",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "MCP Error Rate",
+      "description": "Share of MCP requests with response_code 4xx or 5xx.",
+      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "unit": "percent", "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 5 }] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "textMode": "auto", "colorMode": "value", "graphMode": "area", "justifyMode": "auto" },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "100 * (sum(rate(tyk_mcp_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_method_name=~\"$mcp_method\", mcp_primitive_type=~\"$primitive_type\", http_response_status_code=~\"[45]..\"}[$__rate_interval])) or vector(0)) / clamp_min(sum(rate(tyk_mcp_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_method_name=~\"$mcp_method\", mcp_primitive_type=~\"$primitive_type\"}[$__rate_interval])), 1)",
+          "legendFormat": "% errors",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Active Tools",
+      "description": "Distinct MCP primitive names seen in the time window.",
+      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "purple", "value": null }] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto", "colorMode": "value", "graphMode": "none", "justifyMode": "auto" },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "count(count by(mcp_primitive_name)(rate(tyk_mcp_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_primitive_name!=\"\"}[$__range])))",
+          "legendFormat": "tools",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Active MCP Sessions",
+      "description": "Distinct Mcp-Session-Id values seen on http.server.request.duration in the time window. Requires the mcp.session.id dimension on http.server.request.duration.",
+      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 4 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto", "colorMode": "value", "graphMode": "none", "justifyMode": "auto" },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "count(count by(mcp_session_id)(rate(http_server_request_duration_seconds_count{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_session_id!=\"\"}[$__range])))",
+          "legendFormat": "sessions",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "P95 Primitive Latency",
+      "description": "p95 of tyk_mcp_primitive_duration_seconds across the current selection.",
+      "gridPos": { "x": 16, "y": 0, "w": 4, "h": 4 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "unit": "ms", "decimals": 1, "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 250 }, { "color": "red", "value": 1000 }] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto", "colorMode": "value", "graphMode": "area", "justifyMode": "auto" },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "1000 * histogram_quantile(0.95, sum by(le)(rate(tyk_mcp_primitive_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_primitive_type=~\"$primitive_type\"}[$__rate_interval])))",
+          "legendFormat": "p95",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Top Tool (last 5m)",
+      "description": "Most-called MCP primitive (by name) in the last 5 minutes.",
+      "gridPos": { "x": 20, "y": 0, "w": 4, "h": 4 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "purple", "value": null }] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "value_and_name", "colorMode": "value", "graphMode": "none", "justifyMode": "auto" },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "topk(1, sum by(mcp_primitive_name)(rate(tyk_mcp_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_primitive_name!=\"\"}[5m])))",
+          "legendFormat": "{{mcp_primitive_name}}",
+          "refId": "A"
+        }
+      ]
+    },
+
+    {
+      "id": 10,
+      "type": "row",
+      "title": "Traffic",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 4, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Request Rate by JSON-RPC Method",
+      "description": "MCP request rate broken down by JSON-RPC method (initialize, tools/list, tools/call, resources/read, ...).",
+      "gridPos": { "x": 0, "y": 5, "w": 12, "h": 8 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10, "stacking": { "mode": "normal" } } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(mcp_method_name)(rate(tyk_mcp_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_method_name=~\"$mcp_method\", mcp_primitive_type=~\"$primitive_type\"}[$__rate_interval]))",
+          "legendFormat": "{{mcp_method_name}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "piechart",
+      "title": "Distribution by Primitive Type",
+      "description": "Share of MCP requests by primitive type (tool / resource / prompt / unknown).",
+      "gridPos": { "x": 12, "y": 5, "w": 12, "h": 8 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "options": { "pieType": "donut", "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] }, "reduceOptions": { "calcs": ["sum"] } },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(mcp_primitive_type)(increase(tyk_mcp_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_method_name=~\"$mcp_method\", mcp_primitive_type=~\"$primitive_type\"}[$__range]))",
+          "legendFormat": "{{mcp_primitive_type}}",
+          "refId": "A"
+        }
+      ]
+    },
+
+    {
+      "id": 20,
+      "type": "row",
+      "title": "Latency",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 13, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 21,
+      "type": "timeseries",
+      "title": "Primitive Duration (P50 / P95 / P99)",
+      "description": "Latency percentiles for MCP primitive execution. Unit: ms.",
+      "gridPos": { "x": 0, "y": 14, "w": 12, "h": 8 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "unit": "ms", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 5 } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "1000 * histogram_quantile(0.50, sum by(le)(rate(tyk_mcp_primitive_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_primitive_type=~\"$primitive_type\"}[$__rate_interval])))",
+          "legendFormat": "p50",
+          "refId": "A"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "1000 * histogram_quantile(0.95, sum by(le)(rate(tyk_mcp_primitive_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_primitive_type=~\"$primitive_type\"}[$__rate_interval])))",
+          "legendFormat": "p95",
+          "refId": "B"
+        },
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "1000 * histogram_quantile(0.99, sum by(le)(rate(tyk_mcp_primitive_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_primitive_type=~\"$primitive_type\"}[$__rate_interval])))",
+          "legendFormat": "p99",
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "type": "timeseries",
+      "title": "P95 Primitive Duration by Tool",
+      "description": "Per-tool p95 latency. One series per mcp_primitive_name.",
+      "gridPos": { "x": 12, "y": 14, "w": 12, "h": 8 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "unit": "ms", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 0 } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "1000 * histogram_quantile(0.95, sum by(le, mcp_primitive_name)(rate(tyk_mcp_primitive_duration_seconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_primitive_type=~\"$primitive_type\", mcp_primitive_name!=\"\"}[$__rate_interval])))",
+          "legendFormat": "{{mcp_primitive_name}}",
+          "refId": "A"
+        }
+      ]
+    },
+
+    {
+      "id": 30,
+      "type": "row",
+      "title": "Top Tools",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 22, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 31,
+      "type": "table",
+      "title": "Top Tools by Hits",
+      "description": "Top MCP primitives by total invocations in the current time range.",
+      "gridPos": { "x": 0, "y": 23, "w": 12, "h": 9 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "custom": { "align": "auto", "displayMode": "auto" } }, "overrides": [{ "matcher": { "id": "byName", "options": "Value" }, "properties": [{ "id": "displayName", "value": "Hits" }, { "id": "unit", "value": "short" }, { "id": "custom.displayMode", "value": "color-background" }, { "id": "color", "properties": [{}] }] }] },
+      "options": { "showHeader": true, "footer": { "show": false } },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "topk(20, sum by(mcp_primitive_type, mcp_primitive_name)(increase(tyk_mcp_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_primitive_name!=\"\"}[$__range])))",
+          "legendFormat": "",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        { "id": "organize", "options": { "excludeByName": { "Time": true, "__name__": true, "job": true, "instance": true, "service_name": true }, "indexByName": {}, "renameByName": { "mcp_primitive_type": "Primitive Type", "mcp_primitive_name": "Primitive Name" } } }
+      ]
+    },
+    {
+      "id": 32,
+      "type": "table",
+      "title": "Top Failing Tools (4xx/5xx)",
+      "description": "Top MCP primitives by error count in the current time range.",
+      "gridPos": { "x": 12, "y": 23, "w": 12, "h": 9 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "custom": { "align": "auto", "displayMode": "auto" } }, "overrides": [{ "matcher": { "id": "byName", "options": "Value" }, "properties": [{ "id": "displayName", "value": "Errors" }, { "id": "unit", "value": "short" }] }] },
+      "options": { "showHeader": true, "footer": { "show": false } },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "topk(20, sum by(mcp_primitive_type, mcp_primitive_name, http_response_status_code)(increase(tyk_mcp_requests_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\", mcp_primitive_name!=\"\", http_response_status_code=~\"[45]..\"}[$__range])))",
+          "legendFormat": "",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        { "id": "organize", "options": { "excludeByName": { "Time": true, "__name__": true, "job": true, "instance": true, "service_name": true }, "indexByName": {}, "renameByName": { "mcp_primitive_type": "Primitive Type", "mcp_primitive_name": "Primitive Name", "http_response_status_code": "Status" } } }
+      ]
+    },
+
+    {
+      "id": 40,
+      "type": "row",
+      "title": "Traces",
+      "collapsed": false,
+      "gridPos": { "x": 0, "y": 32, "w": 24, "h": 1 },
+      "panels": []
+    },
+    {
+      "id": 41,
+      "type": "table",
+      "title": "Recent MCP Traces",
+      "description": "Recent traces for the selected MCP API, queried via Tempo TraceQL on the tyk.api.id span attribute. Click a row to open the full trace. Caveat: Tyk spans do not yet carry mcp.method/primitive attributes — use the metrics panels above for per-tool slicing.",
+      "gridPos": { "x": 0, "y": 33, "w": 24, "h": 10 },
+      "datasource": "${datasource_tempo}",
+      "fieldConfig": { "defaults": { "custom": { "align": "auto", "displayMode": "auto" } }, "overrides": [{ "matcher": { "id": "byName", "options": "traceDuration" }, "properties": [{ "id": "unit", "value": "ms" }] }] },
+      "options": { "showHeader": true, "footer": { "show": false } },
+      "targets": [
+        {
+          "datasource": "${datasource_tempo}",
+          "queryType": "traceql",
+          "query": "{ resource.service.name=~\"$service_name\" && span.tyk.api.id=~\"$api_id\" }",
+          "limit": 50,
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "type": "timeseries",
+      "title": "Trace-derived Request Rate by Span",
+      "description": "RED metric from the OTel Collector spanmetrics connector. Filtered to the selected Tyk API (requires tyk.api.id promoted as a spanmetrics dimension in otelcol-config.yml).",
+      "gridPos": { "x": 0, "y": 43, "w": 12, "h": 8 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 5 } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "sum by(span_name)(rate(traces_span_metrics_calls_total{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\"}[$__rate_interval]))",
+          "legendFormat": "{{span_name}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "type": "timeseries",
+      "title": "Trace-derived P95 Latency by Span",
+      "description": "P95 of traces_span_metrics_duration_milliseconds, broken down by span name and scoped to the selected Tyk API.",
+      "gridPos": { "x": 12, "y": 43, "w": 12, "h": 8 },
+      "datasource": "${datasource_prometheus}",
+      "fieldConfig": { "defaults": { "unit": "ms", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 0 } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [
+        {
+          "datasource": "${datasource_prometheus}",
+          "expr": "histogram_quantile(0.95, sum by(le, span_name)(rate(traces_span_metrics_duration_milliseconds_bucket{service_name=~\"$service_name\", tyk_api_id=~\"$api_id\"}[$__rate_interval])))",
+          "legendFormat": "{{span_name}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

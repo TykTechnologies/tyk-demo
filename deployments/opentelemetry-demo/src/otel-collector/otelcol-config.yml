@@ -240,6 +240,15 @@ processors:
 
 connectors:
   spanmetrics:
+    # Promote a few Tyk-specific attributes so spanmetrics-derived RED panels
+    # can filter by API (used by the MCP dashboard).
+    dimensions:
+      - name: tyk.api.id
+        default: ""
+      - name: tyk.api.name
+        default: ""
+      - name: http.target
+        default: ""
 
 service:
   pipelines:
