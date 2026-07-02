@@ -227,8 +227,10 @@ jobs:
         if: steps.read-manifest.outputs.skip-deployment != 'true'
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830  # v4
         with:
-          path: .bootstrap/plugin-cache/${{ needs.discover-deployments.outputs.gateway-tag }}
-          key: tyk-go-plugins-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
+          # cache the whole plugin-cache dir and key on the repo so FIPS and non-FIPS
+          # plugin binaries (which can share the same version tag) are cached separately
+          path: .bootstrap/plugin-cache
+          key: tyk-go-plugins-${{ needs.discover-deployments.outputs.gateway-repo }}-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
 
       - name: Cache Jenkins Plugins
         if: steps.read-manifest.outputs.skip-deployment != 'true' && matrix.deployment == 'cicd'
