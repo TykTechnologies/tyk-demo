@@ -367,6 +367,11 @@ decode_jwt () { _decode_base64_url $(echo -n $1 | cut -d "." -f ${2:-2}) | jq .;
 
 build_go_plugin () {
   local gateway_image_tag=$(get_service_image_tag "tyk-gateway")
+  # when no gateway container is running yet (e.g. building plugins ahead of deployment in CI),
+  # fall back to the version configured in .env
+  if [ -z "$gateway_image_tag" ]; then
+    gateway_image_tag=$(grep -E '^GATEWAY_VERSION=' .env | cut -d '=' -f2)
+  fi
   local go_plugin_filename=$1
   # each plugin must be in its own directory
   local go_plugin_directory="$PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/$2"

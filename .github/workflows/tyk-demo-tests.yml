@@ -106,9 +106,38 @@ jobs:
           echo "gateway-repo=$GATEWAY_REPO" >> "$GITHUB_OUTPUT"
           echo "dashboard-repo=$DASHBOARD_REPO" >> "$GITHUB_OUTPUT"
 
+  # Build the Go plugins once, before the test matrix runs, and populate the shared
+  # plugin cache. This avoids every parallel deployment job rebuilding the same plugins.
+  build-go-plugins:
+    needs: discover-deployments
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Check Out Repository Code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+
+      - name: Cache Go Plugins
+        id: cache-go-plugins
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830  # v4
+        with:
+          path: .bootstrap/plugin-cache
+          key: tyk-go-plugins-${{ needs.discover-deployments.outputs.gateway-repo }}-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
+
+      - name: Build Go Plugins
+        if: steps.cache-go-plugins.outputs.cache-hit != 'true'
+        run: |
+          # provide the repo and version so build_go_plugin can select the correct
+          # (FIPS or standard) plugin compiler image and resolve the tag without a
+          # running gateway container
+          echo "GATEWAY_IMAGE_REPO=${{ needs.discover-deployments.outputs.gateway-repo }}" >> .env
+          echo "GATEWAY_VERSION=${{ needs.discover-deployments.outputs.gateway-tag }}" >> .env
+          ./scripts/build-go-plugins.sh
+
   # Run each deployment test in parallel
   test-deployments:
-    needs: discover-deployments
+    needs: [discover-deployments, build-go-plugins]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
