@@ -1,0 +1,213 @@
+{
+	"info": {
+		"_postman_id": "b3f9a1e2-7c4d-4e8a-9f21-0a4b6c8d2e17",
+		"name": "Tyk Demo - MCP Token Exchange",
+		"description": "Validates the Acme Support Copilot token-exchange deployment: mints an SSO token from the auto-imported Keycloak realm, performs the same RFC 8693 exchange the Tyk MCP proxy performs, then verifies that the downstream acme-api enforces the narrowed scope via the Tyk Gateway.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Mint SSO token for alice (password grant)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"function jwtClaims(t) {",
+							"    var p = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');",
+							"    while (p.length % 4) p += '=';",
+							"    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';",
+							"    var out = '';",
+							"    for (var i = 0; i < p.length; i += 4) {",
+							"        var n = (chars.indexOf(p[i]) << 18) | (chars.indexOf(p[i+1]) << 12) | ((chars.indexOf(p[i+2]) & 63) << 6) | (chars.indexOf(p[i+3]) & 63);",
+							"        out += String.fromCharCode((n >> 16) & 255);",
+							"        if (p[i+2] !== '=') out += String.fromCharCode((n >> 8) & 255);",
+							"        if (p[i+3] !== '=') out += String.fromCharCode(n & 255);",
+							"    }",
+							"    return JSON.parse(decodeURIComponent(escape(out)));",
+							"}",
+							"",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('SSO token issued with broad scope', function () {",
+							"    var token = pm.response.json().access_token;",
+							"    pm.expect(token).to.be.a('string');",
+							"    var claims = jwtClaims(token);",
+							"    pm.expect(claims.scope).to.include('customers:all');",
+							"    pm.expect(claims.preferred_username).to.eql('alice');",
+							"    pm.variables.set('acme.sso-token', token);",
+							"    pm.variables.set('acme.sso-sub', claims.sub);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{ "key": "grant_type", "value": "password" },
+						{ "key": "client_id", "value": "acme-support-chat" },
+						{ "key": "username", "value": "alice" },
+						{ "key": "password", "value": "Acme-Demo-2026!" },
+						{ "key": "scope", "value": "openid customers:all" }
+					]
+				},
+				"url": {
+					"raw": "http://{{acme-keycloak.host}}/realms/acme/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [ "{{acme-keycloak.host}}" ],
+					"path": [ "realms", "acme", "protocol", "openid-connect", "token" ]
+				},
+				"description": "Mints alice's SSO token using the password grant (enabled on the chat client for headless verification). This is the token the copilot chat holds after login."
+			},
+			"response": []
+		},
+		{
+			"name": "RFC 8693 token exchange (impersonation)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"function jwtClaims(t) {",
+							"    var p = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');",
+							"    while (p.length % 4) p += '=';",
+							"    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';",
+							"    var out = '';",
+							"    for (var i = 0; i < p.length; i += 4) {",
+							"        var n = (chars.indexOf(p[i]) << 18) | (chars.indexOf(p[i+1]) << 12) | ((chars.indexOf(p[i+2]) & 63) << 6) | (chars.indexOf(p[i+3]) & 63);",
+							"        out += String.fromCharCode((n >> 16) & 255);",
+							"        if (p[i+2] !== '=') out += String.fromCharCode((n >> 8) & 255);",
+							"        if (p[i+3] !== '=') out += String.fromCharCode(n & 255);",
+							"    }",
+							"    return JSON.parse(decodeURIComponent(escape(out)));",
+							"}",
+							"",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Identity preserved, audience re-pointed, scope narrowed', function () {",
+							"    var token = pm.response.json().access_token;",
+							"    pm.expect(token).to.be.a('string');",
+							"    var claims = jwtClaims(token);",
+							"    pm.expect(claims.sub).to.eql(pm.variables.get('acme.sso-sub'));",
+							"    pm.expect(claims.aud).to.satisfy(function (aud) {",
+							"        return aud === 'api.acme.internal' || (Array.isArray(aud) && aud.includes('api.acme.internal'));",
+							"    });",
+							"    pm.expect(claims.azp).to.eql('tyk-mcp-gateway');",
+							"    pm.expect(claims.scope).to.include('customers:read');",
+							"    pm.expect(claims.scope).to.not.include('customers:write');",
+							"    pm.variables.set('acme.exchanged-token', token);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{ "key": "username", "value": "tyk-mcp-gateway", "type": "string" },
+						{ "key": "password", "value": "acme-demo-exchange-secret", "type": "string" }
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{ "key": "grant_type", "value": "urn:ietf:params:oauth:grant-type:token-exchange" },
+						{ "key": "subject_token", "value": "{{acme.sso-token}}" },
+						{ "key": "subject_token_type", "value": "urn:ietf:params:oauth:token-type:access_token" },
+						{ "key": "audience", "value": "api.acme.internal" },
+						{ "key": "resource", "value": "api.acme.internal" },
+						{ "key": "scope", "value": "customers:read" }
+					]
+				},
+				"url": {
+					"raw": "http://{{acme-keycloak.host}}/realms/acme/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [ "{{acme-keycloak.host}}" ],
+					"path": [ "realms", "acme", "protocol", "openid-connect", "token" ]
+				},
+				"description": "Performs the same RFC 8693 impersonation exchange the Tyk MCP proxy performs: alice's SSO token is swapped for an audience-scoped token that keeps her identity (sub) while narrowing the scope to customers:read."
+			},
+			"response": []
+		},
+		{
+			"name": "Call acme-api with exchanged token (allowed)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{ "key": "Host", "value": "api.acme.internal" },
+					{ "key": "Authorization", "value": "Bearer {{acme.exchanged-token}}" }
+				],
+				"url": {
+					"raw": "http://{{tyk-gateway.host}}/anything/customers/123",
+					"protocol": "http",
+					"host": [ "{{tyk-gateway.host}}" ],
+					"path": [ "anything", "customers", "123" ]
+				},
+				"description": "The lookupCustomer operation requires the customers:read scope, which the exchanged token carries. The Host header matches the acme-api custom domain."
+			},
+			"response": []
+		},
+		{
+			"name": "Refund denied for read-only scope (403)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 403', function () {",
+							"    pm.response.to.have.status(403);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{ "key": "Host", "value": "api.acme.internal" },
+					{ "key": "Authorization", "value": "Bearer {{acme.exchanged-token}}" },
+					{ "key": "Content-Type", "value": "application/json" }
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"customer_id\": \"123\", \"order_id\": \"o-1\", \"amount\": 10}"
+				},
+				"url": {
+					"raw": "http://{{tyk-gateway.host}}/anything/refunds",
+					"protocol": "http",
+					"host": [ "{{tyk-gateway.host}}" ],
+					"path": [ "anything", "refunds" ]
+				},
+				"description": "The issueRefund operation requires the refunds:write scope. The exchanged token was narrowed to customers:read, so the gateway must reject the call with an insufficient_scope 403."
+			},
+			"response": []
+		}
+	]
+}

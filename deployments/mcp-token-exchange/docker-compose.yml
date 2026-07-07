@@ -1,0 +1,159 @@
+---
+# Acme Support Copilot — OAuth 2.0 Token Exchange (RFC 8693) for AI agents/MCP.
+# Extends the base Tyk deployment with a Keycloak IdP (realm auto-imported), the
+# copilot chat app, a generic OpenAPI->MCP tool server, and an OTel observability
+# stack (Tempo/Loki/Prometheus/Grafana). Requires Tyk 5.14+ EE (see pre.sh).
+#
+# Host-published ports (all others are internal to the tyk network):
+#   Chat http://localhost:8095   Keycloak http://acme-keycloak:8280   Grafana http://localhost:3021
+services:
+  # ---- identity provider ----------------------------------------------------
+  acme-keycloak:
+    image: quay.io/keycloak/keycloak:26.3
+    command: [ "start-dev", "--import-realm" ]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      # Single issuer for every audience: the browser resolves acme-keycloak via
+      # /etc/hosts (update-hosts.sh), containers via Docker DNS. Keycloak listens
+      # on 8280 so the URL is identical inside and outside the network.
+      KC_HOSTNAME: http://acme-keycloak:8280
+      KC_HTTP_PORT: 8280
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+    volumes:
+      - ./deployments/mcp-token-exchange/volumes/acme-keycloak/realm-acme.json:/opt/keycloak/data/import/realm-acme.json:ro
+    ports:
+      - 8280:8280
+    networks:
+      - tyk
+
+  # ---- application ----------------------------------------------------------
+  acme-chat:
+    build: ./deployments/mcp-token-exchange/services/chat
+    environment:
+      IDP_AUTHORIZE_URL: http://acme-keycloak:8280/realms/acme/protocol/openid-connect/auth
+      IDP_TOKEN_URL: http://acme-keycloak:8280/realms/acme/protocol/openid-connect/token
+      CHAT_CLIENT_ID: acme-support-chat
+      CHAT_REDIRECT_URI: http://localhost:8095/callback
+      CHAT_SCOPES: openid customers:all
+      # Force the Keycloak login screen so users can switch alice<->bob
+      LOGIN_PROMPT: login
+      MCP_ENDPOINT: http://tyk-gateway:8080/acme-mcp/mcp
+      CHAT_LISTEN: ":8090"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://acme-otel-collector:4318
+    ports:
+      - 8095:8090
+    networks:
+      - tyk
+    depends_on:
+      - acme-otel-collector
+      - acme-keycloak
+
+  acme-mcp-server:
+    build: ./deployments/mcp-token-exchange/services/mcp-server
+    environment:
+      # The OpenAPI spec the MCP tools are derived from (one tool per operation)
+      MCP_OAS_PATH: /etc/acme/acme-api.oas.json
+      # Tool calls replay the exchanged bearer to the acme-api via the gateway,
+      # matched by custom domain via the Host header
+      UPSTREAM_BASE_URL: http://tyk-gateway:8080
+      UPSTREAM_HOST: api.acme.internal
+    volumes:
+      - ./deployments/mcp-token-exchange/data/tyk-dashboard/acme-api.oas.json:/etc/acme/acme-api.oas.json:ro
+    networks:
+      - tyk
+
+  # ---- observability --------------------------------------------------------
+  acme-otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.115.1
+    command: [ "--config=/etc/otelcol/config.yaml" ]
+    volumes:
+      - ./deployments/mcp-token-exchange/volumes/acme-otel-collector/config.yaml:/etc/otelcol/config.yaml:ro
+    networks:
+      - tyk
+    depends_on:
+      - acme-tempo
+      - acme-loki
+      - acme-prometheus
+
+  acme-tempo:
+    image: grafana/tempo:2.6.1
+    command: [ "-config.file=/etc/tempo/tempo.yaml" ]
+    volumes:
+      - ./deployments/mcp-token-exchange/volumes/acme-tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+    networks:
+      - tyk
+
+  acme-loki:
+    image: grafana/loki:3.2.1
+    command: [ "-config.file=/etc/loki/loki-config.yaml" ]
+    volumes:
+      - ./deployments/mcp-token-exchange/volumes/acme-loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+    networks:
+      - tyk
+
+  acme-promtail:
+    image: grafana/promtail:3.2.1
+    command: [ "-config.file=/etc/promtail/promtail.yml" ]
+    volumes:
+      - ./deployments/mcp-token-exchange/volumes/acme-promtail/promtail.yml:/etc/promtail/promtail.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - tyk
+    depends_on:
+      - acme-loki
+
+  acme-prometheus:
+    image: prom/prometheus:v3.0.1
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--web.enable-remote-write-receiver"
+    volumes:
+      - ./deployments/mcp-token-exchange/volumes/acme-prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      # SLO recording rules, shared with the slo-prometheus-grafana deployment
+      - ./deployments/slo-prometheus-grafana/volumes/prometheus/slos.rules.yml:/etc/prometheus/slos.rules.yml:ro
+    networks:
+      - tyk
+
+  # Prometheus pump exposing the standard Tyk analytics metrics, reusing the
+  # slo-prometheus-grafana deployment's pump configuration
+  acme-pump:
+    image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.15.0-rc2}
+    volumes:
+      - ./deployments/slo-prometheus-grafana/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
+    environment:
+      - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
+      - TYK_LOGLEVEL=${PUMP_LOGLEVEL:-info}
+    env_file:
+      - .env
+    networks:
+      - tyk
+    depends_on:
+      - tyk-redis
+
+  acme-grafana:
+    image: grafana/grafana-oss:11.4.0
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes:
+      - ./deployments/mcp-token-exchange/volumes/acme-grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./deployments/mcp-token-exchange/volumes/acme-grafana/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml:ro
+      # Directory mount (not single-file) so host-side edits propagate live; the
+      # provider only loads *.json, so the dashboard.yml inside it is ignored
+      - ./deployments/mcp-token-exchange/volumes/acme-grafana/dashboards:/var/lib/grafana/dashboards:ro
+      # Standard Tyk SLO dashboard, shared with the slo-prometheus-grafana deployment
+      - ./deployments/slo-prometheus-grafana/volumes/grafana/dashboards/SLOs-for-APIs-managed-by-Tyk.json:/var/lib/grafana/dashboards-shared/SLOs-for-APIs-managed-by-Tyk.json:ro
+    ports:
+      - 3021:3000
+    networks:
+      - tyk
+    depends_on:
+      - acme-tempo
+      - acme-prometheus
+      - acme-loki
+
+networks:
+  tyk:

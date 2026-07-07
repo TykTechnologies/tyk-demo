@@ -1,0 +1,29 @@
+---
+apiVersion: 1
+
+# File-based dashboard provider, following the slo-prometheus-grafana deployment
+# conventions. Grafana loads every *.json in the mounted dashboards directory and
+# re-scans it every updateIntervalSeconds.
+providers:
+  - name: "Tyk API Gateway"
+    orgId: 1
+    folder: ""
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+  # Dashboards shared from other deployments (single-file mounts need their own
+  # directory — they can't be mounted inside the read-only directory above)
+  - name: "Tyk Shared"
+    orgId: 1
+    folder: ""
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards-shared

@@ -1,0 +1,201 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "acme-mcp-proxy",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mcp": {
+      "post": {
+        "operationId": "mcpRpc",
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "keycloakJwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {}
+      }
+    }
+  },
+  "security": [
+    {
+      "keycloakJwt": [],
+      "oauth2": []
+    }
+  ],
+  "x-tyk-api-gateway": {
+    "info": {
+      "name": "acme-mcp-proxy",
+      "state": {
+        "active": true
+      }
+    },
+    "upstream": {
+      "url": "http://acme-mcp-server:7878"
+    },
+    "server": {
+      "listenPath": {
+        "value": "/acme-mcp/",
+        "strip": true
+      },
+      "detailedTracing": {
+        "enabled": true
+      },
+      "detailedActivityLogs": {
+        "enabled": true
+      },
+      "authentication": {
+        "enabled": true,
+        "baseIdentityProvider": "jwt_claim",
+        "securitySchemes": {
+          "keycloakJwt": {
+            "enabled": true,
+            "header": {
+              "enabled": true,
+              "name": "Authorization"
+            },
+            "jwksURIs": [
+              {
+                "url": "http://acme-keycloak:8280/realms/acme/protocol/openid-connect/certs",
+                "cacheTimeout": "0s"
+              }
+            ],
+            "signingMethod": "rsa",
+            "identityBaseField": "sub",
+            "defaultPolicies": []
+          },
+          "oauth2": {
+            "enabled": true,
+            "header": {
+              "enabled": true,
+              "name": "Authorization"
+            },
+            "scopeCheck": {
+              "enabled": true,
+              "claimNames": [
+                "entitlements"
+              ],
+              "separator": " "
+            },
+            "protectedResourceMetadata": {
+              "enabled": true,
+              "authorizationServers": [
+                "http://acme-keycloak:8280/realms/acme"
+              ]
+            },
+            "tokenExchange": {
+              "enabled": true,
+              "providers": [
+                {
+                  "name": "keycloak",
+                  "issuers": [
+                    "http://acme-keycloak:8280/realms/acme"
+                  ],
+                  "tokenEndpoint": "http://acme-keycloak:8280/realms/acme/protocol/openid-connect/token",
+                  "clientAuth": {
+                    "method": "client_secret_basic",
+                    "clientId": "tyk-mcp-gateway",
+                    "clientSecret": "acme-demo-exchange-secret"
+                  },
+                  "defaultTarget": {
+                    "audience": "api.acme.internal",
+                    "scopes": [
+                      "customers:read"
+                    ]
+                  },
+                  "cache": {
+                    "enabled": true,
+                    "mode": "derived",
+                    "maxTimeout": "30s",
+                    "safetyMargin": "5s"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "middleware": {
+      "global": {
+        "trafficLogs": {
+          "enabled": true
+        }
+      },
+      "mcpTools": {
+        "lookup_customer": {
+          "security": [
+            {
+              "oauth2": [
+                "customers:read"
+              ]
+            }
+          ],
+          "scopeCheck": {
+            "enabled": true
+          },
+          "exchange": {
+            "enabled": true
+          }
+        },
+        "update_customer": {
+          "security": [
+            {
+              "oauth2": [
+                "customers:write"
+              ]
+            }
+          ],
+          "scopeCheck": {
+            "enabled": true
+          },
+          "exchange": {
+            "enabled": true
+          }
+        },
+        "recent_orders": {
+          "security": [
+            {
+              "oauth2": [
+                "customers:read"
+              ]
+            }
+          ],
+          "scopeCheck": {
+            "enabled": true
+          },
+          "exchange": {
+            "enabled": true
+          }
+        },
+        "issue_refund": {
+          "security": [
+            {
+              "oauth2": [
+                "refunds:write"
+              ]
+            }
+          ],
+          "scopeCheck": {
+            "enabled": true
+          },
+          "exchange": {
+            "enabled": true
+          }
+        }
+      }
+    }
+  }
+}

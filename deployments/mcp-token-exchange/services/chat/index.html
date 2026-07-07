@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tyk Demo Chat App</title>
+<style>
+  :root{
+    --bg:#070b16; --bg2:#0b1120; --panel:#0f1626; --panel2:#141d31; --line:#1f2940;
+    --ink:#eaf0fb; --muted:#8893ad;
+    --teal:#00d6a4; --teal2:#23ecc0; --cyan:#3bc4ff; --coral:#ff5c7a; --amber:#ffc24b;
+    --grad:linear-gradient(135deg,#00d6a4,#3bc4ff);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font:14px/1.55 ui-sans-serif,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);
+    background:
+      radial-gradient(900px 500px at 85% -10%,rgba(0,214,164,.10),transparent 60%),
+      radial-gradient(800px 480px at -5% 110%,rgba(59,196,255,.08),transparent 55%),
+      var(--bg);
+    display:flex;flex-direction:column;height:100vh;overflow:hidden}
+  a{color:inherit}
+  /* header */
+  header{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+    padding:13px 22px;border-bottom:1px solid var(--line);
+    background:rgba(10,15,28,.72);backdrop-filter:blur(12px)}
+  .brand{display:flex;align-items:center;gap:11px}
+  .logo{width:30px;height:30px;border-radius:9px;background:var(--grad);display:grid;place-items:center;
+    font-weight:900;color:#04140f;font-size:15px;box-shadow:0 6px 22px rgba(0,214,164,.35)}
+  .brand b{font-size:15px;letter-spacing:.2px}
+  .brand .sub{color:var(--muted);font-size:11px;margin-left:2px}
+  .who{display:flex;align-items:center;gap:10px}
+  .who .avatar{width:28px;height:28px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);
+    display:grid;place-items:center;font-size:12px;color:var(--teal2);font-weight:700}
+  .who .name{color:var(--ink);font-size:13px}
+  .ghost{background:none;border:1px solid var(--line);color:var(--muted);border-radius:9px;
+    padding:7px 12px;cursor:pointer;font-size:13px;transition:.15s}
+  .ghost:hover{border-color:var(--teal);color:var(--teal2)}
+
+  /* login hero */
+  .login{flex:1;display:grid;place-items:center;text-align:center;padding:22px}
+  .login .card{max-width:560px;padding:42px 38px;border:1px solid var(--line);border-radius:20px;
+    background:linear-gradient(180deg,rgba(20,29,49,.7),rgba(15,22,38,.7));
+    box-shadow:0 30px 80px rgba(0,0,0,.45)}
+  .login .logo{width:54px;height:54px;border-radius:15px;font-size:24px;margin:0 auto 18px}
+  .login h2{margin:0 0 8px;font-size:24px;letter-spacing:-.2px}
+  .login p{color:var(--muted);margin:0 auto 26px;max-width:430px}
+  .btn{display:inline-flex;align-items:center;gap:9px;background:var(--grad);color:#04140f;border:none;
+    border-radius:12px;padding:13px 22px;font-weight:800;font-size:14px;cursor:pointer;text-decoration:none;
+    box-shadow:0 12px 30px rgba(0,214,164,.30);transition:transform .12s,box-shadow .12s}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 16px 38px rgba(0,214,164,.42)}
+
+  /* split layout */
+  #app{flex:1;display:flex;min-height:0}
+  .lhp{flex:1.05;display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--line)}
+  .rhp{flex:.95;display:flex;flex-direction:column;min-width:0;background:rgba(8,12,22,.45)}
+
+  /* chat */
+  .chatlog{flex:1;overflow-y:auto;padding:24px 26px;display:flex;flex-direction:column;gap:14px}
+  .row{display:flex;gap:10px;max-width:84%;animation:rise .22s ease}
+  .row.user{align-self:flex-end;flex-direction:row-reverse}
+  .row.bot{align-self:flex-start}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .av{flex:0 0 30px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800}
+  .av.bot{background:var(--grad);color:#04140f}
+  .av.user{background:var(--panel2);border:1px solid var(--line);color:var(--teal2)}
+  .bubble{padding:11px 15px;border-radius:16px;font-size:13.5px;line-height:1.5}
+  .bubble b{color:var(--teal2)}
+  .row.bot .bubble{background:var(--panel2);border:1px solid var(--line);border-top-left-radius:5px}
+  .row.user .bubble{background:var(--grad);color:#04221b;border-top-right-radius:5px;font-weight:600}
+  .row.user .bubble b{color:#04221b;text-decoration:underline;text-underline-offset:2px}
+  .bubble.bad{border-color:rgba(255,92,122,.4)!important;background:rgba(255,92,122,.10)!important}
+  .bubble.bad b{color:var(--coral)}
+  .bubble.err{border-color:rgba(255,194,75,.4)!important;background:rgba(255,194,75,.08)!important}
+  .meta{margin-top:9px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tag{font-size:11px;padding:2px 9px;border-radius:999px;font-weight:700;letter-spacing:.02em}
+  .tag.ok{background:rgba(0,214,164,.14);color:var(--teal2);border:1px solid rgba(0,214,164,.3)}
+  .tag.bad{background:rgba(255,92,122,.13);color:var(--coral);border:1px solid rgba(255,92,122,.3)}
+  .tag.err{background:rgba(255,194,75,.13);color:var(--amber);border:1px solid rgba(255,194,75,.3)}
+  .tag.tool{background:var(--bg2);color:var(--muted);border:1px solid var(--line);font-family:ui-monospace,Menlo,monospace}
+  .inspect-link{font-size:11.5px;color:var(--cyan);cursor:pointer;border:none;background:none;padding:0;text-decoration:underline;text-underline-offset:2px}
+  .orders{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+  .orders li{display:flex;justify-content:space-between;gap:12px;background:var(--bg2);border:1px solid var(--line);
+    border-radius:9px;padding:7px 11px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  .orders .amt{color:var(--ink);font-weight:700}
+  .orders .st{color:var(--muted)}
+  /* typing dots */
+  .dots{display:inline-flex;gap:4px;padding:4px 2px}
+  .dots i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:blink 1.2s infinite both}
+  .dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+
+  /* composer */
+  .composer{flex:0 0 auto;border-top:1px solid var(--line);padding:14px 18px 16px;
+    background:linear-gradient(180deg,rgba(15,22,38,.4),rgba(10,15,28,.6))}
+  .ctx{display:flex;gap:10px;align-items:flex-end;margin-bottom:11px}
+  .field label{display:block;font-size:10px;color:var(--muted);margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em}
+  .field input{background:var(--bg2);border:1px solid var(--line);color:var(--ink);border-radius:9px;
+    padding:8px 11px;font-size:13px;outline:none;transition:.15s;width:120px}
+  .field.sm input{width:84px}
+  .field input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,214,164,.15)}
+  .hint{flex:1;color:var(--muted);font-size:11.5px;text-align:right;align-self:center}
+  .chips{display:flex;gap:9px;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--line);
+    color:var(--ink);border-radius:999px;padding:9px 15px;cursor:pointer;font-size:13px;font-weight:600;transition:.15s}
+  .chip:hover{border-color:var(--teal);color:var(--teal2);transform:translateY(-1px)}
+  .chip:disabled{opacity:.5;cursor:default;transform:none}
+  .chip.danger:hover{border-color:var(--coral);color:var(--coral)}
+  .chip .ic{font-size:15px}
+
+  /* right / debug panel */
+  .rhp-head{flex:0 0 auto;display:flex;align-items:center;gap:9px;padding:15px 22px;border-bottom:1px solid var(--line)}
+  .rhp-head .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .rhp-head b{font-size:13px;letter-spacing:.2px}
+  .rhp-head .sub{color:var(--muted);font-size:11px}
+  .inspector{flex:1;overflow-y:auto;padding:20px 22px}
+  .chain{display:grid;grid-template-columns:1fr 34px 1fr;gap:10px;align-items:stretch}
+  .tok{background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:13px 15px}
+  .tok.delegated{border-color:rgba(0,214,164,.35);box-shadow:0 0 0 1px rgba(0,214,164,.12) inset}
+  .tok h4{margin:0 0 10px;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+  .arrow{display:grid;place-items:center;color:var(--teal);font-size:18px}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  .kv .k{color:var(--muted)}
+  .kv .v{color:var(--ink);word-break:break-all}
+  .kv .v.hl{color:var(--teal2);font-weight:700}
+  .kv .v.act{color:var(--cyan);font-weight:700}
+  .note{color:var(--muted);font-size:12.5px;margin-top:12px;line-height:1.6}
+  .note b{color:var(--ink)}
+  details{margin-top:12px}
+  details summary{cursor:pointer;color:var(--muted);font-size:12px;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary:before{content:'▸ ';color:var(--teal)}
+  details[open] summary:before{content:'▾ '}
+  textarea.raw{display:block;width:100%;background:#060a13;border:1px solid var(--line);border-radius:10px;
+    padding:12px;margin:8px 0 0;color:#9fb0d6;font:11.5px/1.5 ui-monospace,Menlo,monospace;resize:vertical;
+    outline:none;white-space:pre;overflow:auto;cursor:text}
+  textarea.raw:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,214,164,.12)}
+  textarea.jwt{min-height:70px;color:var(--teal2)}
+  code{background:var(--bg2);padding:1px 6px;border-radius:5px;font-size:12px;color:var(--teal2)}
+  .rhp-empty{color:var(--muted);text-align:center;padding:48px 16px;font-size:13px;line-height:1.7}
+  .rhp-empty .big{font-size:26px;margin-bottom:6px}
+  .hidden{display:none}
+  @media(max-width:880px){
+    body{overflow:auto;height:auto}#app{flex-direction:column}
+    .lhp{border-right:none;border-bottom:1px solid var(--line)}
+    .chatlog{min-height:48vh}.row{max-width:94%}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">T</div>
+    <div><b>Tyk Demo Chat App</b><span class="sub"> · Acme Support Copilot</span></div>
+  </div>
+  <div class="who" id="whoWrap">
+    <a class="ghost" href="/guide" style="text-decoration:none">How it works</a>
+    <a class="ghost" href="/setup" style="text-decoration:none">Technical</a>
+    <div class="avatar" id="avatar"></div>
+    <span class="name" id="who"></span>
+    <button id="logout" class="ghost hidden">Sign out</button>
+  </div>
+</header>
+
+<!-- login -->
+<section id="login" class="login hidden">
+  <div class="card">
+    <div class="logo">T</div>
+    <h2>Sign in to help a customer</h2>
+    <p>Authenticate with your enterprise identity. The assistant acts <b>on your behalf</b> —
+       it can look up accounts, but only supervisors can issue refunds.</p>
+    <a class="btn" href="/login">Sign in with Keycloak →</a>
+  </div>
+</section>
+
+<!-- app -->
+<section id="app" class="hidden">
+  <!-- LEFT: chat -->
+  <div class="lhp">
+    <div class="chatlog" id="chatlog"></div>
+    <div class="composer">
+      <div class="ctx">
+        <div class="field"><label>Customer</label><input id="cust" value="C-1024"></div>
+        <div class="field sm"><label>Amount</label><input id="amount" value="49.99"></div>
+        <div class="hint">Pick an action — the assistant calls it through Tyk on your behalf</div>
+      </div>
+      <div class="chips">
+        <button class="chip" data-tool="lookup_customer"><span class="ic">🔎</span> Look up customer</button>
+        <button class="chip" data-tool="update_customer"><span class="ic">✏️</span> Update customer</button>
+        <button class="chip" data-tool="recent_orders"><span class="ic">📦</span> Recent orders</button>
+        <button class="chip danger" data-tool="issue_refund"><span class="ic">💸</span> Issue refund</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: debug / delegation inspector -->
+  <div class="rhp">
+    <div class="rhp-head">
+      <span class="dot"></span>
+      <b>Delegation inspector</b>
+      <span class="sub" id="rhpSub">— debug view</span>
+    </div>
+    <div class="inspector" id="inspector">
+      <div class="rhp-empty"><div class="big">🪪</div>
+        Run an action and the token exchange shows up here:<br>
+        your SSO token → the token the API received (same <code>sub</code>,
+        new <code>aud</code> and narrowed <code>scope</code>),
+        the raw end-JWT, and the raw upstream response.</div>
+    </div>
+  </div>
+</section>
+
+<script>
+const $ = s => document.querySelector(s);
+let me = null;
+
+async function refresh(){
+  me = await (await fetch('/api/me')).json();
+  const on = me.loggedIn;
+  $('#login').classList.toggle('hidden', on);
+  $('#app').classList.toggle('hidden', !on);
+  $('#app').style.display = on ? 'flex' : 'none';
+  $('#logout').classList.toggle('hidden', !on);
+  const label = on ? (me.name || me.sub || 'signed in') : '';
+  $('#who').textContent = label;
+  $('#avatar').textContent = on ? (label.trim()[0]||'•').toUpperCase() : '';
+  $('#avatar').style.display = on ? 'grid' : 'none';
+  if(on && !$('#chatlog').children.length) greet(label);
+}
+
+function escapeHtml(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function headerOf(h, name){ if(!h) return ''; const e=Object.entries(h).find(([k])=>k.toLowerCase()===name.toLowerCase()); return e?(Array.isArray(e[1])?e[1][0]:e[1]):''; }
+const initial = s => (String(s).trim()[0]||'•').toUpperCase();
+
+/* ---------- chat (left) ---------- */
+function scrollDown(){ const l=$('#chatlog'); l.scrollTop=l.scrollHeight; }
+
+function botRow(html, cls){
+  const row=document.createElement('div'); row.className='row bot';
+  row.innerHTML=`<div class="av bot">T</div><div class="bubble ${cls||''}">${html}</div>`;
+  $('#chatlog').appendChild(row); scrollDown(); return row;
+}
+function userRow(html){
+  const row=document.createElement('div'); row.className='row user';
+  row.innerHTML=`<div class="av user">${initial(me.name||me.sub||'U')}</div><div class="bubble">${html}</div>`;
+  $('#chatlog').appendChild(row); scrollDown();
+}
+function typingRow(){
+  const row=document.createElement('div'); row.className='row bot';
+  row.innerHTML=`<div class="av bot">T</div><div class="bubble"><span class="dots"><i></i><i></i><i></i></span></div>`;
+  $('#chatlog').appendChild(row); scrollDown(); return row;
+}
+function greet(name){
+  botRow(`Hi <b>${escapeHtml((name||'there').split(' ')[0])}</b> 👋 I'm the Acme Support Copilot.
+    I can look things up and act <b>on your behalf</b> through Tyk. What do you need?`);
+}
+
+const USER_MSG = {
+  lookup_customer: c => `Can you pull up customer <b>${escapeHtml(c)}</b>?`,
+  update_customer: c => `Please update <b>${escapeHtml(c)}</b>'s contact details`,
+  recent_orders:   c => `Show me <b>${escapeHtml(c)}</b>'s recent orders`,
+  issue_refund:    (c,a) => `Please refund <b>$${escapeHtml(a)}</b> to <b>${escapeHtml(c)}</b>`,
+};
+
+/* light mock data so the conversation feels real; the real plumbing is in the inspector */
+const NAMES=['Jane Cooper','Marcus Lee','Priya Nair','Tom Becker','Sofia Ramos','Iris Okafor'];
+const PLANS=['Pro','Business','Enterprise','Starter'];
+function pick(arr,seed){let h=0;for(const ch of String(seed))h=(h*31+ch.charCodeAt(0))>>>0;return arr[h%arr.length];}
+function account(c){return `<b>${pick(NAMES,c)}</b> · ${pick(PLANS,c)} plan · account in good standing`;}
+function orders(c){
+  const base=[['#4021','$129.00','delivered'],['#3998','$49.99','delivered'],['#3975','$212.50','refunded']];
+  return `<ul class="orders">${base.map(o=>`<li><span>${o[0]}</span><span class="amt">${o[1]}</span><span class="st">${o[2]}</span></li>`).join('')}</ul>`;
+}
+
+function botReply(tool, res){
+  const st=res.structured||{};
+  const denied=!!res.denied||st.status===403||st.status>=400;
+  const failed=!denied&&!!res.error&&!res.upstreamToken;
+  const c=escapeHtml($('#cust').value||'the customer'), a=escapeHtml($('#amount').value||'0');
+  if(failed) return {tag:'<span class="tag err">error</span>', cls:'err',
+    html:`I hit a problem completing that — <b>${escapeHtml(res.error||st.error||'request failed')}</b>.`};
+  if(denied){
+    const txt = tool==='issue_refund'
+      ? `I can't complete that refund — your access doesn't include <b>refunds:write</b>. Only a supervisor can approve it, so I've flagged it for one. 🛑`
+      : tool==='update_customer'
+      ? `I can't update that record — your access doesn't include <b>customers:write</b>. You're read-only; a customer manager can make changes. 🛑`
+      : `That request was blocked — your token is missing the scope this action needs.`;
+    return {tag:`<span class="tag bad">denied · ${st.status||403}</span>`, cls:'bad', html:txt};
+  }
+  let html;
+  if(tool==='lookup_customer') html=`Here's <b>${c}</b> — ${account(c)}. ✓ I pulled this on your behalf; your identity carried through to the API.`;
+  else if(tool==='update_customer') html=`Done — updated <b>${c}</b>'s record. ✓ The API authorized this write with <b>customers:write</b> — narrowed from your broad access just for this action.`;
+  else if(tool==='recent_orders') html=`Here are <b>${c}</b>'s recent orders: ${orders(c)}`;
+  else html=`Done — refunded <b>$${a}</b> to <b>${c}</b>. Confirmation <b>#RF-${Math.floor(1000+Math.random()*9000)}</b>. ✓`;
+  return {tag:'<span class="tag ok">delegated ✓</span>', cls:'', html};
+}
+
+async function runTool(tool, btn){
+  const chips=document.querySelectorAll('.chip'); chips.forEach(b=>b.disabled=true);
+  userRow(USER_MSG[tool]($('#cust').value, $('#amount').value));
+  const typing=typingRow();
+  let res;
+  try{
+    const payload={tool, customer_id:$('#cust').value, amount:parseFloat($('#amount').value||'0')};
+    res=await (await fetch('/api/tool',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})).json();
+  }catch(e){ res={error:String(e)}; }
+  typing.remove();
+  const r=botReply(tool,res);
+  const row=botRow(`${r.html}<div class="meta"><span class="tag tool">${tool}</span>${r.tag}
+     <button class="inspect-link" onclick="document.getElementById('inspector').scrollIntoView({behavior:'smooth'})">view in inspector →</button></div>`, r.cls);
+  renderInspector(tool,res);
+  chips.forEach(b=>b.disabled=false);
+}
+
+/* ---------- inspector (right) ---------- */
+function kv(claims){
+  if(!claims) return '<div class="note">— no token —</div>';
+  const aud = Array.isArray(claims.aud) ? claims.aud.join(', ') : claims.aud;
+  const r=[]; const add=(k,v,cls)=>r.push(`<div class="k">${k}</div><div class="v ${cls||''}">${v??'—'}</div>`);
+  if(claims.preferred_username) add('user', claims.preferred_username, 'hl');
+  add('sub', claims.sub, 'hl');
+  add('aud', aud, 'hl');
+  add('scope', claims.scope, 'hl');
+  add('entitlements', claims.entitlements);
+  add('azp', claims.azp, 'act');
+  return `<div class="kv">${r.join('')}</div>`;
+}
+
+function renderInspector(tool, res){
+  const st=res.structured||{};
+  const denied=!!res.denied||st.status===403||st.status>=400;
+  const ok=!denied&&!!res.upstreamToken;
+  $('#rhpSub').textContent = `— ${tool}`;
+  let body;
+  if(ok){
+    const ssojwt = me.ssoTokenRaw
+      ? `<div class="note" style="margin-top:14px"><b>SSO JWT sent with the request</b> — the bearer you logged
+           in with, as Tyk received it (click to select, paste into jwt.io):</div>
+         <textarea class="raw jwt" readonly rows="3" onclick="this.select()">${escapeHtml(me.ssoTokenRaw)}</textarea>` : '';
+    const rawjwt = res.upstreamTokenRaw
+      ? `<div class="note" style="margin-top:14px"><b>End JWT that reached upstream</b> — the exact bearer
+           httpbin <code>/anything</code> echoed back (click to select, paste into jwt.io):</div>
+         <textarea class="raw jwt" readonly rows="3" onclick="this.select()">${escapeHtml(res.upstreamTokenRaw)}</textarea>` : '';
+    const echo = st.upstream
+      ? `<details><summary>Upstream <code>/anything</code> response (raw httpbin echo)</summary>
+           <textarea class="raw" readonly rows="12" onclick="this.select()">${escapeHtml(JSON.stringify(st.upstream,null,2))}</textarea></details>` : '';
+    body=`<div class="chain">
+        <div class="tok"><h4>Your SSO token</h4>${kv(me.ssoToken)}</div>
+        <div class="arrow">→</div>
+        <div class="tok delegated"><h4>Token the API received</h4>${kv(res.upstreamToken)}</div>
+      </div>
+      <div class="note">Same <b>sub</b> on both sides — your identity survived the hop. The right card's
+      <b>aud</b> changed to the downstream API, its <b>azp</b> now names the gateway's exchange client
+      (the recorded caller), and its <b>scope</b> was narrowed to just this action — the broad access you
+      logged in with can't leak downstream.</div>
+      ${ssojwt}${rawjwt}${echo}`;
+  } else if(denied){
+    const wa=headerOf(st.responseHeaders,'www-authenticate');
+    body=`<div class="note">Tyk's MCP gateway blocked this with <b>HTTP ${res.status||st.status||403}</b>
+      <b>before minting any token</b> — your <b>entitlements</b> don't include the permission this tool needs.
+      Reads are fine; writes need a customer manager, refunds need a supervisor.</div>`
+      + (wa ? `<div class="note" style="margin-top:12px"><b>OAuth challenge</b> — the API's
+               <code>WWW-Authenticate</code> response header:</div>
+              <textarea class="raw" readonly rows="2" onclick="this.select()">${escapeHtml(wa)}</textarea>` : '');
+  } else {
+    body=`<div class="note">${escapeHtml(res.error||st.error||'request failed')}</div>`;
+  }
+  $('#inspector').innerHTML = body +
+    `<details open><summary>raw response</summary>
+       <textarea class="raw" readonly rows="10" onclick="this.select()">${escapeHtml(JSON.stringify(res,null,2))}</textarea></details>`;
+}
+
+document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>runTool(b.dataset.tool,b)));
+$('#logout').addEventListener('click',async()=>{await fetch('/logout');$('#chatlog').innerHTML='';
+  $('#inspector').innerHTML='';refresh();});
+refresh();
+</script>
+</body>
+</html>

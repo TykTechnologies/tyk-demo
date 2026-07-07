@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technical setup · Tyk Demo Chat App</title>
+<style>
+  :root{
+    --bg:#070b16; --bg2:#0b1120; --panel:#0f1626; --panel2:#141d31; --line:#1f2940;
+    --ink:#eaf0fb; --muted:#8893ad;
+    --teal:#00d6a4; --teal2:#23ecc0; --cyan:#3bc4ff; --coral:#ff5c7a; --amber:#ffc24b; --violet:#9b8cff;
+    --grad:linear-gradient(135deg,#00d6a4,#3bc4ff);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font:15px/1.65 ui-sans-serif,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);
+    background:
+      radial-gradient(1100px 600px at 90% -8%,rgba(59,196,255,.12),transparent 60%),
+      radial-gradient(900px 520px at -8% 30%,rgba(0,214,164,.10),transparent 55%),
+      var(--bg);}
+  a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
+  code{font-family:ui-monospace,Menlo,monospace;background:var(--bg2);border:1px solid var(--line);
+    padding:1px 6px;border-radius:5px;font-size:.86em;color:var(--teal2)}
+  pre{background:#060a13;border:1px solid var(--line);border-radius:12px;padding:15px 16px;overflow:auto;
+    font:12.5px/1.6 ui-monospace,Menlo,monospace;color:#b9c6e6;margin:12px 0}
+  pre .c{color:#5f6b87}        /* comment */
+  pre .k{color:var(--cyan)}    /* key */
+  pre .s{color:var(--teal2)}   /* string/value */
+  pre .h{color:var(--amber)}   /* highlight */
+
+  header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:13px 26px;border-bottom:1px solid var(--line);background:rgba(8,12,22,.78);backdrop-filter:blur(14px)}
+  .brand{display:flex;align-items:center;gap:11px}
+  .logo{width:30px;height:30px;border-radius:9px;background:var(--grad);display:grid;place-items:center;
+    font-weight:900;color:#04140f;font-size:15px;box-shadow:0 6px 22px rgba(0,214,164,.35)}
+  .brand b{font-size:15px}.brand .sub{color:var(--muted);font-size:11px;margin-left:2px}
+  nav.toc{display:flex;gap:4px;flex-wrap:wrap}
+  nav.toc a{color:var(--muted);font-size:12.5px;padding:6px 10px;border-radius:8px;border:1px solid transparent}
+  nav.toc a:hover{color:var(--teal2);border-color:var(--line);text-decoration:none}
+  .cta{display:inline-flex;align-items:center;gap:8px;background:var(--grad);color:#04140f;border:none;
+    border-radius:10px;padding:9px 16px;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}
+  .cta:hover{transform:translateY(-1px);text-decoration:none}
+  .ghost{border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:8px 13px;font-size:13px}
+  .ghost:hover{border-color:var(--teal);color:var(--teal2);text-decoration:none}
+
+  .wrap{max-width:1000px;margin:0 auto;padding:0 26px 90px}
+  section{padding:42px 0;border-bottom:1px solid rgba(31,41,64,.6)}
+  section:last-child{border-bottom:none}
+  .eyebrow{display:inline-block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);
+    font-weight:800;margin-bottom:12px;padding:4px 11px;border:1px solid rgba(59,196,255,.3);border-radius:999px;background:rgba(59,196,255,.07)}
+  h1{font-size:clamp(28px,4.5vw,44px);line-height:1.08;letter-spacing:-.5px;margin:0 0 14px;font-weight:850}
+  h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  h2{font-size:clamp(21px,2.6vw,27px);letter-spacing:-.3px;margin:0 0 8px;font-weight:800}
+  h3{font-size:15.5px;margin:22px 0 4px;font-weight:700;color:var(--ink)}
+  h3 .pin{font-size:11px;color:var(--muted);font-weight:600;margin-left:8px}
+  .lead{font-size:17px;color:#c7d2e8;max-width:720px}
+  .muted{color:var(--muted)}p{margin:0 0 12px}
+  ul{margin:8px 0 14px;padding-left:20px}li{margin:4px 0}
+
+  table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;font-size:13px}
+  th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+  tr:last-child td{border-bottom:none}
+  td .mono{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--teal2)}
+  .badge{display:inline-block;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 7px}
+  .badge.svc{background:rgba(59,196,255,.12);color:var(--cyan);border:1px solid rgba(59,196,255,.3)}
+  .badge.wrk{background:rgba(155,140,255,.13);color:var(--violet);border:1px solid rgba(155,140,255,.3)}
+  .badge.spa{background:rgba(0,214,164,.13);color:var(--teal2);border:1px solid rgba(0,214,164,.3)}
+
+  .callout{display:flex;gap:13px;border:1px solid rgba(255,194,75,.3);border-radius:12px;padding:14px 16px;background:rgba(255,194,75,.06);margin:16px 0}
+  .callout.info{border-color:rgba(59,196,255,.3);background:rgba(59,196,255,.06)}
+  .callout .ic{font-size:20px}.callout .note{color:var(--muted);font-size:13.5px}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .panelbox{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:linear-gradient(180deg,rgba(17,24,41,.6),rgba(12,18,32,.6))}
+  .finalcta{border:1px solid var(--line);border-radius:18px;padding:34px;text-align:center;background:linear-gradient(180deg,rgba(20,29,49,.6),rgba(13,19,33,.6))}
+  @media(max-width:820px){nav.toc{display:none}.twocol{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">T</div><div><b>Tyk Demo Chat App</b><span class="sub"> · technical setup</span></div></div>
+  <nav class="toc">
+    <a href="#overview">Overview</a><a href="#concepts">Concepts</a><a href="#keycloak">Keycloak</a><a href="#tyk">Tyk</a>
+    <a href="#wire">On the wire</a><a href="#chat">Chat</a><a href="#obs">Observability</a>
+  </nav>
+  <div style="display:flex;gap:8px"><a class="ghost" href="/guide">Plain-English version</a><a class="cta" href="/">Open the app →</a></div>
+</header>
+
+<div class="wrap">
+
+  <!-- OVERVIEW -->
+  <section id="overview" style="padding-top:58px">
+    <span class="eyebrow">Under the hood</span>
+    <h1>How Keycloak and Tyk are <span class="g">wired together</span></h1>
+    <p class="lead">The technical companion to the <a href="/guide">plain-English walkthrough</a>. This is exactly what's
+      configured in the identity provider, the gateway, the chat client, and the observability stack — and what travels on
+      the wire during the RFC 8693 exchange.</p>
+
+    <h3>The deployed design — one exchange, at hop 1</h3>
+    <pre><span class="c"># alice signs in at Keycloak (auth-code + PKCE)</span>
+alice ──▶ <span class="h">Chat (MCP client)</span>   tokenSSO: aud=<span class="s">tyk-mcp-gateway</span>  sub=<span class="s">alice</span>  scope=<span class="s">customers:all</span>  entitlements=<span class="s">customers:read</span>
+        │  MCP tool call + Bearer tokenSSO
+        ▼
+   <span class="h">Tyk · acme-mcp-proxy</span>   validate JWT → per-tool entitlement check → <span class="h">RFC 8693 EXCHANGE</span>
+        │  exchanging client = <span class="s">tyk-mcp-gateway</span>   audience = <span class="s">api.acme.internal</span>   scope = per tool
+        │  Keycloak mints: aud=<span class="s">api.acme.internal</span>  sub=<span class="s">alice</span>  <span class="h">azp=tyk-mcp-gateway</span>  scope=<span class="s">customers:read</span>
+        ▼
+   <span class="h">Mock MCP server</span>   tool runs, replays the exchanged token (forwards traceparent)
+        ▼
+   <span class="h">Tyk · acme-api</span> (@ api.acme.internal)   VALIDATE-ONLY → enforce scope (read vs refund)
+        ▼
+   httpbin /anything   echoes the bearer → chat decodes & shows the chain</pre>
+    <div class="callout info"><div class="ic">ℹ️</div><div class="note">This is <b>impersonation-style</b> exchange
+      (RFC 8693 without an actor token): the exchanged token keeps the rep's <code>sub</code> while its audience and
+      scope are re-pointed at the one downstream action. The gateway's exchange client is recorded as
+      <code>azp</code> — the auditable "which client performed the call" marker. Keycloak's standard token exchange
+      does not mint an <code>act</code> (delegation) claim. The resource API never exchanges; it only validates.</div></div>
+  </section>
+
+  <!-- CONCEPTS -->
+  <section id="concepts">
+    <span class="eyebrow">First, the vocabulary</span>
+    <h2>Keycloak concepts &amp; how they connect</h2>
+    <p class="lead muted">Keycloak models identity as a few building blocks inside a <b>realm</b>. Here's what each one is,
+      and how they wire together to shape a token.</p>
+
+    <table>
+      <tr><th>Concept</th><th>What it is</th><th>In this demo</th></tr>
+      <tr><td><b>Realm</b></td><td>An isolated tenant that contains everything below — users, clients, scopes. Its URL is the token <code>iss</code>.</td><td class="mono">acme → http://acme-keycloak:8280/realms/acme</td></tr>
+      <tr><td><b>Client</b><br><span class="muted" style="font-size:12px">(= OAuth client)</span></td><td>An application that requests (or is the target of) tokens. Public clients log users in; confidential clients authenticate with a secret.</td><td class="mono">acme-support-chat, tyk-mcp-gateway, api.acme.internal</td></tr>
+      <tr><td><b>Grant / flow</b></td><td>How a client gets tokens: <code>standard flow</code> (auth-code login), <code>token exchange</code> (swap one token for another — a per-client capability toggle since Keycloak 26.2).</td><td class="mono">PKCE · RFC 8693</td></tr>
+      <tr><td><b>Client scope</b></td><td>A reusable bundle of a scope name + <b>protocol mappers</b>. <i>Default</i> scopes always apply; <i>optional</i> ones apply when requested in <code>scope=</code>.</td><td class="mono">customers:read · refunds:write · entitlements</td></tr>
+      <tr><td><b>Protocol mapper</b></td><td>A rule on a client scope that <b>computes a claim</b> — map a user attribute, stamp an audience, emit <code>sub</code>.</td><td class="mono">entitlements, audience, sub mappers</td></tr>
+      <tr><td><b>Audience</b></td><td>Who a token is <b>for</b> (<code>aud</code>). In Keycloak an audience is a <b>client</b>; audience mappers make it reachable.</td><td class="mono">tyk-mcp-gateway → api.acme.internal</td></tr>
+      <tr><td><b>User</b></td><td>A human identity in the realm, with built-in fields and custom <b>attributes</b>.</td><td class="mono">alice, bob</td></tr>
+      <tr><td><b>User attribute</b></td><td>A custom field on the user record; a mapper turns it into a token claim.</td><td class="mono">entitlements (string)</td></tr>
+      <tr><td><b>Group</b></td><td>A collection of users — org modelling and coarse boundaries.</td><td class="mono">acme-support, acme-supervisors</td></tr>
+    </table>
+
+    <h3>How they connect</h3>
+    <pre><span class="c">REALM (tenant)</span>
+ ├─ <span class="h">Clients</span>       ──attach──▶ <span class="h">Client scopes</span> (default | optional)   <span class="c">// what a token FROM this client contains</span>
+ ├─ <span class="h">Client scopes</span> ──define──▶ <span class="h">Protocol mappers</span>                     <span class="c">// claims: entitlements, aud, sub…</span>
+ ├─ <span class="h">Users</span>         ──have──▶ attributes (<span class="s">entitlements</span>)
+ │                       └─▶ flow into <span class="h">token claims</span> via the user-attribute mapper
+ └─ <span class="h">Groups</span>        ──contain──▶ Users          <span class="c">// org structure / boundaries</span></pre>
+
+    <div class="callout info"><div class="ic">🔑</div><div class="note">The key chain for this demo:
+      a <b>user</b> (alice) carries an <b>attribute</b> (<code>entitlements</code>); the chat <b>client</b> logs her in and its
+      scopes stamp <code>entitlements</code> and <code>aud=tyk-mcp-gateway</code> into the SSO token. The <b>exchange</b> —
+      performed by the <code>tyk-mcp-gateway</code> client — retargets the token at another client
+      (<code>api.acme.internal</code>) with the one scope the tool needs. Tyk enforces <code>entitlements</code> at the proxy
+      and the narrowed <code>scope</code> at the API.</div></div>
+  </section>
+
+  <!-- KEYCLOAK -->
+  <section id="keycloak">
+    <span class="eyebrow">Identity provider</span>
+    <h2>Keycloak configuration</h2>
+    <p class="lead muted">Realm <code>acme</code>, running inside this compose stack and created entirely by
+      <code>keycloak/realm-acme.json</code> (<code>--import-realm</code>) — no console clicking. Admin console:
+      <code>acme-keycloak:8280</code> (admin / admin).</p>
+
+    <h3>Clients</h3>
+    <table>
+      <tr><th>Client</th><th>Type</th><th>Flow</th><th>Role</th></tr>
+      <tr><td class="mono">acme-support-chat</td><td><span class="badge spa">PUBLIC</span></td><td class="mono">auth_code + PKCE</td><td>The chat / MCP client — users log in here.</td></tr>
+      <tr><td class="mono">tyk-mcp-gateway</td><td><span class="badge svc">CONFIDENTIAL</span></td><td class="mono">token_exchange</td><td>The client Tyk authenticates the exchange with. <b>Standard token exchange</b> enabled.</td></tr>
+      <tr><td class="mono">api.acme.internal</td><td><span class="badge wrk">AUDIENCE-ONLY</span></td><td class="mono">—</td><td>Exists to be the exchange's <code>audience</code> — Keycloak audiences are clients.</td></tr>
+    </table>
+    <p class="muted" style="font-size:13px"><b>Constraints found live:</b> Keycloak's standard token exchange only accepts a
+      subject token whose <code>aud</code> includes the exchanging client (hence the <code>mcp-gateway-audience</code> mapper
+      on the chat), and only honours an <code>audience</code> the exchanging client's scopes can produce (hence the
+      <code>acme-api-audience</code> mapper on <code>tyk-mcp-gateway</code>). It ignores the RFC 8707 <code>resource</code>
+      parameter.</p>
+
+    <h3>Client scopes &amp; mappers</h3>
+    <table>
+      <tr><th>Scope</th><th>Mapper</th><th>Effect</th></tr>
+      <tr><td class="mono">customers:read/write/all · refunds:write</td><td>—</td><td>The permission vocabulary; lands in the token's <code>scope</code> claim when granted.</td></tr>
+      <tr><td class="mono">entitlements</td><td>user attribute → claim</td><td>Per-user permissions; the claim Tyk's per-tool check reads.</td></tr>
+      <tr><td class="mono">acme-identity</td><td><code>sub</code>, <code>preferred_username</code>, name</td><td>Identity claims on both the SSO and the exchanged token.</td></tr>
+      <tr><td class="mono">mcp-gateway-audience</td><td>audience → <code>tyk-mcp-gateway</code></td><td>Makes the SSO token exchangeable by the gateway's client.</td></tr>
+      <tr><td class="mono">acme-api-audience</td><td>audience → <code>api.acme.internal</code></td><td>Makes the downstream audience reachable for the exchange.</td></tr>
+    </table>
+
+    <h3>Per-user authorization — the <code>entitlements</code> claim</h3>
+    <p class="muted">Each user's allowed actions live in a custom <b>user attribute</b> <code>entitlements</code>, mapped
+      straight into the token and carried across the exchange. Tyk's per-tool scope check at the MCP proxy reads this
+      claim — not <code>scope</code> — so the gate is about <i>the person</i>, before any token is minted.</p>
+    <pre><span class="k">alice</span>.entitlements = <span class="s">"customers:read"</span>                                <span class="c">// update / refund → denied (403)</span>
+<span class="k">bob</span>.entitlements   = <span class="s">"customers:read customers:write refunds:write"</span>  <span class="c">// everything → allowed</span></pre>
+
+    <h3>Users &amp; groups</h3>
+    <ul>
+      <li><b>Users:</b> <code>alice</code> (group <code>acme-support</code>) and <code>bob</code> (<code>acme-support</code> + <code>acme-supervisors</code>), password <code>Acme-Demo-2026!</code>. Groups model the boundary; the <code>entitlements</code> claim is what's enforced.</li>
+      <li><b>Verify headlessly:</b> <code>keycloak/kc-verify.sh</code> mints alice's token and replays the exact exchange, printing the before/after claims.</li>
+    </ul>
+
+    <div class="callout"><div class="ic">⚠️</div><div class="note"><b>Impersonation, not delegation:</b> RFC 8693 also
+      defines an optional <code>act</code> claim for delegation chains (via an actor token), but Keycloak's standard token
+      exchange keeps the subject's <code>sub</code> and records the exchanging client only as <code>azp</code>. If your
+      compliance model needs a cryptographic <code>act</code> chain, that is IdP-dependent (Ping and Curity mint it;
+      Keycloak, Okta and Auth0 do not).</div></div>
+  </section>
+
+  <!-- TYK -->
+  <section id="tyk">
+    <span class="eyebrow">Gateway</span>
+    <h2>Tyk configuration</h2>
+    <p class="lead muted">Two OpenAPI definitions with Tyk extensions, applied via the Dashboard API by the
+      deployment's <code>bootstrap.sh</code> — MCP defs to <code>/api/mcps</code>, OAS defs to <code>/api/apis/oas</code>,
+      IDs injected dynamically (no static IDs).</p>
+
+    <div class="twocol">
+      <div class="panelbox">
+        <h3 style="margin-top:0">acme-mcp-proxy <span class="pin">the doer</span></h3>
+        <ul style="font-size:13.5px">
+          <li>Listen <code>/acme-mcp/</code> → upstream the MCP server.</li>
+          <li><b>JWT</b> validated against Keycloak <b>JWKS</b>; identity from <code>sub</code>.</li>
+          <li><code>scopeCheck.claimNames: ["entitlements"]</code>.</li>
+          <li><b>tokenExchange</b> provider <code>keycloak</code>, client <code>tyk-mcp-gateway</code>, <code>defaultTarget.audience: api.acme.internal</code>.</li>
+          <li><b>cache</b>: derived, maxTimeout 30s, margin 5s (~25s).</li>
+          <li>Per-tool <code>security</code> + <code>exchange.enabled</code> — each tool narrows to its own scope,
+            <b>inferred from its <code>security</code> requirement</b> (union of alternatives). This demo omits
+            <code>exchange.scopes</code> to demonstrate that inference; set it to pin the outbound scopes explicitly,
+            with the provider's <code>defaultTarget.scopes</code> as the last fallback.</li>
+        </ul>
+      </div>
+      <div class="panelbox">
+        <h3 style="margin-top:0">acme-api <span class="pin">the guard</span></h3>
+        <ul style="font-size:13.5px">
+          <li>Custom domain <code>api.acme.internal</code> (= the exchange audience).</li>
+          <li>Upstream <code>httpbin</code> (the base deployment's, echoes the bearer).</li>
+          <li>Same JWKS validation; scope source is the token's <code>scope</code> claim.</li>
+          <li><b>No</b> tokenExchange — validate-only.</li>
+          <li>Per-operation <code>scopeCheck.enabled: true</code>: <code>customers:read</code> on GETs, <code>customers:write</code> on the update, <code>refunds:write</code> on the refund → real <b>403 insufficient_scope</b>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Two claims, two gates — why a token without <code>customers:read</code> in its scope is accepted</h3>
+    <p class="lead muted">The SSO token arrives with <code>scope: openid customers:all</code> and yet a tool requiring
+      <code>customers:read</code> admits it. That is by design: the two gates authorize against <b>different claims</b>.</p>
+    <ul>
+      <li><b>Front door (acme-mcp-proxy): "may this <i>user</i> do this?"</b> Its scope check is configured with
+        <code>scopeCheck.claimNames: ["entitlements"]</code>, so the tool's required scope is looked up in the token's
+        <code>entitlements</code> claim — a per-user attribute Keycloak stamps into every token (alice:
+        <code>customers:read</code>; bob adds <code>customers:write refunds:write</code>). The incoming token's
+        <code>scope</code> claim is <b>never consulted here</b> — <code>customers:all</code> is just the OAuth consent
+        umbrella the chat requested at login, not a permission the gateway trusts. This is also why alice's refund is
+        rejected <b>before any exchange happens</b>: <code>refunds:write</code> is not in her entitlements.</li>
+      <li><b>The exchange: mint a capability.</b> Keycloak grants the requested narrow scope not because it was in the
+        subject token's <code>scope</code>, but because it is among the <code>tyk-mcp-gateway</code> client's
+        <i>optional client scopes</i> and the subject token's <code>aud</code> authorizes that client to exchange it.</li>
+      <li><b>Back door (acme-api): "may this <i>token</i> do this?"</b> The resource API checks
+        <code>scopeCheck.claimNames: ["scope"]</code> — there the actual <code>scope</code> claim of the
+        <b>exchanged</b> token must contain the operation's scope. It never sees the broad SSO token at all.</li>
+    </ul>
+    <p class="muted" style="font-size:13.5px"><code>entitlements</code> = what the user may do (checked per tool at the
+      proxy) · <code>scope</code> = what this specific token may do (narrowed by the exchange, enforced at the API).</p>
+
+    <h3>What makes a request actually pass</h3>
+    <ul>
+      <li><b>JWT auth needs a policy.</b> A small <code>acme-demo-default</code> policy grants access to both APIs; the deployment's <code>bootstrap.sh</code> resolves its id and injects it into each scheme's <code>defaultPolicies</code>. Without it, JWT auth returns <code>403 Access disallowed</code>.</li>
+      <li><b>Token exchange override is explicit.</b> The provider's <code>enabled: true</code> activates it; the per-tool exchange narrows the request to the scopes inferred from that tool's <code>security</code> requirement (or to <code>exchange.scopes</code>, when set).</li>
+    </ul>
+
+    <h3>Token-exchange client auth (proxy → Keycloak)</h3>
+    <pre><span class="k">clientAuth</span>:    method=<span class="s">client_secret_basic</span>   clientId=<span class="s">tyk-mcp-gateway</span>
+<span class="k">defaultTarget</span>: audience=<span class="s">api.acme.internal</span>   scopes=[<span class="s">customers:read</span>]
+<span class="k">cache</span>:         mode=<span class="s">derived</span>   maxTimeout=<span class="s">30s</span>   safetyMargin=<span class="s">5s</span></pre>
+  </section>
+
+  <!-- ON THE WIRE -->
+  <section id="wire">
+    <span class="eyebrow">RFC 8693</span>
+    <h2>The exchange, on the wire</h2>
+    <p class="lead muted">What Tyk POSTs to Keycloak's token endpoint for one tool call (Basic auth =
+      <code>tyk-mcp-gateway</code> creds):</p>
+    <pre>POST /realms/acme/protocol/openid-connect/token        Authorization: Basic &lt;tyk-mcp-gateway&gt;
+Content-Type: application/x-www-form-urlencoded
+
+<span class="k">grant_type</span>          = <span class="s">urn:ietf:params:oauth:grant-type:token-exchange</span>
+<span class="k">subject_token</span>       = <span class="s">&lt;alice's SSO JWT&gt;</span>
+<span class="k">subject_token_type</span>  = <span class="s">urn:ietf:params:oauth:token-type:access_token</span>
+<span class="k">audience</span>            = <span class="s">api.acme.internal</span>
+<span class="k">resource</span>            = <span class="s">api.acme.internal</span>   <span class="c">// RFC 8707 companion; Keycloak ignores it</span>
+<span class="k">scope</span>               = <span class="s">customers:read</span></pre>
+    <p class="muted" style="font-size:13.5px">Keycloak returns an access token with <code>sub=alice</code>,
+      <code>aud=api.acme.internal</code>, <code>azp=tyk-mcp-gateway</code> and <code>scope=customers:read</code>. Tyk caches it
+      (~25s), swaps it onto the <code>Authorization</code> header, and forwards.</p>
+  </section>
+
+  <!-- CHAT -->
+  <section id="chat">
+    <span class="eyebrow">Client</span>
+    <h2>The chat application</h2>
+    <ul>
+      <li><b>Go back-end-for-frontend</b> holding the user session; it never sees the exchanged token.</li>
+      <li><b>Login:</b> OIDC <b>auth-code + PKCE</b> against Keycloak, with <code>prompt=login</code> so you can switch between alice and bob. The browser is redirected to the host-published Keycloak (<code>acme-keycloak:8280</code>); the code→token POST runs over the compose network (<code>keycloak:8080</code>) — the pinned <code>KC_HOSTNAME</code> keeps the issuer identical on both paths.</li>
+      <li><b>MCP client:</b> the official <b>go-sdk</b> (<code>StreamableClientTransport</code>); a custom RoundTripper injects the user's bearer.</li>
+      <li><b>Tracing:</b> a span per tool call, with the W3C trace context injected into both the HTTP <code>traceparent</code> header <b>and</b> the MCP body's <code>params._meta</code> (SEP-414) — so Tyk and the downstream join the agent's trace.</li>
+      <li><b>UI:</b> a chat surface (left) for the conversation, a <b>Delegation inspector</b> (right) that decodes the SSO vs exchanged token and shows the raw upstream echo.</li>
+    </ul>
+  </section>
+
+  <!-- OBSERVABILITY -->
+  <section id="obs">
+    <span class="eyebrow">Telemetry</span>
+    <h2>Observability stack</h2>
+    <p class="lead muted">The gateway exports OpenTelemetry over gRPC; a self-contained collector fans signals out to three stores.</p>
+    <pre><span class="c">// tyk gateway config (opentelemetry block)</span>
+<span class="k">opentelemetry</span>: { enabled: <span class="s">true</span>, exporter: <span class="s">grpc</span>, endpoint: <span class="s">acme-otel-collector:4317</span>,
+                 context_propagation: <span class="s">tracecontext</span>, sampling: <span class="s">AlwaysOn</span>,
+                 metrics: { enabled: <span class="s">true</span>, endpoint: <span class="s">acme-otel-collector:4317</span> } }
+<span class="c">// per-API: server.detailedTracing.enabled = true  (spans)
+//          server.detailedActivityLogs.enabled = true  (analytics → pump)</span></pre>
+    <pre><span class="c">// OTel Collector pipelines</span>
+traces  → <span class="s">Tempo</span>      (:3200)
+metrics → <span class="s">Prometheus</span> (:9090, remote-write)
+logs    → <span class="s">Loki</span>       (:3100)        view all in <span class="s">Grafana</span> (:3001)</pre>
+    <ul>
+      <li><b>One trace per request:</b> chat span → the gateway's exchange span (attrs: provider, outcome, cache_status) → IdP POST (absent on a cache hit) → acme-api → upstream.</li>
+      <li><b>Metrics:</b> <code>tyk.oauth2.exchange.requests</code> (outcome × provider), <code>…duration</code>, and the separate <code>…cache_hit</code> counter.</li>
+      <li><b>Logs:</b> the gateway console is tailed on the host (<code>loki-tail.py</code>) into Loki — Docker Desktop can't live-tail a host file from inside a container. Every exchange line and access-log line carries the same <code>trace_id</code>.</li>
+      <li><b>Privacy:</b> no token values, no <code>sub</code>/<code>jti</code> in telemetry — only the non-PII client identifiers (<code>azp</code>), and only in logs + audit.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="finalcta">
+      <h2 style="margin-bottom:10px">That's the whole machine</h2>
+      <p class="lead muted" style="margin:0 auto 22px;text-align:center">Identity in Keycloak, enforcement in Tyk, the exchange on the wire, and a trace that ties it all together.</p>
+      <a class="cta" href="/" style="font-size:15px;padding:13px 24px">Open the Tyk Demo Chat App →</a>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

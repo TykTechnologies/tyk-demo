@@ -1,0 +1,49 @@
+---
+apiVersion: 1
+
+datasources:
+  - name: Tempo
+    type: tempo
+    uid: tempo
+    url: http://acme-tempo:3200
+    access: proxy
+    jsonData:
+      # Pivot from a trace to its logs in Loki by trace_id.
+      tracesToLogsV2:
+        datasourceUid: loki
+        filterByTraceID: true
+
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    url: http://acme-prometheus:9090
+    access: proxy
+    isDefault: true
+
+  # Alias for the shared SLO dashboard, whose panels hardcode the legacy uid
+  # that old Grafana versions auto-assigned to the first provisioned datasource.
+  - name: Prometheus (SLO)
+    type: prometheus
+    uid: PBFA97CFB590B2093
+    url: http://acme-prometheus:9090
+    access: proxy
+
+  - name: Loki
+    type: loki
+    uid: loki
+    url: http://acme-loki:3100
+    access: proxy
+    jsonData:
+      # Pivot from a log line to its trace in Tempo by trace_id.
+      derivedFields:
+        - name: trace_id
+          matcherType: label
+          matcherRegex: trace_id
+          datasourceUid: tempo
+          url: "$${__value.raw}"
+        # Gateway container logs arrive via promtail as plain text; extract the
+        # trace id from the line content so the pivot works for them too.
+        - name: TraceID
+          matcherRegex: 'trace_id[=:]\s*"?([0-9a-f]{16,32})'
+          datasourceUid: tempo
+          url: "$${__value.raw}"

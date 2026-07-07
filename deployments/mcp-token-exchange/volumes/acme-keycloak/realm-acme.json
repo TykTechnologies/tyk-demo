@@ -1,0 +1,304 @@
+{
+  "realm": "acme",
+  "enabled": true,
+  "displayName": "Acme Support Copilot demo",
+  "sslRequired": "none",
+  "accessTokenLifespan": 300,
+  "registrationAllowed": false,
+  "components": {
+    "org.keycloak.userprofile.UserProfileProvider": [
+      {
+        "providerId": "declarative-user-profile",
+        "config": {
+          "kc.user.profile.config": [
+            "{\"attributes\":[{\"name\":\"username\",\"displayName\":\"${username}\",\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]}},{\"name\":\"email\",\"displayName\":\"${email}\",\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]}}],\"groups\":[],\"unmanagedAttributePolicy\":\"ENABLED\"}"
+          ]
+        }
+      }
+    ]
+  },
+  "clientScopes": [
+    {
+      "name": "customers:read",
+      "description": "Read Acme customer accounts and orders",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
+    },
+    {
+      "name": "customers:write",
+      "description": "Update Acme customer records",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
+    },
+    {
+      "name": "customers:all",
+      "description": "Broad customer access the chat logs in with (narrowed by the exchange)",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
+    },
+    {
+      "name": "refunds:write",
+      "description": "Issue refunds",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
+    },
+    {
+      "name": "entitlements",
+      "description": "Maps the per-user entitlements attribute into the access token (the claim Tyk's per-tool scope check reads)",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "entitlements",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "entitlements",
+            "claim.name": "entitlements",
+            "jsonType.label": "String",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "name": "acme-identity",
+      "description": "sub + preferred_username + name — declaring clientScopes in an import suppresses Keycloak's built-in basic/profile scopes, so the identity mappers are defined here explicitly",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "sub",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-sub-mapper",
+          "consentRequired": false,
+          "config": {
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        },
+        {
+          "name": "preferred_username",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "username",
+            "claim.name": "preferred_username",
+            "jsonType.label": "String",
+            "access.token.claim": "true",
+            "id.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "full name",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-full-name-mapper",
+          "consentRequired": false,
+          "config": {
+            "access.token.claim": "false",
+            "id.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "name": "mcp-gateway-audience",
+      "description": "Stamps aud=tyk-mcp-gateway on the chat's SSO token — Keycloak's standard token exchange only accepts a subject token whose audience includes the exchanging client",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "mcp-gateway-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "tyk-mcp-gateway",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "name": "acme-api-audience",
+      "description": "Makes api.acme.internal an available audience for the exchange — Keycloak only honours the RFC 8693 audience parameter if the exchanging client's scopes can produce that audience",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "acme-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "api.acme.internal",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "acme-support-chat",
+      "name": "Acme Support Copilot (chat)",
+      "description": "The browser chat / MCP client. Support reps (alice, bob) log in here via auth-code + PKCE; the resulting SSO token is the exchange's subject token.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:8095/callback"
+      ],
+      "webOrigins": [
+        "http://localhost:8095"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:8095"
+      },
+      "defaultClientScopes": [
+        "acme-identity",
+        "entitlements",
+        "mcp-gateway-audience"
+      ],
+      "optionalClientScopes": [
+        "customers:all",
+        "customers:read",
+        "customers:write",
+        "refunds:write"
+      ]
+    },
+    {
+      "clientId": "tyk-mcp-gateway",
+      "name": "Tyk MCP proxy (token-exchange client)",
+      "description": "The confidential client Tyk authenticates the RFC 8693 exchange with. Standard token exchange is enabled on this client.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "acme-demo-exchange-secret",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "attributes": {
+        "standard.token.exchange.enabled": "true"
+      },
+      "defaultClientScopes": [
+        "acme-identity",
+        "entitlements",
+        "acme-api-audience"
+      ],
+      "optionalClientScopes": [
+        "customers:read",
+        "customers:write",
+        "customers:all",
+        "refunds:write"
+      ]
+    },
+    {
+      "clientId": "api.acme.internal",
+      "name": "Acme resource API (exchange audience)",
+      "description": "Exists only to be the audience of the exchange — Keycloak requires the RFC 8693 audience parameter to name a client. Never requests tokens itself.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "audience-only-never-used",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "defaultClientScopes": [],
+      "optionalClientScopes": []
+    }
+  ],
+  "groups": [
+    {
+      "name": "acme-support"
+    },
+    {
+      "name": "acme-supervisors"
+    }
+  ],
+  "users": [
+    {
+      "username": "alice",
+      "enabled": true,
+      "email": "alice@acme.example",
+      "emailVerified": true,
+      "firstName": "Alice",
+      "lastName": "Acme",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Acme-Demo-2026!",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/acme-support"
+      ],
+      "attributes": {
+        "entitlements": [
+          "customers:read"
+        ]
+      }
+    },
+    {
+      "username": "bob",
+      "enabled": true,
+      "email": "bob@acme.example",
+      "emailVerified": true,
+      "firstName": "Bob",
+      "lastName": "Acme",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Acme-Demo-2026!",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "/acme-support",
+        "/acme-supervisors"
+      ],
+      "attributes": {
+        "entitlements": [
+          "customers:read customers:write refunds:write"
+        ]
+      }
+    }
+  ]
+}

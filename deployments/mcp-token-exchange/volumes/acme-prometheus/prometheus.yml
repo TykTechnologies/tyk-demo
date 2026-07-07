@@ -1,0 +1,21 @@
+---
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# SLO recording rules shared with the slo-prometheus-grafana deployment — they
+# compute the job:/task: series the SLO dashboard's error-budget panels query.
+rule_files:
+  - "slos.rules.yml"
+
+# Token-exchange metrics (tyk_oauth2_exchange_*) arrive via OTLP -> collector ->
+# remote-write. The scrape targets below add the standard Tyk analytics metrics
+# (tyk_http_requests_total, tyk_http_latency) exposed by the prometheus pump,
+# matching the slo-prometheus-grafana deployment.
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: [ "localhost:9090" ]
+  - job_name: tyk
+    static_configs:
+      - targets: [ "acme-pump:8092" ]
