@@ -510,10 +510,13 @@ fi
 log_ok
 bootstrap_progress
 
+# Wait for the Dashboard to come back up before asking the Gateway to reload from it -
+# otherwise the reload can race the restart, fail to reach the Dashboard, and stall.
+wait_for_liveness "$gateway_base_url/hello"
+
 log_message "Reloading Gateways"
 hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
 bootstrap_progress
-wait_for_liveness "$gateway_base_url/hello"
 
 log_message "Checking Gateway - Anonymous API access"
 result=""
