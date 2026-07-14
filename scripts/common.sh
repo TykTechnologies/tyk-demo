@@ -1086,6 +1086,14 @@ wait_for_api_loaded () {
     fi
     target_api_result=$(curl "$gateway_url/tyk/apis/$api_id" -o /dev/null -s -w "%{http_code}\n" -H "x-tyk-authorization: $gateway_auth")
     if [ "$target_api_result" != "200" ]; then
+      # A reload cycle can occasionally wedge if it hits a transient connection
+      # error while talking to the Dashboard, blocking every reload queued behind
+      # it. Re-send the reload periodically so a fresh cycle gets a chance to run
+      # once the wedge clears, instead of just polling passively until timeout.
+      if [ "$((attempt_count % 5))" -eq 0 ]; then
+        log_message "  Re-sending group reload request to $gateway_url"
+        hot_reload "$gateway_url" "$gateway_auth" "group"
+      fi
       log_message "  Waiting for API $api_id to become available on $gateway_url..."
       bootstrap_progress
       sleep 2
