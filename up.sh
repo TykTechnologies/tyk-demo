@@ -106,7 +106,13 @@ fi
 
 # set gateway image repo based on licence
 # if the licence contains enterprise scopes, then the enterprise image is used
-if check_licence_requires_enterprise "DASHBOARD_LICENCE"; then
+# an explicitly-set repo (e.g. tyk-gateway-fips or tyk-gateway-ee, set by CI for manual test
+# runs) takes precedence and must not be overwritten, otherwise those runs would silently
+# fall back to the licence-derived gateway image
+current_gateway_image_repo=$(grep -E '^GATEWAY_IMAGE_REPO=' .env | cut -d '=' -f2)
+if [[ "$current_gateway_image_repo" == *"-fips"* || "$current_gateway_image_repo" == *"-ee"* ]]; then
+  echo "Explicit gateway image repo detected ($current_gateway_image_repo) - preserving it"
+elif check_licence_requires_enterprise "DASHBOARD_LICENCE"; then
   set_docker_environment_value "GATEWAY_IMAGE_REPO" "tyk-gateway-ee"
 else
   set_docker_environment_value "GATEWAY_IMAGE_REPO" "tyk-gateway"

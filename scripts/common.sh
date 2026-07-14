@@ -371,8 +371,21 @@ build_go_plugin () {
   # each plugin must be in its own directory
   local go_plugin_directory="$PWD/deployments/tyk/volumes/tyk-gateway/plugins/go/$2"
   local go_plugin_path="$go_plugin_directory/$go_plugin_filename"
+
+  # Use the FIPS plugin compiler when the gateway image repo is a FIPS build, so plugins are
+  # compiled to match the FIPS gateway they'll be loaded into.
+  local gateway_image_repo=$(grep -E '^GATEWAY_IMAGE_REPO=' .env | cut -d '=' -f2)
+  local plugin_compiler_image="tykio/tyk-plugin-compiler"
+  # cache_key keeps FIPS and non-FIPS plugin binaries separate, so a non-FIPS .so built for a
+  # given tag is never served to a FIPS build of the same tag (and vice versa)
+  local cache_key="$gateway_image_tag"
+  if [[ "$gateway_image_repo" == *"-fips"* ]]; then
+    plugin_compiler_image="tykio/tyk-plugin-compiler-fips"
+    cache_key="$gateway_image_tag-fips"
+  fi
+
   local go_plugin_cache_directory="$PWD/.bootstrap/plugin-cache"
-  local go_plugin_cache_version_directory="$go_plugin_cache_directory/$gateway_image_tag"
+  local go_plugin_cache_version_directory="$go_plugin_cache_directory/$cache_key"
   local go_plugin_cache_file_path="$go_plugin_cache_version_directory/$go_plugin_filename"
 
   # create cache directories if missing
@@ -386,7 +399,7 @@ build_go_plugin () {
   log_message "Checking for Go plugin $go_plugin_filename $gateway_image_tag in cache"
   # build plugin if it does not exist in the cache
   if [ ! -f $go_plugin_cache_file_path ]; then
-    log_message "  Not found. Building Go plugin $go_plugin_path using tag $gateway_image_tag"
+    log_message "  Not found. Building Go plugin $go_plugin_path using $plugin_compiler_image:$gateway_image_tag"
     # default Go build targets
     local goarch="amd64"
     local goos="linux"
@@ -397,15 +410,10 @@ build_go_plugin () {
       goarch=$platform
     fi
     log_message "  Target Go Platform: $goos/$goarch"
-    
-    # Build docker run command with optional GOEXPERIMENT for FIPS
+
     local docker_cmd="docker run --rm -v $go_plugin_directory:/plugin-source -e GOOS=$goos -e GOARCH=$goarch"
-    if [ -n "$GOEXPERIMENT" ]; then
-      log_message "  Using GOEXPERIMENT=$GOEXPERIMENT for FIPS build"
-      docker_cmd="$docker_cmd -e GOEXPERIMENT=$GOEXPERIMENT"
-    fi
-    docker_cmd="$docker_cmd --platform linux/amd64 tykio/tyk-plugin-compiler:$gateway_image_tag $go_plugin_filename"
-    
+    docker_cmd="$docker_cmd --platform linux/amd64 $plugin_compiler_image:$gateway_image_tag $go_plugin_filename"
+
     eval $docker_cmd
     local plugin_container_exit_code="$?"
     if [[ "$plugin_container_exit_code" -ne "0" ]]; then
