@@ -1080,7 +1080,7 @@ wait_for_api_loaded () {
   log_message "  Waiting for API $api_id to be available on $gateway_url"
   while [ "$target_api_result" != "200" ]; do
     attempt_count=$((attempt_count+1))
-    if [ "$attempt_count" -gt "10"  ]; then
+    if [ "$attempt_count" -gt "20"  ]; then
       echo "ERROR: Target API ($api_id) not available on Gateway ($gateway_url) - max retry reached"
       exit 1
     fi
