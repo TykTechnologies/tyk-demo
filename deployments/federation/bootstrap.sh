@@ -24,6 +24,15 @@ bootstrap_progress
 create_api "deployments/federation/data/apis-supergraph.json" "$dashboard_user_api_key"
 bootstrap_progress
 
+# The preceding Tyk deployment bootstrap restarts the Dashboard container (for Portal URLs),
+# which briefly drops the Gateway's live-notification connection to it. If the APIs above are
+# created while that connection is reconnecting, the push notifications for them can be lost
+# and the Gateway never learns about them. Force a blocking reload so the Gateway re-fetches
+# the current API list from the Dashboard directly, rather than relying on those notifications.
+log_message "Hot reloading Gateways"
+hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
+bootstrap_progress
+
 log_message "Waiting for API availability"
 for file in deployments/federation/data/*; do
   if [[ -f $file ]]; then

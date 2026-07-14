@@ -12,6 +12,11 @@ on:
         description: 'Dashboard Docker image tag (e.g., v5.12.0)'
         required: true
         type: string
+      fips:
+        description: 'Use FIPS Docker images'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -49,14 +54,21 @@ jobs:
         id: get-tags
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            # Manual trigger: use input values and FIPS repositories
+            # Manual trigger: use input values
             GATEWAY_TAG="${{ inputs.gateway-tag }}"
             DASHBOARD_TAG="${{ inputs.dashboard-tag }}"
-            GATEWAY_REPO="tyk-gateway-fips"
-            DASHBOARD_REPO="tyk-dashboard-fips"
+
+            if [ "${{ inputs.fips }}" == "true" ]; then
+              GATEWAY_REPO="tyk-gateway-fips"
+              DASHBOARD_REPO="tyk-dashboard-fips"
+              echo "Using FIPS repositories"
+            else
+              GATEWAY_REPO="tyk-gateway-ee"
+              DASHBOARD_REPO="tyk-dashboard"
+              echo "Using standard (EE) repositories"
+            fi
 
             echo "Manual workflow dispatch detected"
-            echo "Using FIPS repositories"
             echo "Gateway tag: $GATEWAY_TAG"
             echo "Dashboard tag: $DASHBOARD_TAG"
           else
@@ -191,11 +203,6 @@ jobs:
           echo "Gateway versions set to ${{ needs.discover-deployments.outputs.gateway-tag }}"
           echo "Dashboard versions set to ${{ needs.discover-deployments.outputs.dashboard-tag }}"
 
-          # Set GOEXPERIMENT=boringcrypto for FIPS builds
-          if [[ "${{ needs.discover-deployments.outputs.gateway-repo }}" == *"-fips"* ]]; then
-            echo "GOEXPERIMENT=boringcrypto" >> .env
-            echo "GOEXPERIMENT set to boringcrypto for FIPS build"
-          fi
           echo "::endgroup::"
 
           echo "::group::Default to debug logs for Gateway and Dashboard"
@@ -227,8 +234,10 @@ jobs:
         if: steps.read-manifest.outputs.skip-deployment != 'true'
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830  # v4
         with:
-          path: .bootstrap/plugin-cache/${{ needs.discover-deployments.outputs.gateway-tag }}
-          key: tyk-go-plugins-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
+          # cache the whole plugin-cache dir and key on the repo so FIPS and non-FIPS
+          # plugin binaries (which can share the same version tag) are cached separately
+          path: .bootstrap/plugin-cache
+          key: tyk-go-plugins-${{ needs.discover-deployments.outputs.gateway-repo }}-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
 
       - name: Cache Jenkins Plugins
         if: steps.read-manifest.outputs.skip-deployment != 'true' && matrix.deployment == 'cicd'

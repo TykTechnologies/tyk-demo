@@ -17,6 +17,15 @@ dashboard_user_api_key=$(get_context_data "1" "dashboard-user" "1" "api-key")
 create_api "deployments/plugin-python-grpc/data/apis-python_grpc.json" "$dashboard_user_api_key"
 bootstrap_progress
 
+# The preceding Tyk deployment bootstrap restarts the Dashboard container (for Portal URLs),
+# which briefly drops the Gateway's live-notification connection to it. If the API above is
+# created while that connection is reconnecting, the push notification for it can be lost and
+# the Gateway never learns about it. Force a blocking reload so the Gateway re-fetches the
+# current API list from the Dashboard directly, rather than relying on that notification.
+log_message "Hot reloading Gateways"
+hot_reload "$gateway_base_url" "$gateway_api_credentials" "group"
+bootstrap_progress
+
 # Check that the API has loaded
 log_message "Waiting for API availability"
 for file in deployments/plugin-python-grpc/data/*; do
