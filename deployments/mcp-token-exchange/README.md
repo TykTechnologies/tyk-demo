@@ -90,7 +90,7 @@ Both users sign in with password `Acme-Demo-2026!`:
 - **acme-chat** — the copilot web app (embeds the `/guide` and `/setup` explainer pages).
 - **acme-mcp-server** — a generic OpenAPI→MCP tool server: it reads the acme-api OAS spec and exposes one MCP tool per operation, replaying the inbound bearer and trace context upstream.
 - **acme-otel-collector / acme-tempo / acme-loki / acme-prometheus / acme-grafana / acme-promtail** — the observability pipeline. Only Grafana is published to the host; everything else is internal to the `tyk` network.
-- **acme-pump** — a second Tyk pump exposing the standard analytics metrics (`tyk_http_requests_total`, `tyk_http_latency`) to Prometheus, so Grafana also carries the standard *SLOs for APIs managed by Tyk* dashboard alongside the two MCP dashboards.
+- **tyk-pump (config override)** — the base deployment's pump runs with an extended config that adds a Prometheus export (`tyk_http_requests_total`, `tyk_http_latency`) alongside the standard Mongo pumps, so Grafana also carries the standard *SLOs for APIs managed by Tyk* dashboard alongside the two MCP dashboards. A single pump instance handles all sinks — a second instance would split the analytics records with the first.
 
 The bootstrap script publishes two APIs to the Dashboard and binds them to a policy (JWT auth requires one):
 

@@ -16,8 +16,12 @@ groups:
 
   - name: slo_metrics
     rules:
+      # The "or ... * 0" arm makes the ratio 0 (rather than absent) for APIs
+      # with traffic but no 5xx responses, so the error-budget panels render
+      # from the first request instead of waiting for an error to occur. The
+      # "> 0" filter on the denominator drops idle APIs (0/0 would be NaN).
       - record: job:slo_errors_per_request:ratio_rate10m
-        expr: sum by (job,api_name) (rate(task:http_response_error_count[10m])) / sum by (job,api_name) (rate(task:http_response_total_count[10m]))
+        expr: (sum by (job,api_name) (rate(task:http_response_error_count[10m])) or sum by (job,api_name) (rate(task:http_response_total_count[10m])) * 0) / (sum by (job,api_name) (rate(task:http_response_total_count[10m])) > 0)
 
       - record: job:error_budget:remaining
         expr: (1 - job:slo_errors_per_request:ratio_rate10m) * 100

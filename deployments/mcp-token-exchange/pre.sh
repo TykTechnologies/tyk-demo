@@ -15,7 +15,7 @@ fi
 # (OTel exchange span, tyk_mcp_call_* and tyk_oauth2_exchange_* metrics) follows
 # in 5.15.0. The OpenTelemetry variables are handled by up.sh, keyed on the
 # deployment name.
-tyk_version="v5.14.0-rc6"
+tyk_version="v5.14.0"
 set_docker_environment_value "DASHBOARD_VERSION" "$tyk_version"
 set_docker_environment_value "GATEWAY_VERSION" "$tyk_version"
 set_docker_environment_value "GATEWAY2_VERSION" "$tyk_version"
