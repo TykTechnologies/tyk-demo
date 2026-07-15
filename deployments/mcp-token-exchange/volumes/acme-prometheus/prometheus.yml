@@ -1,0 +1,20 @@
+---
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Standard Tyk SLO recording rules — they compute the job:/task: series the
+# SLO dashboard's error-budget panels query.
+rule_files:
+  - "slos.rules.yml"
+
+# Token-exchange metrics (tyk_oauth2_exchange_*) arrive via OTLP -> collector ->
+# remote-write. The scrape targets below add the standard Tyk analytics metrics
+# (tyk_http_requests_total, tyk_http_latency) exposed by the prometheus pump.
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: [ "localhost:9090" ]
+  - job_name: tyk
+    static_configs:
+      - targets: [ "tyk-pump:8092" ]

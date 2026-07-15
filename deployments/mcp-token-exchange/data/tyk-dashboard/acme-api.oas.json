@@ -1,0 +1,270 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "acme-api",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/anything/customers/{customer_id}": {
+      "get": {
+        "operationId": "lookupCustomer",
+        "summary": "Look up an Acme customer account.",
+        "description": "Look up an Acme customer account. Calls the downstream API on the rep's behalf (requires customers:read).",
+        "security": [
+          {
+            "oauth2": [
+              "customers:read"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "description": "the customer id to look up",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateCustomer",
+        "summary": "Update an Acme customer record.",
+        "description": "Update an Acme customer record. Sensitive write — the downstream API requires customers:write.",
+        "security": [
+          {
+            "oauth2": [
+              "customers:write"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "description": "the customer id to update",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "the customer's new email"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/anything/customers/{customer_id}/orders": {
+      "get": {
+        "operationId": "recentOrders",
+        "summary": "List a customer's recent orders.",
+        "description": "List a customer's recent orders. Calls the downstream API on the rep's behalf (requires customers:read).",
+        "security": [
+          {
+            "oauth2": [
+              "customers:read"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "description": "the customer id whose orders to list",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/anything/refunds": {
+      "post": {
+        "operationId": "issueRefund",
+        "summary": "Issue a refund for a customer.",
+        "description": "Issue a refund for a customer. Sensitive write — the downstream API requires refunds:write, so only supervisors can complete it.",
+        "security": [
+          {
+            "oauth2": [
+              "refunds:write"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_id": {
+                    "type": "string",
+                    "description": "the customer id to refund"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "description": "the refund amount"
+                  }
+                },
+                "required": [
+                  "customer_id",
+                  "amount"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "keycloakJwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {}
+      }
+    }
+  },
+  "security": [
+    {
+      "keycloakJwt": [],
+      "oauth2": []
+    }
+  ],
+  "x-tyk-api-gateway": {
+    "info": {
+      "name": "acme-api",
+      "state": {
+        "active": true
+      }
+    },
+    "upstream": {
+      "url": "http://httpbin"
+    },
+    "middleware": {
+      "global": {
+        "trafficLogs": {
+          "enabled": true
+        }
+      },
+      "operations": {
+        "lookupCustomer": {
+          "scopeCheck": {
+            "enabled": true
+          }
+        },
+        "updateCustomer": {
+          "scopeCheck": {
+            "enabled": true
+          }
+        },
+        "recentOrders": {
+          "scopeCheck": {
+            "enabled": true
+          }
+        },
+        "issueRefund": {
+          "scopeCheck": {
+            "enabled": true
+          }
+        }
+      }
+    },
+    "server": {
+      "listenPath": {
+        "value": "/",
+        "strip": false
+      },
+      "detailedTracing": {
+        "enabled": true
+      },
+      "detailedActivityLogs": {
+        "enabled": true
+      },
+      "customDomain": {
+        "enabled": true,
+        "name": "api.acme.internal"
+      },
+      "authentication": {
+        "enabled": true,
+        "baseIdentityProvider": "jwt_claim",
+        "securitySchemes": {
+          "keycloakJwt": {
+            "enabled": true,
+            "header": {
+              "enabled": true,
+              "name": "Authorization"
+            },
+            "jwksURIs": [
+              {
+                "url": "http://acme-keycloak:8280/realms/acme/protocol/openid-connect/certs",
+                "cacheTimeout": "0s"
+              }
+            ],
+            "signingMethod": "rsa",
+            "identityBaseField": "sub",
+            "defaultPolicies": []
+          },
+          "oauth2": {
+            "enabled": true,
+            "header": {
+              "enabled": true,
+              "name": "Authorization"
+            },
+            "scopeCheck": {
+              "enabled": true,
+              "claimNames": [
+                "scope"
+              ],
+              "separator": " "
+            }
+          }
+        }
+      }
+    }
+  }
+}

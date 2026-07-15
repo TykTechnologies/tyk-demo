@@ -1,0 +1,28 @@
+---
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://acme-loki:3100/loki/api/v1/push
+
+# Ship the Tyk Gateway container logs into Loki, labelled service_name=tyk-gateway
+# so the Grafana dashboard's log panels and trace<->log pivots work. This replaces
+# the host-side log tailer used when the gateway ran outside Docker.
+scrape_configs:
+  - job_name: tyk-gateway-docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: [ "__meta_docker_container_name" ]
+        regex: "/tyk-demo-tyk-gateway.*"
+        action: keep
+      - source_labels: [ "__meta_docker_container_name" ]
+        regex: "/(.*)"
+        target_label: container
+      - target_label: service_name
+        replacement: tyk-gateway

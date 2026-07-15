@@ -1,0 +1,12 @@
+{
+  "name": "acme-demo-default",
+  "active": true,
+  "apis": ["acme-mcp-proxy", "acme-api"],
+  "rate": -1,
+  "per": 1,
+  "quota_max": -1,
+  "quota_renewal_rate": 60,
+  "throttle_interval": -1,
+  "throttle_retry_limit": -1,
+  "tags": []
+}

@@ -26,7 +26,6 @@ Below is a list of the available feature deployments:
 | [OpenTelemetry with New Relic](../deployments/otel-new-relic/README.md) | Use OpenTelemetry with New Relic for distributed tracing | New Relic account | `otel-new-relic` |
 | [Python gRPC server](../deployments/plugin-grpc-python/README.md) | Example deployment of a Python-based gRPC plugin server | None | `plugin-python-grpc` |
 | [Enterprise Portal](../deployments/portal/README.md) | Deploy the Tyk Enterprise Developer Portal | Enterprise license | `portal` |
-| [SLIs with Prometheus/Grafana](../deployments/slo-prometheus-grafana/README.md) | Monitor Service Level Indicators and Objectives with Prometheus and Grafana | None | `slo-prometheus-grafana` |
 | [Single Sign-On](../deployments/sso/README.md) | Enable Single Sign-On for Tyk Dashboard and Portal | None | `sso` |
 | [Subscriptions](../deployments/subscriptions/README.md) | Use GraphQL to service websocket subscriptions | None | `subscriptions` |
 | [Tyk 2](../deployments/tyk2/README.md) | Add a second Tyk environment | None | `tyk2` |

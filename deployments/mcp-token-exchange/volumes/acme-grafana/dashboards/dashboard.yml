@@ -1,0 +1,16 @@
+---
+apiVersion: 1
+
+# File-based dashboard provider. Grafana loads every *.json in the mounted
+# dashboards directory and re-scans it every updateIntervalSeconds.
+providers:
+  - name: "Tyk API Gateway"
+    orgId: 1
+    folder: ""
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
