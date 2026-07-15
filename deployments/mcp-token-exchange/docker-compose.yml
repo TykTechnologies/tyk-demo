@@ -111,17 +111,16 @@ services:
       - "--web.enable-remote-write-receiver"
     volumes:
       - ./deployments/mcp-token-exchange/volumes/acme-prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      # SLO recording rules, shared with the slo-prometheus-grafana deployment
-      - ./deployments/slo-prometheus-grafana/volumes/prometheus/slos.rules.yml:/etc/prometheus/slos.rules.yml:ro
+      # Standard Tyk SLO recording rules for the SLO dashboard's error-budget panels
+      - ./deployments/mcp-token-exchange/volumes/acme-prometheus/slos.rules.yml:/etc/prometheus/slos.rules.yml:ro
     networks:
       - tyk
 
-  # Prometheus pump exposing the standard Tyk analytics metrics, reusing the
-  # slo-prometheus-grafana deployment's pump configuration
+  # Prometheus pump exposing the standard Tyk analytics metrics
   acme-pump:
     image: tykio/tyk-pump-docker-pub:${PUMP_VERSION:-v1.15.0-rc2}
     volumes:
-      - ./deployments/slo-prometheus-grafana/volumes/tyk-pump/pump.conf:/opt/tyk-pump/pump.conf
+      - ./deployments/mcp-token-exchange/volumes/acme-pump/pump.conf:/opt/tyk-pump/pump.conf
     environment:
       - TYK_INSTRUMENTATION=${INSTRUMENTATION_ENABLED:-0}
       - TYK_LOGLEVEL=${PUMP_LOGLEVEL:-info}
@@ -144,8 +143,6 @@ services:
       # Directory mount (not single-file) so host-side edits propagate live; the
       # provider only loads *.json, so the dashboard.yml inside it is ignored
       - ./deployments/mcp-token-exchange/volumes/acme-grafana/dashboards:/var/lib/grafana/dashboards:ro
-      # Standard Tyk SLO dashboard, shared with the slo-prometheus-grafana deployment
-      - ./deployments/slo-prometheus-grafana/volumes/grafana/dashboards/SLOs-for-APIs-managed-by-Tyk.json:/var/lib/grafana/dashboards-shared/SLOs-for-APIs-managed-by-Tyk.json:ro
     ports:
       - 3021:3000
     networks:
