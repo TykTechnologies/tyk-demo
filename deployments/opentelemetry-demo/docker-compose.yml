@@ -924,6 +924,7 @@ services:
       - --enable-feature=exemplar-storage
     volumes:
       - ./deployments/opentelemetry-demo/src/prometheus/prometheus-config.yaml:/etc/prometheus/prometheus-config.yaml
+      - ./deployments/opentelemetry-demo/src/prometheus/slos.rules.yml:/etc/prometheus/slos.rules.yml
     deploy:
       resources:
         limits:

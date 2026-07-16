@@ -1,0 +1,26 @@
+---
+apiVersion: 1
+
+# Alias UIDs for dashboards imported from other tyk-demo deployments
+# (mcp-token-exchange), whose panels hardcode datasource UIDs from their
+# original Grafana instance. Both point at this stack's Prometheus.
+datasources:
+  - name: Prometheus (tyk alias)
+    uid: prometheus
+    type: prometheus
+    url: http://prometheus:9090
+    access: proxy
+    jsonData:
+      # Metrics arrive via OTLP push every 60s; without this, $__rate_interval
+      # is too short to span two samples and rate() panels render empty.
+      timeInterval: "60s"
+
+  # Legacy uid old Grafana versions auto-assigned to the first provisioned
+  # datasource; the shared SLO dashboard's panels reference it.
+  - name: Prometheus (SLO alias)
+    uid: PBFA97CFB590B2093
+    type: prometheus
+    url: http://prometheus:9090
+    access: proxy
+    jsonData:
+      timeInterval: "60s"

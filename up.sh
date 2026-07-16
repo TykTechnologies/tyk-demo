@@ -92,8 +92,6 @@ if [[ "$*" == *otel* ]]; then
   set_docker_environment_value "OPENTELEMETRY_ENABLED" "true"
 elif [[ "$*" == *opentelemetry-demo* ]]; then
   set_docker_environment_value "OPENTELEMETRY_ENABLED" "true"
-elif [[ "$*" == *mcp-token-exchange* ]]; then
-  set_docker_environment_value "OPENTELEMETRY_ENABLED" "true"
 else
   set_docker_environment_value "OPENTELEMETRY_ENABLED" "false"
 fi
@@ -102,8 +100,6 @@ if [[ "$*" == *otel-jaeger* ]]; then
   set_docker_environment_value "OPENTELEMETRY_ENDPOINT" "jaeger-all-in-one:4317"
 elif [[ "$*" == *opentelemetry-demo* ]]; then
   set_docker_environment_value "OPENTELEMETRY_ENDPOINT" "otel-collector:4317"
-elif [[ "$*" == *mcp-token-exchange* ]]; then
-  set_docker_environment_value "OPENTELEMETRY_ENDPOINT" "acme-otel-collector:4317"
 else
   set_docker_environment_value "OPENTELEMETRY_ENDPOINT" ""
 fi

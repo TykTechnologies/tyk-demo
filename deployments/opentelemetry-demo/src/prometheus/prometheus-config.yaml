@@ -47,3 +47,18 @@ otlp:
 storage:
   tsdb:
     out_of_order_time_window: 30m
+
+# SLO recording rules over the pump's standard analytics metrics; feed the
+# "SLOs for APIs managed by Tyk" dashboard.
+rule_files:
+  - /etc/prometheus/slos.rules.yml
+
+scrape_configs:
+  # Tyk Pump's Prometheus export (tyk_http_requests_total, tyk_http_latency)
+  # covers every API the gateway serves, regardless of which deployment
+  # defined it. Requires a deployment that overrides the pump config with a
+  # prometheus sink on :8092 (e.g. mcp-token-exchange).
+  - job_name: tyk
+    scrape_interval: 10s
+    static_configs:
+      - targets: [ "tyk-pump:8092" ]

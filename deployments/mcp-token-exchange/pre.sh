@@ -11,10 +11,12 @@ if ! check_licence_requires_enterprise "DASHBOARD_LICENCE"; then
   exit 1
 fi
 
-# Token exchange ships in 5.14.0; the gateway-native exchange/MCP observability
-# (OTel exchange span, tyk_mcp_call_* and tyk_oauth2_exchange_* metrics) follows
-# in 5.15.0. The OpenTelemetry variables are handled by up.sh, keyed on the
-# deployment name.
+# Token exchange ships in 5.14.0. Gateway-native MCP metrics (tyk_mcp_requests_total
+# etc.) are also available on 5.14 as configurable API metrics — the opentelemetry-demo
+# deployment enables them via TYK_GW_OPENTELEMETRY_METRICS_APIMETRICS. Only the
+# exchange-specific observability (exchange OTel span, tyk_oauth2_exchange_* metrics)
+# is still unreleased (TT-17186). The OpenTelemetry variables are handled by up.sh,
+# keyed on the deployment name.
 tyk_version="v5.14.0"
 set_docker_environment_value "DASHBOARD_VERSION" "$tyk_version"
 set_docker_environment_value "GATEWAY_VERSION" "$tyk_version"
