@@ -124,7 +124,8 @@ echo -e "\033[2K
   ▽ Keycloak
             Browser URL : http://acme-keycloak:8280
       Username/Password : admin/admin
-  ▽ Grafana
-                    URL : http://localhost:3021
-    MCP Usage Dashboard : http://localhost:3021/d/acme-mcp-usage
-          SLO Dashboard : http://localhost:3021/d/YjXeVVZ4k"
+  ▽ Observability (requires the opentelemetry-demo deployment)
+                Grafana : http://localhost:8085/grafana/
+    MCP Usage Dashboard : http://localhost:8085/grafana/d/acme-mcp-usage
+    MCP Metrics (gw-native) : http://localhost:8085/grafana/d/tyk-mcp-metrics
+          SLO Dashboard : http://localhost:8085/grafana/d/YjXeVVZ4k"

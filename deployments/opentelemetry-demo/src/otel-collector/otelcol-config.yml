@@ -249,6 +249,11 @@ connectors:
         default: ""
       - name: http.target
         default: ""
+      # Per-tool-call spans from MCP client apps (e.g. mcp-token-exchange's
+      # acme-support-chat) carry the tool name; the MCP usage dashboard's
+      # per-tool panels group by it.
+      - name: mcp.tool
+        default: ""
 
 service:
   pipelines:

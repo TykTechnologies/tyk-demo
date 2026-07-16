@@ -383,7 +383,7 @@
         {
           "datasource": "${datasource_tempo}",
           "queryType": "traceql",
-          "query": "{ resource.service.name=~\"$service_name\" && span.tyk.api.id=~\"$api_id\" }",
+          "query": "{ resource.service.name=~\"$service_name\" && span.tyk.api.id=~\"$api_id\" } && { span.mcp.method.name != nil }",
           "limit": 50,
           "refId": "A"
         }

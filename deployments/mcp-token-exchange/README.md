@@ -8,7 +8,8 @@ An AI support copilot calls real company APIs **on behalf of** a signed-in suppo
 
 - Docker with Docker Compose (4GB+ RAM allocated) and the `jq` command-line utility — the standard Tyk Demo requirements.
 - **An enterprise-scoped Tyk licence.** Token exchange is an enterprise feature, so the EE gateway image is required — `up.sh` selects it automatically based on your licence, and this deployment fails fast with an error if the licence isn't enterprise-scoped.
-- No Tyk version setup needed: this deployment's `pre.sh` automatically sets the Gateway and Dashboard images to `v5.14.0-rc6` (update once 5.14.0 is GA) and enables OpenTelemetry, pointed at the deployment's own collector.
+- No Tyk version setup needed: this deployment's `pre.sh` automatically sets the Gateway and Dashboard images to `v5.14.0`.
+- Optional: for the observability part of the demo (traces, MCP dashboards, SLOs), compose with the `opentelemetry-demo` deployment — this deployment carries no observability stack of its own.
 
 ## Getting started
 
@@ -32,6 +33,12 @@ sudo ./scripts/update-hosts.sh
 ./up.sh mcp-token-exchange
 ```
 
+Or, to include the observability stack (Grafana with the MCP and SLO dashboards, Tempo traces):
+
+```bash
+./up.sh mcp-token-exchange opentelemetry-demo
+```
+
 On first run the chat app and MCP server are built from source (Go, in Docker) — allow a couple of minutes on top of the usual base-deployment bootstrap. Wait for "Tyk Demo initialisation process completed"; the deployment details below are printed at that point.
 
 **4. Open the demo:** go to http://localhost:8095, sign in as **alice** / `Acme-Demo-2026!`, and run a tool (see [The flow](#the-flow) below).
@@ -42,7 +49,7 @@ To stop and remove everything:
 ./down.sh
 ```
 
-To resume a stopped deployment, include the deployment name (this keeps the OpenTelemetry environment variables set — see Troubleshooting):
+To resume a stopped deployment, repeat the same `./up.sh` command you started it with (the OpenTelemetry environment variables are argument-driven — see Troubleshooting):
 
 ```bash
 ./up.sh mcp-token-exchange
@@ -59,9 +66,12 @@ Once bootstrapped, these are the places to go:
 | In-app guides | http://localhost:8095/guide and `/setup` | Plain-English and technical explainers |
 | MCP proxy | http://tyk-gateway.localhost:8080/acme-mcp/mcp | The Tyk API that runs the exchange |
 | Keycloak admin | http://acme-keycloak:8280 | admin / admin |
-| Grafana | http://localhost:3021 | Traces, metrics, and logs (anonymous access) |
-| — MCP Usage dashboard | http://localhost:3021/d/acme-mcp-usage | Tool/MCP usage and failures |
-| — SLO dashboard | http://localhost:3021/d/YjXeVVZ4k | Standard Tyk SLOs |
+| Grafana* | http://localhost:8085/grafana/ | Traces, metrics, and logs (anonymous access) |
+| — MCP Usage dashboard* | http://localhost:8085/grafana/d/acme-mcp-usage | Tool/MCP usage and failures |
+| — MCP Metrics dashboard* | http://localhost:8085/grafana/d/tyk-mcp-metrics | Gateway-native MCP metrics |
+| — SLO dashboard* | http://localhost:8085/grafana/d/YjXeVVZ4k | Standard Tyk SLOs |
+
+\* Only when composed with the `opentelemetry-demo` deployment.
 
 ### Demo users
 
@@ -75,22 +85,22 @@ Both users sign in with password `Acme-Demo-2026!`:
 1. Open http://localhost:8095 and sign in as alice.
 2. Run a tool and watch the **Delegation inspector** decode the SSO token vs the exchanged token: same `sub`, `aud` re-pointed to `api.acme.internal`, `azp` now `tyk-mcp-gateway`, `scope` narrowed from `customers:all` to the one action.
 3. Sign out, sign in as bob, and issue a refund — it now succeeds.
-4. In **Grafana → Explore → Tempo**, open the request traces; gateway logs are in Loki (`{service_name="tyk-gateway"}`) and the standard Tyk analytics metrics feed the *SLOs for APIs managed by Tyk* dashboard.
+4. If deployed with `opentelemetry-demo`: in **Grafana → Explore → Tempo**, open the request traces; gateway logs are in Loki (`{service_name="tyk-gateway"}`) and the standard Tyk analytics metrics feed the *SLOs for APIs managed by Tyk* dashboard.
 
-> **Note on observability scope:** token exchange ships in 5.14.0; the gateway-native exchange/MCP observability (the exchange OTel span, and the `tyk_mcp_call_*` / `tyk_oauth2_exchange_*` metrics) follows in **5.15.0**. Everything Grafana carries here works on 5.14:
+> **Note on observability scope:** all observability lives in the `opentelemetry-demo` deployment — this deployment brings none of its own. When composed, its shared Grafana carries (all working on 5.14):
 >
-> - ***Acme — MCP Usage*** (http://localhost:3021/d/acme-mcp-usage) — most used tools, per-tool call/failure rates and p95 latency (with a tool dropdown), most used MCPs, outcomes and failures by HTTP status. Tool panels are derived from the chat's per-tool-call spans via the collector's spanmetrics connector; status panels come from the pump's `tyk_http_requests_total`.
-> - ***SLOs for APIs managed by Tyk*** (http://localhost:3021/d/YjXeVVZ4k) — the standard Tyk SLO dashboard.
+> - ***Acme — MCP Usage*** (http://localhost:8085/grafana/d/acme-mcp-usage) — most used tools, per-tool call/failure rates and p95 latency (with a tool dropdown), most used MCPs, outcomes and failures by HTTP status. Tool panels are derived from the chat's per-tool-call spans via the collector's spanmetrics connector; status panels come from the pump's `tyk_http_requests_total`.
+> - ***Tyk Gateway - MCP Metrics*** (http://localhost:8085/grafana/d/tyk-mcp-metrics) — gateway-native MCP metrics (`tyk_mcp_requests_total`, `tyk_mcp_primitive_duration_seconds`), available on 5.14 as configurable API metrics (see `TYK_GW_OPENTELEMETRY_METRICS_APIMETRICS` in the opentelemetry-demo's `demo.env`). These cover *any* MCP API the gateway serves — including agents that aren't instrumented, which the chat-span panels can't see.
+> - ***SLOs for APIs managed by Tyk*** (http://localhost:8085/grafana/d/YjXeVVZ4k) — the standard Tyk SLO dashboard.
 >
-> Traces (Tempo) and logs (Loki) also work on 5.14. Once on 5.15, the gateway-native metrics can power additional dashboards (the original demo's `mcp-gateway` dashboard lives in the [acme-support-copilot-keycloak-demo](https://github.com/TykTechnologies/acme-support-copilot-keycloak-demo) repo).
+> Traces (Tempo) and gateway logs (Loki) also work on 5.14. Only the exchange-specific observability (the exchange OTel span and `tyk_oauth2_exchange_*` metrics) is still unreleased. The original demo's `mcp-gateway` dashboard lives in the [acme-support-copilot-keycloak-demo](https://github.com/TykTechnologies/acme-support-copilot-keycloak-demo) repo.
 
 ## What gets deployed
 
 - **acme-keycloak** — Keycloak 26 with the `acme` realm auto-imported (clients, scopes, protocol mappers, users). The realm enables standard token exchange on the `tyk-mcp-gateway` client.
 - **acme-chat** — the copilot web app (embeds the `/guide` and `/setup` explainer pages).
 - **acme-mcp-server** — a generic OpenAPI→MCP tool server: it reads the acme-api OAS spec and exposes one MCP tool per operation, replaying the inbound bearer and trace context upstream.
-- **acme-otel-collector / acme-tempo / acme-loki / acme-prometheus / acme-grafana / acme-promtail** — the observability pipeline. Only Grafana is published to the host; everything else is internal to the `tyk` network.
-- **tyk-pump (config override)** — the base deployment's pump runs with an extended config that adds a Prometheus export (`tyk_http_requests_total`, `tyk_http_latency`) alongside the standard Mongo pumps, so Grafana also carries the standard *SLOs for APIs managed by Tyk* dashboard alongside the two MCP dashboards. A single pump instance handles all sinks — a second instance would split the analytics records with the first.
+- **tyk-pump (config override)** — the base deployment's pump runs with an extended config that adds a Prometheus export (`tyk_http_requests_total`, `tyk_http_latency`) alongside the standard Mongo pumps; the `opentelemetry-demo` Prometheus scrapes it to feed the SLO and MCP-usage dashboards. A single pump instance handles all sinks — a second instance would split the analytics records with the first.
 
 The bootstrap script publishes two APIs to the Dashboard and binds them to a policy (JWT auth requires one):
 
@@ -111,5 +121,5 @@ The Postman collection replicates the exchange headlessly: it mints alice's SSO 
 - **`403 Access disallowed` on every call** — the policy wasn't bound to the APIs; re-run the bootstrap or check `logs/bootstrap.log`.
 - **Exchange fails with `Client is not within the token audience`** — the realm import didn't apply (it only runs against an empty database). Recreate the Keycloak container: `docker compose -p tyk-demo rm -sf acme-keycloak && ./up.sh mcp-token-exchange`.
 - **Login loops back as the same user** — the chat forces the Keycloak login prompt (`LOGIN_PROMPT=login`) so you can switch alice↔bob; a private window also works.
-- **No traces in Grafana** — resuming with a bare `./up.sh` resets the OpenTelemetry Docker environment variables (they are argument-driven); include the deployment name when resuming: `./up.sh mcp-token-exchange`.
+- **No traces in Grafana** — resuming with a bare `./up.sh` resets the OpenTelemetry Docker environment variables (they are argument-driven); include both deployment names when resuming: `./up.sh mcp-token-exchange opentelemetry-demo`.
 - **Refund unexpectedly allowed/denied** — check the user's `entitlements` attribute in the Keycloak admin console (Users → alice → Attributes).
