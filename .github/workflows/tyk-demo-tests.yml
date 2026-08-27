@@ -17,6 +17,11 @@ on:
         required: false
         type: boolean
         default: false
+      fips-plugin-compiler-ng:
+        description: 'Use FIPS plugin compiler with -ng tag suffix (e.g. v5.15.0-rc9-ng). Requires fips.'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -34,6 +39,7 @@ jobs:
       dashboard-tag: ${{ steps.get-tags.outputs.dashboard-tag }}
       gateway-repo: ${{ steps.get-tags.outputs.gateway-repo }}
       dashboard-repo: ${{ steps.get-tags.outputs.dashboard-repo }}
+      plugin-compiler-tag: ${{ steps.get-tags.outputs.plugin-compiler-tag }}
     steps:
       - name: Check Out Repository Code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
@@ -68,9 +74,20 @@ jobs:
               echo "Using standard (EE) repositories"
             fi
 
+            PLUGIN_COMPILER_TAG="$GATEWAY_TAG"
+            if [ "${{ inputs.fips-plugin-compiler-ng }}" == "true" ]; then
+              if [ "${{ inputs.fips }}" != "true" ]; then
+                echo "::error::fips-plugin-compiler-ng requires fips to be enabled" >&2
+                exit 1
+              fi
+              PLUGIN_COMPILER_TAG="${GATEWAY_TAG}-ng"
+              echo "Using FIPS plugin compiler with -ng tag suffix"
+            fi
+
             echo "Manual workflow dispatch detected"
             echo "Gateway tag: $GATEWAY_TAG"
             echo "Dashboard tag: $DASHBOARD_TAG"
+            echo "Plugin compiler tag: $PLUGIN_COMPILER_TAG"
           else
             # Push trigger: extract from docker-compose.yml and use standard repositories
             GATEWAY_TAG=$(awk '/tyk-gateway:/ { in_gateway=1 }
@@ -108,6 +125,8 @@ jobs:
             GATEWAY_REPO="tyk-gateway"
             DASHBOARD_REPO="tyk-dashboard"
 
+            PLUGIN_COMPILER_TAG="$GATEWAY_TAG"
+
             echo "Push trigger detected"
             echo "Extracted gateway tag: $GATEWAY_TAG"
             echo "Extracted dashboard tag: $DASHBOARD_TAG"
@@ -117,6 +136,7 @@ jobs:
           echo "dashboard-tag=$DASHBOARD_TAG" >> "$GITHUB_OUTPUT"
           echo "gateway-repo=$GATEWAY_REPO" >> "$GITHUB_OUTPUT"
           echo "dashboard-repo=$DASHBOARD_REPO" >> "$GITHUB_OUTPUT"
+          echo "plugin-compiler-tag=$PLUGIN_COMPILER_TAG" >> "$GITHUB_OUTPUT"
 
   # Run each deployment test in parallel
   test-deployments:
@@ -203,6 +223,11 @@ jobs:
           echo "Gateway versions set to ${{ needs.discover-deployments.outputs.gateway-tag }}"
           echo "Dashboard versions set to ${{ needs.discover-deployments.outputs.dashboard-tag }}"
 
+          if [[ "${{ needs.discover-deployments.outputs.plugin-compiler-tag }}" != "${{ needs.discover-deployments.outputs.gateway-tag }}" ]]; then
+            echo "PLUGIN_COMPILER_TAG=${{ needs.discover-deployments.outputs.plugin-compiler-tag }}" >> .env
+            echo "PLUGIN_COMPILER_TAG set to ${{ needs.discover-deployments.outputs.plugin-compiler-tag }}"
+          fi
+
           echo "::endgroup::"
 
           echo "::group::Default to debug logs for Gateway and Dashboard"
@@ -237,7 +262,7 @@ jobs:
           # cache the whole plugin-cache dir and key on the repo so FIPS and non-FIPS
           # plugin binaries (which can share the same version tag) are cached separately
           path: .bootstrap/plugin-cache
-          key: tyk-go-plugins-${{ needs.discover-deployments.outputs.gateway-repo }}-${{ needs.discover-deployments.outputs.gateway-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
+          key: tyk-go-plugins-${{ needs.discover-deployments.outputs.gateway-repo }}-${{ needs.discover-deployments.outputs.plugin-compiler-tag }}-${{ hashFiles('deployments/tyk/volumes/tyk-gateway/plugins/go/**/*') }}
 
       - name: Cache Jenkins Plugins
         if: steps.read-manifest.outputs.skip-deployment != 'true' && matrix.deployment == 'cicd'
