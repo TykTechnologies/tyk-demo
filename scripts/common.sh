@@ -376,12 +376,16 @@ build_go_plugin () {
   # compiled to match the FIPS gateway they'll be loaded into.
   local gateway_image_repo=$(grep -E '^GATEWAY_IMAGE_REPO=' .env | cut -d '=' -f2)
   local plugin_compiler_image="tykio/tyk-plugin-compiler"
+  local plugin_compiler_tag="$gateway_image_tag"
+  if grep -qE '^PLUGIN_COMPILER_TAG=' .env 2>/dev/null; then
+    plugin_compiler_tag=$(grep -E '^PLUGIN_COMPILER_TAG=' .env | cut -d '=' -f2-)
+  fi
   # cache_key keeps FIPS and non-FIPS plugin binaries separate, so a non-FIPS .so built for a
   # given tag is never served to a FIPS build of the same tag (and vice versa)
   local cache_key="$gateway_image_tag"
   if [[ "$gateway_image_repo" == *"-fips"* ]]; then
     plugin_compiler_image="tykio/tyk-plugin-compiler-fips"
-    cache_key="$gateway_image_tag-fips"
+    cache_key="${plugin_compiler_tag}-fips"
   fi
 
   local go_plugin_cache_directory="$PWD/.bootstrap/plugin-cache"
@@ -396,10 +400,10 @@ build_go_plugin () {
     mkdir $go_plugin_cache_version_directory
   fi
 
-  log_message "Checking for Go plugin $go_plugin_filename $gateway_image_tag in cache"
+  log_message "Checking for Go plugin $go_plugin_filename ($plugin_compiler_image:$plugin_compiler_tag) in cache"
   # build plugin if it does not exist in the cache
   if [ ! -f $go_plugin_cache_file_path ]; then
-    log_message "  Not found. Building Go plugin $go_plugin_path using $plugin_compiler_image:$gateway_image_tag"
+    log_message "  Not found. Building Go plugin $go_plugin_path using $plugin_compiler_image:$plugin_compiler_tag"
     # default Go build targets
     local goarch="amd64"
     local goos="linux"
@@ -412,7 +416,7 @@ build_go_plugin () {
     log_message "  Target Go Platform: $goos/$goarch"
 
     local docker_cmd="docker run --rm -v $go_plugin_directory:/plugin-source -e GOOS=$goos -e GOARCH=$goarch"
-    docker_cmd="$docker_cmd --platform linux/amd64 $plugin_compiler_image:$gateway_image_tag $go_plugin_filename"
+    docker_cmd="$docker_cmd --platform linux/amd64 $plugin_compiler_image:$plugin_compiler_tag $go_plugin_filename"
 
     eval $docker_cmd
     local plugin_container_exit_code="$?"
@@ -421,11 +425,39 @@ build_go_plugin () {
       exit 1
     fi
     # the .so file created by the plugin build container includes the target release version and architecture e.g. example-go-plugin_v4.1.0_linux_amd64.so
-    # we need to remove these so that the file name matches what's in the API definition e.g. example-go-plugin.so
-    rm $go_plugin_directory/$go_plugin_filename
-    mv $go_plugin_directory/*.so $go_plugin_directory/$go_plugin_filename
+    # we need to rename it so that the file name matches what's in the API definition e.g. example-go-plugin.so
+    shopt -s nullglob
+    local built_so_files=("$go_plugin_directory"/*.so)
+    shopt -u nullglob
+
+    if [ ${#built_so_files[@]} -eq 0 ]; then
+      log_message "  ERROR: Plugin compiler did not produce a .so file in $go_plugin_directory"
+      exit 1
+    fi
+
+    rm -f "$go_plugin_directory/$go_plugin_filename"
+
+    local versioned_plugin=""
+    for built_plugin in "${built_so_files[@]}"; do
+      if [ "$(basename "$built_plugin")" != "$go_plugin_filename" ]; then
+        versioned_plugin="$built_plugin"
+        break
+      fi
+    done
+
+    if [ -n "$versioned_plugin" ]; then
+      mv "$versioned_plugin" "$go_plugin_directory/$go_plugin_filename"
+    elif [ ! -f "$go_plugin_directory/$go_plugin_filename" ]; then
+      mv "${built_so_files[0]}" "$go_plugin_directory/$go_plugin_filename"
+    fi
+
+    if [ ! -f "$go_plugin_directory/$go_plugin_filename" ]; then
+      log_message "  ERROR: Failed to rename plugin build output to $go_plugin_filename"
+      exit 1
+    fi
+
     # copy to cache, to enable built plugins to be reused across bootstraps
-    cp $go_plugin_directory/*.so $go_plugin_cache_version_directory
+    cp "$go_plugin_directory/$go_plugin_filename" "$go_plugin_cache_version_directory/"
 
     # limit the number of plugin caches to prevent uncontrolled growth
     local PLUGIN_CACHE_MAX_SIZE=$(grep -E '^PLUGIN_CACHE_MAX_SIZE=[0-9]+' .env | cut -d '=' -f2)
