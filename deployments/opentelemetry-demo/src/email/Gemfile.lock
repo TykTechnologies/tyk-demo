@@ -3,7 +3,7 @@ GEM
   specs:
     base64 (0.2.0)
     bigdecimal (3.2.2)
-    date (3.4.1)
+    date (3.5.1)
     google-protobuf (4.32.0-aarch64-linux-musl)
       bigdecimal
       rake (>= 13)
@@ -18,6 +18,18 @@ GEM
       rake (>= 13)
     googleapis-common-protos-types (1.20.0)
       google-protobuf (>= 3.18, < 5.a)
+    grpc (1.81.0-aarch64-linux-musl)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.81.0-arm64-darwin)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.81.0-x86_64-darwin)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.81.0-x86_64-linux-musl)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
     logger (1.7.0)
     mail (2.8.1)
       mini_mime (>= 0.1.1)
@@ -27,7 +39,7 @@ GEM
     mini_mime (1.1.5)
     mustermann (3.0.3)
       ruby2_keywords (~> 0.0.1)
-    net-imap (0.5.8)
+    net-imap (0.5.15)
       date
       net-protocol
     net-pop (0.1.2)
@@ -37,6 +49,10 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.4)
+    openfeature-flagd-provider (0.1.0)
+      grpc (~> 1.50)
+      openfeature-sdk (~> 0.3)
+    openfeature-sdk (0.6.5)
     opentelemetry-api (1.6.0)
     opentelemetry-common (0.22.0)
       opentelemetry-api (~> 1.0)
@@ -281,7 +297,7 @@ GEM
       rack-session (>= 2.0.0, < 3)
       tilt (~> 2.0)
     tilt (2.6.0)
-    timeout (0.4.3)
+    timeout (0.6.1)
 
 PLATFORMS
   aarch64-linux-musl
@@ -292,6 +308,8 @@ PLATFORMS
 DEPENDENCIES
   google-protobuf (~> 4.32.0)
   net-smtp (~> 0.5.1)
+  openfeature-flagd-provider (~> 0.1)
+  openfeature-sdk (~> 0.4)
   opentelemetry-exporter-otlp (~> 0.30.0)
   opentelemetry-instrumentation-all (~> 0.80.0)
   opentelemetry-sdk (~> 1.8)
