@@ -1,0 +1,17 @@
+{
+  "Name": "Curity DCR Plan",
+  "ProviderID": 1,
+  "AutoApproveAccessRequests": false,
+  "Catalogues": [2],
+  "JWTScope": "tyk-plan",
+  "KeyExpiresIn": 0,
+  "MetaData": {},
+  "Per": 1,
+  "PlanQuota": 0,
+  "PlanQuotaRenewalRate": -1,
+  "Quota": -1,
+  "QuotaRenewalRate": -1,
+  "RateLimit": 100,
+  "UnlimitedQuota": true,
+  "UnlimitedRateLimit": false
+}

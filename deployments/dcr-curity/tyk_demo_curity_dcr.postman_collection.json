@@ -1,0 +1,145 @@
+{
+	"info": {
+		"_postman_id": "c85cb233-6025-410c-9367-d490b9e07c6e",
+		"name": "Tyk Demo - Curity DCR",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10157957"
+	},
+	"item": [
+		{
+			"name": "Part 1 - Obtain access token from curity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// this if statement helps prevent the code within from generating a failed test status, since this example requires manual human intervention to be successful it does not work in an automated environment",
+							"if (pm.response.code == 200) {",
+							"    var jsonData = JSON.parse(responseBody);",
+							"    postman.setEnvironmentVariable(\"token\", jsonData.access_token);",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "<client-id>",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "<client-secret>",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "tyk-product tyk-plan",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://{{curity.host}}/oauth/v2/oauth-token",
+					"protocol": "https",
+					"host": [
+						"{{curity.host}}"
+					],
+					"path": [
+						"oauth",
+						"v2",
+						"oauth-token"
+					]
+				},
+				"description": "Obtain access token\n\nTo use this example, you must update the `client_id` and `client_secret` values, using those of the OAuth client created by following the guidance as described in the _usage_ section of the deployment readme."
+			},
+			"response": []
+		},
+		{
+			"name": "Part 2 - Call API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "<token>",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{tyk-gateway.host}}/curity-dcr/get",
+					"protocol": "http",
+					"host": [
+						"{{tyk-gateway.host}}"
+					],
+					"path": [
+						"curity-dcr",
+						"get"
+					]
+				},
+				"description": "Set the authorization token using the token generated in Part 1. This will grant access to the API."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "tyk-gateway.host",
+			"value": "tyk-gateway.localhost:8080"
+		},
+		{
+			"key": "curity.host",
+			"value": "curity:8443"
+		},
+		{
+			"key": "test-runner-ignore",
+			"value": "true"
+		}
+	]
+}

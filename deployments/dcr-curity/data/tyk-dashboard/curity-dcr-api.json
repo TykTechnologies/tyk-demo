@@ -1,0 +1,1002 @@
+{
+  "components": {
+    "securitySchemes": {
+      "api_key": {
+        "in": "header",
+        "name": "Authorization",
+        "type": "apiKey"
+      },
+      "jwtAuth": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "contact": {},
+    "description": "API Management facade for a very handy and free online HTTP tool.",
+    "title": "Curity DCR API",
+    "version": "v1"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/anything": {
+      "get": {
+        "description": "Returns request data, including method used.",
+        "operationId": "/anything",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/anything"
+      }
+    },
+    "/base64/{value}": {
+      "get": {
+        "description": "Decodes base64url-encoded string.",
+        "operationId": "/base64",
+        "parameters": [
+          {
+            "description": "Base64 encoded string.",
+            "in": "path",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/base64"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "value",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/brotli": {
+      "get": {
+        "description": "Returns brotli-encoded data.",
+        "operationId": "/brotli",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/brotli"
+      }
+    },
+    "/bytes/{number}": {
+      "get": {
+        "description": "Generates n random bytes of binary data",
+        "operationId": "/bytes",
+        "parameters": [
+          {
+            "description": "Number of bytes to return.",
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/bytes"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "number",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/cache/{maxAge}": {
+      "get": {
+        "description": "Sets a Cache-Control header for n seconds.",
+        "operationId": "/cache",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "maxAge",
+            "required": true,
+            "schema": {
+              "enum": [
+                10
+              ],
+              "format": "int32",
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/cache"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "maxAge",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/deflate": {
+      "get": {
+        "description": "Returns deflate-encoded data.",
+        "operationId": "/deflate",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/deflate"
+      }
+    },
+    "/delay/{seconds}": {
+      "get": {
+        "description": "Delays responding for n–10 seconds.",
+        "operationId": "/delay",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "seconds",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/delay"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "seconds",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/delete": {
+      "delete": {
+        "description": "Returns DELETE data.",
+        "operationId": "/delete",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/delete"
+      }
+    },
+    "/get": {
+      "get": {
+        "description": "Returns GET data.",
+        "operationId": "/get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/get"
+      }
+    },
+    "/gzip": {
+      "get": {
+        "description": "Returns gzip-encoded data.",
+        "operationId": "/gzip",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/gzip"
+      }
+    },
+    "/headers": {
+      "get": {
+        "description": "Returns headers dictionary.",
+        "operationId": "/headers",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/headers"
+      }
+    },
+    "/ip": {
+      "get": {
+        "description": "Returns origin IP.",
+        "operationId": "/ip",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/ip"
+      }
+    },
+    "/patch": {
+      "patch": {
+        "description": "Returns PATCH data.",
+        "operationId": "/patch",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/patch"
+      }
+    },
+    "/post": {
+      "post": {
+        "description": "Returns POST data.",
+        "operationId": "/post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/post"
+      }
+    },
+    "/put": {
+      "put": {
+        "description": "Returns PUT data.",
+        "operationId": "/put",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/put"
+      }
+    },
+    "/redirect-to": {
+      "get": {
+        "description": "302 redirects to a URL provided in query",
+        "operationId": "/redirect-to",
+        "parameters": [
+          {
+            "description": "Redirect target",
+            "explode": true,
+            "in": "query",
+            "name": "url",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/redirect-to"
+      }
+    },
+    "/response-headers": {
+      "get": {
+        "description": "Returns key-value query parameters as response headers.",
+        "operationId": "/response-headers",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/response-headers"
+      }
+    },
+    "/status/{code}": {
+      "get": {
+        "description": "Returns provided HTTP Status code.",
+        "operationId": "/status",
+        "parameters": [
+          {
+            "description": "HTTP code to return.",
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "enum": [
+                200
+              ],
+              "format": "int32",
+              "type": "integer"
+            },
+            "style": "simple"
+          },
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/status"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "code",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/stream/{number}": {
+      "get": {
+        "description": "Streams min(number, 100) lines.",
+        "operationId": "/stream",
+        "parameters": [
+          {
+            "description": "Number of lines to stream.",
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            },
+            "style": "simple"
+          },
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/stream"
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "number",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/user-agent": {
+      "get": {
+        "description": "Returns user agent string.",
+        "operationId": "/user-agent",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/user-agent"
+      }
+    },
+    "/uuid": {
+      "get": {
+        "description": "Returns UUID4.",
+        "operationId": "/uuid",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/uuid"
+      }
+    },
+    "/xml": {
+      "get": {
+        "description": "Returns some XML.",
+        "operationId": "/xml",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-api-version",
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "summary": "/xml"
+      }
+    }
+  },
+  "security": [
+    {
+      "jwtAuth": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://tyk-gateway.localhost:8080/curity-dcr"
+    },
+    {
+      "url": "http://httpbin/"
+    }
+  ],
+  "x-tyk-api-gateway": {
+    "info": {
+      "dbId": "68dd434dd1e8f50001449798",
+      "id": "4948f8ae1f3b4ed55ffca5beef979fb1",
+      "name": "Curity DCR API",
+      "orgId": "5e9d9544a1dcd60001d0ed20",
+      "state": {
+        "active": true
+      }
+    },
+    "middleware": {
+      "global": {
+        "contextVariables": {
+          "enabled": true
+        },
+        "trafficLogs": {
+          "enabled": true
+        }
+      },
+      "operations": {
+        "/anything": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/base64": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/brotli": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/bytes": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/cache": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/deflate": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/delay": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/delete": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/get": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/gzip": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/headers": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/ip": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/patch": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/post": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/put": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/redirect-to": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/response-headers": {
+          "allow": {
+            "enabled": true
+          }
+        },
+        "/status": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/stream": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/user-agent": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/uuid": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        },
+        "/xml": {
+          "allow": {
+            "enabled": true
+          },
+          "validateRequest": {
+            "enabled": true,
+            "errorResponseCode": 422
+          }
+        }
+      }
+    },
+    "server": {
+      "authentication": {
+        "enabled": true,
+        "securitySchemes": {
+          "jwtAuth": {
+            "enabled": true,
+            "header": {
+              "enabled": true,
+              "name": "Authorization"
+            },
+            "identityBaseField": "sub",
+            "policyFieldName": "pol",
+            "signingMethod": "rsa"
+          }
+        }
+      },
+      "listenPath": {
+        "strip": true,
+        "value": "/curity-dcr"
+      }
+    },
+    "upstream": {
+      "url": "http://httpbin/"
+    }
+  }
+}
