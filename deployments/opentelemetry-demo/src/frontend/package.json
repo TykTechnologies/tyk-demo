@@ -46,7 +46,7 @@
     "react-dom": "19.2.0",
     "sharp": "0.34.4",
     "styled-components": "6.1.19",
-    "uuid": "13.0.0"
+    "uuid": "14.0.0"
   },
   "devDependencies": {
     "@types/node": "24.9.1",
