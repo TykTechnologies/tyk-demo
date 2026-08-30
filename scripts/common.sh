@@ -1109,10 +1109,25 @@ wait_for_api_loaded () {
   local gateway_auth="$3"
   local target_api_result=""
   local attempt_count=0
+  local restarted_gateway="false"
   log_message "  Waiting for API $api_id to be available on $gateway_url"
   while [ "$target_api_result" != "200" ]; do
     attempt_count=$((attempt_count+1))
     if [ "$attempt_count" -gt "20"  ]; then
+      # Investigation of CI failures showed that resending reloads (below) doesn't
+      # help when the gateway's reload processor itself has wedged: it hit a
+      # transient network error re-registering with the Dashboard, never recovered,
+      # and every reload queued behind it (including our resends) is accepted but
+      # never actually runs. No amount of polling clears that, so restart the
+      # gateway once to force a clean reconnect, then give it one more fresh budget.
+      if [ "$restarted_gateway" = "false" ]; then
+        log_message "  API still not available after re-sending reloads; restarting tyk-gateway in case its reload cycle has wedged"
+        eval $(generate_docker_compose_command) restart tyk-gateway
+        restarted_gateway="true"
+        attempt_count=0
+        sleep 5
+        continue
+      fi
       echo "ERROR: Target API ($api_id) not available on Gateway ($gateway_url) - max retry reached"
       exit 1
     fi

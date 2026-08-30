@@ -280,8 +280,18 @@ jobs:
           if ./up.sh ${COMPOSE_ARG:-${{ matrix.deployment }}} --hide-progress --skip-hostname-check; then
             echo "Deployment created successfully"
           else
-            echo "::error::Deployment creation failed for ${{ matrix.deployment }}"
-            exit 1
+            # Deployment creation can fail due to transient issues (e.g. a Docker network
+            # blip between containers during bootstrap) unrelated to the code under test.
+            # Tear down and retry once before treating it as a real failure.
+            echo "::warning::Deployment creation failed for ${{ matrix.deployment }} on first attempt, retrying once after a clean teardown"
+            ./down.sh || true
+
+            if ./up.sh ${COMPOSE_ARG:-${{ matrix.deployment }}} --hide-progress --skip-hostname-check; then
+              echo "Deployment created successfully on retry"
+            else
+              echo "::error::Deployment creation failed for ${{ matrix.deployment }} (after retry)"
+              exit 1
+            fi
           fi
 
       - name: Validate Tests
