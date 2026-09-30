@@ -6,6 +6,7 @@
 @import './components/alert.css';
 @import './components/modal.css';
 @import './components/tooltip.css';
+@import './components/mcp-service-explorer.css';
 
 @import './pages/catalogue.css';
 @import './pages/login.css';
@@ -48,6 +49,7 @@
   --tdp-primary-warning-light: #fef9e7; /* Light yellow (ACME) */
   --tdp-warning-light: #f39c12;     /* Modern orange (ACME) */
   --tdp-warning-dark: #d35400;      /* Darker orange (ACME) */
+  --tdp-warning-pressed: #FFECC8;   /* Upstream v1.16.0 GA */
   --tdp-light-border: 1px solid #dfe4ea; /* Subtle border (ACME) */
   --tdp-extra-dark: #2c3e50;        /* Modern dark blue-gray (ACME) */
   --tdp-dark: #4F8CFF;              /* ACME gradient start color (PRESERVED) */
@@ -124,6 +126,7 @@
   --border-brand-default: #2980b9;  /* Darker blue (ACME) */
   --border-brand-hover: #1c6ca1;    /* Even darker blue for hover (ACME) */
   --border-neutral-default: var(--tdp-neutral); /* NEW from v1.16.0 */
+  --tdp-border-neutral-pressed: 1px solid #656582; /* Upstream v1.16.0 GA */
   --link-default: #3498db;          /* Consistent blue for links (ACME) */
   --surface-brand-hover: #DEE5FE;   /* NEW from v1.16.0 */
   --surface-neutral-hover: #F8F8F9; /* NEW from v1.16.0 */
@@ -147,6 +150,20 @@
 
   /* Icons */
   --tdp-icon-success-dark: #27ae60; /* Modern green (ACME) */
+
+  /* Catalogue-card badge palette (upstream v1.19.0) */
+  --tdp-badge-rest: #DCE7FF;
+  --tdp-badge-graphql: #FFE0B2;
+  --tdp-badge-mcp: #C9F2D8;
+  --tdp-badge-tcp: #FFD4BF;
+  --tdp-badge-streams: #FFD4D4;
+  --tdp-badge-auth-default: #F5F5F5;
+  --tdp-badge-auth-token: #C9E9D7;
+  --tdp-badge-auth-jwt: #FFC2C2;
+  --tdp-badge-auth-ba: #ADEFF8;
+  --tdp-badge-auth-custom: #FFE5C7;
+  --tdp-badge-auth-multi: #AFD8ED;
+  --tdp-badge-auth-mtls: #E8F4FD;
 }
 
 html {

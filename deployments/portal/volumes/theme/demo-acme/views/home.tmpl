@@ -202,56 +202,7 @@
       <div class="container">
         <div class="row justify-content-center">
           {{ range $featured_products }}
-          {{ $productPath := .Path}}
-          {{ $hasDocs := false }}
-            <div class="col-lg-4 card-container">
-              <div class="card d-flex flex-column {{ if .Logo }}has-logo{{end}}">
-                {{ if .Logo }}
-                  <img class="card-image-border-card-view" src="{{ safe .Logo.URL}}" alt="">
-                {{ end }}
-                <div class="home-card-body align-self-center w-100">
-                  <div class="card-title d-flex flex-column justify-content-end">
-                    <div class="pill-container mb-4 align-self-end">
-                      <div class="pill">{{ .AuthType }} </div>
-                    </div>
-                    <h2>{{ safe .ProductName}}</h2>
-                  </div>
-                  <p class="card-text">{{ .Description }}</p>
-                </div>
-                <div class="home-card-cta d-flex flex-row align-self-center justify-content-between w-100">
-                  <a href="/portal/catalogue-products/{{ .Path }}" class="btn btn-secondary-outline">More Info</a>
-                  <div class="api-product-page__header card__action-buttons d-flex align-self-center">
-                  {{ range .APIDetails }}
-                    {{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
-                    {{ $oasurl := gt (.OASUrl | trim | length) 0 }}
-                      {{ if or $oasfile $oasurl }}
-                        {{ $hasDocs = true }}
-                      {{end}}
-                    {{end}}
-                    {{if $hasDocs }}
-                      <div class="dropdown mr-2">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          View Docs
-                        </button>
-                        <div class="view-docs-dropdown dropdown-menu" aria-labelledby="dropdownMenuButton">
-                          {{ range .APIDetails }}
-                            {{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
-                            {{ $oasurl := gt (.OASUrl | trim | length) 0 }}
-                            {{ if or $oasfile $oasurl }}
-                              <a href="/portal/catalogue-products/{{$productPath}}/{{ safe .APIID}}/docs" target="_blank">
-                                <p class="docs-link">
-                                  {{ .Name }}
-                                </p>
-                              </a>
-                            {{ end }}
-                          {{ end }}
-                        </div>
-                      </div>
-                    {{end}}
-                  </div>
-                </div>
-              </div>
-            </div>
+            {{ render "catalogue_card" . }}
           {{ end }}
         </div>
         <div class="col-12 text-center mt-3">
@@ -264,7 +215,7 @@
         {{ if eq $user.Role "provider-admin"}}
           <div class="row dark-to-light-bg p-5">
             <div class="col-md-12 text-center text-white">
-              <h4>There are no featured API products yet</h4>
+              <h4>There are no featured products yet</h4>
               <p>Create a product or mark one as featured</p>
             </div>
           </div>

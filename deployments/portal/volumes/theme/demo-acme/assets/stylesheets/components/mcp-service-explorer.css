@@ -1,0 +1,66 @@
+/* MCP Service Explorer: the service selector, the "Try it / Instructions"
+   toggle and the embedded Inspector frame shown inside the product-detail
+   Service explorer tab. */
+
+/* The Service selector: a fixed-width native select. */
+.mcp-service-explorer .mcp-service-select {
+  display: inline-block;
+  width: 320px;
+  max-width: 100%;
+}
+
+.mcp-service-explorer .mcp-service-select > select {
+  width: 100%;
+}
+
+/* The Try it / Instructions control and the embedded Inspector frame are shared
+   by the product-detail Service explorer and the standalone MCP docs page. */
+
+/* A segmented pill control: a rounded outer track holding two buttons; the
+   active one becomes a filled blue pill, the other reads as plain text. */
+.mcp-service-explorer .mcp-view-toggle,
+.mcp-doc-page .mcp-view-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--tdp-primary-light);
+  border-radius: 999px;
+  background-color: white;
+}
+
+.mcp-service-explorer .mcp-view-btn,
+.mcp-doc-page .mcp-view-btn {
+  padding: 5px 16px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background-color: transparent;
+  color: var(--tdp-text-color);
+  font-size: var(--tdp-size-sm);
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.mcp-service-explorer .mcp-view-btn:hover:not(.active),
+.mcp-doc-page .mcp-view-btn:hover:not(.active) {
+  color: var(--tdp-primary);
+}
+
+.mcp-service-explorer .mcp-view-btn.active,
+.mcp-doc-page .mcp-view-btn.active {
+  background-color: var(--surface-brand-hover);
+  border-color: var(--tdp-primary);
+  color: var(--tdp-primary);
+  font-weight: 500;
+}
+
+/* The embedded Inspector iframe fills the width; the tall min-height gives the
+   SPA room without an inner scrollbar fight. */
+.mcp-service-explorer .mcp-inspector-frame,
+.mcp-doc-page .mcp-inspector-frame {
+  width: 100%;
+  min-height: 800px;
+  border: 0;
+  border-radius: 6px;
+}

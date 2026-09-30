@@ -1,14 +1,8 @@
-<div class="docs-container">
-  <div class="card mt-4">
-    <div class="card-body" style="padding: 20px;">
-      <h3 class="card-title">
-        <a href="/portal/catalogue-products/{{.Path}}">{{.Name}}</a>
-      </h3>
-      <p class="card-text">
-        {{.Description}}
-      </p>
-    </div>
-  </div>
+{{/* The product hero (name, badges, description, Access CTA) now renders from
+     the shared doc layout, so the header card is gone. The spec viewer sits in a
+     centered max-width container (like the MCP docs) instead of running
+     full-bleed edge-to-edge. */}}
+<div class="container docs-container mt-4">
   <div>
 
     <div id="asyncapi"></div>

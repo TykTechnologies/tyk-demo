@@ -285,7 +285,7 @@ appSelects.forEach((appSelect) => {
     showCredentialsForApp(e.target, selectedAppId);
   });
 
-  // Initialize: disable all credential dropdowns except for currently selected app
+  // Initialize: disable all credential dropdowns and hidden inputs except for currently selected app
   const form = appSelect.closest("form");
   if (form) {
     const credentialSection = form.querySelector(".credential-selection-section");
@@ -296,15 +296,25 @@ appSelects.forEach((appSelect) => {
         if (dropdownBtn) {
           dropdownBtn.disabled = true;
         }
+        // Disable hidden inputs so they don't get submitted with the form
+        const hiddenInput = div.querySelector('input[name="credential_id"]');
+        if (hiddenInput) {
+          hiddenInput.disabled = true;
+        }
       });
 
-      // If an app is already selected, enable its credential dropdown
+      // If an app is already selected, enable its credential dropdown and hidden input
       if (appSelect.value) {
         const selectedAppCredentials = credentialSection.querySelector(`.app-credentials[data-app-id="${appSelect.value}"]`);
         if (selectedAppCredentials) {
           const dropdownBtn = selectedAppCredentials.querySelector('.credential-dropdown .dropdown-toggle');
           if (dropdownBtn) {
             dropdownBtn.disabled = false;
+          }
+          // Enable the hidden input for the selected app
+          const hiddenInput = selectedAppCredentials.querySelector('input[name="credential_id"]');
+          if (hiddenInput) {
+            hiddenInput.disabled = false;
           }
         }
       }
@@ -320,11 +330,14 @@ function showCredentialsForApp(appSelectElement, appId) {
   const credentialSection = form.querySelector(".credential-selection-section");
   if (!credentialSection) return;
 
-  // Hide all app-credentials divs and disable their dropdowns
+  // Hide all app-credentials divs, disable their dropdowns and hidden inputs
   credentialSection.querySelectorAll(".app-credentials").forEach((div) => {
     div.style.display = "none";
     const dropdownBtn = div.querySelector('.credential-dropdown .dropdown-toggle');
     if (dropdownBtn) dropdownBtn.disabled = true;
+    // Disable hidden inputs so they don't get submitted with the form
+    const hiddenInput = div.querySelector('input[name="credential_id"]');
+    if (hiddenInput) hiddenInput.disabled = true;
   });
 
   // Show the credentials div for the selected app
@@ -332,6 +345,10 @@ function showCredentialsForApp(appSelectElement, appId) {
   if (!selectedAppCredentials) return;
 
   selectedAppCredentials.style.display = "block";
+
+  // Enable the hidden input for the selected app so it gets submitted
+  const selectedHiddenInput = selectedAppCredentials.querySelector('input[name="credential_id"]');
+  if (selectedHiddenInput) selectedHiddenInput.disabled = false;
 
   // Enable dropdown only if "reuse_existing" is selected
   const dropdownBtn = selectedAppCredentials.querySelector('.credential-dropdown .dropdown-toggle');

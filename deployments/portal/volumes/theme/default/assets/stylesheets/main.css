@@ -6,6 +6,7 @@
 @import './components/alert.css';
 @import './components/modal.css';
 @import './components/tooltip.css';
+@import './components/mcp-service-explorer.css';
 
 @import './pages/catalogue.css';
 @import './pages/login.css';
@@ -148,6 +149,24 @@
 
   /* Icons */
   --tdp-icon-success-dark: #00B798;
+
+  /* Catalogue-card badge palette. These mirror the portal-admin API-selector
+     badges (portal-admin select-many-apis.css) so a product's type and auth
+     method read identically across the admin and the live portal; the values
+     are exact so both surfaces stay in lockstep. Exposed as variables so the
+     card stylesheet references tokens rather than raw hexes. */
+  --tdp-badge-rest: #DCE7FF;
+  --tdp-badge-graphql: #FFE0B2;
+  --tdp-badge-mcp: #C9F2D8;
+  --tdp-badge-tcp: #FFD4BF;
+  --tdp-badge-streams: #FFD4D4;
+  --tdp-badge-auth-default: #F5F5F5;
+  --tdp-badge-auth-token: #C9E9D7;
+  --tdp-badge-auth-jwt: #FFC2C2;
+  --tdp-badge-auth-ba: #ADEFF8;
+  --tdp-badge-auth-custom: #FFE5C7;
+  --tdp-badge-auth-multi: #AFD8ED;
+  --tdp-badge-auth-mtls: #E8F4FD;
 }
 
 html {

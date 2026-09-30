@@ -26,10 +26,28 @@
 		{{ $oasfile := gt (.OASDocument.Base.Url | trim | length) 0 }}
 		{{ $oasurl := gt (.OASUrl | trim | length) 0 }}
 		{{ $graphqlsdl := gt (.GraphQLSDL.Base.Url | trim | length) 0 }}
-		{{ $isGraphQL := eq .APIType "GraphQL" }}
+		{{ $isGraphQL := or (eq .APIType "GraphQL") (eq .APIType "UDG") }}
 		{{ if or $oasfile $oasurl $graphqlsdl $isGraphQL }}
 			{{ $hasDocs = true}}
 		{{ end }}
+	{{ end }}
+{{end}}
+{{/* MCP APIs carry operator-authored markdown (MCPContent) rather than an OAS
+     or GraphQL spec, so they never set $hasDocs. Track whether the product has
+     any MCP SERVICE to explore so the Service explorer tab can render instead of
+     the empty-spec warning. An API-backed MCP API always has a live gateway
+     proxy, so its "Try it" playground must show regardless of whether the
+     operator wrote any Instructions markdown — the explorer is gated on having
+     an MCP service, NOT on content. Doc-only products have no live proxy, so
+     there the explorer only makes sense when there is markdown to show. */}}
+{{ $hasMCPContent := false }}
+{{ if $thisProduct.IsDocumentationOnly }}
+	{{ range $thisProduct.SpecDetails }}
+		{{ if gt (.MCPContent | trim | length) 0 }}{{ $hasMCPContent = true }}{{ end }}
+	{{ end }}
+{{else}}
+	{{ range $thisProduct.APIDetails }}
+		{{ if or .IsMCPAPI (gt (.MCPContent | trim | length) 0) }}{{ $hasMCPContent = true }}{{ end }}
 	{{ end }}
 {{end}}
 {{ $redoc := "product_doc_redoc" }}
@@ -37,10 +55,6 @@
 
 <div class="api-product-page-wrapper">
     <div class="container">
-	<p class="mb-3">
-	    <a href="/portal/catalogue-products" class="breadcrumb-link">
-		< Back to catalogue overview </a>
-	</p>
 	{{ if .errors }}
 	<div class="alert alert-danger" role="alert">
 	    {{ range $category, $messages := .errors }}
@@ -55,18 +69,30 @@
 	{{ if .added }}
 	<div class="alert alert-success" role="alert">
 	    <i class="tyk-icon tykon tykon-check "></i>
-	    <div class="alert__content">Success! This API Product was added to cart. <a href="/portal/private/cart/provision">Go to cart</a> to complete the request.</div>
+	    <div class="alert__content">Success! This product was added to cart. <a href="/portal/private/cart/provision">Go to cart</a> to complete the request.</div>
 	</div>
 	{{ end }}
     </div>
     <div class="api-detail-background-color">
-	<div class="api-product-page__header w-100 mt-5">
+	<div class="container pt-4 pb-2">
+	    <a href="/portal/catalogue-products" class="breadcrumb-link breadcrumb-link--on-dark">< Back to catalogue overview</a>
+	</div>
+	<div class="api-product-page__header w-100">
             <div class="maxh-268 minh-268 api-detail-background-color card d-flex flex-row {{ if $thisProduct.Logo.URL }}has-logo{{end}} container justify-content-between">
 		<div class="left-side-card-body">
 		    <div class="card-title mt-35 d-flex flex-row align-items-center">
 			<h1 class="heading-medium">{{.product.ProductName}}</h1>
+			{{/* API-type badges inline after the title (mirrors the catalogue card) */}}
+			{{ $seenTypes := dict }}
+			{{ range $thisProduct.APIDetails }}
+			  {{ $formattedType := .GetAPITypeFormatted }}
+			  {{ if $formattedType }}{{ if not (index $seenTypes $formattedType) }}
+			    {{ $seenTypes = merge $seenTypes (dict $formattedType true) }}
+			    <span class="badge badge-api-type badge-{{ lower $formattedType }} ml-2">{{ $formattedType }}</span>
+			  {{ end }}{{ end }}
+			{{ end }}
 			{{ if not $thisProduct.IsDocumentationOnly }}
-			<div class="pill-container {{ if not $thisProduct.Logo.URL }}ml-2 align-self-start{{end}} mb-2">
+			<div class="pill-container ml-2">
 			    <div class="pill">
 				<h5 class="body-medium-default m-0">{{ .product.GetAuthTypeBadgeFormatted }}</h5>
 			    </div>
@@ -82,15 +108,19 @@
 			<!--	Not displaying access button for Products with Basic Auth or Documentation Only products 	-->
 			{{if and (ne $.product.AuthType "ba") (ne $.product.AuthType "custom") (not $thisProduct.IsDocumentationOnly)}}
 				{{ if $user }}
-					<button type="button" class="btn btn-primary" id="access-button">
-						<a href="#available-plans" class="access-btn-link">Access this product</a>
-					</button>
+					{{/* A single anchor styled as a button: an <a> nested inside a
+					     <button> is invalid HTML and the button swallows the anchor's
+					     navigation, so the link to #available-plans never fired. Matches
+					     the "Try it out"/"View docs" CTAs below, which are also <a.btn>. */}}
+					<a href="#available-plans" class="btn btn-primary access-btn-link" id="access-button">Access Product</a>
 				{{end}}
 			{{end}}
 		    </div>
 		</div>
 		{{ if $thisProduct.Logo.URL }}
 		<img class="card-img-top img-fluid" src='{{$thisProduct.Logo.URL}}' alt="">
+		{{ else }}
+		<img class="card-img-top img-fluid card-img-placeholder" src="/assets/images/card-placeholder.svg" alt="" aria-hidden="true">
 		{{ end }}
             </div>
 	</div>
@@ -98,20 +128,22 @@
     <div class="container mb-45">
 	<div class="step-wrapper tabs-wrapper d-flex flex-row">
 	    <span class="step active tab">Overview</span>
-	    <span class="step tab">API specification</span>
+	    <span class="step tab">Service explorer</span>
 	    <span class="step tab">Get started</span>
 	</div>
     </div>
     <div class="content-wrapper">
 	   <div class="content-wrapper__content d-block container">
 	    <div class="api-product-page__details">
-		{{if .product.Content }}
+		{{ $moreInfo := .product.Content }}
+		{{ if not $moreInfo }}{{ $moreInfo = .product.Description }}{{ end }}
+		{{if $moreInfo }}
 		<div class="api-product-page__info">
 		    <div class="api-product-page__info-title">
 			<h2 class="heading-large">More info</h2>
 		    </div>
 		    <div class="api-product-page__info-description more-info-text">
-			<p>{{ safe .product.Content }}</p>
+			<p>{{ safe $moreInfo }}</p>
 		    </div>
 		</div>
 		{{end}}
@@ -148,27 +180,42 @@
 		{{ if gt $apisLength 0}}
 		<div class="api-product-page__info">
 		    <div class="api-product-page__info-title">
-			<h2 class="heading-large">APIs available in this product</h2>
+			<h2 class="heading-large">Services available in this product</h2>
 		    </div>
 		    <div class="api-product-page__info-description text-default-subdue flex-column">
 			<div class="row m-0 justify-content-center">
 			    {{ range $index, $api := .product.APIDetails }}
-			    <div class="product-api-details col-xl-3 labeled-card d-flex flex-column align-items-center {{if and (ge $index 0) (lt $index $lastApi)}}mr-35{{end}} mb-4">
-				<div class="labeled-card__title heading-large text-default-subdue mb-4">
-				    <h3 class="mb-0">{{ $api.Name }}</h3>
-				</div>
+			    <div class="product-api-details col-xl-3 labeled-card d-flex flex-column align-items-center text-center position-relative {{if and (ge $index 0) (lt $index $lastApi)}}mr-3{{end}} mb-4">
 				{{ $formattedType := $api.GetAPITypeFormatted }}
-				<span class="badge badge-api-type badge-{{ lower $formattedType }}">{{ $formattedType }}</span>
-				<div>
-				    <p class="text-regular-14 listen-path-text"> Listen path:
-					<span class="heading-small">{{ $api.ListenPath }}</span></p>
-				</div>
-				<div class="mt-12">
-				    {{if not (eq $api.Description "")}}
+				<span class="badge badge-api-type badge-{{ lower $formattedType }} api-card-badge">{{ $formattedType }}</span>
+				<h3 class="labeled-card__title heading-large text-default-subdue mb-3">{{ $api.Name }}</h3>
+				{{if not (eq $api.Description "")}}
+				<div class="mb-3">
 				    <span class="m-0 body-large-bold">Description:</span>
-				    <p class="api-description-text text-regular-14" data-description="{{$api.Description}}">{{safe (TruncateString $api.Description 60)}}</p>
-				    {{end}}
+				    <p class="api-description-text text-regular-14 m-0" data-description="{{$api.Description}}">{{safe (TruncateString $api.Description 60)}}</p>
 				</div>
+				{{end}}
+				<div class="mb-3">
+				    {{/* Figma: all API types use the "Listen path" label on its own
+				         line with the path centered below. For MCP, the developer-facing
+				         endpoint is the gateway MCP server URL (falling back to the raw
+				         listen path when unset). */}}
+				    <p class="text-regular-14 listen-path-label mb-0">Listen path</p>
+				    <p class="heading-small listen-path-text m-0">{{ if $api.IsMCPAPI }}{{ if gt ($api.MCPServerURL | trim | length) 0 }}{{ $api.MCPServerURL }}{{ else }}{{ $api.ListenPath }}{{ end }}{{ else }}{{ $api.ListenPath }}{{ end }}</p>
+				</div>
+				{{ $oasfile := gt ($api.OASDocument.Base.Url | trim | length) 0 }}
+				{{ $oasurl := gt ($api.OASUrl | trim | length) 0 }}
+				{{/* Interactive types (MCP Inspector, GraphQL playground) always get a
+				     "Try it out" CTA to their /docs route — every MCP API gets the
+				     Inspector regardless of whether operator markdown docs exist. Other
+				     types show "View docs" only when a spec is available.
+				     .btn margin-top in api-product.css spaces the CTA below the card
+				     content. */}}
+				{{ if or $api.IsMCPAPI $api.IsGraphQLAPI }}
+				<a class="btn btn-primary-outline" href="/portal/catalogue-products/{{ $thisProduct.Path }}/{{ $api.APIID }}/docs" target="_blank"><i class="bi bi-play-fill mr-2"></i>Try it out</a>
+				{{ else if or $oasfile $oasurl }}
+				<a class="btn btn-primary-outline" href="/portal/catalogue-products/{{ $thisProduct.Path }}/{{ $api.APIID }}/docs" target="_blank">View docs</a>
+				{{ end }}
 			    </div>
 			    {{ end }}
 			</div>
@@ -180,7 +227,7 @@
 		<div class="api-product-page__info">
 		    <div class="api-product-page__info-title">
 			<h2 class="heading-large" id="available-plans">Plans available for subscription</h2>
-			<p class="text-regular-14 text-default-subdue">These different plans are available to subscribe this product to.</p>
+			<p class="text-regular-14 text-default-subdue">Different plans available. Select the plan you'd like to access this product with to create an app.</p>
 		    </div>
 		    <div class="api-product-page__info-description flex-column">
 			<div class="row m-0 justify-content-center">
@@ -191,8 +238,8 @@
                             {{ else }}
                             {{ range $index,$plan := .unique_plans }}
                             {{$plan_id := .ID}}
-                            <div class="col-xl-3 labeled-card-plan {{if and (ge $index 0) (lt $index $lastPlan)}}mr-4{{end}} mb-3">
-				<div class="mt-43">
+                            <div class="col-xl-3 labeled-card-plan {{if and (ge $index 0) (lt $index $lastPlan)}}mr-3{{end}} mb-3">
+				<div>
                                     <h2 class="heading-large text-default-subdue">{{$plan.PlanName}}</h2>
 				</div>
 				<div class="mt-3 rate-limit-and-quota">
@@ -207,11 +254,11 @@
                                         <input type="hidden" name="product_id" value={{$thisProduct.ID}}>
                                         <input type="hidden" name="catalogue_id" value="{{ .ID }}">
                                         <input type="hidden" name="plan_id" value="{{$plan_id}}">
-                                        <button type="submit" class="btn btn-secondary" id="add-to-cart-btn" data-single-catalogue="true">Access with this plan</button>
+                                        <button type="submit" class="btn btn-primary" id="add-to-cart-btn" data-single-catalogue="true"><i class="tyk-icon tykon tykon-arrowright mr-2"></i>Access with this plan</button>
                                     </form>
                                     {{end}}
                                     {{else}}
-                                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#selectCatalogueForPlan{{$plan_id}}">Access with this plan</button>
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#selectCatalogueForPlan{{$plan_id}}"><i class="tyk-icon tykon tykon-arrowright mr-2"></i>Access with this plan</button>
                                     <form method="post" id="add-to-cart-form-b">
 					<div class="modal fade" id="selectCatalogueForPlan{{$plan_id}}" tabindex="-1" role="dialog" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -277,7 +324,7 @@
 					{{ else }}
 						{{ range $index, $post := .posts }}
 							{{$post_id := .ID}}
-							<div class="p-4 labeled-card-post {{if and (ge $index 0) (lt $index $lastPost)}}mr-4{{end}} mb-3 d-flex flex-column align-items-center">
+							<div class="p-4 labeled-card-post {{if and (ge $index 0) (lt $index $lastPost)}}mr-3{{end}} mb-3 d-flex flex-column align-items-center text-center">
 								<div class="text-uppercase text-regular-16 text-default-subdue m-0 text-center mb-3">
 									{{.CreatedAt | date "2 Jan, 2006" }} - {{.Author.DisplayName}}
 								</div>
@@ -304,6 +351,35 @@
 	</div>
 	<div>
 	    <div class="content-wrapper__content d-none">
+		{{ if $hasMCPContent }}
+		{{/* Normalize the two product shapes into one list of MCP doc items so
+		     the explorer partial needs no IsDocumentationOnly branching. Doc-only
+		     products key on SpecAlias (used as both id and label); API-backed
+		     products key on APIID (id) + Name (label). Only MCP items (non-empty
+		     MCPContent) are included; the first item's docs render server-side,
+		     the rest lazy-load. */}}
+		{{ $mcpItems := list }}
+		{{ if $thisProduct.IsDocumentationOnly }}
+		    {{/* Doc-only products have no gateway API to proxy, so apiID is empty
+		         — the Service explorer shows Instructions (markdown) only, no live
+		         "Try it" Inspector. */}}
+		    {{ range $thisProduct.SpecDetails }}
+			{{ if gt (.MCPContent | trim | length) 0 }}
+			    {{ $mcpItems = append $mcpItems (dict "id" .SpecAlias "apiID" "" "label" .SpecAlias "mcpContent" .MCPContent "mcpServerURL" .MCPServerURL) }}
+			{{ end }}
+		    {{ end }}
+		{{ else }}
+		    {{ range $thisProduct.APIDetails }}
+			{{/* Include any MCP API — it has a live gateway proxy, so its
+			     "Try it" Inspector must render even with empty MCPContent
+			     (clearing the docs must not remove the playground). */}}
+			{{ if or .IsMCPAPI (gt (.MCPContent | trim | length) 0) }}
+			    {{ $mcpItems = append $mcpItems (dict "id" .APIID "apiID" .APIID "label" .Name "mcpContent" .MCPContent "mcpServerURL" .MCPServerURL) }}
+			{{ end }}
+		    {{ end }}
+		{{ end }}
+		{{ render "mcp_service_explorer" (dict "productPath" $thisProduct.Path "productID" $thisProduct.ID "items" $mcpItems) }}
+		{{ end }}
 		{{if $hasDocs}}
 		<div class="container api-product-page_spec">
 		    <p>Select an API</p>
@@ -427,7 +503,7 @@
         </div>
         {{end}}
         </div>
-		{{else}}
+		{{else if not $hasMCPContent}}
 		<div class="container">
 		    <div class="alert alert-warning mt-5" role="alert">
 			<i class="tyk-icon tykon tykon-warning "></i>
@@ -469,7 +545,7 @@
 		<div class="alert alert-warning mt-5" role="alert">
 		    <i class="tyk-icon tykon tykon-warning "></i>
 		    <div class="alert__content">
-			There are currently no API Products documentation available
+			There is currently no product documentation available
 		    </div>
 		</div>
 		{{end}}

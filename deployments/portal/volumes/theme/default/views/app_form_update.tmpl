@@ -195,6 +195,7 @@
                   "availablePlans" $availablePlans
                   "pendingPlan" $pendingPlan
                   "hasPending" $hasPending
+                  "showMTLSSection" $.showMTLSSection
                 ) }}
               {{end}}
             </div>
@@ -215,6 +216,7 @@
                       "appCerts" $appCerts
                       "allCerts" $allCerts
                       "index" $pendingIndex
+                      "showMTLSSection" $.showMTLSSection
                     ) }}
                     {{ $pendingIndex = add $pendingIndex 1 }}
                   {{ end }}

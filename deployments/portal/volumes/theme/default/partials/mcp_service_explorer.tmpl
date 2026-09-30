@@ -1,0 +1,157 @@
+{{/* MCP service explorer: a "Select an API" dropdown plus, per MCP service, a
+     "Try it / Instructions" toggle. "Try it" (the default) embeds the live MCP
+     Inspector SPA for that service; "Instructions" shows the operator-authored
+     markdown. A small vanilla-JS controller toggles which service is visible,
+     which view (try-it vs instructions) is shown, and lazy-loads each service's
+     markdown on first view.
+
+     Expects a dict:
+       .productPath  string  product Path, used to build each panel's docs URL
+       .productID    uint    product id, used to build the Inspector iframe route
+       .items        []dict  normalized MCP services; each item has:
+                               id           string  DOM/URL key (SpecAlias or APIID)
+                               apiID        string  gateway api_id, or "" for
+                                                    doc-only services (no live proxy)
+                               label        string  dropdown label (SpecAlias or Name)
+                               mcpContent   string  operator-authored markdown
+                               mcpServerURL string  optional MCP endpoint to show
+
+     The caller filters to MCP items (non-empty mcpContent) and only renders
+     this partial when at least one exists, so .items is assumed non-empty.
+     Only the first item's markdown is rendered server-side; the rest carry a
+     data-docs-url and load on selection to keep the initial page small. */}}
+{{ $productPath := .productPath }}
+{{ $productID := .productID }}
+{{ $firstId := (index .items 0).id }}
+{{/* The shared Try it / Instructions toggle only makes sense when at least one
+     service is backed by a gateway API (a live Inspector); a purely doc-only
+     product is Instructions-only. The live Inspector authenticates against the
+     portal session (WithInboundAuth), so it is offered only to a logged-in
+     developer — an anonymous visitor on a public product sees Instructions only
+     (mirroring how the OAS/GraphQL viewers degrade to read-only). */}}
+{{ $loggedIn := ne (CurrentUser req) nil }}
+{{ $anyInspector := false }}
+{{ if and $loggedIn (gt (default 0 $productID) 0) }}
+    {{ range .items }}{{ if gt (.apiID | trim | length) 0 }}{{ $anyInspector = true }}{{ end }}{{ end }}
+{{ end }}
+<div class="container mcp-service-explorer pt-4">
+    <p class="mb-1">Service</p>
+    {{/* One row: the Service selector (left) and the Try it / Instructions view
+         toggle (right). The toggle lives here rather than per-panel so it sits on
+         the selector's baseline and switches whichever service is selected. */}}
+    <div class="d-flex flex-row justify-content-between align-items-center mt-1 mb-4">
+	<div class="mcp-service-select">
+	    <select id="McpApiSelect">
+		{{ range .items }}
+		<option value="mcp-doc-{{ .id }}">{{ .label }}</option>
+		{{ end }}
+	    </select>
+	</div>
+	{{ if $anyInspector }}
+	<div class="mcp-view-toggle" role="group" aria-label="Service explorer view">
+	    <button type="button" class="mcp-view-btn active" data-view="tryit">Try it</button>
+	    <button type="button" class="mcp-view-btn" data-view="instructions">Instructions</button>
+	</div>
+	{{ end }}
+    </div>
+    {{ range .items }}
+    {{/* A service has a live Inspector only when it is backed by a gateway API
+         (apiID set) and the product id is known; doc-only services show
+         Instructions only. */}}
+    {{ $hasInspector := and $loggedIn (gt (.apiID | trim | length) 0) (gt (default 0 $productID) 0) }}
+    <div class="mcp-service-doc mb-5{{ if ne .id $firstId }} d-none{{ end }}" id="mcp-doc-{{ .id }}" data-docs-url="/portal/catalogue-products/{{ $productPath }}/{{ .id }}/docs" data-loaded="{{ if eq .id $firstId }}true{{ else }}false{{ end }}">
+	{{ if $hasInspector }}
+	{{/* Try it: the embedded MCP Inspector SPA, pre-wired at
+	     /portal/catalogue-products/{product-name}/{api}/mcpp/inspector (addressed
+	     by the product slug, a sibling of /docs). Shown by default. The iframe src
+	     is set eagerly for the first service and lazily (data-src) for the rest so
+	     hidden services don't load an Inspector until selected. */}}
+	<div class="mcp-tryit mt-3">
+	    <iframe class="mcp-inspector-frame" title="MCP Inspector: {{ .label }}"
+		{{ if eq .id $firstId }}src{{ else }}data-src{{ end }}="/portal/catalogue-products/{{ $productPath }}/{{ .apiID }}/mcpp/inspector"
+		style="width:100%;min-height:800px;border:0;"></iframe>
+	</div>
+	{{ end }}
+	{{/* Instructions: the operator-authored markdown. Hidden by default when a
+	     live Inspector exists (Try it is the default view); the sole view for
+	     doc-only services. */}}
+	<div class="mcp-instructions mcp-docs blog-content mt-3{{ if $hasInspector }} d-none{{ end }}">{{ if eq .id $firstId }}{{ safe_md_sanitized .mcpContent }}{{ end }}</div>
+    </div>
+    {{ end }}
+    {{/* Controller: switch which service is visible (McpApiSelect), toggle
+         Try it vs Instructions within a service, lazy-load each service's
+         markdown on first view, and lazy-load the Inspector iframe on first
+         reveal (data-src -> src). */}}
+    <script>
+      (function () {
+        var sel = document.getElementById('McpApiSelect');
+        if (!sel) return;
+        var toggle = sel.closest('.mcp-service-explorer').querySelector('.mcp-view-toggle');
+        function lazyMarkdown(panel) {
+          if (!panel || panel.getAttribute('data-loaded') === 'true') return;
+          panel.setAttribute('data-loaded', 'true');
+          var target = panel.querySelector('.mcp-instructions');
+          fetch(panel.getAttribute('data-docs-url'))
+            .then(function (r) { return r.text(); })
+            .then(function (html) {
+              var parsed = new DOMParser().parseFromString(html, 'text/html');
+              var src = parsed.querySelector('.mcp-docs');
+              if (src && target) {
+                target.innerHTML = src.innerHTML;
+                // Highlight the just-injected code blocks (the layout exposes this).
+                if (window.highlightMcpDocs) { window.highlightMcpDocs(target); }
+              }
+            })
+            .catch(function () { panel.setAttribute('data-loaded', 'false'); });
+        }
+        function lazyIframe(panel) {
+          var f = panel.querySelector('iframe.mcp-inspector-frame[data-src]');
+          if (f) { f.setAttribute('src', f.getAttribute('data-src')); f.removeAttribute('data-src'); }
+        }
+        function visiblePanel() {
+          return document.getElementById(sel.value);
+        }
+        // Apply a view (tryit|instructions) to the visible panel and reflect it
+        // in the shared toggle.
+        function setView(view) {
+          var panel = visiblePanel();
+          if (!panel) return;
+          var tryit = panel.querySelector('.mcp-tryit');
+          var instr = panel.querySelector('.mcp-instructions');
+          // A panel without a live Inspector (doc-only) is instructions-only.
+          if (!tryit) { view = 'instructions'; }
+          if (toggle) {
+            var btns = toggle.querySelectorAll('.mcp-view-btn');
+            for (var i = 0; i < btns.length; i++) {
+              btns[i].classList.toggle('active', btns[i].getAttribute('data-view') === view);
+            }
+            toggle.classList.toggle('d-none', !tryit);
+          }
+          if (tryit) { tryit.classList.toggle('d-none', view !== 'tryit'); }
+          if (instr) { instr.classList.toggle('d-none', view !== 'instructions'); }
+          if (view === 'tryit') { lazyIframe(panel); } else { lazyMarkdown(panel); }
+        }
+        function currentView() {
+          var active = toggle && toggle.querySelector('.mcp-view-btn.active');
+          return active ? active.getAttribute('data-view') : 'tryit';
+        }
+        function show(id) {
+          var docs = document.querySelectorAll('.mcp-service-doc');
+          for (var i = 0; i < docs.length; i++) {
+            docs[i].classList.toggle('d-none', docs[i].id !== id);
+          }
+          // Default to Try it when switching services; setView downgrades to
+          // instructions for a doc-only panel.
+          setView('tryit');
+        }
+        if (toggle) {
+          var btns = toggle.querySelectorAll('.mcp-view-btn');
+          for (var i = 0; i < btns.length; i++) {
+            btns[i].addEventListener('click', function () { setView(this.getAttribute('data-view')); });
+          }
+        }
+        sel.addEventListener('change', function () { show(this.value); });
+        show(sel.value);
+      })();
+    </script>
+</div>

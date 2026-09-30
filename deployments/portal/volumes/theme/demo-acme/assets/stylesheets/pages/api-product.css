@@ -1,7 +1,14 @@
 .api-product-page-wrapper {
-  padding-top: 56px;
-  margin-top: 50px;
+  padding-top: 0;
+  margin-top: 0;
   margin-bottom: 100px;
+}
+
+/* Back link sits inside the navy hero, so it needs the light on-dark colour
+   (overrides the default dark link colour below). */
+.api-product-page-wrapper .breadcrumb-link--on-dark,
+.api-product-page-wrapper a:not(.btn).breadcrumb-link--on-dark {
+  color: var(--tdp-nav-link-color);
 }
 
 .api-product-page-wrapper a:not(.btn) {
@@ -9,7 +16,7 @@
   font-family: 'OpenSans-Semibold';
 }
 
-.api-product-page__info-description a {
+.api-product-page__info-description a:not(.btn) {
   text-decoration: underline;
 }
 
@@ -34,8 +41,13 @@
 }
 
 .api-product-page-wrapper .card img {
-  width: 600px !important;
-  height: 100%;
+  width: 416px;             /* Figma hero illustration panel (416 x 193) */
+  max-width: 45%;
+  height: 193px;
+  object-fit: cover;
+  border-radius: 8px;       /* contained rounded panel (overrides the 5px top-only) */
+  margin: 24px;
+  align-self: center;
 }
 
 .api-product-page__header .card .card-body {
@@ -48,6 +60,20 @@
 
 .api-product-page__header .card .pill-container {
   margin-left: 10px;
+  padding-bottom: 0; /* keep the auth badge inline with the title, not raised */
+  margin-bottom: 0;
+}
+
+/* Auth pill matches the API-type badge size so the hero badges are uniform. */
+.api-product-page__header .card .pill,
+.api-product-page__header .card .pill h5 {
+  font-size: var(--tdp-size-xs);
+  line-height: normal;
+}
+
+.api-product-page__header .card .pill {
+  padding: 2px 4px;
+  background-color: var(--tdp-primary-success-light);   /* auth badge green (matches catalogue card) */
 }
 
 .api-product-page__info {
@@ -94,7 +120,15 @@
 }
 
 .api-product-page__info-description__base-url {
-  padding: 20px;
+  /* Hug the URL instead of stretching the full page width. Centered pill with
+     the copy icon inline. */
+  width: fit-content;
+  max-width: 100%;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
   background: var(--tdp-light-gray);
   border-radius: var(--tdp-border-radius);
 }
@@ -111,10 +145,20 @@
   border-bottom: 1px solid var(--tdp-primary-light);
   margin: 0;
   padding: 10px 10px 10px 20px;
+  /* Name on the left, type badge pinned right so the badges line up in a
+     column regardless of API-name length. */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 .view-docs-dropdown a,
 .view-docs-dropdown a:hover {
   color: var(--tdp-text-color);
+}
+
+.view-docs-dropdown .docs-link .badge {
+  flex-shrink: 0;
 }
 
 
@@ -124,11 +168,34 @@
 
 .labeled-card {
   border: 1px solid var(--tdp-secondary-btn-hover-color);
-  border-radius: 10px;
-  min-width: 274px;
+  border-radius: 7px;            /* Figma */
+  min-width: 269px;
   min-height: 166px;
-  max-width: 274px;
+  max-width: 269px;
   max-height: 200px;
+}
+
+/* API cards: centered content, badge in the top-right corner, padded, height
+   grows with content (Figma layout: px-10 py-20). */
+.product-api-details.labeled-card {
+  max-height: none;
+  height: auto;
+  padding: 20px 10px;
+  text-align: center;
+  position: relative;
+}
+
+.product-api-details.labeled-card .api-card-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+/* Keep breathing room above the card CTA. mt-auto bottom-aligns the button
+   across cards of differing heights; the top padding guarantees a gap so the
+   button never hugs the listen path on short (docs-only) cards. */
+.product-api-details.labeled-card .btn {
+  margin-top: 24px;
 }
 
 .product-api-details .pill {
@@ -145,12 +212,14 @@
 
 .labeled-card-plan {
   border: 1px solid var(--tdp-secondary-btn-hover-color);
-  border-radius: 10px;
-  min-width: 274px;
-  min-height: 217px;
-  max-width: 274px;
-  max-height: 217px;
+  border-radius: 7px;            /* Figma */
+  min-width: 269px;
+  min-height: 217px;             /* Figma h-217 */
+  max-width: 269px;
+  max-height: none;
   cursor: pointer;
+  text-align: center; /* Figma: centered plan content */
+  padding: 30px 16px 20px;       /* Figma pt-30 pb-20 */
 }
 
 .cart-wrapper .labeled-card {
@@ -167,8 +236,9 @@
 .labeled-card__title {
   text-align: center;
   align-self: center;
-  text-transform: uppercase;
-  padding: 7px 17px;
+  /* Clear the absolutely-positioned top-right badge (top:16px + ~20px tall)
+     with room to spare, and read in normal case (Figma). */
+  margin-top: 40px;
   padding-inline: 7px;
   max-width: 240px;
 }
@@ -183,7 +253,7 @@
   border-bottom: var(--tpd-gray-200-border);
 }
 .tabs-wrapper .step.active {
-  background: var(--tdp-primary-dark);
+  background: var(--tdp-primary);   /* Figma Action/Brand/Default == --tdp-primary (#335FFD) */
   color: var(--tdp-nav-link-color);
 }
 
@@ -191,7 +261,7 @@
   width: 171px;
   height: 39px;
   background: var(--tdp-tab-active);
-  border-radius: 15px 15px 0px 0px;
+  border-radius: 15px 15px 0px 0px;   /* Figma: rounded-top only (tab/folder) */
   text-align: center;
   padding-top: 10px;
   margin-right: 10px;
@@ -237,7 +307,8 @@
   position: absolute;
 }
 
-#OasApiSelect {
+#OasApiSelect,
+#McpApiSelect {
   width: 273px;
   height: 39px;
 }
@@ -256,9 +327,6 @@
 .mr-35{
   margin-right: 35px;
 }
-.mt-43{
-  margin-top: 43px;
-}
 .mt-60{
   margin-top: 60px;
 }
@@ -272,17 +340,25 @@
   max-height: 38px;
 }
 .api-detail-background-color{
-  background-color: var(--tdp-dark);
+  background-color: #181834;   /* Figma product hero navy */
 }
 .mb-45{
   margin-bottom: 45px;
 }
+.listen-path-label{
+  text-align: center;
+  /* Same top gap as the CTA button (see .product-api-details .btn) so the
+     card's vertical rhythm is consistent above the listen path and the button. */
+  margin-top: 24px;
+}
+/* Path sits on its own line below the label, centered, and wraps freely
+   (no fixed height clamp so long paths don't get clipped). */
 .listen-path-text{
-  min-width: 260px;
-  max-width: 260px;
-  max-height: 20px;
-  min-height: 20px;
+  max-width: 240px;
+  margin-inline: auto;
   margin-bottom: 0%;
+  text-align: center;
+  overflow-wrap: break-word;
 }
 .api-description-text{
   min-width: 255px;
@@ -413,4 +489,11 @@
 #redoc-wrapper{
   position: absolute;
   width: 100%;
+}
+
+/* Docs pages (MCP / Stoplight / AsyncAPI) centre their content in
+   .docs-container; give it breathing room above the footer, matching the
+   product-detail page's bottom spacing. */
+.docs-container {
+  margin-bottom: 100px;
 }
