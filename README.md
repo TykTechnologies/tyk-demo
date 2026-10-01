@@ -4,6 +4,9 @@
 
 A ready-to-run sandbox for exploring Tyk's API management platform through practical, hands-on use.
 
+> [!NOTE]
+> Tyk Demo is Tyk's internal demo environment. To install or evaluate Tyk, use [tyk-install](https://github.com/TykTechnologies/tyk-install) or follow the [Tyk Self-Managed quick start](https://tyk.io/docs/getting-started/quick-start).
+
 ## What is Tyk Demo?
 
 Tyk Demo provides:
