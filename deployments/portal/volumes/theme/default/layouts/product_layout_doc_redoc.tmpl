@@ -23,6 +23,9 @@
     <!-- Render top navigation menu -->
     {{ render "top_nav" . }}
 
+    <!-- Product hero (shared across all doc types) -->
+    {{ render "product_doc_hero" . }}
+
     <!-- Render main page content -->
     {{ yield }}
 

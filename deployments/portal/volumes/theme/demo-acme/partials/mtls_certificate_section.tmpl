@@ -60,7 +60,7 @@
           </div>
           {{ if not $isPending }}
           <div class="d-flex justify-content-end mt-4 cta-btns-wrapper col-4 p-0">
-            <button type="button" class="btn btn-danger-outline ml-2 enable-editing d-block" data-toggle="modal" data-target="#detachCertificateModal">Detach Certificate</button>
+            <button type="button" class="btn btn-danger-outline ml-2 enable-editing d-block" data-toggle="modal" data-target="#detachCertificateModal-{{ $accessRequest.ID }}">Detach Certificate</button>
             <button type="button" class="btn btn-secondary d-block" data-action="edit">Replace Certificate</button>
             <div class="edit-cta d-none disable-editing">
               <button type="button" class="btn btn-secondary-outline" data-action="cancel">
@@ -72,9 +72,10 @@
               <input type="hidden" name="cert-mode" value="update">
             </div>
           </div>
+          {{ end }}
         {{else}}
           <div class="mt-2 mb-3 col-8 p-0">
-            <h6 class="heading-small text-default mr-4 text-uppercase mb-1">attach mutual tls certificate</h6>
+            <h6 class="heading-small text-default mr-4 mb-1">Attach Mutual TLS certificate</h6>
             <select class="form-control w-100 mt-5 mb-3" name="selected-cert">
               <option disabled selected value="">Select a certificate</option>
               {{ range $key, $cert := $allCerts }}
@@ -97,14 +98,13 @@
 </div>
 {{ if not $isPending }}
 {{ render "confirmation_modal" (dict
-  "id" "detachCertificateModal"
+  "id" (printf "detachCertificateModal-%d" $accessRequest.ID)
   "title" "Detach certificate?"
-  "body" (raw "<p>Detaching the certificate will result in losing access to the APIs.</p><p>If you detach the certificate, it is advised to promptly replace with a new one to maintain access to the API Product(s).</p><p>Do you wish to continue?</p>")
+  "body" (raw "<p>Detaching the certificate will result in losing access to the services.</p><p>If you detach the certificate, it is advised to promptly replace with a new one to maintain access to the Product(s).</p><p>Do you wish to continue?</p>")
   "confirmText" "Remove certificate"
   "confirmClass" "btn-danger"
   "showIcon" true
-  "formAction" (printf "%s/cert/%d" $appID $accessRequest.CertificateID)
+  "formAction" (printf "%d/cert/%d" $appID $accessRequest.CertificateID)
   "hiddenFields" (dict "cert-mode" "delete" "access-request" $accessRequest.ID "provider" $accessRequest.ProviderID)
 ) }}
-{{ end }}
 {{ end }}

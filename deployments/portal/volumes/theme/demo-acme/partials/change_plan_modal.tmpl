@@ -25,23 +25,28 @@
 
           <h5 class="heading-small text-default mb-3">Plans available:</h5>
 
-          <!-- Debug: Current Plan ID: {{ $currentPlanID }} -->
-          <!-- Debug: Available Plans Count: {{ if $availablePlans }}{{ len $availablePlans }}{{ else }}0{{ end }} -->
-
-          <div class="plans-grid" id="plans-grid-{{ $credID }}">
+          <div class="plans-grid mb-5" id="plans-grid-{{ $credID }}">
             {{ if $availablePlans }}
               {{ range $plan := $availablePlans }}
                 {{ $isCurrent := eq $plan.ID $currentPlanID }}
-                <!-- Debug: Plan {{ $plan.ID }} ({{ $plan.Name }}) - Current: {{ $isCurrent }} -->
-                <div class="plan-card card p-4 border{{ if $isCurrent }} current disabled{{ end }}" data-plan-id="{{ $plan.ID }}"{{ if $isCurrent }} data-is-current="true"{{ end }}>
+                <div class="plan-card basic-card p-4 {{ if $isCurrent }} current disabled{{ end }}" data-plan-id="{{ $plan.ID }}"{{ if $isCurrent }} data-is-current="true"{{ end }} style="min-width: 250px;">
                   {{ if $isCurrent }}
-                    <span class="plan-badge badge badge-secondary">Current</span>
-                  {{ else }}
-                    <div class="plan-check">✓</div>
-                  {{ end }}
-                  <h6 class="heading-small mb-2">{{ $plan.Name }}</h6>
-                  <div class="text-muted small mb-1"><strong>Quota:</strong> {{ $plan.FormatQuota }}</div>
-                  <div class="text-muted small"><strong>Rate limit:</strong> {{ $plan.FormatRateLimit }}</div>
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <h4 class="heading-medium mb-0 text-default">{{ $plan.Name }}</h4>
+                      <span class="pill text-regular-12">Current</span>
+                    </div>
+                    <h6 class="heading-xsmall mb-0">Quota: {{ $plan.FormatQuota }}</h6>
+                    <h6 class="heading-xsmall">Rate limit: {{ $plan.FormatRateLimit }}</h6>
+                  {{else}}
+                    <div class="d-flex">
+                      <div class="plan-check mt-1">✓</div>
+                      <div class="ml-2">
+                        <h4 class="heading-medium mb-2 text-default">{{ $plan.Name }}</h4>
+                        <h6 class="heading-xsmall mb-0">Quota: {{ $plan.FormatQuota }}</h6>
+                        <h6 class="heading-xsmall">Rate limit: {{ $plan.FormatRateLimit }}</h6>
+                      </div>
+                    </div>
+                  {{end}}
                 </div>
               {{ end }}
             {{ else }}
@@ -84,13 +89,7 @@
 }
 
 #change-plan-{{ $credID }} .plan-card.selected {
-  border-color: #28a745;
-  background-color: #f0f9f4;
-}
-
-#change-plan-{{ $credID }} .plan-card.current {
-  border-color: #DDDDDD;
-  background-color: #F0F0F3;
+  border: var(--tdp-border-neutral-pressed);
 }
 
 #change-plan-{{ $credID }} .plan-card.disabled {
@@ -103,11 +102,8 @@
 }
 
 #change-plan-{{ $credID }} .plan-check {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background-color: #28a745;
   display: none;
@@ -119,12 +115,6 @@
 
 #change-plan-{{ $credID }} .plan-card.selected .plan-check {
   display: flex;
-}
-
-#change-plan-{{ $credID }} .plan-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
 }
 
 #change-plan-{{ $credID }} .plan-card.selected .plan-badge {

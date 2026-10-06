@@ -18,15 +18,16 @@ services:
       start_period: 5s
 
   mcp-inspector:
-    image: node:22-alpine
-    command: sh -c "npx -y @modelcontextprotocol/inspector"
+    image: ghcr.io/modelcontextprotocol/inspector:2.3.0
+    # Published on host loopback only: auth is disabled below, so this binding is
+    # the sole guard on a backend that can spawn local processes. Never widen it.
+    # 6274 is the web UI; 6275 is the sandbox used by MCP Apps.
     ports:
-      - "6274:6274"
-      - "6277:6277"
+      - "127.0.0.1:6274:6274"
+      - "127.0.0.1:6275:6275"
     environment:
-      - HOST=0.0.0.0
       - DANGEROUSLY_OMIT_AUTH=true
-      - ALLOWED_ORIGINS=http://localhost:6274
+      - ALLOWED_ORIGINS=http://localhost:6274,http://127.0.0.1:6274
     networks:
       - tyk
     depends_on:

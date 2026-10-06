@@ -3,7 +3,8 @@
 }
 
 .page-wrapper .home-page-wrapper,
-  .page-wrapper .flip-flop-wrapper {
+  .page-wrapper .flip-flop-wrapper,
+  .page-wrapper .api-product-page-wrapper {
   padding-top: 0;
 }
 

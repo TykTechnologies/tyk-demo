@@ -11,6 +11,12 @@
   border: 2px solid var(--tdp-primary-light);
 }
 
+/* Catalogue product card: thin 1px border per the Figma design (scoped to
+   .product-card so other cards keep the default). --tdp-neutral == #D8D8DF. */
+.product-card {
+  border: 1px solid var(--tdp-neutral);
+}
+
 .card-header {
   border: none;
   background-color: transparent;
@@ -99,9 +105,9 @@
 
 /* API Type Badges - shared styles matching .pill */
 .badge-api-type {
-  font-size: var(--tdp-size-sm);
+  font-size: var(--tdp-size-xs);
   font-weight: normal;
-  padding: 4px;
+  padding: 2px 4px;
   border-radius: 6px;
   text-transform: none;
   letter-spacing: normal;
@@ -109,20 +115,33 @@
   display: inline-block;
 }
 
-.badge-graphql {
-  background-color: var(--tdp-warning-pressed);
+/* API-type badge backgrounds mirror the portal-admin API-selector badges
+   (views/assets/stylesheets/components/select-many-apis.css) and the admin
+   product-card badges (app/product/helpers.go apiTypeBadgeColor* constants) so
+   a product's type reads identically across the admin and the live portal.
+   Colours come from the --tdp-badge-* palette (main.css :root); the token
+   values are exact so both surfaces stay in lockstep. */
+.badge-rest {
+  background-color: var(--tdp-badge-rest);
 }
 
-.badge-rest {
-  background-color: var(--surface-brand-hover);
+.badge-graphql,
+.badge-udg {
+  background-color: var(--tdp-badge-graphql);
+}
+
+.badge-mcp {
+  background-color: var(--tdp-badge-mcp);
+}
+
+/* TCP keeps its own decorative colour (Crayola Orange / Extra-Subdued) so it
+   reads distinctly from the green MCP badge, matching portal-admin. */
+.badge-tcp {
+  background-color: var(--tdp-badge-tcp);
 }
 
 .badge-streams {
-  background-color: var(--tdp-primary-danger-light);
-}
-
-.badge-tcp {
-  background-color: var(--tdp-success-pressed);
+  background-color: var(--tdp-badge-streams);
 }
 
 /* Card Badges Container */
@@ -142,6 +161,38 @@
 
 .card-badges__auth-type {
   flex-shrink: 0;
+}
+
+/* Auth-type badge — one colour per auth type, mirroring the portal-admin
+   API-selector auth badges (keyed on data-auth-type == the raw AuthType). The
+   neutral base covers any auth type without an explicit colour (e.g. the
+   mutualTLS+* composites). */
+.card-badges__auth-type .pill {
+  background-color: var(--tdp-badge-auth-default);
+}
+
+.card-badges__auth-type .pill[data-auth-type="authToken"] {
+  background-color: var(--tdp-badge-auth-token);
+}
+
+.card-badges__auth-type .pill[data-auth-type="jwt"] {
+  background-color: var(--tdp-badge-auth-jwt);
+}
+
+.card-badges__auth-type .pill[data-auth-type="ba"] {
+  background-color: var(--tdp-badge-auth-ba);
+}
+
+.card-badges__auth-type .pill[data-auth-type="custom"] {
+  background-color: var(--tdp-badge-auth-custom);
+}
+
+.card-badges__auth-type .pill[data-auth-type="multiAuth"] {
+  background-color: var(--tdp-badge-auth-multi);
+}
+
+.card-badges__auth-type .pill[data-auth-type="mutualTLS"] {
+  background-color: var(--tdp-badge-auth-mtls);
 }
 
 .card-title .pill-container__product-type {

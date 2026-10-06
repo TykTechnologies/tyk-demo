@@ -1,0 +1,85 @@
+<!-- Template used to render MCP API documentation (operator-authored markdown) -->
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="docs-container mcp-doc-page mt-4">
+        {{/* The product hero (name, badges, description, Access CTA) renders from
+             the shared layout partial. Below it: a Try it / Instructions toggle
+             (mirroring the Service explorer) — Try it embeds the live Inspector,
+             Instructions shows the operator markdown.
+
+             The live Inspector authenticates against the portal session
+             (WithInboundAuth), so it is offered only to a logged-in developer;
+             an anonymous visitor on a public product sees Instructions only
+             (mirroring how the OAS/GraphQL viewers degrade to read-only). */}}
+        {{ $loggedIn := ne (CurrentUser req) nil }}
+        {{/* The Inspector needs a gateway-routed MCP server URL to connect to.
+             HasMCPServerURL is false when the API has no MCPServerURL (no gateway
+             upstream); in that case the Inspector is not shown at all, the docs
+             page degrades to Instructions only, rather than embedding an
+             Inspector that can't connect (or would bypass the gateway). */}}
+        {{ $hasInspector := and $loggedIn (default false .HasMCPServerURL) (gt (default "" .APIID | trim | length) 0) (gt (default 0 .ProductID) 0) }}
+        {{ if $hasInspector }}
+        <div class="d-flex flex-row justify-content-end align-items-center mb-3">
+          <div class="mcp-view-toggle" role="group" aria-label="MCP docs view">
+            <button type="button" class="mcp-view-btn active" data-view="tryit">Try it</button>
+            <button type="button" class="mcp-view-btn" data-view="instructions">Instructions</button>
+          </div>
+        </div>
+        {{/* Try it: the embedded MCP Inspector SPA, pre-wired at
+             /portal/catalogue-products/{product-name}/{api}/mcpp/inspector — the
+             SPA framed with the proxy address, session token, upstream URL and
+             transport already seeded. Addressed by the product slug, a sibling of
+             the product's /docs page (like the OAS/GraphQL viewers). Shown by
+             default. */}}
+        <div class="mcp-tryit">
+          <iframe class="mcp-inspector-frame"
+                  title="MCP Inspector"
+                  src="/portal/catalogue-products/{{ .product.Path }}/{{ .APIID }}/mcpp/inspector"></iframe>
+        </div>
+        {{ end }}
+        {{/* Instructions: the operator-authored markdown. Hidden by default when
+             a live Inspector exists (Try it is the default view). Rendered only
+             when there is content — no empty "no documentation" placeholder. */}}
+        {{ if gt (.Content | trim | length) 0 }}
+        <div class="mcp-instructions mcp-docs blog-content{{ if $hasInspector }} d-none{{ end }}">
+          {{ safe_md_sanitized .Content }}
+        </div>
+        {{ end }}
+      </div>
+      {{ if $hasInspector }}
+      <script>
+        (function () {
+          // Stash this docs URL so the top-level OAuth callback can return here
+          // after auth instead of leaving the tab on the standalone Inspector.
+          // The OAuth redirect navigates window.top (this page) to the auth
+          // server and back to /oauth/callback — same portal origin, so this
+          // sessionStorage value survives the round-trip. See OAuthCallback.
+          try {
+            sessionStorage.setItem('mcp_return_to', window.location.pathname + window.location.search);
+          } catch (e) {}
+          var page = document.querySelector('.mcp-doc-page');
+          if (!page) return;
+          var toggle = page.querySelector('.mcp-view-toggle');
+          var tryit = page.querySelector('.mcp-tryit');
+          var instr = page.querySelector('.mcp-instructions');
+          if (!toggle) return;
+          function setView(view) {
+            var btns = toggle.querySelectorAll('.mcp-view-btn');
+            for (var i = 0; i < btns.length; i++) {
+              btns[i].classList.toggle('active', btns[i].getAttribute('data-view') === view);
+            }
+            if (tryit) { tryit.classList.toggle('d-none', view !== 'tryit'); }
+            if (instr) { instr.classList.toggle('d-none', view !== 'instructions'); }
+          }
+          var btns = toggle.querySelectorAll('.mcp-view-btn');
+          for (var i = 0; i < btns.length; i++) {
+            btns[i].addEventListener('click', function () { setView(this.getAttribute('data-view')); });
+          }
+        })();
+      </script>
+      {{ end }}
+    </div>
+  </div>
+</div>

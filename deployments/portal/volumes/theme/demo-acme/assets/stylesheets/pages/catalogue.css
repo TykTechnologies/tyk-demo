@@ -9,19 +9,6 @@
   border-bottom: 1px solid var(--tdp-primary-light, #E8E8F0);
 }
 
-.catalogue-header__title h1 {
-  margin: 0 0 4px 0;
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: var(--tdp-text-color-extra-dark, #03031C);
-}
-
-.catalogue-header__subtitle {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--tdp-text-color, #414160);
-}
-
 .catalogue-controls__view-toggle {
   display: flex;
   gap: 0;
@@ -33,12 +20,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  gap: 6px;
+  padding: 0 14px;
+  height: 38px;
   border: 1px solid var(--tdp-primary-light, #E8E8F0);
   background: white;
   cursor: pointer;
   transition: all 0.15s ease;
+}
+
+.catalogue-controls__view-toggle button .view-toggle__label {
+  font-size: var(--tdp-size-sm);
+  color: var(--tdp-secondary-dark);
+}
+
+.catalogue-controls__view-toggle button.active .view-toggle__label {
+  color: white;
 }
 
 .catalogue-controls__view-toggle button:first-child {
@@ -82,23 +79,29 @@
 /* Search container - original styling with 42px height */
 .catalogue-controls .search-container {
   flex: 1;
-  max-width: 400px;
   position: relative;
 }
 
 .catalogue-controls .search-container .form-control.search-input {
-  height: 42px;
-  padding-right: 50px;
+  padding-right: 44px;
+  padding-left: 16px;
+  height: 40px;
+  border-radius: 8px; /* Figma rounded rectangle, not a pill */
 }
 
 .catalogue-controls .search-container .input-group-append {
   position: absolute;
-  right: 12px;
-  height: 42px;
+  right: 14px;
   background: transparent;
   top: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
+  pointer-events: none;
+}
+
+.catalogue-controls .search-container .input-group-append svg {
+  display: block;
 }
 
 .catalogue-controls .search-container .input-group-append .input-group-text {
@@ -107,43 +110,10 @@
   padding: 0;
 }
 
-/* Filter container - original styling with 42px height */
-.catalogue-controls .filter-container {
-  min-width: 180px;
-}
-
 .catalogue-controls .filter-container .form-select {
-  height: 42px;
-}
-
-/* Search button - outline style with 42px height */
-.catalogue-controls .btn-primary-outline {
-  height: 42px;
-  padding: 0 20px;
-  white-space: nowrap;
-}
-
-/* ==========================================================================
-   Badge Styles (shared between grid and list views)
-   ========================================================================== */
-
-.catalogue-page-wrapper .badge-api-type {
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.catalogue-page-wrapper .badge-rest {
-  background-color: #fff7cc;
-  color: #505071;
-}
-
-.catalogue-page-wrapper .badge-graphql {
-  background-color: #E535AB;
-  color: white;
+  min-width: 240px;
+  height: 40px;
+  border-radius: 8px; /* match the search input (Figma rounded rectangle) */
 }
 
 /* ==========================================================================
@@ -163,7 +133,7 @@
 .catalogue-page-wrapper .card-container .product-card,
 .catalogue-page-wrapper .card.flex-column.product-card {
   width: 100%;
-  min-height: 380px !important; /* Override card.css 300px - consistent height across all cards */
+  min-height: 398px !important; /* Figma card height; overrides card.css 300px - consistent across all cards */
   display: flex;
   flex-direction: column;
   margin: 0;
@@ -181,12 +151,13 @@
   z-index: 100;
 }
 
-/* Card Image Section - Grid View */
+/* Card Image Section - Grid View. The band is always present (matching the
+   Figma card footprint); imageless cards show the placeholder background. */
 .catalogue-page-wrapper .card-img-wrapper {
   position: relative;
   width: 100%;
-  height: 160px;
-  background-color: var(--surface-default-subdued, #F5F5FA);
+  height: 180px;
+  background-color: var(--tdp-light-gray); /* Figma empty-state band (#EDEDF9) */
   border-top-left-radius: var(--tdp-card-border-radius);
   border-top-right-radius: var(--tdp-card-border-radius);
   overflow: hidden;
@@ -195,34 +166,18 @@
   justify-content: center;
 }
 
-/* Grid View: Hide image wrapper for cards WITHOUT images */
-.catalogue-page-wrapper .product-card:not(.has-image) .card-img-wrapper {
-  display: none;
-}
-
 .catalogue-page-wrapper .card-img-wrapper img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* Card Badges - Grid View: inline below image (or at top if no image) */
-.catalogue-page-wrapper .product-card .card-badges {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* Placeholder illustration (imageless cards) fills the band like a real
+   cover image — the asset matches the 388x180 band aspect. */
+.catalogue-page-wrapper .card-img-wrapper img.card-img-placeholder {
   width: 100%;
-  margin-bottom: 12px;
-}
-
-.catalogue-page-wrapper .card-badges__api-types {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.catalogue-page-wrapper .card-badges__auth-type {
-  flex-shrink: 0;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Card Body - Grid View */
@@ -236,19 +191,11 @@
 }
 
 .catalogue-page-wrapper .product-card .card-title {
-  font-size: 1.1rem;
-  font-weight: 600;
   flex-shrink: 0;
-  color: var(--tdp-text-color, #36364C);
   margin-bottom: 8px;
-  line-height: 1.3;
 }
 
 .catalogue-page-wrapper .product-card .card-text {
-  font-size: 0.875rem;
-  color: var(--tdp-secondary);
-  margin: 0;
-  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -261,21 +208,12 @@
   display: inline;
 }
 
-.catalogue-page-wrapper .product-card .card-text strong {
-  font-weight: 600;
-}
-
 /* Card CTA / Footer - Grid View */
 .catalogue-page-wrapper .product-card .card-cta {
   padding: 16px 20px;
   background: transparent;
   border-top: none;
   margin-top: auto;
-}
-
-.catalogue-page-wrapper .product-card .card-cta .btn {
-  font-size: 0.875rem;
-  padding: 8px 16px;
 }
 
 .catalogue-page-wrapper .product-card .card-cta .dropdown {
@@ -290,11 +228,6 @@
 
 .catalogue-page-wrapper .product-card .card-cta .dropdown-menu {
   z-index: 1000;
-}
-
-.catalogue-page-wrapper .product-card .card-cta .dropdown-toggle {
-  font-size: 0.875rem;
-  padding: 8px 16px;
 }
 
 /* ==========================================================================
@@ -345,40 +278,6 @@
   width: auto;
 }
 
-.catalogue-page-wrapper .card-container.col-lg-12 .card-badges__api-types {
-  display: flex;
-  gap: 8px;
-}
-
-.catalogue-page-wrapper .card-container.col-lg-12 .card-badges__auth-type {
-  margin-left: 0;
-}
-
-/* List view - Badge styling overrides (must override Bootstrap .badge) */
-.catalogue-page-wrapper .card-container.col-lg-12 .badge.badge-api-type,
-.catalogue-page-wrapper .card-container.col-lg-12 span.badge-api-type {
-  font-size: 0.7rem !important;
-  font-weight: 600 !important;
-  padding: 4px 10px !important;
-  border-radius: 4px !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.3px !important;
-}
-
-.catalogue-page-wrapper .card-container.col-lg-12 .badge.badge-rest,
-.catalogue-page-wrapper .card-container.col-lg-12 span.badge-rest {
-  background-color: #fff7cc !important;
-  background: #fff7cc !important;
-  color: #505071 !important;
-}
-
-.catalogue-page-wrapper .card-container.col-lg-12 .badge.badge-graphql,
-.catalogue-page-wrapper .card-container.col-lg-12 span.badge-graphql {
-  background-color: #E535AB !important;
-  background: #E535AB !important;
-  color: white !important;
-}
-
 /* List view - Card body */
 .catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-body {
   flex: 1;
@@ -393,11 +292,6 @@
 
 .catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-title {
   margin-bottom: 4px;
-}
-
-.catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-title h2 {
-  font-size: 1.125rem;
-  font-weight: 600;
 }
 
 .catalogue-page-wrapper .card-container.col-lg-12 .product-card .card-text {
@@ -598,12 +492,6 @@
 
   .catalogue-page-wrapper .product-card .card-cta .dropdown .dropdown-toggle {
     width: 100%;
-  }
-
-  /* Badges smaller on mobile */
-  .catalogue-page-wrapper .badge-api-type {
-    font-size: 0.65rem;
-    padding: 3px 8px;
   }
 
   /* Mobile list view - stack vertically */

@@ -91,7 +91,7 @@ api_response=$(curl --location "$portal_base_url/portal-api/providers" -s \
 --header "Authorization: $portal_admin_api_token" \
 --data '{
   "Configuration": {
-    "MetaData": "{\"URL\":\"http://tyk-dashboard:3000\",\"Secret\":\"'$dashboard_user_api_credentials'\",\"OrgID\":\"'$dashboard_user_org_id'\",\"Gateway\":\"\",\"PoliciesTags\":[],\"InsecureSkipVerify\":false}"
+    "MetaData": "{\"URL\":\"http://tyk-dashboard:3000\",\"Secret\":\"'$dashboard_user_api_credentials'\",\"OrgID\":\"'$dashboard_user_org_id'\",\"Gateway\":\"http://tyk-gateway:8080\",\"PoliciesTags\":[],\"InsecureSkipVerify\":false}"
   },
   "Name": "Tyk Demo Dashboard",
   "Type": "tyk-pro"

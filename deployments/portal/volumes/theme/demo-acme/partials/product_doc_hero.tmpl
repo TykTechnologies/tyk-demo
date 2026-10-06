@@ -1,0 +1,76 @@
+{{/* Product hero for the documentation pages: the dark banner with the product
+     name, one API-type badge per distinct type, the auth pill, the description,
+     an "Access Product" CTA, and the logo — mirroring the product-detail page
+     header so a docs page carries the same identity.
+
+     Expects .product (a *pm.Product). Rendered by every product_layout_doc_*
+     layout right after top_nav. Hidden in ?embed=1 mode (the layouts strip
+     their chrome when a docs page is iframed, e.g. the Service explorer). */}}
+{{ if .product }}
+{{ $product := .product }}
+{{ $user := CurrentUser req }}
+{{/* Hide the hero when the docs page is iframed (?embed=1) — e.g. the OAS
+     "Select an API" preview and the Service explorer. The guard lives with the
+     hero so it applies in every doc layout uniformly. */}}
+<script>
+  (function () {
+    try {
+      if (new URLSearchParams(window.location.search).get('embed') === '1') {
+        var s = document.createElement('style');
+        s.innerHTML = '.mcp-doc-hero{display:none!important;}';
+        document.head.appendChild(s);
+      }
+    } catch (e) {}
+  })();
+</script>
+<div class="api-product-page-wrapper mcp-doc-hero">
+    <div class="api-detail-background-color">
+	<div class="container pt-4 pb-2">
+	    <a href="/portal/catalogue-products/{{ $product.Path }}" class="breadcrumb-link breadcrumb-link--on-dark">&lt; Back to product</a>
+	</div>
+	<div class="api-product-page__header w-100">
+	    <div class="maxh-268 minh-268 api-detail-background-color card d-flex flex-row {{ if $product.Logo.URL }}has-logo{{ end }} container justify-content-between">
+		<div class="left-side-card-body">
+		    <div class="card-title mt-35 d-flex flex-row align-items-center">
+			<h1 class="heading-medium">{{ $product.ProductName }}</h1>
+			{{/* One badge per distinct API type (mirrors the catalogue card). */}}
+			{{ $seenTypes := dict }}
+			{{ range $product.APIDetails }}
+			  {{ $formattedType := .GetAPITypeFormatted }}
+			  {{ if $formattedType }}{{ if not (index $seenTypes $formattedType) }}
+			    {{ $seenTypes = merge $seenTypes (dict $formattedType true) }}
+			    <span class="badge badge-api-type badge-{{ lower $formattedType }} ml-2">{{ $formattedType }}</span>
+			  {{ end }}{{ end }}
+			{{ end }}
+			{{ if not $product.IsDocumentationOnly }}
+			<div class="pill-container ml-2">
+			    <div class="pill">
+				<h5 class="body-medium-default m-0">{{ $product.GetAuthTypeBadgeFormatted }}</h5>
+			    </div>
+			</div>
+			{{ end }}
+		    </div>
+		    <div class="minh-95 pr-4">
+			{{ if $product.Description }}
+			<p class="text-regular-14 maxh-95 m-0">{{ $product.Description }}</p>
+			{{ end }}
+		    </div>
+		    <div class="api-product-page__header card__action-buttons">
+			{{/* Access Product is offered for a logged-in developer on a
+			     non-doc-only product that is not Basic/Custom auth, matching
+			     the product-detail page. It links back to the product page. */}}
+			{{ if and (ne $product.AuthType "ba") (ne $product.AuthType "custom") (not $product.IsDocumentationOnly) $user }}
+			<a href="/portal/catalogue-products/{{ $product.Path }}#available-plans" class="btn btn-primary">Access Product</a>
+			{{ end }}
+		    </div>
+		</div>
+		{{ if $product.Logo.URL }}
+		<img class="card-img-top img-fluid" src='{{ $product.Logo.URL }}' alt="">
+		{{ else }}
+		<img class="card-img-top img-fluid card-img-placeholder" src="/assets/images/card-placeholder.svg" alt="" aria-hidden="true">
+		{{ end }}
+	    </div>
+	</div>
+    </div>
+</div>
+{{ end }}

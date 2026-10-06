@@ -1,7 +1,7 @@
 ---
 services:
   tyk-portal:
-    image: tykio/portal:${PORTAL_VERSION:-v1.16.0}
+    image: tykio/portal:${PORTAL_VERSION:-v1.19.0}
     networks:
       - tyk
     environment:
@@ -21,6 +21,9 @@ services:
       - PORTAL_LICENSEKEY=${DASHBOARD_LICENCE:?Licence missing from Docker environment file .env.}
       - PORTAL_DOCRENDERER=stoplight
       - PORTAL_TIB_ENABLED=true
+      # The embedded MCP Inspector (v1.19+) proxies through the Portal, whose SSRF guard
+      # rejects private targets by default; in Docker the Gateway is always one.
+      - PORTAL_MCP_INSPECTOR_BLOCKPRIVATEFETCH=false
     env_file:
       - .env
     ports:

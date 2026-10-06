@@ -14,8 +14,108 @@
   padding: 0;
 }
 
-.blog-detail-page-wrapper .blog-content p {
+/* Markdown paragraph rhythm. The MCP docs page reuses the .blog-content
+   markdown styling but is not nested under .blog-detail-page-wrapper, so it is
+   listed explicitly to keep operator-authored MCP docs consistent with blog and
+   other markdown content. blog.css is @imported by main.css, so this applies on
+   the MCP doc pages too. */
+.blog-detail-page-wrapper .blog-content p,
+.mcp-docs.blog-content p {
   line-height: 26px;
+}
+
+/* MCP docs markdown section spacing. Bootstrap resets heading margin-top to 0,
+   so operator-authored MCP docs render with headings hugging the preceding text
+   (cramped sections). Give headings breathing room above so the docs read like
+   normal formatted markdown. Scoped to .mcp-docs so blog/global headings are
+   unaffected. */
+.mcp-docs.blog-content h1,
+.mcp-docs.blog-content h2,
+.mcp-docs.blog-content h3,
+.mcp-docs.blog-content h4,
+.mcp-docs.blog-content h5,
+.mcp-docs.blog-content h6 {
+  margin-top: 1.5rem;
+}
+
+/* No extra gap above the very first heading of the document. */
+.mcp-docs.blog-content > :first-child {
+  margin-top: 0;
+}
+
+/* MCP docs markdown code font. Inline code and fenced blocks are the only
+   markdown elements not covered by the theme's bundled Inter web font — they
+   fall back to Bootstrap's system monospace stack, which resolves to a different
+   font per OS (SFMono on macOS, Consolas on Windows, Liberation Mono on Linux),
+   so code renders inconsistently across users. Pin an explicit, cross-platform
+   monospace stack so operator-authored MCP docs render code the same everywhere.
+   Scoped to .mcp-docs. */
+.mcp-docs.blog-content code,
+.mcp-docs.blog-content pre,
+.mcp-docs.blog-content kbd,
+.mcp-docs.blog-content samp {
+  font-family: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+/* Fenced code blocks: a subtle surface + padding so multi-line code reads as a
+   distinct block, not inline text. The inline <code> font is set above; here we
+   only frame the <pre> container and neutralize the inner <code> background so it
+   is not double-shaded. Scoped to .mcp-docs. */
+.mcp-docs.blog-content pre {
+  background-color: var(--surface-default-subdued, #f6f8fa);
+  border: 1px solid var(--tdp-table-border-color, #e1e4e8);
+  border-radius: var(--tdp-border-radius, 6px);
+  padding: 12px 16px;
+  overflow-x: auto;
+}
+.mcp-docs.blog-content pre code {
+  background: none;
+  padding: 0;
+}
+
+/* highlight.js adds .hljs to the <code> and ships its own background + padding;
+   the <pre> above already frames the block, so neutralize the hljs box (keep
+   only its token colors) to avoid a nested white panel and doubled padding. */
+.mcp-docs.blog-content pre code.hljs {
+  background: none;
+  padding: 0;
+}
+
+/* GFM tables: operator API docs lean on tables (params, headers, status codes).
+   Without borders/padding they render cramped. Give them full width, cell
+   borders, padding and a shaded header row. Scoped to .mcp-docs. */
+.mcp-docs.blog-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+.mcp-docs.blog-content th,
+.mcp-docs.blog-content td {
+  border: 1px solid var(--tdp-table-border-color, #e1e4e8);
+  padding: 8px 12px;
+  text-align: left;
+}
+.mcp-docs.blog-content thead th {
+  background-color: var(--surface-default-subdued, #f6f8fa);
+  font-weight: 600;
+}
+
+/* Definition lists (term/definition glossaries). */
+.mcp-docs.blog-content dt {
+  font-weight: 600;
+  margin-top: 0.75rem;
+}
+.mcp-docs.blog-content dd {
+  margin: 0 0 0 1.25rem;
+}
+
+/* Footnotes: the endnotes block reads as small print separated from the body. */
+.mcp-docs.blog-content .footnotes {
+  margin-top: 2rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--tdp-table-border-color, #e1e4e8);
+  font-size: 0.875rem;
 }
 
 .pagination .page-link {

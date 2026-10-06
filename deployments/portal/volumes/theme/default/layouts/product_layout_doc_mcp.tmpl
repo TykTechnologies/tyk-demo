@@ -1,0 +1,52 @@
+<!-- Layout used to render MCP API documentation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{{.Name}} Documentation</title>
+
+    <!-- Load style assets -->
+    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/stylesheets/fonts.css{{.previewId}}" rel="stylesheet">
+    <link href="/assets/stylesheets/main.css{{.previewId}}" rel="stylesheet">
+    <!-- Syntax highlighting for operator-authored MCP doc fenced code blocks -->
+    <link href="/assets/vendor/highlightjs/github.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <!-- Render top navigation menu -->
+    {{ render "top_nav" . }}
+
+    <!-- Product hero (shared across all doc types) -->
+    {{ render "product_doc_hero" . }}
+
+    <!-- Render main page content -->
+    {{ yield }}
+
+    <!-- Render footer menu -->
+    {{ render "footer" . }}
+
+    <!-- Highlight fenced code blocks by their language-* class. Runs after the
+         DOM is parsed; the markdown is already sanitized (script/attr XSS stripped,
+         code class constrained to language-<name>), so highlight.js only
+         re-tokenizes already-safe, escaped text. -->
+    <script src="/assets/vendor/highlightjs/highlight.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".mcp-docs pre code").forEach(function (el) {
+          window.hljs.highlightElement(el);
+        });
+      });
+    </script>
+
+</body>
+
+</html>

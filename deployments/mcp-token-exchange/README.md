@@ -8,7 +8,12 @@ An AI support copilot calls real company APIs **on behalf of** a signed-in suppo
 
 - Docker with Docker Compose (4GB+ RAM allocated) and the `jq` command-line utility — the standard Tyk Demo requirements.
 - **An enterprise-scoped Tyk licence.** Token exchange is an enterprise feature, so the EE gateway image is required — `up.sh` selects it automatically based on your licence, and this deployment fails fast with an error if the licence isn't enterprise-scoped.
-- No Tyk version setup needed: this deployment's `pre.sh` automatically sets the Gateway and Dashboard images to `v5.14.0`.
+- **Tyk Gateway and Dashboard `v5.14.0` or later.** Token exchange ships in 5.14.0, so it is the minimum version. The base `tyk` deployment already defaults to a later release, so nothing is needed unless you've pinned older versions in `.env`. This deployment doesn't change your versions: its `pre.sh` reads `DASHBOARD_VERSION` and `GATEWAY_VERSION` from `.env` (or the base deployment defaults if they're unset) and prints a warning if either is below `v5.14.0`. To pin a version explicitly:
+
+  ```bash
+  ./scripts/update-env.sh DASHBOARD_VERSION v5.14.0
+  ./scripts/update-env.sh GATEWAY_VERSION v5.14.0
+  ```
 - Optional: for the observability part of the demo (traces, MCP dashboards, SLOs), compose with the `opentelemetry-demo` deployment — this deployment carries no observability stack of its own.
 
 ## Getting started

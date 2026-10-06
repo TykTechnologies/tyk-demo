@@ -112,12 +112,11 @@
                           <div class="d-flex flex-column pr-3">
                             <h6 class="heading-small text-default mr-4">Redirect URLs:</h6>
                           </div>
-                          <div class="text-regular-14">
+                          <div class="text-regular-14 mb-1">
                             {{if $app.RedirectURLs }} {{ $app.RedirectURLs }} {{else}} <i>No redirect URLs set</i> {{end}}
                           </div>
                         </div>
                       </div>
-
                     </div>
                     <div class="card-footer__dynamic-data d-none w-100 p-3">
                       <div class="mb-4">
@@ -196,6 +195,7 @@
                   "availablePlans" $availablePlans
                   "pendingPlan" $pendingPlan
                   "hasPending" $hasPending
+                  "showMTLSSection" $.showMTLSSection
                 ) }}
               {{end}}
             </div>
@@ -216,6 +216,7 @@
                       "appCerts" $appCerts
                       "allCerts" $allCerts
                       "index" $pendingIndex
+                      "showMTLSSection" $.showMTLSSection
                     ) }}
                     {{ $pendingIndex = add $pendingIndex 1 }}
                   {{ end }}

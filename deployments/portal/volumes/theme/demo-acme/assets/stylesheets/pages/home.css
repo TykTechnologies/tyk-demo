@@ -41,3 +41,51 @@
 .step-wrapper .step:hover {
   color: var(--tdp-link-color);
 }
+
+/* Featured Products Section - Catalogue Card Overrides */
+.featured-apis-wrapper .row.justify-content-center {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Override Bootstrap column classes for featured cards */
+.featured-apis-wrapper .card-container.col-lg-4.col-md-6.col-sm-12 {
+  flex: 0 0 calc(33.333% - 20px);
+  max-width: calc(33.333% - 20px);
+  margin: 0 10px 24px 10px;
+}
+
+.featured-apis-wrapper .product-card {
+  background-color: white;
+  width: 100%;
+  min-height: 380px;
+}
+
+.featured-apis-wrapper .product-card .card-body {
+  padding: 20px;
+}
+
+.featured-apis-wrapper .product-card .card-cta {
+  padding: 16px 20px;
+}
+
+/* Responsive adjustments for featured products */
+@media (max-width: 991px) {
+  .featured-apis-wrapper .card-container.col-lg-4.col-md-6.col-sm-12 {
+    flex: 0 0 calc(50% - 20px);
+    max-width: calc(50% - 20px);
+  }
+}
+
+@media (max-width: 767px) {
+  .featured-apis-wrapper .card-container.col-lg-4.col-md-6.col-sm-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin: 0 0 24px 0;
+  }
+}
+
+.on-dark {
+	  color: var(--tdp-on-dark-text-color);
+}

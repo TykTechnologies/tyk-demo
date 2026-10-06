@@ -20,12 +20,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
+  gap: 6px;
+  padding: 0 14px;
   height: 38px;
   border: 1px solid var(--tdp-primary-light, #E8E8F0);
   background: white;
   cursor: pointer;
   transition: all 0.15s ease;
+}
+
+.catalogue-controls__view-toggle button .view-toggle__label {
+  font-size: var(--tdp-size-sm);
+  color: var(--tdp-secondary-dark);
+}
+
+.catalogue-controls__view-toggle button.active .view-toggle__label {
+  color: white;
 }
 
 .catalogue-controls__view-toggle button:first-child {
@@ -69,22 +79,29 @@
 /* Search container - original styling with 42px height */
 .catalogue-controls .search-container {
   flex: 1;
-  max-width: 400px;
   position: relative;
 }
 
 .catalogue-controls .search-container .form-control.search-input {
-  padding-right: 50px;
-  height: 38px;
+  padding-right: 44px;
+  padding-left: 16px;
+  height: 40px;
+  border-radius: 8px; /* Figma rounded rectangle, not a pill */
 }
 
 .catalogue-controls .search-container .input-group-append {
   position: absolute;
-  right: 12px;
+  right: 14px;
   background: transparent;
   top: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
+  pointer-events: none;
+}
+
+.catalogue-controls .search-container .input-group-append svg {
+  display: block;
 }
 
 .catalogue-controls .search-container .input-group-append .input-group-text {
@@ -94,8 +111,9 @@
 }
 
 .catalogue-controls .filter-container .form-select {
-  min-width: 180px;
-  height: 38px;
+  min-width: 240px;
+  height: 40px;
+  border-radius: 8px; /* match the search input (Figma rounded rectangle) */
 }
 
 /* ==========================================================================
@@ -115,7 +133,7 @@
 .catalogue-page-wrapper .card-container .product-card,
 .catalogue-page-wrapper .card.flex-column.product-card {
   width: 100%;
-  min-height: 380px !important; /* Override card.css 300px - consistent height across all cards */
+  min-height: 398px !important; /* Figma card height; overrides card.css 300px - consistent across all cards */
   display: flex;
   flex-direction: column;
   margin: 0;
@@ -133,12 +151,13 @@
   z-index: 100;
 }
 
-/* Card Image Section - Grid View */
+/* Card Image Section - Grid View. The band is always present (matching the
+   Figma card footprint); imageless cards show the placeholder background. */
 .catalogue-page-wrapper .card-img-wrapper {
   position: relative;
   width: 100%;
-  height: 160px;
-  background-color: var(--surface-default-subdued, #F5F5FA);
+  height: 180px;
+  background-color: var(--tdp-light-gray); /* Figma empty-state band (#EDEDF9) */
   border-top-left-radius: var(--tdp-card-border-radius);
   border-top-right-radius: var(--tdp-card-border-radius);
   overflow: hidden;
@@ -147,12 +166,15 @@
   justify-content: center;
 }
 
-/* Grid View: Hide image wrapper for cards WITHOUT images */
-.catalogue-page-wrapper .product-card:not(.has-image) .card-img-wrapper {
-  display: none;
+.catalogue-page-wrapper .card-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.catalogue-page-wrapper .card-img-wrapper img {
+/* Placeholder illustration (imageless cards) fills the band like a real
+   cover image — the asset matches the 388x180 band aspect. */
+.catalogue-page-wrapper .card-img-wrapper img.card-img-placeholder {
   width: 100%;
   height: 100%;
   object-fit: cover;

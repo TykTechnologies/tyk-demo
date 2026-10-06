@@ -14,8 +14,8 @@ It deliberately **does not** bootstrap any MCP proxies, policies, or keys into t
 1. **Tyk 5.13 or later.** MCP Gateway support ships in 5.13. Set these in your `.env` before running `./up.sh`:
 
    ```
-   DASHBOARD_VERSION=v5.13.0
-   GATEWAY_VERSION=v5.13.0
+   DASHBOARD_VERSION=v5.15.0
+   GATEWAY_VERSION=v5.15.0
    ```
 
 2. A valid Tyk Dashboard licence in `.env` (already required by the base `tyk` deployment).
