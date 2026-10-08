@@ -1,0 +1,382 @@
+---
+# Unit tests for tyk-control-plane.rules.yml. Run from the repository root:
+#
+#   docker run --rm -v "$PWD/deployments/opentelemetry-demo/src/prometheus:/p" -w /p/tests \
+#     --entrypoint promtool quay.io/prometheus/prometheus:v3.5.0 test rules tyk-control-plane.rules.test.yml
+
+rule_files:
+  - ../tyk-control-plane.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+
+  # A component that reported, then went silent, fires once the 5m lookback expires.
+  - interval: 1m
+    input_series:
+      - series: 'process_uptime_seconds{service_name="tyk-mdcb", control_plane_id="cp1", service_instance_id="mdcb-0"}'
+        values: '60+60x10 _x20'
+      - series: 'process_uptime_seconds{service_name="tyk-dashboard", control_plane_id="cp1", service_instance_id="d-0"}'
+        values: '60+60x30'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: TykControlPlaneComponentStoppedReporting
+        exp_alerts: []
+      - eval_time: 18m
+        alertname: TykControlPlaneComponentStoppedReporting
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              tyk_component: control-plane
+              control_plane_id: cp1
+              service_name: tyk-mdcb
+            exp_annotations:
+              summary: "tyk-mdcb stopped reporting metrics"
+              description: "tyk-mdcb in control plane cp1 has not exported metrics for over 5 minutes. The process may be down, hung, or unable to reach the OpenTelemetry Collector."
+              dashboard: /grafana/d/tyk-environments
+
+  # Health gauges: 0 for 2 minutes pages, per component/store.
+  - interval: 1m
+    input_series:
+      - series: 'tyk_dashboard_health{control_plane_id="cp1", service_instance_id="d-0", component="main", store="mongo"}'
+        values: '1 1 0 0 0 0'
+      - series: 'tyk_dashboard_health{control_plane_id="cp1", service_instance_id="d-0", component="temporal_storage", store="redis"}'
+        values: '1 1 1 1 1 1'
+      - series: 'tyk_mdcb_health{control_plane_id="cp1", service_instance_id="mdcb-0", component="rpc_server"}'
+        values: '1 0 0 0 0 0'
+      - series: 'tyk_portal_health{control_plane_id="cp1", service_instance_id="p-0", component="database", store="postgres"}'
+        values: '1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: TykDashboardDependencyUnhealthy
+        exp_alerts: []
+      - eval_time: 4m
+        alertname: TykDashboardDependencyUnhealthy
+        exp_alerts:
+          - exp_labels: {severity: critical, tyk_component: dashboard, component: main, store: mongo, control_plane_id: cp1, service_instance_id: d-0}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-dashboard"
+              description: "The Dashboard health probe for main (mongo) has been failing for 2 minutes. Operators may be unable to manage APIs, policies or keys."
+              summary: "Dashboard cannot reach its main store (mongo)"
+      - eval_time: 4m
+        alertname: TykMDCBDependencyUnhealthy
+        exp_alerts:
+          - exp_labels: {severity: critical, tyk_component: mdcb, component: rpc_server, control_plane_id: cp1, service_instance_id: mdcb-0}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-mdcb"
+              description: "The MDCB health check for rpc_server  has been failing for 2 minutes on mdcb-0. Data plane gateways may be unable to sync configuration or validate keys."
+              summary: "MDCB rpc_server is unhealthy"
+      - eval_time: 5m
+        alertname: TykPortalDependencyUnhealthy
+        exp_alerts: []
+
+  # MDCB data plane connectivity: a whole group disappearing, and a group shrinking.
+  - interval: 1m
+    input_series:
+      - series: 'tyk_mdcb_gateway_connected{control_plane_id="cp1", group_id="eu", gateway_id="gw-1", version="5.15.0"}'
+        values: '1x10 _x10'
+      - series: 'tyk_mdcb_gateway_connected{control_plane_id="cp1", group_id="us", gateway_id="gw-2", version="5.15.0"}'
+        values: '1x30'
+      - series: 'tyk_mdcb_gateway_connected{control_plane_id="cp1", group_id="us", gateway_id="gw-3", version="5.15.0"}'
+        values: '1x10 _x20'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: TykMDCBDataPlaneGroupDisconnected
+        exp_alerts: []
+      - eval_time: 18m
+        alertname: TykMDCBDataPlaneGroupDisconnected
+        exp_alerts:
+          - exp_labels: {severity: critical, tyk_component: mdcb, control_plane_id: cp1, group_id: eu}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-mdcb"
+              description: "Every gateway in group eu has disconnected from MDCB in the last hour. Gateways keep serving from their local Redis cache, but no longer receive configuration changes. (The alert resolves an hour after the group disappears.)"
+              summary: "No gateways connected from data plane group eu"
+      - eval_time: 22m
+        alertname: TykMDCBDataPlaneGatewaysDropped
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: mdcb, control_plane_id: cp1, group_id: us}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-mdcb"
+              description: "1 gateways are connected from group us, fewer than 15 minutes ago."
+              summary: "Data plane group us lost gateways"
+
+  # Reconnect storm: 10 reconnects/min sustained in one group.
+  - interval: 1m
+    input_series:
+      - series: 'tyk_mdcb_gateway_reconnects_total{control_plane_id="cp1", group_id="eu", gateway_id="gw-1", hostname="h1", org_id="o"}'
+        values: '0+10x20'
+      - series: 'tyk_mdcb_gateway_reconnects_total{control_plane_id="cp1", group_id="us", gateway_id="gw-2", hostname="h2", org_id="o"}'
+        values: '0+1x20'
+    alert_rule_test:
+      - eval_time: 15m
+        alertname: TykMDCBGatewayReconnectStorm
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: mdcb, control_plane_id: cp1, group_id: eu}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-mdcb"
+              description: "Gateways in group eu are reconnecting to MDCB at 10.0/min. Reconnect storms precede RPC pool saturation and config sync stalls."
+              summary: "Reconnect storm from data plane group eu"
+
+  # Config drift and version skew inside a group.
+  - interval: 1m
+    input_series:
+      - series: 'tyk_mdcb_gateway_apis_loaded{control_plane_id="cp1", group_id="eu", gateway_id="gw-1"}'
+        values: '12x40'
+      - series: 'tyk_mdcb_gateway_apis_loaded{control_plane_id="cp1", group_id="eu", gateway_id="gw-2"}'
+        values: '10x40'
+      - series: 'tyk_mdcb_gateway_connected{control_plane_id="cp1", group_id="eu", gateway_id="gw-1", version="5.15.0"}'
+        values: '1x40'
+      - series: 'tyk_mdcb_gateway_connected{control_plane_id="cp1", group_id="eu", gateway_id="gw-2", version="5.14.0"}'
+        values: '1x40'
+    alert_rule_test:
+      - eval_time: 15m
+        alertname: TykMDCBGatewayConfigDrift
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: mdcb, control_plane_id: cp1, group_id: eu}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-mdcb"
+              description: "Gateways in the same data plane group disagree by 2 APIs for 10 minutes. Some gateways are serving stale configuration."
+              summary: "Gateways in group eu have different API counts loaded"
+      - eval_time: 35m
+        alertname: TykMDCBGatewayVersionSkew
+        exp_alerts:
+          - exp_labels: {severity: info, tyk_component: mdcb, control_plane_id: cp1, group_id: eu}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-mdcb"
+              description: "2 different gateway versions are connected from group eu. Expected during a rolling upgrade, otherwise check for an unsupported version."
+              summary: "Mixed gateway versions in data plane group eu"
+
+  # Licence runway: 20 days left is a warning, not yet critical.
+  - interval: 1m
+    input_series:
+      - series: 'tyk_dashboard_license_expiry_timestamp_seconds{control_plane_id="cp1"}'
+        values: '1728000x5'
+      - series: 'tyk_mdcb_license_expiry_timestamp{control_plane_id="cp1"}'
+        values: '0x5'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: TykDashboardLicenseExpiringSoon
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: dashboard, control_plane_id: cp1}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-dashboard"
+              description: "Renew the Dashboard licence before it expires."
+              summary: "Dashboard licence expires in 19d 23h 59m 0s"
+      - eval_time: 1m
+        alertname: TykDashboardLicenseExpiryImminent
+        exp_alerts: []
+      # 0 means "no licence information", not "expired".
+      - eval_time: 1m
+        alertname: TykMDCBLicenseExpiryImminent
+        exp_alerts: []
+
+  # Dashboard licence capacity and notification failures.
+  - interval: 1m
+    input_series:
+      - series: 'tyk_dashboard_license_gateways_used{control_plane_id="cp1"}'
+        values: '10x10'
+      - series: 'tyk_dashboard_license_gateways_limit{control_plane_id="cp1"}'
+        values: '10x10'
+      - series: 'tyk_dashboard_notifications_failures_total{control_plane_id="cp1", channel="tyk.cluster.notifications", resource_type="api"}'
+        values: '0+1x10'
+    alert_rule_test:
+      - eval_time: 8m
+        alertname: TykDashboardLicenseGatewayCapacity
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: dashboard, control_plane_id: cp1}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-dashboard"
+              description: "New gateways will be refused once the licence limit is reached; scale-outs during an incident are the usual victim."
+              summary: "Dashboard licence is at 100% of its gateway limit"
+      - eval_time: 8m
+        alertname: TykDashboardNotificationFailures
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: dashboard, control_plane_id: cp1, channel: tyk.cluster.notifications}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-dashboard"
+              description: "API, policy or key changes are not being propagated to gateways through Redis pub/sub. Gateways may be serving stale configuration."
+              summary: "Dashboard is failing to publish on tyk.cluster.notifications"
+
+  # Dashboard management API error rate.
+  - interval: 1m
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{service_name="tyk-dashboard", control_plane_id="cp1", http_response_status_class="2xx"}'
+        values: '0+90x15'
+      - series: 'http_server_request_duration_seconds_count{service_name="tyk-dashboard", control_plane_id="cp1", http_response_status_class="5xx"}'
+        values: '0+10x15'
+      # Gateway traffic with the same metric name must not count.
+      - series: 'http_server_request_duration_seconds_count{service_name="tyk-gateway", control_plane_id="cp1", http_response_status_class="2xx"}'
+        values: '0+10000x15'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: TykDashboardHighErrorRate
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: dashboard, control_plane_id: cp1}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-dashboard"
+              description: "More than 5% of Dashboard management API requests are failing with 5xx. CI/CD pipelines and operators deploying through the Dashboard will see errors."
+              summary: "Dashboard API 5xx rate is 10%"
+
+  # Portal provider sync: stale, unreachable and failing.
+  - interval: 1m
+    input_series:
+      # Last success at t=0, then nothing: stale after 30 minutes.
+      - series: 'tyk_portal_provider_sync_last_success_timestamp_seconds{control_plane_id="cp1", provider_id="1"}'
+        values: '0x40'
+      - series: 'tyk_portal_provider_reachable{control_plane_id="cp1", provider_id="1"}'
+        values: '1x10 0x30'
+      - series: 'tyk_portal_provider_sync_failures_total{control_plane_id="cp1", provider_id="1", error_type="auth"}'
+        values: '0x10 1x10 2x20'
+    alert_rule_test:
+      - eval_time: 25m
+        alertname: TykPortalProviderSyncStale
+        exp_alerts: []
+      - eval_time: 32m
+        alertname: TykPortalProviderSyncStale
+        exp_alerts:
+          - exp_labels: {severity: critical, tyk_component: portal, control_plane_id: cp1, provider_id: "1"}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-portal"
+              description: "The Developer Portal has not completed a successful sync with provider 1 for more than 3 refresh intervals. Developers see a stale catalogue and credential provisioning may fail."
+              summary: "Portal provider 1 has not synced for 32m 0s"
+      - eval_time: 13m
+        alertname: TykPortalProviderUnreachable
+        exp_alerts:
+          - exp_labels: {severity: critical, tyk_component: portal, control_plane_id: cp1, provider_id: "1"}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-portal"
+              description: "The Dashboard behind provider 1 did not answer the last sync. Check Dashboard health and the provider's credentials."
+              summary: "Portal cannot reach provider 1"
+      - eval_time: 25m
+        alertname: TykPortalProviderSyncFailing
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: portal, control_plane_id: cp1, provider_id: "1", error_type: auth}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-portal"
+              description: "auth means the provider's Dashboard API credentials were rejected; network and timeout point to connectivity; dashboard_error means the Dashboard answered with an error."
+              summary: "Portal sync with provider 1 is failing (auth)"
+
+  # MDCB sync failures, analytics data loss and RPC pool rejections.
+  - interval: 1m
+    input_series:
+      - series: 'tyk_mdcb_sync_failures_total{control_plane_id="cp1", group_id="eu", resource_type="keys", error_type="redis_error", mode="synchronizer"}'
+        values: '0+2x15'
+      - series: 'tyk_mdcb_analytics_records_total{control_plane_id="cp1", org_id="o", analytics_type="raw", result="failed"}'
+        values: '0+5x15'
+      - series: 'tyk_mdcb_analytics_records_total{control_plane_id="cp1", org_id="o", analytics_type="raw", result="stored"}'
+        values: '0+100x15'
+      - series: 'tyk_mdcb_connection_pool_rejected_total{control_plane_id="cp1", service_instance_id="mdcb-0", component="rpc_server"}'
+        values: '0+1x15'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: TykMDCBSyncFailures
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: mdcb, control_plane_id: cp1, group_id: eu, resource_type: keys, error_type: redis_error}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-mdcb"
+              description: "Gateways in group eu are not receiving keys and may be serving stale configuration or keys. redis_error and datastore_error point to MDCB's dependencies; decode_error to corrupt stored data."
+              summary: "MDCB failing to sync keys to group eu (redis_error)"
+      - eval_time: 12m
+        alertname: TykMDCBAnalyticsRecordsFailing
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: mdcb, control_plane_id: cp1, analytics_type: raw}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-mdcb"
+              description: "Analytics records from data plane gateways are failing to be stored. API analytics in the Dashboard will have gaps."
+              summary: "MDCB is dropping raw analytics records"
+      - eval_time: 12m
+        alertname: TykMDCBRPCConnectionsRejected
+        exp_alerts:
+          - exp_labels: {severity: critical, tyk_component: mdcb, control_plane_id: cp1, service_instance_id: mdcb-0, component: rpc_server}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-mdcb"
+              description: "mdcb-0 is turning away connections because its rpc_server pool is full. Data plane gateways cannot connect or sync."
+              summary: "MDCB is rejecting gateway connections"
+
+  # Slow RPC: GetKey at ~1s fires, while the CheckReload poll (sleeps 1s by design) does not.
+  - interval: 1m
+    input_series:
+      - series: 'tyk_mdcb_rpc_duration_seconds_bucket{control_plane_id="cp1", method="GetKey", le="0.5"}'
+        values: '0x20'
+      - series: 'tyk_mdcb_rpc_duration_seconds_bucket{control_plane_id="cp1", method="GetKey", le="1"}'
+        values: '0+10x20'
+      - series: 'tyk_mdcb_rpc_duration_seconds_bucket{control_plane_id="cp1", method="GetKey", le="+Inf"}'
+        values: '0+10x20'
+      - series: 'tyk_mdcb_rpc_duration_seconds_bucket{control_plane_id="cp1", method="CheckReload", le="0.5"}'
+        values: '0x20'
+      - series: 'tyk_mdcb_rpc_duration_seconds_bucket{control_plane_id="cp1", method="CheckReload", le="2.5"}'
+        values: '0+10x20'
+      - series: 'tyk_mdcb_rpc_duration_seconds_bucket{control_plane_id="cp1", method="CheckReload", le="+Inf"}'
+        values: '0+10x20'
+    alert_rule_test:
+      - eval_time: 18m
+        alertname: TykMDCBRPCSlow
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: mdcb, control_plane_id: cp1, method: GetKey}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-mdcb"
+              description: "The p95 MDCB handler time for GetKey has been above 500ms for 10 minutes. Check MDCB's Redis and datastore health."
+              summary: "MDCB GetKey p95 latency is 975ms"
+
+  # Keys not_found (deleted/unknown keys) is normal traffic and must not page.
+  - interval: 1m
+    input_series:
+      - series: 'tyk_mdcb_sync_failures_total{control_plane_id="cp1", group_id="eu", resource_type="keys", error_type="not_found", mode="on_demand"}'
+        values: '0+5x15'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: TykMDCBSyncFailures
+        exp_alerts: []
+
+  # RPC errors: GetKey errors (invalid client keys) never fire, errors on other methods do.
+  - interval: 1m
+    input_series:
+      - series: 'tyk_mdcb_rpc_requests_total{control_plane_id="cp1", method="GetKey", result="error"}'
+        values: '0+50x15'
+      - series: 'tyk_mdcb_rpc_requests_total{control_plane_id="cp1", method="GetKey", result="ok"}'
+        values: '0+50x15'
+      - series: 'tyk_mdcb_rpc_requests_total{control_plane_id="cp2", method="GetApiDefinitions", result="error"}'
+        values: '0+10x15'
+      - series: 'tyk_mdcb_rpc_requests_total{control_plane_id="cp2", method="GetApiDefinitions", result="ok"}'
+        values: '0+90x15'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: TykMDCBRPCErrorRate
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: mdcb, control_plane_id: cp2}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-mdcb"
+              description: "More than 5% of RPC calls from data plane gateways are failing."
+              summary: "MDCB RPC error rate is 10%"
+
+  # Heartbeat stale: a gateway still exported with a frozen heartbeat fires; a gateway whose
+  # series stops (restart with a new ID, deregistered) does not, although Prometheus keeps
+  # returning its last value for 5 minutes. Heartbeats are unix seconds (the test clock starts at
+  # 0) and trail the export by a minute, as a heartbeat lands between two exports.
+  - interval: 1m
+    input_series:
+      - series: 'tyk_mdcb_gateway_last_heartbeat_timestamp{control_plane_id="cp1", group_id="eu", gateway_id="frozen", hostname="gw-a"}'
+        values: '0x15'
+      - series: 'tyk_mdcb_gateway_last_heartbeat_timestamp{control_plane_id="cp1", group_id="eu", gateway_id="restarted", hostname="gw-b"}'
+        values: '-60+60x5 _x10'
+      - series: 'tyk_dashboard_gateways_heartbeat_timestamp_seconds{control_plane_id="cp1", node_id="frozen", hostname="gw-c"}'
+        values: '0x15'
+      - series: 'tyk_dashboard_gateways_heartbeat_timestamp_seconds{control_plane_id="cp1", node_id="restarted", hostname="gw-d"}'
+        values: '-60+60x5 _x10'
+    alert_rule_test:
+      - eval_time: 9m
+        alertname: TykMDCBGatewayHeartbeatStale
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: mdcb, control_plane_id: cp1, group_id: eu, gateway_id: frozen, hostname: gw-a}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-mdcb"
+              description: "MDCB has not seen a login or sync call from gateway frozen for 9m 0s, although it is still registered."
+              summary: "Gateway gw-a (eu) has gone quiet"
+      - eval_time: 9m
+        alertname: TykDashboardGatewayHeartbeatStale
+        exp_alerts:
+          - exp_labels: {severity: warning, tyk_component: dashboard, control_plane_id: cp1, node_id: frozen, hostname: gw-c}
+            exp_annotations:
+              dashboard: "/grafana/d/tyk-dashboard"
+              description: "Gateway node frozen (gw-c) last heartbeated 9m 0s ago."
+              summary: "Gateway gw-c stopped heartbeating to the Dashboard"

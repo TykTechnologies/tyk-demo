@@ -89,5 +89,3 @@ groups:
           severity: warning
           team_name: webstore
         isPaused: false
-        notification_settings:
-          receiver: grafana-default-email

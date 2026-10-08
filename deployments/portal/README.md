@@ -35,6 +35,10 @@ Make sure that the deployment is bootstrapped first.
 
 The tests will run for both the standard `tyk` deployment and also the `portal` deployment.
 
+### Metrics
+
+Deploy together with `opentelemetry-demo` (`./up.sh portal opentelemetry-demo`) to export the Portal's OpenTelemetry metrics and get the Developer Portal Grafana dashboard and alert rules. See [Control Plane Observability](../opentelemetry-demo/README.md#control-plane-observability-dashboard-mdcb-developer-portal).
+
 
 ## Usage
 
