@@ -17,6 +17,11 @@ otlp:
     - cloud.region
     - deployment.environment.name
 
+    # Tyk control-plane components (Dashboard, MDCB, Developer Portal) stamp
+    # these on their OTLP metrics; dashboards and alerts group by them.
+    - deployment.environment
+    - control_plane_id
+
     # When deploying on Kubernetes, resource attributes used to identify the
     # kubernetes resources in dashboards and alerts.
     - k8s.cluster.name
@@ -52,6 +57,8 @@ storage:
 # "SLOs for APIs managed by Tyk" dashboard.
 rule_files:
   - /etc/prometheus/slos.rules.yml
+  # Alert rules for the Tyk control plane (Dashboard, MDCB, Developer Portal)
+  - /etc/prometheus/tyk-control-plane.rules.yml
 
 scrape_configs:
   # Tyk Pump's Prometheus export (tyk_http_requests_total, tyk_http_latency)

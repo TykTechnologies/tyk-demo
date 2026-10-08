@@ -44,6 +44,10 @@ To use this deployment, run the `up.sh` script with the `mdcb` parameter:
 
 You can import the deployment-specific Postman collection `tyk_demo_mdcb.postman_collection.json`.
 
+### Metrics
+
+Deploy together with `opentelemetry-demo` (`./up.sh mdcb opentelemetry-demo`) to export MDCB's OpenTelemetry metrics and get the MDCB Grafana dashboard and alert rules. See [Control Plane Observability](../opentelemetry-demo/README.md#control-plane-observability-dashboard-mdcb-developer-portal).
+
 ## Usage
 
 One of the benefits of MDCB is that it provides Gateways in the Data Plane with reliancy against network partitions. If the Worker Gateway becomes disconnected from MDCB it will use the locally available Worker Redis to continue operating.

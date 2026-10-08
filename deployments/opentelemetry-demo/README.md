@@ -80,7 +80,7 @@ docker logs otel-collector 2>&1 | grep -i "grafana\|export\|error"
 
 Grafana is available at **http://localhost:8085/grafana** (no login required).
 
-The deployment ships four pre-configured dashboards that together give a complete picture of Tyk Gateway in production. They cross-link to each other so you can navigate seamlessly during a demo.
+The deployment ships four pre-configured dashboards that together give a complete picture of Tyk Gateway in production. They cross-link to each other so you can navigate seamlessly during a demo. Four more cover the control plane (Environments Overview, Tyk Dashboard, MDCB, Developer Portal): see [Control Plane Observability](#control-plane-observability-dashboard-mdcb-developer-portal).
 
 ---
 
@@ -184,6 +184,154 @@ For a **deep-dive demo** focused on a specific persona:
 - **Platform ops**: Focus on Fleet Health — config drift, Go runtime, log histogram.
 - **API product manager**: Focus on Portfolio — SLOs, error budget, consumer identity rows.
 - **Backend engineer**: Focus on Troubleshooting — latency attribution + trace + log correlation.
+
+---
+
+## Control Plane Observability (Dashboard, MDCB, Developer Portal)
+
+The Tyk Dashboard, MDCB and the Enterprise Developer Portal export their own OTLP metrics, the same way the Gateway does. This deployment collects them through the same OpenTelemetry Collector → Prometheus pipeline, and ships four Grafana dashboards and a set of Prometheus alert rules for them.
+
+### Requirements
+
+| Component | Minimum version | Metrics |
+| --------- | --------------- | ------- |
+| Tyk Dashboard | v5.16.0 | Management API HTTP, gateway registry, licence, change propagation, dependency pools and health, object inventory and governance, build info, Go runtime |
+| Tyk MDCB | v2.14.0 | Data plane connectivity and churn, config and key sync, keyspace events, analytics ingestion, RPC load, connection pools, dependency health, licence and certificate expiry, build info, Go runtime |
+| Tyk Developer Portal | v1.20.0 | Provider sync health, dependency health |
+| Tyk Gateway | v5.16.0 | Reports its version and loaded APIs/policies to the Dashboard registry; older gateways show as `unknown` |
+| Grafana | 13 | The Environments Overview is a Grafana v2 (dynamic) dashboard; this deployment runs Grafana 13.2.3 |
+
+Older versions ignore the configuration; their dashboards simply stay empty. Data plane gateways must be connected to MDCB to appear on the MDCB dashboard. Pre-releases can be used by setting `DASHBOARD_VERSION`, `GATEWAY_VERSION`, `MDCB_VERSION` and `PORTAL_VERSION` in `.env` (for example `v5.16.0-alpha1`, `v2.14.0-alpha1`, `v1.20.0-alpha1`).
+
+### Setup
+
+Deploy the components you want alongside this deployment. MDCB requires `MDCB_LICENCE` in `.env` (see the [MDCB deployment](../mdcb/README.md)):
+
+```
+./up.sh opentelemetry-demo mdcb portal
+```
+
+The Tyk Dashboard always exports metrics with this deployment. MDCB and the Portal export them when their deployment is included. Configuration comes from [`demo.env`](./demo.env):
+
+| Variable | Default | Description |
+| -------- | ------- | ----------- |
+| `CONTROL_PLANE_ID` | `tyk-demo-cp` | `control_plane_id` label stamped on every control-plane series; dashboards and alerts group by it |
+| `CONTROL_PLANE_ENVIRONMENT` | `demo` | `deployment_environment` label |
+| `CONTROL_PLANE_METRICS_ENDPOINT` | `otel-collector:4317` | OTLP gRPC endpoint for all three components |
+| `CONTROL_PLANE_METRICS_EXPORTINTERVAL` | `5` | Export interval, in seconds (the Gateways also export every 5s) |
+| `TYK_DB_OPENTELEMETRY_METRICS_ENABLED` | `true` | Dashboard metrics on/off |
+| `TYK_DB_OPENTELEMETRY_METRICS_OBJECTSMETRICS_COLLECTIONINTERVAL` | `60` | How often the Dashboard counts APIs, policies and users, in seconds |
+| `TYK_MDCB_OPENTELEMETRY_METRICS_ENABLED` | `true` | MDCB metrics on/off |
+| `PORTAL_OPENTELEMETRY_METRICS_ENABLED` | `true` | Portal metrics on/off |
+
+The compose files map these to each component's own settings (`TYK_DB_OPENTELEMETRY_METRICS_*`, `TYK_MDCB_OPENTELEMETRY_METRICS_*`, `PORTAL_OPENTELEMETRY_METRICS_*`). The Portal has no `control_plane_id` setting, so it receives it through `OTEL_RESOURCE_ATTRIBUTES`.
+
+### Control plane dashboards
+
+The four dashboards share the same filters (data source, environment, control plane, and component replica) and link to each other, keeping the filters and time range. Every panel's description names the metric it reads. Data plane groups link to the Gateway Fleet Health dashboard with the group pre-selected.
+
+#### 5. Tyk Environments Overview — `tyk-environments`
+
+**Who it's for**: Platform owners and on-call SREs: the single pane for every environment and control plane.
+
+**What it shows**:
+- An environments table: control planes, dependency checks, connected gateways and data planes, gateway version drift, the licence or certificate that expires first, Developer Portal sync, and when checks last reported
+- One section per environment, and inside it one per control plane:
+  - Summary: dependency checks, gateway version drift against the Tyk Dashboard, first licence/certificate to expire, gateways by version
+  - Tyk Dashboard: version, connected gateways, licence seats, API errors, datastore and Redis checks, certificates and licence expiry
+  - MDCB (only when the control plane runs MDCB): version, data planes and their gateways, RPC errors, checks, data planes by group, certificates and licence
+- The Developer Portal: instances, last successful provider sync, unreachable providers, failed syncs, database and file storage checks
+
+Each section links to the component dashboard for that environment and control plane.
+
+#### 6. Tyk Dashboard — `tyk-dashboard`
+
+**Who it's for**: Platform teams running the management plane, and CI/CD owners asking "is it the Dashboard or my pipeline?".
+
+**What it shows**: at-a-glance health; dependency checks and connection pool usage; gateways connected to the Dashboard (heartbeats, loaded config, versions, tags, segmentation, gateways that stopped heartbeating); certificates and licence seats and expiry; the control API (5xx rate, requests by status class, p50/p95/p99, busiest and slowest routes); change propagation to gateways; process and runtime; object inventory; and API governance compliance.
+
+#### 7. Tyk MDCB — `tyk-mdcb`
+
+**Who it's for**: SREs operating MDCB and the data planes behind it.
+
+**What it shows**: at-a-glance health; data planes by group (gateways, change vs an hour ago, heartbeats, loaded config, versions), gateways that went missing, connection failures and reconnects; dependency checks and connection pools; RPC requests to MDCB (errors and denied, results, latency by method, top groups and gateways, data transferred); config and key sync (last successful sync, failures by cause, config change events, sync duration); certificates and licence; analytics ingestion; process and runtime.
+
+**Demo talking points**:
+- Stop a worker gateway (`docker stop tyk-demo-tyk-worker-gateway-1`): it moves to "Gateways that went missing" and its group's count drops, firing `TykMDCBGatewayHeartbeatStale` and `TykMDCBDataPlaneGroupDisconnected`.
+- Create and delete a few keys in the Dashboard: config change events show what MDCB propagates to data planes, and deleted keys show up as `keys · not_found` sync failures (normal, so they do not alert).
+- MDCB syncs a group when a gateway connects (bulk push) or after a change (pull), not on a timer, so an old "Last successful sync" on a stable estate is normal.
+- RPC latency by method leaves out `CheckReload`/`CheckIdPReload`: gateways long-poll them and MDCB holds each call for about 1s by design.
+- Call a protected API on the worker gateway with an invalid key (`curl -H 'Authorization: wrong' http://localhost:8090/basic-protected-api/get`): every lookup of a key that does not exist counts as a `GetKey` RPC error, so the RPC error ratio rises. `TykMDCBRPCErrorRate` ignores `GetKey` for this reason.
+- Right after bootstrap, the RPC error and connection failure panels show a few minutes of `denied`/`invalid_credentials`: the worker gateways start before the MDCB bootstrap creates their Dashboard credentials. It clears once they restart with them, and is too short to fire the connection-error alert.
+
+#### 8. Tyk Developer Portal — `tyk-portal`
+
+**Who it's for**: Teams running the public developer storefront.
+
+**What it shows**: at-a-glance health; provider sync with the Tyk Dashboard (time since the last successful sync, reachability, failures by cause: `auth`, `network`, `timeout`, `dashboard_error`, ..., and sync duration); database, file storage and process health.
+
+**Demo talking points**:
+- The time since the last successful sync resets every `PORTAL_REFRESHINTERVAL` (10 minutes here). A value that keeps climbing is the silent sync stall that today only shows up as stale catalogues.
+- Rotate the Dashboard API key used by the provider to show `auth` failures, an unreachable provider, and the stale-sync alert.
+
+### Control plane alert rules
+
+[`src/prometheus/tyk-control-plane.rules.yml`](./src/prometheus/tyk-control-plane.rules.yml) is loaded by Prometheus and can be reused as-is in any Prometheus that ingests these metrics. Every alert has a `severity` (`critical`, `warning`, `info`) and a `tyk_component` label, plus `summary`, `description` and `dashboard` annotations. Firing alerts appear at http://localhost:8085/grafana/alerting/list (data source-managed rules).
+
+| Alert | Severity | Fires when |
+| ----- | -------- | ---------- |
+| `TykControlPlaneComponentStoppedReporting` | critical | Dashboard, MDCB or Portal reported in the last 30 minutes but not in the last 5 |
+| `TykControlPlaneComponentRestarted` | info | A replica started less than 5 minutes ago |
+| `TykControlPlaneMemoryNearLimit` | warning | Go memory above 90% of `GOMEMLIMIT` for 10m |
+| `TykDashboardDependencyUnhealthy` | critical | A Dashboard storage role (main, analytics, logs, uptime, Redis) fails its probe for 2m |
+| `TykDashboardHighErrorRate` | warning | Management API 5xx rate above 5% for 5m |
+| `TykDashboardHighLatency` | warning | Management API p95 above 2s for 10m |
+| `TykDashboardGatewayHeartbeatStale` | warning | A registered gateway has not heartbeated for 60s |
+| `TykDashboardConnectedGatewaysDropped` | warning | Fewer gateways registered than 15 minutes ago |
+| `TykDashboardLicenseGatewayCapacity` | warning | More than 90% of licensed gateway slots in use |
+| `TykDashboardLicenseExpiringSoon` / `TykDashboardLicenseExpiryImminent` | warning / critical | Licence expires within 30 / 7 days |
+| `TykDashboardCertificateExpiringSoon` | warning | Dashboard TLS certificate expires within 14 days |
+| `TykDashboardNotificationFailures` | warning | Changes failing to publish to gateways for 5m |
+| `TykDashboardDatastorePoolSaturated` / `TykDashboardRedisPoolSaturated` | warning | Connection pool above 90% of its maximum for 5m |
+| `TykDashboardTelemetryExporterUnhealthy` | warning | OTLP exports failing for 10m |
+| `TykMDCBDependencyUnhealthy` | critical | MDCB datastore, Redis or RPC server unhealthy for 2m |
+| `TykMDCBDataPlaneGroupDisconnected` | critical | Every gateway of a group that was connected in the last hour is gone |
+| `TykMDCBDataPlaneGatewaysDropped` | warning | A group has fewer gateways than 15 minutes ago |
+| `TykMDCBGatewayReconnectStorm` | warning | More than 5 reconnects/min in a group for 5m |
+| `TykMDCBGatewayConnectErrors` | warning | More than 3 failed connection attempts/min of one cause for 10m |
+| `TykMDCBGatewayHeartbeatStale` | warning | A registered gateway has made no login or sync call for 2 minutes |
+| `TykMDCBGatewayConfigDrift` | warning | Gateways in the same group report different API counts for 10m |
+| `TykMDCBGatewayVersionSkew` | info | More than one gateway version in a group for 30m |
+| `TykMDCBRPCErrorRate` | warning | More than 5% of RPC calls failing for 5m (GetKey excluded: invalid client keys return errors) |
+| `TykMDCBRPCSlow` | warning | p95 handler time of an RPC method above 500ms for 10m (polls excluded) |
+| `TykMDCBRPCPoolSaturated` | warning | A connection pool above 80% of its maximum for 5m |
+| `TykMDCBRPCConnectionsRejected` | critical | MDCB turning away connections because its pool is full |
+| `TykMDCBSyncFailures` | warning | Config or key syncs to a group failing for 5m (`not_found` excluded) |
+| `TykMDCBAnalyticsRecordsFailing` | warning | Analytics records failing to be stored for 5m |
+| `TykMDCBTelemetryExporterUnhealthy` | warning | MDCB OTLP exports failing for 10m |
+| `TykMDCBLicenseExpiringSoon` / `TykMDCBLicenseExpiryImminent` | warning / critical | MDCB licence expires within 30 / 7 days |
+| `TykMDCBCertificateExpiringSoon` | warning | MDCB TLS certificate expires within 14 days |
+| `TykPortalDependencyUnhealthy` | critical | Portal database or asset storage fails its probe for 2m |
+| `TykPortalProviderSyncStale` | critical | No successful provider sync for 30 minutes (3 × `PORTAL_REFRESHINTERVAL`) |
+| `TykPortalProviderUnreachable` | critical | The provider's Dashboard did not answer the last sync |
+| `TykPortalProviderSyncFailing` | warning | Provider sync failures in the last 30 minutes |
+| `TykPortalProviderSyncSlow` | warning | Provider sync p95 above 60s for 30m |
+
+Thresholds are demo defaults; tune them per estate. The rules have unit tests:
+
+```
+docker run --rm -v "$PWD/deployments/opentelemetry-demo/src/prometheus:/p" -w /p/tests \
+  --entrypoint promtool quay.io/prometheus/prometheus:v3.5.0 test rules tyk-control-plane.rules.test.yml
+```
+
+### Known limitations
+
+- The Dashboard's per-gateway version and loaded API/policy counts need Gateway v5.16.0 or later; older gateways show `unknown` and empty counts.
+- MDCB syncs on gateway login and reload rather than on a timer, so the age of the last successful sync is shown but not alerted on; sync failures are.
+- The Portal does not yet export HTTP, authentication, provisioning or Go runtime metrics, so its dashboard covers provider sync and dependency health only.
+- Prometheus misses the first increment of a counter series that starts mid-run, so a brand-new series (a gateway that just logged in, the first Portal sync or failure after a restart) shows up in rates from its second increment. The bulk API definition transfer a gateway receives at login is the most visible case in "RPC data transferred".
+- MDCB v2.14.0-alpha1 forgets the last successful sync of every group if its node registry looks empty for a single export cycle (seen under load, when a gateway heartbeat is late). "Last successful sync" then shows no data until the group's gateways log in again or a change is pulled.
+- A restarted gateway comes back with a new node ID. Series pushed over OTLP get no staleness marker when they stop, so Prometheus keeps returning the old ID's last value for up to 5 minutes: both IDs are listed (the old one with a growing heartbeat age) until it drops out.
 
 ---
 

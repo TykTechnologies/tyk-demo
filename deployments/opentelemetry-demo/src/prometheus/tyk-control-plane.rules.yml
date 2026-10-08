@@ -1,0 +1,617 @@
+---
+# Alert rules for the Tyk control plane: Dashboard, MDCB and Developer Portal.
+#
+# The components push OTLP metrics to the OpenTelemetry Collector, which forwards
+# them to Prometheus' OTLP receiver. Resource attributes promoted to labels
+# (see prometheus-config.yaml): service_name, service_instance_id,
+# control_plane_id, deployment_environment.
+#
+# Every alert carries:
+#   severity  - critical (page), warning (ticket / business hours), info (FYI)
+#   tyk_component - control-plane | dashboard | mdcb | portal
+#   (not "component": the health metrics already use that label for the dependency)
+# and a "dashboard" annotation pointing to the Grafana dashboard to start from.
+#
+# Thresholds are starting points for a demo; tune them per estate.
+
+groups:
+
+  # ---------------------------------------------------------------------------
+  # Cross-component
+  # ---------------------------------------------------------------------------
+  - name: tyk-control-plane
+    rules:
+
+      # Metrics are pushed, so there is no scrape "up" series. A component that
+      # reported in the last 30 minutes but has nothing within the 5 minute
+      # lookback has stopped exporting (crashed, hung, or its exporter is broken).
+      # Use absent() instead if you need to alert on a component that never
+      # reported at all.
+      - alert: TykControlPlaneComponentStoppedReporting
+        expr: |-
+          max by (control_plane_id, service_name) (max_over_time(process_uptime_seconds{service_name=~"tyk-dashboard|tyk-mdcb|tyk-portal"}[30m]))
+          unless
+          max by (control_plane_id, service_name) (process_uptime_seconds{service_name=~"tyk-dashboard|tyk-mdcb|tyk-portal"})
+        for: 1m
+        labels:
+          severity: critical
+          tyk_component: control-plane
+        annotations:
+          summary: "{{ $labels.service_name }} stopped reporting metrics"
+          description: >-
+            {{ $labels.service_name }} in control plane {{ $labels.control_plane_id }} has not
+            exported metrics for over 5 minutes. The process may be down, hung, or unable to
+            reach the OpenTelemetry Collector.
+          dashboard: /grafana/d/tyk-environments
+
+      - alert: TykControlPlaneComponentRestarted
+        expr: |-
+          min by (control_plane_id, service_name, service_instance_id) (process_uptime_seconds{service_name=~"tyk-dashboard|tyk-mdcb|tyk-portal"}) < 300
+          and on (control_plane_id, service_name)
+          count by (control_plane_id, service_name) (max_over_time(process_uptime_seconds{service_name=~"tyk-dashboard|tyk-mdcb|tyk-portal"}[1h] offset 10m))
+        labels:
+          severity: info
+          tyk_component: control-plane
+        annotations:
+          summary: "{{ $labels.service_name }} restarted"
+          description: >-
+            A {{ $labels.service_name }} replica in control plane {{ $labels.control_plane_id }}
+            started less than 5 minutes ago. Frequent restarts point to crashes or OOM kills.
+          dashboard: /grafana/d/tyk-environments
+
+      - alert: TykControlPlaneMemoryNearLimit
+        expr: |-
+          sum by (control_plane_id, service_name, service_instance_id) (go_memory_used_bytes{service_name=~"tyk-dashboard|tyk-mdcb"})
+          /
+          max by (control_plane_id, service_name, service_instance_id) (go_memory_limit_bytes{service_name=~"tyk-dashboard|tyk-mdcb"} > 0)
+          > 0.9
+        for: 10m
+        labels:
+          severity: warning
+          tyk_component: control-plane
+        annotations:
+          summary: "{{ $labels.service_name }} memory above 90% of GOMEMLIMIT"
+          description: >-
+            Go runtime memory for {{ $labels.service_name }} ({{ $labels.service_instance_id }})
+            is {{ $value | humanizePercentage }} of its configured memory limit. Only evaluated
+            when GOMEMLIMIT is set.
+          dashboard: /grafana/d/tyk-environments
+
+  # ---------------------------------------------------------------------------
+  # Tyk Dashboard
+  # ---------------------------------------------------------------------------
+  - name: tyk-dashboard
+    rules:
+
+      - alert: TykDashboardDependencyUnhealthy
+        expr: min by (control_plane_id, service_instance_id, component, store) (tyk_dashboard_health) == 0
+        for: 2m
+        labels:
+          severity: critical
+          tyk_component: dashboard
+        annotations:
+          summary: "Dashboard cannot reach its {{ $labels.component }} store ({{ $labels.store }})"
+          description: >-
+            The Dashboard health probe for {{ $labels.component }} ({{ $labels.store }}) has been
+            failing for 2 minutes. Operators may be unable to manage APIs, policies or keys.
+          dashboard: /grafana/d/tyk-dashboard
+
+      - alert: TykDashboardHighErrorRate
+        expr: |-
+          sum by (control_plane_id) (rate(http_server_request_duration_seconds_count{service_name="tyk-dashboard", http_response_status_class="5xx"}[5m]))
+          /
+          sum by (control_plane_id) (rate(http_server_request_duration_seconds_count{service_name="tyk-dashboard"}[5m]) > 0)
+          > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          tyk_component: dashboard
+        annotations:
+          summary: "Dashboard API 5xx rate is {{ $value | humanizePercentage }}"
+          description: >-
+            More than 5% of Dashboard management API requests are failing with 5xx. CI/CD
+            pipelines and operators deploying through the Dashboard will see errors.
+          dashboard: /grafana/d/tyk-dashboard
+
+      - alert: TykDashboardHighLatency
+        expr: |-
+          histogram_quantile(0.95, sum by (le, control_plane_id) (rate(http_server_request_duration_seconds_bucket{service_name="tyk-dashboard"}[5m])))
+          > 2
+        for: 10m
+        labels:
+          severity: warning
+          tyk_component: dashboard
+        annotations:
+          summary: "Dashboard API p95 latency is {{ $value | humanizeDuration }}"
+          description: >-
+            The Dashboard management API p95 latency has been above 2s for 10 minutes. Datastore
+            slowness usually surfaces here first.
+          dashboard: /grafana/d/tyk-dashboard
+
+      # Only series still being exported: Prometheus keeps returning an OTLP series for 5
+      # minutes after it stops, so a restarted or deregistered gateway would look stale.
+      # Gateways that are gone are covered by TykDashboardConnectedGatewaysDropped.
+      - alert: TykDashboardGatewayHeartbeatStale
+        expr: |-
+          time() - max by (control_plane_id, node_id, hostname) (
+            tyk_dashboard_gateways_heartbeat_timestamp_seconds
+            and timestamp(tyk_dashboard_gateways_heartbeat_timestamp_seconds) > time() - 120
+          ) > 60
+        for: 2m
+        labels:
+          severity: warning
+          tyk_component: dashboard
+        annotations:
+          summary: "Gateway {{ $labels.hostname }} stopped heartbeating to the Dashboard"
+          description: >-
+            Gateway node {{ $labels.node_id }} ({{ $labels.hostname }}) last heartbeated
+            {{ $value | humanizeDuration }} ago.
+          dashboard: /grafana/d/tyk-dashboard
+
+      - alert: TykDashboardConnectedGatewaysDropped
+        expr: |-
+          max by (control_plane_id) (sum by (control_plane_id, service_instance_id) (tyk_dashboard_gateways_connected))
+          <
+          max by (control_plane_id) (sum by (control_plane_id, service_instance_id) (tyk_dashboard_gateways_connected offset 15m))
+        for: 5m
+        labels:
+          severity: warning
+          tyk_component: dashboard
+        annotations:
+          summary: "Fewer gateways connected to the Dashboard than 15 minutes ago"
+          description: >-
+            {{ $value }} gateways are registered with the Dashboard, fewer than 15 minutes ago.
+            Check the Gateway Registry row for the missing nodes.
+          dashboard: /grafana/d/tyk-dashboard
+
+      - alert: TykDashboardLicenseGatewayCapacity
+        expr: |-
+          max by (control_plane_id) (tyk_dashboard_license_gateways_used)
+          /
+          max by (control_plane_id) (tyk_dashboard_license_gateways_limit > 0)
+          > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          tyk_component: dashboard
+        annotations:
+          summary: "Dashboard licence is at {{ $value | humanizePercentage }} of its gateway limit"
+          description: >-
+            New gateways will be refused once the licence limit is reached; scale-outs during an
+            incident are the usual victim.
+          dashboard: /grafana/d/tyk-dashboard
+
+      - alert: TykDashboardLicenseExpiringSoon
+        expr: max by (control_plane_id) (tyk_dashboard_license_expiry_timestamp_seconds > 0) - time() < 30 * 86400
+        labels:
+          severity: warning
+          tyk_component: dashboard
+        annotations:
+          summary: "Dashboard licence expires in {{ $value | humanizeDuration }}"
+          description: Renew the Dashboard licence before it expires.
+          dashboard: /grafana/d/tyk-dashboard
+
+      - alert: TykDashboardLicenseExpiryImminent
+        expr: max by (control_plane_id) (tyk_dashboard_license_expiry_timestamp_seconds > 0) - time() < 7 * 86400
+        labels:
+          severity: critical
+          tyk_component: dashboard
+        annotations:
+          summary: "Dashboard licence expires in {{ $value | humanizeDuration }}"
+          description: The Dashboard licence expires within 7 days (or has already expired).
+          dashboard: /grafana/d/tyk-dashboard
+
+      - alert: TykDashboardCertificateExpiringSoon
+        expr: min by (control_plane_id, cert_type, domain) (tyk_dashboard_cert_expiry_timestamp_seconds) - time() < 14 * 86400
+        labels:
+          severity: warning
+          tyk_component: dashboard
+        annotations:
+          summary: "Dashboard {{ $labels.cert_type }} certificate for {{ $labels.domain }} expires in {{ $value | humanizeDuration }}"
+          description: An expired Dashboard TLS certificate locks operators out of the UI and API.
+          dashboard: /grafana/d/tyk-dashboard
+
+      - alert: TykDashboardNotificationFailures
+        expr: sum by (control_plane_id, channel) (rate(tyk_dashboard_notifications_failures_total[5m])) > 0
+        for: 5m
+        labels:
+          severity: warning
+          tyk_component: dashboard
+        annotations:
+          summary: "Dashboard is failing to publish on {{ $labels.channel }}"
+          description: >-
+            API, policy or key changes are not being propagated to gateways through Redis
+            pub/sub. Gateways may be serving stale configuration.
+          dashboard: /grafana/d/tyk-dashboard
+
+      - alert: TykDashboardDatastorePoolSaturated
+        expr: |-
+          max by (control_plane_id, service_instance_id, component, store, pool) (tyk_dashboard_datastore_pool_active)
+          /
+          max by (control_plane_id, service_instance_id, component, store, pool) (tyk_dashboard_datastore_pool_max > 0)
+          > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          tyk_component: dashboard
+        annotations:
+          summary: "Dashboard {{ $labels.component }} {{ $labels.store }} pool is {{ $value | humanizePercentage }} used"
+          description: >-
+            The {{ $labels.component }} datastore connection pool is close to exhaustion.
+            Requests will start queueing for a connection.
+          dashboard: /grafana/d/tyk-dashboard
+
+      - alert: TykDashboardRedisPoolSaturated
+        expr: |-
+          max by (control_plane_id, service_instance_id) (tyk_dashboard_redis_pool_active)
+          /
+          max by (control_plane_id, service_instance_id) (tyk_dashboard_redis_pool_max > 0)
+          > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          tyk_component: dashboard
+        annotations:
+          summary: "Dashboard Redis pool is {{ $value | humanizePercentage }} used"
+          description: The Dashboard Redis connection pool is close to exhaustion.
+          dashboard: /grafana/d/tyk-dashboard
+
+      - alert: TykDashboardTelemetryExporterUnhealthy
+        expr: min by (control_plane_id, service_instance_id) (tyk_dashboard_telemetry_exporter_healthy) == 0
+        for: 10m
+        labels:
+          severity: warning
+          tyk_component: dashboard
+        annotations:
+          summary: "Dashboard OTLP metrics exporter is failing"
+          description: >-
+            The Dashboard reports its last metric exports failed. Metrics may be delayed or
+            missing; check the Collector endpoint and credentials.
+          dashboard: /grafana/d/tyk-dashboard
+
+  # ---------------------------------------------------------------------------
+  # Tyk MDCB
+  # ---------------------------------------------------------------------------
+  - name: tyk-mdcb
+    rules:
+
+      - alert: TykMDCBDependencyUnhealthy
+        expr: min by (control_plane_id, service_instance_id, component, store) (tyk_mdcb_health) == 0
+        for: 2m
+        labels:
+          severity: critical
+          tyk_component: mdcb
+        annotations:
+          summary: "MDCB {{ $labels.component }} is unhealthy"
+          description: >-
+            The MDCB health check for {{ $labels.component }} {{ $labels.store }} has been failing
+            for 2 minutes on {{ $labels.service_instance_id }}. Data plane gateways may be unable
+            to sync configuration or validate keys.
+          dashboard: /grafana/d/tyk-mdcb
+
+      - alert: TykMDCBDataPlaneGroupDisconnected
+        expr: |-
+          group by (control_plane_id, group_id) (max_over_time(tyk_mdcb_gateway_connected[1h]))
+          unless
+          group by (control_plane_id, group_id) (tyk_mdcb_gateway_connected)
+        for: 2m
+        labels:
+          severity: critical
+          tyk_component: mdcb
+        annotations:
+          summary: "No gateways connected from data plane group {{ $labels.group_id }}"
+          description: >-
+            Every gateway in group {{ $labels.group_id }} has disconnected from MDCB in the last
+            hour. Gateways keep serving from their local Redis cache, but no longer receive
+            configuration changes. (The alert resolves an hour after the group disappears.)
+          dashboard: /grafana/d/tyk-mdcb
+
+      - alert: TykMDCBDataPlaneGatewaysDropped
+        expr: |-
+          count by (control_plane_id, group_id) (group by (control_plane_id, group_id, gateway_id) (tyk_mdcb_gateway_connected))
+          <
+          count by (control_plane_id, group_id) (group by (control_plane_id, group_id, gateway_id) (tyk_mdcb_gateway_connected offset 15m))
+        for: 5m
+        labels:
+          severity: warning
+          tyk_component: mdcb
+        annotations:
+          summary: "Data plane group {{ $labels.group_id }} lost gateways"
+          description: >-
+            {{ $value }} gateways are connected from group {{ $labels.group_id }}, fewer than
+            15 minutes ago.
+          dashboard: /grafana/d/tyk-mdcb
+
+      - alert: TykMDCBGatewayReconnectStorm
+        expr: sum by (control_plane_id, group_id) (rate(tyk_mdcb_gateway_reconnects_total[5m])) * 60 > 5
+        for: 5m
+        labels:
+          severity: warning
+          tyk_component: mdcb
+        annotations:
+          summary: "Reconnect storm from data plane group {{ $labels.group_id }}"
+          description: >-
+            Gateways in group {{ $labels.group_id }} are reconnecting to MDCB at
+            {{ $value | printf "%.1f" }}/min. Reconnect storms precede RPC pool saturation and
+            config sync stalls.
+          dashboard: /grafana/d/tyk-mdcb
+
+      - alert: TykMDCBGatewayConnectErrors
+        expr: sum by (control_plane_id, error_type) (rate(tyk_mdcb_gateway_connect_errors_total[5m])) * 60 > 3
+        for: 10m
+        labels:
+          severity: warning
+          tyk_component: mdcb
+        annotations:
+          summary: "Gateways failing to connect to MDCB ({{ $labels.error_type }})"
+          description: >-
+            {{ $value | printf "%.1f" }} connection attempts/min are failing with
+            {{ $labels.error_type }}. invalid_credentials and tls usually mean a rotated key or
+            certificate; eof and timeout point to the network or MDCB load.
+          dashboard: /grafana/d/tyk-mdcb
+
+      # Same freshness guard as TykDashboardGatewayHeartbeatStale: a restarted gateway comes
+      # back with a new gateway_id and its old series lingers for 5 minutes. Gateways that
+      # are gone are covered by TykMDCBDataPlaneGatewaysDropped.
+      - alert: TykMDCBGatewayHeartbeatStale
+        expr: |-
+          time() - max by (control_plane_id, group_id, gateway_id, hostname) (
+            tyk_mdcb_gateway_last_heartbeat_timestamp
+            and timestamp(tyk_mdcb_gateway_last_heartbeat_timestamp) > time() - 120
+          ) > 120
+        for: 2m
+        labels:
+          severity: warning
+          tyk_component: mdcb
+        annotations:
+          summary: "Gateway {{ $labels.hostname }} ({{ $labels.group_id }}) has gone quiet"
+          description: >-
+            MDCB has not seen a login or sync call from gateway {{ $labels.gateway_id }} for
+            {{ $value | humanizeDuration }}, although it is still registered.
+          dashboard: /grafana/d/tyk-mdcb
+
+      - alert: TykMDCBGatewayConfigDrift
+        expr: |-
+          max by (control_plane_id, group_id) (tyk_mdcb_gateway_apis_loaded)
+          -
+          min by (control_plane_id, group_id) (tyk_mdcb_gateway_apis_loaded)
+          > 0
+        for: 10m
+        labels:
+          severity: warning
+          tyk_component: mdcb
+        annotations:
+          summary: "Gateways in group {{ $labels.group_id }} have different API counts loaded"
+          description: >-
+            Gateways in the same data plane group disagree by {{ $value }} APIs for 10 minutes.
+            Some gateways are serving stale configuration.
+          dashboard: /grafana/d/tyk-mdcb
+
+      - alert: TykMDCBGatewayVersionSkew
+        expr: count by (control_plane_id, group_id) (group by (control_plane_id, group_id, version) (tyk_mdcb_gateway_connected)) > 1
+        for: 30m
+        labels:
+          severity: info
+          tyk_component: mdcb
+        annotations:
+          summary: "Mixed gateway versions in data plane group {{ $labels.group_id }}"
+          description: >-
+            {{ $value }} different gateway versions are connected from group
+            {{ $labels.group_id }}. Expected during a rolling upgrade, otherwise check for an
+            unsupported version.
+          dashboard: /grafana/d/tyk-mdcb
+
+      # GetKey answers a key that does not exist with an error, so clients sending invalid
+      # API keys would fire this; MDCB's own Redis problems are caught by TykMDCBDependencyUnhealthy.
+      - alert: TykMDCBRPCErrorRate
+        expr: |-
+          sum by (control_plane_id) (rate(tyk_mdcb_rpc_requests_total{result="error",method!="GetKey"}[5m]))
+          /
+          sum by (control_plane_id) (rate(tyk_mdcb_rpc_requests_total[5m]) > 0)
+          > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          tyk_component: mdcb
+        annotations:
+          summary: "MDCB RPC error rate is {{ $value | humanizePercentage }}"
+          description: More than 5% of RPC calls from data plane gateways are failing.
+          dashboard: /grafana/d/tyk-mdcb
+
+      # CheckReload and CheckIdPReload are polls that deliberately sleep 1s per call.
+      - alert: TykMDCBRPCSlow
+        expr: |-
+          histogram_quantile(0.95, sum by (le, control_plane_id, method) (rate(tyk_mdcb_rpc_duration_seconds_bucket{method!~"CheckReload|CheckIdPReload"}[5m])))
+          > 0.5
+        for: 10m
+        labels:
+          severity: warning
+          tyk_component: mdcb
+        annotations:
+          summary: "MDCB {{ $labels.method }} p95 latency is {{ $value | humanizeDuration }}"
+          description: >-
+            The p95 MDCB handler time for {{ $labels.method }} has been above 500ms for 10
+            minutes. Check MDCB's Redis and datastore health.
+          dashboard: /grafana/d/tyk-mdcb
+
+      - alert: TykMDCBRPCPoolSaturated
+        expr: |-
+          max by (control_plane_id, service_instance_id, component) (tyk_mdcb_connection_pool_active)
+          /
+          max by (control_plane_id, service_instance_id, component) (tyk_mdcb_connection_pool_max > 0)
+          > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          tyk_component: mdcb
+        annotations:
+          summary: "MDCB {{ $labels.component }} pool is {{ $value | humanizePercentage }} used"
+          description: >-
+            The {{ $labels.component }} connection pool on {{ $labels.service_instance_id }} is
+            above 80% of its maximum. Saturation precedes rejected gateway connections and
+            ingress CPU throttling.
+          dashboard: /grafana/d/tyk-mdcb
+
+      - alert: TykMDCBRPCConnectionsRejected
+        expr: sum by (control_plane_id, service_instance_id, component) (rate(tyk_mdcb_connection_pool_rejected_total[5m])) > 0
+        for: 5m
+        labels:
+          severity: critical
+          tyk_component: mdcb
+        annotations:
+          summary: "MDCB is rejecting gateway connections"
+          description: >-
+            {{ $labels.service_instance_id }} is turning away connections because its
+            {{ $labels.component }} pool is full. Data plane gateways cannot connect or sync.
+          dashboard: /grafana/d/tyk-mdcb
+
+      # Syncs run on gateway login and reload, not on a timer, so failures (not the
+      # age of the last success) are what signals stale configuration. not_found is
+      # excluded: gateways asking for deleted or unknown keys produce it in normal use.
+      - alert: TykMDCBSyncFailures
+        expr: sum by (control_plane_id, group_id, resource_type, error_type) (rate(tyk_mdcb_sync_failures_total{error_type!="not_found"}[5m])) > 0
+        for: 5m
+        labels:
+          severity: warning
+          tyk_component: mdcb
+        annotations:
+          summary: "MDCB failing to sync {{ $labels.resource_type }} to group {{ $labels.group_id }} ({{ $labels.error_type }})"
+          description: >-
+            Gateways in group {{ $labels.group_id }} are not receiving {{ $labels.resource_type }}
+            and may be serving stale configuration or keys. redis_error and datastore_error point
+            to MDCB's dependencies; decode_error to corrupt stored data.
+          dashboard: /grafana/d/tyk-mdcb
+
+      - alert: TykMDCBAnalyticsRecordsFailing
+        expr: sum by (control_plane_id, analytics_type) (rate(tyk_mdcb_analytics_records_total{result="failed"}[5m])) > 0
+        for: 5m
+        labels:
+          severity: warning
+          tyk_component: mdcb
+        annotations:
+          summary: "MDCB is dropping {{ $labels.analytics_type }} analytics records"
+          description: >-
+            Analytics records from data plane gateways are failing to be stored. API analytics
+            in the Dashboard will have gaps.
+          dashboard: /grafana/d/tyk-mdcb
+
+      - alert: TykMDCBTelemetryExporterUnhealthy
+        expr: min by (control_plane_id, service_instance_id) (tyk_mdcb_telemetry_exporter_healthy) == 0
+        for: 10m
+        labels:
+          severity: warning
+          tyk_component: mdcb
+        annotations:
+          summary: "MDCB OTLP metrics exporter is failing"
+          description: >-
+            MDCB reports its last metric exports failed. Metrics may be delayed or missing; check
+            the Collector endpoint and credentials.
+          dashboard: /grafana/d/tyk-mdcb
+
+      - alert: TykMDCBLicenseExpiringSoon
+        expr: max by (control_plane_id) (tyk_mdcb_license_expiry_timestamp > 0) - time() < 30 * 86400
+        labels:
+          severity: warning
+          tyk_component: mdcb
+        annotations:
+          summary: "MDCB licence expires in {{ $value | humanizeDuration }}"
+          description: Renew the MDCB licence before it expires.
+          dashboard: /grafana/d/tyk-mdcb
+
+      - alert: TykMDCBLicenseExpiryImminent
+        expr: max by (control_plane_id) (tyk_mdcb_license_expiry_timestamp > 0) - time() < 7 * 86400
+        labels:
+          severity: critical
+          tyk_component: mdcb
+        annotations:
+          summary: "MDCB licence expires in {{ $value | humanizeDuration }}"
+          description: The MDCB licence expires within 7 days (or has already expired).
+          dashboard: /grafana/d/tyk-mdcb
+
+      - alert: TykMDCBCertificateExpiringSoon
+        expr: min by (control_plane_id, cert_type) (tyk_mdcb_cert_expiry_timestamp) - time() < 14 * 86400
+        labels:
+          severity: warning
+          tyk_component: mdcb
+        annotations:
+          summary: "MDCB {{ $labels.cert_type }} certificate expires in {{ $value | humanizeDuration }}"
+          description: >-
+            An expired MDCB certificate disconnects every data plane gateway at once (rpc_tls) or
+            breaks its HTTP endpoints (http_tls).
+          dashboard: /grafana/d/tyk-mdcb
+
+  # ---------------------------------------------------------------------------
+  # Tyk Developer Portal
+  # ---------------------------------------------------------------------------
+  - name: tyk-portal
+    rules:
+
+      - alert: TykPortalDependencyUnhealthy
+        expr: min by (control_plane_id, service_instance_id, component, store) (tyk_portal_health) == 0
+        for: 2m
+        labels:
+          severity: critical
+          tyk_component: portal
+        annotations:
+          summary: "Developer Portal {{ $labels.component }} ({{ $labels.store }}) is unhealthy"
+          description: >-
+            The Developer Portal health probe for {{ $labels.component }} has been failing for
+            2 minutes. The public developer storefront is likely broken.
+          dashboard: /grafana/d/tyk-portal
+
+      # 1800s = 3 x PORTAL_REFRESHINTERVAL (10 minutes in this demo). Adjust if
+      # your Portal syncs on a different interval.
+      - alert: TykPortalProviderSyncStale
+        expr: time() - max by (control_plane_id, provider_id) (tyk_portal_provider_sync_last_success_timestamp_seconds) > 1800
+        for: 1m
+        labels:
+          severity: critical
+          tyk_component: portal
+        annotations:
+          summary: "Portal provider {{ $labels.provider_id }} has not synced for {{ $value | humanizeDuration }}"
+          description: >-
+            The Developer Portal has not completed a successful sync with provider
+            {{ $labels.provider_id }} for more than 3 refresh intervals. Developers see a stale
+            catalogue and credential provisioning may fail.
+          dashboard: /grafana/d/tyk-portal
+
+      - alert: TykPortalProviderUnreachable
+        expr: max by (control_plane_id, provider_id) (tyk_portal_provider_reachable) == 0
+        for: 1m
+        labels:
+          severity: critical
+          tyk_component: portal
+        annotations:
+          summary: "Portal cannot reach provider {{ $labels.provider_id }}"
+          description: >-
+            The Dashboard behind provider {{ $labels.provider_id }} did not answer the last
+            sync. Check Dashboard health and the provider's credentials.
+          dashboard: /grafana/d/tyk-portal
+
+      - alert: TykPortalProviderSyncFailing
+        expr: sum by (control_plane_id, provider_id, error_type) (increase(tyk_portal_provider_sync_failures_total[30m])) > 0
+        labels:
+          severity: warning
+          tyk_component: portal
+        annotations:
+          summary: "Portal sync with provider {{ $labels.provider_id }} is failing ({{ $labels.error_type }})"
+          description: >-
+            auth means the provider's Dashboard API credentials were rejected; network and
+            timeout point to connectivity; dashboard_error means the Dashboard answered with an
+            error.
+          dashboard: /grafana/d/tyk-portal
+
+      - alert: TykPortalProviderSyncSlow
+        expr: |-
+          histogram_quantile(0.95, sum by (le, control_plane_id, provider_id) (rate(tyk_portal_provider_sync_duration_seconds_bucket[1h])))
+          > 60
+        for: 30m
+        labels:
+          severity: warning
+          tyk_component: portal
+        annotations:
+          summary: "Portal sync with provider {{ $labels.provider_id }} takes {{ $value | humanizeDuration }} (p95)"
+          description: >-
+            Provider syncs are slowing down, usually because the Dashboard is under load or the
+            catalogue has grown. Slow syncs precede stale-sync incidents.
+          dashboard: /grafana/d/tyk-portal

@@ -24,6 +24,13 @@ services:
       # The embedded MCP Inspector (v1.19+) proxies through the Portal, whose SSRF guard
       # rejects private targets by default; in Docker the Gateway is always one.
       - PORTAL_MCP_INSPECTOR_BLOCKPRIVATEFETCH=false
+      # OTLP metrics: enabled by the opentelemetry-demo deployment's demo.env. The Portal has
+      # no control_plane_id setting, so it is passed as an OTel resource attribute instead.
+      - PORTAL_OPENTELEMETRY_METRICS_ENABLED=${PORTAL_OPENTELEMETRY_METRICS_ENABLED:-false}
+      - PORTAL_OPENTELEMETRY_METRICS_ENDPOINT=${CONTROL_PLANE_METRICS_ENDPOINT:-otel-collector:4317}
+      - PORTAL_OPENTELEMETRY_METRICS_EXPORTINTERVAL=${CONTROL_PLANE_METRICS_EXPORTINTERVAL:-5}
+      - PORTAL_OPENTELEMETRY_METRICS_DEPLOYMENTENVIRONMENT=${CONTROL_PLANE_ENVIRONMENT:-demo}
+      - OTEL_RESOURCE_ATTRIBUTES=control_plane_id=${CONTROL_PLANE_ID:-unknown}
     env_file:
       - .env
     ports:

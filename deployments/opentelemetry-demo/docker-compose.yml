@@ -925,6 +925,7 @@ services:
     volumes:
       - ./deployments/opentelemetry-demo/src/prometheus/prometheus-config.yaml:/etc/prometheus/prometheus-config.yaml
       - ./deployments/opentelemetry-demo/src/prometheus/slos.rules.yml:/etc/prometheus/slos.rules.yml
+      - ./deployments/opentelemetry-demo/src/prometheus/tyk-control-plane.rules.yml:/etc/prometheus/tyk-control-plane.rules.yml
     deploy:
       resources:
         limits:
@@ -1018,6 +1019,18 @@ services:
         max-size: "10m"
         max-file: "3"
         tag: "tyk-gateway"
+
+# Extend tyk-dashboard with OTLP metrics export (control-plane dashboards and alerts).
+# MDCB and the Developer Portal are configured in their own deployments, from the same
+# demo.env variables, since those services only exist when their deployment is bootstrapped.
+  tyk-dashboard:
+    environment:
+      - TYK_DB_CONTROLPLANEID=${CONTROL_PLANE_ID:-}
+      - TYK_DB_OPENTELEMETRY_METRICS_ENABLED=${TYK_DB_OPENTELEMETRY_METRICS_ENABLED:-false}
+      - TYK_DB_OPENTELEMETRY_METRICS_ENDPOINT=${CONTROL_PLANE_METRICS_ENDPOINT:-otel-collector:4317}
+      - TYK_DB_OPENTELEMETRY_METRICS_EXPORTINTERVAL=${CONTROL_PLANE_METRICS_EXPORTINTERVAL:-5}
+      - TYK_DB_OPENTELEMETRY_METRICS_DEPLOYMENTENVIRONMENT=${CONTROL_PLANE_ENVIRONMENT:-demo}
+      - TYK_DB_OPENTELEMETRY_METRICS_OBJECTSMETRICS_COLLECTIONINTERVAL=${TYK_DB_OPENTELEMETRY_METRICS_OBJECTSMETRICS_COLLECTIONINTERVAL:-60}
 
 volumes:
   tempo-data:
